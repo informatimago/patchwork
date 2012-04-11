@@ -1,0 +1,6 @@
+;;
+;;csound loader
+;;
+
+(load-again "cleni:cleni")
+
