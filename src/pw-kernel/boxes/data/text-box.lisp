@@ -7,27 +7,22 @@
 ;;;;
 ;;;;=========================================================
 
+(pw:enable-patchwork-readtable)
+
 ;;=======================================
 ;;A text box for PW Windows
 ;;=======================================
 
 (defpackage "C-PW-TEXT-INPUT"
-  (:use "COMMON-LISP" "CCL")
-  (:import-from "PATCH-WORK" "C-TTYBOX")
-  (:export "C-PW-TEXT-INPUT")
-  )
-
+  (:use "COMMON-LISP" "PATCH-WORK")
+  (:export "C-PW-TEXT-INPUT"))
 (in-package "C-PW-TEXT-INPUT")
 
 (defclass C-pw-text-input (C-ttybox) ())
 
 (defpackage "C-PW-TEXT-BOX"
-  (:use "COMMON-LISP" "CCL")
-  (:import-from "PATCH-WORK" "C-PW-RESIZE-X" "H" "PW-CONTROLS" "OUT-PUT" "W"
-                "DRAW-FUNCTION-NAME" "RESIZE-PATCH-BOX" "C-PW-FUNCTIONAL")
-  (:export "C-PW-TEXT-BOX")
-  )
-
+  (:use "COMMON-LISP" "UI"  "PATCH-WORK")
+  (:export "C-PW-TEXT-BOX"))
 (in-package "C-PW-TEXT-BOX")
 
 (defclass C-pw-text-box (C-pw-resize-x) ())

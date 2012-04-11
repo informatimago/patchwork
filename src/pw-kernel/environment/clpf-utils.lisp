@@ -1,6 +1,6 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 ;; =============================================================================-======
-;; [jack] 910821               CLPF-Utils.Lisp
+;; [jack] 910821               CLPF-UTILs.Lisp
 ;; =============================================================================-======
 
 ;;;;=========================================================
@@ -11,19 +11,14 @@
 ;;;;
 ;;;;=========================================================
 
-(eval-when (eval compile load)
-  (load-once "CLPF:LeLisp-Macros"))
-
-(defpackage "CLPF-Util"
-  (:use "COMMON-LISP")
-  (:import-from "MODULE" "ADJOIN-NEW-LAST")
+(defpackage "CLPF-UTIL"
+  (:use "COMMON-LISP" "LELISP-MACROS")
   (:export
-   "ADJOIN-NEW-LAST"
    "SYNONYM" "VECTOR-TO-LIST" "COMPILE-FILE?"
    "FILE-COMPARE…" "FILE-COMPARE" "READ-LISTS-FROM"
    "PREFIX-EXPR" "PREFIX-HELP" "*COMPILE-NUM-LAMBDA*" "MAKE-NUM-FUN" "MAKE-NUM-LAMBDA"))
 
-(in-package "CLPF-Util")
+(in-package "CLPF-UTIL")
 
 ;; =============================================================================-======
 
@@ -66,11 +61,11 @@
 
 (defun file-compare… ()
   (let*
-    ((file1 (CCL:choose-file-dialog :button-string "Read 1st"))
-     (file2 (CCL:choose-file-dialog :button-string "Read 2nd"))
+    ((file1 (ui:choose-file-dialog :button-string "Read 1st"))
+     (file2 (ui:choose-file-dialog :button-string "Read 2nd"))
      (diffname (format () "~A/~A" (pathname-name file1) (pathname-name file2)))
      (outfile
-      (CCL:choose-new-file-dialog
+      (ui:choose-new-file-dialog
        :directory
        (merge-pathnames (make-pathname  :name diffname :type "diff") file2)
        :prompt "Save difference as:"
@@ -178,21 +173,21 @@ and the associativity."
   (unless (listp dop) (setq dop (list dop)))
   (unless (listp iop) (setq iop (list iop)))
   (setq me
-     (make-level
-       :dop dop
-       :iop iop
-       :ops (setq ops (remove-duplicates (append dop iop (mapcar #'car l-op.tr))))
-       :l-op.tr l-op.tr
-       :associative? associative?))
+        (make-level
+         :dop dop
+         :iop iop
+         :ops (setq ops (remove-duplicates (append dop iop (mapcar #'car l-op.tr))))
+         :l-op.tr l-op.tr
+         :associative? associative?))
   (setf (level-tr-default me) (level-translate me (car (level-dop me)))
         (level-tr-inverse me) (level-translate me (car (level-iop me))))
-  (mapc
-   #'(lambda (op)
-       (check-type op symbol)
-       (unless (eq (symbol-package op) #.(find-package "KEYWORD"))
-         (import op "COMMON-LISP")
-         (export op "COMMON-LISP")))
-   ops)
+  ;; (mapc
+  ;;  #'(lambda (op)
+  ;;      (check-type op symbol)
+  ;;      (unless (eq (symbol-package op) (load-time-value (find-package "KEYWORD")))
+  ;;        (import op "COMMON-LISP")
+  ;;        (export op "COMMON-LISP")))
+  ;;  ops)
   me)
 
 (defun level-has? (me op) (memq op (level-ops me)))
@@ -242,14 +237,9 @@ Help on available operations can be obtained with (prefix-help)."
   (cond
    ((not (consp expr)) expr)
    ((and (symbolp (first expr)) (fboundp (first expr)))
-    `(,(first expr) ,.(mapcar #'prefix-expr (rest expr))))
+    `(,(first expr) ,@(mapcar #'prefix-expr (rest expr))))
    (t (prefix-iexpr (test-syntax expr) *levels*))))
 
-(set-dispatch-macro-character
- #\# #\i
- #'(lambda (stream char count)
-     (declare (ignore char count))
-     (prefix-expr (read stream t nil t)))) ; maybe (CLtLII p548)
 
 ;; ==== internals ====
 
@@ -285,12 +275,12 @@ Help on available operations can be obtained with (prefix-help)."
       result))
    ;; associative and only inverse (- /)
    ((every #'(lambda (op) (level-inverse? level op)) ops)
-    `(,(level-tr-inverse level) ,.exprs))
+    `(,(level-tr-inverse level) ,@exprs))
    ;; associative operator (+ - * /): skip default operators (+ *)
    ;; could use commutativity too...
    (t `(,(level-tr-default level)
         ,(nextl exprs)
-        ,.(mapcar
+        ,@(mapcar
            #'(lambda (op expr)
                (if (level-default? level op) expr
                    (list (level-translate level op) expr)))

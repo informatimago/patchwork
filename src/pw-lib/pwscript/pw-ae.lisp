@@ -1,24 +1,24 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
-;*********************************************
-;*                                           *
-;* AppleEvents <-> Clos Object layer  V 1.02 *
-;*                                           *
-;*     By Philippe  Piernot                  *
-;*        (piernot@ksl.stanford.edu)         *
-;*                                           *
-;* Copyright 1993 by Philippe Piernot.       *
-;* All Rights Reserved.                      *
-;*                                           *
-;* Permission is given to modify and         *
-;* distribute this source code provided that *
-;* the name of the author and this copyright *
-;* notice appear at the top.                 *
-;*                                           *
-;*********************************************
+;;*********************************************
+;;*                                           *
+;;* AppleEvents <-> Clos Object layer  V 1.02 *
+;;*                                           *
+;;*     By Philippe  Piernot                  *
+;;*        (piernot@ksl.stanford.edu)         *
+;;*                                           *
+;;* Copyright 1993 by Philippe Piernot.       *
+;;* All Rights Reserved.                      *
+;;*                                           *
+;;* Permission is given to modify and         *
+;;* distribute this source code provided that *
+;;* the name of the author and this copyright *
+;;* notice appear at the top.                 *
+;;*                                           *
+;;*********************************************
 
 
 (in-package :cl-user)
-;(require :appleevent-toolkit)
+;;(require :appleevent-toolkit)
 (load "PW:PW-lib;PWScript;appleevent-toolkit" :if-does-not-exist nil)
 
 (defconstant $kAECoreSuite             :|core|)
@@ -69,22 +69,22 @@
 (setf (getHash :|targ| *AEToDesc*) 'AEAddressDesc)
 
 
-;*******************************************************************
-;*                                                                 *
-;* AEDesc Class                                                    * 
-;*                                                                 *
-;*   nullAEDesc         ()                                         *
-;*   fromClosObject     ((self Symbol) &optional object type size) *
-;*   asClosObject       ((self AEDesc))                            *
-;*   dispose            ((self AEDesc))                            *
-;*   getDescriptorType  ((self AEDesc))                            *
-;*   getDataHandle      ((self AEDesc))                            *
-;*   duplicate          ((self AEDesc))                            *
-;*   coerceTo           ((self AEDesc) type)                       *
-;*   putInAE            ((self AEDesc) dataPtr)                    *
-;*   getAEType          ((self AEDesc))                            *
-;*                                                                 *
-;*******************************************************************
+;;*******************************************************************
+;;*                                                                 *
+;;* AEDesc Class                                                    * 
+;;*                                                                 *
+;;*   nullAEDesc         ()                                         *
+;;*   fromClosObject     ((self Symbol) &optional object type size) *
+;;*   asClosObject       ((self AEDesc))                            *
+;;*   dispose            ((self AEDesc))                            *
+;;*   getDescriptorType  ((self AEDesc))                            *
+;;*   getDataHandle      ((self AEDesc))                            *
+;;*   duplicate          ((self AEDesc))                            *
+;;*   coerceTo           ((self AEDesc) type)                       *
+;;*   putInAE            ((self AEDesc) dataPtr)                    *
+;;*   getAEType          ((self AEDesc))                            *
+;;*                                                                 *
+;;*******************************************************************
 
 
 (defclass AEDesc (Standard-Object)
@@ -169,13 +169,13 @@
   :|****|)
 
 
-;*************************************************************
-;*                                                           *
-;* AEAddressDesc Class                                       *
-;*                                                           *
-;*   fromPPCBrowser     ((self AEAddressDesc) prompt title)  *
-;*                                                           *
-;*************************************************************
+;;*************************************************************
+;;*                                                           *
+;;* AEAddressDesc Class                                       *
+;;*                                                           *
+;;*   fromPPCBrowser     ((self AEAddressDesc) prompt title)  *
+;;*                                                           *
+;;*************************************************************
 
 
 (defclass AEAddressDesc (AEDesc)
@@ -191,7 +191,7 @@
     (setq descRecPtr (make-Record :AEDesc))
     (case (class-Name (class-Of object))
       (Cons    (apply 'create-Psn-Target    descRecPtr object))
-      (Keyword (ccl::create-Signature-Target     descRecPtr object))
+      (Keyword (ui::create-Signature-Target     descRecPtr object))
       (String  (create-Named-Process-Target descRecPtr object))
       (Null    (create-Self-Target          descRecPtr))))
   (setDescRecPtr descRecPtr self))
@@ -209,20 +209,20 @@
                   descRecPtr)))
 
 
-;*****************************************************************
-;*                                                               *
-;* AEDescList Class                                              *
-;*                                                               *
-;*   getSize            ((self AEDescList))                      *
-;*   deleteNthItem      ((self AEDescList) index)                *
-;*   setNthItem         ((self AEDescList) index item)           *
-;*   getNthItem         ((self AEDescList) index &optional type) *
-;*   setNthDesc         ((self AEDescList) index desc)           *
-;*   getNthDesc         ((self AEDescList) index &optional type) *
-;*   getAESizeOfNthDesc ((self AEDescList) index)                *
-;*   getAEType          ((self AEDescList))                      *
-;*                                                               *
-;*****************************************************************
+;;*****************************************************************
+;;*                                                               *
+;;* AEDescList Class                                              *
+;;*                                                               *
+;;*   getSize            ((self AEDescList))                      *
+;;*   deleteNthItem      ((self AEDescList) index)                *
+;;*   setNthItem         ((self AEDescList) index item)           *
+;;*   getNthItem         ((self AEDescList) index &optional type) *
+;;*   setNthDesc         ((self AEDescList) index desc)           *
+;;*   getNthDesc         ((self AEDescList) index &optional type) *
+;;*   getAESizeOfNthDesc ((self AEDescList) index)                *
+;;*   getAEType          ((self AEDescList))                      *
+;;*                                                               *
+;;*****************************************************************
 
 
 (defclass AEDescList (AEDesc)
@@ -244,11 +244,13 @@
   (setDescRecPtr descRecPtr self))
 
 (defmethod getSize ((self AEDescList))
-  (rlet ((result :Signed-Long))           
-    (#_AECountItems
-     (getDescRecPtr self)
-     result)
-    (%get-Signed-Long result)))
+  (warn "~S ~S is not implemented yet" 'getSize '((self AEDescList)))
+  ;; (rlet ((result :Signed-Long))           
+  ;;   (#_AECountItems
+  ;;    (getDescRecPtr self)
+  ;;    result)
+  ;;   (%get-Signed-Long result))
+  )
 
 (defmethod deleteNthItem ((self AEDescList) index)
   (#_AEDeleteItem
@@ -274,50 +276,54 @@
    (getDescRecPtr desc)))
 
 (defmethod getNthDesc ((self AEDescList) index &optional (type :|****|))
-  (let ((result (make-Record :AEDesc))
-        (descClass nil))
-    (rlet ((keyword :OSType))
-      (#_AEGetNthDesc
-       (getDescRecPtr self)
-       index
-       type
-       keyword
-       result)
-      (setq descClass (getHash (rref result :AEDesc.descriptorType) *AEToDesc*))
-      (unless descClass
-        (setq descClass 'AEDesc))
-      (values
-       (make-Instance descClass :descRecPtr result)
-       (%get-OSType keyword)))))
+  (warn "~S ~S is not implemented yet" 'getNthDesc '((self AEDescList) index &optional (type :|****|)))
+  ;; (let ((result (make-Record :AEDesc))
+  ;;       (descClass nil))
+  ;;   (rlet ((keyword :OSType))
+  ;;     (#_AEGetNthDesc
+  ;;      (getDescRecPtr self)
+  ;;      index
+  ;;      type
+  ;;      keyword
+  ;;      result)
+  ;;     (setq descClass (getHash (rref result :AEDesc.descriptorType) *AEToDesc*))
+  ;;     (unless descClass
+  ;;       (setq descClass 'AEDesc))
+  ;;     (values
+  ;;      (make-Instance descClass :descRecPtr result)
+  ;;      (%get-OSType keyword))))
+  )
 
 (defmethod getAESizeOfNthDesc ((self AEDescList) index)
-  (rlet ((size :Signed-Long)
-         (type :OSType))
-    (#_AESizeOfNthItem 
-     (getDescRecPtr self) 
-     index 
-     type
-     size)
-    (values (%get-Signed-Long size) (%get-OSType type))))
+  (warn "~S ~S is not implemented yet" 'getAESizeOfNthDesc '((self AEDescList) index))
+  ;; (rlet ((size :Signed-Long)
+  ;;        (type :OSType))
+  ;;   (#_AESizeOfNthItem 
+  ;;    (getDescRecPtr self) 
+  ;;    index 
+  ;;    type
+  ;;    size)
+  ;;   (values (%get-Signed-Long size) (%get-OSType type)))
+  )
 
 (defmethod getAEType ((self AEDescList))
   (declare (ignore self))
   :|list|)
 
 
-;*****************************************************************
-;*                                                               *
-;* AERecord Class                                                *
-;*                                                               *
-;*   deleteKeyItem      ((self AERecord) keyword)                *
-;*   setKeyItem         ((self AERecord) keyword item)           *
-;*   getKeyItem         ((self AERecord) keyword &optional type) *
-;*   setKeyDesc         ((self AERecord) keyword desc)           *
-;*   getKeyDesc         ((self AERecord) keyword &optional type) *
-;*   getAESizeOfKeyDesc ((self AERecord) keyword)                *
-;*   getAEType          ((self AERecord))                        *
-;*                                                               *
-;*****************************************************************
+;;*****************************************************************
+;;*                                                               *
+;;* AERecord Class                                                *
+;;*                                                               *
+;;*   deleteKeyItem      ((self AERecord) keyword)                *
+;;*   setKeyItem         ((self AERecord) keyword item)           *
+;;*   getKeyItem         ((self AERecord) keyword &optional type) *
+;;*   setKeyDesc         ((self AERecord) keyword desc)           *
+;;*   getKeyDesc         ((self AERecord) keyword &optional type) *
+;;*   getAESizeOfKeyDesc ((self AERecord) keyword)                *
+;;*   getAEType          ((self AERecord))                        *
+;;*                                                               *
+;;*****************************************************************
 
 
 (defclass AERecord (AEDescList)
@@ -376,38 +382,40 @@
     (make-Instance descClass :descRecPtr result)))
 
 (defmethod getAESizeOfKeyDesc ((self AERecord) keyword)
-  (rlet ((size :Signed-Long)
-         (type :OSType))
-    (#_AESizeOfNthItem 
-     (getDescRecPtr self) 
-     keyword 
-     type
-     size)
-    (values (%get-Signed-Long size) (%get-OSType type))))
+  (warn "~S ~S is not implemented yet" 'getAESizeOfKeyDesc '((self AERecord) keyword))
+  ;; (rlet ((size :Signed-Long)
+  ;;        (type :OSType))
+  ;;   (#_AESizeOfNthItem 
+  ;;    (getDescRecPtr self) 
+  ;;    keyword 
+  ;;    type
+  ;;    size)
+  ;;   (values (%get-Signed-Long size) (%get-OSType type)))
+  )
 
 (defmethod getAEType ((self AERecord))
   (declare (ignore self))
   :|reco|)
 
 
-;*********************************************************************
-;*                                                                   *
-;* AppleEvent Class                                                  *
-;*                                                                   *
-;*   deleteParam          ((self AppleEvent) keyword)                *
-;*   setParam             ((self AppleEvent) keyword item)           *
-;*   getParam             ((self AppleEvent) keyword &optional type) *
-;*   setParamDesc         ((self AppleEvent) keyword desc)           *
-;*   getParamDesc         ((self AppleEvent) keyword &optional type) *
-;*   getAESizeOfParam     ((self AppleEvent) keyword)                *
-;*   setAttribute         ((self AppleEvent) keyword item)           *
-;*   getAttribute         ((self AppleEvent) keyword &optional type) *
-;*   setAttributeDesc     ((self AppleEvent) keyword desc)           *
-;*   getAttributeDesc     ((self AppleEvent) keyword &optional type) *
-;*   getAESizeOfAttribute ((self AppleEvent) keyword)                *
-;*   getAEType            ((self AppleEvent))                        *
-;*                                                                   *
-;*********************************************************************
+;;*********************************************************************
+;;*                                                                   *
+;;* AppleEvent Class                                                  *
+;;*                                                                   *
+;;*   deleteParam          ((self AppleEvent) keyword)                *
+;;*   setParam             ((self AppleEvent) keyword item)           *
+;;*   getParam             ((self AppleEvent) keyword &optional type) *
+;;*   setParamDesc         ((self AppleEvent) keyword desc)           *
+;;*   getParamDesc         ((self AppleEvent) keyword &optional type) *
+;;*   getAESizeOfParam     ((self AppleEvent) keyword)                *
+;;*   setAttribute         ((self AppleEvent) keyword item)           *
+;;*   getAttribute         ((self AppleEvent) keyword &optional type) *
+;;*   setAttributeDesc     ((self AppleEvent) keyword desc)           *
+;;*   getAttributeDesc     ((self AppleEvent) keyword &optional type) *
+;;*   getAESizeOfAttribute ((self AppleEvent) keyword)                *
+;;*   getAEType            ((self AppleEvent))                        *
+;;*                                                                   *
+;;*********************************************************************
 
 
 (defclass AppleEvent (AERecord)
@@ -466,14 +474,16 @@
     (make-Instance descClass :descRecPtr result)))
 
 (defmethod getAESizeOfParam ((self AppleEvent) keyword)
-  (rlet ((size :Signed-Long)
-         (type :OSType))
-    (#_AESizeOfParam 
-     (getDescRecPtr self) 
-     keyword 
-     type
-     size)
-    (values (%get-Signed-Long size) (%get-OSType type))))
+  (warn "~S ~S is not implemented yet" 'getAESizeOfParam '((self AppleEvent) keyword))
+  ;; (rlet ((size :Signed-Long)
+  ;;        (type :OSType))
+  ;;   (#_AESizeOfParam 
+  ;;    (getDescRecPtr self) 
+  ;;    keyword 
+  ;;    type
+  ;;    size)
+  ;;   (values (%get-Signed-Long size) (%get-OSType type)))
+  )
 
 (defmethod setAttribute ((self AppleEvent) keyword item)
   (let ((desc (asAEDesc item)))
@@ -506,14 +516,16 @@
     (make-Instance descClass :descRecPtr result)))
 
 (defmethod getAESizeOfAttribute ((self AppleEvent) keyword)
-  (rlet ((size :Signed-Long)
-         (type :OSType))
-    (#_AESizeOfAttribute 
-     (getDescRecPtr self) 
-     keyword 
-     type
-     size)
-    (values (%get-Signed-Long size) (%get-OSType type))))
+  (warn "~S ~S is not implemented yet" 'getAESizeOfAttribute '((self AppleEvent) keyword))
+  ;; (rlet ((size :Signed-Long)
+  ;;        (type :OSType))
+  ;;   (#_AESizeOfAttribute 
+  ;;    (getDescRecPtr self) 
+  ;;    keyword 
+  ;;    type
+  ;;    size)
+  ;;   (values (%get-Signed-Long size) (%get-OSType type)))
+  )
 
 (defmethod getAEType ((self AppleEvent))
   (declare (ignore self))
@@ -546,59 +558,59 @@
     ))
 
 
-;**************************
-;*                        *
-;* OffsetDescriptor Class *
-;*                        *
-;**************************
+;;**************************
+;;*                        *
+;;* OffsetDescriptor Class *
+;;*                        *
+;;**************************
 
 
 (defclass OffsetDescriptor (AERecord)
   ())
 
 
-;******************************
-;*                            *
-;* ComparisonDescriptor Class *
-;*                            *
-;******************************
+;;******************************
+;;*                            *
+;;* ComparisonDescriptor Class *
+;;*                            *
+;;******************************
 
 
 (defclass ComparisonDescriptor (AERecord)
   ())
 
 
-;***************************
-;*                         *
-;* LogicalDescriptor Class *
-;*                         *
-;***************************
+;;***************************
+;;*                         *
+;;* LogicalDescriptor Class *
+;;*                         *
+;;***************************
 
 
 (defclass LogicalDescriptor (AERecord)
   ())
 
 
-;*************************
-;*                       *
-;* RangeDescriptor Class *
-;*                       *
-;*************************
+;;*************************
+;;*                       *
+;;* RangeDescriptor Class *
+;;*                       *
+;;*************************
 
 
 (defclass RangeDescriptor (AERecord)
   ())
 
 
-;********************************************************
-;*                                                      *
-;* ObjectSpecifier Class                                *
-;*                                                      *
-;*   fromAEDesc ((self (eql 'ObjectSpecifier)) desc)    *
-;*   asAEDesc   ((self ObjectSpecifier) &optional type) *
-;*   getAEType  ((self ObjectSpecifier))                *
-;*                                                      *
-;********************************************************
+;;********************************************************
+;;*                                                      *
+;;* ObjectSpecifier Class                                *
+;;*                                                      *
+;;*   fromAEDesc ((self (eql 'ObjectSpecifier)) desc)    *
+;;*   asAEDesc   ((self ObjectSpecifier) &optional type) *
+;;*   getAEType  ((self ObjectSpecifier))                *
+;;*                                                      *
+;;********************************************************
 
 
 (defclass ObjectSpecifier (Standard-Object)
@@ -653,17 +665,17 @@
   :|obj |)
 
 
-;**************************************
-;*                                    *
-;* T Class                            *
-;*                                    *
-;*   fromAEDesc ((self (eql T)) desc) *
-;*   asAEDesc   ((self T))            *
-;*   putInAE    ((self T) dataPtr)    *
-;*   getAEType  ((self T))            *
-;*   getAESize  ((self T))            *
-;*                                    *
-;**************************************
+;;**************************************
+;;*                                    *
+;;* T Class                            *
+;;*                                    *
+;;*   fromAEDesc ((self (eql T)) desc) *
+;;*   asAEDesc   ((self T))            *
+;;*   putInAE    ((self T) dataPtr)    *
+;;*   getAEType  ((self T))            *
+;;*   getAESize  ((self T))            *
+;;*                                    *
+;;**************************************
 
 
 (defmethod fromAEDesc ((self (eql T)) desc)
@@ -690,16 +702,16 @@
   2)
 
 
-;******************************************
-;*                                        *
-;* List Class                             *
-;*                                        *
-;*   fromAEDesc ((self (eql 'List)) desc) *
-;*   asAEDesc   ((self List))             *
-;*   getAEType  ((self List))             *
-;*   getAESize  ((self List))             *
-;*                                        *
-;******************************************
+;;******************************************
+;;*                                        *
+;;* List Class                             *
+;;*                                        *
+;;*   fromAEDesc ((self (eql 'List)) desc) *
+;;*   asAEDesc   ((self List))             *
+;;*   getAEType  ((self List))             *
+;;*   getAESize  ((self List))             *
+;;*                                        *
+;;******************************************
 
 
 (defmethod fromAEDesc ((self (eql 'List)) descriptor)
@@ -725,15 +737,15 @@
   (declare (ignore self)))
 
 
-;************************************************
-;*                                              *
-;* Hash-Table Class                             *
-;*                                              *
-;*   fromAEDesc ((self (eql 'Hash-Table)) desc) *
-;*   getAEType  ((self Hash-Table))             *
-;*   getAESize  ((self Hash-Table))             *
-;*                                              *
-;************************************************
+;;************************************************
+;;*                                              *
+;;* Hash-Table Class                             *
+;;*                                              *
+;;*   fromAEDesc ((self (eql 'Hash-Table)) desc) *
+;;*   getAEType  ((self Hash-Table))             *
+;;*   getAESize  ((self Hash-Table))             *
+;;*                                              *
+;;************************************************
 
 
 (defmethod fromAEDesc ((self (eql 'Hash-Table)) aerecord)
@@ -757,16 +769,16 @@
   :|reco|)
 
 
-;********************************************
-;*                                          *
-;* Fixnum Class                             *
-;*                                          *
-;*   fromAEDesc ((self (eql 'Fixnum)) desc) *
-;*   putInAE    ((self Fixnum) dataPtr)     *
-;*   getAEType  ((self Fixnum))             *
-;*   getAESize  ((self Fixnum))             *
-;*                                          *
-;********************************************
+;;********************************************
+;;*                                          *
+;;* Fixnum Class                             *
+;;*                                          *
+;;*   fromAEDesc ((self (eql 'Fixnum)) desc) *
+;;*   putInAE    ((self Fixnum) dataPtr)     *
+;;*   getAEType  ((self Fixnum))             *
+;;*   getAESize  ((self Fixnum))             *
+;;*                                          *
+;;********************************************
 
 
 (defmethod fromAEDesc ((self (eql 'Fixnum)) desc)
@@ -787,16 +799,16 @@
   2)
 
 
-;********************************************
-;*                                          *
-;* Double-float                             *
-;*                                          *
-;*   fromAEDesc ((self (eql 'double-float)) desc) *
-;*   putInAE    ((self double-float) dataPtr)     *
-;*   getAEType  ((self double-float))             *
-;*   getAESize  ((self double-float))             *
-;*                                          *
-;********************************************
+;;********************************************
+;;*                                          *
+;;* Double-float                             *
+;;*                                          *
+;;*   fromAEDesc ((self (eql 'double-float)) desc) *
+;;*   putInAE    ((self double-float) dataPtr)     *
+;;*   getAEType  ((self double-float))             *
+;;*   getAESize  ((self double-float))             *
+;;*                                          *
+;;********************************************
 
 (DEFUN AS-GET-STRING (data)
   (let* ((size (#_GetHandleSize data))
@@ -827,16 +839,16 @@
   2)
 
 
-;********************************************
-;*                                          *
-;* Bignum Class                             *
-;*                                          *
-;*   fromAEDesc ((self (eql 'Bignum)) desc) *
-;*   putInAE    ((self Bignum) dataPtr)     *
-;*   getAEType  ((self Bignum))             *
-;*   getAESize  ((self Bignum))             *
-;*                                          *
-;********************************************
+;;********************************************
+;;*                                          *
+;;* Bignum Class                             *
+;;*                                          *
+;;*   fromAEDesc ((self (eql 'Bignum)) desc) *
+;;*   putInAE    ((self Bignum) dataPtr)     *
+;;*   getAEType  ((self Bignum))             *
+;;*   getAESize  ((self Bignum))             *
+;;*                                          *
+;;********************************************
 
 
 (defmethod fromAEDesc ((self (eql 'Bignum)) desc)
@@ -855,16 +867,16 @@
   4)
 
 
-;*********************************************
-;*                                           *
-;* Keyword Class                             *
-;*                                           *
-;*   fromAEDesc ((self (eql 'Keyword)) desc) *
-;*   putInAE    ((self Keyword) dataPtr)     *
-;*   getAEType  ((self Keyword))             *
-;*   getAESize  ((self Keyword))             *
-;*                                           *
-;*********************************************
+;;*********************************************
+;;*                                           *
+;;* Keyword Class                             *
+;;*                                           *
+;;*   fromAEDesc ((self (eql 'Keyword)) desc) *
+;;*   putInAE    ((self Keyword) dataPtr)     *
+;;*   getAEType  ((self Keyword))             *
+;;*   getAESize  ((self Keyword))             *
+;;*                                           *
+;;*********************************************
 
 
 (defmethod fromAEDesc ((self (eql 'Keyword)) desc)
@@ -882,22 +894,22 @@
   4)
 
 
-;********************************************
-;*                                          *
-;* String Class                             *
-;*                                          *
-;*   fromAEDesc ((self (eql 'String)) desc) *
-;*   putInAE    ((self String) dataPtr)     *
-;*   getAEType  ((self String))             *
-;*   getAESize  ((self String))             *
-;*                                          *
-;********************************************
+;;********************************************
+;;*                                          *
+;;* String Class                             *
+;;*                                          *
+;;*   fromAEDesc ((self (eql 'String)) desc) *
+;;*   putInAE    ((self String) dataPtr)     *
+;;*   getAEType  ((self String))             *
+;;*   getAESize  ((self String))             *
+;;*                                          *
+;;********************************************
 
 
 (defmethod fromAEDesc ((self (eql 'String)) desc)
   (declare (ignore self))
   (with-dereferenced-handles ((ptr (getDataHandle desc)))
-    (ccl::%str-from-ptr ptr (#_GetHandleSize (getDataHandle desc)))))
+    (ui::%str-from-ptr ptr (#_GetHandleSize (getDataHandle desc)))))
 
 (defmethod putInAE ((self String) dataPtr)
   (%put-CString dataPtr self))
@@ -912,16 +924,16 @@
   (length self))
  
 
-;******************************************
-;*                                        *
-;* Null Class                             *
-;*                                        *
-;*   fromAEDesc ((self (eql 'Null)) desc) *
-;*   putInAE    ((self Null) dataPtr)     *
-;*   getAEType  ((self Null))             *
-;*   getAESize  ((self Null))             *
-;*                                        *
-;******************************************
+;;******************************************
+;;*                                        *
+;;* Null Class                             *
+;;*                                        *
+;;*   fromAEDesc ((self (eql 'Null)) desc) *
+;;*   putInAE    ((self Null) dataPtr)     *
+;;*   getAEType  ((self Null))             *
+;;*   getAESize  ((self Null))             *
+;;*                                        *
+;;******************************************
 
 
 (defmethod fromAEDesc ((self (eql 'Null)) desc)

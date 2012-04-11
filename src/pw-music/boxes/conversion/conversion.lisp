@@ -13,9 +13,6 @@
 
 (in-package "EPW")
 
-(eval-when (eval compile load)
-  (export '(*no-sharp-read-table* *ascii-note-c-scale* *ascii-note-do-scale*)))
-
 ;; =============================================================================-======
 
 (defvar *no-sharp-read-table*)
@@ -24,9 +21,9 @@
 
 ;; ==== Pitch approximation ====
 
-; midics? : a midic or a list of midics
-; approx  : 2=1/2 4=1/4
-; output  : a midic or a list of midics approximated
+;; midics? : a midic or a list of midics
+;; approx  : 2=1/2 4=1/4
+;; output  : a midic or a list of midics approximated
 
 (defun approx-m1 (midic approx &optional (ref-midic 0))
   "Approximates <midic> to the closest. (2=semi-tone 4=quarter-tone).
@@ -52,8 +49,8 @@ semitone resolution, 50 specifies quartertone resolution, and so on.
 "
   (deep-mapcar 'approx-m 'approx-m1 midics? approx ref-midic))
 
-;(defunt approx-m1 ((midic midic) (approx approx)) midic)
-;(defunt approx-m ((midics? midics?) (approx approx)) midics?)
+;;(defunt approx-m1 ((midic midic) (approx approx)) midic)
+;;(defunt approx-m ((midics? midics?) (approx approx)) midics?)
 
 ;; ==== Pitch conversions ====
 
@@ -103,15 +100,15 @@ frequencies and returns corresponding midicent values. The optional approx
 argument lets one limit returned values to a given approximation (see  approx-
 m).  When approx = 1, the optional argument ref-m in midicents specifies the 
 frequency resolution of the approximation. A value of 100 specifies   semitone 
-;resolution, 50 specifies   quartertone ;resolution, and so on."
+;;resolution, 50 specifies   quartertone ;resolution, and so on."
   (deep-mapcar 'f->mc 'f->mc1 freqs? approx ref-midic))
 
-;(defunt f->mc1 ((freq freq)) midic)
-;(defunt f->mc ((freqs? freqs?)) midics?)
+;;(defunt f->mc1 ((freq freq)) midic)
+;;(defunt f->mc ((freqs? freqs?)) midics?)
 
 ;; ---- midic -> symbol ----
 
-(export '(*ascii-note-scales* *ascii-note-C-scale* *ascii-note-do-scale*))
+
 
 (defvar *ascii-note-C-scale*)
 (defvar *ascii-note-do-scale*)
@@ -156,8 +153,8 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
           (car note) (or (car (cassq (cdr note) *ascii-note-alterations*)) "")
           (- oct+2 2) (if (> cents 0) "+" "") (if (zerop cents) "" cents) )))))
 
-; (mc->n1 6000)
-; (mc->n1 6000 *ascii-note-do-scale*)
+;; (mc->n1 6000)
+;; (mc->n1 6000 *ascii-note-do-scale*)
 
 (defun n->mc1 (str &optional (*ascii-note-scale* (car *ascii-note-scales*)))
   "Converts a string representing a symbolic ascii note to a midic."
@@ -202,9 +199,9 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
         (nth index *ascii-intervals*)
         (format () "~A~@D" (nth index *ascii-intervals*) oct)))))
 
-;(defunt int->symb1 ((int fix)) string)
+;;(defunt int->symb1 ((int fix)) string)
 
-; called "itv->ascii" by CR
+;; called "itv->ascii" by CR
 (defunp int->symb ((ints fixs)) list
   "<int->symb> takes an interval expressed in midi-cents, and returns a 
 symbolic interval name.
@@ -255,7 +252,7 @@ interval as its inversion, and then transposes downwards as necessary. Thus, a
 major third down 6m-1, returns -400 in midicents ."
   (deep-mapcar #'symb->int #'symb->int1 ints))
 
-;(defunt mc->n1 ((midic midic)) string)
+;;(defunt mc->n1 ((midic midic)) string)
 
 (defunp mc->n ((midics? midics?)) strings?
   "mc->n takes a midi-cent value <midics> or list of midi-cent values,
@@ -268,7 +265,7 @@ smaller than a quartertone are expressed as the closest  quartertone + or - the
 remaining cent value (i.e., midi-cent 8176 would be expressed as Bb4-24)."
   (deep-mapcar 'mc->n 'mc->n1 midics?))
 
-;(defunt n->mc1 ((str string)) midic)
+;;(defunt n->mc1 ((str string)) midic)
 
 (defunp n->mc ((strs list)) midics?
   "<n->mc> takes a symbolic <strs> note name or list of note names,
@@ -281,13 +278,13 @@ remaining cent value (i.e., midi-cent 8176 would be expressed as Bb4-24)."
 remaining cent value (i.e., mid-cent 8176 would be expressed as Bb4-24)."
   (deep-mapcar 'n->mc 'n->mc1 strs))
 
-; (equal (mc->n1 6940) "A+3-10")
-; (equal (mc->n1 6001) "C3+1")
+;; (equal (mc->n1 6940) "A+3-10")
+;; (equal (mc->n1 6001) "C3+1")
 
-; (n->mc1 "do+3-10")
-; (n->mc1 "a#-3-10")
-; (n->mc1 "C3+1")
-; (n->mc1 "C3")
+;; (n->mc1 "do+3-10")
+;; (n->mc1 "a#-3-10")
+;; (n->mc1 "C3+1")
+;; (n->mc1 "C3")
 
 (defunp cents->coef ((nb-cents midic)) float
   "<cents->coef> takes an interval expressed in midi-cents and returns the ratio 
@@ -295,20 +292,20 @@ between two frequencies separated by that interval; i.e., the value: (freq + <nb
 cents>) / freq."
   (expt 2.0 (/ nb-cents 1200.0)))
 
-; (cents->coef 1200)  => 2
-; (cents->coef  200)  => 1.122462048309373
-; (cents->coef  100)  => 1.059463094359295
-; (cents->coef   50)  => 1.029302236643492
+;; (cents->coef 1200)  => 2
+;; (cents->coef  200)  => 1.122462048309373
+;; (cents->coef  100)  => 1.059463094359295
+;; (cents->coef   50)  => 1.029302236643492
 
 (defunp coef->cents ((coef float)) midic
   "<coef->cents> takes a frequency ratio <coef> f1/f2 and returns the interval, 
 expressed in midi-cents, between f1 and f2."
   (round (log coef) #.(/ (log 2) 1200)))
 
-; (coef->cents 2)                 => 1200
-; (coef->cents 1.122462048309373) =>  200
-; (coef->cents 1.059463094359295) =>  100
-; (coef->cents 1.029302236643492) =>   50
+;; (coef->cents 2)                 => 1200
+;; (coef->cents 1.122462048309373) =>  200
+;; (coef->cents 1.059463094359295) =>  100
+;; (coef->cents 1.029302236643492) =>   50
 
 (defunp nbcents-f ((f-lo freq) (f-hi freq)) midic
   "Returns the interval in cents from <f-lo> to <f-hi>."

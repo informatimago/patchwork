@@ -11,12 +11,12 @@
 ;; Printing PW windows
 ;; 
 
-(in-package :ccl)
+(in-package :pw)
 
 (eval-when (eval load compile)
-  (require 'traps)
-  ;(load-once "ccl:Examples;NotInROM;NotInROM")
-  ;(load-once "ccl:Library;interfaces;SERIAL")
+  ;; (require 'traps)
+  ;(load-once "ui:Examples;NotInROM;NotInROM")
+  ;(load-once "ui:Library;interfaces;SERIAL")
   (defconstant $PrintErr #x944)  
   (defconstant $prJob.bjDocLoop (+ 62 6))
   (defconstant $iPrStatSize 26)
@@ -41,51 +41,56 @@
  (tell (subviews self) 'set-window-hardcopy-wptr wptr))
 
 (defmethod win-print-setUp ((self window))
-  (unwind-protect
-    (with-cursor *arrow-cursor*
-      (#_PrOpen)
-      (prchk $err-printer-load)
-      (#_PrStlDialog :ptr (get-print-record) :boolean))
-    (#_PrClose)))
+  (warn "~S ~S is not implemented yet" 'win-print-setUp '((self window)))
+  ;; (unwind-protect
+  ;;   (with-cursor *arrow-cursor*
+  ;;     (#_PrOpen)
+  ;;     (prchk $err-printer-load)
+  ;;     (#_PrStlDialog :ptr (get-print-record) :boolean))
+  ;;   (#_PrClose))
+  )
   
 (defmethod window-hardcopy ((self pw::C-pw-window) &optional show-fl)
+  (warn "~S ~S is not implemented yet" 'window-hardcopy '((self pw::C-pw-window) &optional show-fl))
+
   show-fl
-  (unwind-protect
-    (with-cursor *arrow-cursor*
-      (#_PrOpen)
-      ;;;(reset-printer-port)
-      (prchk $err-printer-load)
-      (let ((pRec (get-print-record)))
-        (when (#_PrJobDialog :ptr (get-print-record) :boolean)
-          (let ((*hc-page-open-p* nil) (ccl::*inhibit-error* t)) ; err)
-            (declare (special *hc-page-open-p* ccl::*inhibit-error*))
-            (without-interrupts
-             (let* ((window-ptr (wptr self))
-                    (hardcopy-ptr 
-                     (#_PrOpenDoc :ptr (get-print-record) :long 0 :long 0 :ptr)))
-               (unwind-protect
-                 (with-dereferenced-handles ((ppRec PRec))
-                   pprec
-                   (prchk $err-printer-start)
-                   (unwind-protect
-                      (progn
-                        (set-window-hardcopy-wptr self hardcopy-ptr)
-                        (#_PrOpenPage :ptr hardcopy-ptr :long 0)
-                        (with-port hardcopy-ptr
-                          (print-all-subviews self))
-                        (set-window-hardcopy-wptr self window-ptr)
-                        )
-                     (#_PrClosePage :ptr hardcopy-ptr)
-                     ))
-                 (#_PrCloseDoc  :ptr hardcopy-ptr)))
-             (when (print (eq (%hget-byte pRec $prJob.bjDocLoop)
-                              $bSpoolLoop))
-               (prchk)
-               (%stack-block ((StRec $iPrStatSize))
-                 (#_PrPicFile :ptr pRec :long 0 :long 0 :long 0 :ptr StRec))
-               (prchk)))  ;))
-            t))))
-    (#_PrClose)))
+  ;; (unwind-protect
+  ;;   (with-cursor *arrow-cursor*
+  ;;     (#_PrOpen)
+  ;;     ;;;(reset-printer-port)
+  ;;     (prchk $err-printer-load)
+  ;;     (let ((pRec (get-print-record)))
+  ;;       (when (#_PrJobDialog :ptr (get-print-record) :boolean)
+  ;;         (let ((*hc-page-open-p* nil) (ui::*inhibit-error* t)) ; err)
+  ;;           (declare (special *hc-page-open-p* ui::*inhibit-error*))
+  ;;           (without-interrupts
+  ;;            (let* ((window-ptr (wptr self))
+  ;;                   (hardcopy-ptr 
+  ;;                    (#_PrOpenDoc :ptr (get-print-record) :long 0 :long 0 :ptr)))
+  ;;              (unwind-protect
+  ;;                (with-dereferenced-handles ((ppRec PRec))
+  ;;                  pprec
+  ;;                  (prchk $err-printer-start)
+  ;;                  (unwind-protect
+  ;;                     (progn
+  ;;                       (set-window-hardcopy-wptr self hardcopy-ptr)
+  ;;                       (#_PrOpenPage :ptr hardcopy-ptr :long 0)
+  ;;                       (with-port hardcopy-ptr
+  ;;                         (print-all-subviews self))
+  ;;                       (set-window-hardcopy-wptr self window-ptr)
+  ;;                       )
+  ;;                    (#_PrClosePage :ptr hardcopy-ptr)
+  ;;                    ))
+  ;;                (#_PrCloseDoc  :ptr hardcopy-ptr)))
+  ;;            (when (print (eq (%hget-byte pRec $prJob.bjDocLoop)
+  ;;                             $bSpoolLoop))
+  ;;              (prchk)
+  ;;              (%stack-block ((StRec $iPrStatSize))
+  ;;                (#_PrPicFile :ptr pRec :long 0 :long 0 :long 0 :ptr StRec))
+  ;;              (prchk)))  ;))
+  ;;           t))))
+  ;;   (#_PrClose))
+  )
     
 (defmethod print-all-subviews ((self pw::C-pw-window))
   (let ((views (subviews self)))
@@ -96,10 +101,10 @@
 
 #|
                           
-;(window-hardcopy pw::*active-mn-window*)
-;(window-hardcopy pw::*active-bpf-window*)
-;(window-hardcopy  pw::*active-patch-window*)
-;(pw::super-win (view-window (car (subviews (car (subviews pw::*active-mn-window*))))))
-;(win-print-setUp  pw::*active-patch-window*)
+;;(window-hardcopy pw::*active-mn-window*)
+;;(window-hardcopy pw::*active-bpf-window*)
+;;(window-hardcopy  pw::*active-patch-window*)
+;;(pw::super-win (view-window (car (subviews (car (subviews pw::*active-mn-window*))))))
+;;(win-print-setUp  pw::*active-patch-window*)
 
 |#

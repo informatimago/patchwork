@@ -100,7 +100,7 @@ A previous function called ~D will be redefined" new-name new-name)
             (setq in-docs-temp (get-absin-boxes-types-n patches in-boxes))
              (cond
               ((member nil in-docs-temp)
-              (CCL:message-dialog 
+               (ui:message-dialog 
                "WARNING! absin box connected to irreducible types. ALL-type used")
               (mapcar #'(lambda (type-spec) '(nilNum))
                        in-docs-temp))
@@ -174,7 +174,7 @@ A previous function called ~D will be redefined" new-name new-name)
               (list 'if '(zerop (clock (clock-obj *global-calling-object*))) ,code nil))))
 
 ;;best-way to compile C-pw-stop-time is to make it a standard patch (as it should!)
-;(defun stime (val) val)  ; (now it is...)
+;;(defun stime (val) val)  ; (now it is...)
 
 (defvar *global-calling-object*)
 

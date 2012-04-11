@@ -11,8 +11,8 @@
 
 (provide 'resize+extend-patch)
 
-;====================================================================================================
-; resizable PW box in x direction 
+;;====================================================================================================
+;; resizable PW box in x direction 
 (defclass  C-pw-resize-x (C-patch) ())
 
 (defmethod resize-patch? ((self C-pw-resize-x)) t) 
@@ -36,9 +36,9 @@
   (if (and *current-small-inBox* (eq (view-container *current-small-inBox*) self))
     (resize-text-item *current-small-inBox*)))      ;this function is in pw-controls
 
-;=========================================================================================================
-;===================================
-; a PW box that can be extended
+;;=========================================================================================================
+;;===================================
+;; a PW box that can be extended
 
 (defclass C-pw-extend (C-patch)())  
 

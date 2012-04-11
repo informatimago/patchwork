@@ -9,7 +9,7 @@
 
 (in-package :pw)
 
-;=================================
+;;=================================
 
 (defclass C-nargs-input-patch (C-patch) ())
 
@@ -41,7 +41,7 @@
        (setf (nth nargs-input (input-objects self))
             (adjoin ctrl-panel (nth nargs-input (input-objects self))))))))
 
-;       (push ctrl-panel (nth nargs-input (input-objects self)))))))
+;;       (push ctrl-panel (nth nargs-input (input-objects self)))))))
 
 (defmethod connect-nth-control ((self C-nargs-input-patch) nth-ctrl ctrl-panel)
  (let ((nargs-input (give-nargs-place self)))
@@ -54,7 +54,7 @@
   (setf (open-state (nth nth-ctrl (pw-controls self))) ()))
 
 
-;=================================
+;;=================================
 #|
 (new-PW-sub-menu-item *Midi-menu* "nargs-test" 'C-nargs-input-patch  'nargs-test
     '(*fix-float-pw-type* "1st" *fix-float-pw-type* "2nd" ) '())

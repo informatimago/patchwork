@@ -496,7 +496,7 @@
       (if (selected-chords panel)
         (setq chords (append chords (ask-all (selected-chords panel) 'decompile)))))
     (setf (editor-scrap self) 
-          (if chords `(list ,.chords) nil))))
+          (if chords `(list ,@chords) nil))))
      
 (defmethod mn-paste ((self C-MN-panel-Mod)) 
   (save-all-undo self)

@@ -7,13 +7,13 @@
 ;;;;
 ;;;;=========================================================
 
-(in-package :ccl)
+(in-package :pw)
 
-;======================================
-; from library:scrollers.lisp to allow smaller scrollbars
+;;======================================
+;; from library:scrollers.lisp to allow smaller scrollbars
 (defvar *default-scroll-size* 8) ; normally 16
 
-(defmethod initialize-instance ((self ccl::scroller-mixin) &rest initargs &key
+(defmethod initialize-instance ((self ui::scroller-mixin) &rest initargs &key
                                 view-container (v-scrollp t) (h-scrollp t)
                                 (draw-scroller-outline t) (bottom-boarder 1)
                                 track-thumb-p

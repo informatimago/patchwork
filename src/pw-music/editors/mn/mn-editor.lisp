@@ -8,23 +8,23 @@
 ;;;;=========================================================
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-(provide 'MN-editor)
-;=================================================================================================
-;=================================================================================================
-; delta-y -> staffin alareuna
+;;=================================================================================================
+;;=================================================================================================
+;; delta-y -> staffin alareuna
 
-(defclass C-clef (simple-view)
+(defclass C-clef (ui:simple-view)
    ((clef :initform #\& :initarg :clef :accessor clef)
     (delta-y :initform 0 :initarg :delta-y :accessor delta-y)))
 
 (defmethod draw-clef ((self C-clef) x y)
   (draw-char (+ 5 x) (- y (delta-y self)) (clef self)))
 
-;==============================
+;;==============================
 
 ;;; GA 17/5/94
-;(defvar *staff-lines* (make-string 255 :initial-element #\= ))
+;;(defvar *staff-lines* (make-string 255 :initial-element #\= ))
 (defvar *staff-lines* (make-string 65 :initial-element #\= ))
 
 (defclass C-staff ()
@@ -35,14 +35,14 @@
   (draw-clef (clef-obj self) x (- C5 (delta-y self)))
   (draw-string x (- C5 (delta-y self)) *staff-lines*))
 
-;__________________________
+;;__________________________
 
 (defclass C-staff-empty (C-staff) ())
 
 (defmethod draw-staff ((self C-staff-empty) x C5) (declare (ignore x C5)))
 
-;__________________________
-; global staffs and clefs
+;;__________________________
+;; global staffs and clefs
 
 (defvar *mn-staff-line-width* 4)
 
@@ -77,14 +77,14 @@
     (4 (values -20 -20)) (5 (values 4 -48)) (6 (values 32 -48))
     (7 (values 0 0))))
 
-;=====================================================
-;=====================================================
-;editor
+;;=====================================================
+;;=====================================================
+;;editor
 (defvar *note-head-cursor* 110)
 (defvar *MN-editor-scrap* ())
 (defvar *CURRENT-MN-EDITOR* ())
 
-(defclass C-mus-not-view (ccl::scroller) 
+(defclass C-mus-not-view (ui:scroller) 
   ((editor-objects :initform nil :initarg :editor-objects :accessor editor-objects) 
    (active-editor :initform nil :accessor active-editor) 
    (external-controls :initarg nil :accessor external-controls)
@@ -93,6 +93,8 @@
    (MN-zoom-scaler :initform 1.0 :initarg :MN-zoom-scaler :accessor MN-zoom-scaler)
    (local-scale :initform nil :accessor local-scale)
    (local-approx :initform nil :accessor local-approx)))
+
+(defmethod editor-objects (self) '())
 
 (defmethod decompile ((self C-mus-not-view))
    (let ((editor-objects (ask-all (editor-objects self) 'decompile)))
@@ -170,7 +172,7 @@
   (set-playing-option (if (eq (car (last mark-list)) :mc) :mc :pb))
   (set-eval-click eval-option))
 
-;(restore-global-options '(nil t nil nil t :mc))
+;;(restore-global-options '(nil t nil nil t :mc))
 
 (defun set-globally-scale (scale)
   (erase-all-scale-marks)
@@ -328,15 +330,15 @@
       ;(update-all-selections panel)
       )))
 
-(defmethod ccl::normal-scroll-bar-limits ((view C-mus-not-view) max-h &optional max-v)
+(defmethod ui::normal-scroll-bar-limits ((view C-mus-not-view) max-h &optional max-v)
   (declare (ignore max-h max-v))
   (values (make-point 0 30000)
           (make-point 0 30000)))
 
-(defmethod ccl::scroll-bar-page-size ((view C-mus-not-view))
+(defmethod ui::scroll-bar-page-size ((view C-mus-not-view))
   (round (point-h (view-size view)) 4))
 
-;==============
+;;==============
 (defmethod pretty-visible-layout ((self C-mus-not-view))
   (tell (editor-objects self) 'pretty-visible-layout)
   (set-view-size (view-window self) (make-point (w self)(+ (h self) 2))))
@@ -345,8 +347,8 @@
   (let ((editors (editor-objects self)))
      (while (and chord-lines editors)
        (setf (chord-line (pop editors)) (pop chord-lines)))))
-;==============
-;events
+;;==============
+;;events
 
 (defmethod view-mouse-moved ((self C-mus-not-view) mouse)
   (setf (active-editor self) (ask (editor-objects self) #'view-contains-point-p+self mouse))
@@ -397,7 +399,7 @@
          (record--ae :|PWst| :|gloo| `((,:|oppl| ,"Multi Channel"))))))
 
 
-;aaa from pw-modifs le 10-9-95
+;;aaa from pw-modifs le 10-9-95
 (defmethod stop-all-staffs ((self C-mus-not-view))
   (declare (special *MN-play-flag*))
   (setf *MN-play-flag* nil)
@@ -439,13 +441,13 @@
            (active-chord (active-editor self)))
     (view-mouse-up (active-editor self))))
  
-;=====================================================
+;;=====================================================
 (defvar  *MN-draw-offset* 40)
 (defvar  *MN-C5* 70)
-;==========================================================================================================
-;==========================================================================================================
+;;==========================================================================================================
+;;==========================================================================================================
 
-(defclass C-music-notation-panel (ccl::scroller) 
+(defclass C-music-notation-panel (ui::scroller) 
   ((chord-line :initform nil :initarg :chord-line :accessor chord-line)
    (visible-chords :initform nil :accessor visible-chords)
    (active-chord :initform nil :accessor active-chord)
@@ -463,9 +465,9 @@
          :track-thumb-p t
          :chord-line ,(decompile (chord-line self))))
 
-;==============
+;;==============
 
-(defmethod ccl::normal-scroll-bar-limits ((view C-music-notation-panel) max-h &optional max-v)
+(defmethod ui::normal-scroll-bar-limits ((view C-music-notation-panel) max-h &optional max-v)
   (declare (ignore max-h max-v))
   (values (make-point -250 250)
           (make-point -250 250)))
@@ -490,8 +492,8 @@
       (update-chord chord))
     (erase+view-draw-contents self)))
 
-;==============
-;draw&print
+;;==============
+;;draw&print
 
 (defmethod print-draw-contents ((self C-music-notation-panel))
   (declare (special *current-MN-editor* *MN-global-ins-y*))
@@ -595,8 +597,8 @@
                 (make-point h-pos (scroll-bar-setting scroll-bar)))
     (view-draw-contents view)
     (update-all-selections view)))
-;==============
-;misc
+;;==============
+;;misc
 (defmethod scaled-mouse-h ((self C-music-notation-panel) mouse-h)
       (/  mouse-h  (MN-zoom-scaler (view-container self))))
 
@@ -623,8 +625,8 @@
     (erase-draw-contents self))
   (view-draw-contents self))
 
-;==============
-;events
+;;==============
+;;events
 
 (defmethod view-mouse-moved ((self C-music-notation-panel) mouse)
   (declare (ignore mouse))
@@ -660,7 +662,7 @@
 
 (defmethod view-mouse-up ((self C-music-notation-panel)) (erase+view-draw-contents self))
 
-;to be used by sub-classes
+;;to be used by sub-classes
 (defmethod draw-single-dur-line-2  ((self C-music-notation-panel) chord note)
   (with-focused-view self
   (draw-single-dur-line chord note
@@ -710,7 +712,7 @@
 
 (defmethod update-all-selections ((self C-music-notation-panel)) )
 
-;===========================================================
+;;===========================================================
 
 (defvar *MN-window-counter* 0)
 
@@ -784,8 +786,8 @@
 
 #|
  
-;=========================================================================================================
-;=========================================================================================================
+;;=========================================================================================================
+;;=========================================================================================================
 (defvar mn-window ())
 (defvar first-scroller ())
 (defvar second-scroller ())
@@ -827,26 +829,26 @@
 
 (setf (editor-objects first-scroller) (list second-scroller third-scroller fourth-scroller))
 
-;(font-codes '("MusNot-j"  18  :srcor))
-;*font-list*
-;(real-font '("MusNot-j"  18  :srcor))
-;(font-info '("MusNot-j"  18  :srcor))
-;(view-font  second-scroller)
-; (set-view-font second-scroller '("monaco"  9  :srcor))
-;(font-codes '("MusNot-j"  18  :srcor))
+;;(font-codes '("MusNot-j"  18  :srcor))
+;;*font-list*
+;;(real-font '("MusNot-j"  18  :srcor))
+;;(font-info '("MusNot-j"  18  :srcor))
+;;(view-font  second-scroller)
+;; (set-view-font second-scroller '("monaco"  9  :srcor))
+;;(font-codes '("MusNot-j"  18  :srcor))
 
-;(set-view-size  first-scroller (make-point 400 380))
-;(set-view-size second-scroller (make-point 390 125))
-;(set-view-size third-scroller (make-point 390 125))
-;(set-view-size fourth-scroller (make-point 390 125))
-;(view-size fourth-scroller)
-;(view-size first-scroller)
-;(point-v (view-position (car (editor-objects first-scroller))))
-;(point-h (view-scroll-position second-scroller))
-;(point-v (view-scroll-position third-scroller))
-;(point-v (view-scroll-position fourth-scroller))
-;=========================================================================================================
-;=========================================================================================================
+;;(set-view-size  first-scroller (make-point 400 380))
+;;(set-view-size second-scroller (make-point 390 125))
+;;(set-view-size third-scroller (make-point 390 125))
+;;(set-view-size fourth-scroller (make-point 390 125))
+;;(view-size fourth-scroller)
+;;(view-size first-scroller)
+;;(point-v (view-position (car (editor-objects first-scroller))))
+;;(point-h (view-scroll-position second-scroller))
+;;(point-v (view-scroll-position third-scroller))
+;;(point-v (view-scroll-position fourth-scroller))
+;;=========================================================================================================
+;;=========================================================================================================
 (setf (chords (chord-line second-scroller)) (list 
   (make-chord-object '(7000 8900 9000) 0)(make-chord-object '(4500 6900 7200) 60)
   (make-chord-object '(3400 7600 9000) 80)(make-chord-object '(4500 5400 6600) 160)
@@ -863,7 +865,8 @@
   (make-chord-object '(3400 7600 9000) 90)(make-chord-object '(4500 5400 6700) 110)
   (make-chord-object '(7000 8900 9000) 128)(make-chord-object '(4500 6900 7200) 170)
   (make-chord-object '(6500 8800 8900) 180)(make-chord-object '(3300 5400 7200) 290)))
-;(decompile fourth-scroller)
+;;(decompile fourth-scroller)
 |#
 
 
+(provide 'MN-editor)

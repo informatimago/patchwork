@@ -15,7 +15,9 @@
 
 (in-package :cl-user)
 
-(ccl::add-to-shared-library-search-path "PlayerSharedPPC")
+#||
+
+(ui::add-to-shared-library-search-path "PlayerSharedPPC")
 
 
 ;; Date structures ond constants
@@ -315,3 +317,4 @@
     (MidiFileSave cstr seq info)))
 
 
+||#

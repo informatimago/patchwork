@@ -10,40 +10,40 @@
 (in-package :pw)
 
 (provide 'chbox-help-window)
-;====================================================================================================
+;;====================================================================================================
 (defclass C-chbox-help-window (C-pw-help-window)())
 
 (defmethod view-key-event-handler ((self C-chbox-help-window) char)
-     (cond 
-        ((eq char  #\Newline)
-           (when *active-MN-window* (window-select *active-MN-window*))
-           (window-hide self)) 
-        ((eq char  #\Enter)
-           (when *active-MN-window* (window-select *active-MN-window*))))) 
+  (case char
+    ((:Newline)
+     (when *active-MN-window* (window-select *active-MN-window*))
+     (window-hide self)) 
+    ((:Enter)
+     (when *active-MN-window* (window-select *active-MN-window*))))) 
 
-;====================================================================================================
+;;====================================================================================================
 
 (defvar *chbox-help-window* ())
 
 
 (defmethod open-application-help-window ((self C-chordbox-Win))
-   (if *chbox-help-window*
-         (unless (wptr  *chbox-help-window*) (make-chbox-help-window))
-         (make-chbox-help-window))
-   (window-select *chbox-help-window*))
+  (if *chbox-help-window*
+      (unless (wptr  *chbox-help-window*) (make-chbox-help-window))
+      (make-chbox-help-window))
+  (window-select *chbox-help-window*))
 
 (defun make-chbox-help-window ()
- (let (scroller)
-  (setq *chbox-help-window*
-    (make-instance 'C-chbox-help-window :window-title "Chordbox help" :GROW-ICON-P t
-         :view-position (make-point 30 25) :view-size (make-point 460 255) :close-box-p nil))
-   (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 460 8) (- 255 16)) 
-        :view-container *chbox-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
-  (add-subviews scroller
-   (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
-    :view-font '("monaco" 9 :srcor)
-    :dialog-item-text 
-"    Chord box editor keyboard shortcuts and clicks:
+  (let (scroller)
+    (setq *chbox-help-window*
+          (make-instance 'C-chbox-help-window :window-title "Chordbox help" :GROW-ICON-P t
+                         :view-position (make-point 30 25) :view-size (make-point 460 255) :close-box-p nil))
+    (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 460 8) (- 255 16)) 
+                                  :view-container *chbox-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
+    (add-subviews scroller
+                  (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
+                                 :view-font '("monaco" 9 :srcor)
+                                 :dialog-item-text 
+                                 "    Chord box editor keyboard shortcuts and clicks:
    general:
     h            open help window
     Return       select MN window,hide chord box editor window

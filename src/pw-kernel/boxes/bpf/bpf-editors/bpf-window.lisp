@@ -8,15 +8,14 @@
 ;;;;=========================================================
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-(provide 'BPF-window)
-
-;====================================================================================================
+;;====================================================================================================
 (defclass C-numbox-continuous-no-double-click (C-numbox-continuous) ())
 
 (defmethod view-double-click-event-handler ((self C-numbox-continuous-no-double-click) where)
   (declare (ignore where)))
-;====================================================================================================
+;;====================================================================================================
 
 (defclass C-BPF-window (C-mouse-window C-application-window) 
   ((bpf-lib-pointer :initform 0 :allocation :class :accessor bpf-lib-pointer)
@@ -80,7 +79,7 @@
   (make-extra-bpf-view-ins-controls self)
   (set-ctrl-positions self))
 
-;================
+;;================
 
 (defmethod add-bpf-editor-radio-cluster ((self C-BPF-window) x y txt)
   (make-instance 
@@ -98,11 +97,11 @@
   (radio-button-push item)
   (setf (edit-mode (editor-view-object self)) text))
 
-;================
+;;================
 
 (defmethod editor-view-object ((self C-BPF-window)) (BPF-editor-object self))
 
-;================
+;;================
 
 (defmethod key-pressed-extra ((self C-BPF-window) char)
   (key-pressed-BPF-editor (editor-view-object self) char))
@@ -113,20 +112,20 @@
          (make-BPF-help-window))
    (window-select *BPF-help-window*))
 
-;==================
+;;==================
 
 (defmethod view-activate-event-handler :after ((self C-BPF-window))
   (when (pw-object self)
     (draw-appl-label (pw-object self) #\*))
   (setq *active-BPF-window* self) 
-  (set-menubar *BPF-menu-root*)
+  (ui:set-menubar *BPF-menu-root*)
   (enable-all-apps-menu-items)
   (menu-item-disable *apps-BPF-menu-item*))
 
-;(defmethod give-mini-view-class-name ((self C-BPF-window))
-;  (class-name (class-of (mini-view (car (editor-objects (car (controls self))))))))
-;  (when (eq (give-mini-view-class-name self) 'patch-work::c-mini-bpf-view-chant)
-;    (setf (window-visible-p self) nil))
+;;(defmethod give-mini-view-class-name ((self C-BPF-window))
+;;  (class-name (class-of (mini-view (car (editor-objects (car (controls self))))))))
+;;  (when (eq (give-mini-view-class-name self) 'patch-work::c-mini-bpf-view-chant)
+;;    (setf (window-visible-p self) nil))
 
 (defmethod view-deactivate-event-handler :after ((self C-BPF-window))
   (when (pw-object self)
@@ -136,8 +135,8 @@
      (menu-item-enable *apps-BPF-menu-item*)
      (enable-Lisp-apps-menu-item?)))
 
-;==================
-; PW interface
+;;==================
+;; PW interface
 
 (defmethod set-mini-view ((self C-BPF-window) mini-view)
   (setf (mini-view (editor-view-object self)) mini-view))
@@ -149,8 +148,8 @@
   (scale-to-fit-in-rect (editor-view-object self)) 
   (view-draw-contents self))
 
-;==========================================
-; layout
+;;==========================================
+;; layout
 
 (defmethod BPF-window-ctrl-1st-y ((self C-BPF-window)) (- (h self) 47))
 (defmethod BPF-window-ctrl-2nd-y ((self C-BPF-window)) (- (h self) 35))
@@ -174,7 +173,7 @@
       (set-view-position (nth  i (bpf-radio-ctrls self)) (make-point (* i 60)  y3)))
    (set-ctrl-positions-extra self)))
 
-;==========================================
+;;==========================================
 
 (defmethod window-grow-event-handler ((self C-BPF-window) where)
   (declare (ignore where))
@@ -186,13 +185,13 @@
   (call-next-method)
   (set-ctrl-positions self))
 
-;==========================================
+;;==========================================
 
 (defmethod no-active-mouse-moved ((self C-BPF-window))
   (tell (subviews self) #'reset-active-point))
 
 (defmethod window-update-cursor :around ((self C-BPF-window) where)
-;  (declare (ignore where))
+;;  (declare (ignore where))
   (cond ((string= (edit-mode (editor-view-object self)) "edit")
             (if (ask (subviews self) #'active-point)
               (set-cursor *cross-hair-cursor*)
@@ -203,7 +202,7 @@
              (set-cursor *arrow-cursor*)))
         (t (call-next-method))))
 
-;==========================================
+;;==========================================
 
 (defvar *BPF-window-counter* 0)
 
@@ -224,4 +223,6 @@
       (scale-to-fit-in-rect bp-view)
       win))
 
-;(window-select (make-BPF-editor (make-break-point-function '(0 100) '(0 100)))) 
+;;(window-select (make-BPF-editor (make-break-point-function '(0 100) '(0 100)))) 
+
+(provide 'BPF-window)

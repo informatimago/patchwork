@@ -3,17 +3,17 @@
 
 (provide 'rtm-menu)
 
-;=========================================
-;=========================================
-; file
+;;=========================================
+;;=========================================
+;; file
 
 (defvar *RTM-menu-file* (new-menu "File"))
 
-(add-menu-items  *RTM-menu-file* (new-leafmenu "Save as midifile..."  
+(ui:add-menu-items  *RTM-menu-file* (new-leafmenu "Save as midifile..."  
     #'(lambda () (RTM-midi-file-SAVE))))
 
-;=========================================
-; edit
+;;=========================================
+;; edit
 
 (defun get-current-rtm-selection ()
   (rtm-selection-1 (editor-collection-object *active-rtm-window*)))
@@ -22,7 +22,7 @@
 (defvar *RTM-menu-edit* (new-menu "Edit"))
 
 (let ((menu-now))
-  (add-menu-items  *RTM-menu-edit* 
+  (ui:add-menu-items  *RTM-menu-edit* 
      (setq menu-now (new-leafmenu "Cut" 
        #'(lambda () 
            (when (get-current-rtm-selection)
@@ -31,7 +31,7 @@
                 (update-all-beat-groupings)
                 (erase+view-draw-contents *current-rtm-editor*))))))
    (set-command-key menu-now #\X)
-   (add-menu-items  *RTM-menu-edit* 
+   (ui:add-menu-items  *RTM-menu-edit* 
       (setq menu-now (new-leafmenu "Copy" 
         #'(lambda () 
             (when (get-current-rtm-selection) 
@@ -45,7 +45,7 @@
                     (t   
                         (setf *measure-line-selection-scrap* (decompile (get-current-rtm-selection))))))))))
    (set-command-key menu-now #\C)
-   (add-menu-items  *RTM-menu-edit* 
+   (ui:add-menu-items  *RTM-menu-edit* 
       (setq menu-now (new-leafmenu "Paste" 
        #'(lambda ()    
            (when (get-current-rtm-selection) 
@@ -58,28 +58,28 @@
                   (current-rtm-editor (editor-collection-object *active-rtm-window*))))))))
    (set-command-key menu-now #\V) )
 
-;(remove-menu-items  *RTM-menu-edit* (find-menu-item *RTM-menu-edit* "Paste")) 
+;;(remove-menu-items  *RTM-menu-edit* (find-menu-item *RTM-menu-edit* "Paste")) 
 
-;============================================
-; RTM
+;;============================================
+;; RTM
 
 (defvar *RTM-menu* (new-menu "RTM"))
 
-;============================================
-; menubar for RTM
+;;============================================
+;; menubar for RTM
 
 (setf *RTM-menu-root*
   (list 
      *pw-menu-apps*
      *RTM-menu-file* 
      *RTM-menu-edit*
-     (fifth (menubar))
-     (sixth (menubar))
+     (fifth (ui:menubar) )
+     (sixth (ui:menubar) )
      *RTM-menu* 
  ))
 
-;============================================
-; application 
+;;============================================
+;; application 
 
 
 (setf *apps-RTM-menu-item* 
@@ -94,14 +94,14 @@
             (ed-beep))
           (ed-beep)))))
 
-;============================================
-; printing 
+;;============================================
+;; printing 
 
 (defvar *rtm-print-setUp*
-  (new-leafmenu "Page Setup…" #'(lambda () (ccl::win-print-setUp *active-rtm-window*))))
+  (new-leafmenu "Page Setup…" #'(lambda () (ui::win-print-setUp *active-rtm-window*))))
 
 (defvar *print-rtm-menu* 
-  (new-leafmenu "Print…" #'(lambda () (ccl::window-hardcopy *active-rtm-window*))))
+  (new-leafmenu "Print…" #'(lambda () (ui::window-hardcopy *active-rtm-window*))))
 
-(add-menu-items *rtm-menu-file* *rtm-print-setUp* *print-rtm-menu*)
+(ui:add-menu-items *rtm-menu-file* *rtm-print-setUp* *print-rtm-menu*)
 

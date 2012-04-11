@@ -37,28 +37,21 @@
 ;;;==========================================
 (defvar *my-menu* '*collector-popup-menu*)
 
-(eval-when (eval load compile)
-  (load-once "PW:PW-kernel;Boxes;Data;Table-displayer"))
-
 (defpackage "C-LIST-ITEM-H"    ;the package for inheritance
-  (:use "COMMON-LISP" "CCL")
-  (:import-from "PATCH-WORK" "SET-DIALOG-ITEM-TEXT-FROM-DIALOG" "OPEN-PW-CONTROLS-DIALOG"
-                "C-ARRAY-ITEM" "MY-ARRAY")
+  (:use "COMMON-LISP" "LELISP-MACROS" "UI" "PATCH-WORK")
   (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
            "ADD-DOWNWARD-ELEMENT" "CELL-WIDTH" "CELL-HIGHT" "C-LIST-ITEM" "MY-ARRAY"
            "OUT-SIDE-LIST-P" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" 
            "ADD-UPWARD-ROW" "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
-           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT")
-  )
+           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
 
 (defpackage "C-LIST-ITEM"      ;the package for a user
-  (:use "C-LIST-ITEM-H" "COMMON-LISP")
+  (:use "C-LIST-ITEM-H" "COMMON-LISP" "UI")
   (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
            "ADD-DOWNWARD-ELEMENT" "CELL-WIDTH" "CELL-HIGHT" "OUT-SIDE-LIST-P" 
            "C-LIST-ITEM" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" "ADD-UPWARD-ROW"
            "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
-           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT")
-  )
+           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
 
 (in-package "C-LIST-ITEM-H")
 
@@ -70,21 +63,21 @@
 (defmethod cell-contents ((self C-list-item) h &optional v)
   (let ((point (if v (make-point h v) h)))
     (if (out-side-list-p self point)
-      #\space
-      (nth (point-v point) (nth (point-h point) (my-array self))))))
+        #\space
+        (nth (point-v point) (nth (point-h point) (my-array self))))))
 
 (defmethod set-array ((self C-list-item) the-array &optional cell)
   (if the-array
-    (let* ((dim-v  (length the-array))
-           (dim-h (apply #'max (mapcar #'length the-array)))
-           (dialog (view-container self)))
-      (remove-subviews dialog self)
-      (set-table-dimensions self  dim-v dim-h)
-      (setf (my-array self) the-array)
-      (add-subviews dialog self)
-      (when cell
-        (cell-select self cell)
-        (edit-selected-cell self)) )))
+      (let* ((dim-v  (length the-array))
+             (dim-h (apply #'max (mapcar #'length the-array)))
+             (dialog (view-container self)))
+        (remove-subviews dialog self)
+        (set-table-dimensions self  dim-v dim-h)
+        (setf (my-array self) the-array)
+        (add-subviews dialog self)
+        (when cell
+          (cell-select self cell)
+          (edit-selected-cell self)) )))
 
 (defmethod update-size ((self C-list-item) size)
   (set-view-size self 
@@ -106,7 +99,7 @@
       (* (- (point-v selection) (point-v (scroll-position self)))
          cell-hight))
      (make-point cell-width cell-hight))))
-    
+
 (defmethod set-dialog-item-text-from-dialog ((self C-list-item) text)
   (set-array-item self (car (selected-cells self))
                   (if (zerop (length text)) 0 (read-from-string text)))
@@ -121,8 +114,8 @@
 (defmethod set-array-item ((self C-list-item) point val)
   (and point
        (if (out-side-list-p self point)
-         (update-list self point val)
-         (setf (nth (point-v point) (nth (point-h point) (my-array self))) val))))
+           (update-list self point val)
+           (setf (nth (point-v point) (nth (point-h point) (my-array self))) val))))
 
 (defmethod update-list ((self C-list-item) point val)
   (let* ((sublist (nth (point-h point) (my-array self)))
@@ -136,54 +129,54 @@
          (place (1+ (point-h point)))
          (length (length the-list)))
     (if (= length place)
-      (add-forward-element self point)
-      (progn
+        (add-forward-element self point)
         (progn
-        (cell-select self (make-point place (point-v point)))
-        (cell-deselect self point))))))
+          (progn
+            (cell-select self (make-point place (point-v point)))
+            (cell-deselect self point))))))
 
 (defmethod next-left-element ((self  C-list-item) point)
   (let ((place (1- (point-h point))))
     (if (minusp place)
-      (add-backward-element self point)
-      (progn
-        (cell-select self (make-point place (point-v point)))
-        (cell-deselect self point)))))
+        (add-backward-element self point)
+        (progn
+          (cell-select self (make-point place (point-v point)))
+          (cell-deselect self point)))))
 
 (defmethod next-up-element ((self  C-list-item) point)
   (let ((place (1- (point-v point))))
     (if (minusp place)
-      (add-upward-element self point)
-      (progn
-        (cell-select self (make-point (point-h point) place))
-        (cell-deselect self point)))))
+        (add-upward-element self point)
+        (progn
+          (cell-select self (make-point (point-h point) place))
+          (cell-deselect self point)))))
 
 (defmethod next-down-element ((self  C-list-item) point)
   (let* ((sublist (nth (point-h point) (my-array self)))
          (place (1+ (point-v point)))
          (length (length sublist)))
     (if (= length place)
-      (add-downward-element self point)
-      (progn
-        (cell-select self (make-point (point-h point) place))
-        (cell-deselect self point)))))
+        (add-downward-element self point)
+        (progn
+          (cell-select self (make-point (point-h point) place))
+          (cell-deselect self point)))))
 
 (defmethod add-upward-element ((self C-list-item) point)
   (let* ((sublist (nth (point-h point) (my-array self)))
          (place (point-v point))
          (added-items (if (zerop place)
-                        (copy-list (nthcdr place sublist))
-                        (cons 0 (copy-list (nthcdr place sublist))))))
+                          (copy-list (nthcdr place sublist))
+                          (cons 0 (copy-list (nthcdr place sublist))))))
     (if (zerop place)
-      (progn  
-        (setf (nthcdr (1+ place) sublist) added-items)
-        (setf (nth 0 sublist) 0))
-      (setf (nthcdr place sublist) added-items))
+        (progn  
+          (setf (nthcdr (1+ place) sublist) added-items)
+          (setf (nth 0 sublist) 0))
+        (setf (nthcdr place sublist) added-items))
     (set-array self (my-array self) point)))
 
 (defmethod add-upward-row ((self C-list-item) point)
   (for (i 0 1 (point-h point))
-    (add-upward-element self (make-point i (point-v point)))))
+       (add-upward-element self (make-point i (point-v point)))))
 
 (defmethod add-downward-element ((self C-list-item) point)
   (let* ((sublist (nth (point-h point) (my-array self)))
@@ -196,7 +189,7 @@
 
 (defmethod add-downward-row ((self C-list-item) point)
   (for (i 0 1 (point-h point))
-    (add-downward-element self (make-point i (point-v point)))))
+       (add-downward-element self (make-point i (point-v point)))))
 
 (defmethod add-forward-element ((self C-list-item) point)
   (let* ((the-list (my-array self))
@@ -205,8 +198,8 @@
          (new-list (make-list (1+ (point-v point)) :initial-element 0))
          (added-items 
           (if (= length place)
-            (list new-list)
-            (cons new-list (copy-list (nthcdr place the-list))))))
+              (list new-list)
+              (cons new-list (copy-list (nthcdr place the-list))))))
     (setf (nthcdr place the-list) added-items)
     (set-array self the-list (make-point place (point-v point)))))
 
@@ -216,29 +209,29 @@
          (new-list (make-list (1+ (point-v point)) :initial-element 0))
          (added-items 
           (if (zerop place)
-            (copy-list (nthcdr place the-list))
-            (cons new-list (copy-list (nthcdr place the-list))))))
+              (copy-list (nthcdr place the-list))
+              (cons new-list (copy-list (nthcdr place the-list))))))
     (if (zerop place)
-      (progn  
-        (setf (nthcdr (1+ place) the-list) added-items)
-        (setf (nth 0 the-list) new-list))
-      (setf (nthcdr place the-list) added-items))
+        (progn  
+          (setf (nthcdr (1+ place) the-list) added-items)
+          (setf (nth 0 the-list) new-list))
+        (setf (nthcdr place the-list) added-items))
     (set-array self the-list point)))
 
 (defmethod cut-element ((self C-list-item) point)
   (let* ((sublist (nth (point-h point) (my-array self)))
          (place (point-v point)))
     (if (zerop place)
-      (if (cdr sublist)
-        (setf (nth (point-h point) (my-array self)) (cdr sublist))
-        (erase-line self (point-h point)))
-      (setf (nthcdr place sublist) (nthcdr (1+ place) sublist)))
+        (if (cdr sublist)
+            (setf (nth (point-h point) (my-array self)) (cdr sublist))
+            (erase-line self (point-h point)))
+        (setf (nthcdr place sublist) (nthcdr (1+ place) sublist)))
     (set-array self (my-array self))))
 
 (defmethod erase-line ((self C-list-item) line)
   (if (zerop line)
-    (and (cdr (my-array self)) (setf (my-array self) (cdr (my-array self))))
-    (setf (nthcdr line (my-array self)) (nthcdr (1+ line) (my-array self)))))
+      (and (cdr (my-array self)) (setf (my-array self) (cdr (my-array self))))
+      (setf (nthcdr line (my-array self)) (nthcdr (1+ line) (my-array self)))))
 
 
 ;;;==================================================
@@ -251,58 +244,58 @@
 ;;;==================================================
 
 (defpackage "C-TABLE-WINDOW-H"
-  (:use "COMMON-LISP" "CCL" "C-LIST-ITEM")
-  (:import-from "PATCH-WORK"  "C-APPLICATION-WINDOW" "KEY-PRESSED-EXTRA" "PW-OBJECT")
-  (:export "C-TABLE-WINDOW" "THE-LIST")
-  )
+  (:use "COMMON-LISP" "UI" "C-LIST-ITEM"  "PATCH-WORK")
+  (:export "C-TABLE-WINDOW" "THE-LIST"))
 
 (defpackage "C-TABLE-WINDOW"
   (:use "C-TABLE-WINDOW-H")
-  (:export "C-TABLE-WINDOW" "THE-LIST") )
+  (:export "C-TABLE-WINDOW" "THE-LIST"))
 
 (in-package "C-TABLE-WINDOW-H")
 
 (defclass C-table-window (C-application-window) ()) 
 
+
+
 (defmethod key-pressed-extra ((self C-table-window) char)
   (let* ((table (first (subviews self)))
          (selection (car (selected-cells table))))
     (if (and selection (not (out-side-list-p table selection)))
-      (case char 
-        (#\ForwardArrow 
-         (if (option-key-p)
-           (add-forward-element table selection)
-           (next-right-element table selection)))
-        (#\BackArrow 
-         (if (option-key-p)
-           (add-backward-element table selection)
-           (next-left-element table selection)))
-        (#\upArrow 
-         (cond ((shift-key-p)
-                (add-upward-row table selection))
-               ((option-key-p)
-                (add-upward-element table selection))
-               (t (next-up-element table selection))))
-        (#\DownArrow 
-         (cond ((shift-key-p)
-                (add-downward-row table selection))
-               ((option-key-p)
-                (add-downward-element table selection))
-               (t (next-down-element table selection))))
-        (#\Backspace (cut-element table selection))
-        (#\h (open-application-help-window self))
-        (otherwise 
-         (set-array-item table selection (string char))
-         (edit-selected-cell table)  ;;;(ed-beep)
-                   )))))
+        (case char
+          ((:ForwardArrow) 
+           (if (option-key-p)
+               (add-forward-element table selection)
+               (next-right-element table selection)))
+          ((:BackArrow) 
+           (if (option-key-p)
+               (add-backward-element table selection)
+               (next-left-element table selection)))
+          ((:UpArrow) 
+           (cond ((shift-key-p)
+                  (add-upward-row table selection))
+                 ((option-key-p)
+                  (add-upward-element table selection))
+                 (t (next-up-element table selection))))
+          ((:DownArrow) 
+           (cond ((shift-key-p)
+                  (add-downward-row table selection))
+                 ((option-key-p)
+                  (add-downward-element table selection))
+                 (t (next-down-element table selection))))
+          ((:Backspace) (cut-element table selection))
+          ((#\h) (open-application-help-window self))
+          (otherwise 
+           (set-array-item table selection (string char))
+           (edit-selected-cell table)  ;;;(ed-beep)
+           )))))
 
 (defvar *lst-ed-box-help-window* ())
 
 (defmethod pw::open-application-help-window ((self C-table-window))
-   (if *lst-ed-box-help-window*
-         (unless (wptr  *lst-ed-box-help-window*) (make-lst-ed-help-window))
-         (make-lst-ed-help-window))
-   (window-select *lst-ed-box-help-window*))
+  (if *lst-ed-box-help-window*
+      (unless (wptr  *lst-ed-box-help-window*) (make-lst-ed-help-window))
+      (make-lst-ed-help-window))
+  (window-select *lst-ed-box-help-window*))
 
 (defmethod window-grow-event-handler ((self C-table-window) where)
   (declare (ignore where))
@@ -310,12 +303,12 @@
   (update-size (first (subviews self)) (view-size self)))
 
 #|(defmethod view-activate-event-handler :after ((self C-table-window)) ())
-  (let ((table (first (subviews self))))
-    (when (pw-object self)
-      (set-array table (the-list (pw-object self)))
-      (set-view-size self
-                     (add-points (view-size table)
-                                 (make-point cell-width (* 2 cell-hight)))))))|#
+(let ((table (first (subviews self))))
+(when (pw-object self)
+(set-array table (the-list (pw-object self)))
+(set-view-size self
+(add-points (view-size table)
+(make-point cell-width (* 2 cell-hight)))))))|#
 
 (defmethod open-application-window ((self C-table-window))
   (let ((table (first (subviews self))))
@@ -331,7 +324,7 @@
   (when (and *lst-ed-box-help-window* (wptr *lst-ed-box-help-window*))
     (window-close *lst-ed-box-help-window*))
   (call-next-method))
-      
+
 
 ;;;=====================================
 ;;; The class of list editor patch boxes
@@ -346,14 +339,8 @@
 ;;;======================================
 
 (defpackage "C-PATCH-LIST-EDITOR"
-  (:use "COMMON-LISP" "CCL" "C-TABLE-WINDOW" "C-LIST-ITEM")
-  (:import-from "PATCH-WORK" "C-PATCH-APPLICATION" "MAKE-APPLICATION-OBJECT" "LOCK" "-MAKE-LOCK"
-                "PATCH-VALUE" "OPEN-PATCH-WIN" "APPLICATION-OBJECT"
-                "PW-CONTROLS" "INPUT-OBJECTS" "DECOMPILE" "*COLLECTOR-POPUP-MENU*"
-                "MAKE-POPUPBOX" "W" "H" "SAVE" "PW-FUNCTION" "COMPLETE-BOX"
-                "PW-FUNCTION-STRING" "VALUE" "SET-PW-WIN+PW-OBJ")
-  (:export "C-PATCH-LIST-EDITOR" "THE-LIST")
-  )
+  (:use "COMMON-LISP" "UI" "PATCH-WORK"  "C-TABLE-WINDOW" "C-LIST-ITEM")
+  (:export "C-PATCH-LIST-EDITOR" "THE-LIST"))
 
 (in-package "C-PATCH-LIST-EDITOR")
 
@@ -364,22 +351,22 @@
    (value :initform nil :accessor value)))
 
 (defmethod make-application-object ((self C-patch-list-editor))
-   (make-instance 'C-table-window
-                 :view-subviews 
-                 (list (make-instance 'C-list-item
-                                      :view-font '("Monaco" 9  :plain)
-                                      :table-dimensions (make-point 2 2)
-                                      :cell-size (make-point cell-width cell-hight)
-                                      :view-size (make-point 100 80)))
-                 :window-show nil
-                 :window-title (pw-function-string self)))
+  (make-instance 'C-table-window
+      :view-subviews 
+    (list (make-instance 'C-list-item
+              :view-font '("Monaco" 9  :plain)
+              :table-dimensions (make-point 2 2)
+              :cell-size (make-point cell-width cell-hight)
+              :view-size (make-point 100 80)))
+    :window-show nil
+    :window-title (pw-function-string self)))
 
 (defmethod decompile ((self C-patch-list-editor))
   (append (call-next-method)
           `(nil (list ',(copy-tree (the-list self)) 
                       ,(if (wptr (application-object self))
-                         (window-title (application-object self))
-                         (pw-function-string self))))))
+                           (window-title (application-object self))
+                           (pw-function-string self))))))
 
 (defmethod complete-box ((self C-patch-list-editor) args)
   (setf (the-list self) (first args))
@@ -400,19 +387,19 @@
 (defmethod save ((self C-patch-list-editor))
   (call-next-method)
   (if (and (application-object self) (wptr (application-object self)))
-    (set-window-title (application-object self) (pw-function-string self))))
+      (set-window-title (application-object self) (pw-function-string self))))
 
 
 (defmethod patch-value ((self C-patch-list-editor) obj)
   (if (or (value self) (eq (first (pw-controls self)) (first (input-objects self))))
-    (the-list self)
-    (let ((entry (patch-value (first (input-objects self)) obj)))
-      (cond ((null entry)
-             (setf (the-list self) (list (list 0 0) (list 0 0)))
-             nil)
-            ((consp (car entry))
-             (setf (the-list self) (copy-tree entry)))
-            (t (setf (the-list self) (list entry)) entry)))))
+      (the-list self)
+      (let ((entry (patch-value (first (input-objects self)) obj)))
+        (cond ((null entry)
+               (setf (the-list self) (list (list 0 0) (list 0 0)))
+               nil)
+              ((consp (car entry))
+               (setf (the-list self) (copy-tree entry)))
+              (t (setf (the-list self) (list entry)) entry)))))
 
 (defmethod open-patch-win ((self C-patch-list-editor))
   (when (not (wptr (application-object self)))
@@ -423,21 +410,21 @@
     (set-view-size (application-object self)
                    (add-points (view-size table)
                                (make-point cell-width (* 2 cell-hight))))
-  (call-next-method)))
+    (call-next-method)))
 
 (in-package :pw)
 
 (defunp lst-ed ((list (list (:dialog-item-text "()")))) list
-  "This module is an editor for graphic tables. To open the window associated 
+        "This module is an editor for graphic tables. To open the window associated 
 with this module, click twice within the module (but not on the input window!). 
 To obtain more information, type ‘o’ with the module open."
-  (declare (ignore list)))
+        (declare (ignore list)))
 
 
 #|
 (in-package :pw)
 (add-patch-box *active-patch-window* 
-               (make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd  
-                               '(*symbol-eval-pw-type* "list") '(list)))
+(make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd  
+'(*symbol-eval-pw-type* "list") '(list)))
 
 |#

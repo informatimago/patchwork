@@ -9,10 +9,8 @@
 
 (in-package :pw)
 
-(provide 'create-patch-box)
-
-;====================================================================================================
-;====================================================================================================
+;;====================================================================================================
+;;====================================================================================================
 (defmethod set-default-pw-value ((self simple-view) value) (declare (ignore value)))
 
 (defmethod set-default-pw-value ((self C-numbox) value) 
@@ -33,7 +31,7 @@
          ((symbolp value) (set-dialog-item-text self (string-downcase (string value)))))))
 
 
-;==========================
+;;==========================
 
 (defun order-inside-box-by-two (ws hs w-max)
   (let (res temp h-temp 
@@ -49,9 +47,9 @@
        (push (list (nreverse temp) (apply #'max h-temp)) res))
     (nreverse res)))
 
-;(order-inside-box-by-two '(56) '(65) 78)
-;(order-inside-box-by-two '(56 36 36 55 36) '(65 15 5 14 66) 78)
-;(order-inside-box-by-two '(56 36 36 42 36 42 87 36 36 36) '(5 5 5 5 5 5 65 5 15 5) 78)
+;;(order-inside-box-by-two '(56) '(65) 78)
+;;(order-inside-box-by-two '(56 36 36 55 36) '(65 15 5 14 66) 78)
+;;(order-inside-box-by-two '(56 36 36 42 36 42 87 36 36 36) '(5 5 5 5 5 5 65 5 15 5) 78)
 
 (defun make-patch-box 
    (patch pw-function pw-control-type-list &optional out-type-list defaults-list)
@@ -70,19 +68,19 @@
            )  
      (while box-w-list
        (set-view-position (car input-boxes-temp) (make-point 5 y-now))
-;       (setf (x (car input-boxes-temp)) 5)
-;       (setf (y (car input-boxes-temp)) y-now)
+;;       (setf (x (car input-boxes-temp)) 5)
+;;       (setf (y (car input-boxes-temp)) y-now)
        (pop input-boxes-temp)
        (when (= (length  (car box-w-list)) 2)
          (set-view-position (car input-boxes-temp)
              (make-point (+ 5 2 (car (first box-w-list))) y-now))
-;         (setf (x (car input-boxes-temp)) (+ 5 2 (car (first box-w-list))))
-;         (setf (y (car input-boxes-temp)) y-now)
+;;         (setf (x (car input-boxes-temp)) (+ 5 2 (car (first box-w-list))))
+;;         (setf (y (car input-boxes-temp)) y-now)
          (pop input-boxes-temp))
        (incf y-now (+ 2 (pop row-ys)))
        (pop box-w-list)) 
      (setq w-now (+ 5 (apply #'max (ask-all input-boxes 'x+w))))
-;     (tell input-boxes 'dmove-control 15 15)
+;;     (tell input-boxes 'dmove-control 15 15)
      (when defaults-list
        (for (i 0 1 (1- (length input-boxes)))
          (set-default-pw-value (nth i input-boxes) (pop defaults-list))))))
@@ -92,7 +90,7 @@
                    :type-list out-type-list
                    :VIEW-SUBVIEWS input-boxes)))
 
-;__________________________________________
+;;__________________________________________
 
 (defun make-pw-narg-arg-list (count)
   (let ((arg-list))
@@ -118,10 +116,7 @@
     (push "else" arg-list)
     (nreverse arg-list)))
 
-;====================================
-
-(defun get-arglist (function)
- (arglist function))
+;;====================================
 
 (defun make-lisp-function-arg-list (function)
   (let ((arg-list (get-arglist function))
@@ -131,16 +126,16 @@
        (push  '*symbol-test-type* res)
        (push  (string (pop arg-list)) res)))
     (nreverse res)))
-;=============================================
+;;=============================================
 
 (unless (fboundp 'get-lisp-function-arg-list)
   (defun get-lisp-function-arg-list (function)
     (make-lisp-function-arg-list function)))
 
-; (defun foo (x) 3)
-; (Patch-work::get-arglist 'foo)
+;; (defun foo (x) 3)
+;; (Patch-work::get-arglist 'foo)
 
-; (&optional &rest &aux &key ccl::&key* &allow-other-keys &body &environment &whole)
+;; (&optional &rest &aux &key ui::&key* &allow-other-keys &body &environment &whole)
 
 (defvar *lisp-keywords-for-extension* '(&optional &rest &key &allow-other-keys))
 
@@ -181,18 +176,18 @@
                    (setq res (list* (string-downcase (string (pop arg-list)))
                                     '*symbol-test-type* res))
                    (decf nb-arg))
-                  ((&aux ccl::&key* &body &environment &whole) (pop arg-list))
+                  ((&aux ui::&key* &body &environment &whole) (pop arg-list))
                   (&key
                    (setq res (list* (string-downcase (string (pop arg-list)))
                                     '*symbol-test-type* "key" '*symbol-test-type* res))
                    (decf nb-arg))))))
     (values (nreverse res) extensible?)))
 
-; (get-arglist 'print)
-; (make-lisp-function-arg-list 'print 4)
-; (make-lisp-function-arg-list 'make-list)
-; (make-lisp-function-arg-list 'car)
-; (make-lisp-function-arg-list '+)
+;; (get-arglist 'print)
+;; (make-lisp-function-arg-list 'print 4)
+;; (make-lisp-function-arg-list 'make-list)
+;; (make-lisp-function-arg-list 'car)
+;; (make-lisp-function-arg-list '+)
 
 (defun make-lisp-pw-boxes (function win) 
   (if (not (fboundp function))
@@ -217,3 +212,6 @@
 (defmethod generate-extended-inputs ((self C-pw-lispfun))
   (make-lisp-function-arg-list (pw-function self) (1+ (length (pw-controls self)))))
 
+
+
+(provide 'create-patch-box)

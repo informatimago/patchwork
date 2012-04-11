@@ -11,8 +11,8 @@
 
 (provide 'abstraction)
 
-;====================================================================================================
-;====================================================================================================
+;;====================================================================================================
+;;====================================================================================================
 
 (defclass C-abstract-in (C-patch)
   ((in-index :initform nil :accessor in-index)
@@ -51,8 +51,8 @@ the name input of absin takes the same name as the variable linked to the patche
 It is advised to give a name to the absin module after having made the patch connection. 
 "
   (declare (ignore name order)))
-;=================================
-;    
+;;=================================
+;;    
 
 (defclass C-abstract-out (C-patch) 
   ((abstract-obj :initform nil :accessor abstract-obj)))
@@ -80,7 +80,7 @@ You can edit the name of the abstraction-box and the abstraction
 window by editing the input-box of the absout-box."
 name)
 
-;=================================
+;;=================================
 
 (defclass C-abstract (C-patch) 
   ((patch-win :initform nil :initarg :patch-win :accessor patch-win)
@@ -103,7 +103,7 @@ name)
     ;      (eval `(function (lambda ,arg-names (declare (ignore ,@arg-names)) nil))))
     (setf (symbol-function fun)
           (eval `(function (lambda ,arg-names (declare (ignore ,@arg-names)) nil))))
-    (setf (arglist fun) arg-names)
+    (setf (ccl:arglist fun) arg-names)
     ;; GA
     (box class fun box-name posn values nil win-patches)))
 
@@ -152,7 +152,7 @@ name)
       (draw-char (- (w self) 8) (- (h self) 4) label) 
       (set-view-font  (view-container  self) '(:srcor)))))
 
-;=================================
+;;=================================
 
 (defmethod find-active-rectangle ((self C-pw-window))
   (let ((ctrls (active-patches self)) min-x min-y)

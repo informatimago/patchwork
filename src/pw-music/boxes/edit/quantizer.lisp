@@ -6,8 +6,8 @@
 ;;;===========================================================================
 
 (defpackage "QUANTIZING"
-  (:use "COMMON-LISP")
-  (:import-from "PATCH-WORK" "DEFUNP" "PW-ADDMENU" "L-SCALER/SUM" "DX->X" "X->DX")
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
+  (:import-from "EPW"  "L-SCALER/SUM" "DX->X" "X->DX")
   (:export "QUANT-MEASURE"))
 
 (in-package "QUANTIZING")
@@ -133,7 +133,7 @@
 
 (defun sqr (n) (* n n))
 
-;(compute-quanta 32.78688524590164 65.57377049180327 12 '( 48.85774285327191 49.85774285327191))
+;;(compute-quanta 32.78688524590164 65.57377049180327 12 '( 48.85774285327191 49.85774285327191))
 
 (defvar *distance-weight* 1)
 ;;(setf *distance-weight* 0.2)
@@ -151,8 +151,8 @@
                                              (* (get-distance item2) *distance-weight*) )
                                         item1 item2)) option1 option2)))   ;;)
 
-;(score-approx '(0 0.33 0.7 1 1.50 1.7) 0 2)
-;(score-approx '( 49.85774285327191 52.586885245901634) 32.78688524590164 33)
+;;(score-approx '(0 0.33 0.7 1 1.50 1.7) 0 2)
+;;(score-approx '( 49.85774285327191 52.586885245901634) 32.78688524590164 33)
 
 (defvar *iota* 0.0001)
 (defvar *dist-iota* 0.03)
@@ -439,7 +439,7 @@ becomes prev-slur in the next call)."
                      (t (cons (car beat-tree) (loop-beats (cdr beat-tree)))))))
       (loop-beats beats))))
 
-;(put-in-silences '((1 (1)) (1 (1.0 1))) '(-10 20 20))
+;;(put-in-silences '((1 (1)) (1 (1.0 1))) '(-10 20 20))
 
 (defun put-in-silences (beats durs &optional prev-silence)
   (if (every #'plusp durs)
@@ -667,10 +667,10 @@ initial ('b-tempo') and final ('e-tempo') tempi. "
                                        (/ (car (last tattack)) (* 0.5 (+ final-tempo start-tempo))) 0)
                        tattack)) 100) 1)))
 
-;(pw-addmenu pw::*rtm-boxes-menu* '(transf-durs))
+;;(pw-addmenu pw::*rtm-boxes-menu* '(transf-durs))
   
-;(transf-durs '(100 100 100 100 100 100 100 100 100) 120 60)
-;(transf-durs '(100) 120 60)
+;;(transf-durs '(100 100 100 100 100 100 100 100 100) 120 60)
+;;(transf-durs '(100) 120 60)
 
 (defunp mul&subm ((numbers numbers? (:value 100)) (%err fix/float )
                   (unit fix>=0 (:value 100))) numbers?
@@ -695,6 +695,6 @@ initial ('b-tempo') and final ('e-tempo') tempi. "
           ((< plus minus) (round (+ plus num)))
           (t (round (- num minus))))))
 
-;(pw-addmenu pw::*pw-menu-patch* '(mul&subm))
+;;(pw-addmenu pw::*pw-menu-patch* '(mul&subm))
 |#
 

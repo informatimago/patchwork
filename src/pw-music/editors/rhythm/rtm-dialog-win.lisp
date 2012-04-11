@@ -1,13 +1,13 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-;=======================================
+;;=======================================
 
 (defvar *rtm-win-1st-numbox* ())
 (defvar *rtm-win-2nd-numbox* ())
 (defvar *rtm-editor-dialog-window* ())
 
-;=======================================
+;;=======================================
 
 (defun open-rtm-win (mode text-text function &key (min1 0) (max1 127) (val1 100) (min2 0)(max2 127) (val2 100))
   (setf *rtm-editor-dialog-window* (make-instance 'dialog
@@ -55,15 +55,15 @@
      (set-view-font  *rtm-win-1st-numbox* '("MusNot-j"  13  :srcor)))
   (modal-dialog *rtm-editor-dialog-window*))
 
-;================================================================================================
-; selection editing
-;================================================================================================
+;;================================================================================================
+;; selection editing
+;;================================================================================================
 
 (defvar *RTM-selection-menu* (new-menu "Edit selection"))
-(add-menu-items *RTM-menu* *RTM-selection-menu*)
+(ui:add-menu-items *RTM-menu* *RTM-selection-menu*)
 
-;========================================
-;velocity
+;;========================================
+;;velocity
 
 (defun edit-rtm-editor-velocity-menu ()
    (open-rtm-win 'range "Velocity" 
@@ -83,11 +83,11 @@
                 ;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
                 ))))
 
-(add-menu-items  *RTM-selection-menu*                        
+(ui:add-menu-items  *RTM-selection-menu*                        
    (new-leafmenu "Velocity..." #'edit-rtm-editor-velocity-menu))
 
-;========================================
-;transpose
+;;========================================
+;;transpose
 
 (defun edit-rtm-editor-transpose-menu ()
    (open-rtm-win 'simple "Transpose (in cents)" 
@@ -105,11 +105,11 @@
       ;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
       )))
 
-(add-menu-items  *RTM-selection-menu*                        
+(ui:add-menu-items  *RTM-selection-menu*                        
    (new-leafmenu "Transpose..." #'edit-rtm-editor-transpose-menu))
 
-;========================================
-;chans
+;;========================================
+;;chans
 
 (defun edit-rtm-editor-chans-menu ()
    (open-rtm-win 'simple "Midi channel" 
@@ -123,11 +123,11 @@
      (let ((chords (give-rtm-range-chords (editor-collection-object self) t)))
         (tell chords #'set-all-chans chan))))
 
-(add-menu-items  *RTM-selection-menu*                        
+(ui:add-menu-items  *RTM-selection-menu*                        
    (new-leafmenu "Channel..." #'edit-rtm-editor-chans-menu))
 
-;========================================
-;duration
+;;========================================
+;;duration
 
 #|
 (defun edit-rtm-editor-duration-menu ()
@@ -138,7 +138,7 @@
        :min1 1 :max1 1000 :val1 90))
 |#
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defun edit-rtm-editor-duration-menu ()
   (open-rtm-win 'simple "Duration (in %)" 
        #'(lambda (item) (declare (ignore item))
@@ -160,11 +160,11 @@
         ;(erase+view-draw-contents self)
         ))))
 
-(add-menu-items  *RTM-selection-menu*                        
+(ui:add-menu-items  *RTM-selection-menu*                        
    (new-leafmenu "Duration..." #'edit-rtm-editor-duration-menu))
 
-;========================================
-;Metronome
+;;========================================
+;;Metronome
 
 (defun edit-rtm-editor-Metronome-menu ()
    (open-rtm-win 'range "Unit   Metronome" 
@@ -192,18 +192,18 @@
           ;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
           )))))
 
-(add-menu-items  *RTM-selection-menu*                        
+(ui:add-menu-items  *RTM-selection-menu*                        
    (new-leafmenu "Metronome..." #'edit-rtm-editor-Metronome-menu))
 
 
-;================================================================================================
-; global editing
-;================================================================================================
+;;================================================================================================
+;; global editing
+;;================================================================================================
 
 (defvar *RTM-global-menu* (new-menu "Edit globally"))
-(add-menu-items *RTM-menu* *RTM-global-menu*)
+(ui:add-menu-items *RTM-menu* *RTM-global-menu*)
 
-;========================================
+;;========================================
 
 (defmethod give-all-beat-chord-objects ((self C-rtm-editor-window))
   (let ((leaves-lst-lst  
@@ -211,8 +211,8 @@
                   #'collect-all-chord-beat-leafs)))
      (ask-all (apply #'append leaves-lst-lst) #'beat-chord)))
 
-;========================================
-;global transpose
+;;========================================
+;;global transpose
 
 (defun edit-rtm-editor-transpose-global-menu ()
    (open-rtm-win 'simple "Transpose (in cents)" 
@@ -229,11 +229,11 @@
       ;(erase+view-draw-contents (editor-collection-object self))
       ))
 
-(add-menu-items  *RTM-global-menu*                        
+(ui:add-menu-items  *RTM-global-menu*                        
    (new-leafmenu "Transpose..." #'edit-rtm-editor-transpose-global-menu))
 
-;========================================
-;global chans
+;;========================================
+;;global chans
 
 (defun edit-rtm-editor-chans-global-menu ()
    (open-rtm-win 'simple "Midi channel" 
@@ -246,10 +246,10 @@
   (with-cursor *watch-cursor*
      (tell (give-all-beat-chord-objects self) #'set-all-chans chan)))
 
-(add-menu-items  *RTM-global-menu*                        
+(ui:add-menu-items  *RTM-global-menu*                        
    (new-leafmenu "Channel..." #'edit-rtm-editor-chans-global-menu))
 
-;======
+;;======
 
 (defmethod edit-rtm-editor-chans-global-2 ((self C-rtm-editor-window))
    (with-cursor *watch-cursor*
@@ -261,13 +261,13 @@
             (setq chords (ask-all (nth (1- chan) leaves-lst-lst) #'beat-chord))
             (tell chords #'set-all-chans chan)))))
 
-(add-menu-items  *RTM-global-menu*                        
+(ui:add-menu-items  *RTM-global-menu*                        
    (new-leafmenu "Increment channel" #'(lambda () (edit-rtm-editor-chans-global-2 *active-rtm-window*))))
 
-;========================================
-;global duration
+;;========================================
+;;global duration
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defun edit-rtm-editor-duration-global-menu ()
    (open-rtm-win 'simple "Duration (in %)" 
        #'(lambda (item) (declare (ignore item))
@@ -294,12 +294,12 @@
     ;(erase+view-draw-contents self)
     ))
 
-(add-menu-items  *RTM-global-menu*                        
+(ui:add-menu-items  *RTM-global-menu*                        
    (new-leafmenu "Duration..." #'edit-rtm-editor-duration-global-menu))
 
 
-;========================================
-;Metronome
+;;========================================
+;;Metronome
 
 (defun edit-rtm-editor-Metronome-global-menu ()
   (without-interrupts
@@ -321,12 +321,12 @@
         ;(erase+view-draw-contents self)
         ))))
 
-(add-menu-items  *RTM-global-menu*                        
+(ui:add-menu-items  *RTM-global-menu*                        
    (new-leafmenu "Metronome..." #'edit-rtm-editor-Metronome-global-menu))
 
-;================================================================================================================
-;layout
-;================================================================================================================
+;;================================================================================================================
+;;layout
+;;================================================================================================================
 
 (defmethod edit-rtm-editor-staff-layout ((self C-rtm-editor-window) staff)
   (when (current-rtm-editor (editor-collection-object self))
@@ -338,7 +338,7 @@
      (while editors (setf (staff-number (pop editors))  staff)))
    (erase+view-draw-contents self))
 
-(add-menu-items  *RTM-menu*    
+(ui:add-menu-items  *RTM-menu*    
    (new-menu "Choose Staff"
       (new-menu "Selected staff"
                            (new-leafmenu "G2-G" #'(lambda()     (edit-rtm-editor-staff-layout *active-rtm-window* 1)))  

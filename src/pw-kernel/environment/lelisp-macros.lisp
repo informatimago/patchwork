@@ -7,7 +7,8 @@
 ;;;;
 ;;;;=========================================================
 
-(defpackage "LeLisp-macros" (:use "COMMON-LISP")
+(defpackage "LELISP-MACROS"
+  (:use "COMMON-LISP")
   #+:ccl
   (:import-from "CCL" "MEMQ" "ASSQ" "DELQ" "NEQ" "TRUE" "FALSE" "WHILE" "UNTIL")
   #+:loop
@@ -18,45 +19,46 @@
    "WHILE" "UNTIL" "IFNOT" "REPEAT" "FOR"
    "NEWL" "NEXTL" "VREF" "VSET"
    "TELL" "ASK" "ASK-ALL" "WITH"))
+(in-package "LELISP-MACROS")
 
-(in-package "LeLisp-macros")
+;; (do-external-symbols (s "LELISP-MACROS")
+;;   (import s "COMMON-LISP")
+;;   (export s "COMMON-LISP"))
 
-(do-external-symbols (s "LeLisp-macros")
-  (import s "COMMON-LISP")
-  (export s "COMMON-LISP"))
 
 ;; =============================================================================-======
-;; This file "LeLisp-macros.Lisp" exports lisp macros.
+;; This file "LELISP-MACROS.Lisp" exports lisp macros.
 ;; Macros have a special status for the compiler:
 ;; Any file exporting macros must be LOADED
 ;; before "compile-file" can compile any source file using these macros,
 ;; otherwise you get strange error messages ("undefined variable", "cant compile ...").
 ;; So any file saying :
-;;	(load-once "CLPF:LeLisp-macros")
+;;	(load-once "CLPF:LELISP-MACROS")
 ;; MUST embed it in a good "eval-when":
 ;; (eval-when (eval compile)
-;;	(load-once "CLPF:LeLisp-macros"))
+;;	(load-once "CLPF:LELISP-MACROS"))
 ;; It is not needed to import the macros since they are exported to common lisp
-;;	(use-package "LeLisp-macros") ;is not needed
+;;	(use-package "LELISP-MACROS") ;is not needed
 
 ;; =============================================================================-======
 
 #-:ccl
 (progn
   ; From "MACL1.3.2:PCL:macros.lisp"
-  (defmacro memq (item list) `(member ,item ,list :test #'eq))
-  (defmacro assq (item list) `(assoc ,item ,list :test #'eq))
-  (defmacro delq (item list) `(delete ,item ,list :test #'eq))
-  (defmacro neq (x y) `(not (eq ,x ,y)))
-  (defmacro true (&body body) `(progn ,@body t))
+  (defun memq (item list) (member item list :test #'eq))
+  (defun assq (item list) (assoc  item list :test #'eq))
+  (defun delq (item list) (delete item list :test #'eq))
+  (defun neq (x y) (not (eq x y)))
+  (declaim (inline memq assq delq neq))
+  (defmacro true  (&body body) `(progn ,@body t))
   (defmacro false (&body body) `(progn ,@body nil)))
 
-(defmacro rassq (item list) `(rassoc ,item ,list :test #'eq))
-(defmacro cassq (item list) `(cdr (assq ,item ,list)))
-
+(defun rassq (item list) (rassoc item list :test #'eq))
+(defun cassq (item list) (cdr (assq item list)))
+(declaim (inline rassq cassq))
 ;; =============================================================================-======
 
-;; [jack] 910821 ccl::while is more efficient than Lee's with loop
+;; [jack] 910821 ui::while is more efficient than Lee's with loop
 
 #-:ccl
 (defmacro while (condition &body body)
@@ -71,14 +73,14 @@
 
 #-:ccl
 (defmacro until (condition &body body)
-  `(while (not ,condition) ,.body))
+  `(while (not ,condition) ,@body))
 
 (defmacro ifnot (testform elseform &body body)
-  `(if (not ,testform) ,elseform (progn ,.body)))
+  `(if (not ,testform) ,elseform (progn ,@body)))
 
 (defmacro repeat (count &body body)
   `(dotimes (,(gensym) ,count)
-     ,.body))
+     ,@body))
 
 (defmacro for ((var begin step end) &body body)
   (let ((s2 (gensym)) (s3 (gensym)))
@@ -86,11 +88,11 @@
        (if (> ,s2 0)
          (loop
            (when (> ,var ,s3) (return))
-           (progn ,.body)
+           (progn ,@body)
            (incf ,var ,s2))
          (loop
            (when (< ,var ,s3) (return))
-           (progn ,.body)
+           (progn ,@body)
            (incf ,var ,s2))))))
 
 ;; =============================================================================-======
@@ -102,8 +104,9 @@
     `(setq ,symb (pop ,lst))
     `(pop ,lst) ))
 
-(defmacro vref (vect index) `(svref ,vect ,index))
-(defmacro vset (vect index val) `(setf (svref ,vect ,index) ,val))
+(defun vref (vect index)     (svref vect index))
+(defun vset (vect index val) (setf (svref vect index) val))
+(declaim (inline vref vset))
 
 ;; =============================================================================-======
 
@@ -143,10 +146,10 @@ would not be restricted to variables)."
     `(let ,(mapcar #'list vars places)
        (unwind-protect
          (progn
-           ,.(mapcar #'(lambda (place value) `(setf ,place ,value)) places values)
-           ,.body)
-         ,.(mapcar #'(lambda (place var) `(setf ,place ,var)) places vars)))))
+           ,@(mapcar #'(lambda (place value) `(setf ,place ,value)) places values)
+           ,@body)
+         ,@(mapcar #'(lambda (place var) `(setf ,place ,var)) places vars)))))
 
-;(let ((l '(a . b))) (with (((car l) 1) ((cdr l) 2)) (print l)))
+;;(let ((l '(a . b))) (with (((car l) 1) ((cdr l) 2)) (print l)))
 
 ;; =============================================================================-======

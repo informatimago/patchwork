@@ -12,11 +12,7 @@
 ;;;
 
 (defpackage "C-PATCH-FILE-BUFFER"
-  (:use "COMMON-LISP" "CCL")
-  (:import-from "PATCH-WORK"
-                "*TARGET-ACTION-OBJECT*" "NEW-MENU" "NEW-LEAFMENU" "MAKE-POPUPBOX"
-                "PATCH-VALUE" "H" "W" "C-PATCH" "PW-CONTROLS" "INPUT-OBJECTS" "LIST!"
-                "PW-FUNCTION-STRING" "DEFUNP" "COMPLETE-BOX" "REMOVE-YOURSELF-CONTROL")
+  (:use "COMMON-LISP" "LELISP-MACROS" "UI" "PATCH-WORK")
   (:export "C-PATCH-FILE-BUFFER"))
 
 (in-package "C-PATCH-FILE-BUFFER")
@@ -136,7 +132,7 @@
                         (not (string= (file-namestring (file-name self)) "New")))
                  (file-name self)
                  (CHOOSE-FILE-DIALOG))))
-     (ccl:with-cursor *watch-cursor*
+     (ui:with-cursor *watch-cursor*
       (setf (fred-win self) 
             (make-instance 'fred-window :window-show nil))
       (setf (file-name self) name)
@@ -179,25 +175,25 @@
 (defmethod set-ascii-win ((self C-patch-file-buffer))
   (setf *lisp-win-option* ())
   (remove-menu-items *file-box-popUpMenu* *ascii-option*)
-  (add-menu-items *file-box-popUpMenu* *lisp-option*))
+  (ui:add-menu-items *file-box-popUpMenu* *lisp-option*))
 
 (defmethod set-lisp-win ((self C-patch-file-buffer))
   (setf *lisp-win-option* t)
   (remove-menu-items *file-box-popUpMenu* *lisp-option*)
   (unless (member *ascii-option* (menu-items *file-box-popUpMenu*))
-    (add-menu-items *file-box-popUpMenu* *ascii-option*)))
+    (ui:add-menu-items *file-box-popUpMenu* *ascii-option*)))
 
 (defmethod set-add-mode ((self C-patch-file-buffer))
   (setf *add-option* t)
    (remove-menu-items *file-box-popUpMenu* *add-mode-option*)
    (unless (member *replace-mode-option* (menu-items *file-box-popUpMenu*))
-    (add-menu-items *file-box-popUpMenu* *replace-mode-option*)))
+    (ui:add-menu-items *file-box-popUpMenu* *replace-mode-option*)))
 
 (defmethod set-replace-mode ((self C-patch-file-buffer))
   (setf *add-option* ())
    (remove-menu-items *file-box-popUpMenu* *replace-mode-option*)
    (unless (member *add-mode-option* (menu-items *file-box-popUpMenu*))
-    (add-menu-items *file-box-popUpMenu* *add-mode-option*)))
+    (ui:add-menu-items *file-box-popUpMenu* *add-mode-option*)))
 
 (in-package :pw)
 

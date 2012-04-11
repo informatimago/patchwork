@@ -15,8 +15,7 @@
 ;;;=============================================================
 
 (defpackage "COMBINATORIAL-INTERV"
-  (:use "COMMON-LISP")
-  (:import-from "PATCH-WORK" "DEFUNP")
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
   (:export "FIND-INTERVALS" "INT-REC"))
 
 (in-package "COMBINATORIAL-INTERV")
@@ -29,10 +28,11 @@
          (cols (length int-list))
          (matrix (make-array (list  amb cols) :initial-element 0)))
     (for (i 0 1 (- amb 1))
-      (for (j 0 1 (1- cols))
-        (setq entry  (+ i (nth  j int-list)))
-        (setf (aref matrix i j) (if (<= entry amb) entry 0))))
+         (for (j 0 1 (1- cols))
+              (setq entry  (+ i (nth  j int-list)))
+              (setf (aref matrix i j) (if (<= entry amb) entry 0))))
     matrix))
+
 
 (defun insert-one-int (end1 end2 list)
   (let ((min (min end1 end2)) (max (max end1 end2)))

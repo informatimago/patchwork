@@ -11,8 +11,8 @@
 
 (provide 'structured-time2)
 
-;==============================================================================================================
-;========================================================================================
+;;==============================================================================================================
+;;========================================================================================
 (defclass C-make-structured-win (C-patch) ()) 
 
 (defmethod patch-value ((self C-make-structured-win) obj)
@@ -25,7 +25,7 @@ It should be connected to the ins input of the collector box
 while collecting.The super-notes will contain a plain PW window.
 Strwin box is normally used in context of structured time.
 ")
-;========================================================================================
+;;========================================================================================
 (defclass C-make-structured-win+collector (C-patch) ()) 
 
 (defmethod patch-value ((self C-make-structured-win+collector) obj)
@@ -43,7 +43,7 @@ while collecting.The super-notes will contain a PW window with a collector.
 Strcoll box is normally used in context of structured time.
 ")
 
-;========================================================================================
+;;========================================================================================
 (defclass C-make-structured-abstraction (C-patch) ()) 
 
 (defmethod patch-value ((self C-make-structured-abstraction) obj)

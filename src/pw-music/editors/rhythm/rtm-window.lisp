@@ -1,7 +1,7 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-;========================================================
+;;========================================================
 
 (defclass C-rtm-editor-window (C-application-window) ())
 
@@ -12,15 +12,15 @@
        (add-subviews rtm-win ,(decompile (editor-collection-object self)))
        rtm-win))
  
-;========================
+;;========================
 #|  ; for printing ...
-;*screen-width* 
+;;*screen-width* 
 (progn 
   (set-view-size pw::*active-rtm-window* *screen-width* 1650) 
   (pw::resize-new-rtm-w (pw::editor-collection-object pw::*active-rtm-window*) (view-size pw::*active-rtm-window*)))
 |#
 
-;========================
+;;========================
 (defmethod window-close ((self C-rtm-editor-window))
     (if (wptr *the-chord-rtm-editor*) (window-close *the-chord-rtm-editor*))
     (call-next-method))
@@ -85,90 +85,93 @@
 
 (defmethod key-pressed-extra ((self C-rtm-editor-window) char)
   (case char
-    (#\ForwardArrow  (calc-next-rtm-page+scroll self ()))
-    (#\BackArrow  (calc-prev-rtm-page+scroll self ()))
+    ((:ForwardArrow)  (calc-next-rtm-page+scroll self ()))
+    ((:BackArrow)  (calc-prev-rtm-page+scroll self ()))
     (#\+  (set-dialog-item-text-from-dialog
-              (beat-number-ctrl (editor-collection-object self))
-              (format nil "~5D" (1+ (value (beat-number-ctrl (editor-collection-object self))))))
-         (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
+           (beat-number-ctrl (editor-collection-object self))
+           (format nil "~5D" (1+ (value (beat-number-ctrl (editor-collection-object self))))))
+          (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
     (#\-  (set-dialog-item-text-from-dialog
-              (beat-number-ctrl (editor-collection-object self))
-              (format nil "~5D" (max 1 (1- (value (beat-number-ctrl (editor-collection-object self)))))))
-         (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
+           (beat-number-ctrl (editor-collection-object self))
+           (format nil "~5D" (max 1 (1- (value (beat-number-ctrl (editor-collection-object self)))))))
+          (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
     (#\H  (set-dialog-item-text-from-dialog
-              (beat-number-ctrl (editor-collection-object self)) (format nil "~5D" 1))
-         (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
+           (beat-number-ctrl (editor-collection-object self)) (format nil "~5D" 1))
+          (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
     (#\L  (set-dialog-item-text-from-dialog
-              (beat-number-ctrl (editor-collection-object self)) 
-                 (format nil "~5D" (max 1 (length (measures (measure-line (car (beat-editors (editor-collection-object self)))))))))
-         (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
+           (beat-number-ctrl (editor-collection-object self)) 
+           (format nil "~5D" (max 1 (length (measures (measure-line (car (beat-editors (editor-collection-object self)))))))))
+          (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self)))) 
     (#\p (when (rtm-selection-1 (editor-collection-object self)) 
            (let* ((nth-measure (position (rtm-selection-1 (editor-collection-object self))
                                          (measures (measure-line (current-rtm-editor (editor-collection-object self))))))
-                   measures)
+                  measures)
              (when nth-measure 
-                (setq measures 
-                    (mapcar #'nth (cirlist nth-measure)
-                       (ask-all (ask-all (give-selected-editors (editor-collection-object self)) #'measure-line) #'measures)))
-                (setq measures (remove nil measures))
-                (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls (editor-collection-object self)))))
-                (start 
-                 (apdfuncall  100 (priority) 15 
-                    #'(lambda ()
-                          (tell measures #'play-measure (get-play-speed (editor-collection-object self))))))))))
+               (setq measures 
+                     (mapcar #'nth (cirlist nth-measure)
+                             (ask-all (ask-all (give-selected-editors (editor-collection-object self)) #'measure-line) #'measures)))
+               (setq measures (remove nil measures))
+               (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls (editor-collection-object self)))))
+               (start 
+                (apdfuncall  100 (priority) 15 
+                             #'(lambda ()
+                                 (tell measures #'play-measure (get-play-speed (editor-collection-object self))))))))))
     (#\P (when (eq 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
            (start
-             (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls (editor-collection-object self)))))
-             (apdfuncall 100 (priority) 15 
-               #'(lambda ()
-                     (play-measure (rtm-selection-1 (editor-collection-object self)) (get-play-speed (editor-collection-object self))))))))
+            (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls (editor-collection-object self)))))
+            (apdfuncall 100 (priority) 15 
+                        #'(lambda ()
+                            (play-measure (rtm-selection-1 (editor-collection-object self)) (get-play-speed (editor-collection-object self))))))))
     (#\a (when (rtm-selection-1 (editor-collection-object self))
            (if (eq 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
-              (if (measures (measure-line (current-rtm-editor (editor-collection-object self))))
-                  (add-beat-after (car (last (measures (measure-line (current-rtm-editor (editor-collection-object self)))))))
-                  (add-beat-after-myself (rtm-selection-1 (editor-collection-object self)) ()))
-              (add-beat-after (rtm-selection-1 (editor-collection-object self))))
+               (if (measures (measure-line (current-rtm-editor (editor-collection-object self))))
+                   (add-beat-after (car (last (measures (measure-line (current-rtm-editor (editor-collection-object self)))))))
+                   (add-beat-after-myself (rtm-selection-1 (editor-collection-object self)) ()))
+               (add-beat-after (rtm-selection-1 (editor-collection-object self))))
            (update-all-beat-groupings)
            (erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))))
     (#\b (when (rtm-selection-1 (editor-collection-object self)) 
-             (unless (eq 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
-               (add-beat-before (rtm-selection-1 (editor-collection-object self)))
-               (update-all-beat-groupings)
-               (erase+view-draw-contents (current-rtm-editor (editor-collection-object self))))))
+           (unless (eq 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
+             (add-beat-before (rtm-selection-1 (editor-collection-object self)))
+             (update-all-beat-groupings)
+             (erase+view-draw-contents (current-rtm-editor (editor-collection-object self))))))
     (#\r (when (rtm-selection-1 (editor-collection-object self)) 
-       (record-rtm-chords-from-midi (give-rtm-range-chords (editor-collection-object self) nil))
+           (record-rtm-chords-from-midi (give-rtm-range-chords (editor-collection-object self) nil))
            (erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))))
     (#\k (read-from-midi)) 
     (#\K  
-       (tell (ask-all (beat-editors (editor-collection-object self)) 'measure-line) 'kill-all-measures)
-       (erase+view-draw-contents self))
-    (#\Backspace 
-       (let (m-line?)
-         (if (not (eq 'C-measure-line (class-name (class-of (setq m-line? (rtm-selection-1 (editor-collection-object self)))))))
-           (when (rtm-selection-1 (editor-collection-object self)) 
-               (remove-beat-from-measure (rtm-selection-1 (editor-collection-object self)))
-               (update-all-beat-groupings)
-               (erase+view-draw-contents (current-rtm-editor (editor-collection-object self))))
+     (tell (ask-all (beat-editors (editor-collection-object self)) 'measure-line) 'kill-all-measures)
+     (erase+view-draw-contents self))
+    ((:Backspace) 
+     (let (m-line?)
+       (if (eq 'C-measure-line
+               (class-name
+                (class-of
+                 (setq m-line? (rtm-selection-1
+                                (editor-collection-object self))))))
            (progn
-               (kill-chords m-line?)(setf (measures m-line?) ())
-               (erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))))))
+             (kill-chords m-line?)(setf (measures m-line?) ())
+             (erase+view-draw-contents (current-rtm-editor (editor-collection-object self))))
+           (when (rtm-selection-1 (editor-collection-object self)) 
+             (remove-beat-from-measure (rtm-selection-1 (editor-collection-object self)))
+             (update-all-beat-groupings)
+             (erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))))))
     (#\S  (tell (beat-editors (editor-collection-object self)) 'set-selection-button t))
     (#\U  (tell (beat-editors (editor-collection-object self)) 'set-selection-button nil))
     (#\D  (erase+view-draw-contents self))
     (#\e  (let ((e-ctrl (beat-edit-ctrl (editor-collection-object self))))
             (if (check-box-checked-p e-ctrl)
-               (check-box-uncheck  e-ctrl) (check-box-check  e-ctrl))
-          (set-edit-mode (editor-collection-object self) e-ctrl)))
-    (t (ed-beep))
-))
+                (check-box-uncheck  e-ctrl) (check-box-check  e-ctrl))
+            (set-edit-mode (editor-collection-object self) e-ctrl)))
+    (t (ed-beep))))
   
-;=================
+;;=================
 
 (defmethod view-activate-event-handler :after ((self C-rtm-editor-window))
   (when (pw-object self)
     (draw-appl-label (pw-object self) #\*))
   (setq *active-RTM-window* self) 
-  (set-menubar *RTM-menu-root*)
+  (ui:set-menubar *RTM-menu-root*)
   (enable-all-apps-menu-items)
   (menu-item-disable *apps-RTM-menu-item*))
 

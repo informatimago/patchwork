@@ -11,8 +11,8 @@
 
 (provide 'basic-library-boxes)
 
-;====================================================================================================
-; circular buffer
+;;====================================================================================================
+;; circular buffer
 #|(defclass  C-pw-circ (C-pw-resize-x)  
   ((data :initform nil :accessor data)
    (lock :initform nil :accessor lock)
@@ -94,7 +94,7 @@ evaluation of circ  (select the module and type 'v') causes the list of circulat
  around the buffer. "
   (declare (ignore list)))
 
-;===================================
+;;===================================
 
 (defclass  C-pw-circ-end (C-pw-circ)     
   ((stop-flag  :initform t :accessor stop-flag)))
@@ -122,7 +122,7 @@ clicking inside the small rectangle bottom-right
 and dragging the mouse."
   (declare (ignore list)))
 
-;===================================
+;;===================================
 
 (defclass C-pw-narg (C-pw-extend)())  
 
@@ -149,7 +149,7 @@ This box can be extended by option-clicking bottom-right
 (defvar arg9 () "Look at the documentation of arg2.")
 (defvar arg10 () "Look at the documentation of arg2.")
 
-;===================================
+;;===================================
 (defclass C-pw-test (C-pw-extend)())  
 
 (defmethod give-new-extended-title ((self C-pw-test)) 'test)
@@ -220,14 +220,14 @@ This box can be extended by option-clicking bottom-right
 (E = extend)."
 )
 
-;===================================
+;;===================================
 (defclass C-pw-gclock (C-patch)())  
 
 (defmethod patch-value ((self  C-pw-gclock) obj) (declare (ignore obj)) (clock *global-clock*))
 
 (defunp pw-clock () nil
 "Returns the value of the global clock in ticks.")
-;===================================
+;;===================================
 
 (defclass C-clock-constant (C-patch)  
    ((last-clock :initform 32000 :accessor last-clock)
@@ -260,7 +260,7 @@ time an evaluation of a patch is triggered by a mouse-click, so use the mouse in
 the keyboard ('v') to evaluate when there is an ev-once in your patch."
   (declare (ignore val)))
 
-;===================================
+;;===================================
 (defclass C-pw-loop (C-patch)())  
 
 (defmethod patch-value ((self  C-pw-loop) obj)
@@ -277,8 +277,8 @@ second
 input <patch> is evaluated."
   (declare (ignore count patch)))
   
-;===================================
-; 
+;;===================================
+;; 
 (defpackage "USER-SUPPLIED-IN-OUTS")
 
 (defclass C-pw-out (C-patch)())  
@@ -287,8 +287,8 @@ input <patch> is evaluated."
   (declare (ignore controls))
   (set (intern (dialog-item-text (car (pw-controls self))) "USER-SUPPLIED-IN-OUTS")  self))
 
-;(defmethod set-pw-out-symbol ((self C-pw-out) ctrl)
-;  (set (value ctrl) self))
+;;(defmethod set-pw-out-symbol ((self C-pw-out) ctrl)
+;;  (set (value ctrl) self))
  
 (defmethod patch-value ((self C-pw-out) obj)
   (patch-value (car (input-objects self)) obj))
@@ -310,7 +310,7 @@ to assign pairs of variables; also, avoid duplicating
 or changing the names of the already used  in ;and out modules."
   (declare (ignore patch)))
 
-;===================================
+;;===================================
 
 (defclass C-pw-in (C-patch)())  
 

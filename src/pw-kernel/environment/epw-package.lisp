@@ -10,20 +10,28 @@
 ;;;;=========================================================
 ;; This file (and no other one) contains also the definition of the package "EPW"
 
-(eval-when (eval compile load)
-  (load-once "PW:PW-Kernel;Environment;PW-symbolic-types"))
 
 (defpackage "EPW" 
-  (:use "COMMON-LISP" "PW-STYPE")
-  (:import-from "PATCH-WORK" "DEFUNP" "DEFUNT" "DEFMETHODP" "SELF"))
+  (:use "COMMON-LISP" "LELISP-MACROS" "CLPF-UTIL" "PATCH-WORK" "PW-STYPE")
+
+  (:export "*ASCII-NOTE-C-SCALE*" "*ASCII-NOTE-DO-SCALE*"
+           "*ASCII-NOTE-SCALES*" "*NO-SHARP-READ-TABLE*" "ARITHM-SER"
+           "AVERAGE" "DEFUNE" "DISTOR" "DISTOR-EXT" "F-BINARY-SEARCH"
+           "FLAT" "FLAT-ONCE" "FUN-MINMAX" "G-MAX" "G-MIN" "G-SCALING"
+           "INCLUDED?" "INTERPOLATION" "L-LAST" "L-MAX" "L-MIN"
+           "L-NTH" "L-SCALER/MAX" "L-SCALER/SUM" "L-SUPPRESS"
+           "LIST-EXPLODE" "LIST-FILL" "LIST-PART" "LO-FLAT"
+           "MAKE-LIST2" "MAT-TRANS" "NTH-RANDOM" "PERMUT-CIRC"
+           "PERMUT-RANDOM" "SORT-LIST" "X-APPEND" "X-DIFF"
+           "X-INTERSECT" "X-UNION" "X-XOR" "MAKE-NUM-FUN" "LAGRANGE"
+           "LINEAR" "POWER-FUN" "POWER/2" "POWER/3" "PARABOLE/2"
+           "PARABOLE/3"))
+
 
 ;; =============================================================================-======
 
 (in-package "EPW")
 
-(export '(defune))
-
-;;(import '(pw::defunp pw::defunt pw::defmethodp pw::self))
 
 (defmacro defune (name args outtype documentation &body body)
   `(defunp ,name ,args ,outtype ,documentation ,@body))

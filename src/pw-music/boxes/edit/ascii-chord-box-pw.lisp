@@ -15,17 +15,10 @@
 
 (in-package "EPW")
 
-(eval-when (eval compile load)
-  (import
-   '(patch-work::C-pw-resize-x
-     patch-work::patch-value
-     patch-work::compile-me
-     patch-work::input-objects
-     patch-work::pw-controls)))
 
 ;; =============================================================================-======
 ;; From "CAO:From-Mika-910218:PW-CL:PatchWork:PW-Library:basic-library-boxes.Lisp" 
-;; (in-package 'Patch-work)
+;; (in-package "PATCH-WORK")
 
 (defclass C-pw-ascii-chord-box (C-pw-resize-x) ())
 

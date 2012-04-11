@@ -16,6 +16,7 @@
 ;;;  patch-value          ;builds a chord object
 ;;;============================================
 (in-package :patch-work)
+(enable-patchwork-readtable)
 
 (defunp Chbuild ((midics (fixs (:dialog-item-text "()" :type-list (fixnum list))))
                  (durs (fixs (:dialog-item-text "()" :type-list (fixnum list))))
@@ -26,8 +27,7 @@
                    (ords (fixs (:dialog-item-text "()" :type-list (fixnum list) :value ())))
                    (comments (symbol (:value () :dialog-item-text "()")))
                    (objects (list (:value () :dialog-item-text "()" :type-list ())))
-                   (ch-type (symbol (:value 'pw::c-chord)))
-                   )
+                   (ch-type (symbol (:value 'pw::c-chord))))
         ch-ob
 "Constructs a chord object. All entries accept either single values or lists.
  The 'objects' entry takes either a note (or list of note) objects or a chord object whose
@@ -222,7 +222,7 @@ Patchwork instrument. This could be, for example, a structured abstraction, that
 is, a window with a subpatch on it. Any argument not supplied to make-note 
 takes its default value."
   (declare (ignore midic dur vel chan m-ins)))
-;==================================
+;;==================================
 
 (setf *note-obj-pw-type*
   (make-instance 'C-pw-type
@@ -244,4 +244,4 @@ takes its default value."
                      ("instrument". instrument)) 
     :type-list '(no-connection))))
 
-;==================================
+;;==================================

@@ -11,19 +11,19 @@
 
 (provide 'BPF-help-window)
 
-;====================================================================================================
+;;====================================================================================================
 (defclass C-bpf-help-window (C-pw-help-window)())
 
 (defmethod view-key-event-handler ((self C-bpf-help-window) char)
   (declare (special *active-bpf-window*))
-     (cond 
-        ((eq char  #\Newline)
+     (case char
+        ((:Newline)
            (when *active-bpf-window* (window-select *active-bpf-window*))
            (window-hide self)) 
-        ((eq char  #\Enter)
+        ((:Enter)
            (when *active-bpf-window* (window-select *active-bpf-window*))))) 
 
-;====================================================================================================
+;;====================================================================================================
 
 (defvar *BPF-help-window* ())
 

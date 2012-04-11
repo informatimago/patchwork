@@ -10,8 +10,8 @@
 (in-package :pw)
 
 (provide 'PW-scheduler)
-;============================================================
-; non real time scheduler test
+;;============================================================
+;; non real time scheduler test
 
 (defclass C-clock ()
   ((clock :initform 0 :accessor clock)  
@@ -38,7 +38,7 @@
 (defmethod  stop-clock ((self C-clock)) (setf (stop-time self) (clock self)))
 
 (defmethod  continue-clock ((self C-clock))
-;  (print (list 'clock (clock self)))
+;;  (print (list 'clock (clock self)))
   (if (>= (clock self) (stop-time self))
     (tell (processes self) 'stop-process)
     (let ((ready-list)
@@ -55,7 +55,7 @@
        (incf (clock self))
        (continue-clock self)))) 
 
-;______________
+;;______________
 
 (defclass C-process ()
   ((clock-obj :initform nil :allocation :class :accessor clock-obj)
@@ -76,7 +76,7 @@
   (insert-in-wait-list (clock-obj self) 
     (*dfuncall* (+ delay (clock (clock-obj self))) (process self) self)))
 
-;______________
+;;______________
 
 
 (defun *dfuncall*  (delay fun process)
@@ -84,8 +84,8 @@
 
 #|
 
-; examples of different processes
-; a process has no arguments
+;; examples of different processes
+;; a process has no arguments
 
 (defmethod  proc-print-bar  ((self C-process))
   (print (list 'bar (clock (clock-obj self))))
@@ -100,7 +100,7 @@
   (dfuncall-process self 10))
 
 (defmethod  proc-print-blah2  ((self C-process))
-;  (write-midi-note 10 1 60 100) 
+;;  (write-midi-note 10 1 60 100) 
   (print (list 'blah2 (clock (clock-obj self))))
   (dfuncall-process self 20))
 
@@ -113,7 +113,7 @@
 
 |#
 
-; a process with an individual begin-time and duration-time
+;; a process with an individual begin-time and duration-time
 
 (defclass C-process-begin+end (C-process)
   ((begin-time :initform 0  :initarg  :begin-time :accessor begin-time)

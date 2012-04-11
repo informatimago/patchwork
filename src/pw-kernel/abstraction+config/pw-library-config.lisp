@@ -48,12 +48,12 @@
       (dotimes (x (1- (length sub-dir-list)))
         (unless 
           (setq menu (find-menu-item current-sub-menu (car sub-dir-list)))
-          (add-menu-items current-sub-menu
+          (ui:add-menu-items current-sub-menu
                      (setq menu (new-menu (car sub-dir-list)))))                            
         (setq current-sub-menu menu)
         (pop sub-dir-list))
       (or (find-menu-item current-sub-menu (car sub-dir-list))
-          (add-menu-items current-sub-menu (new-leafmenu (trim-extension (car sub-dir-list)) 
+          (ui:add-menu-items current-sub-menu (new-leafmenu (trim-extension (car sub-dir-list)) 
                                                     (eval `(function (lambda () ,code))))))))
 
 (defvar *compiled-abstr-extension* ".comp")

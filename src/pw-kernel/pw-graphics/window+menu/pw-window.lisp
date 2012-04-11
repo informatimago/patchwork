@@ -9,14 +9,14 @@
 
 (in-package :pw)
 
-;=======================================================================================
-;=======================================================================================
+;;=======================================================================================
+;;=======================================================================================
 
 (defvar *global-clock* (make-instance 'C-clock))
 (defvar *decompile-chords-mode* nil)
 (defvar *pw-nosave-mode* nil)
 
-;===================================================================================
+;;===================================================================================
 
 (defclass C-pw-window (window)
   ((patch-scrap :initform nil :allocation :class :accessor patch-scrap)
@@ -31,16 +31,16 @@
 
 (defmethod decompile ((self C-pw-window))
   `(make-win ',(type-of self) ,(window-title self) ,(view-position self) ,(view-size self)
-           (list ,@(ask-all (controls self) 'decompile))
-           (list ,@(window-decompile-connections self) )
-           ,(and (top-level-patch-win? self) t)))
+             (list ,@(ask-all (controls self) 'decompile))
+             (list ,@(window-decompile-connections self) )
+             ,(and (top-level-patch-win? self) t)))
 
 (defun make-win (class title position size controls connections &optional close-button)
   (let ((win (make-instance class
-                     :window-title title 
-                     :view-position position
-                     :view-size size :window-show () :close-box-p close-button
-                     )))
+                 :window-title title 
+                 :view-position position
+                 :view-size size :window-show () :close-box-p close-button
+                 )))
     (apply #'add-subviews win controls)
     (mapc #'(lambda (connection-list) 
               (connect-nth-control (nth (first connection-list) controls)
@@ -51,47 +51,49 @@
     (tell controls 'set-pw-window-pointers win)
     win))
 
-;=================
-;events
+;;=================
+;;events
 
 (defmethod view-click-event-handler ((self C-pw-window) where)
   (set-changes-to-file-flag self)
   (when (eq  (call-next-method) self)  ; click inside window
     (if *current-small-inBox* (kill-text-item) )          ;;(see pw-controls)
-    (unless (shift-key-p)(tell (controls self) #'deactivate-control))   
-    (rlet ((user-rect :rect)
-           (scratch-rect :rect)
-           (i-rect :rect))
-      (#_pt2rect :long where
-       :long (grow-gray-rect where 0 (wptr self) nil)
-       :ptr user-rect)
-      (let (lista)
-        (dolist (item (controls self))
-          (setq where (view-position item))
-          (rset i-rect :rect.topleft where)
-          (rset i-rect :rect.bottomright (add-points where (view-size item)))
-          (#_SectRect :ptr user-rect :ptr i-rect :ptr scratch-rect)
-          (unless (#_EmptyRect :ptr scratch-rect :boolean)
-            (progn
-              (activate-control item)
-              (push (mkSO :|cbox| nil :|name| (pw-function-string item)) lista))))
-        (when lista
-          (record-select-list lista))))))
+    (unless (shift-key-p)(tell (controls self) #'deactivate-control))
+    (warn "~S ~S is not implemented yet" 'view-click-event-handler '((self C-pw-window) where))
+    ;; (rlet ((user-rect :rect)
+    ;;        (scratch-rect :rect)
+    ;;        (i-rect :rect))
+    ;;       (#_pt2rect :long where
+    ;;                  :long (grow-gray-rect where 0 (wptr self) nil)
+    ;;                  :ptr user-rect)
+    ;;       (let (lista)
+    ;;         (dolist (item (controls self))
+    ;;           (setq where (view-position item))
+    ;;           (rset i-rect :rect.topleft where)
+    ;;           (rset i-rect :rect.bottomright (add-points where (view-size item)))
+    ;;           (#_SectRect :ptr user-rect :ptr i-rect :ptr scratch-rect)
+    ;;           (unless (#_EmptyRect :ptr scratch-rect :boolean)
+    ;;             (progn
+    ;;               (activate-control item)
+    ;;               (push (mkSO :|cbox| nil :|name| (pw-function-string item)) lista))))
+    ;;         (when lista
+    ;;           (record-select-list lista))))
+    ))
 
-;=================
+;;=================
 (defmethod controls ((self C-pw-window)) (subviews self))
 
 (defmethod activate-all ((self C-pw-window)) (tell (controls self) 'activate-control))
- 
+
 (defmethod active-patches ((self C-pw-window))
   (let ((actives)(controls (controls self)))
     (while controls
-       (when (active-mode (car controls)) (push (car controls) actives))
-       (pop controls))
+      (when (active-mode (car controls)) (push (car controls) actives))
+      (pop controls))
     actives))
 
-;=================================
-; draw
+;;=================================
+;; draw
 
 (defvar *pw-connections-drawing-mode* ())
 
@@ -106,36 +108,36 @@
     (with-focused-view self
       (draw-string 5 10 (window-title (super-win self)))))) 
 
-;=============================
-; saving and loading patches
+;;=============================
+;; saving and loading patches
 
 (defmethod top-level-patch-win? ((self C-pw-window))
   (and (not (abstract-box self))
        (not (super-win self))
        (not (super-note self)) self))
 
-; menu stuff !
+;; menu stuff !
 
 (defmethod set-changes-to-file-flag ((self C-pw-window))
- (when (controls self)
-  (when (top-level-patch-win? self)
-    (unless (save-changes-to-file-flag self)
-      (setf (save-changes-to-file-flag self) t)
-      (update-PW-file-menu-items t t)
-      (set-window-title self (concatenate 'string "†" (window-title self)))
-      (when (wins-menu-item self)
-        (set-menu-item-title (wins-menu-item self) (window-title self)))))))
+  (when (controls self)
+    (when (top-level-patch-win? self)
+      (unless (save-changes-to-file-flag self)
+        (setf (save-changes-to-file-flag self) t)
+        (update-PW-file-menu-items t t)
+        (set-window-title self (concatenate 'string "†" (window-title self)))
+        (when (wins-menu-item self)
+          (set-menu-item-title (wins-menu-item self) (window-title self)))))))
 
 (defmethod reset-changes-to-file-flag ((self C-pw-window))
   (setf (save-changes-to-file-flag self) nil)
   (update-PW-file-menu-items t nil)
   (set-window-title self (remove  "†" (window-title self) :test 'string=))
   (when (wins-menu-item self)
-     (set-menu-item-title (wins-menu-item self) (window-title self))))
+    (set-menu-item-title (wins-menu-item self) (window-title self))))
 
 (defmethod save-window-title ((self C-pw-window)) (remove  "†" (window-title self) :test 'string=))
 
-;==================================================
+;;==================================================
 (defvar *save-compiled-file* nil)
 
 (defmethod PW-WINDOW-SAVE-MN  ((self C-pw-window))
@@ -146,26 +148,26 @@
 
 (defmethod PW-WINDOW-SAVE  ((self C-pw-window))
   (if *pw-nosave-mode*
-    (ccl::message-dialog "Sorry this version cannot save files.")
-    (if (not (patch-win-pathname self))
-      (PW-WINDOW-SAVE-as self)
-      (let ((*print-pretty* ()) newfile)
-        (set-window-title  self (save-window-title self))
-        (when (wins-menu-item self)
-          (set-menu-item-title (wins-menu-item self) (window-title self)))
-        (delete-file (patch-win-pathname self))
-        (WITH-OPEN-FILE (out (patch-win-pathname self) :direction :output 
-                             :if-does-not-exist :create :if-exists :supersede) 
-          (prin1 '(in-package :pw) out)
-          (let ((*package* :pw))
-            (prin1 (decompile self) out)))
-        (record--ae :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat| ) (,:|mnpa| ,t))
-                                        `((,:|----| ,:|cpat|) )))
-        (when *save-compiled-file*
-          (setf newfile (compile-file (patch-win-pathname self)))
-          (delete-file (patch-win-pathname self))
-          (rename-file newfile (patch-win-pathname self)))
-        (reset-changes-to-file-flag self)))))
+      (ui::message-dialog "Sorry this version cannot save files.")
+      (if (not (patch-win-pathname self))
+          (PW-WINDOW-SAVE-as self)
+          (let ((*print-pretty* ()) newfile)
+            (set-window-title  self (save-window-title self))
+            (when (wins-menu-item self)
+              (set-menu-item-title (wins-menu-item self) (window-title self)))
+            (delete-file (patch-win-pathname self))
+            (WITH-OPEN-FILE (out (patch-win-pathname self) :direction :output 
+                                 :if-does-not-exist :create :if-exists :supersede) 
+              (prin1 '(in-package :pw) out)
+              (let ((*package* :pw))
+                (prin1 (decompile self) out)))
+            (record--ae :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat| ) (,:|mnpa| ,t))
+                                            `((,:|----| ,:|cpat|) )))
+            (when *save-compiled-file*
+              (setf newfile (compile-file (patch-win-pathname self)))
+              (delete-file (patch-win-pathname self))
+              (rename-file newfile (patch-win-pathname self)))
+            (reset-changes-to-file-flag self)))))
 
 (defmethod PW-WINDOW-SAVE-MN-as ((self C-pw-window))
   (setq *decompile-chords-mode* t)
@@ -174,80 +176,98 @@
 
 (defmethod PW-WINDOW-SAVE-as ((self C-pw-window))
   (if *pw-nosave-mode*
-    (ccl::message-dialog "Sorry this version cannot save files.")
-    (let ((new-name (choose-new-file-dialog    
-                     :directory (concatenate 'string  (save-window-title self) ".pw")
-                     :prompt "Save Patch As…"))
-          newfile
-          (*print-pretty* ()))
-      (setf (patch-win-pathname self) new-name)
-      (set-window-title self (pathname-name new-name))
-      (when (wins-menu-item self)
-        (set-menu-item-title (wins-menu-item self) (window-title self)))
-      (delete-file new-name)   ;ML
-      (ccl:with-cursor *watch-cursor* 
-        (WITH-OPEN-FILE  (out new-name :direction :output 
-                              :if-does-not-exist :create :if-exists :supersede) 
-          (prin1 '(in-package :pw) out)
-          (let ((*package* :pw))
-            (prin1 (decompile self) out))))
-      (record--ae :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat|) 
-                                                                (,:|asna| ,(namestring new-name)) (,:|mnpa| ,t))
-                                      `((,:|----| ,:|cpat|) (,:|asna| ,(namestring new-name)))))
-      (when *save-compiled-file*
-        (setf newfile (compile-file new-name))
-        (delete-file new-name)
-        (rename-file newfile new-name))
-      (reset-changes-to-file-flag self))))
+      (ui::message-dialog "Sorry this version cannot save files.")
+      (let ((new-name (choose-new-file-dialog    
+                       :directory (concatenate 'string  (save-window-title self) ".pw")
+                       :prompt "Save Patch As…"))
+            newfile
+            (*print-pretty* ()))
+        (setf (patch-win-pathname self) new-name)
+        (set-window-title self (pathname-name new-name))
+        (when (wins-menu-item self)
+          (set-menu-item-title (wins-menu-item self) (window-title self)))
+        (delete-file new-name)   ;ML
+        (ui:with-cursor *watch-cursor* 
+          (WITH-OPEN-FILE  (out new-name :direction :output 
+                                :if-does-not-exist :create :if-exists :supersede) 
+            (prin1 '(in-package :pw) out)
+            (let ((*package* :pw))
+              (prin1 (decompile self) out))))
+        (record--ae :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat|) 
+                                                                  (,:|asna| ,(namestring new-name)) (,:|mnpa| ,t))
+                                        `((,:|----| ,:|cpat|) (,:|asna| ,(namestring new-name)))))
+        (when *save-compiled-file*
+          (setf newfile (compile-file new-name))
+          (delete-file new-name)
+          (rename-file newfile new-name))
+        (reset-changes-to-file-flag self))))
 
 (defun load-a-patch (name)
-  (with-cursor *watch-cursor* 
-      (load name :verbose t)
-      (PW-update-wins-menu name)))
+  (with-cursor *watch-cursor*
+    (let ((*readtable* *readtable-patchwork*))
+     (load name :verbose t :external-format :mac-roman))
+    (PW-update-wins-menu name)))
 
 (defun PW-LOAD-PATCH ()
   (let ((name (CHOOSE-FILE-DIALOG :button-string "Open Patch"))
-        (*compile-definitions* ()))  
-    (with-cursor *watch-cursor* 
-      (load name :verbose t)    
+        (*compile-definitions* ()))
+    (unless *active-patch-window*
+      (let ((win (make-instance 'c-pw-window)))
+        (push win *pw-window-list*) 
+        (view-activate-event-handler win)))
+    (assert *pw-window-list*)
+    (assert *active-patch-window*)
+    (with-cursor *watch-cursor*
+      (let ((*readtable* *readtable-patchwork*))
+        (handler-case
+            (load name :verbose t :external-format :mac-roman)
+          (error (err)
+            (format t "~&Error: ~A~%" err)
+            (return-from pw-load-patch :error))))
+      (format t "~&File ~S loaded.~%" name) (finish-output)
       (record--ae :|aevt| :|odoc| `((,:|----| ,(mkSO :|cpat| nil :|name| (namestring name))))) 
-      (PW-update-wins-menu name))))
+      (pw-update-wins-menu name))))
 
 (defun PW-update-wins-menu (&optional pathname)
+  (format t "~&Length window list: ~A~%" (length *pw-window-list*))
   (let ((window-now (car *pw-window-list*)))
+    (window-select window-now)
     (when (and (not (abstract-box window-now))
                (not (wins-menu-item window-now)))
-       (when pathname (setf (patch-win-pathname window-now) pathname)) 
-       (window-select window-now)
-       (add-menu-items  *pw-windows-menu* 
-           (setf (wins-menu-item window-now)
-              (new-leafmenu  (window-title window-now) 
-                 #'(lambda ()(window-select window-now))))))
-       (when (eq (front-window)  window-now) (update-wins-menu-items window-now)))) 
+      (when pathname (setf (patch-win-pathname window-now) pathname)) 
+      ;; (window-select window-now)
+      (ui:add-menu-items  *pw-windows-menu* 
+                          (setf (wins-menu-item window-now)
+                                (new-leafmenu  (window-title window-now) 
+                                               #'(lambda ()(window-select window-now))))))
+    (when (eq (front-window)  window-now)
+      (update-wins-menu-items window-now)))) 
 
-;___________
-; activate deactivate kill
+;;___________
+;; activate deactivate kill
 
 (defmethod update-wins-menu-items ((self C-pw-window))
   (when (wins-menu-item self)
-     (MENU-item-disABLE (wins-menu-item self)))) 
+    (MENU-item-disABLE (wins-menu-item self)))) 
 
-#|(defmethod view-activate-event-handler :after ((self C-pw-window))
-   (when (abstract-box self)
-     (draw-appl-label (abstract-box self) #\*))
-   (set-menubar *patch-work-menu-root*)
-   (enable-all-apps-menu-items)
-   (menu-item-disable *apps-PW-menu-item*)
-   (update-PW-file-menu-items
-      (top-level-patch-win? self) (save-changes-to-file-flag self))
-   (update-wins-menu-items self)
-   (setq *active-patch-window* self))|#
+#||
+(defmethod view-activate-event-handler :after ((self C-pw-window))
+(when (abstract-box self)
+(draw-appl-label (abstract-box self) #\*))
+(ui:set-menubar *patch-work-menu-root*)
+(enable-all-apps-menu-items)
+(menu-item-disable *apps-PW-menu-item*)
+(update-PW-file-menu-items
+(top-level-patch-win? self) (save-changes-to-file-flag self))
+(update-wins-menu-items self)
+(setq *active-patch-window* self))
+||#
 
 (defmethod view-activate-event-handler :after ((self C-pw-window))
   (when (abstract-box self)
     (draw-appl-label (abstract-box self) #\*))
-  (unless (equal (menubar) *patch-work-menu-root*)
-    (set-menubar *patch-work-menu-root*)
+  (unless (equal (ui:menubar)  *patch-work-menu-root*)
+    (ui:set-menubar *patch-work-menu-root*)
     (enable-all-apps-menu-items))
   (menu-item-disable *apps-PW-menu-item*)
   (update-PW-file-menu-items
@@ -257,28 +277,28 @@
     (record--ae :|PWst| :|sele| `((,:|----| ,(mkSO :|cpat| nil :|name| (win-title self))))))
   (setq *active-patch-window* self))
 
-(defmethod view-activate-event-handler :after ((self ccl::fred-window))
-  (unless (equal (menubar) *default-CCL-menubar*)
-    (set-menubar *default-CCL-menubar*)
-      ;;added 920818 [Camilo]
+(defmethod view-activate-event-handler :after ((self ui::fred-window))
+  (unless (equal (ui:menubar)  *default-CCL-menubar*)
+    (ui:set-menubar *default-CCL-menubar*)
+    ;;added 920818 [Camilo]
     (mapc #'menu-enable (cdr *default-CCL-menubar*))
     (menu-item-disable *apps-lisp-menu-item*)))
 
 #|(defmethod view-deactivate-event-handler :after ((self C-pw-window))
-   (when (abstract-box self)
-     (draw-appl-label (abstract-box self) #\A))
-  (when (eq *active-patch-window* self) ; no PW window selected
-    (menu-item-enable *apps-PW-menu-item*)
-    (enable-Lisp-apps-menu-item?))
-  (when (wins-menu-item self)
-    (MENU-item-ENABLE (wins-menu-item self))))|#
+(when (abstract-box self)
+(draw-appl-label (abstract-box self) #\A))
+(when (eq *active-patch-window* self) ; no PW window selected
+(menu-item-enable *apps-PW-menu-item*)
+(enable-Lisp-apps-menu-item?))
+(when (wins-menu-item self)
+(MENU-item-ENABLE (wins-menu-item self))))|#
 
 (defmethod view-deactivate-event-handler :after ((self C-pw-window))
-   (when (abstract-box self)
-     (draw-appl-label (abstract-box self) #\A))
-   (menu-item-enable *apps-PW-menu-item*)
-   (if (wins-menu-item self)
-     (MENU-item-ENABLE (wins-menu-item self))))
+  (when (abstract-box self)
+    (draw-appl-label (abstract-box self) #\A))
+  (menu-item-enable *apps-PW-menu-item*)
+  (if (wins-menu-item self)
+      (MENU-item-ENABLE (wins-menu-item self))))
 
 (defmethod kill-patch-window ((self C-pw-window))
   (if (top-level-patch-win? self) (window-close self)))
@@ -287,17 +307,17 @@
   (if (and  (top-level-patch-win? self)  ;;
             (save-changes-to-file-flag self)
             (not *pw-nosave-mode*))
-    (if (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self)))
-      (PW-WINDOW-SAVE-MN self)))
+      (if (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self)))
+          (PW-WINDOW-SAVE-MN self)))
   (view-deactivate-event-handler self)
   (if (wins-menu-item self)
-    (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
+      (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
   (setq *pw-window-list* (remove self *pw-window-list* :test 'eq)) 
   (tell (controls self) 'remove-yourself-control)
   (call-next-method)
   (record--ae :|core| :|clos| `((,:|----| , :|cpat| ))))
 
-;=============================
+;;=============================
 
 (defmethod decompile-selection ((self C-pw-window))
   `(let ((controls (list ,@(ask-all (active-patches self) 'decompile))))
@@ -306,19 +326,19 @@
 
 (defmethod decompile-all-connections ((self C-pw-window))
   (let ((controls (controls self)))
-     (apply 'append (ask-all controls 'decompile-connections controls))))
+    (apply 'append (ask-all controls 'decompile-connections controls))))
 
 (defmethod decompile-all-selection-connections ((self C-pw-window))
   (let ((controls (active-patches self)))
-     (apply 'append (ask-all controls 'decompile-connections controls))))
+    (apply 'append (ask-all controls 'decompile-connections controls))))
 
 ;;this method will dissapear at any moment....
 (defmethod window-decompile-connections ((self C-pw-window))
   (mapcar #'(lambda (code) `(list ,(second (second code)) ,(third code) ,(second (fourth code))))
           (decompile-all-connections self)))
 
-;=================
-;cut copy paste
+;;=================
+;;cut copy paste
 
 (defun connect/unconn (active rest &optional flag)
   (tell active 'draw-connections flag)
@@ -364,14 +384,14 @@
       (dolist (dead-patch cut-patches)
         (disconnect-my-self alive-patch dead-patch))
       (repaint-connections alive-patch cut-patches))
-   ))
+    ))
 
 (defmethod cut ((self C-pw-window))
   (let ((active-patches (active-patches self)))
-  (when active-patches
-    (set-changes-to-file-flag self) 
-    (disconnect-all-cut-patches self active-patches)
-    (copy self)
+    (when active-patches
+      (set-changes-to-file-flag self) 
+      (disconnect-all-cut-patches self active-patches)
+      (copy self)
       (dolist (patch active-patches)
         (remove-yourself-control patch)
         (remove-subviews self patch)))
@@ -388,8 +408,8 @@
         (remove-subviews self patch)
         ))))
 
-;========================
-; key handler
+;;========================
+;; key handler
 (defvar *pw-default-stop-time* 1000)
 
 (defmethod view-key-event-handler ((self C-pw-window) char)
@@ -399,40 +419,40 @@
         (t
          (let (no-change-flag)
            (case char
-             (#\Newline 
+             (:Newline 
               (cond ((abstract-box self) (window-hide self) (window-select (view-window (abstract-box self))))
                     ((super-win self) (window-hide self) (window-select (super-win self)))
                     (t (ed-beep) (setq no-change-flag t))))
-             (#\Enter  
+             (:Enter  
               (cond ((abstract-box self) (window-select (view-window (abstract-box self))))
                     ((super-win self) (window-select (super-win self)))
                     (t (ed-beep) (setq no-change-flag t))))
-             ;(#\b  (if (active-patches self) (browse (car (active-patches self)))))
-             (#\Delete (cut-delete self))
+                                        ;(#\b  (if (active-patches self) (browse (car (active-patches self)))))
+             (:Delete (cut-delete self))
              (#\h 
               (if *PW-help-window*
-                (unless (wptr  *PW-help-window*) (make-PW-help-window))
-                (make-PW-help-window))
+                  (unless (wptr  *PW-help-window*) (make-PW-help-window))
+                  (make-PW-help-window))
               (window-select *PW-help-window*))
              (#\t     ;;tutorial patch
               (if (active-patches self) (tell (active-patches self) #'get-tutorial-patch) (ed-beep)))
              (#\R 
               (if (top-level-patch-win? self)
-                (ed-beep)
-                (let ((title
-                       (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
-                                              :initial-string (window-title self))))
-                  (when title
-                    (cond 
-                     ((abstract-box self)
-                      (set-dialog-item-text-from-dialog (car (pw-controls (out-obj (abstract-box self)))) title))
-                     ((super-win self)
-                      (set-window-title self title)(erase+view-draw-contents (super-win self))))))))
+                  (ed-beep)
+                  (let ((title
+                          (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
+                                                 :initial-string (window-title self))))
+                    (when title
+                      (cond 
+                        ((abstract-box self)
+                         (set-dialog-item-text-from-dialog (car (pw-controls (out-obj (abstract-box self)))) title))
+                        ((super-win self)
+                         (set-window-title self title)(erase+view-draw-contents (super-win self))))))))
              (#\r (if (active-patches self) (rename-boxes self) (ed-beep)))
              (#\X (if (active-patches self) 
-                    (allign-patches-to-x-y self) (setq no-change-flag t)))
+                      (allign-patches-to-x-y self) (setq no-change-flag t)))
              (#\Y (if (active-patches self) 
-                    (allign-patches-to-y self) (setq no-change-flag t)))
+                      (allign-patches-to-y self) (setq no-change-flag t)))
              (#\D  (view-draw-contents  self))
              (#\i (tell (ask-all (active-patches self) 'pw-function) 'inspect))
              (#\e (tell (ask-all (active-patches self) 'pw-function) 'edit-definition))
@@ -443,12 +463,12 @@
              (#\c 
               (let ((stop-time (ask (controls self) 'give-stop-time))) 
                 (if stop-time
-                  (record-midi-out-boxes- self stop-time)
-                  (record-midi-out-boxes- self *pw-default-stop-time*))))
+                    (record-midi-out-boxes- self stop-time)
+                    (record-midi-out-boxes- self *pw-default-stop-time*))))
              (#\C 
               (if (super-note self)
-                (record-midi-out-boxes- self (give-structured-duration1 self 1))
-                (ed-beep)))
+                  (record-midi-out-boxes- self (give-structured-duration1 self 1))
+                  (ed-beep)))
              (#\s (tell (controls self) 'stop-play))
              (#\v (run-boxes self))
              (otherwise (ED-BEEP)(setq no-change-flag t)))
@@ -463,31 +483,31 @@
   (let ((boxes (active-patches self)))
     (dolist (box boxes)
       (eval-enqueue `(print (patch-value ,box ,box)))
-      ;aaa
+                                        ;aaa
       (record--ae :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box)))))
       )))
 
-;==================================
-;recording 
+;;==================================
+;;recording 
 
 (defmethod find-all-midi-out-boxes ((self C-pw-window))
-   (remove nil (ask-all (controls self) #'yourself-if-collecting)))
+  (remove nil (ask-all (controls self) #'yourself-if-collecting)))
 
 
 (defmethod find-midi-out-boxes ((self C-pw-window))
   (let ((patches (active-patches self)) )  ;(res))
     (remove nil (ask-all patches 'yourself-if-collecting))))
 
-    
+
 (defmethod record-midi-out-boxes- ((self C-pw-window) stop-time)
   (let ((boxes (find-midi-out-boxes self)))
-     (tell boxes 'set-begin-time 0)  
-     (tell boxes 'set-duration-time stop-time)  
-     (tell boxes 'init-patch) ; before scheduling !! 
-     (eval-enqueue `(start-clock *global-clock* ',stop-time ',boxes))))
+    (tell boxes 'set-begin-time 0)  
+    (tell boxes 'set-duration-time stop-time)  
+    (tell boxes 'init-patch) ; before scheduling !! 
+    (eval-enqueue `(start-clock *global-clock* ',stop-time ',boxes))))
 
-;==================================
-;layout
+;;==================================
+;;layout
 
 (defmethod allign-patches-to-x-y  ((self C-pw-window))
   (tell (controls self) 'draw-connections t) 
@@ -498,7 +518,7 @@
     (while ctrls 
       (set-view-position (car ctrls) x-now (+ 8 (y previous-ctrl) (h previous-ctrl)))
       (setq previous-ctrl (pop ctrls))))
-   (tell (controls self) 'draw-connections))
+  (tell (controls self) 'draw-connections))
 
 (defmethod allign-patches-to-y  ((self C-pw-window))
   (tell (controls self) 'draw-connections t) 
@@ -509,5 +529,5 @@
     (while ctrls 
       (set-view-position  (car ctrls) (make-point (+ 8 (x previous-ctrl)(w previous-ctrl)) y-now))
       (setq previous-ctrl (pop ctrls))))
-   (tell (controls self) 'draw-connections))
+  (tell (controls self) 'draw-connections))
 

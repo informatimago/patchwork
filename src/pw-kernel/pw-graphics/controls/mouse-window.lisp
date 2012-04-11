@@ -8,8 +8,9 @@
 ;;;;=========================================================  
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-;==================================================================================================================
+;;==================================================================================================================
 (defvar *xy-windoid* ())
 (defvar *x-value-text* ())
 (defvar *y-value-text* ())
@@ -18,7 +19,7 @@
 (defvar *next-point-h-val* ())
 (defvar *bpf-view-draw-lock* ())
 
-;==================================================================================================================
+;;==================================================================================================================
 
 (defun make-xy-windoid-instance ()
   (setf *xy-windoid* (make-instance 'windoid :view-size #@(90 32) :close-box-p nil :window-show nil))
@@ -42,7 +43,7 @@
                      :dialog-item-text "    0"
                      :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)))))
 
-;======================================
+;;======================================
 (defvar *last-mouse* ())
 
 (defclass C-mouse-window (window) ())
@@ -79,13 +80,13 @@
   (tell (subviews self) #'view-mouse-up))
 
 #|    
-(CCL:defobfun (CCL:window-null-event-handler *CCL-internal-window*) ()
-   (declare (CCL:object-variable clpf-object clicked))
-   (let ((mouse (CCL:window-mouse-position)))
+(ui:defobfun (ui:window-null-event-handler *CCL-internal-window*) ()
+   (declare (ui:object-variable clpf-object clicked))
+   (let ((mouse (ui:window-mouse-position)))
      (unless (eq *last-mouse* mouse)
        (setq *last-mouse* mouse)
        (if clicked
-         (mouse-dragged clpf-object (CCL:point-h mouse) (CCL:point-v mouse))
-         (mouse-moved clpf-object (CCL:point-h mouse) (CCL:point-v mouse))))))
+         (mouse-dragged clpf-object (ui:point-h mouse) (ui:point-v mouse))
+         (mouse-moved clpf-object (ui:point-h mouse) (ui:point-v mouse))))))
 |#    
 

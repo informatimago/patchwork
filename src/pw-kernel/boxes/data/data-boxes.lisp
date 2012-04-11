@@ -12,8 +12,6 @@
 ;;;
 (in-package :pw)
 
-(export '(const evconst))
-
 (defunp const ((const list (:type-list ()))) nil
   "This module controls numerical values or lists  (on many levels). It accepts 
 either numerical values, symbols, or mixed values. It returns a list without 

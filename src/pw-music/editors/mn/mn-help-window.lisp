@@ -11,33 +11,33 @@
 
 (provide 'MN-help-window)
 
-;====================================================================================================
+;;====================================================================================================
 (defclass C-MN-help-window (C-pw-help-window)())
 
 (defmethod view-key-event-handler ((self C-MN-help-window) char)
-     (cond 
-        ((eq char  #\Newline)
-           (when *active-MN-window* (window-select *active-MN-window*))
-           (window-hide self)) 
-        ((eq char  #\Enter)
-           (when *active-MN-window* (window-select *active-MN-window*))))) 
+  (case char
+    ((:Newline)
+     (when *active-MN-window* (window-select *active-MN-window*))
+     (window-hide self)) 
+    ((:Enter)
+     (when *active-MN-window* (window-select *active-MN-window*))))) 
 
-;====================================================================================================
+;;====================================================================================================
 
 (defvar *MN-help-window* ())
 
 (defun make-MN-help-window ()
- (let (scroller)
-  (setq *MN-help-window*
-    (make-instance 'C-MN-help-window :window-title "MN help" :GROW-ICON-P t
-         :view-position (make-point 30 25) :view-size (make-point 560 455) :close-box-p nil))
-   (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 560 8) (- 455 16)) 
-        :view-container *MN-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
-  (add-subviews scroller
-   (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
-    :view-font '("monaco" 9 :srcor)
-    :dialog-item-text 
-"    MN editor keyboard shortcuts and clicks:
+  (let (scroller)
+    (setq *MN-help-window*
+          (make-instance 'C-MN-help-window :window-title "MN help" :GROW-ICON-P t
+                         :view-position (make-point 30 25) :view-size (make-point 560 455) :close-box-p nil))
+    (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 560 8) (- 455 16)) 
+                                  :view-container *MN-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
+    (add-subviews scroller
+                  (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
+                                 :view-font '("monaco" 9 :srcor)
+                                 :dialog-item-text 
+                                 "    MN editor keyboard shortcuts and clicks:
    general:
     h         open help window
     Return    select PW window,hide MN window

@@ -11,14 +11,13 @@
 
 (in-package "EPW")
 
-;(import '(mc->f1 f->mc1)) ; etc.
 
-;=============================================================
-;===================== freq harmony ==========================
-;=============================================================
+;;=============================================================
+;;===================== freq harmony ==========================
+;;=============================================================
 
 
-; ==================== série harm  ===========================
+;; ==================== série harm  ===========================
 
 (defun rankcalc (numer denom begin end )
   (let ((cdeb (mod begin denom)) (pas (if (< end begin) -1 1)) res)
@@ -142,7 +141,7 @@ the fundamentals."
         ((= type 2)  (mapcar #'(lambda (x) (flat (simplenth x nth type))) fund) )))
        
 
-; anciens noms, pour compatibilité
+;; anciens noms, pour compatibilité
 
 (defunp overtones ((fund midics? (:value 3600)) (numer fix>0s? (:value 1)) 
                    (denom fix>0s? (:value 1)) (begin fix (:value 1))
@@ -260,7 +259,7 @@ chords."
     (if  (not (atom (car chord))) (flat-once res) res)))
 
 
-; ========== distorsion des fréquences ==============================================
+;; ========== distorsion des fréquences ==============================================
 
 
 (defunp fdistor ((chord midic) (minout midic (:value 5700)) (maxout midic (:value 6300))
@@ -383,7 +382,7 @@ If <chord> is a list of chords the output is a list of the central
 values."
   (less-deep-mapcar  'midi-center-1  chord)  )
 
-; fonctions supprimées du menu ------------------------------------
+;; fonctions supprimées du menu ------------------------------------
 (defunp freq-center2 ((freq1 freq) (freq2 freq)) freq
   "central freq between <freq1> and <freq2>"
   (sqrt (* (car! freq2) (car! freq1))) )
@@ -391,7 +390,7 @@ values."
 (defunp freq-center ((freqs freq)) freq 
   "central freq between the lowest and highest notes of the chord <freqs>"
   (freq-center2 (l-min (list! chord)) (l-max (list! chord))))
-;------------------------------------------------------------------
+;;------------------------------------------------------------------
 
 (defunp best-freq ((chord midic)
               &optional (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) numbers?
@@ -420,9 +419,9 @@ calculations and output are all in hertz."
 
 
 
-; ============ modulations ==========================================================
+;; ============ modulations ==========================================================
 
-; ----------   modulation de fréquence
+;; ----------   modulation de fréquence
 
 (defun fmcalc (p m index)
   (let ((res (list p)))
@@ -445,7 +444,7 @@ calculations and output are all in hertz."
    mcarrier and mmod may be lists"
      (f->mc (fm/freq (mc->f mcarrier) (mc->f mmod) index)))
 
-; nouvelles fonctions plus performantes ---------
+;; nouvelles fonctions plus performantes ---------
 
 (defun fmnth (p m lindex output)
   (let ((res (if (= output 2) () (list p))))
@@ -540,7 +539,7 @@ lists."
 
 
 
-; --------------  modulation en anneau
+;; --------------  modulation en anneau
 
 (defune ringharm/f/struc ((fond1 freq) (fond2 freq) (hqa fix>0) (hqb fix>0)) chord
 ""
@@ -651,7 +650,7 @@ de chaque fréquence de la liste <freqs1> par la liste <freqs2>"
         (push (append (l+ a freqs2) (l- a freqs2)) ll) ))
     (if  x (flat (nreverse ll)) (nreverse ll))))
  
-; anciennes fonctions - pour compatibilité
+;; anciennes fonctions - pour compatibilité
 (defunp ring/midic ((ch1 chord) (ch2 chord (:value 6200))) chord ""
 (ring-mod ch1 ch2))
 
@@ -687,7 +686,7 @@ transpositions combined."
 
 ;; ==== (usually) for chord interpolation ====
 
-;from Rhythms:Functions [magnus]
+;;from Rhythms:Functions [magnus]
 
 (defun -power-function (begin end time curve)
   (+ (* (- end begin) (expt time curve)) begin))
@@ -710,7 +709,7 @@ transpositions combined."
 ;;   |       |       |
 ;; ints   curints revints
 
-;(defunt espace-ch ((chord chord)) chords)
+;;(defunt espace-ch ((chord chord)) chords)
 
 (defunp auto-transp ((chord list (:value "(6000 6300)")) 
                      &optional (output menu (:menu-box-list (("inclus" . 1) ("exclus". 2))))
@@ -768,10 +767,10 @@ in the (optional) register given."
     (nreverse revints)
     (nreverse chords)))
 
-;(defunt espace-chn ((chord chord) (min midic) (max midic)) chords)
+;;(defunt espace-chn ((chord chord) (min midic) (max midic)) chords)
 
 
-; --------------transpositions, filterings ------------------------------
+;; --------------transpositions, filterings ------------------------------
 
 (defunp transpoct-prox1 ((midics midics?) (min midic) (max midic) (pivot midic)) midic
   ""
@@ -853,15 +852,15 @@ d'une frequence cible (sans approximation des hauteurs)."
     (while (> midic min) (decf midic 1200))
     (while (< midic max) (incf midic 1200))))
 
-;(defunt reject ((midic midic) (min midic) (max midic)) midic)
+;;(defunt reject ((midic midic) (min midic) (max midic)) midic)
 
 
 ;; =============================================================================-======
-;By Pierre-François Baisnée 26-04-90
-;Copyright 1990 IRCAM
-;==============================================================================
+;;By Pierre-François Baisnée 26-04-90
+;;Copyright 1990 IRCAM
+;;==============================================================================
 ;;; SUPRIMER OU REMPLACER DES INTERVALLES DANS UN ACCORD
-;==============================================================================
+;;==============================================================================
 #|
    remove-inter replace-inter replace-inter-i:
    SUPPRIMER/REMPLACER DANS UN ACCORD LES NOTES COMPRISES DANS
@@ -972,10 +971,10 @@ the function approx-m prior to the entries."
    (sort&no-repeat (sort (copy-list (list! midics)) #'<)
                    inf (if (zerop sup) (car (last (list! midics))) sup) forbid replace))
 
-; =============================================================================
-;fonctions pour famille replace-inter
+;; =============================================================================
+;;fonctions pour famille replace-inter
 
-;rend une liste ordonnee de valeurs uniques
+;;rend une liste ordonnee de valeurs uniques
 (defun sort&no-repeat (l-inter inf sup forbid replace)
    (setq l-inter (sort l-inter #'<))
    ;on remplace
@@ -985,7 +984,7 @@ the function approx-m prior to the entries."
    ;l-inter
  )
 
-;iteration jusqu'a effet nul, sans protection contre bouclage
+;;iteration jusqu'a effet nul, sans protection contre bouclage
 (defun foo-iter (l-inter inf sup forbid replace)
   (let ((tem))
      (setq l-inter (sort l-inter #'<))
@@ -995,31 +994,31 @@ the function approx-m prior to the entries."
         ))
   l-inter )
 
-;l-inter: liste ORDONNEE de midic "APPROXIME"
-;inf et sup : midic, bornes de l'ambitus pris en compte
-;forbid replace : intervalles exprimes en midic, valeur a supprimer
-;                   et valeur eventuelle de remplacement.
-;les pointeurs sur la liste de depart sont impredictibles
+;;l-inter: liste ORDONNEE de midic "APPROXIME"
+;;inf et sup : midic, bornes de l'ambitus pris en compte
+;;forbid replace : intervalles exprimes en midic, valeur a supprimer
+;;                   et valeur eventuelle de remplacement.
+;;les pointeurs sur la liste de depart sont impredictibles
 ;
 ;
-;fonction auxiliaire: ne rend pas de valeur, mais fonctionne par
-;modifications physiques de la liste de longueur n,
-;en prenant comme pivot successivement les n-1 premieres notes et en verifiant
-;les intervalles formés avec les notes suivantes. Le sens des intervalles est
-;pris en compte.
-;SI forbid= 9eme replace=octave =>
-;   Pour les notes comprises dans l'ambitus precisé, et formant un intervalle
-;   sur ou sous-multiple de 9ieme avec le pivot courant:
-;   les secondes ne sont pas modifiees
-;   les 9iemes, 16iemes, 23iemes... sont remplacees respectivement par des
-;       8iemes, 15Iemes, 22iemes... de meme direction par rapport au pivot
-;   utilise.
-;VARIANTES POSSIBLES:
-; - prendre au sens strict (9ieme != 2de) forbid ou bien replace ou bien les
-;   deux.
-; - Tenir ou ne pas tenir compte du sens
-; - ordonner ou non
-; - laisser les notes en double ou non
+;;fonction auxiliaire: ne rend pas de valeur, mais fonctionne par
+;;modifications physiques de la liste de longueur n,
+;;en prenant comme pivot successivement les n-1 premieres notes et en verifiant
+;;les intervalles formés avec les notes suivantes. Le sens des intervalles est
+;;pris en compte.
+;;SI forbid= 9eme replace=octave =>
+;;   Pour les notes comprises dans l'ambitus precisé, et formant un intervalle
+;;   sur ou sous-multiple de 9ieme avec le pivot courant:
+;;   les secondes ne sont pas modifiees
+;;   les 9iemes, 16iemes, 23iemes... sont remplacees respectivement par des
+;;       8iemes, 15Iemes, 22iemes... de meme direction par rapport au pivot
+;;   utilise.
+;;VARIANTES POSSIBLES:
+;; - prendre au sens strict (9ieme != 2de) forbid ou bien replace ou bien les
+;;   deux.
+;; - Tenir ou ne pas tenir compte du sens
+;; - ordonner ou non
+;; - laisser les notes en double ou non
 
 (defun foo1 (l-inter inf sup forbid replace)
   (let ( (tete l-inter) (pivot (car l-inter)) (octaves 0) (tem) (direction) )
@@ -1045,10 +1044,10 @@ the function approx-m prior to the entries."
     (when (cddr tete) (foo1 (cdr tete) inf sup forbid replace)) ))
 
 
-; =============================================================================
-;fonctions pour famille replace-inter2
+;; =============================================================================
+;;fonctions pour famille replace-inter2
 
-;rend la liste transformee
+;;rend la liste transformee
 (defun foo2 (l-inter inf sup pivot forbid replace oct-flag oct-flag2)
   (let ( (tete (setq l-inter (cons '? l-inter)))
          (octaves 0) (tem) (direction) )
@@ -1095,7 +1094,7 @@ and octaviation."
       (newl chords (nreverse new-ch)))
     (nreverse chords)))
 
-;(defunt interp-oct ((ch chord) (mel chord) (order list)) chords)
+;;(defunt interp-oct ((ch chord) (mel chord) (order list)) chords)
 
 ;; =============================================================================-======
 
@@ -1118,12 +1117,12 @@ and filled with permutations of <notes> and intervals among <intervals>."
 
 (defunt all-series ((serie chord) (notes chord (:value 6300)) (ints chord (:value 300))) chords)
 
-; (all-series '(6700 6400 6000) '(6900 6800 7000 7300) '(100 200 300))
-; (time (setq ls (all-series '(2500 2400) (make-list3 2600 100 3500)
-;                    (make-list3 200 100 1100))))
+;; (all-series '(6700 6400 6000) '(6900 6800 7000 7300) '(100 200 300))
+;; (time (setq ls (all-series '(2500 2400) (make-list3 2600 100 3500)
+;;                    (make-list3 200 100 1100))))
 
 
-;------------ intervals --> chord -------------
+;;------------ intervals --> chord -------------
 
 ;;
 
@@ -1161,7 +1160,7 @@ returns the intervals present as well as the first note, given as '0'."
   (if (= format 2) (g/ (g- chord (first chord)) 100)
       (remove 0 (g/ (g- chord (first chord)) 100)) ))
 
-; ------------ analyse --------------
+;; ------------ analyse --------------
 
 
 (defunp exist-note? ((chord midic) (note midic)) midic
@@ -1269,7 +1268,7 @@ function, however, will be altered to accommodate the reference point."
       (g* liste (sample-fun (parabole/3 1 fact1st  ref factref long factlast () ) 1 1 long)))
 ))
  
-;-----------------------------------------
+;;-----------------------------------------
 (defun sec->min1 (sec nbdec format)
 (let ((min (truncate sec 60)))
   (if  (and (= format 2 )(= 0 min)) (list(lldecimals sec nbdec))
@@ -1305,7 +1304,7 @@ may be entered as a list in any of the following formats: (3 min), or
 character or characters) "
   (less-deep-mapcar  'min->sec1 (list! minutes)))
 
-;--------------------------------------------
+;;--------------------------------------------
 
 (defun monnayage (list density)
   (let* ((interv (/ (- (second list) (car list)) (1+ density))) res)
@@ -1338,7 +1337,7 @@ than <max>; all other parts of the list will be returned unchanged."
     (nreverse (flat (push (last-elem list) res)))))
     
 
-;---------------------formatage de texte-----------------------
+;;---------------------formatage de texte-----------------------
 
 (defunp special-char ((sep menu (:menu-box-list (("space" . 1) ("line". 2) ("tab". 3)) ))
                      (nb fix>0) ) list
@@ -1374,7 +1373,7 @@ than <max>; all other parts of the list will be returned unchanged."
     (insert  (special-char sep nb)  inter (flat (x-append text texts ))))
 
 
-; pourrait être mis dans kernel
+;; pourrait être mis dans kernel
 
 (defunp insert ((item list (:value 'toto) ) (inter fix>0)  
                (liste list) &optional (nb fix>0)  ) list
@@ -1400,7 +1399,7 @@ ext.: <nb> = nombre de ces éléments"
 
 
 
-;--------------------------------------------
+;;--------------------------------------------
 
 
 (defunp TXtun1 ((tune fix (:value 0 :min-val -64  :max-val 63))

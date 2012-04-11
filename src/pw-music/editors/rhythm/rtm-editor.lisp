@@ -2,9 +2,9 @@
 (in-package :pw)
 
 
-;========================================================
+;;========================================================
 
-(defclass C-beat-editor-panel (view) 
+(defclass C-beat-editor-panel (ui:view) 
   ((measure-line :initform () :initarg :measure-line :accessor measure-line)
    (first-beat-num :initform 0 :initarg :first-beat-num :accessor first-beat-num)  
    (edit-mode :initform () :initarg :edit-mode :accessor edit-mode)  
@@ -46,7 +46,7 @@
   (setf (rtm-y-pixel self) (fifth state))
   (setf (beat-zoom self) (sixth state)))
 
-;========================================================
+;;========================================================
 (defmethod set-selection-button ((self C-beat-editor-panel) flag)
   (set-value (selection-button self) flag)
   (with-focused-view self
@@ -150,7 +150,7 @@
          (t   ;plain click
               (fill-xor-view-selections self)))))))
  
-;=======================
+;;=======================
 
 (defun fill-xor-view-selections (editor)
  (when editor
@@ -173,9 +173,9 @@
            (for (i 0 incr (1- (length lst)))(push (nth (truncate i) lst) res))
            (scale-low-high (nreverse (cons (car (last lst)) res)) high low  t))))) ;reversed y
 
-;(get-every-nth-item-of-list '(12 13 45 75) 3 50 100) 
-;(break-point-fun 5  '(0 100) '(78 67)) 
-;===================================
+;;(get-every-nth-item-of-list '(12 13 45 75) 3 50 100) 
+;;(break-point-fun 5  '(0 100) '(78 67)) 
+;;===================================
 (defmethod open-measure-line-editor ((self C-measure-line) ctrl)  
   (declare (ignore ctrl)))
 
@@ -187,9 +187,9 @@
  (when *measure-line-selection-scrap*
    (setf (measures (measure-line self)) (measures (eval *measure-line-selection-scrap*)))))
 
-;========================================================
+;;========================================================
 
-(defclass C-beat-editor-collection (view) 
+(defclass C-beat-editor-collection (ui:view) 
   ((beat-editors :initform () :initarg :beat-editors :accessor beat-editors)
    (first-staff-num :initform 0 :initarg :first-staff-num :accessor first-staff-num)  
    (visible-staffs-count :initform 1 :initarg :visible-staffs-count :accessor visible-staffs-count)  
@@ -216,7 +216,7 @@
         :view-position ,(view-position self) :view-size ,(view-size self)  
         :first-staff-num ,(first-staff-num self) :visible-staffs-count ,(visible-staffs-count self)  
         :beat-zoom-ctrl-value ,(value (beat-zoom-ctrl self))
-        :beat-editors (list ,.(ask-all (beat-editors self) 'decompile))))
+        :beat-editors (list ,@(ask-all (beat-editors self) 'decompile))))
 
 (defmethod get-window-state ((self C-beat-editor-collection) win)
   (declare (ignore win))
@@ -237,7 +237,7 @@
   (setf (value (beat-zoom-ctrl self)) (fifth state))
   (resize-new-rtm-w self ())) 
 
-;(defvar *rtm-playing-option* ())
+;;(defvar *rtm-playing-option* ())
 
 #|(defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
@@ -256,7 +256,7 @@
                            (t 2))))))|#
 
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
@@ -384,7 +384,7 @@
                                      :view-font '("monaco" 9 :srcor)
                                      :view-position (make-point 470 ctrl-y) :view-size (make-point 50 14))))))
 
-;================
+;;================
 
 (defmethod add-rtm-editor-radio-cluster ((self C-beat-editor-collection) x y txt)
   (make-instance 
@@ -395,7 +395,7 @@
             :view-font '("monaco" 9 :srcor)
             :dialog-item-action #'(lambda (item) item (erase+view-draw-contents (view-window self))))) 
 
-;================
+;;================
 
 (defmethod get-play-speed ((self C-beat-editor-collection)) (float (/ (value (play-speed-ctrl self)) 100)))
 (defmethod give-selected-editors ((self C-beat-editor-collection)) 
@@ -406,7 +406,7 @@
       (pop editors))
     (nreverse res))) 
 
-;================================
+;;================================
 (defmethod update-staff-count-number ((self C-beat-editor-collection) item)
   (setf (visible-staffs-count self) (max  1 (value item)))
   (resize-new-rtm-w self ())
@@ -430,7 +430,7 @@
   (tell (beat-editors self) 'set-beat-zoom (max .1 (/ (value ctrl) 100)))
   (with-focused-view self (erase+view-draw-contents self)))
 
-;================================
+;;================================
 
 (defmethod set-edit-mode ((self C-beat-editor-collection) ctrl)
   (tell (beat-editors self) 'set-edit-mode (check-box-checked-p ctrl))
@@ -441,7 +441,7 @@
   (draw-rect 0 0 (- (w self) 0) (- (h self) 25)))
 
 (defmethod draw-beat-editor-objects ((self C-beat-editor-collection)) 
-;(beat-editors self))
+;;(beat-editors self))
   (let ((editors (nthcdr (first-staff-num self) (beat-editors self))))
     (firstn  (visible-staffs-count self) editors)))
 
@@ -460,14 +460,14 @@
 (defmethod view-draw-contents :after ((self C-beat-editor-collection))
   (draw-control-extra-stuff self))
  
-;(defmethod view-draw-contents :before ((self C-beat-editor-collection)))
-;  (init-beat-selection-buttons-pool *selection-buttons-pool*))
+;;(defmethod view-draw-contents :before ((self C-beat-editor-collection)))
+;;  (init-beat-selection-buttons-pool *selection-buttons-pool*))
 
-;=================================
-;layout
+;;=================================
+;;layout
 
-;(defmethod resize-new-rtm-w ((self C-beat-editor-panel) w)
-;  (set-view-size self (- w 30) (h self)))
+;;(defmethod resize-new-rtm-w ((self C-beat-editor-panel) w)
+;;  (set-view-size self (- w 30) (h self)))
 
 (defmethod set-view-y ((self simple-view) y) (set-view-position self (x self) y))
 
@@ -486,7 +486,7 @@
               (cons (static-text-ctrl self)(rtm-radio-ctrls self))) #'set-view-y (- (h self) 25))
   (tell (cons (static-text-ctrl self)(rtm-radio-ctrls self)) #'set-view-y (- (h self) 11)))
 
-;============================
+;;============================
 
 (defmethod give-rtm-range-chords ((self C-beat-editor-collection) chord-fl)      
   (when (and (rtm-selection-1 self) (current-rtm-editor self))

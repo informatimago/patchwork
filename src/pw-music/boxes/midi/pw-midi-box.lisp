@@ -77,10 +77,7 @@ between
 
 
 (defpackage "C-PW-SEND-MIDI-NOTE"
-  (:use "COMMON-LISP")
-  (:import-from "PATCH-WORK"
-                "DEFUNP" "PATCH-VALUE" "PW-CONTROLS" "INPUT-OBJECTS" "MIDI-WRITE"
-                "LIST!" "WRITE-MIDI-NOTE" "C-PW-FUNCTIONAL")
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
   (:import-from "SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL")
   (:export "SND-MIDINOTE" "C-PW-SEND-MIDI-NOTE"))
 
@@ -350,12 +347,7 @@ given parameters to MIDI"
 
   
 (defpackage "C-PW-MIDI-IN"
-  (:use "COMMON-LISP")
-  (:import-from "PATCH-WORK"
-                "DEFUNP" "PATCH-VALUE" "PW-CONTROLS" "INPUT-OBJECTS" "C-PW-FUNCTIONAL"
-                 "C-PATCH" "ADD-OUTPUT-TYPE" "PW-FUNCTION-STRING" "*TARGET-ACTION-OBJECT*"
-                 "MAKE-POPUPBOX" "NEW-MENU" "NEW-LEAFMENU" "SET-BOX-TITLE" "H" "W" 
-                 "DECOMPILE")
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
   (:import-from "SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
   (:import-from "MIDI" "MIDI-READ")
   (:export "PW-MIDI-IN" "M-DATA" "C-PW-MIDI-IN" "DELAY" "STATUS" "MIDI-CHAN" "DATA1"
@@ -382,7 +374,7 @@ given parameters to MIDI"
   (setf (popUpBox self) 
         (make-popUpbox  "D" self
                        *Midi-box-popUpMenu*
-                       :view-position (CCL:make-point (- (w self) 19)
+                       :view-position (ui:make-point (- (w self) 19)
                                                   (- (h self) 13))
                        :view-container self
                        :view-font '("monaco"  9  :srcor))))
@@ -406,7 +398,7 @@ given parameters to MIDI"
 
 (defmethod pw-schedule-midi-in ((self C-pw-midi-in) box patch delay)
   (let ((data (midi-read)))
-    (if (and (not (ccl::%null-ptr-p data)) (pw-midi-filtered self data))
+    (if (and (not (ui::%null-ptr-p data)) (pw-midi-filtered self data))
       (progn
           (setf (value box) (format-midi self data))
           (patch-value patch self)
@@ -444,7 +436,7 @@ MIDI data in between. The optional input delay gives the delay time  evaluation
 (in 
 100ths of a second) of the input patch. In order to start the loop collecting 
   MIDI 
-;data, the raw-in module must be evaluated. When you are finished collecting 
+;;data, the raw-in module must be evaluated. When you are finished collecting 
 MIDI 
 data, select 'Deactivate' in the raw-in menu. Warning , Very Important!!:: If the 
 module is not deactivated after use, patch evaluation will be very slow.  It is 
@@ -589,13 +581,13 @@ endlessly: 'late Task'."
   (patch-value (second (input-objects self)) obj))
 
  
-;(defmethod patch-value ((self C-pw-delay-box) obj)
-;  (start (apdfuncall 0 (priority)
-;                     (round (patch-value (first (input-objects self)) obj))
-;                     'sleep-yourself self))
-;  (while (state self))
-;  (setf (state self) t)
-;  (patch-value (second (input-objects self)) obj))
+;;(defmethod patch-value ((self C-pw-delay-box) obj)
+;;  (start (apdfuncall 0 (priority)
+;;                     (round (patch-value (first (input-objects self)) obj))
+;;                     'sleep-yourself self))
+;;  (while (state self))
+;;  (setf (state self) t)
+;;  (patch-value (second (input-objects self)) obj))
 
 (defmethod sleep-yourself ((self C-pw-delay-box))
   (setf (state self) nil))

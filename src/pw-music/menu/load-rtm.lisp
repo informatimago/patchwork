@@ -24,7 +24,7 @@ now defined in Music-Package.lisp GA 20/06/94
   "PW:PW-Music;Boxes;edit;rhythm-formation"))
 
 (defun update-all-rhythm-files ()
-  (mapc  #'|CLPF-Util|:compile-file? *all-rhythm-files*))
+  (mapc  #'|CLPF-UTIL|:compile-file? *all-rhythm-files*))
 
 (mapc #'(lambda (file) (load-once file)) *all-rhythm-files*)
 
@@ -35,7 +35,7 @@ now defined in Music-Package.lisp GA 20/06/94
   ((clock :initform 0 :accessor clock)
    (clock-obj :initform *global-clock* :allocation :class :accessor clock-obj)
    (chord-objects :initform nil :accessor chord-objects)
-;   (previous-t-time :initform nil :accessor previous-t-time)
+;;   (previous-t-time :initform nil :accessor previous-t-time)
    (play-flag :initform nil :accessor play-flag)
   (measure-line :initform (make-instance 'C-measure-line) :initarg :measure-line :accessor measure-line)
 ))

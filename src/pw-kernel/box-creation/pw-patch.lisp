@@ -8,9 +8,10 @@
 ;;;;=========================================================
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-;=======================================================================================
-;=======================================================================================
+;;=======================================================================================
+;;=======================================================================================
 
 (defclass C-pw-outrect (BUTTON-DIALOG-ITEM) ())
 
@@ -120,10 +121,10 @@
                 (format t "Mismatch of type ! ~%~a~%" 
                         (list 'output (type-list (view-container self)) 'input (type-list ctrl)))))))))))
 
-;=======================================================================================
-;=======================================================================================
+;;=======================================================================================
+;;=======================================================================================
 
-(defclass C-patch (view) 
+(defclass C-patch (ui:view) 
   ((input-objects :initform nil  :accessor input-objects)
    (pw-controls :initform nil  :accessor pw-controls)
    (type-list :initform ()  :initarg :type-list :accessor type-list)
@@ -156,7 +157,7 @@
 
 (defmethod save((self C-patch))
   (if *pw-nosave-mode* 
-    (ccl::message-dialog "Sorry this version cannot save files.")
+    (ui::message-dialog "Sorry this version cannot save files.")
     (let* ((new-name 
             (choose-new-file-dialog :directory (string (pw-function self)) 
                                     :button-string "Save patch as"))
@@ -172,8 +173,8 @@
             (prin1 `(add-patch-box *active-patch-window* ,(decompile self)) out)))))))
 
 (defmethod yourself-if-collecting ((self C-patch)) nil)
-;======================================================
-;init
+;;======================================================
+;;init
 
 (defmethod initialize-instance :after ((self C-patch) &key controls)
   (declare (ignore controls))
@@ -203,11 +204,11 @@
 
 (defmethod erase-BPF-label? ((self C-patch)) nil) 
 
-;======================================================
-;events
+;;======================================================
+;;events
 
-; can be used by subclasses
-; should return as value a flag
+;; can be used by subclasses
+;; should return as value a flag
 
 (defmethod mouse-pressed-no-active-extra ((self C-patch) x y) 
   (declare (ignore x y))
@@ -250,8 +251,8 @@
                                                                :|indx| (+ (position ctrl (input-objects self)) 1)))))
           ))))) 
 
-;======================================================
-;draw
+;;======================================================
+;;draw
 
 (defmethod view-focus-and-draw-contents ((v C-patch) &optional visrgn cliprgn)
   (declare (ignore visrgn cliprgn))
@@ -319,7 +320,7 @@
      (unless (member 'no-connection (type-list (nth i (pw-controls self))) :test 'eq)
        (draw-rect (nth i (in-xs self)) (nth i (in-ys self)) 3 6))))
 
-; draw-connections is called only by the window not by a patch !
+;; draw-connections is called only by the window not by a patch !
 
 (defvar *object-connection-draw-mode* *gray-pattern*) 
 (defvar *normal-connection-draw-mode* *black-pattern*) 
@@ -368,8 +369,8 @@
       (if (intersection objects (input-objects dead-patch))
         (draw-connections self)))))
 
-;======================================================
-;connect
+;;======================================================
+;;connect
 
 (defmethod check-recursive-connections ((self simple-view) patch) (declare (ignore patch)) nil)
 
@@ -421,8 +422,8 @@
       (view-focus-and-draw-contents ctrl))))
 
 
-;======================================================
-;resize
+;;======================================================
+;;resize
 
 (defmethod set-view-size :before ((view C-patch) h &optional v)
   (declare (ignore h v))
@@ -433,22 +434,24 @@
   (inval-r-view-sides view))
 
 (defmethod inval-r-view-sides ((view C-patch) &optional top&left?)
-  (when (wptr view)
-    (let* ((pos (view-scroll-position view))
-           (size (view-size view))
-           (end-pos (add-points pos size))
-           (rgn *r-view-temp-region*))
-      (unless top&left?
-        (setq pos (subtract-points pos #@(1 1))))
-      (#_SetRectRgn :ptr rgn :long pos :long end-pos)
-      (#_InsetRgn :ptr rgn :long #@(1 1))
-      (#_DiffRgn :ptr (view-clip-region view) :ptr rgn :ptr rgn)
-      (with-focused-view view
-        (#_EraseRgn :ptr rgn)
-        (#_InvalRgn :ptr rgn)))))
+  (warn "~S ~S is not implemented yet" 'inval-r-view-sides '((view C-patch) &optional top&left?))
+  ;; (when (wptr view)
+  ;;   (let* ((pos (view-scroll-position view))
+  ;;          (size (view-size view))
+  ;;          (end-pos (add-points pos size))
+  ;;          (rgn *r-view-temp-region*))
+  ;;     (unless top&left?
+  ;;       (setq pos (subtract-points pos #@(1 1))))
+  ;;     (#_SetRectRgn :ptr rgn :long pos :long end-pos)
+  ;;     (#_InsetRgn :ptr rgn :long #@(1 1))
+  ;;     (#_DiffRgn :ptr (view-clip-region view) :ptr rgn :ptr rgn)
+  ;;     (with-focused-view view
+  ;;       (#_EraseRgn :ptr rgn)
+  ;;       (#_InvalRgn :ptr rgn))))
+  )
 
-;======================================================
-;move
+;;======================================================
+;;move
 
 (defmethod dmove-patch ((self C-patch) dx dy)
   (record--ae :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
@@ -607,8 +610,8 @@
   (with-focused-view view
     (draw-function-name view 2 (- (h view) 5)))) 
 
-;====================================================
-;misc
+;;====================================================
+;;misc
  
 (defmethod am-i-connected? ((self C-patch) patch)
   (member patch (input-objects self) :test 'eq))
@@ -673,7 +676,7 @@
   (declare (ignore where))
   (set-view-container view nil))
 
-;______________
+;;______________
 (defmethod nth-connected-p ((self C-patch) nth-input)
   (not (eq (nth nth-input (input-objects self))(nth nth-input (pw-controls self)))))
 
@@ -699,7 +702,7 @@
 (defmethod are-you-handling-keys? ((self C-patch) char)
   (declare (ignore char)) nil)
 
-(defclass C-key-handler-box (C-patch) ())
+;; (defclass C-key-handler-box (C-patch) ())
 (defclass C-key-handler-box (C-pw-functional) ())
 
 (defmethod are-you-handling-keys? ((self C-key-handler-box) char)
@@ -726,8 +729,9 @@
 (defvar *tutorial-a-list* ())
 (defvar *tutorial-dirs* '("PW-HELP-DOC:**;"))
 
-(eval-when (load eval compile)
-  (load-once  "PW-HELP-DOC:box-name-list.lisp" :if-does-not-exist nil))
+
+;; (eval-when (load eval compile)
+;;   (load-once  "PW-HELP-DOC:box-name-list.lisp" :if-does-not-exist nil))
 
 #|
 (defun get-patch-file (file)
@@ -778,15 +782,15 @@ tutorial file only if the names differ"
 
 
 
-;______________ 
-;init-patch 
+;;______________ 
+;;init-patch 
 
 (defmethod init-patch ((self C-ttybox)))
 
 (defmethod init-patch ((self C-patch))
   (tell (input-objects self) 'init-patch))
 
-;====================================================
+;;====================================================
 
 (defun add-patch-box (win patch)
   (init-patch-pos win patch)
@@ -805,7 +809,7 @@ tutorial file only if the names differ"
     (setq win (make-instance 'C-pw-window 
                 :window-title win-string :close-box-p close-button
                 :view-position (make-point 50 38) :view-size (make-point 500 300) :window-show t))
-    (add-menu-items  *pw-windows-menu* 
+    (ui:add-menu-items  *pw-windows-menu* 
                      (setf (wins-menu-item win)
                            (new-leafmenu win-string #'(lambda ()(window-select win)))))
     (push win *pw-window-list*) 

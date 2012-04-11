@@ -11,10 +11,10 @@
 
 (provide 'midi-instrument-PW)
 
-;====================================================================================================
-;==============================================================================
-; PW boxes
-;==============================================================================
+;;====================================================================================================
+;;==============================================================================
+;; PW boxes
+;;==============================================================================
 
 (defclass C-patch-midi-fix (C-patch)())
 
@@ -36,7 +36,7 @@ The inputs (status,controller,value) determine what midi
 information is sent before a midi-note-on event.
 Label is used for browsing inside the MN-editor. 
 ")
-;==============================================================================
+;;==============================================================================
 
 (defclass C-patch-midi-bpf (C-patch)())
 
@@ -63,7 +63,7 @@ midi information is sent during a midi-note event.
 The input (ticks) tells how often this information is sent.
 Label is used for browsing inside the MN-editor. 
 ")
-;_________________
+;;_________________
 
 (setq *bpf-lib-midi-ins-pw-type*
   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf  
@@ -83,9 +83,9 @@ Label is used for browsing inside the MN-editor.
     :menu-box-list '(("paftr" . #xA0) ("contr". #xB0) ("prog" . #xC0) ("maftr" . #xD0) ("ptchb" . #xE0)) 
     :type-list '(fixnum))))
 
-;==============================================================================
-;  midi-ins box
-; second argument is nargs
+;;==============================================================================
+;;  midi-ins box
+;; second argument is nargs
 
 (defclass C-patch-midi-ins (C-patch)())
 
@@ -99,7 +99,7 @@ Label is used for browsing inside the MN-editor.
         :ins-name (dialog-item-text (car (pw-controls self)))
         :ins-objects (ask-all (nth 1 (input-objects self)) 'patch-value obj))))
 
-;______________________
+;;______________________
 
 (defmethod connect-ctrl ((self C-patch-midi-ins) ctrl ctrl-panel)
    (if (eq ctrl (car (pw-controls self)))
@@ -124,7 +124,7 @@ The second input can accept any collection of midi-fix and
 midi-bpf boxes - so this box acts as collector for 
 midi-instrument information.
 ")
-;_________________
+;;_________________
 
 (setq *midi-ins-label-pw-type*
   (make-instance 'C-pw-type
@@ -139,4 +139,4 @@ midi-instrument information.
               :view-size (make-point 36 14) 
               :dialog-item-text "nargs" :type-list '(midi-fix midi-bpf))))
 
-;==============================================================================
+;;==============================================================================

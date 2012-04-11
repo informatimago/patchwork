@@ -10,38 +10,38 @@
 (in-package :pw)
 
 (provide 'midi-note)
-;=======================
+;;=======================
 
 
-;(export '(write-midi-note write-midicent-note update-cents-vector write-midicent-note
-;         write-pitch-bend-value write-controller-value write-program-change-value 
-;         write-program-change-value midi-only-attacks-pitches quantize-chords
-;         read-from-midi))
+;;(export '(write-midi-note write-midicent-note update-cents-vector write-midicent-note
+;;         write-pitch-bend-value write-controller-value write-program-change-value 
+;;         write-program-change-value midi-only-attacks-pitches quantize-chords
+;;         read-from-midi))
 
-;=========================
+;;=========================
 
-;(require "LELISP-MACROS")
-;(use-package "LELISP-MACROS")
-;(eval-when (load eval compile)
-;     (require :LeLisp-macros)
-;     (use-package "LELISP-MACROS"))
+;;(require "LELISP-MACROS")
+;;(use-package "LELISP-MACROS")
+;;(eval-when (load eval compile)
+;;     (require :LELISP-MACROS)
+;;     (use-package "LELISP-MACROS"))
 
-;(require "MIDI")
-;(use-package "MIDI")
+;;(require "MIDI")
+;;(use-package "MIDI")
 
-;(require "SCHEDULER")
-;(use-package "SCHEDULER")
+;;(require "SCHEDULER")
+;;(use-package "SCHEDULER")
 
-;=================================================================================================
-;=================================================================================================
+;;=================================================================================================
+;;=================================================================================================
 
-;(latency) ??
+;;(latency) ??
 (defun write-midi-note (dur chan key vel) 
   (unless (or (minusp key) (> key 127))
     (setq chan (1- chan))
     (setf dur (* 10 dur))
     (let ((event (midishare::MidiNewEv midishare::typeNote)))	
-      (unless (ccl::%null-ptr-p event)	
+      (unless (ui::%null-ptr-p event)	
         (midishare::chan event chan)			
         (midishare::port event 0)			
         (midishare::field event 0 key)		
@@ -50,7 +50,7 @@
         (midi::midi-write  event)))))
 
 
-;========================================================================
+;;========================================================================
 (defvar *cents-vector* (make-array '(100)))
 
 (defun update-cents-vector (pitch-bend-range)
@@ -63,7 +63,7 @@
           (+ 64 (truncate (/ temp 128)))    ; high
           (truncate (mod temp 128))))))) ; low
 
-; (for (i 0 1 99) (print (svref *cents-vector* i)))
+;; (for (i 0 1 99) (print (svref *cents-vector* i)))
 
 (update-cents-vector 1)  ; pitch-bend-range +- 1 semitone
 
@@ -75,7 +75,7 @@
       (setq chan (1- chan))
       (setf dur (* 10 dur))
       (let ((event (midishare::MidiNewEv midishare::typeNote)))	
-        (unless (ccl::%null-ptr-p event)	
+        (unless (ui::%null-ptr-p event)	
           (midishare::chan event chan)			
           (midishare::port event 0)			
           (midishare::field event 0 key)		
@@ -83,7 +83,7 @@
           (midishare::field event 2 dur)
           (midi::midi-write  event))))))
 
-;========================================================================
+;;========================================================================
 
 (defun write-pitch-bend-value (chan value &optional (ls 0))
     (setq chan (1- chan))
@@ -106,7 +106,7 @@
        (midishare::MidiSendIm midi::*pw-refnum* event))))
  
 
-; ????
+;; ????
 (defun write-program-change-value (chan program) 
     (setq chan (1- chan))
     (let ((event (midishare::MidiNewEv midishare::typeProgChange)))	
@@ -127,8 +127,8 @@
       (midishare::field event 1 value)
       (midishare::MidiSendIm midi::*pw-refnum* event))))
 
-;========================================================================
-; recording from midi
+;;========================================================================
+;; recording from midi
 
 
 

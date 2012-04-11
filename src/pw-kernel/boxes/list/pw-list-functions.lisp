@@ -11,15 +11,8 @@
 ;;;PW-list-functions (contributions by Tristan Murail)
 ;;;
 
-(eval-when (eval compile load)
-  (load-once "PW:PW-Kernel;Environment;EPW-Package"))
-
 (in-package "EPW")
 
-(export '(l-nth l-min g-min g-max l-max l-last flat x-append sort-list x-union x-intersect
-          x-Xor x-diff included? list-fill make-list2 list-part lo-flat list-explode
-          l-suppress l-scaler/sum l-scaler/max permut-circ nth-random permut-random
-          flat-once mat-trans))
 
 (defunp flat-once ((list list)) list
         "flattens the first level of a list of lists.Ex: 
@@ -102,8 +95,8 @@ all nonleaves. "
         (setq l (nconc (rev-flat (nextl lst)) l))))
     l ))
 
-;les fonctions suivantes inspirées des inoubliables cours de LISP de M. Assayag
-; add by aaa 29-08-95 from pw-modifs
+;;les fonctions suivantes inspirées des inoubliables cours de LISP de M. Assayag
+;; add by aaa 29-08-95 from pw-modifs
 
 (in-package :pw)
 
@@ -272,7 +265,7 @@ will return
 function <funct> ( < by default)"
   (mapcar #'(lambda (x) (position x list)) (epw::sort-list list funct)))
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defunp posn-order ((list list)  (funct list (:value "<"))) list
         "Ce module retourne une liste de rangs de la liste <list>
     ordonnée à partir de <funct>. Il est possible de changer <funct>

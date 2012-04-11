@@ -15,8 +15,8 @@
 ;;;;then coordinates must be relative to box origin. The box class is responsible for 
 ;;;;building up the Pop up menu hierarchy
 ;;;;       
-;==============================================================
-;(defpackage :popUp-menu)
+;;==============================================================
+;;(defpackage :popUp-menu)
 
 (in-package :patch-work)
 
@@ -45,25 +45,27 @@ located in the x,y position specified by the &rest key arguments"
            (ignore mouse))
   (unwind-protect
     (progn
-      (add-menu-items *pw-menu-apps* (menu self))    ;adds the PUMenu in the menu-bar 
-      (let ((hdl (menu-handle (menu self)))
-            (selection) (ID) (item) (menu-object)
-            (global (local-to-global self (view-mouse-position  self))))
-        (when hdl                                  ; just in case of weird menu deallocation
-          (#_insertmenu  :ptr hdl :word -1)        ;this actually inserts the popUpMenu     
-          (setq selection 
-                (#_popUpMenuSelect 
-                  :ptr hdl 
-                  :word (point-v global)
-                  :word (point-h global)
-                  :word 1 :long))           ;selection is an encoding of ID plus ITEM chosen
-          (setq ID (ldb (byte 16 16) selection) item (ldb (byte 16 0) selection))
-          (unless (zerop ID)                                    ;0=no selection
-            (setq menu-object  (gethash ID *menu-id-object-table*))
-            (setf *target-action-object* (patch-box self))  ;necessary for proper funcalling of menu's methods
-            (if (leafmenu-p menu-object)
-              (menu-item-action menu-object)
-              (menu-item-action (nth (1- item) (menu-items menu-object)) ))))))
+      (ui:add-menu-items *pw-menu-apps* (menu self))    ;adds the PUMenu in the menu-bar
+      (warn "~S ~S is not implemented entirely yet" 'view-click-event-handler '((self C-PopUpbox) mouse))
+      ;; (let ((hdl (menu-handle (menu self)))
+      ;;       (selection) (ID) (item) (menu-object)
+      ;;       (global (local-to-global self (view-mouse-position  self))))
+      ;;   (when hdl                                  ; just in case of weird menu deallocation
+      ;;     (#_insertmenu  :ptr hdl :word -1)        ;this actually inserts the popUpMenu     
+      ;;     (setq selection 
+      ;;           (#_popUpMenuSelect 
+      ;;             :ptr hdl 
+      ;;             :word (point-v global)
+      ;;             :word (point-h global)
+      ;;             :word 1 :long))           ;selection is an encoding of ID plus ITEM chosen
+      ;;     (setq ID (ldb (byte 16 16) selection) item (ldb (byte 16 0) selection))
+      ;;     (unless (zerop ID)                                    ;0=no selection
+      ;;       (setq menu-object  (gethash ID *menu-id-object-table*))
+      ;;       (setf *target-action-object* (patch-box self))  ;necessary for proper funcalling of menu's methods
+      ;;       (if (leafmenu-p menu-object)
+      ;;         (menu-item-action menu-object)
+      ;;         (menu-item-action (nth (1- item) (menu-items menu-object)) )))))
+      )
     (remove-menu-items *pw-menu-apps*  (menu self))))
     
 (defun leafmenu-p (menu)

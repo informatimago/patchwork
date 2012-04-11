@@ -9,17 +9,13 @@
 
 
 (defpackage "CLENI" 
-  (:use "COMMON-LISP" "CCL")
-)
+  (:use "COMMON-LISP")
+  (:export  "NEW-SCORE" "DESCRIBE-SCORE" "TRANSLATE-SCORE"
+            "*HALF-TONE*" "*QUARTER-TONE*" "*G-KEY*" "*C-3-KEY*"
+            "*C-4-KEY*" "*F-KEY*"))
 (in-package "CLENI")
 
-;(eval-when (load eval compile)
-;  (require "CLOS" "CLOS;CLOS")
-;  (use-package 'CLOS))
 
-
-(export '( new-score describe-score translate-score *half-tone* *quarter-tone*
-           *G-key* *C-3-key* *C-4-key* *F-key* ))
 
 (defclass Score ()
   (
@@ -623,7 +619,7 @@
                             :direction :output :if-exists ,(or if-exists :overwrite)
                             :if-does-not-exist :create)
        (let ((*standard-output* ,fvar) (*load-verbose* nil) )
-         ,. forms ))))
+         ,@ forms ))))
 
 (defun cleni-error (format &rest args)
   (format *error-output* "Common Lisp to Enigma Interface. Error.~%")
@@ -732,7 +728,7 @@
                   'simple-string)))
         (target-file (full-pathname (merge-pathnames filename ".etf"))))    
     (format *error-output* "~%copying ~S to ~S~%"  template-file target-file)
-    (ccl:copy-file template-file target-file :if-exists :overwrite)
+    (ui:copy-file template-file target-file :if-exists :overwrite)
     (format *error-output* "appending score desc. to ~S~%" target-file)
     (with-output-to-file (target-file :if-exists :append)
       (translate-to-enigma score))

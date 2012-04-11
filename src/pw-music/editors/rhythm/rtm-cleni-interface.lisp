@@ -1,13 +1,13 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :PW)
 
-; ==============================================
+;; ==============================================
 
 (defvar *rtm-cleni-score* ())
 (defvar *cleni-notehead-list* ())
 (defvar *cleni-previous-chord-info-list* ())
 
-; ==============================================
+;; ==============================================
 (defun convert-rtm-unit-to-cleni (unit dots)
   (let ((new-unit
          (case unit
@@ -24,7 +24,7 @@
     (double-dot  (+ new-unit  (* 3/4 new-unit)))
     (t new-unit))))
 
-; ==============================================
+;; ==============================================
 (defvar *cleni-temperament-mode* 2)
 
 #|(defmethod write-cleni-measure-line ((self C-measure-line) staff)
@@ -34,7 +34,7 @@
         (write-cleni-measure (nth i measures) (1+ i)))
   `(cleni:describe-score *rtm-cleni-score*  :temperament *cleni-temperament-mode*
            :staff ,staff
-             ,.(apply #'append (nreverse *cleni-notehead-list*)))))|#
+             ,@(apply #'append (nreverse *cleni-notehead-list*)))))|#
 
 (defmethod write-cleni-measure-line ((self C-measure-line) staff)
   (setf *cleni-notehead-list* nil)
@@ -56,14 +56,14 @@
       (while beats
         (write-cleni-beat (pop beats) self (give-low-number (read-from-string (low self)))))))
  
-;  :chord 1/4 '(c5 g5)
-;  :rest 1/8
-; note rest slur
+;;  :chord 1/4 '(c5 g5)
+;;  :rest 1/8
+;; note rest slur
 
 (defun convert-note-to-cleani-symbol (note)
  (let ((diatone (diatone note))
        (alteration (alteration note)))
-;  (print (list diatone alteration))
+;;  (print (list diatone alteration))
   (read-from-string
     (concatenate 'string 
       (string (case (mod diatone 7)
@@ -72,7 +72,7 @@
       (case alteration
         (#\Y "s")(#\I "b")(#\y "+")(t ""))))))
 
-;(convert-note-to-cleani-symbol (make-C-note 6100 36 #\I 100 120 1))
+;;(convert-note-to-cleani-symbol (make-C-note 6100 36 #\I 100 120 1))
   
 #|
 (defmethod write-cleni-beat  ((self C-beat) super-beat low)
@@ -98,7 +98,7 @@
         (progn
             (setq note-head-info 
                (calc-next-note-head  (unit-length self) rtm-sum rtm-now low))
-;            (print (list (car *notehead-type-list*) note-head-info))
+;;            (print (list (car *notehead-type-list*) note-head-info))
             (cond  
               ((beat-chord rtm-obj)  
                 (push  
@@ -203,8 +203,8 @@
     ))
 |#
 
-;changed by aaa from pw-modif
-;modify by GAS
+;;changed by aaa from pw-modif
+;;modify by GAS
 (defmethod write-cleni-beat  ((self C-beat) super-beat low)
   (let* ((rtm-list (rtm-list self))
          (rtm-sum (round (apply #'+ (mapcar #'abs (ask-all (rtm-list self) 'unit-length)))))
@@ -277,11 +277,11 @@
        *cleni-notehead-list*))
     ))
 
-;(length (eval (third *cleni-previous-chord-info-list*)))
-;(length '(6000))
-;==========================================
+;;(length (eval (third *cleni-previous-chord-info-list*)))
+;;(length '(6000))
+;;==========================================
 
-;(write-cleni-measure-line (measure-line (car (beat-editors (editor-collection-object *active-rtm-window*)))) 1)
+;;(write-cleni-measure-line (measure-line (car (beat-editors (editor-collection-object *active-rtm-window*)))) 1)
 
 (defun calc-cleni-rtm-score (win)
   (setf *rtm-cleni-score* (cleni:new-score))
@@ -289,8 +289,8 @@
     (for (i 0 1 (1- (length measure-lines)))
       (write-cleni-measure-line (nth i measure-lines) (1+ i)))))
   
-;(calc-cleni-rtm-score *active-rtm-window*)
-;(cleni:translate-score *rtm-cleni-score* "root;rtm-test")
+;;(calc-cleni-rtm-score *active-rtm-window*)
+;;(cleni:translate-score *rtm-cleni-score* "root;rtm-test")
 
 (defun save-cleni-rtm-score ()
   (let ((new-name (choose-new-file-dialog     
@@ -299,6 +299,6 @@
      (calc-cleni-rtm-score *active-rtm-window*)
      (cleni:translate-score *rtm-cleni-score* new-name)))
 
-;(save-cleni-rtm-score)
-(add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as ENIGMA..." #'(lambda () (save-cleni-rtm-score))))  
-(add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as 1/4-ENIGMA..." #'(lambda () (let ((*cleni-temperament-mode* 4))(save-cleni-rtm-score)))))  
+;;(save-cleni-rtm-score)
+(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as ENIGMA..." #'(lambda () (save-cleni-rtm-score))))  
+(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as 1/4-ENIGMA..." #'(lambda () (let ((*cleni-temperament-mode* 4))(save-cleni-rtm-score)))))  

@@ -11,13 +11,9 @@
 ;; A general buffer box
 ;;
 (defpackage "C-PATCH-BUFFER"
-  (:use "COMMON-LISP" "CCL")
-  (:import-from "PATCH-WORK" "C-PATCH" "DECOMPILE" "PATCH-VALUE" "INPUT-OBJECTS"
-                "PW-CONTROLS" "H" "W" "OUT-PUT" "X" "Y" "TYPE-LIST" "ACTIVE-MODE"
-                "PW-FUNCTION" "MAKE-PW-STANDARD-BOX" "DEFUNP" "PW-FUNCTION-STRING"
-                "SBOX" "C-PW-FUNCTIONAL" "C-RADIO-BUTTON")
-  (:export "C-PATCH-BUFFER" "THE-BUFFER" "BUFFER" "C-RADIO-BUTTON" "GET-LOCK-BUTTON-FUN"
-           "VALUE"))
+  (:use "COMMON-LISP" "UI" "PATCH-WORK")
+  (:export "C-PATCH-BUFFER" "THE-BUFFER" "BUFFER" "C-RADIO-BUTTON"
+           "GET-LOCK-BUTTON-FUN" "VALUE"))
 
 (in-package "C-PATCH-BUFFER")
 
@@ -88,17 +84,14 @@ close the module immediately after evaluation to avoid recalculating the input."
 |#
 
 (defpackage "C-PATCH-ACCUM"
-  (:use "COMMON-LISP" "C-PATCH-BUFFER")
-  (:import-from "PATCH-WORK" "C-PATCH"  "PATCH-VALUE" "INPUT-OBJECTS" "PW-CONTROLS"
-                "DEFUNP")
-  (:import-from "CCL" "SET-DIALOG-ITEM-TEXT" "VIEW-CONTAINER")
+  (:use "COMMON-LISP" "UI" "PATCH-WORK"  "C-PATCH-BUFFER")
   (:export "C-PATCH-ACCUM" "THE-BUFFER" "ACCUM" "*ACCUM-BUFFER-LIMIT*"))
 
 (in-package "C-PATCH-ACCUM")
 
 (defvar *accum-buffer-limit* 400)
 
-;changed by aaa 29-08-95 from pw-modifs
+;;changed by aaa 29-08-95 from pw-modifs
 (defclass C-patch-accum (C-patch-buffer pw::C-pw-functional )
   ((my-buffer-limit :initform 400 :accessor my-buffer-limit)
    (the-buffer :initform (make-list 400 :initial-element 0)

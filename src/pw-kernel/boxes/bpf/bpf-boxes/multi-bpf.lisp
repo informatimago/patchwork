@@ -1,7 +1,7 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-;================================================================================================================
+;;================================================================================================================
 (defclass C-multi-bpf-view (C-bpf-view)
   ((break-point-functions :initform nil :initarg :break-point-functions  :accessor break-point-functions)
    (break-point-functions-pointer :initform 0 :initarg :break-point-functions-pointer  :accessor break-point-functions-pointer)))
@@ -48,24 +48,25 @@
               (update-mini-view (mini-view self)))))
     (t (call-next-method))))
 
-;================================================================================================================
+;;================================================================================================================
 
 (defclass  C-patch-multi-function (C-patch-function) ()) 
 
 (defmethod make-application-object ((self C-patch-multi-function))
-  (make-BPF-editor (make-break-point-function '(0 100) '(0 100)) 'C-multi-bpf-view))
+  (setf (application-object self)
+        (make-BPF-editor (make-break-point-function '(0 100) '(0 100)) 'C-multi-bpf-view)))
 
 #|(defmethod decompile ((self C-patch-multi-function))
   (let ((temp (call-next-method))
         (bpfs (break-point-functions (editor-view-object (application-object self)))))
-    `(,.(butlast temp)
+    `(,@(butlast temp)
         ',(cons (eval (car (last temp))) (ask-all bpfs #'break-point-list )))))|#
 
 (defmethod decompile ((self C-patch-multi-function))
   (let ((temp (call-next-method))
         (bpfs (cons (break-point-function (give-mini-bpf self)) 
                     (break-point-functions (editor-view-object (application-object self))))))
-    `(,.(butlast temp)
+    `(,@(butlast temp)
         ',(cons (eval (car (last temp)))  (list (ask-all bpfs #'break-point-list ))))))
 
 #|(defmethod complete-box ((self C-patch-multi-function) args)
@@ -116,9 +117,9 @@
      (append short-l 
         (make-list (abs (- (length a) (length b))) :initial-element (car (last short-l))))))
 
-;(fill-to-equal-length-lst '(1 2 3) '(7 8 9 8 7))
-;(fill-to-equal-length-lst '(1 2 3 8 9 8 9 0) '(7 8 9 8 7))
-;(fill-to-equal-length-lst '(1 2 3) '(7 8 9))
+;;(fill-to-equal-length-lst '(1 2 3) '(7 8 9 8 7))
+;;(fill-to-equal-length-lst '(1 2 3 8 9 8 9 0) '(7 8 9 8 7))
+;;(fill-to-equal-length-lst '(1 2 3) '(7 8 9))
 
 #|
 (defun convert-to-lst-lst (a)
@@ -211,10 +212,10 @@
              (push (fill-to-equal-length-lst (first sub1) (first sub2)) res2))
             (t (push (butlast (first sub2) (- (length (first sub2))(length (first sub1)))) res2))))))
 
-;================================================================================================================
-;from ...:bpf:bpf-editors:bpf-mini-view
-;=====================================
-;draw
+;;================================================================================================================
+;;from ...:bpf:bpf-editors:bpf-mini-view
+;;=====================================
+;;draw
 
 (defmethod break-point-functions ((self simple-view)) nil)
 
@@ -239,7 +240,7 @@
         (draw-string 3 9 (doc-string self))))))
 |#
 
-; reversed drawing 1st bpfs then bpf
+;; reversed drawing 1st bpfs then bpf
 (defmethod view-draw-contents ((self C-mini-bpf-view))
   (let* ((object (application-object (view-container self)))
          (bpfs (and object (break-point-functions (editor-view-object object)))))
@@ -258,7 +259,7 @@
                (break-point-function self) self nil (h-view-scaler self)(v-view-scaler self))))
         (draw-string 3 9 (doc-string self))))))
 
-;================================================================================================================
+;;================================================================================================================
 
 (defunp multi-bpf ((tlist (fix>0s? (:value 10))) (vl/bpfs list (:value 100 :type-list (bpf list)))
              (mini-bpf bpf)) list

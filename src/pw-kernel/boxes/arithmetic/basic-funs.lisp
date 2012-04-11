@@ -10,11 +10,6 @@
 ;;
 ;;PW Arithmetic modules (several by Tristan Murail)
 
-
-
-(eval-when (eval compile load)
-  (load-once "PW:PW-kernel;Environment;CLPF-Utils")) 
-
 (in-package "EPW")
 
 (defun carlist! (thing)

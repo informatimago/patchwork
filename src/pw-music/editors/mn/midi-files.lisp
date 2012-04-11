@@ -31,12 +31,12 @@
         (setq ticks mod-ticks)
         (list high-byte1 ticks))  
       (t (list ticks)))
-;    (setq *print-base* 16)
-;    (print (list high-byte3 high-byte2 high-byte1 ticks))  
-;    (setq *print-base* 10) 
+;;    (setq *print-base* 16)
+;;    (print (list high-byte3 high-byte2 high-byte1 ticks))  
+;;    (setq *print-base* 10) 
  ))
 
-;(variable-length-midi-time #x64)
+;;(variable-length-midi-time #x64)
 
 (defun covert-length-to-4-byte-list (len)
   (let ((byte1 0)(byte2 0)(byte3 0)(byte4 0))
@@ -59,9 +59,9 @@
 
   
 
-;(covert-length-to-4-byte-list 700)
+;;(covert-length-to-4-byte-list 700)
 
-;============================================================
+;;============================================================
 
 (defun  make-variable-length-midi-delta-times  (midi-list)
   (let ((res)(time-now 0))
@@ -180,7 +180,7 @@
 
 |#
 
-;======================================================
+;;======================================================
 
 
 (defun PW-midi-file-SAVE ()
@@ -193,7 +193,7 @@
       (make-midi-file-1
          (ask-all (ask-all (editor-objects editor-view) 'chord-line) 'chords))))
    (setq new-name (choose-new-file-dialog :directory "MIDI FILE" :prompt "Save Midi file As…"))
-;   (setq new-file (CREATE-FILE  new-name))
+;;   (setq new-file (CREATE-FILE  new-name))
    (delete-file new-name)  
    (WITH-OPEN-FILE  
        (out new-name :direction :output  :if-does-not-exist :create :if-exists :supersede
@@ -201,7 +201,7 @@
      (while midi-data-list
        (write-byte  (pop midi-data-list) out)))
    (set-mac-file-type new-name "Midi")))
-;=======================================================
+;;=======================================================
 #|
 
 (setq m1

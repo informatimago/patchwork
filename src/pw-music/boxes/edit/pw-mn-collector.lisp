@@ -8,15 +8,15 @@
 ;;;;=========================================================
 
 (in-package :pw)
-;====================================================================================================
+;;====================================================================================================
 (defclass  C-patch-application-midi (C-patch-application) ())
 
 (defmethod make-application-object ((self C-patch-application-midi))
-  (make-music-notation-editor))
+  (setf (application-object self) (make-music-notation-editor)))
 
-;====================================================================================================
+;;====================================================================================================
 
-;(defvar  *global-clock* (make-instance 'C-clock))
+;;(defvar  *global-clock* (make-instance 'C-clock))
 
 (defclass  C-patch-midi (C-patch-application-midi C-process-begin+end)
   ((clock :initform 0  :accessor clock)
@@ -64,7 +64,9 @@
 (defun make-pw-chord-line-box (box mode chords-form)
   (form-to-chord-line (chord-seq box) chords-form)
   (setf (active-mode box) mode)
-  (setf (chord-line (give-MN-editor box)) (chord-seq box))
+  (if  (give-MN-editor box)
+       (setf (chord-line (give-MN-editor box)) (chord-seq box))
+       (warn "in ~S ~S,  (give-MN-editor box) is nil" 'make-pw-chord-line-box '(box mode chords-form)))
   box)
 
 (defmethod yourself-if-collecting ((self C-patch-midi)) self)
@@ -79,7 +81,7 @@
 (defmethod give-structured-begin-time ((self C-patch-midi))
   (give-structured-begin-time (view-window self)))
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defmethod play ((self C-patch-midi))
   (let ((ch-l (chord-seq self))
         notes ;begint
@@ -179,7 +181,7 @@
   (draw-appl-label self #\A)
   (fill-patch-outrect (out-put self)))
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defmethod stop-play ((self C-patch-midi))
   (declare (special *MN-play-flag*))
   (setf *MN-play-flag* nil)
@@ -249,7 +251,7 @@
     (window-select (application-object self))
     (draw-appl-label self #\*)))
 |#
-;(defmethod open-patch-win ((self C-patch-midi-Mod)) (call-next-method))
+;;(defmethod open-patch-win ((self C-patch-midi-Mod)) (call-next-method))
 
 (defmethod put-window-state ((self C-patch-midi-Mod) win state)
   (let ((mus-view (car (subviews win))))
@@ -301,7 +303,7 @@
                        :view-font '("monaco"  9  :srcor)))
   (-make-lock self (make-point (- (w self) 37) (- (h self) 9))))
 
-;(defmethod decompile ((self C-patch-PolifMN)) (call-next-method))
+;;(defmethod decompile ((self C-patch-PolifMN)) (call-next-method))
 
 (defmethod decompile ((self C-patch-polifMN-mod))
   (append (call-next-method) 
@@ -358,9 +360,10 @@
 (defmethod put-window-state ((self C-patch-polifMN-mod) win state)
   (let ((mus-view (car (subviews win))))
     (set-view-size win (first state))
-    (setf (MN-zoom-scaler mus-view) (second state))
-    ;(set-staff-count mus-view (third state))
-    (view-window-grown mus-view)))
+    (when mus-view
+      (setf (MN-zoom-scaler mus-view) (second state))
+      ;;(set-staff-count mus-view (third state))
+      (view-window-grown mus-view))))
 
 (defmethod get-window-state ((self C-patch-polifMN-mod) win)
   (let ((mus-view (car (subviews win))))
@@ -417,7 +420,7 @@
       (when (and win (wptr win)) (update-editor  view-object))
       (chord-line-list self))))|#
 
-;changed by aaa 2-10-95
+;;changed by aaa 2-10-95
 (defmethod patch-value ((self C-patch-polifMN-mod) obj)
   (if (value self)
     (chord-line-list self)
@@ -478,13 +481,13 @@
 
 (defmethod polifonic? ((self C-patch-polifMn-mod)) t)
 
-;add by aaa 28-08-95 from pw-modif
+;;add by aaa 28-08-95 from pw-modif
 (defmethod play ((self C-patch-polifMN-mod))
  (play-all-staffs (car (subviews (application-object self)))))
 
 
 
-;add by aaa 28-08-95 from pw-modif
+;;add by aaa 28-08-95 from pw-modif
 (defmethod stop-play ((self C-patch-polifMN-mod))
   (declare (special *MN-play-flag*))
   (setf *MN-play-flag* nil)
@@ -531,7 +534,7 @@ aspect of the notes can later be edited.
 When requested for a value, collector-box returns a chord line object.
 "
 (declare (ignore del dur mid/ob vel chan ins)))
-;===================================
+;;===================================
 
 (defunp poly-coll ((coll1 (symbol (:dialog-item-text "obj" :type-list (collector))))
                &rest (colln (symbol (:dialog-item-text "obj" :type-list (collector)))))
@@ -570,11 +573,11 @@ information."
 
 ;;======================================
 
-;(defvar *pw-stop-time* 1000)
+;;(defvar *pw-stop-time* 1000)
 
 (defclass C-pw-stop-time (C-patch) ())
 
-;(defmethod patch-value ((self C-pw-stop-time) obj) (patch-value (car (input-objects self)) obj))
+;;(defmethod patch-value ((self C-pw-stop-time) obj) (patch-value (car (input-objects self)) obj))
 
 (defmethod give-stop-time ((self C-patch)))
 (defmethod give-stop-time ((self C-pw-stop-time)) (patch-value self ()))

@@ -8,12 +8,11 @@
 ;;;;=========================================================
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-(provide 'PW-BPF-library)
-
-;====================================================================================================
-;====================================================================================================
-; BPFunction
+;;====================================================================================================
+;;====================================================================================================
+;; BPFunction
 
 ;;these two are probably redundant now... (Camilo 911114)
 (defvar *bpf-pw-type*
@@ -31,8 +30,8 @@
                    (list :view-size #@(74 72) :type-list '(no-connection)))
 
 (add-output-type 'bpf '(bpf))
-;====================================================================================================
-; 1 = timelist 2 = valuelist 3 = bpf
+;;====================================================================================================
+;; 1 = timelist 2 = valuelist 3 = bpf
 (defvar *collector-popUp-menu*
   (new-menu " "
             (new-leafmenu "Save" #'(lambda() (save *target-action-object*)))))
@@ -172,7 +171,8 @@
     self))
 
 (defmethod make-application-object ((self C-patch-function))
-  (make-BPF-editor (make-break-point-function '(0 100) '(0 100))))
+  (setf (application-object self)
+        (make-BPF-editor (make-break-point-function '(0 100) '(0 100)))))
 
 (defmethod give-mini-bpf ((self C-patch-function)) (third (pw-controls self)))
 
@@ -231,7 +231,7 @@ module bpf (in segments by default) to a representation in points by selecting <
 mode> in the front menu. Click on the "
   (declare (ignore tlist vlist mini-bpf)))
 
-;===========================================
+;;===========================================
 
 (defclass  C-patch-env (C-patch)())
 
@@ -246,7 +246,7 @@ its own clock (midi,oscilloscope).
 Behaves like an envelope. If values are asked outside the timerange
 of the bpf,env returns a constant value (first or last value)"
   (declare (ignore bpf-ob)))
-;________________
+;;________________
 
 (defclass  C-patch-transfer (C-patch)())
 
@@ -311,7 +311,7 @@ and nbdec  is the number of decimals desired in the output.
 
 (defmethod get-bpf-sample-output ((self number) echan1 xinit2 xend3 fact4 nbdec5)
   (declare (ignore echan1 xinit2 xend3 fact4 nbdec5))  self)
-;________________
+;;________________
 
 (defclass  C-patch-osc (C-patch)())
 
@@ -325,7 +325,7 @@ Is used normally with a patch that is driven by a PW box with
 its own clock (midi,oscilloscope).
 Behaves like an oscillator."
   (declare (ignore bpf-ob)))
-;________________
+;;________________
 
 (defclass  C-patch-osc-period (C-patch) ())
 
@@ -344,7 +344,7 @@ Behaves like an oscillator with a period that is given
 by the second inputbox"
   (declare (ignore bpf-ob period)))
 
-;________________
+;;________________
 
 (defclass  C-patch-osc-phase (C-patch)
    ((osc-phase :initform 0 :accessor osc-phase) 
@@ -382,7 +382,7 @@ because the phase is stored in the phase-box each time there is a
 request at input."
   (declare (ignore bpf-ob period)))
 
-;====================================================================================================
+;;====================================================================================================
 
 (defclass  C-patch-bpf-lib (C-patch)())
 
@@ -409,3 +409,4 @@ The menu items next BPF from lib   and prev BPF from lib   allow browsing in the
 "
   (declare (ignore bpflib)))
 
+(provide 'PW-BPF-library)

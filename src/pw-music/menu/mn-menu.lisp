@@ -11,16 +11,16 @@
 
 (provide 'MN-menu)
 
-;==================================================================================
-;=========================================
-; file
+;;==================================================================================
+;;=========================================
+;; file
 (defvar *pw-menu-Music* (new-menu "Music"))
 (defvar *pw-MN-Edit-menu* (new-menu "Edit"))
 (defvar *pw-Conv-approx-menu* (new-menu "Conv-Approx"))
 (defvar *pw-Music-Extern-menu* (new-menu "Extern"))
 (defvar *pw-Midi-menu* (new-menu "Midi"))
 (defvar *pw-Multidim-Music-menu* (new-menu "Multidim"))
-(add-menu-items *pw-menu-Music* *pw-MN-Edit-menu* *pw-Conv-approx-menu*
+(ui:add-menu-items *pw-menu-Music* *pw-MN-Edit-menu* *pw-Conv-approx-menu*
                 ;*pw-Music-Extern-menu*
                 *pw-Midi-menu* *pw-Multidim-Music-menu*)
 
@@ -31,7 +31,7 @@
      *PWoper-menu* *pw-kernel-menu* *pw-menu-Music* *pw-menu-patch* 
      *pw-windows-menu*))
 
-(set-menubar *default-CCL-menubar*)
+(ui:set-menubar *default-CCL-menubar*)
 
 ;;==================================
 
@@ -39,16 +39,16 @@
 
 (defvar *MN-menu-file* (new-menu "File"))
 
-(add-menu-items  *MN-menu-file* (new-leafmenu "Save as midifile..."  
+(ui:add-menu-items  *MN-menu-file* (new-leafmenu "Save as midifile..."  
     #'(lambda () (PW-midi-file-SAVE))))
 
-;============================================
-; MN
+;;============================================
+;; MN
 (defvar a-leaf-menu ())
 (defvar *MN-menu* (new-menu "MN"))
 
 #|
-(add-menu-items *MN-menu*
+(ui:add-menu-items *MN-menu*
     (new-menu "Approximation"
         (prog1 (setf a-leaf-menu
                      (new-leafmenu "SemiTone" #'(lambda() (use-all-approx-scale  *c-major-scale*))))
@@ -78,29 +78,29 @@
 (defvar *play-Multichan-menu* 
   (new-leafmenu "Multi Channel" #'(lambda () (set-playing-option :mc))))
 
-#|(add-menu-items *MN-menu*
+#|(ui:add-menu-items *MN-menu*
                 (new-menu "Play Option" *play-Pbend-menu* *play-Multichan-menu*))|#
 
-;============================================
-; menubar for MN
+;;============================================
+;; menubar for MN
 (defvar *MN-menu-edit* (new-menu "Edit"))
 
 ;;added 910415
 (defvar *undo-MN-menu* (new-leafmenu "Undo" #'(lambda () (redo-MN-edit))))
-(add-menu-items *MN-menu-edit* *undo-MN-menu*)
+(ui:add-menu-items *MN-menu-edit* *undo-MN-menu*)
 (set-command-key *undo-MN-menu* #\Z)
 (menu-item-disable *undo-MN-menu*)
-(add-menu-items *MN-menu-edit* (new-leafmenu "-" ()))
+(ui:add-menu-items *MN-menu-edit* (new-leafmenu "-" ()))
 
- (add-menu-items  *MN-menu-edit* 
+ (ui:add-menu-items  *MN-menu-edit* 
      (setq menu-now (new-leafmenu "Cut" 
        #'(lambda () (cut *active-MN-window*)))))
    (set-command-key menu-now #\X)
-   (add-menu-items  *MN-menu-edit*
+   (ui:add-menu-items  *MN-menu-edit*
       (setq menu-now (new-leafmenu "Copy" 
        #'(lambda () (copy *active-MN-window*)))))
    (set-command-key menu-now #\C)
-   (add-menu-items  *MN-menu-edit*
+   (ui:add-menu-items  *MN-menu-edit*
       (setq menu-now (new-leafmenu "Paste" 
        #'(lambda () (paste *active-MN-window*)))))
    (set-command-key menu-now #\V)
@@ -110,13 +110,13 @@
      *pw-menu-apps*
      *MN-menu-file* 
      *MN-menu-edit*
-     (fifth (menubar))
-     (sixth (menubar))
+     (fifth (ui:menubar) )
+     (sixth (ui:menubar) )
      ;*MN-menu*
      ))
 
-;============================================
-; application 
+;;============================================
+;; application 
 
 (defvar *apps-MN-menu-item* ())
 

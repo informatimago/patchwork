@@ -1,158 +1,189 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
+(enable-patchwork-readtable)
 
 (defvar *record-enable* nil)
 
 (defun check-s ()
   (declare (special *record-enable*))
-  (if (ccl::gestalt :|ascr|) 
-    (setf *record-enable* t)
-    (setf *record-enable* nil)))
+  (setf *record-enable* nil)
+  ;; (if (ui::gestalt :|ascr|) 
+  ;;   (setf *record-enable* t)
+  ;;   (setf *record-enable* nil))
+  )
 
-(ccl::def-load-pointers check-script () (ccl::without-interrupts (check-s)))
+#||PJB
+(ui::def-load-pointers check-script () (ui::without-interrupts (check-s)))
+||#
 
-;RECORDABLES
+;;RECORDABLES
 (defun pw::send-appleevent (the-appleevent the-reply &key
-                                       (reply-mode :no-reply) (interact-mode nil)
-                                       (can-switch-layer nil) (dont-reconnect nil)
-                                       (want-receipt nil) (priority #$kAENormalPriority)
-                                       (timeout #$kAEDefaultTimeout)
-                                       (idleproc appleevent-idle)
-                                       filterproc)
-  (let ((mode (+ (ecase reply-mode
-                   (:no-reply #$kAENoReply)
-                   (:queue-reply #$kAEQueueReply)
-                   (:wait-reply #$kAEWaitReply))
-                 (ecase interact-mode
-                   ((nil) 0)
-                   (:never-interact #$kAENeverInteract)
-                   (:can-interact #$kAECanInteract)
-;introduced for recording, only withn ver. 1.0.1 or greater aaa 15-2-94
-                   (:notexecute #x2000)
-                   (:always-interact #$kAEAlwaysInteract))
-                 (if can-switch-layer #$kAECanSwitchLayer 0)
-                 (if dont-reconnect #$kAEDontReconnect 0)
-                 (if want-receipt #$nreturnreceipt 0))))
-    (ae-error 
-      (let ((*inside-aesend* t)
-            (res (#_AESend the-appleevent the-reply mode priority 
-                  timeout idleproc (or filterproc (%null-ptr)))))
-        (if (eq res #$errAEWaitCanceled)        ; be silent about aborts
-          #$NoErr
-          res)))
-    (when (eq reply-mode :wait-reply)
-      (ccl::check-reply-error the-reply)
-      the-reply)))
+                            (reply-mode :no-reply) (interact-mode nil)
+                            (can-switch-layer nil) (dont-reconnect nil)
+                            (want-receipt nil) (priority #$kAENormalPriority)
+                            (timeout #$kAEDefaultTimeout)
+                            (idleproc appleevent-idle)
+                            filterproc)
+  (warn "~S is not implemented" 'pw::send-appleevent)
+  ;;   (let ((mode (+ (ecase reply-mode
+  ;;                    (:no-reply #$kAENoReply)
+  ;;                    (:queue-reply #$kAEQueueReply)
+  ;;                    (:wait-reply #$kAEWaitReply))
+  ;;                  (ecase interact-mode
+  ;;                    ((nil) 0)
+  ;;                    (:never-interact #$kAENeverInteract)
+  ;;                    (:can-interact #$kAECanInteract)
+  ;; ;;introduced for recording, only withn ver. 1.0.1 or greater aaa 15-2-94
+  ;;                    (:notexecute #x2000)
+  ;;                    (:always-interact #$kAEAlwaysInteract))
+  ;;                  (if can-switch-layer #$kAECanSwitchLayer 0)
+  ;;                  (if dont-reconnect #$kAEDontReconnect 0)
+  ;;                  (if want-receipt #$nreturnreceipt 0))))
+  ;;     (ae-error 
+  ;;       (let ((*inside-aesend* t)
+  ;;             (res (#_AESend the-appleevent the-reply mode priority 
+  ;;                   timeout idleproc (or filterproc (%null-ptr)))))
+  ;;         (if (eq res #$errAEWaitCanceled)        ; be silent about aborts
+  ;;           #$NoErr
+  ;;           res)))
+  ;;     (when (eq reply-mode :wait-reply)
+  ;;       (ui::check-reply-error the-reply)
+  ;;       the-reply))
+  )
 
 
 
 
 (defun record--ae (class keyword lis)
-  (when (and *si-record* *record-enable*)
-  (with-aedescs (event reply target )
-    (create-self-target target)
-    (create-appleevent event class keyword target)
-    (mapcar #'(lambda (par)
-                (put-appleevent-par event (first par) (second par))) lis)
-    (send-appleevent event reply :interact-mode :notexecute))))
+  (warn "~S is not implemented" 'record--ae)
+  ;; (when (and *si-record* *record-enable*)
+  ;; (with-aedescs (event reply target )
+  ;;   (create-self-target target)
+  ;;   (create-appleevent event class keyword target)
+  ;;   (mapcar #'(lambda (par)
+  ;;               (put-appleevent-par event (first par) (second par))) lis)
+  ;;   (send-appleevent event reply :interact-mode :notexecute)))
+  )
 
 
 (defun record-select-list (lista)
-  (when (and *si-record* *record-enable*)
-  (with-aedescs (event reply target )
-      (create-self-target target)
-      (create-appleevent event :|PWst| :|sele| target)
-      (put-appleevent-par event :|----| (cl-user::getDescRecPtr (cl-user::asAEDesc  lista)))
-      (send-appleevent event reply :interact-mode :notexecute))))
+  (warn "~S is not implemented" 'record-select-list)
+  ;; (when (and *si-record* *record-enable*)
+  ;; (with-aedescs (event reply target )
+  ;;     (create-self-target target)
+  ;;     (create-appleevent event :|PWst| :|sele| target)
+  ;;     (put-appleevent-par event :|----| (cl-user::getDescRecPtr (cl-user::asAEDesc  lista)))
+  ;;     (send-appleevent event reply :interact-mode :notexecute)))
+  )
 
 
 
 
 
 
-;RENAME
+;;RENAME
 (defmethod set-dialog-item-text-from-dialog ((view C-patch) str)
-  (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
-                                      (,:|newn| ,(string-downcase str))))
-  (setf (pw-function-string view) (string-downcase str))
-  (with-focused-view view
-    (draw-function-name view 2 (- (h view) 5))))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
+  ;;                                     (,:|newn| ,(string-downcase str))))
+  ;; (setf (pw-function-string view) (string-downcase str))
+  ;; (with-focused-view view
+  ;;   (draw-function-name view 2 (- (h view) 5)))
+  )
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch-application) str)
-  (let ((win (application-object view)))
-    (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
-                                            (,:|newn| ,(string-downcase str))))
-    (setf (pw-function-string view) (string-downcase str))
-    (if (and win (wptr win)) 
-      (set-window-title win (string-downcase str)))
-    (with-focused-view view
-      (draw-function-name view 2 (- (h view) 5)))))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (let ((win (application-object view)))
+  ;;   (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
+  ;;                                           (,:|newn| ,(string-downcase str))))
+  ;;   (setf (pw-function-string view) (string-downcase str))
+  ;;   (if (and win (wptr win)) 
+  ;;     (set-window-title win (string-downcase str)))
+  ;;   (with-focused-view view
+  ;;     (draw-function-name view 2 (- (h view) 5))))
+  )
 
 
-;SET
+;;SET
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-out) text)
-  (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
-                                                 :|indx| 1))
-                                (,:|data| ,text)))
-  (set-dialog-item-text self text)
-  (set (intern text "USER-SUPPLIED-IN-OUTS") (view-container self)))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
+  ;;                                                :|indx| 1))
+  ;;                               (,:|data| ,text)))
+  ;; (set-dialog-item-text self text)
+  ;; (set (intern text "USER-SUPPLIED-IN-OUTS") (view-container self))
+  )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-in-box) text)
-  (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
-                                                 :|indx| 1))
-                                (,:|data| ,text)))
-  (set-dialog-item-text self text))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
+  ;;                                                :|indx| 1))
+  ;;                               (,:|data| ,text)))
+  ;; (set-dialog-item-text self text)
+  )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-instrument) text)
-  (set-dialog-item-text self text)
-  (when (dialog-item-action-function self)
-     (funcall (dialog-item-action-function  self) self)))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (set-dialog-item-text self text)
+  ;; (when (dialog-item-action-function self)
+  ;;    (funcall (dialog-item-action-function  self) self))
+  )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-absin) text)
-  (set-dialog-item-text self text)
-  (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
-                                                 :|indx| (+ (position self (pw-controls (view-container self))) 1)))
-                                (,:|data| ,text)))
-  (update-absin-doc-string (view-container self)))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (set-dialog-item-text self text)
+  ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
+  ;;                                                :|indx| (+ (position self (pw-controls (view-container self))) 1)))
+  ;;                               (,:|data| ,text)))
+  ;; (update-absin-doc-string (view-container self))
+  )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-absout) text)
-  (set-dialog-item-text self text)
-  (setf (doc-string self) text)
-  (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
-                                                 :|indx| 1))
-                                (,:|data| ,text)))
-  (update-absout-doc-string (view-container self)))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (set-dialog-item-text self text)
+  ;; (setf (doc-string self) text)
+  ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
+  ;;                                                :|indx| 1))
+  ;;                               (,:|data| ,text)))
+  ;; (update-absout-doc-string (view-container self))
+  )
 
 
 (defmethod item-action-after-drag ((self C-numbox))
-  (if (patch-type-p (view-container self))
-    (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
-                                                         :|indx| (+ (position self (pw-controls (view-container self))) 1)))
-                                        (,:|data| ,(value self)))))
-  (when (dialog-item-action-function self)
-    (funcall (dialog-item-action-function  self) self)))
+  (warn "~S is not implemented" 'item-action-after-drag)
+  ;; (if (patch-type-p (view-container self))
+  ;;   (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
+  ;;                                                        :|indx| (+ (position self (pw-controls (view-container self))) 1)))
+  ;;                                       (,:|data| ,(value self)))))
+  ;; (when (dialog-item-action-function self)
+  ;;   (funcall (dialog-item-action-function  self) self))
+  )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox) text)
-  (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
-                                                      :|indx| (+ (position self (pw-controls (view-container self))) 1)))
-                                      (,:|data| ,text)))
-  (set-dialog-item-text self text))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
+  ;;                                                     :|indx| (+ (position self (pw-controls (view-container self))) 1)))
+  ;;                                     (,:|data| ,text)))
+  ;; (set-dialog-item-text self text)
+  )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-numbox) text)
-  (let ((value (read-from-string text)))
-    (when (numberp value)
-      (setf (value self) value)
-      (if (patch-type-p (view-container self))
-        (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
-                                                            :|indx| (+ (position self (pw-controls (view-container self))) 1)))
-                                            (,:|data| ,value))))
-      (set-numbox-item-text self value))))
+  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  ;; (let ((value (read-from-string text)))
+  ;;   (when (numberp value)
+  ;;     (setf (value self) value)
+  ;;     (if (patch-type-p (view-container self))
+  ;;       (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
+  ;;                                                           :|indx| (+ (position self (pw-controls (view-container self))) 1)))
+  ;;                                           (,:|data| ,value))))
+  ;;     (set-numbox-item-text self value)))
+  )
 
 
 
 (defun original-args (fun)
-  (let* ((theargs (arglist fun))
+  (let* ((theargs (ccl:arglist fun))
          (i 0))
     (while (and theargs (not (equal (car theargs) '&optional))
                 (not (equal (car theargs) '&rest))
@@ -184,33 +215,33 @@
   (if (wptr (application-object self)) (window-close (application-object self)))
   (let ((m-line (make-instance 'C-measure-line)))
     (setf (measure-line-list new-box) (append (measure-line-list self) (list m-line)))
-    ;(unless (wptr (application-object self))
-    ;  (setf (application-object self) (make-application-object self)))
+                                        ;(unless (wptr (application-object self))
+                                        ;  (setf (application-object self) (make-application-object self)))
     (let ((editors (beat-editors (car (subviews (application-object self)))))
           (new-editors-list (beat-editors (car (subviews (application-object new-box))))))
       (for (i 0 1 (- (length editors) 2))
-        (setf (measure-line (nth i new-editors-list)) (measure-line (nth i editors))))
+           (setf (measure-line (nth i new-editors-list)) (measure-line (nth i editors))))
       (setf (measure-line (car (last new-editors-list))) m-line))))
 
-; I can't make delete input for the extended because the method
-; (mouse-pressed-no-active-extra ((self C-pw-extend) x y)) isn't rigth
+;; I can't make delete input for the extended because the method
+;; (mouse-pressed-no-active-extra ((self C-pw-extend) x y)) isn't rigth
 
 
 (defmethod delete-extra-inputs ((self C-pw-extend)) 
   (let* ((values (butlast (ask-all (pw-controls self) 'patch-value ())))
          (box-now
-           (make-patch-box  (class-name (class-of self)) (give-new-extended-title self)
-              (generate-extended-inputs self) (type-list self))))
+          (make-patch-box  (class-name (class-of self)) (give-new-extended-title self)
+                           (generate-extended-inputs self) (type-list self))))
     (setf (pw-function-string box-now) (pw-function-string self))
     (set-view-position box-now (make-point (x self) (y self))) 
     (for (i 0 1 (1- (length values)))
-      (set-dialog-item-text (nth i (pw-controls box-now)) 
-        (if (numberp (nth i values))
-          (format () "~D" (nth i values))
-          (string (nth i values)))) 
-      (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
-        (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
-        (setf (open-state (nth i (pw-controls box-now))) nil)))
+         (set-dialog-item-text (nth i (pw-controls box-now)) 
+                               (if (numberp (nth i values))
+                                   (format () "~D" (nth i values))
+                                   (string (nth i values)))) 
+         (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+           (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
+           (setf (open-state (nth i (pw-controls box-now))) nil)))
     (correct-extension-box self box-now values)
     (tell (controls (view-window self)) 'draw-connections t)
     (setf *position-new-box* (view-position self))
@@ -220,8 +251,9 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
-     box-now)
+    (warn "~S is not implemented" 'delete-extra-inputs)
+    ;; (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
+    box-now)
   )
 
 
@@ -238,11 +270,11 @@
       (set-window-title (application-object box-now) (pw-function-string self) )
       (setf (pw-function-string box-now) (pw-function-string self))
       (if (and *current-small-inBox* (eq (view-container *current-small-inBox*) self))
-        (kill-text-item))
+          (kill-text-item))
       (for (i 0 1 (1- (length values)))
-        (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
-          (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
-          (setf (open-state (nth i (pw-controls box-now))) nil)))
+           (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+             (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
+             (setf (open-state (nth i (pw-controls box-now))) nil)))
       (correct-extension-box-2 self box-now values)
       (tell (controls (view-window self)) 'draw-connections t)
       (setf *position-new-box* (view-position self))
@@ -252,7 +284,7 @@
       (setf *si-record* t)
       (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
       (tell (controls *active-patch-window*) 'draw-connections)
-      ;(record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
+      ;;(record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
       box-now)
     ))
 
@@ -265,11 +297,11 @@
           (values (butlast (ask-all (pw-controls self) 'patch-value ()))))
       (setf (pw-function-string box-now) (pw-function-string self))
       (if (and *current-small-inBox* (eq (view-container *current-small-inBox*) self))
-        (kill-text-item))
+          (kill-text-item))
       (for (i 0 1 (1- (length values)))
-        (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
-          (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
-          (setf (open-state (nth i (pw-controls box-now))) nil)))
+           (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+             (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
+             (setf (open-state (nth i (pw-controls box-now))) nil)))
       (correct-extension-box-2 self box-now values)
       (tell (controls (view-window self)) 'draw-connections t)
       (setf *position-new-box* (view-position self))
@@ -279,13 +311,13 @@
       (setf *si-record* t)
       (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
       (tell (controls *active-patch-window*) 'draw-connections)
-      ;(record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
+      ;;(record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
       box-now)
     ))
 
 
 
-;EXTENDED
+;;EXTENDED
 (defmethod mouse-pressed-no-active-extra :after ((self C-patch-PolifMN) x y) 
   (declare (ignore x y))
   (remove-yourself-control self))
@@ -301,20 +333,20 @@
 (defmethod mouse-pressed-no-active-extra ((self C-pw-extend) x y) 
   (declare (ignore x y)) 
   (let ((box-now
-           (make-patch-box  (class-name (class-of self)) (give-new-extended-title self)
-              (generate-extended-inputs self) (type-list self)))
-         (values))
+         (make-patch-box  (class-name (class-of self)) (give-new-extended-title self)
+                          (generate-extended-inputs self) (type-list self)))
+        (values))
     (setf (pw-function-string box-now) (pw-function-string self))
     (set-view-position box-now (make-point (x self) (y self))) 
     (setq values (ask-all (pw-controls self) 'patch-value ()))
     (for (i 0 1 (1- (length values)))
-      (set-dialog-item-text (nth i (pw-controls box-now)) 
-        (if (numberp (nth i values))
-          (format () "~D" (nth i values))
-          (string (nth i values)))) 
-      (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
-        (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
-        (setf (open-state (nth i (pw-controls box-now))) nil)))
+         (set-dialog-item-text (nth i (pw-controls box-now)) 
+                               (if (numberp (nth i values))
+                                   (format () "~D" (nth i values))
+                                   (string (nth i values)))) 
+         (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+           (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
+           (setf (open-state (nth i (pw-controls box-now))) nil)))
     (correct-extension-box self box-now values)
     (tell (controls (view-window self)) 'draw-connections t)
     (setf *position-new-box* (view-position self))
@@ -324,9 +356,9 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
-     box-now)
-  ) 
+    (warn "~S is not implemented" 'mouse-pressed-no-active-extra)
+    ;; (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
+    box-now)) 
 
 (defmethod mouse-pressed-no-active-extra ((self C-pw-functional) x y) 
   (declare (ignore x y) )
@@ -337,11 +369,11 @@
         (values (ask-all (pw-controls self) 'patch-value ())))
     (setf (pw-function-string box-now) (pw-function-string self))
     (if (and *current-small-inBox* (eq (view-container *current-small-inBox*) self))
-      (kill-text-item))
+        (kill-text-item))
     (for (i 0 1 (1- (length values)))
-      (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
-        (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
-        (setf (open-state (nth i (pw-controls box-now))) nil)))
+         (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+           (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
+           (setf (open-state (nth i (pw-controls box-now))) nil)))
     (correct-extension-box self box-now values)
     (tell (controls (view-window self)) 'draw-connections t)
     (setf *position-new-box* (view-position self))
@@ -351,9 +383,9 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
-    box-now)
-  )
+    (warn "~S is not implemented" 'mouse-pressed-no-active-extra)
+    ;;(record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
+    box-now))
 
 
 (defmethod mouse-pressed-no-active-extra ((self C-patch-application) x y) 
@@ -366,11 +398,11 @@
     (set-window-title (application-object box-now) (pw-function-string self) )
     (setf (pw-function-string box-now) (pw-function-string self))
     (if (and *current-small-inBox* (eq (view-container *current-small-inBox*) self))
-      (kill-text-item))
+        (kill-text-item))
     (for (i 0 1 (1- (length values)))
-      (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
-        (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
-        (setf (open-state (nth i (pw-controls box-now))) nil)))
+         (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+           (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
+           (setf (open-state (nth i (pw-controls box-now))) nil)))
     (correct-extension-box self box-now values)
     (tell (controls (view-window self)) 'draw-connections t)
     (setf *position-new-box* (view-position self))
@@ -380,7 +412,8 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
+    (warn "~S is not implemented" 'mouse-pressed-no-active-extra)
+    ;; (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
     box-now))
 
 
@@ -388,44 +421,44 @@
 
 
 
-;LOCK
+;;LOCK
 (in-package "C-PATCH-BUFFER")
 (defmethod get-lock-button-fun ((self C-patch-buffer))
   #'(lambda (item)
-    (if (value (view-container item))
-      (progn 
-          (set-dialog-item-text item "o")
-          (pw::record--ae :|PWst| :|cann| `((,:|----| ,(pw::mkSO :|cbox| nil :|name| (pw-function-string self))))))
-      (progn
-          (set-dialog-item-text item "x")
-          (pw::record--ae :|PWst| :|cand| `((,:|----| ,(pw::mkSO :|cbox| nil :|name| (pw-function-string self)))))))
-    (setf (value (view-container item))
-          (not (value (view-container item))))))
+      (warn "~S is not implemented" 'get-lock-button-fun)
+      ;; (if (value (view-container item))
+      ;;   (progn 
+      ;;       (set-dialog-item-text item "o")
+      ;;       (pw::record--ae :|PWst| :|cann| `((,:|----| ,(pw::mkSO :|cbox| nil :|name| (pw-function-string self))))))
+      ;;   (progn
+      ;;       (set-dialog-item-text item "x")
+      ;;       (pw::record--ae :|PWst| :|cand| `((,:|----| ,(pw::mkSO :|cbox| nil :|name| (pw-function-string self)))))))
+      (setf (value (view-container item))
+            (not (value (view-container item))))))
 
 (in-package :pw)
-(defmethod get-lock-button-fun ((self C-patch-accum))
+(defmethod get-lock-button-fun ((self c-patch-accum:c-patch-accum))
   (eval `(function (lambda (item)
-                     (if (value (view-container item))
-                       (progn (set-dialog-item-text item "o") 
-                              (record--ae :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))
-                              (init-buffer ,self))
-                       (progn
-                       (set-dialog-item-text item "x")
-                       (record--ae :|PWst| :|cand| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
-                     (setf (value (view-container item))
-                           (not (value (view-container item))))))))
+           (warn "~S is not implemented" 'get-lock-button-fun)
+           ;; (if (value (view-container item))
+           ;;   (progn (set-dialog-item-text item "o") 
+           ;;          (record--ae :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))
+           ;;          (init-buffer ,self))
+           ;;   (progn
+           ;;   (set-dialog-item-text item "x")
+           ;;   (record--ae :|PWst| :|cand| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
+           (setf (value (view-container item))
+                 (not (value (view-container item))))))))
 
 
 
-;CLOSE 
+;;CLOSE 
 
 
 
 
-;NEW 
+;;NEW 
 
-
- 
 
 (defun init-patch-pos (win patch)
   (when *position-new-box*
@@ -434,51 +467,53 @@
            (x1 (point-h (view-size win)))
            (y1 (point-v (view-size win))))
       (if (and (>= x 0) (>= y 0) (< x x1) (< y y1))
-        (set-view-position patch *position-new-box*)))))
+          (set-view-position patch *position-new-box*)))))
+
 
 (defun record-patch (clase posi name)
-  (when (and *si-record* *record-enable*)
-    (if (equal (string-downcase clase) "text")
-      (setf clase "Window Comment"))
-    (with-aedescs (event reply target )
-      (create-self-target target)
-      (create-appleevent event :|core| :|crel| target)
-      (put-appleevent-par event :|----|  :|cbox| )
-      (put-appleevent-par event :|mbcn| (string-downcase clase))
-      (when name
-        (put-appleevent-par event :|mbnb| name))
-      (put-appleevent-par event :|mbpb| (cl-user::getDescRecPtr (cl-user::asAEDesc  posi)))
-      (send-appleevent event reply :interact-mode :notexecute))
-    ))
+  (warn "~S is not implemented" 'record-patch)
+  ;; (when (and *si-record* *record-enable*)
+  ;;   (if (equal (string-downcase clase) "text")
+  ;;     (setf clase "Window Comment"))
+  ;;   (with-aedescs (event reply target )
+  ;;     (create-self-target target)
+  ;;     (create-appleevent event :|core| :|crel| target)
+  ;;     (put-appleevent-par event :|----|  :|cbox| )
+  ;;     (put-appleevent-par event :|mbcn| (string-downcase clase))
+  ;;     (when name
+  ;;       (put-appleevent-par event :|mbnb| name))
+  ;;     (put-appleevent-par event :|mbpb| (cl-user::getDescRecPtr (cl-user::asAEDesc  posi)))
+  ;;     (send-appleevent event reply :interact-mode :notexecute)))
+  )
 
 
 
 
-;PARA GENERACION DE NOMBRES
+;;PARA GENERACION DE NOMBRES
 
 (defun application-window-name (obj string)
   (if (null (position obj (controls *active-patch-window*) :test 'equal))
-    (mk-nuevo-name-box  string) (pw-function-string obj)))
+      (mk-nuevo-name-box  string) (pw-function-string obj)))
 
 
 (defun mk-nuevo-name-box (string )
   (if (null *active-patch-window*)
-    string
-    (let* ((nompot string)
-           (i 0)
-           (seguir (match-name nompot)))
-      (while seguir
-        (incf i)
-        (setf nompot (concatenate 'string string (format nil "~D" i)))
-        (setf seguir (match-name nompot)))
-      nompot)))
+      string
+      (let* ((nompot string)
+             (i 0)
+             (seguir (match-name nompot)))
+        (while seguir
+          (incf i)
+          (setf nompot (concatenate 'string string (format nil "~D" i)))
+          (setf seguir (match-name nompot)))
+        nompot)))
 
 (defun match-name (name)
   (let* ((lista (controls *active-patch-window*)) (i 0)
          (leng (length lista)) (next t))
     (while (and (< i leng) next)
       (if (equal name (pw-function-string (nth i lista)))
-        (setf next nil))
+          (setf next nil))
       (incf i))
     (if next nil t)))
 
@@ -487,93 +522,94 @@
 (defmethod init-pw-function-string ((self C-patch))
   (setf (pw-function-string self) 
         (mk-nuevo-name-box  (string-downcase (string (pw-function self))))))
-          
+
 
 
 (defmethod draw-function-name ((self C-patch-application) x y)
   (let* ((win (application-object self))
          (str (if (and win (wptr win))
-                (setf (pw-function-string self) (window-title win))  (pw-function-string self))))
+                  (setf (pw-function-string self) (window-title win))  (pw-function-string self))))
     (if (second (pw-controls self))
-      (draw-string x y str)
-      (draw-string x y (subseq  str 0 (min 5 (length str) ))))))
+        (draw-string x y str)
+        (draw-string x y (subseq  str 0 (min 5 (length str) ))))))
 
-;EDITORES A CAMBIAR
+;;EDITORES A CAMBIAR
 
 
 
 (defun make-BPF-editor (bp &optional editor-view-class)
   (let* ((win-string (mk-nuevo-name-box  "bpf") )
          (win (make-instance 
-                'C-BPF-window :window-title win-string :close-box-p nil :window-show nil
-                :view-position #@(10 40) :view-size #@(250 275)))
+                  'C-BPF-window :window-title win-string :close-box-p nil :window-show nil
+                  :view-position #@(10 40) :view-size #@(250 275)))
          (bp-view 
           (make-instance 
-            (if editor-view-class editor-view-class 'C-bpf-view) 
-               :view-container win
-               :view-position #@(2 2) :view-size #@(240 217) 
-               :break-point-function bp 
-               :track-thumb-p t)))
-      (add-subviews win bp-view)
-      (setf (BPF-editor-object win) bp-view)
-      (scale-to-fit-in-rect bp-view)
-      win))
+              (if editor-view-class editor-view-class 'C-bpf-view) 
+              :view-container win
+              :view-position #@(2 2) :view-size #@(240 217) 
+              :break-point-function bp 
+              :track-thumb-p t)))
+    (add-subviews win bp-view)
+    (setf (BPF-editor-object win) bp-view)
+    (scale-to-fit-in-rect bp-view)
+    win))
 
 
 
 (defun make-rtm-editor-window (measure-line)
- (let* ((win-string (mk-nuevo-name-box  "rtm"))
-        (rtm-win (make-instance 'C-rtm-editor-window :window-show nil 
-                       :view-position (make-point 10 50) 
-                       :view-size (make-point 710 205) :window-title win-string))
+  (let* ((win-string (mk-nuevo-name-box  "rtm"))
+         (rtm-win (make-instance 'C-rtm-editor-window :window-show nil 
+                                 :view-position (make-point 10 50) 
+                                 :view-size (make-point 710 205) :window-title win-string))
          (rtm-col (make-instance 'C-beat-editor-collection 
-                       :view-position (make-point 5 5) 
-                       :view-size (make-point 700 200)  
-                        :beat-editors 
-                         (list 
-                            (make-instance 'C-beat-editor-panel 
-                                :view-position (make-point 10 2) :view-size (make-point 690 150)
-                                :measure-line measure-line)))))
-         (add-subviews rtm-win rtm-col)
-         (resize-new-rtm-w rtm-col (view-size rtm-win))
-        rtm-win))           
+                      :view-position (make-point 5 5) 
+                      :view-size (make-point 700 200)  
+                      :beat-editors 
+                      (list 
+                       (make-instance 'C-beat-editor-panel 
+                           :view-position (make-point 10 2) :view-size (make-point 690 150)
+                           :measure-line measure-line)))))
+    (add-subviews rtm-win rtm-col)
+    (resize-new-rtm-w rtm-col (view-size rtm-win))
+    rtm-win))           
 
 
 
 
 (defun make-n-rtm-editors-window (count measure-lines)
- (let* ((win-string (mk-nuevo-name-box   "prtm"))
-        (rtm-win (make-instance 'C-rtm-editor-window :window-show nil :close-box-p t 
-                       :view-position (make-point 10 50) 
-                       :view-size (make-point 710 (+ 45 (* count 150))) :window-title win-string))
+  (let* ((win-string (mk-nuevo-name-box   "prtm"))
+         (rtm-win (make-instance 'C-rtm-editor-window :window-show nil :close-box-p t 
+                                 :view-position (make-point 10 50) 
+                                 :view-size (make-point 710 (+ 45 (* count 150))) :window-title win-string))
          (rtm-collection 
-           (make-instance 'C-beat-editor-collection 
-                       :view-position (make-point 5 5) 
-                       :view-size (make-point 700 (+ 40 (* count 150)))))
-        (rtm-editors))
-       (for (i 0 1 (1- count))
-           (push (make-instance 'C-beat-editor-panel 
-                                :view-position (make-point 10 (+ (* i 150) 10 2)) :view-size (make-point 690 150)
-                                :measure-line (nth i measure-lines))
-                  rtm-editors))
-        (setf (beat-editors rtm-collection) (nreverse rtm-editors))
-        (apply #'add-subviews rtm-collection (beat-editors rtm-collection))
-        (add-subviews rtm-win rtm-collection)
-        (setf (visible-staffs-count rtm-collection) (max 1 (length (beat-editors rtm-collection))))
-        (resize-new-rtm-w rtm-collection (view-size rtm-win))
-        rtm-win))
+          (make-instance 'C-beat-editor-collection 
+              :view-position (make-point 5 5) 
+              :view-size (make-point 700 (+ 40 (* count 150)))))
+         (rtm-editors))
+    (for (i 0 1 (1- count))
+         (push (make-instance 'C-beat-editor-panel 
+                   :view-position (make-point 10 (+ (* i 150) 10 2)) :view-size (make-point 690 150)
+                   :measure-line (nth i measure-lines))
+               rtm-editors))
+    (setf (beat-editors rtm-collection) (nreverse rtm-editors))
+    (apply #'add-subviews rtm-collection (beat-editors rtm-collection))
+    (add-subviews rtm-win rtm-collection)
+    (setf (visible-staffs-count rtm-collection) (max 1 (length (beat-editors rtm-collection))))
+    (resize-new-rtm-w rtm-collection (view-size rtm-win))
+    rtm-win))
 
 
 (defmethod make-application-object ((self C-table-displayer))
-  (make-instance 'C-disp-window
-                 :view-subviews 
-                 (list (make-instance 'C-array-item
-                                      :view-font '("Monaco" 9  :plain)
-                                      :table-dimensions (make-point 2 2)
-                                      :cell-size (make-point 20 12)
-                                      :view-size (make-point 100 80)))
-                 :window-show nil
-                 :window-title (application-window-name self "Tdisp")))
+  (setf (application-object self)
+        (make-instance 'C-disp-window
+            :view-subviews 
+          (list (make-instance 'C-array-item
+                    :view-font '("Monaco" 9  :plain)
+                    :table-dimensions (make-point 2 2)
+                    :cell-size (make-point 20 12)
+                    :view-size (make-point 100 80)))
+          :window-show nil
+          :window-title (application-window-name self "Tdisp"))))
 
 
 (defmethod make-application-object ((self C-patch-midi-Mod))
@@ -581,34 +617,38 @@
         (make-music-notation-editor 'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
                                     (make-point 350 200) *g2-g-f-f2-staffs*
                                     (application-window-name self "chordseq")))
-  (setf (chord-line (give-MN-editor self)) (chord-seq self))
+  (if  (give-MN-editor self)
+       (setf (chord-line (give-MN-editor self)) (chord-seq self))
+       (warn "in ~S ~S,  (give-MN-editor self) is nil" 'make-application-object '((self C-patch-midi-Mod))))
   (application-object self))
 
 
 (defmethod make-application-object ((self C-patch-polifMN-mod))
-  (let ((editor
-         (make-n-music-notation-editors
-          (max (length (pw-controls self)) (length (chord-line-list self)))
-          self
-          'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
-          (make-point 350 200))))
-    (set-window-title editor (mk-nuevo-name-box  (pw-function-string self)))
-    editor))
+  (setf (application-object self)
+        (let ((editor
+               (make-n-music-notation-editors
+                (max (length (pw-controls self)) (length (chord-line-list self)))
+                self
+                'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
+                (make-point 350 200))))
+          (set-window-title editor (mk-nuevo-name-box  (pw-function-string self)))
+          editor)))
 
 (in-package "C-PATCH-LIST-EDITOR")
 (defmethod make-application-object ((self C-patch-list-editor))
-   (make-instance 'C-table-window
-                 :view-subviews 
-                 (list (make-instance 'C-list-item
-                                      :view-font '("Monaco" 9  :plain)
-                                      :table-dimensions (make-point 2 2)
-                                      :cell-size (make-point cell-width cell-hight)
-                                      :view-size (make-point 100 80)))
-                 :window-show nil
-                 :window-title (pw::application-window-name self "lst-ed")))
+  (setf (application-object self)
+        (make-instance 'C-table-window
+            :view-subviews 
+          (list (make-instance 'C-list-item
+                    :view-font '("Monaco" 9  :plain)
+                    :table-dimensions (make-point 2 2)
+                    :cell-size (make-point cell-width cell-hight)
+                    :view-size (make-point 100 80)))
+          :window-show nil
+          :window-title (pw::application-window-name self "lst-ed"))))
 
 
-(in-package c-patch-file-buffer)
+(in-package "C-PATCH-FILE-BUFFER")
 (defmethod get-file ((self C-patch-file-buffer))
   (cond ((and (fred-win self) (wptr (fred-win self)))
          (window-select (fred-win self))
@@ -619,18 +659,18 @@
                 (w-name (file-namestring f-name))
                 (win (find-window w-name)))
            (if (and win (wptr win))
-             (window-select win)
-             (get-selected-file self))))
+               (window-select win)
+               (get-selected-file self))))
         (t (get-selected-file self))))
 
 
 (defmethod get-selected-file ((self C-patch-file-buffer))
-   (let ((name (if (and (file-name self) 
-                        (not (string= (file-namestring (file-name self)) "New")))
-                 (file-name self)
-                 (CHOOSE-FILE-DIALOG))))
-     (pw::record-menu "Open File"  (mac-namestring name) self)
-     (ccl:with-cursor *watch-cursor*
+  (let ((name (if (and (file-name self) 
+                       (not (string= (file-namestring (file-name self)) "New")))
+                  (file-name self)
+                  (CHOOSE-FILE-DIALOG))))
+    (pw::record-menu "Open File"  (mac-namestring name) self)
+    (ui:with-cursor *watch-cursor*
       (setf (fred-win self) 
             (make-instance 'fred-window :window-show nil))
       (setf (file-name self) name)
@@ -649,37 +689,39 @@
     (set-view-size (application-object self)
                    (add-points (view-size table)
                                (make-point cell-width (* 2 cell-hight))))
-  (call-next-method)))
+    (call-next-method)))
 
 (in-package :pw)
 
 (defmethod save ((self C-patch))
   (if *pw-nosave-mode* 
-    (ccl::message-dialog "Sorry this version cannot save files.")
-    (let* ((new-name 
-            (choose-new-file-dialog :directory (string (pw-function self)) 
-                                    :button-string "Save patch as"))
-           
-           (*print-pretty* nil)
-           (*decompile-chords-mode* t))
-      (record-menu (if (equal (class-name (class-of self)) 'C-patch-chord-box-M )
-                     "Save Chord" "Save") (string-downcase  (pathname-name new-name)) self) 
-      (setf (pw-function-string self) (string-downcase  (pathname-name new-name)))
-      (delete-file new-name)   ;ML
-      (with-cursor *watch-cursor*
-        (WITH-OPEN-FILE (out new-name :direction :output :if-exists :supersede :if-does-not-exist :create)
-          (prin1 '(in-package :pw) out)
-          (let ((*package* :pw))
-            (prin1 `(add-patch-box *active-patch-window* ,(decompile self)) out))))
-      )))
+      (ui::message-dialog "Sorry this version cannot save files.")
+      (let* ((new-name 
+              (choose-new-file-dialog :directory (string (pw-function self)) 
+                                      :button-string "Save patch as"))
+             
+             (*print-pretty* nil)
+             (*decompile-chords-mode* t))
+        (record-menu (if (equal (class-name (class-of self)) 'C-patch-chord-box-M )
+                         "Save Chord" "Save") (string-downcase  (pathname-name new-name)) self) 
+        (setf (pw-function-string self) (string-downcase  (pathname-name new-name)))
+        (delete-file new-name)   ;ML
+        (with-cursor *watch-cursor*
+          (WITH-OPEN-FILE (out new-name :direction :output :if-exists :supersede :if-does-not-exist :create)
+            (prin1 '(in-package :pw) out)
+            (let ((*package* :pw))
+              (prin1 `(add-patch-box *active-patch-window* ,(decompile self)) out))))
+        )))
 
 (defun record-menu  (title para self)
-  (if para
-    (record--ae :|PWst| :|come| `((,:|----| ,(mkSO :|cmen| (mkSO :|cbox| nil :|name| (pw-function-string self)) :|name| 
-                                                   title))
-                                  (,:|fina| ,para)))
-    (record--ae :|PWst| :|come| `((,:|----| ,(mkSO :|cmen| (mkSO :|cbox| nil :|name| (pw-function-string self)) :|name| 
-                                                   title))))))
+  (warn "~S is not implemented" 'record-menu)
+  ;; (if para
+  ;;   (record--ae :|PWst| :|come| `((,:|----| ,(mkSO :|cmen| (mkSO :|cbox| nil :|name| (pw-function-string self)) :|name| 
+  ;;                                                  title))
+  ;;                                 (,:|fina| ,para)))
+  ;;   (record--ae :|PWst| :|come| `((,:|----| ,(mkSO :|cmen| (mkSO :|cbox| nil :|name| (pw-function-string self)) :|name| 
+  ;;                                                  title)))))
+  )
 
 (defun make-box-menu-recordables (theboxmenu)
   (mapc #'(lambda (par) 
@@ -687,12 +729,12 @@
                          (igual (menu-item-title par) "Save")
                          (igual (menu-item-title par) "Open")
                          (igual (menu-item-title par) "Open File")))
-              (let* ((fun (menu-item-action-function par)))
-              (set-menu-item-action-function par 
-                                             #'(lambda () 
-                                                 (record-menu (menu-item-title par) nil *target-action-object*)
-                                                       (funcall fun)))))) (menu-items theboxmenu)))
-  
+                (let* ((fun (menu-item-action-function par)))
+                  (set-menu-item-action-function par 
+                                                 #'(lambda () 
+                                                     (record-menu (menu-item-title par) nil *target-action-object*)
+                                                     (funcall fun)))))) (menu-items theboxmenu)))
+
 
 (defmethod redraw-patch ((self C-abstract-M))
   (let* ((win (patch-win self))
@@ -705,16 +747,16 @@
           (when in-boxes 
             (setq in-docs-temp (get-absin-boxes-types-n patches in-boxes))
             (cond 
-             ((member nil in-docs-temp)
-              (CCL:message-dialog 
-               "WARNING! absin box connected to irreducible types. ALL-type used")
-              (mapcar #'(lambda (type-spec) (declare (ignore type-spec)) '(nilNum)) in-docs-temp))
-             (t in-docs-temp))))
+              ((member nil in-docs-temp)
+               (ui:message-dialog 
+                "WARNING! absin box connected to irreducible types. ALL-type used")
+               (mapcar #'(lambda (type-spec) (declare (ignore type-spec)) '(nilNum)) in-docs-temp))
+              (t in-docs-temp))))
          (abstract-box 
           (make-std-patch-box (type-of self)  
                               (read-from-string title) in-put-docs win in-boxes)))
     (dmove-patch abstract-box (x self) (y self))
-    ;   connections
+                                        ;   connections
     (make-abstract-box-connections *active-patch-window* 
                                    abstract-box out-box in-boxes win)
     (tell (controls *active-patch-window*) 'draw-connections t)
@@ -739,21 +781,27 @@
 (make-box-menu-recordables c-patch-file-buffer::*file-box-popUpMenu*)
 
 
-
+(defmethod view-position ((self null)) (make-point 0 0))
+(defmethod view-size     ((self null)) (make-point 1000 1000))
 (defun init-patch-pos (win patch)
   (if (null *position-new-box*)
       (progn
-        (with-cursor *box-cursor*
-          (while (null (mouse-down-p)) t))
-        (setf *position-new-box* (view-mouse-position win)))) 
-    (when *position-new-box*
-      (let* ((x (point-h *position-new-box*))
-             (y (point-v *position-new-box*))
-             (x1 (point-h (view-size win)))
-             (y1 (point-v (view-size win))))
-        (if (and (>= x 0) (>= y 0) (< x x1) (< y y1))
+        ;; (with-cursor *box-cursor*
+        ;;   (while (null (mouse-down-p)) t))
+        ;; (setf *position-new-box* (view-mouse-position win))
+        (warn "~S sets a random position" 'init-patch-pos)
+        (if win
+            (setf *position-new-box* (add-points (view-position win)
+                                                 (make-point (random (point-h (view-size win)))
+                                                             (random (point-v (view-size win))))))))) 
+  (when *position-new-box*
+    (let* ((x (point-h *position-new-box*))
+           (y (point-v *position-new-box*))
+           (x1 (point-h (view-size win)))
+           (y1 (point-v (view-size win))))
+      (if (and (>= x 0) (>= y 0) (< x x1) (< y y1))
           (set-view-position patch *position-new-box*)))))
 
 
 
-                                 
+

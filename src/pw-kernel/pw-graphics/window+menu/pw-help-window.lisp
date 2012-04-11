@@ -11,16 +11,16 @@
 
 (provide 'PW-help-window)
 
-;====================================================================================================
+;;====================================================================================================
 (defclass C-pw-help-window (window)())
 
 (defmethod view-key-event-handler ((self C-pw-help-window) char)
-     (cond 
-        ((eq char  #\Newline)
-           (when *active-patch-window* (window-select *active-patch-window*))
-           (window-hide self)) 
-        ((eq char  #\Enter)
-           (when *active-patch-window* (window-select *active-patch-window*))))) 
+  (case char 
+    ((:Newline)
+     (when *active-patch-window* (window-select *active-patch-window*))
+     (window-hide self)) 
+    ((:Enter)
+     (when *active-patch-window* (window-select *active-patch-window*))))) 
 
 (defmethod window-grow-event-handler ((self C-pw-help-window) where)
   (declare (ignore where))
@@ -32,25 +32,25 @@
   (call-next-method)
   (set-view-size (car (subviews self)) (subtract-points (view-size self)(make-point 8 16))))
 
-(defclass C-pw-help-window-view (ccl::scroller)())
+(defclass C-pw-help-window-view (ui::scroller)())
 
-(defmethod ccl::scroll-bar-limits ((view C-pw-help-window-view))
-  (ccl::normal-scroll-bar-limits view 1000 1000))
+(defmethod ui::scroll-bar-limits ((view C-pw-help-window-view))
+  (ui::normal-scroll-bar-limits view 1000 1000))
 
-;====================================================================================================
+;;====================================================================================================
 
 (defvar *PW-help-window* ())
 
 (defun make-PW-help-window ()
- (let (view-now scroller)
-  (setq *PW-help-window*
-    (make-instance 'C-pw-help-window :window-title "PW help" :GROW-ICON-P t
-        :view-position (make-point 50 25) :view-size (make-point 550 455) :close-box-p nil))
+  (let (view-now scroller)
+    (setq *PW-help-window*
+          (make-instance 'C-pw-help-window :window-title "PW help" :GROW-ICON-P t
+                         :view-position (make-point 50 25) :view-size (make-point 550 455) :close-box-p nil))
     (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 550 8) (- 455 16)) 
-        :view-container *PW-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
-(add-subviews scroller
-  (setq view-now (make-instance 'static-text-dialog-item :view-position (make-point 5 5) :dialog-item-text 
-"   PW keyboard shortcuts:
+                                  :view-container *PW-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
+    (add-subviews scroller
+                  (setq view-now (make-instance 'static-text-dialog-item :view-position (make-point 5 5) :dialog-item-text 
+                                                "   PW keyboard shortcuts:
     h        open help window
     Return   select super-window,hide PW window 
     Enter    select super-window
@@ -97,6 +97,6 @@
     selected boxes will be dragged.    
     
 ")))
-  (set-view-font  view-now '("monaco" 9 :srcor))))
+    (set-view-font  view-now '("monaco" 9 :srcor))))
 
 

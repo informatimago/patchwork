@@ -11,11 +11,11 @@
 
 (provide 'application-box)
 
-;====================================================================================================
-;====================================================================================================
+;;====================================================================================================
+;;====================================================================================================
 
-;(import '(PW-editors:C-application-window PW-editors:set-pw-win+pw-obj))
-;====================================================================================================
+;;(import '(PW-editors:C-application-window PW-editors:set-pw-win+pw-obj))
+;;====================================================================================================
 
 (defclass C-radio-button (static-text-dialog-item) ())
 
@@ -23,9 +23,9 @@
 
 (defmethod decompile ((self C-radio-button)) )
 
-;====================================================================================================
-; application-object is a pointer to a application-window object
-;====================================================================================================
+;;====================================================================================================
+;; application-object is a pointer to a application-window object
+;;====================================================================================================
 
 (defclass  C-patch-application (C-pw-functional)
   ((application-object :initform nil :initarg :application-object 
@@ -79,7 +79,7 @@
 (defmethod restore-window-state ((self C-patch-application) win)
   (put-window-state self win (window-state self)))
 
-; this method should be redefined by subclasses and should return the pointer to the window
+;; this method should be redefined by subclasses and should return the pointer to the window
 (defmethod make-application-object ((self C-patch-application))) 
 
 (defmethod set-pw-window-pointers ((self C-patch-application) win) 
@@ -103,8 +103,8 @@
 (defmethod patch-value ((self C-patch-application) obj)
   (patch-value (application-object self) obj))
 
-;(defmethod draw-control-win ((self C-patch-application))
-;  (draw-control self (win self)))
+;;(defmethod draw-control-win ((self C-patch-application))
+;;  (draw-control self (win self)))
 
 (defmethod draw-function-name ((self C-patch-application) x y)
   (let* ((win (application-object self))
@@ -138,17 +138,17 @@
   (let ((win (application-object self)))
     (if (and win (wptr win)) 
       (set-window-title win (pw-function-string self)))))
-;====================================================================================================
+;;====================================================================================================
 
 #|
 
-;__________________
+;;__________________
 (defclass  C-patch-application-test (C-patch-application) ())
 
 (defmethod make-application-object ((self C-patch-application-test))
   (make-test-application))
 
-;==================
+;;==================
 
 (progn 
  (setq pw-appl (make-patch-box 'C-patch-application-test 'T-Appl ()))

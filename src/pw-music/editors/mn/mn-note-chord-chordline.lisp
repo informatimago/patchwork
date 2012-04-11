@@ -10,7 +10,7 @@
 
 (provide 'MN-note-chord-chordline)
 
-;=================================================================================================
+;;=================================================================================================
 (defvar *mn-view-dyn-flag* nil)
 (defvar *mn-view-dur-flag* nil)
 (defvar *mn-view-ins-flag* nil)
@@ -20,7 +20,7 @@
 (defvar  *MN-VIEW-ARP-FLAG* nil)
 (defvar  *MN-NOTE-INS-Y* 0)
 (defvar *GLOBAL-SELECTED-NOTE* nil)
-;=================================================================================================
+;;=================================================================================================
 (defclass C-scale ()
    ((alteration-vector :initform nil :initarg :alteration-vector :accessor alteration-vector)
     (diatone-vector    :initform nil :initarg :diatone-vector    :accessor diatone-vector)
@@ -37,7 +37,7 @@
 
 (defvar *chromatic-scale* (make-instance 'C-scale 
    :alteration-vector
-;          c   c#     d  d#   e     f   f#    g   g#   a   a#    h  
+;;          c   c#     d  d#   e     f   f#    g   g#   a   a#    h  
   (vector  () #\Y    () #\Y  ()    ()  #\Y   ()  #\Y   ()  #\Y  ())
    :diatone-vector
   (vector  0   0      1  1     2     3   3     4   4    5     5   6)
@@ -45,7 +45,7 @@
 
 (defvar *c-major-scale* (make-instance 'C-scale 
    :alteration-vector
-;          c   c#     d  es    e     f   f#    g   as   a   b    h  
+;;          c   c#     d  es    e     f   f#    g   as   a   b    h  
   (vector  () #\Y    () #\I   ()    ()  #\Y   ()  #\I   ()  #\I  ())
    :diatone-vector
   (vector  0   0      1   2     2     3   3     4   5    5   6   6)
@@ -53,9 +53,9 @@
 
 (defvar *1/4-tone-chromatic-scale* (make-instance 'C-scale 
     :alteration-vector
-;          c  c+  c#  c++    d  d+  d#  d++   e  e+    f  f+   f#  f++      g  g+  g#  g++   
+;;          c  c+  c#  c++    d  d+  d#  d++   e  e+    f  f+   f#  f++      g  g+  g#  g++   
   (vector  () #\y #\Y #\L    () #\y #\Y  #\L  () #\y   () #\y  #\Y #\L     () #\y  #\Y #\L 
-;           a   a+  a#  a++   h  h+ 
+;;           a   a+  a#  a++   h  h+ 
            ()  #\y  #\Y #\L   () #\y)
    :diatone-vector
   (vector  0   0    0  0      1   1   1   1    2   2    3   3   3   3       4   4    4   4
@@ -65,11 +65,11 @@
 ;
 (defvar *1/8-tone-chromatic-scale* (make-instance 'C-scale 
     :alteration-vector
-;          c   c^  c+  c+!  c#  c#^ c++  C++!    d   d!      d+  d+! d#  d#^ d++  eb+ e  e!  e+   e+!     
+;;          c   c^  c+  c+!  c#  c#^ c++  C++!    d   d!      d+  d+! d#  d#^ d++  eb+ e  e!  e+   e+!     
   (vector  () #\Z #\y  #\u  #\Y #\U #\L   #\z ()   #\Z    #\y #\u #\Y #\U #\L  #\z  () #\Z #\y  #\z 
-;           f  f!  f+   f+! f#  f#^ f++  f++!   g  g^ g+  g+! g#  g#^ g++ ab+
+;;           f  f!  f+   f+! f#  f#^ f++  f++!   g  g^ g+  g+! g#  g#^ g++ ab+
            () #\Z #\y  #\u #\Y  #\U #\L #\z  () #\Z #\y #\u #\Y #\U #\L #\z
-;           a  a^ a+   a+! a#  a#^ a++  a++!  h h^   h+ h+!
+;;           a  a^ a+   a+! a#  a#^ a++  a++!  h h^   h+ h+!
            () #\Z #\y #\u #\Y #\U #\L  #\z () #\Z #\y  #\z ) ;#\u)        ;#\302
    :diatone-vector
   (vector  0   0    0  0   0  0 0 1  1   1   1   1  1 1 1  2   2  2 2 3  3   3   3   3  3 3 3 4  4   4    4   4
@@ -77,11 +77,11 @@
   :approx-factor 25))
 
 (defvar *standard-music-notation-scale* *c-major-scale*)
-;(setq *standard-music-notation-scale* *1/4-tone-chromatic-scale*)
+;;(setq *standard-music-notation-scale* *1/4-tone-chromatic-scale*)
 (defvar *current-music-notation-scale* *c-major-scale*)         ;the scale selected by the user
 (defvar *current-approx-scale* *1/4-tone-chromatic-scale*)      ; the scale for user selected approximations
 ;;(setf *current-approx-scale* *c-major-scale*)
-;================================
+;;================================
 
 (defclass C-note ()
    ((midic :initform 6000 :initarg :midic :accessor midic)
@@ -99,7 +99,7 @@
     (comm :initform nil :initarg :comm :accessor comm)
     (extra :initform nil :accessor extra)))
 
-; more compact 
+;; more compact 
 
 (defmethod decompile ((self C-note))
   `(make-C-note  
@@ -125,7 +125,7 @@
       (make-super-note-connections instrument note *current-MN-window*))
     note))
 
-;(make-C-note 6000 34 nil 100 120 1)
+;;(make-C-note 6000 34 nil 100 120 1)
 
 (defmethod initialize-instance :after  ((self C-note) &key midic)
   (declare (ignore midic))
@@ -155,8 +155,8 @@
     (setf (alteration self) (second dia-alt))))
 
 ;
-; 35 = diatone of C5
-; 2 = 1 ditone in pixels
+;; 35 = diatone of C5
+;; 2 = 1 ditone in pixels
 
 (defmethod give-pixel-y  ((self C-note) C5)
    (+ 1 (- C5 (* 2 (- (diatone self) 35)))))
@@ -166,9 +166,9 @@
   (update-note self))
  
 
-;___________________________
-;___________________________
-; instrument
+;;___________________________
+;;___________________________
+;; instrument
 
 (defmethod open-instrument-editor ((self C-note) win x y)
   (if (instrument self) 
@@ -182,7 +182,7 @@
     (setq *global-selected-note* self)
     (remove-instrument-item (instrument self) x y)))
 
-;___________________________
+;;___________________________
 (defmethod draw-note-4  ((self C-note) x C5 t-scfactor)
   (declare (special *mn-view-time-flag*))
   (let ((y-now (give-pixel-y self C5))
@@ -206,7 +206,7 @@
    (draw-line (+ 3 x1) (- y-now 2)
         (round (+ (* t-scfactor (dur self)) (+ 3 x1))) (- y-now 2)))
 
-; used when editing
+;; used when editing
 
 (defmethod draw-note-duration-line-xor ((self C-note) x C5 t-scfactor)
   (let ((y-now (give-pixel-y self C5))
@@ -234,7 +234,7 @@
        (draw-line (+ 3 x-now) (- y-now 2)
           (round (+ (* t-scfactor (offset-time self)) (+ 3 x-now))) (- y-now 2)))))
 
-;__
+;;__
 
 (defmethod map-to-note-symbolic-dynamic ((self C-note))
    (cond 
@@ -272,7 +272,7 @@
                        (if approx (epw::approx-m (midic self) approx) (midic self))
                        (vel self))))
 
-;============================================
+;;============================================
 
 (defun make-chord-object (midics t-time &optional chord-object)
   (if  (eq (type-of (car midics))  chord-object)
@@ -293,7 +293,7 @@
     (notes  :initform nil :initarg :notes :accessor notes)
     (extra :initform nil :accessor extra)))
 
-; more compact 
+;; more compact 
 
 (defmethod decompile ((self C-chord))
   `(make-C-chord ,(t-time self) (list ,@(ask-all (notes self) 'decompile)))) 
@@ -301,7 +301,7 @@
 (defun make-C-chord (t-time notes)
   (make-instance 'C-chord :t-time t-time :notes notes))
 
-;(make-C-chord 0 (list  (make-C-note 6000 34 nil 60 99 1)(make-C-note 6000 34 nil 60 99 1)))
+;;(make-C-chord 0 (list  (make-C-note 6000 34 nil 60 99 1)(make-C-note 6000 34 nil 60 99 1)))
 
 (defmethod initialize-instance :after  ((self C-chord) &key notes)
   (declare (ignore notes))
@@ -331,13 +331,13 @@
 
 (defmethod kill-notes ((self C-chord))
   (tell (notes self) 'remove-instrument-item ()()))
-;__________
+;;__________
 
 (defmethod calc-chord-pixel-x ((self C-chord) t-scfactor beg-x time1)
   (+ beg-x (round (* t-scfactor (- (t-time self) time1)))))
 
-;__________
-; (reverse (notes self)) ->  because of drawing of instrument information
+;;__________
+;; (reverse (notes self)) ->  because of drawing of instrument information
 
 (defmethod give-all-draw-notes  ((self C-chord))
   (reverse (notes self)))
@@ -349,7 +349,7 @@
     (draw-stem self x-now C5 mode)
     (tell (give-all-draw-notes self) 'draw-note-4 x-now C5 t-scfactor) 
     (draw-extra-info self x-now C5 mode))))
-;__________
+;;__________
 
 (defmethod draw-extra-info ((self C-chord) x-now C5 mode)
   (declare (ignore x-now C5 mode)))
@@ -370,13 +370,13 @@
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
     (draw-note-offset-line-xor note x-now C5 t-scfactor)))
 
-;___________
-; stem shows the exact time
+;;___________
+;; stem shows the exact time
 (defmethod draw-stem ((self C-chord) x C5 &optional mode)
   (declare (ignore mode)) 
   (let ((y-min (1- (give-pixel-y (car (notes self)) C5)))
         (y-max (give-pixel-y (car (last (notes self))) C5)))
-;    (let-window-pen win :mode (if mode :patxor  :srcor)
+;;    (let-window-pen win :mode (if mode :patxor  :srcor)
       (draw-line x y-min x (- y-max 18))
     (draw-ledger-lines self x y-min y-max C5)))
 
@@ -384,7 +384,7 @@
    (when (and (> (t-time self) (- x rel-offset))
               (< (t-time self) (+ x rel-offset))) self))
 
-;_______________
+;;_______________
 
 (defmethod get-dias-with-alts ((self C-chord))
   (let ((dias (ask-all (notes self) 'diatone))
@@ -432,9 +432,9 @@
           (push (decf x-now left) x-values))
         (setq left? (not left?))))
      x-values))
-;___________
-; ledger-lines  
-;*g2-g-staffs* *g-plain-staffs* -> (low-y-off-set  (+ C5 0)
+;;___________
+;; ledger-lines  
+;;*g2-g-staffs* *g-plain-staffs* -> (low-y-off-set  (+ C5 0)
 
 (defun round-midic (midic)
   (let ((approx (approx-factor *current-approx-scale*)))
@@ -489,8 +489,8 @@
 (defmethod draw-ledger-line ((self C-chord) x y)
   (draw-line (- x 10) y (+ x 6) y))
 
-;___________
-;  noteheads
+;;___________
+;;  noteheads
 
 (defmethod make-diatone-groups ((self C-chord))
   (let ((notes (notes self))
@@ -525,7 +525,7 @@
 
 (defmethod calc-chord-x-values ((self C-chord)) (make-chord-zig-zag self)) 
 
-;___________
+;;___________
 
 (defmethod sort-notes ((self C-chord))
   (let ((min (midic (car (notes self)))))
@@ -556,7 +556,7 @@
   (let ((dias (ask-all (notes self) 'diatone)))
     (cons (apply #'min dias)(apply #'max dias))))
 
-;================================
+;;================================
 
 (defclass C-chord-line ()
     ((chords  :initform nil :initarg :chords :accessor chords)
@@ -570,7 +570,7 @@
 (defmethod kill-chords ((self C-chord-line))
   (tell (chords self) 'kill-notes))
 
-;________________
+;;________________
 
 (defmethod stop-play ((self C-chord-line))
   (setf (play-flag self) ()))
@@ -602,11 +602,11 @@
       (let ((new-start-time (t-time (car chords))))
         (dfuncall (- new-start-time start-time) 'continue-play-chords self chords new-start-time)))))
 
-;_____________________
+;;_____________________
 
-;(defmethod draw-chord-line1  ((self C-chord-line) t-scfactor beg-x time1 time2 C5)
-;  (set-visible-chords self time1 time2)
-;  (tell (visible-chords self)  'draw-chord t-scfactor beg-x time1 C5)) 
+;;(defmethod draw-chord-line1  ((self C-chord-line) t-scfactor beg-x time1 time2 C5)
+;;  (set-visible-chords self time1 time2)
+;;  (tell (visible-chords self)  'draw-chord t-scfactor beg-x time1 C5)) 
 
 (defmethod draw-active-chord  ((self C-chord-line) chord t-scfactor beg-x time1 C5) 
   (draw-chord chord t-scfactor beg-x time1 C5 t)) 
@@ -619,10 +619,10 @@
      (tell (notes chord) 'remove-instrument-item ()()))
   (setf (chords self) (remove chord (chords self) :test 'eq)))
 
-;  (stable-sort  (chords self) '< :key '(lambda (obj) (t-time obj)))
+;;  (stable-sort  (chords self) '< :key '(lambda (obj) (t-time obj)))
 
-;(defmethod set-visible-chords ((self C-chord-line) time1 time2)
-;   (setf (visible-chords self) (find-visible-chords self time1 time2)))
+;;(defmethod set-visible-chords ((self C-chord-line) time1 time2)
+;;   (setf (visible-chords self) (find-visible-chords self time1 time2)))
 
 (defmethod find-visible-chords ((self C-chord-line) time1 time2)
    (let ((chords (chords self))

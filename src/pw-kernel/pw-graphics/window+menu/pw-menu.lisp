@@ -9,11 +9,11 @@
 
 (in-package :patch-work)
 
-;===========================================
-; menubar for lisp
-(defvar *PW-box-instance-list* ())
-(defvar *pw-window-list* ())
-(defvar *active-patch-window* ())
+;;===========================================
+;; menubar for lisp
+(defvar *PW-box-instance-list* '())
+(defvar *pw-window-list*       '())
+(defvar *active-patch-window*  '())
 
 
 (defun new-menu (title &rest menus)
@@ -30,21 +30,20 @@
 
 (defvar *pw-menu-apps* (new-menu "Apps"))
 
-(defvar *apps-lisp-menu-item* ())
-(defvar *apps-PW-menu-item* ())
+(defvar *apps-lisp-menu-item* '())
+(defvar *apps-PW-menu-item*   '())
 
-;_________________
+;;_________________
 
-(defvar *original-CCL-menubar* (menubar))
-
-(defvar *default-CCL-menubar* ())
+(defvar *original-CCL-menubar* (ui:menubar))
+(defvar *default-CCL-menubar*  '())
 
 (unless *default-CCL-menubar*
-  (let ((menus (cons (car (menubar))
-                     (cons *pw-menu-apps* (cdr (menubar))))))
-    (set-menubar (setf *default-CCL-menubar* menus))))
+  (let ((menus (cons (car (ui:menubar))
+                     (cons *pw-menu-apps* (cdr (ui:menubar))))))
+    (ui:set-menubar (setf *default-CCL-menubar* menus))))
 
-;___________
+;;___________
 
 (defun enable-all-apps-menu-items ()
   (let ((menus (menu-list *pw-menu-apps*)))
@@ -52,18 +51,18 @@
 
 (defun enable-Lisp-apps-menu-item? ()
   (unless (member nil (mapcar #'menu-enabled-p (menu-list *pw-menu-apps*)))
-      (set-menubar *default-CCL-menubar*)
+      (ui:set-menubar *default-CCL-menubar*)
       ;;added 920818 [Camilo]
       (mapc #'menu-enable (cdr *default-CCL-menubar*))
       (menu-item-disable *apps-lisp-menu-item*)))
 
 (defun add-apps-item-to-apps-menu (title action)
   (let ((menu))
-    (add-menu-items  *pw-menu-apps* 
+    (ui:add-menu-items  *pw-menu-apps* 
        (setq menu (new-leafmenu title action)))
     menu))
 
-;___________
+;;___________
 
 (setf *apps-lisp-menu-item* 
       (add-apps-item-to-apps-menu "Lisp"
@@ -89,8 +88,8 @@
   (setq *active-patch-window* (ask *pw-window-list* 'top-level-patch-win?))
   (if  *active-patch-window* (window-select *active-patch-window*)(make-new-pw-window t)))
 
-;=========================================
-; file
+;;=========================================
+;; file
 
 (defvar *pw-menu-file* (new-menu "File"))
 
@@ -130,8 +129,8 @@
         (new-leafmenu "Save with MN as..." 
           #'(lambda () (PW-WINDOW-SAVE-MN-as *active-patch-window*))))))
 
-;=========================================
-; edit
+;;=========================================
+;; edit
 
 (defvar *pw-menu-edit* (new-menu "Edit"))
 
@@ -194,8 +193,8 @@
 
 (defvar *pw-windows-menu* (new-menu "Wins"))
 
-;============================================
-; PW
+;;============================================
+;; PW
 
 (add-menu-items  *PWoper-menu* 
             (new-leafmenu "Documentation"
@@ -294,15 +293,15 @@
                      (* 6500  1024))))
     (when file
       ;(clear-patchwork)
-      ;(setf ccl::*lisp-cleanup-functions* (list (car ccl::*lisp-cleanup-functions* )))
+      ;(setf ui::*lisp-cleanup-functions* (list (car ui::*lisp-cleanup-functions* )))
       (eval-enqueue        
        #'(lambda ()
            (save-application
             file
-            :application-class (find-class 'ccl::lisp-development-system)
+            :application-class (find-class 'ui::lisp-development-system)
             :size sizes
             ;aaa 140397 new protection
-            :resources (ccl::get-app-resources "CL:PW-inits;Drivers+Resources;CLPF.rsrc" :|CCL2|)
+            :resources (ui::get-app-resources "CL:PW-inits;Drivers+Resources;CLPF.rsrc" :|CCL2|)
             ;:init-file "PW:PW-lib;PWscript;image-init" GA 230996
             :init-file "image-init" 
             :clear-clos-caches t
@@ -321,9 +320,9 @@
    (dis/enable-menu-item *pw-menu-file-SaveMN-item* fl)
    (dis/enable-menu-item *pw-menu-file-only-Save-item* (and fl change-fl))
    (dis/enable-menu-item *pw-menu-file-only-SaveMN-item* (and fl change-fl)))
-;============================================
-;============================================
-; menubar for PW
+;;============================================
+;;============================================
+;; menubar for PW
 
 (defvar *patch-work-menu-root*
   (list
@@ -332,9 +331,9 @@
      *PWoper-menu* *pw-kernel-menu* *pw-menu-patch*
      *pw-windows-menu*))
 
-;==================================================
+;;==================================================
 
-(set-menubar *default-CCL-menubar*)
+(ui:set-menubar *default-CCL-menubar*)
 (menu-item-disable *apps-lisp-menu-item*)
 (set-command-key *apps-lisp-menu-item* #\L)
 (set-command-key *apps-PW-menu-item* #\1)

@@ -11,7 +11,10 @@
 ;; Printing MN windows 
 ;; 
 
-(in-package :ccl)
+;; TODO:
+#||
+
+(in-package :pw
 
 (defmethod window-hardcopy ((self pw::C-BPF-window) &optional show-fl)
   show-fl
@@ -21,8 +24,8 @@
       (prchk $err-printer-load)
       (let ((pRec (get-print-record)))
         (when (#_PrJobDialog :ptr (get-print-record) :boolean)
-          (let ((*hc-page-open-p* nil) (ccl::*inhibit-error* t)) ; err)
-            (declare (special *hc-page-open-p* ccl::*inhibit-error*))
+          (let ((*hc-page-open-p* nil) (ui::*inhibit-error* t)) ; err)
+            (declare (special *hc-page-open-p* ui::*inhibit-error*))
             (without-interrupts
              (let* ((window-ptr (wptr self))
                     (hardcopy-ptr 
@@ -58,6 +61,5 @@
           (pw::display-only-points (view-container (pw::mini-view view)))))
     (pw::print-draw-contents view)))
 
-#|
 
-|#
+||#

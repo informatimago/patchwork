@@ -8,7 +8,7 @@
 ;;;;=========================================================
 (in-package :PW)
 
-;================================================
+;;================================================
 
 (defclass C-points-collection  ()
   ((x-points :initform () :initarg :x-points :accessor x-points)
@@ -24,13 +24,13 @@
   (setf (slot-value self 'scaled-y-points)
       (mapcar #'round (scale-low-high (y-points self) 0 h))))
 
-;================================================
+;;================================================
 
 (defclass C-points-rect (C-ttybox C-points-collection) ())
 
-;???
-;(defmethod resize-control :after ((self C-points-rect) w h)
-;  (when (x-points self) (set-x&y self (list (x-points self)(y-points self)))))
+;;???
+;;(defmethod resize-control :after ((self C-points-rect) w h)
+;;  (when (x-points self) (set-x&y self (list (x-points self)(y-points self)))))
 
 (defmethod view-draw-contents ((self C-points-rect))
   (with-focused-view  self
@@ -47,7 +47,7 @@
     (setq points (list (mapcar #'first points)(mapcar #'second points))))
   (scale-x&y-points self points (w self)(h self))) 
 
-;=====================================
+;;=====================================
 
 (setq *pw-points-rect-type*
   (make-instance 'C-pw-type
@@ -61,8 +61,8 @@
     :menu-box-list '("sort" "nosort")
     :type-list '(no-connection))))
 
-;===================================
-; save points ??
+;;===================================
+;; save points ??
 (defclass C-pw-points-view (C-pw-oscilloscope) ()) 
 
 

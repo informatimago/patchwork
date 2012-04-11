@@ -12,12 +12,12 @@
 ;;;
 
 (in-package "EPW")
+(pw:enable-patchwork-readtable)
 
-(eval-when (eval compile load)
-  (import '(|CLPF-Util|:make-num-lambda |CLPF-Util|:prefix-expr
-            |CLPF-Util|:prefix-help)))
+;; (eval-when (eval compile load)
+;;   (import '(|CLPF-UTIL|:make-num-lambda |CLPF-UTIL|:prefix-expr
+;;             |CLPF-UTIL|:prefix-help)))
 
-(export '(make-num-fun lagrange linear power-fun power/2 power/3 parabole/2 parabole/3))
 
 (defunp make-num-fun ((fexpr list (:value "(f(x)= x + 1)"))) nil
   "Creates a lisp function object from the \"functional\" expr <fexpr> which is
@@ -35,7 +35,7 @@ function (f(x)= ...) is optional. If it is not included by the user, the program
 figures out which variables are involved."
   ;; fexpr == <expr> || (<fun> <args> = . <expr>)
   (multiple-value-bind (lambda name) (make-num-lambda fexpr)
-    ;(if |CLPF-Util|:*compile-num-lambda*
+    ;(if |CLPF-UTIL|:*compile-num-lambda*
       ;(compile name lambda)
      ;; so that it works without the compiler
       (eval `(function ,lambda))))
@@ -205,7 +205,7 @@ and create the corresponding function, either y = axb
    (power/2 x0 y0 x1 y1 '*weird-symb*)))
 |#
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defunp parabole/2 ((x0 float) (y0 float)
                     (x1 float (:value 2)) (y1 float (:value 12))
                     (sym list (:value "fparab2")) ) ()
@@ -237,7 +237,7 @@ and create the corresponding function, either y = axb
     ))
 |#
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defunp parabole/3 ((x0 float) (y0 float)
                     (x1 float (:value 2)) (y1 float (:value 15))
                     (x2 float (:value 1)) (y2 float (:value 7))

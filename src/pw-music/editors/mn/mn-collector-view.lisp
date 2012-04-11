@@ -26,6 +26,7 @@
 ;;;   accell-selection          ;affects chord fields of selected chords
 ;;;   
 (in-package :pw)
+(enable-patchwork-readtable)
 
 (defvar *MN-common-popUpMenu* ())
 (defun make-chord-collector-pops ()
@@ -429,7 +430,7 @@
 (defmethod Cresc-selection ((self C-MN-view-mod))
   (let ((dialog (make-instance 'dialog :window-show nil :view-size #@(285 200) 
                                :window-type :double-edge-box 
-                               :view-position (ccl:make-point 100 200))))
+                               :view-position (ui:make-point 100 200))))
     (add-subviews dialog
                   (slot-value self 'dial-stF) (slot-value self 'dial-stT)
                   (slot-value self 'vel-button) (slot-value self 'vel-%)
@@ -558,7 +559,7 @@
 (defmethod scroll-editor-to-home ((self C-MN-view-mod))
    (update-editor self))
 
-;========================
+;;========================
 (defmethod order-the-notes ((self C-chord-line) the-chords t-offset)
   (declare (ignore t-offset))
   (when the-chords

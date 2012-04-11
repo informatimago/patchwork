@@ -11,16 +11,15 @@
 
 (provide 'MN-window)
 
-;============================================================================
+;;============================================================================
 
-;(defmethod decompile ((self simple-view)))
-;(defmethod decompile ((self scroll-bar-dialog-item)))
+;;(defmethod decompile ((self simple-view)))
+;;(defmethod decompile ((self scroll-bar-dialog-item)))
 
 (defun make-MN-popUpMenus ()
   (make-chord-ed-pops)
   (make-chord-collector-pops)
-  (make-bpf-pops)
-)
+  (make-bpf-pops))
 
 (defclass C-mn-window (C-mouse-window C-application-window)  
   ((super-win :initform nil :accessor super-win)
@@ -38,12 +37,12 @@
 (defmethod window-killed-p ((self C-mn-window))
   (not (wptr self)))
 
-;================
+;;================
 
 (defmethod editor-view-object ((self C-MN-window)) (car (subviews self)))
 
-;================
-;application
+;;================
+;;application
 
 (defmethod open-application-help-window ((self C-MN-window))
    (if *MN-help-window*
@@ -56,19 +55,21 @@
   (window-close  self))
 
 (defmethod key-pressed-extra ((self C-MN-window) char)
-  (cond ((eq char #\Enter) 
-           (if (pw-win self)
-             (if (super-win (pw-win self)) 
-                 (window-select (super-win (pw-win self)))
-                 (ed-beep))
-             (ed-beep)))
-        ((eq char #\C) 
-           (record-structured-process self))
-        ((eq char #\Q) 
-           (make-structured-score self))
-        ((eq char #\L) 
-           (pretty-visible-layout  (editor-view-object self)))
-        (t (key-pressed-MN-editor (editor-view-object self) char))))
+  (case char
+    ((:Enter) 
+     (if (pw-win self)
+         (if (super-win (pw-win self)) 
+             (window-select (super-win (pw-win self)))
+             (ed-beep))
+         (ed-beep)))
+    ((#\C) 
+     (record-structured-process self))
+    ((#\Q) 
+     (make-structured-score self))
+    ((#\L) 
+     (pretty-visible-layout  (editor-view-object self)))
+    (otherwise
+     (key-pressed-MN-editor (editor-view-object self) char))))
 
 (defmethod cut ((self C-MN-window))
   (cut (editor-view-object self)))
@@ -78,13 +79,13 @@
 
 (defmethod paste ((self C-MN-window))
   (paste (editor-view-object self)))
-;========================
+;;========================
 (defmethod view-activate-event-handler :after ((self C-MN-window))
   (when (pw-object self)
      (draw-appl-label (pw-object self) #\*))
   (setf *active-MN-window* self)
-  (unless (equal (menubar) *MN-menu-root*)
-    (set-menubar *MN-menu-root*)
+  (unless (equal (ui:menubar)  *MN-menu-root*)
+    (ui:set-menubar *MN-menu-root*)
     (enable-all-apps-menu-items))
   (menu-item-disable *apps-MN-menu-item*))
   
@@ -100,14 +101,14 @@
     (draw-appl-label (pw-object self) #\A))
   (menu-item-enable *apps-MN-menu-item*))
 
-;========================
-;================
-;mouse
+;;========================
+;;================
+;;mouse
 
 (defmethod no-active-mouse-moved ((self C-mn-window))
   (tell (subviews (car (subviews self))) #'reset-active-chord))
 
-;(window-hide *xy-windoid*))
+;;(window-hide *xy-windoid*))
 (defvar *default-MN-cursor* 110)
 (defconstant *cross-line-cursor* 604)
 (defmethod window-update-cursor :around ((self C-mn-window) where)

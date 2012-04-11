@@ -12,14 +12,9 @@
 ;; ==========================================================================
 
 (defpackage "PW-STYPE"
-  (:use "COMMON-LISP")
-  (:import-from "PATCH-WORK"
-   "C-PW-TYPE" "C-PATCH"
-   "C-NUMBOX" "REPEAT" "WHILE")
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
   (:export
-   "CAR!" "LIST!" "DEEP-MAPCAR" "DOUBLE-MAPCAR"
-))
-
+   "CAR!" "LIST!" "DEEP-MAPCAR" "DOUBLE-MAPCAR"))
 (in-package "PW-STYPE")
 
 ;; =============================================================================-======
@@ -64,8 +59,8 @@ whether each of <list1?> <list2?> is a list or not."
 All the arguments <fun> <fun1> <list?> <args> must not side-effect.
 <list?> must not contain any dotted pair."
   `(ifnot (listp ,list?)
-     (,fun1 ,list? ,.args)
-     (mapcar ,(ifnot args `#',fun `#'(lambda (arg1) (,fun arg1 ,.args)))
+     (,fun1 ,list? ,@args)
+     (mapcar ,(ifnot args `#',fun `#'(lambda (arg1) (,fun arg1 ,@args)))
        ,list?)))
 
 (defun do-+ (freqs)
@@ -77,12 +72,12 @@ All the arguments <fun> <fun1> <list?> <args> must not side-effect.
 (defun one-+ (x) (1+ x))
 
 (time (repeat 100 (do-+ '((4 8) 3 (6) ()))))
-;     (repeat 100 (do-+ '((4 8) 3 (6) nil))) took 96 ticks (1.600 seconds) to run.
-;= ((5 9) 4 (7) nil)
+;;     (repeat 100 (do-+ '((4 8) 3 (6) nil))) took 96 ticks (1.600 seconds) to run.
+;;= ((5 9) 4 (7) nil)
 
 (time (repeat 100 (do-rec-+ '((4 8) 3 (6) ()))))
-;     (repeat 100 (do-rec-+ '((4 8) 3 (6) nil))) took 95 ticks (1.583 seconds) to run.
-;= ((5 9) 4 (7) nil)
+;;     (repeat 100 (do-rec-+ '((4 8) 3 (6) nil))) took 95 ticks (1.583 seconds) to run.
+;;= ((5 9) 4 (7) nil)
 
 (defun do-++ (freqs val)
   (mapcar! do-++ one-++ freqs val))
@@ -93,12 +88,12 @@ All the arguments <fun> <fun1> <list?> <args> must not side-effect.
 (defun one-++ (x val) (+ x val))
 
 (time (repeat 100 (do-++ '((4 8) 3 (6) ()) 2)))
-;     (repeat 100 (do-++ '((4 8) 3 (6) nil) 2)) took 113 ticks (1.883 seconds) to run.
-;= ((6 10) 5 (8) nil)
+;;     (repeat 100 (do-++ '((4 8) 3 (6) nil) 2)) took 113 ticks (1.883 seconds) to run.
+;;= ((6 10) 5 (8) nil)
 
 (time (repeat 100 (do-rec-++ '((4 8) 3 (6) ()) 2)))
-;     (repeat 100 (do-rec-++ '((4 8) 3 (6) nil) 2)) took 112 ticks (1.867 seconds) to run.
-;= ((6 10) 5 (8) nil)
+;;     (repeat 100 (do-rec-++ '((4 8) 3 (6) nil) 2)) took 112 ticks (1.867 seconds) to run.
+;;= ((6 10) 5 (8) nil)
 |#
 
 ;; ============================================================================`

@@ -13,26 +13,27 @@
 ;;;
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-(provide 'PW-types)
 
-;=================================================================================================
-;=================================================================================================
 
-; x , y , doc-string has to be given from outside 
+;;=================================================================================================
+;;=================================================================================================
+
+;; x , y , doc-string has to be given from outside 
 
 (defclass C-pw-type ()
   ((control-form :initform nil :initarg :control-form :reader control-form)))
 
-;________________
+;;________________
 
 (defvar *pw-object-type-list* ())
 
 (defun push-to-object-types (pw-object-name)
   (push pw-object-name *pw-object-type-list*))
 
-;________________
-; numboxes
+;;________________
+;; numboxes
 
 (defvar *fix-pw-type*
   (make-instance 'C-pw-type
@@ -70,8 +71,8 @@
    `(make-instance 'C-numbox  :view-size #@(36 14) :value 0 :min-val -32000 :max-val 32000
      :type-list '(fixnum))))
 
-; tty boxes
-; inputs are lists
+;; tty boxes
+;; inputs are lists
 (defvar *symbol-pw-type*
   (make-instance 'C-pw-type
   :control-form
@@ -82,8 +83,8 @@
   :control-form
    `(make-instance 'C-ttybox-str  :view-size #@(36 14) :dialog-item-text "name")))
 
-;==================================
-;for absout absin
+;;==================================
+;;for absout absin
 (defvar *string-absout-pw-type*
   (make-instance 'C-pw-type
   :control-form
@@ -94,23 +95,23 @@
   :control-form
    `(make-instance 'C-ttybox-absin :view-size #@(36 14) :dialog-item-text "name" :type-list '(no-connection))))
 
-;==================================
-; default global list
+;;==================================
+;; default global list
 (defvar cl-user::lst '(0 1 2 3 4))
-; inputs are lists
+;; inputs are lists
 (defvar *symbol-eval-pw-type*
   (make-instance 'C-pw-type
   :control-form
    `(make-instance 'C-ttybox-eval  :view-size #@(36 14) :dialog-item-text "lst" :type-list '(list))))
 
-; argboxes
+;; argboxes
 
 (defvar *symbol-argfn-type*
   (make-instance 'C-pw-type
   :control-form
    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "+" :type-list '(symbol))))
 
-; testboxes
+;; testboxes
 
 (defvar *symbol-testfn-type*
   (make-instance 'C-pw-type
@@ -123,13 +124,13 @@
    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "0")))
 
 
-; MN + midibox
-;(setq *MN-midi-type*
-;  (make-instance 'C-pw-type
-;  :control-form
-;   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "midi" :type-list '(midi))))
+;; MN + midibox
+;;(setq *MN-midi-type*
+;;  (make-instance 'C-pw-type
+;;  :control-form
+;;   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "midi" :type-list '(midi))))
 
-; MN + collector-box
+;; MN + collector-box
 (defvar *MN-collector-type*
   (make-instance 'C-pw-type
   :control-form
@@ -141,7 +142,7 @@
    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "m-ins" :type-list '(midi-ins))))
 
 
-; midi
+;; midi
 
 (defvar *midi-pw-type*
   (make-instance 'C-pw-type
@@ -177,8 +178,8 @@
        :view-size (make-point 36 14) :value 1 :min-val 1 :max-val 100
        :type-list '(fixnum))))
 
-;___________________
-; set-stop-time box
+;;___________________
+;; set-stop-time box
 
 (defvar *midi-pw-type-stop-time*
   (make-instance 'C-pw-type
@@ -186,8 +187,8 @@
            `(make-instance 'C-numbox  :view-size #@(36 14) :value 1000 :min-val 0 :max-val 99999
               :type-list '(fixnum))))
 
-;___________________
-; pw out + in  box
+;;___________________
+;; pw out + in  box
 
 (defvar *pw-out-tty-type*
   (make-instance 'C-pw-type
@@ -200,7 +201,7 @@
            `(make-instance 'C-ttybox-in-box  :view-size #@(40 14) :dialog-item-text "sym"
                :type-list '(no-connection))))
 
-;================================
+;;================================
 (defvar *boolean-pw-type*
   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-val  :view-size #@(36 14)
     :menu-box-list '(("T" . t) ("NIL". nil)) 
@@ -213,11 +214,13 @@
    `(make-instance 'C-numbox  :view-size #@(36 14) :value 0 :min-val -9999 :max-val 999999
       :type-list '(fixnum float list))))
 
-;=================================
-;???? who uses
-; pw-type for fixnum-float-list
-;(setq *fix-float-list-pw-type*
-;  (make-instance 'C-pw-type
-;  :control-form
-;   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "0" 
-;      :type-list '(fixnum float list))))
+;;=================================
+;;???? who uses
+;; pw-type for fixnum-float-list
+;;(setq *fix-float-list-pw-type*
+;;  (make-instance 'C-pw-type
+;;  :control-form
+;;   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "0" 
+;;      :type-list '(fixnum float list))))
+
+(provide 'PW-types)

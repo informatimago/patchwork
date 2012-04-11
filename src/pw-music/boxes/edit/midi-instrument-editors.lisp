@@ -8,13 +8,15 @@
 ;;;;=========================================================
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
 
-;==============================================================================
-;  Midi instrument
-;==============================================================================
 
-;==============================================================================
+;;==============================================================================
+;;  Midi instrument
+;;==============================================================================
+
+;;==============================================================================
 (defclass C-ttybox-instrument (C-ttybox) ()) 
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-instrument) text)
@@ -22,10 +24,10 @@
   (when (dialog-item-action-function self)
      (funcall (dialog-item-action-function  self) self)))
 
-;==============================================================================
-; data type editors 
-;==============================================================================
-; fix
+;;==============================================================================
+;; data type editors 
+;;==============================================================================
+;; fix
 
 (defclass C-fix-window (window)
   ((pw-win :initform nil :accessor pw-win)
@@ -82,7 +84,7 @@
                  (window-select (pw-win self)))
               (window-hide self))))
  
-;=========================
+;;=========================
 
 (defmethod update-status ((self C-fix-window) ctrl)
    (setf (status (midi-ins-object self)) (patch-value ctrl ())))
@@ -98,21 +100,21 @@
    (setf (label (midi-ins-object self)) (dialog-item-text ctrl))
    (erase+view-draw-contents *current-mn-editor*))
 
-;(defmethod play-selected-note ((self C-fix-window) ctrl) (play-note *global-selected-note*))
+;;(defmethod play-selected-note ((self C-fix-window) ctrl) (play-note *global-selected-note*))
 
-;==============================================================================
+;;==============================================================================
 
 (defun make-fix-ins-editor ()
   (make-instance 'C-fix-window :window-title "fix" :close-box-p nil :window-show nil
      :view-position (make-point 30 40) :view-size (make-point 254 45)))
      
-;(make-fix-ins-editor)        
+;;(make-fix-ins-editor)        
 
-;==============================================================================
-;==============================================================================
-; midi-ins data types  
-;==============================================================================
-; abstract data type
+;;==============================================================================
+;;==============================================================================
+;; midi-ins data types  
+;;==============================================================================
+;; abstract data type
 (defclass C-midi-ins-data-type ()
   ((status :initform 0 :initarg :status :accessor status)
    (controller :initform 0 :initarg :controller :accessor controller)
@@ -127,8 +129,8 @@
   (make-connections-to-instrument-editor self)
   (window-select (editor-object self)))
 
-;==============================================================================
-; fix
+;;==============================================================================
+;; fix
 
 (defclass C-midi-ins-fix (C-midi-ins-data-type)
   ((editor-object :initform nil :allocation :class :accessor editor-object)
@@ -177,8 +179,8 @@
         ((eq (status self) #xC0) (write-program-change-value (chan note) (value self)))
         ((eq (status self) #xD0)) 
         ((eq (status self) #xE0) (write-pitch-bend-value (chan note)  (value self)))))
-;==============================================================================
-; bpf
+;;==============================================================================
+;; bpf
 
 (defclass C-bpf-view-ins-win (C-BPF-window)
   ((pw-win :initform nil :accessor pw-win)
@@ -193,7 +195,7 @@
    (midi-ins-object :initform nil :accessor midi-ins-object)))
 
 
-;(defmethod initialize-instance :after ((self C-bpf-view-ins-win) &rest l))
+;;(defmethod initialize-instance :after ((self C-bpf-view-ins-win) &rest l))
 (defmethod make-extra-bpf-view-ins-controls ((self C-bpf-view-ins-win))
   (add-subviews self 
    (setf (static-text-ctrl2 self) 
@@ -237,7 +239,7 @@
           :view-font '("Monaco" 9 :SRCOR :PLAIN)
           :dialog-item-text  " play"))))
 
-;=========================
+;;=========================
 
 (defmethod update-low-limit ((self C-bpf-view-ins-win) ctrl)
    (setf (low-limit (midi-ins-object self)) (patch-value ctrl ())))
@@ -258,8 +260,8 @@
    (setf (label (midi-ins-object self)) (dialog-item-text ctrl))
    (erase+view-draw-contents *current-mn-editor*))
 
-;==========================================
-; layout
+;;==========================================
+;; layout
 
 (defmethod BPF-window-ctrl-1st-y ((self C-bpf-view-ins-win)) (- (h self) 60))
 (defmethod BPF-window-ctrl-2nd-y ((self C-bpf-view-ins-win)) (- (h self) 48))
@@ -275,13 +277,13 @@
  (set-view-position (sample-rate-ctrl self)  (make-point 162 (- (h self) 16)))
  (set-view-position (note-play-ctrl self)   (make-point 202 (- (h self) 16))))
 
-;==========================================
+;;==========================================
 (defclass C-bpf-view-ins (C-bpf-view) ())
 
 (defmethod set-size-view-window-grown ((self C-bpf-view-ins))
   (set-view-size self (subtract-points (view-size (view-window self)) (make-point 10 70)))) 
 
-;==========================================
+;;==========================================
 
 (defun make-BPF-ins-editor (bp)
   (let* ((win (make-instance 
@@ -298,10 +300,10 @@
       (scale-to-fit-in-rect bp-view)
       win))
 
-; (window-select (make-BPF-ins-editor (make-break-point-function '(0 100) '(0 100))))
-;==============================================================================
-;==============================================================================
-; bpf
+;; (window-select (make-BPF-ins-editor (make-break-point-function '(0 100) '(0 100))))
+;;==============================================================================
+;;==============================================================================
+;; bpf
 
 (defclass C-midi-ins-bpf (C-midi-ins-data-type) 
   ((editor-object :initform nil :allocation :class :accessor editor-object)
@@ -321,10 +323,10 @@
         :label ',(label self)
         :sample-rate ,(sample-rate self)))
 
-;(defmethod update-label ((self C-midi-ins-bpf) ctrl)
-;  (declare (special *global-music-notation-panel* *global-editor-x*))
-;  (setf (label self) (str ctrl))
-;  (small-update-mus-panel *global-music-notation-panel* *global-editor-x* t))
+;;(defmethod update-label ((self C-midi-ins-bpf) ctrl)
+;;  (declare (special *global-music-notation-panel* *global-editor-x*))
+;;  (setf (label self) (str ctrl))
+;;  (small-update-mus-panel *global-music-notation-panel* *global-editor-x* t))
 
 (defmethod update-low-limit ((self C-midi-ins-bpf) ctrl)(setf (low-limit self) (value ctrl)))
 (defmethod update-high-limit ((self C-midi-ins-bpf) ctrl)(setf (high-limit self) (value ctrl)))
@@ -350,26 +352,26 @@
   (setf *MN-midi-ins-bpf-object* self)
   (setf (pw-win (editor-object self)) win))
 
-;  (add-bpf-to-bpf-editor (car (controls (editor-object self))) 0  (break-point-function self))
-;  (setf (win (BPF-mini-view self)) win)
-;  (setf (pw-win (editor-object self)) win)
-;  (setf (mini-view (car (editor-objects (car (controls (editor-object self))))))
-;          (BPF-mini-view self))
-;  (scale-bpf-to-fit-in-rect (car (controls (editor-object self))) (break-point-function self))) 
+;;  (add-bpf-to-bpf-editor (car (controls (editor-object self))) 0  (break-point-function self))
+;;  (setf (win (BPF-mini-view self)) win)
+;;  (setf (pw-win (editor-object self)) win)
+;;  (setf (mini-view (car (editor-objects (car (controls (editor-object self))))))
+;;          (BPF-mini-view self))
+;;  (scale-bpf-to-fit-in-rect (car (controls (editor-object self))) (break-point-function self))) 
 
 (defmethod view-size ((self C-midi-ins-bpf)) 50)
-;view draw-rects-fl h-view-scaler v-view-scaler
+;;view draw-rects-fl h-view-scaler v-view-scaler
 (defmethod draw-instrument ((self C-midi-ins-bpf) x-now y-now dur)
   (declare (ignore y-now dur))
   (with-focused-view *current-MN-editor*
     (draw-string x-now *MN-note-ins-y* (label self))
     (incf *MN-note-ins-y* 12)))
-;    (draw-bpf-function  (break-point-function self) self nil 1.0 1.0)
-;    (set-view-position (BPF-mini-view self) (make-point x-now *MN-note-ins-y*))
-;    (incf *MN-note-ins-y* 30)
-;    (set-view-size (BPF-mini-view self) dur 20)
-;    (set-break-point-function-to-mini (BPF-mini-view self) (break-point-function self))
-;    (view-draw-contents (BPF-mini-view self))))
+;;    (draw-bpf-function  (break-point-function self) self nil 1.0 1.0)
+;;    (set-view-position (BPF-mini-view self) (make-point x-now *MN-note-ins-y*))
+;;    (incf *MN-note-ins-y* 30)
+;;    (set-view-size (BPF-mini-view self) dur 20)
+;;    (set-break-point-function-to-mini (BPF-mini-view self) (break-point-function self))
+;;    (view-draw-contents (BPF-mini-view self))))
 
 (defmethod continue-play-pitchb ((self C-midi-ins-bpf) delay chan points)
   (write-pitch-bend-value chan (pop points))
@@ -428,9 +430,9 @@
            ((eq (status self) #xD0)) 
            ((eq (status self) #xE0)
             (start (continue-play-pitchb self (sample-rate self) (chan note) points)))))))
-;==============================================================================
-; data types collector used by mid-ins and C-note instrument field
-;==============================================================================
+;;==============================================================================
+;; data types collector used by mid-ins and C-note instrument field
+;;==============================================================================
 
 
 (defclass C-midi-ins-collection ()
@@ -440,9 +442,9 @@
 (defmethod decompile ((self C-midi-ins-collection))
   `(make-instance ',(class-name (class-of self))
       :ins-name ',(ins-name self)
-      :ins-objects (list ,.(ask-all (ins-objects self) 'decompile))))
+      :ins-objects (list ,@(ask-all (ins-objects self) 'decompile))))
   
-;!!!
+;;!!!
 (defmethod draw-instrument ((self C-midi-ins-collection) x-now y-now t-scfactor)
    (set-view-font  (view-container (view-container  *current-MN-editor*)) '("Monaco"  9  :srcor))
    (draw-string x-now *MN-note-ins-y* (ins-name self))
@@ -479,14 +481,14 @@
                 (setf (ins-objects ,self) 
                   (remove  ,(pop objects) (ins-objects ,self) :test 'eq)) 
                 (when (null (ins-objects ,self))(setf (instrument *global-selected-note*) ())) 
-;                (small-update-mus-panel *global-music-notation-panel* ,x)
+;;                (small-update-mus-panel *global-music-notation-panel* ,x)
 )
               funs)) 
      (make-pw-pop-up (pairlis (nreverse labels) funs))))
 
 (defmethod make-super-note-connections ((self C-midi-ins-collection) super-note super-win)
   (declare (ignore super-note super-win)))
-;==============================================================================
+;;==============================================================================
 #|
 (defmethod add-bpf-to-note ((self C-note) win x y)
   (declare (special *global-music-notation-panel*) (ignore y win))
@@ -532,5 +534,5 @@
            :ins-objects (list new-fix)))))
       (small-update-mus-panel *global-music-notation-panel* x t))
 |#
-;==========================================
+;;==========================================
 

@@ -3,31 +3,31 @@
 
 (provide 'rtm-help-window)
 
-;====================================================================================================
+;;====================================================================================================
 (defclass C-rtm-help-window (C-pw-help-window)())
 
 (defmethod view-key-event-handler ((self C-rtm-help-window) char)
-     (cond 
-        ((eq char  #\Newline)
-           (when *active-rtm-window* (window-select *active-rtm-window*))
-           (window-hide self)) 
-        ((eq char  #\Enter)
-           (when *active-rtm-window* (window-select *active-rtm-window*))))) 
+  (case char
+    ((:Newline)
+     (when *active-rtm-window* (window-select *active-rtm-window*))
+     (window-hide self)) 
+    ((:Enter)
+     (when *active-rtm-window* (window-select *active-rtm-window*))))) 
 
-;====================================================================================================
+;;====================================================================================================
 
 (defun make-rtm-help-window ()
- (let (scroller)
-  (setq *rtm-help-window*
-    (make-instance 'C-rtm-help-window :window-title "Rhythm help" :GROW-ICON-P t
-         :view-position (make-point 30 25) :view-size (make-point 560 455) :close-box-p nil))
-   (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 560 8) (- 455 16)) 
-        :view-container *rtm-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
-  (add-subviews scroller
-   (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
-    :view-font '("monaco" 9 :srcor)
-    :dialog-item-text 
-"    Rhythm editor keyboard shortcuts and clicks:
+  (let (scroller)
+    (setq *rtm-help-window*
+          (make-instance 'C-rtm-help-window :window-title "Rhythm help" :GROW-ICON-P t
+                         :view-position (make-point 30 25) :view-size (make-point 560 455) :close-box-p nil))
+    (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 560 8) (- 455 16)) 
+                                  :view-container *rtm-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
+    (add-subviews scroller
+                  (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
+                                 :view-font '("monaco" 9 :srcor)
+                                 :dialog-item-text 
+                                 "    Rhythm editor keyboard shortcuts and clicks:
 
     h         open help window
     Return    select PW window,hide RTM window

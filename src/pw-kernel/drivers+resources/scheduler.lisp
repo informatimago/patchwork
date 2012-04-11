@@ -13,32 +13,27 @@
 
 ;; Scheduler -- CLPF V1.0  (after Lee Boynton) © 1991 IRCAM
 
-;----------------------------------------------------------------------------------;
-; preFORM 3.0 Scheduler © 1988 Lee Boynton, MIT Media Lab. For non-profit use only ;
-;----------------------------------------------------------------------------------;
-
-(eval-when (eval compile load)
-  (load-once "CLPF:LeLisp-macros")
-  (load-once "CLPF:MIDI"))
+;;----------------------------------------------------------------------------------;
+;; preFORM 3.0 Scheduler © 1988 Lee Boynton, MIT Media Lab. For non-profit use only ;
+;;----------------------------------------------------------------------------------;
 
 (defpackage "SCHEDULER"
   (:use "COMMON-LISP")
-  (:import-from "CCL" "WITHOUT-INTERRUPTS" "*EVENTHOOK*" "EVENT-DISPATCH")
-  (:import-from "MIDI" "CLOCK-TIME" "MIDI-WRITE" "MIDI-WRITE-TIME"))
+  (:import-from "UI" "WITHOUT-INTERRUPTS" "*EVENTHOOK*" "EVENT-DISPATCH")
+  (:import-from "MIDI" "CLOCK-TIME" "MIDI-WRITE" "MIDI-WRITE-TIME")
+  (:export "START" "*ERROR-WHEN-EXTRA-START?*" "DFUNCALL" "APDFUNCALL"
+           "RE-DFUNCALL" "ADVANCE" "PRIORITY" "WITH-MORE-PRIORITY"
+           "WITH-LESS-PRIORITY" "WITH" "*HIGHEST-PRIORITY*" "MIDI:MIDI-WRITE"
+           "EVENT-DISPATCH" "SCHEDULER-STATE" "SET-SCHEDULER-STATE"
+           "*SCHEDULER-INITIAL-STATE*" "WITH-SCHEDULER-OOT1" "SCHEDULER-STEP"
+           "PRINT-SCHEDULER-QUEUE" "ABORT-TASK" "RESET-SCHEDULER"
+           "*HIGHEST-LATENCY*" "*LATE-TASK*" "*PRINT-ON-LATE?*"
+           "*STEP-ON-LATE?*" "*RESET-ON-LATE?*" "*EVAL-ON-LATE?*"
+           "*ERROR-TASK*" "*CONDITION*" "*PRINT-ON-ERROR?*" "*STEP-ON-ERROR?*"
+           "*RESET-ON-ERROR?*"))
 
 (in-package "SCHEDULER")
 
-(eval-when (eval compile load)
-  (export
-   '(start *error-when-extra-start?* dfuncall apdfuncall re-dfuncall
-     advance priority with-more-priority with-less-priority
-     with *highest-priority* midi:midi-write event-dispatch
-     scheduler-state set-scheduler-state *scheduler-initial-state* with-scheduler-OOT1
-     scheduler-step print-scheduler-queue
-     abort-task reset-scheduler
-     *highest-latency* *late-task*
-     *print-on-late?* *step-on-late?* *reset-on-late?* *eval-on-late?*
-     *error-task* *condition* *print-on-error?* *step-on-error?* *reset-on-error?*)))
 
 ;; =============================================================================-======
 
@@ -125,7 +120,7 @@ It cannot be changed, except in the source code.")
   `(task-logtime *current-task*))
 
 (in-package "SCHEDULER")
-(let ((ccl:*warn-if-redefine* nil))
+(let ((ui:*warn-if-redefine* nil))
   (defun midi:midi-write (event)
     "New version"
     (midi-write-time event
@@ -147,22 +142,22 @@ value of its body."
          (setf (logtime) (if *scheduler-RT?* (real-time) *scheduler-time*))
          (when *error-when-extra-start?*
            (error "~S should not be called from within a scheduler task, with body~%~S"
-                  'start '(start ,.body))))
-       ,.body)))
+                  'start '(start ,@body))))
+       ,@body)))
 
 (defmacro apdfuncall (advance priority delay function . arguments)
   "Evaluates immediately all its arguments (producing garbage with the <arguments>
 list) and creates a scheduler task with the given <advance> and <priority>, which
 will apply <function> to <arguments> after the given <delay>."
-  `(when (check-start '(apdfuncall ,advance ,priority ,delay ,function ,.arguments))
+  `(when (check-start '(apdfuncall ,advance ,priority ,delay ,function ,@arguments))
      (create-task
-      (logtime) ,advance ,priority ,delay ,function (list ,.arguments))))  ;GARBAGE
+      (logtime) ,advance ,priority ,delay ,function (list ,@arguments))))  ;GARBAGE
 
 (defmacro dfuncall (delay function . arguments)
   "Evaluates immediately all its arguments (producing garbage with the <arguments>
 list) and creates a scheduler task with the current advance and priority, which
 will apply <function> to <arguments> after the given <delay>."
-  `(apdfuncall (advance) (priority) ,delay ,function ,.arguments))
+  `(apdfuncall (advance) (priority) ,delay ,function ,@arguments))
 
 ;; This routine does not allocate any new argument list.
 
@@ -174,7 +169,7 @@ priority.  It must not be called more than once from the same task."
      ;; HACK! I need a place to store a flag and a value
      ;; HACK! the delay is stored in (task-exectime task) (see execute-task)
      (setf (task-link task) :re-dfuncall (task-exectime task) ,delay)
-     ,.(mapcan
+     ,@(mapcan
         #'(lambda (arg) (list `(rplaca arg-list ,arg) '(pop arg-list)))
         arguments)
      task))
@@ -183,13 +178,13 @@ priority.  It must not be called more than once from the same task."
   "Continues the current task with the same priority, but the \"dfuncall\"s which
 occur inside <body> will create new tasks with the next higher priority level which
 is (1+ (priority)) unless *highest-priority* is achieved."
-  `(with (((priority) (min *highest-priority* (1+ (priority))))) ,.body))
+  `(with (((priority) (min *highest-priority* (1+ (priority))))) ,@body))
 
 (defmacro with-less-priority (&rest body)
   "Continues the current task with the same priority, but the \"dfuncall\"s which
 occur inside <body> will create new tasks with the next lower priority level which
 is (1- (priority)) unless 0 is achieved."
-  `(with (((priority) (max 0 (1- (priority))))) ,.body))
+  `(with (((priority) (max 0 (1- (priority))))) ,@body))
 
 ;; =============================================================================-======
 ;;; The scheduler state and user functions
@@ -220,7 +215,7 @@ keywords: :RT :STEP :OOT :OOT1."
   "Starts and evaluates the <body> with the scheduler in the mode \"Out-Of-Time-Once\",
 and reverts to the previous mode after evaluation.  This is indispensable when wishing
 to use the scheduler mode :OOT1 and starting with an empty scheduler queue."
-  `(start (set-scheduler-state :OOT1) ,.body))
+  `(start (set-scheduler-state :OOT1) ,@body))
 
 (defun scheduler-step (&optional (nb-step 1))
   "Signals an error if the scheduler was not in the :STEP mode.  Otherwise, the clock
@@ -325,15 +320,15 @@ is stopped in the :STEP mode)."
             (task-advance task)
             (task-priority task)
             `(,(task-function task)
-              ,.(mapcar #'(lambda (arg) `',arg) (task-arguments task))))
+              ,@(mapcar #'(lambda (arg) `',arg) (task-arguments task))))
     (when next-task (pretty-print-task next-task stream))))
 
-; At current exec-time 219954 (clock=310151) [:step mode]
-; Ready   |  lat |  exec  |   log  | adv | pri| form
-; Waiting |  lat |  exec  |   log  | adv | pri| form
-; #<task  | -200 | 220154 | 220159 |   5 |  1 | (t-sched::dlooprint '8 '200)>
-; #<task  | -350 | 220304 | 220309 |   5 |  1 | (set-scheduler-state :step)>
-; #<task  | -850 | 220804 | 220809 |   5 |  1 | (set-scheduler-state :rt)>
+;; At current exec-time 219954 (clock=310151) [:step mode]
+;; Ready   |  lat |  exec  |   log  | adv | pri| form
+;; Waiting |  lat |  exec  |   log  | adv | pri| form
+;; #<task  | -200 | 220154 | 220159 |   5 |  1 | (t-sched::dlooprint '8 '200)>
+;; #<task  | -350 | 220304 | 220309 |   5 |  1 | (set-scheduler-state :step)>
+;; #<task  | -850 | 220804 | 220809 |   5 |  1 | (set-scheduler-state :rt)>
 
 ;; Inserts a task in the wait-queue.
 
@@ -685,8 +680,8 @@ time with the :STEP mode.")
         (return)))))
   nil)
 
-; (setq *eventhook* #'check-scheduler)
-; (setq *eventhook* nil)
+;; (setq *eventhook* #'check-scheduler)
+;; (setq *eventhook* nil)
 
 ;; Aborts activity past due.
 
@@ -715,12 +710,12 @@ time with the :STEP mode.")
 
 (proclaim '(optimize (speed 1) (safety 1) (space 1)))
 
-;(push #'(lambda () (setq *eventhook* nil)) CCL:*save-exit-functions*)
+;;(push #'(lambda () (setq *eventhook* nil)) ui:*save-exit-functions*)
 
-;(new-restore-lisp-function 'init-scheduler :if-exists :old)
-;(ccl::def-load-pointers startup-the-scheduler () (ccl::without-interrupts (init-scheduler)))
+;;(new-restore-lisp-function 'init-scheduler :if-exists :old)
+;;(ui::def-load-pointers startup-the-scheduler () (ui::without-interrupts (init-scheduler)))
 
-;(init-scheduler)
+;;(init-scheduler)
 
 #|
 (defun bar (n) (repeat n (print 'bar)))

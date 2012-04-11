@@ -1,9 +1,9 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-;=======================================================
-;PW
-;=======================================================
+;;=======================================================
+;;PW
+;;=======================================================
 
 (defun count-positive-rtms (rtm-list)
   (let ((res 0))
@@ -11,7 +11,7 @@
       (unless (or (< (car rtm-list) 0)(floatp (car rtm-list))) (incf res))
       (pop rtm-list))
     res))
-;(count-positive-rtms '(1 -1 3 1.0 5))
+;;(count-positive-rtms '(1 -1 3 1.0 5))
 
 
 (defun make-rtm-editor-window (measure-line)
@@ -33,21 +33,21 @@
         rtm-win))
 
 
-;(window-select (setf gh (make-rtm-editor-window)))
-;(window-select (setf gh2 (eval (decompile gh))))    
-;(window-select (setf gh3 (eval (decompile gh2))))    
-;==================
+;;(window-select (setf gh (make-rtm-editor-window)))
+;;(window-select (setf gh2 (eval (decompile gh))))    
+;;(window-select (setf gh3 (eval (decompile gh2))))    
+;;==================
 
 (defclass  C-patch-application-rtm-editor (C-patch-application C-process-begin+end)  
   ((clock :initform 0 :accessor clock)
    (clock-obj :initform *global-clock* :allocation :class :accessor clock-obj)
    (chord-objects :initform nil :accessor chord-objects)
-;   (previous-t-time :initform nil :accessor previous-t-time)
+;;   (previous-t-time :initform nil :accessor previous-t-time)
    (play-flag :initform nil :accessor play-flag)
   (measure-line :initform (make-instance 'C-measure-line) :initarg :measure-line :accessor measure-line)
 ))
-;==================
-;???
+;;==================
+;;???
 #|
 (defmethod decompile ((self C-patch-application-rtm-editor))
   `(let ((patch (make-instance ',(class-name (class-of self))
@@ -56,7 +56,7 @@
                :active-mode  ,(active-mode self)
                :pw-function  ',(pw-function self)
                :type-list ',(type-list self) 
-;               :measure-line-list (list ,@(ask-all (measure-line-list self) 'decompile))
+;;               :measure-line-list (list ,@(ask-all (measure-line-list self) 'decompile))
                :application-object 
                       ,(when (wptr (application-object self)) (decompile (application-object self)))
                :view-subviews (list ,@(ask-all (pw-controls self) 'decompile)))))
@@ -105,10 +105,10 @@
   (put-window-state (editor-collection-object win) win (subseq  state 0 5)) 
   (put-window-state (car (beat-editors (editor-collection-object win))) win (subseq state 5 11))) 
 
-;==================
+;;==================
 
 (defmethod make-application-object ((self C-patch-application-rtm-editor))
-  (make-rtm-editor-window (measure-line self)))
+  (setf (application-object self) (make-rtm-editor-window (measure-line self))))
 
 (defmethod give-measure-line ((self C-patch-application-rtm-editor))
   (measure-line (car (beat-editors (editor-collection-object (application-object self))))))
@@ -131,7 +131,7 @@
         (with-focused-view (application-object self) (erase+view-draw-contents (application-object self))))
       measure-line)))
 
-;==================
+;;==================
 
 
 (defmethod yourself-if-collecting ((self C-patch-application-rtm-editor)) self)
@@ -151,7 +151,7 @@
          (notes (patch-value (second (input-objects self)) self))
          (t-time (t-time (car (chord-objects self))))
          delay)
-;    (setf (previous-t-time self) t-time)
+;;    (setf (previous-t-time self) t-time)
     (when (atom notes) (setq notes (list notes)))
     (setf (notes (car (chord-objects self))) notes)
     (update-chord (car (chord-objects self)))
@@ -164,10 +164,10 @@
 (defmethod  begin-process  ((self C-patch-application-rtm-editor))
   (fill-patch-outrect (out-put self))  
   (setf (clock self) 0)
-;  (setf (previous-t-time self) 0)
+;;  (setf (previous-t-time self) 0)
   (setf (chord-objects self) 
     (ask-all (collect-all-chord-beat-leafs (give-measure-line self)) 'beat-chord))
-;  (print (ask-all (chord-objects self) 't-time))  
+;;  (print (ask-all (chord-objects self) 't-time))  
   (calc-t-time-measure-line  (give-measure-line self) 1) 
   (dfuncall-process self (t-time (car (chord-objects self)))))
 
@@ -182,8 +182,8 @@
 (defmethod draw-patch-extra :after ((self C-patch-application-rtm-editor))
   (when (play-flag self) (fill-patch-outrect (out-put self))))     
 
-;====================================================================================================
-;====================================================================================================
+;;====================================================================================================
+;;====================================================================================================
 (defun make-rtm-polif-arg-list (count)
   (let ((arg-list))
     (for (i 0 1 (1- count)) 
@@ -192,9 +192,9 @@
                   (concatenate  'string  "rtmcoll" (format nil "~D" (1+ i)))) arg-list))
     (nreverse arg-list)))
 
-;(make-rtm-polif-arg-list 6)
+;;(make-rtm-polif-arg-list 6)
         
-;====================================================================================================
+;;====================================================================================================
 
 (defun make-n-rtm-editors-window (count measure-lines)
  (let* ((win-string (concatenate  'string  "RTM" (format nil "~D" (incf *RTM-window-counter*))))
@@ -218,11 +218,11 @@
         (resize-new-rtm-w rtm-collection (view-size rtm-win))
         rtm-win))
 
-;(setq r1 (make-n-rtm-editors-window 2))
-;(window-select r1)
-;====================================================================================================
+;;(setq r1 (make-n-rtm-editors-window 2))
+;;(window-select r1)
+;;====================================================================================================
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defclass  C-patch-PolifRTM (C-patch-application)
   ((measure-line-list :initform nil :initarg :measure-line-list :accessor measure-line-list)
    (popUpbox :initform nil :accessor popUpbox)))
@@ -232,7 +232,7 @@
   ((measure-line-list :initform nil :initarg :measure-line-list :accessor measure-line-list)))
 |#
 
-;??????
+;;??????
 #|
 (defmethod decompile ((self C-patch-Polifrtm))
   `(let ((patch (make-instance ',(class-name (class-of self))
@@ -261,13 +261,14 @@
     (make-n-rtm-editors-window length (measure-line-list self))))|#
 
 (defmethod make-application-object ((self C-patch-PolifRTM))
-  (let* ((m-length (length (measure-line-list self)))
-         (length (if (plusp m-length) m-length (length (pw-controls self))))
-         res)
-    (unless (measure-line-list self)
-      (for (i 1 1 length) (push (make-instance 'C-measure-line) res))
-      (setf (measure-line-list self) res))
-    (make-n-rtm-editors-window length (measure-line-list self))))
+  (setf (application-object self)
+        (let* ((m-length (length (measure-line-list self)))
+               (length (if (plusp m-length) m-length (length (pw-controls self))))
+               res)
+          (unless (measure-line-list self)
+            (for (i 1 1 length) (push (make-instance 'C-measure-line) res))
+            (setf (measure-line-list self) res))
+          (make-n-rtm-editors-window length (measure-line-list self)))))
 
 (defmethod decompile ((self C-patch-Polifrtm))
   (append (call-next-method) 
@@ -308,7 +309,7 @@
       (for (i 0 1 (1- (length eds)))
         (setf (measure-line (nth i eds)) (nth i (measure-line-list self))))))))
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defmethod initialize-instance :after ((self C-patch-Polifrtm) &key controls)
   (declare (ignore controls))
   (make-rtm-lock self)
@@ -349,12 +350,12 @@
     (for (i 0 1 (1- length-ed))
       (put-window-state (nth i beats-eds) win (nth i main-list)))))
 
-;_________
+;;_________
 
 (defmethod draw-patch-extra :after ((self C-patch-PolifRTM))
   (draw-char (+ -16 (w self)) (- (h self) 4) #\E)) 
-;_________
-; extend
+;;_________
+;; extend
 
 (defmethod correct-extension-box ((self C-patch-PolifRTM) new-box values)
   (declare (ignore values))
@@ -380,7 +381,7 @@
   (declare (ignore x y))
   (when (option-key-p) 
     (remove-yourself-control self)))
-;_________
+;;_________
 
 #|(defmethod patch-value ((self C-patch-PolifRTM) obj)
   (if (value self)
@@ -429,8 +430,8 @@
       (measure-line-list self))))
 
 
-;====================================================================================================
-;====================================================================================================
+;;====================================================================================================
+;;====================================================================================================
 
 (defunp make-beat ((unit float (:min-val 1 :value 1)) (rtm-list list (:value "(1 1 1)"))
                    &optional (ch-objs (list (:type-list (chord) :value 'chob)))) beat
@@ -451,10 +452,10 @@ else the input has to be a list of chord-objects. "
        (pop lst))
     (list first-elem (nreverse res))))
 
-;(make-car+cdr-list '(2 3 4 7 8 5)) 
-;(make-car+cdr-list '(2 3 4)) 
-;(make-car+cdr-list '(2 3 (3 4 5) 7))
-;(make-car+cdr-list '(2 (3 4 5) (4 (5 6 7)) 7))
+;;(make-car+cdr-list '(2 3 4 7 8 5)) 
+;;(make-car+cdr-list '(2 3 4)) 
+;;(make-car+cdr-list '(2 3 (3 4 5) 7))
+;;(make-car+cdr-list '(2 (3 4 5) (4 (5 6 7)) 7))
   
 (defunp make-beat2 ((unit+rtm list (:value "(1 2 1)"))) beat
   "Creates a beat object according to unit+rtm where unit is car of
@@ -499,17 +500,17 @@ Click 'h' with the <poly-rtm> editor opened for more information."
   (declare (ignore rtmcol rtmcn)))
 
 
-;====================================================================================================
+;;====================================================================================================
 (defmethod play ((self C-patch-application-rtm-editor)) (play-from-pw self))
 (defmethod play ((self C-patch-PolifRTM)) (play-from-pw self))
 
-;add by aaa 28-08-95 from pw-modif
+;;add by aaa 28-08-95 from pw-modif
 (defmethod stop-play ((self c-patch-polifrtm))
   (start 
     (tell (ask-all (beat-editors (car (subviews (application-object self))))
                    'measure-line) 'stop-measure-line))) 
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defun play-from-pw (self) 
  (let* ((editor (car (subviews (application-object self))))
          (editors (give-selected-editors editor)))
@@ -529,16 +530,16 @@ Click 'h' with the <poly-rtm> editor opened for more information."
                   #'(lambda ()
                       (tell (ask-all editors 'measure-line) 'play-measure-line (get-play-speed editor)))))))
 |#
-;====================================================================================================
-;(defvar *rtm-boxes-menu* (new-menu "Rhythm"))
+;;====================================================================================================
+;;(defvar *rtm-boxes-menu* (new-menu "Rhythm"))
 (defvar *rtm-boxes-menu* *pw-MN-Edit-menu*)
 
-(add-menu-items *rtm-boxes-menu* 
+(ui:add-menu-items *rtm-boxes-menu* 
                 (new-leafmenu "-" ()))
 
-;(pw-addmenu  *rtm-boxes-menu* '(make-beat make-beat2 make-measure))
+;;(pw-addmenu  *rtm-boxes-menu* '(make-beat make-beat2 make-measure))
 
-;(pw-addmenu-fun *rtm-boxes-menu* 'rtm-collector 'C-patch-application-rtm-editor)
+;;(pw-addmenu-fun *rtm-boxes-menu* 'rtm-collector 'C-patch-application-rtm-editor)
 
 (pw-addmenu-fun *rtm-boxes-menu* 'poly-rtm 'C-patch-PolifRTM)
 
@@ -546,12 +547,12 @@ Click 'h' with the <poly-rtm> editor opened for more information."
  "Returns all chord objects from a rhythm-editor"
   (ask-all (collect-all-chord-beat-leafs rtmcol) #'beat-chord))
 
-;(pw-addmenu  *rtm-boxes-menu* '(get-rchords))
+;;(pw-addmenu  *rtm-boxes-menu* '(get-rchords))
 
-;(add-menu-items *pw-MN-Edit-menu* *rtm-boxes-menu*)
+;;(ui:add-menu-items *pw-MN-Edit-menu* *rtm-boxes-menu*)
 
 
-;====================================================================================================
+;;====================================================================================================
 
 
 (push-to-object-types 'beat)

@@ -9,14 +9,7 @@
 
 (in-package :pw)
 
-(provide 'PW-lisp-functions)
-
-;====================================================================================================
-
-(export '(scale% random2 mapcar-fun cirlist cumul-sum interpol break-point-fun nth-remove 
-          firstn))
-
-;=====================================================================================
+;;=====================================================================================
 (defun scale% (num %scfc)
   "Returns an integer that is scaled as %scfc percentage of num."
   (round (* num %scfc) 100))
@@ -76,8 +69,8 @@ The length of the list is determined by count."
          (interpol (pop timelst) last-value (setq last-value value-now) float-fl) res))
      (apply 'append (nreverse res))))
 
-;(break-point-fun 30 '(0 3 5) '(50 40 50))
-;(break-point-fun 30 '(0 3 5) '(50 40 50) t)
+;;(break-point-fun 30 '(0 3 5) '(50 40 50))
+;;(break-point-fun 30 '(0 3 5) '(50 40 50) t)
 
 (defun nth-remove (n lst)
   "removes nth (n) member of lst"
@@ -90,7 +83,7 @@ The length of the list is determined by count."
        (subseq lst 0 len)
        (subseq lst 0 count))))
 
-;(firstn 2 '(0 10 3 2 4 3 5 4 5 ))
+;;(firstn 2 '(0 10 3 2 4 3 5 4 5 ))
 
 (defun scale-low-high (lst low high
                            &optional fix-fl)
@@ -107,10 +100,12 @@ The length of the list is determined by count."
          (if fix-fl
            (mapcar #'round (nreverse res))
            (nreverse res))))))
-;(pw-addmenu *pw-menu-patch* '(scale-low-high))
-;===============================
+;;(pw-addmenu *pw-menu-patch* '(scale-low-high))
+;;===============================
 
 ;; chord-box should accept a fix as well as a list of fixes
 (defun list! (thing)
   "Returns a list containing <thing> or <thing> if it's already a list."
   (if (listp thing) thing (list thing)))
+
+(provide 'PW-lisp-functions)

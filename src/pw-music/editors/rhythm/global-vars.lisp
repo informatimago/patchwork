@@ -1,14 +1,14 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)           
 
-;================================================================
-;(defvar *selection-buttons-window* ())
+;;================================================================
+;;(defvar *selection-buttons-window* ())
 (defvar *selection-buttons-x* ())
 (defvar *selection-buttons-y* ())
-;(defvar  *global-pw-edit-control* ())
-;(defvar  *previous-global-pw-edit-control* ())
+;;(defvar  *global-pw-edit-control* ())
+;;(defvar  *previous-global-pw-edit-control* ())
 (defvar  *beat-leaf-objs* ())
-;================================================================
+;;================================================================
 (defvar *selection-buttons-pool* ())
 (defvar *rtm-struct-selection-scrap* ())
 (defvar *measure-selection-scrap* ())

@@ -195,7 +195,7 @@ editor opened for more information."
         )))
 
 ;;; version corrigée du 21/6/94. GA/CR. Dans Rythm-Formation.lisp
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 
 (defun put-in-grace-notes (grace-notes chords) ;(print grace-notes)
   (let (piece-chord res sorted-grace-notes pivot-chord needed-chords
@@ -254,7 +254,7 @@ editor opened for more information."
     new-chords))
 |#
 
-;add by aaa 28-08-95 from pw-modif
+;;add by aaa 28-08-95 from pw-modif
 (defmethod stop-play ((self C-patch-score-voice)) 
  (start 
     (tell (ask-all (beat-editors (car (subviews (application-object self))))
@@ -295,7 +295,7 @@ editor opened for more information."
 
 (defun low-of (sign) (second sign))
 
-;(pw-addmenu-fun *rtm-boxes-menu* 'score-voice 'C-patch-score-voice)
+;;(pw-addmenu-fun *rtm-boxes-menu* 'score-voice 'C-patch-score-voice)
 (pw-addmenu-fun *rtm-boxes-menu* 'rtm 'C-patch-score-voice)
 
 (defun rtm-tree (measure-lines)
@@ -323,7 +323,7 @@ editor opened for more information."
                       #'t-time)))
           measure-lines))
 
-;changed by aaa le 26-09-95
+;;changed by aaa le 26-09-95
 (defun rtm-durs (measure-lines)
   (mapcar #'(lambda (m-line)
               (calc-t-time-measure-line m-line 1.0)

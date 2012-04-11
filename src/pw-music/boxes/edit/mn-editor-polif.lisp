@@ -11,7 +11,7 @@
 
 (provide 'MN-editor-polif)
 
-;====================================================================================================
+;;====================================================================================================
 
 (defun make-polif-arg-list (count)
   (let ((arg-list))
@@ -21,21 +21,22 @@
                   (concatenate  'string  "coll" (format nil "~D" (1+ i)))) arg-list))
     (nreverse arg-list)))
 
-;(make-polif-arg-list 6)
+;;(make-polif-arg-list 6)
         
-;====================================================================================================
+;;====================================================================================================
 (defclass  C-patch-PolifMN (C-patch-application)
   ((chord-line-list :initform nil :initarg :chord-line-list :accessor chord-line-list)))
 
 (defmethod make-application-object ((self C-patch-PolifMN))
-  (make-n-music-notation-editors (length (pw-controls self))))
+  (setf (application-object self)
+        (make-n-music-notation-editors (length (pw-controls self)))))
 
-;_________
+;;_________
 
 (defmethod draw-patch-extra :after ((self C-patch-PolifMN))
   (draw-char (+ -16 (w self)) (- (h self) 4) #\E)) 
-;_________
-; extend
+;;_________
+;; extend
 
 (defmethod correct-extension-box ((self C-patch-PolifMN) new-box values)
   (declare (ignore values))
@@ -44,7 +45,7 @@
     (for (i 0 1 (1- (length editors)))
        (setf (chord-line (nth i new-editors-list)) (chord-line (nth i editors))))))
 
-;(defmethod generate-extended-inputs ((self C-patch-PolifMN)) (call-next-method))
+;;(defmethod generate-extended-inputs ((self C-patch-PolifMN)) (call-next-method))
 
 (defmethod give-new-extended-title ((self C-patch-PolifMN)) 'pmnn) 
 
@@ -52,7 +53,7 @@
   (declare (ignore x y))
   (when (option-key-p) 
     (remove-yourself-control self)))
-;_________
+;;_________
 
 (defmethod patch-value ((self C-patch-PolifMN) obj)
   (declare (ignore obj))
@@ -64,4 +65,4 @@
         (view-draw-contents (nth i editors)))))
     (application-object self))
 
-;=================================================================
+;;=================================================================

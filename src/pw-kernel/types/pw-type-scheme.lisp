@@ -14,10 +14,8 @@
 ;;=====================================================
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-(eval-when (eval compile load)
-  (export '(defunp Get-Pw-Type-Specs defunt add-pw-input-type add-alias-to-pw
-             add-output-type)))
 
 (defclass C-PW-type-set ()
   ((type-list :initform () :initarg :type-list :accessor type-list))
@@ -343,7 +341,7 @@
     (unless (stringp documentation)
       (error *error-functiondoc-missing* name) )
      `(progn
-        (defun ,name ,lambda-list ,documentation ,.body)
+        (defun ,name ,lambda-list ,documentation ,@body)
         (set-PW-symbolic-type-data ',name  ',parsed-list ',outtype))))
 
 (defun get-lambda-list (collected-a-list)
@@ -371,7 +369,7 @@
 (defmacro defunt (name args outtype)
     `(set-PW-symbolic-type-data ',name  ',(collect-keywords args) ',outtype))
 
-(nconc (cassq 'function ccl::*define-type-alist*) (list "unp" "unt"))
+;; (nconc (cassq 'function *define-type-alist*) (list "unp" "unt"))
   
 (defmethod set-PW-symbolic-type-data ((me symbol) intypes outtype)
   "the symbol stores information about its function"
@@ -425,6 +423,10 @@
 
 (defun find-out-type (name) 
   (cdr (assoc name *pw-all-out-types* :test #'string=)))
+
+(defun get-arglist (function)
+ (ccl:arglist function))
+
 
 (defun make-defunp-function-arg-list (function &optional (nb-arg 0))
   (let ((arg-list (get-arglist function))
@@ -613,9 +615,9 @@
       (error *error-functiondoc-missing* name) )
     `(progn
        (defmethod pw::patch-value ((self ,class-argument) ,obj-var)
-         (let ,(match-inputs-to-args lambda-list obj-var) ,.body))
+         (let ,(match-inputs-to-args lambda-list obj-var) ,@body))
         (defun ,name ,lambda-list ,documentation nil)
         (set-PW-symbolic-type-data ',name  ',parsed-list ',outtype))))
 
-;(defclass C-fru (C-PW-functional) ((boa :initform 5 :accessor boa)))
-;(macroexpand (defmethodp fifi C-fru ((x fix) (y fix)) fix "fu" (+ x y  (boa self))))
+;;(defclass C-fru (C-PW-functional) ((boa :initform 5 :accessor boa)))
+;;(macroexpand (defmethodp fifi C-fru ((x fix) (y fix)) fix "fu" (+ x y  (boa self))))

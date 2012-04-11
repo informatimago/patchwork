@@ -1,7 +1,7 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-;================================================================
+;;================================================================
 (defclass C-beat-selection-button ()
   ((rtm-view-obj :initform ()  :accessor rtm-view-obj)
    (view-position :initform (make-point 0 0) :initarg :view-position :accessor view-position)
@@ -56,7 +56,7 @@
             (eq (cdr (selection-button-function self)) (rtm-selection-2 view)))
     (with-pen-state (:mode :patXOR :pattern *black-pattern*)
        (fill-rect* (x self) (y self) (w self) (h self)))))
-;================================================================
+;;================================================================
 
 (defclass C-selection-buttons-pool ()  
   ((buttons-pool :initform () :initarg :buttons-pool :accessor buttons-pool)
@@ -94,6 +94,6 @@
        (connect-control selection-butt function rtm-obj)))
 
 (setf *selection-buttons-pool* (make-instance 'C-selection-buttons-pool))
-;(length (buttons-pool *selection-buttons-pool*))
-;(length (free-beat-selection-buttons *selection-buttons-pool*))
-;(give-beat-selection-button  *selection-buttons-pool* () 0 0 0 0)
+;;(length (buttons-pool *selection-buttons-pool*))
+;;(length (free-beat-selection-buttons *selection-buttons-pool*))
+;;(give-beat-selection-button  *selection-buttons-pool* () 0 0 0 0)

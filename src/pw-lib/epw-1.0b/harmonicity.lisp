@@ -17,7 +17,7 @@
 
 (in-package "EPW")
 
-;(import '(unique-sorted f->mc1 mc->f1 f->mc mc->f cents->coef coef->cents))
+
 
 ;; =============================================================================-======
 
@@ -123,9 +123,9 @@ partial rankings or the notes corresponding to those partials."
   (let ((coef (cents->coef (/ 100 approx))))
     (cons (/ freq coef) (* freq coef))))
 
-; (interval-around-f 440. (/ 1. 12)) => (220.0 . 880.0)
-; (interval-around-f 440. 1) => (415.3046975799451 . 466.1637615180899) (G# . A#)
-; (f->mc (interval-around-f 440. 1)) => (6800 . 7000)
+;; (interval-around-f 440. (/ 1. 12)) => (220.0 . 880.0)
+;; (interval-around-f 440. 1) => (415.3046975799451 . 466.1637615180899) (G# . A#)
+;; (f->mc (interval-around-f 440. 1)) => (6800 . 7000)
 
 #|(defun fond-virt-f (freqs approx)
   (let*
@@ -169,10 +169,10 @@ partial rankings or the notes corresponding to those partials."
                        (return-from gcd-try gcd-interval))))))))
     (gcd-try values .1 (grid-above (apply 'min values)))))
 
-; (fond-virt-f '(400. 500. 601.) 64) => ((4 5 6) 100.0763034890829 . 100.0902942798978)
-; (fond-virt-f '(400. 500. 601.) 32) => ((4 5 6) 99.98602183067244 . 100.1806700903654)
+;; (fond-virt-f '(400. 500. 601.) 64) => ((4 5 6) 100.0763034890829 . 100.0902942798978)
+;; (fond-virt-f '(400. 500. 601.) 32) => ((4 5 6) 99.98602183067244 . 100.1806700903654)
 
-; (f->mc (fond-virt-f (mc->f '(6000 6400 6700)) 4)) => 3604
+;; (f->mc (fond-virt-f (mc->f '(6000 6400 6700)) 4)) => 3604
 
 ;; ==== harmonic distances ====
 
@@ -311,9 +311,8 @@ If two or more adjacent min or max have the same value, they are collected in a 
       (setq oxs xs ox x oy y))
     (nreverse l) ))
 
-(export 'fun-minmax)
 
-;(defun list-sub (l1 l2) (car l1))
+;;(defun list-sub (l1 l2) (car l1))
 
 (defun list-sub (l1 l2)
   (if (eq l2 (cdr l1)) (car l1)
@@ -408,9 +407,9 @@ harmonic distance to the chord <ch> between <locents> and <hicents>."
  ;(oct 1)(nreverse (sumabs-minmax (+ min (* (1- oct) 1200)) ch (+ min (* oct 1200)))))
 #|
 (time (length (sumabs-allminmax -700 '(4100 4900 5100 5700 6000 6600 7000 7400) 2900)))
-; took 1800 ticks (30.000 seconds) to run. with remove-duplicates
-; took 93 ticks (1.550 seconds) to run. with unique-sorted
-;657
+;; took 1800 ticks (30.000 seconds) to run. with remove-duplicates
+;; took 93 ticks (1.550 seconds) to run. with unique-sorted
+;;657
 |#
 (defunp fv-sumabs-plot ((m0s midics?) (ch chord)) list
   "Returns the list of distances (according to <fun>) between each f0 and <ch>."

@@ -11,8 +11,8 @@
 
 (provide 'oscilloscope)
 
-;====================================================================================================
-;====================================================================================================
+;;====================================================================================================
+;;====================================================================================================
 (defclass C-pw-oscilloscope (C-pw-resize-x) 
   ((clock :initform 0 :accessor clock)
    (x-now :initform 0 :accessor x-now)
@@ -31,7 +31,7 @@
       (set-view-position (out-put self) 
           (make-point (- (round (w self) 2) 6) (- (h self) 5))))))
 
-;__________
+;;__________
 (defmethod draw-patch-extra :after ((self C-pw-oscilloscope))
   (when (play-flag self) (fill-patch-outrect (out-put self))))     
 
@@ -90,7 +90,7 @@ This box can bee resized by clicking inside the small rectangle
 bottom right and dragging the mouse.
 "
   (declare (ignore del value points)))
-;====================================================
+;;====================================================
 
 
 ;;;not needed?????!!  911107

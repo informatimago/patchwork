@@ -8,19 +8,11 @@
 ;;;;=========================================================
 
 (defpackage "C-PATCH-CHORD-LINE"
-  (:use "COMMON-LISP" "CCL")
-  (:import-from "PATCH-WORK"
-                "PW-CONTROLS" "PATCH-VALUE" "INPUT-OBJECTS" "C-CHORD-LINE" "C-PATCH"
-                "C-CHORD" "DECOMPILE" "CHORDS" "LIST!" "C-PW-TYPE" "C-TTYBOX" "T-TIME"
-                "*DECOMPILE-CHORDS-MODE*" "CHORD-LINE" "COMPILE-ME" "COMPLETE-BOX"
-                "C-PATCH-MIDI-MOD" "-MAKE-LOCK" "VALUE" "CHBUILD" "CHORD-SEQ"
-                "MAKE-INSTRUMENT-FOR-CHORD" "APPLICATION-OBJECT" "C-PW-FUNCTIONAL"
-                "W" "H" "COLLECT" "YOURSELF-IF-COLLECTING" "BEGIN-PROCESS"
-                "DRAW-PATCH-EXTRA" "CORRECT-EXTENSION-BOX" "APPLICATION-OBJECT"
-                "UPDATE-EDITOR" "SET-DIALOG-ITEM-TEXT-FROM-DIALOG" "PW-FUNCTION-STRING")
+  (:use "COMMON-LISP" "UI" "LELISP-MACROS" "PATCH-WORK")
   (:export "C-PATCH-CHORD-LINE" "CHORD-SEQN"))
 
 (in-package "C-PATCH-CHORD-LINE")
+(enable-patchwork-readtable)
 
 (defclass C-patch-chord-line (C-patch-midi-Mod )())
 
@@ -251,7 +243,7 @@ that is under 'chord') to keep its contents by clicking on the small ‘o’ in 
 right of the module The ‘o’ indicates that the module is open."
   (declare (ignore chords dels durs vels offs chans insts start)))
 
-;(pw::pw-addmenu-fun pw::*pw-menu-patch* 'chordseq 'C-patch-chord-line)
+;;(pw::pw-addmenu-fun pw::*pw-menu-patch* 'chordseq 'C-patch-chord-line)
 
 ;;;this is only kept for compatibility and may be erased at any moment...
 (setf pw::*chord-line-object-type*
@@ -259,4 +251,4 @@ right of the module The ‘o’ indicates that the module is open."
   :control-form
    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "()" 
       :type-list '(pw::chord list))))
-;(pw::pw-addmenu-fun (pw::the-user-menu) 'chordseq 'C-patch-chord-line::C-patch-chord-line)
+;;(pw::pw-addmenu-fun (pw::the-user-menu) 'chordseq 'C-patch-chord-line::C-patch-chord-line)

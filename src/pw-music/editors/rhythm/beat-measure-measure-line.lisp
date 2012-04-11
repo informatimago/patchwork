@@ -1,18 +1,18 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-;================================================================
+;;================================================================
 (defvar *global-rtm-level-x-list* ())
 (defvar *global-rtm-level-list* ())
 (defvar *notehead-type-list* ())
 (defvar *rtm-editor-measure-x-offset* 15) ;pixels
-;================================================================
+;;================================================================
 
-; units 3  .
-; units 5  slur 4 + 1
-; units 6  .
-; units 7  ..
-; slur ....
+;; units 3  .
+;; units 5  slur 4 + 1
+;; units 6  .
+;; units 7  ..
+;; slur ....
 #|(defun calc-extra-note-head-info (units)
   (case (round units) (3 'dot)
               (5 'slur)
@@ -59,24 +59,24 @@
         (when (<= unit-count-now rtm-sum) (incf level-counter))))
     level-counter))
 
-;#\w  whole note
-;#\h  1/2 note
-;#\q  1/4 note
-;#\e  1/8 note
-;#\x  1/16
-;#\≈  1/32
-;#\…  1/64 (appogiatura) ??
+;;#\w  whole note
+;;#\h  1/2 note
+;;#\q  1/4 note
+;;#\e  1/8 note
+;;#\x  1/16
+;;#\≈  1/32
+;;#\…  1/64 (appogiatura) ??
 
-;#\W  whole 1/2  rest
-;#\Œ 1/4 rest
-;#\‰ 1/8 rest
-;#\r 1/16 rest
-;#\R 1/32 rest
-; 64 rest ???
+;;#\W  whole 1/2  rest
+;;#\Œ 1/4 rest
+;;#\‰ 1/8 rest
+;;#\r 1/16 rest
+;;#\R 1/32 rest
+;; 64 rest ???
 
 
 (defun calc-next-note-head (unit-count rtm-sum rtm base-unit)
-; (print (list unit-count rtm-sum rtm base-unit))
+;; (print (list unit-count rtm-sum rtm base-unit))
  (let ((notehead-type (if (minusp rtm) 'rest 'notehead))
         note-head-info level)
    (setq rtm (abs rtm))
@@ -106,47 +106,47 @@
            (t (if (eq notehead-type 'rest) #\W #\w)))  ;1/1
 |#
 
-;rtm-sum > unit-count
-;(calc-next-note-head 2 5 1 0)
-;(calc-next-note-head 3 11 1 0)
-;(calc-next-note-head 3 4 1 1)
-;(calc-next-note-head 3 5 1 1)
-;(calc-next-note-head 3 5 2 1)
-;(calc-next-note-head 3 5 4 1)
-;(calc-next-note-head 3 6 1 1)
+;;rtm-sum > unit-count
+;;(calc-next-note-head 2 5 1 0)
+;;(calc-next-note-head 3 11 1 0)
+;;(calc-next-note-head 3 4 1 1)
+;;(calc-next-note-head 3 5 1 1)
+;;(calc-next-note-head 3 5 2 1)
+;;(calc-next-note-head 3 5 4 1)
+;;(calc-next-note-head 3 6 1 1)
 
-;unit-count > rtm-sum  
-;(calc-next-note-head 3 2 1 1)
-;(calc-next-note-head 4 2 1 1)
-;(calc-next-note-head 4 3 1 1)
-;(calc-next-note-head 7 3 1 1)
+;;unit-count > rtm-sum  
+;;(calc-next-note-head 3 2 1 1)
+;;(calc-next-note-head 4 2 1 1)
+;;(calc-next-note-head 4 3 1 1)
+;;(calc-next-note-head 7 3 1 1)
 
-;unit-count = rtm-sum  
-;(calc-next-note-head 2 2 1 1)
+;;unit-count = rtm-sum  
+;;(calc-next-note-head 2 2 1 1)
 #|
 (defun give-note-head-minus-2-levels (note-head)
-;  (print note-head)
+;;  (print note-head)
   (case note-head
      (#\w #\q)
      (#\h #\e)
      (#\q #\x)
      (#\e #\≈)
      (#\x #\…)
-; rests
+;; rests
      (#\W #\‰)
      (#\Œ #\r)
      (#\‰ #\R)
 ))|#
 
 (defun give-note-head-minus-2-levels (note-head)
-;  (print note-head)
+;;  (print note-head)
   (case note-head
      (#\w #\q)
      (#\h #\e)
      (#\q #\x)
      (#\e #\≈)
      (#\x #\…)
-; rests
+;; rests
      (#\W #\‰)
      (#\Œ #\r)
      (#\‰ #\R)
@@ -154,12 +154,12 @@
      (otherwise (error "cannot draw smaller than a 32th rest or a 64th note"))
 ))
 
-;================================================================
+;;================================================================
 (defun make-rtm-chords (count midics)
   (let (chords)
     (repeat count (push (make-chord-object (list (pop midics)) 0) chords))
     (nreverse chords)))
-;(make-rtm-chords 6 '(6000 6100 6200 6300 6400 6500))
+;;(make-rtm-chords 6 '(6000 6100 6200 6300 6400 6500))
 
 (defun beat-constructor (unit-length rtm-list &optional chords)
  (let (res rtm-list-now beat chord-beats)
@@ -170,7 +170,7 @@
           (beat-constructor (car rtm-list-now)(second rtm-list-now) chords)
          `(make-instance 'C-beat :unit-length ,rtm-list-now)) 
           res))
-    (setq beat (eval `(make-instance 'C-beat :unit-length ,unit-length :rtm-list (list ,.(nreverse res)))))
+    (setq beat (eval `(make-instance 'C-beat :unit-length ,unit-length :rtm-list (list ,@(nreverse res)))))
     (setq *beat-leaf-objs* ())
     (setq chord-beats (collect-all-chord-beat-leafs2 beat))
     (while chord-beats
@@ -188,7 +188,7 @@
           (beat-constructor (car rtm-list-now)(second rtm-list-now) chords)
          `(make-instance 'C-beat :unit-length ,rtm-list-now)) 
           res))
-    (setq beat (eval `(make-instance 'C-beat :unit-length ,unit-length :rtm-list (list ,.(nreverse res)))))
+    (setq beat (eval `(make-instance 'C-beat :unit-length ,unit-length :rtm-list (list ,@(nreverse res)))))
     (setq *beat-leaf-objs* ())
     (setq chord-beats (collect-all-chord-beat-leafs2 beat))
     (while chord-beats
@@ -197,10 +197,10 @@
     beat))
 |#
 
-;================================================================
-;================================================================
-;   unit-length
-; if in a leaf - fix -> note-head , negative fix -> rest , float -> slur 
+;;================================================================
+;;================================================================
+;;   unit-length
+;; if in a leaf - fix -> note-head , negative fix -> rest , float -> slur 
 
 (defclass C-beat ()
   ((rtm-list :initform nil :initarg :rtm-list :accessor rtm-list)
@@ -212,7 +212,7 @@
 (defmethod decompile-rtm ((self C-beat) rtm-list)  
   (declare (ignore rtm-list))
   (let ((rtm-list (rtm-list self)) rtm-obj res)
-;    (print rtm-list)
+;;    (print rtm-list)
     (while rtm-list
       (setq rtm-obj (pop rtm-list))
       (if (no-beat-leaf? rtm-obj)
@@ -223,24 +223,24 @@
 
 (defmethod decompile  ((self C-beat))  
   (setq *rec-rtm-chs-list* ())
- `(beat-constructor ,(unit-length self) ',(decompile-rtm self ()) (list ,.(nreverse *rec-rtm-chs-list*)))) 
+ `(beat-constructor ,(unit-length self) ',(decompile-rtm self ()) (list ,@(nreverse *rec-rtm-chs-list*)))) 
 
 (defmethod decompile-to-dialog  ((self C-beat))  ;;; 
   (setq *rec-rtm-chs-list* ())
- `(beat-constructor ,(unit-length self) ',(decompile-rtm self ()) (list ,.(nreverse *rec-rtm-chs-list*)))) 
+ `(beat-constructor ,(unit-length self) ',(decompile-rtm self ()) (list ,@(nreverse *rec-rtm-chs-list*)))) 
 
-;(setq b (beat-constructor 1 '(1 1 -1 (1 (1 1))) (make-rtm-chords 4 '(6000 6100 6200 6300))))
-;(decompile-rtm b ())
-;(decompile (eval (decompile b)))
+;;(setq b (beat-constructor 1 '(1 1 -1 (1 (1 1))) (make-rtm-chords 4 '(6000 6100 6200 6300))))
+;;(decompile-rtm b ())
+;;(decompile (eval (decompile b)))
 
 (defmethod no-beat-leaf? ((self C-beat)) (rtm-list self))
 (defmethod beat-leaf? ((self C-beat)) (null (rtm-list self)))
 
-;=======================================
+;;=======================================
 (defmethod add-beat-after-myself ((self C-beat) beat) (declare (ignore beat)))  
 (defmethod add-beat-before-myself ((self C-beat) beat) (declare (ignore beat)))  
 (defmethod remove-myself-from-measure ((self C-beat) beat) (declare (ignore beat)))  
-;(defmethod paste-beat-myself ((self C-beat) beat) (declare (ignore beat)) (print (rtm-list self)))  
+;;(defmethod paste-beat-myself ((self C-beat) beat) (declare (ignore beat)) (print (rtm-list self)))  
 
 (defmethod paste-beat-myself ((self C-beat) beat)  
  (when *rtm-struct-selection-scrap*
@@ -267,13 +267,13 @@
       (when *beat-chord-scrap* (setf (beat-chord self) 
         (eval *beat-chord-scrap*))))
      (when (super-beat self) (paste-beat-myself (super-beat self) self))))
-;=======================================
+;;=======================================
 
 (defmethod replace-old-beat ((self C-beat) old-beat new-beat) 
   (setf (rtm-list self) (substitute new-beat old-beat (rtm-list self) :test 'eq)))
 
-;(setf a (read-from-string (delete  "'" "(2 '(2 3 4 5))" :test #'string=)))
-;`(,(car a) ',@(cdr a)) 
+;;(setf a (read-from-string (delete  "'" "(2 '(2 3 4 5))" :test #'string=)))
+;;`(,(car a) ',@(cdr a)) 
 
 (defun substitute-nil-to-paren (str)
   (setf (elt  (setf str (substitute  #\Space #\n  (substitute #\Space #\i  (substitute #\Space #\l  str)))) 4)  #\( ) 
@@ -292,7 +292,7 @@
          (get-string-from-user  "rtm" :size (make-point 300 85) :position :centered
             :initial-string str))))) 
 
-; (window-select-ccl-tty-dialog  (PRIN1-TO-STRING (list (second edit-data)(third edit-data))) 50 50 t))))
+;; (window-select-ccl-tty-dialog  (PRIN1-TO-STRING (list (second edit-data)(third edit-data))) 50 50 t))))
 
 (defmethod draw-appl-label ((self C-beat) label)(declare (ignore label)))
 (defmethod update-editor ((self C-beat)))
@@ -361,7 +361,7 @@
         (when *current-rtm-editor* 
           (erase+view-draw-contents *current-rtm-editor*))))))
     
-;==============================
+;;==============================
 
 (defmethod play-beat-continue ((self C-beat) beats beat-unit-ticks)
   (when beats 
@@ -371,7 +371,7 @@
 
 (defmethod play-beat ((self C-beat) beat-unit-ticks)
   (setq beat-unit-ticks (* (unit-length self) beat-unit-ticks))
-;  (print (list 'beat-unit-ticks beat-unit-ticks))
+;;  (print (list 'beat-unit-ticks beat-unit-ticks))
   (if (beat-leaf? self) 
      (progn  (when (beat-chord self) 
                 (play-chord-with-offset (beat-chord self)))
@@ -389,12 +389,12 @@
   *beat-leaf-objs*)   
 
 (defmethod collect-all-chord-beat-leafs2 ((self C-beat))
-;  (print (list 'test (plusp (unit-length self)) (ccl:fixnump (unit-length self)) (beat-leaf? self)(rtm-list self)))
-  (if (and (plusp (unit-length self)) (ccl:fixnump (unit-length self)) (beat-leaf? self))
+;;  (print (list 'test (plusp (unit-length self)) (ui:fixnump (unit-length self)) (beat-leaf? self)(rtm-list self)))
+  (if (and (plusp (unit-length self)) (ui:fixnump (unit-length self)) (beat-leaf? self))
      (setf *beat-leaf-objs* (append *beat-leaf-objs* (list self)))
      (tell  (rtm-list self) 'collect-all-chord-beat-leafs2))
   *beat-leaf-objs*)   
-;==============================
+;;==============================
 
 (defmethod draw-beat-slur/tuplet  ((self C-beat) x1 x2 y1 y2)
   (draw-line (+ 5 x1) y1 (- x2 3) y1)
@@ -434,7 +434,7 @@
             (when (and (not (= *staff-num* 7)) (beat-chord rtm-obj))  
               (draw-beat-extra-stuff rtm-obj pixel-now C5 (beat-zoom obj))
               (draw-beat-chord-5 (beat-chord rtm-obj) pixel-now C5 (beat-zoom obj) (+ 10 y2) (car note-head-info)))
-            (when (and (edit-mode obj)(ccl:fixnump rtm-now))
+            (when (and (edit-mode obj)(ui:fixnump rtm-now))
               (connect-to-selection-button obj rtm-obj  (- pixel-now 7) y2 10 15 'open-beat-chord-editor)  
               (setf (super-beat rtm-obj) self))
             (draw-extra-note-info self note-head-info rtm-now pixel-now y2 pixel-incr)  
@@ -450,9 +450,9 @@
           (draw-tuplets  self (view-container (view-container  obj)) (unit-length self) beg-x typlet-y rtm-sum))
     (round end-pixel)))
       
-;================================================================
-; draw beams 
-;================================================================
+;;================================================================
+;; draw beams 
+;;================================================================
 
 (defun make-1+2-groupings-list (lst)
   (let ((count 1) 1-res (ref (pop lst))) ;2-res)
@@ -467,10 +467,10 @@
     (push (if (<= ref 0) (- count) count) 1-res)
     (nreverse 1-res)))
 
-;(make-1+2-groupings-list '(0 0 0 1 1 0 0 1 1)) ; 3 -2 1 ; negative no draw group
-;(make-1+2-groupings-list(substitute 1 2 '(2 1 0 1 1 0 0 1 1))) -> also 2s
-;(make-1+2-groupings-list(substitute 0 1 '(2 1 0 1 1 0 0 1 1))) -> only 2s
-;(time (make-1+2-groupings-list (substitute-list* '(1 1 1) '(4 3 2) '(1 2 1 2 2))))
+;;(make-1+2-groupings-list '(0 0 0 1 1 0 0 1 1)) ; 3 -2 1 ; negative no draw group
+;;(make-1+2-groupings-list(substitute 1 2 '(2 1 0 1 1 0 0 1 1))) -> also 2s
+;;(make-1+2-groupings-list(substitute 0 1 '(2 1 0 1 1 0 0 1 1))) -> only 2s
+;;(time (make-1+2-groupings-list (substitute-list* '(1 1 1) '(4 3 2) '(1 2 1 2 2))))
 
 (defun substitute-list* (new-lst old-lst lst)
   (while new-lst
@@ -485,9 +485,9 @@
         (4s-list (make-1+2-groupings-list (substitute-list* '(0 0 0) '(3 2 1) level-lst))) ;->  only 4s ; max 1/64 notes
         (y-start y)
         first-x main-list list-now  nth-first-x1 nth-first-x2 first-time? single-case)
-;  (print (list "x" x-lst "level" level-lst))
-;  (print (list "1s" 1s-list "2s" 2s-list "3s" 3s-list "4s" 4s-list))
-;  (print note-types)
+;;  (print (list "x" x-lst "level" level-lst))
+;;  (print (list "1s" 1s-list "2s" 2s-list "3s" 3s-list "4s" 4s-list))
+;;  (print note-types)
   (setq main-list (list 1s-list 2s-list 3s-list 4s-list))
   (setq single-case (= 4 (apply #'+ (mapcar #'length main-list))))
   (with-pen-state  (:size (make-point 1 2)) 
@@ -514,9 +514,9 @@
 
 
 
-;================================================================
-; draw extra note info  
-;================================================================
+;;================================================================
+;; draw extra note info  
+;;================================================================
 
 (defmethod draw-extra-note-info  ((self C-beat) note-head-info rtm-now pixel-now y2 pixel-incr)
   (let (slur-x (slur-y (- y2 6)) (dot-y (if (minusp rtm-now) (+ 19 y2) (+ 12 y2)))) ; rest?
@@ -543,9 +543,9 @@
         (draw-beat-slur/tuplet self (- *rtm-last-note-pixel* 5) (- pixel-now 5) (+ 15 y2) -2)))
     (setq *rtm-last-note-pixel* (if slur-x slur-x  pixel-now))))
 
-;================================================================
-; tuplets  
-;================================================================
+;;================================================================
+;; tuplets  
+;;================================================================
 
 (defmethod draw-tuplets ((self C-beat) win unit-length beg-x typlet-y rtm-sum)
   (let ((tuplet-num  (give-tuplet-num2 rtm-sum unit-length)))
@@ -560,11 +560,11 @@
           (draw-string (+ 10 middle-pixel) (- typlet-y 6) (format () "~D" tuplet-num))))
       (set-view-font  win '("MusNot-j"  18  :srcor)))))
 
-; 9 2  -> 9:8
-; 9 1  -> 9
-; 6 7  -> 6:3.5
+;; 9 2  -> 9:8
+;; 9 1  -> 9
+;; 6 7  -> 6:3.5
 (defun give-tuplet-num2 (rtm-sum unit)
-;  (format () "~D" 
+;;  (format () "~D" 
     (let ((num (cond ((>  unit rtm-sum) 
                          (while (> unit rtm-sum) (setq unit (/ unit 2))) unit)
                      ((<  unit rtm-sum) 
@@ -573,7 +573,7 @@
       (if (fixnump num) num (float num))))
 
 (defun draw-tuplets? (rtm-sum unit)
-;  (print (list rtm-sum unit))
+;;  (print (list rtm-sum unit))
   (and
     (not (and (= rtm-sum 4)(= unit 2)))    
     (not (and (= rtm-sum 8)(= unit 4)))    
@@ -584,10 +584,10 @@
     (or (and (> rtm-sum 1)(oddp rtm-sum))
         (= rtm-sum 6)(= rtm-sum 10)(= rtm-sum 12)(= rtm-sum 14) 
         (> unit 1))))
-;(draw-tuplets? 8 4) 
+;;(draw-tuplets? 8 4) 
 
-;================================================================
-;================================================================
+;;================================================================
+;;================================================================
 
 (defclass C-measure ()
   ((high :initform "3" :initarg :high :accessor high)  
@@ -603,7 +603,7 @@
   `(make-instance 'C-measure :low ,(low self) ;:rtm-list ,(rtm-list self) 
                              :metronome ,(metronome self)
                              :metronome-unit ,(metronome-unit self)
-                             :beat-objects (list ,.(ask-all (beat-objects self) 'decompile))))
+                             :beat-objects (list ,@(ask-all (beat-objects self) 'decompile))))
 
 (defmethod calc-high-value ((self C-measure))
   (apply #'+ (mapcar #'abs (ask-all (beat-objects self) 'unit-length))))
@@ -622,7 +622,7 @@ metronome units
 (defmethod set-metronome ((self C-measure) num)(setf (metronome self) num))
 (defmethod set-unit+metronome ((self C-measure) unit metr)
   (setf (metronome-unit self) unit) (setf (metronome self) metr))
-;=======================================
+;;=======================================
 
 (defmethod play-measure-continue ((self C-measure) beats beat-unit-ticks)
   (when beats 
@@ -633,20 +633,20 @@ metronome units
  (let* ((measure-length (calc-measure-length self t-scfactor))
         (beats (beat-objects self))
         (beat-unit-ticks (/ measure-length (calc-high-value self))))
-;    (print (list 'measure-length measure-length 'beat-unit-ticks beat-unit-ticks))
+;;    (print (list 'measure-length measure-length 'beat-unit-ticks beat-unit-ticks))
     (play-measure-continue self beats beat-unit-ticks)
     measure-length))
-;=======================================
+;;=======================================
 (defmethod collect-all-chord-beat-leafs ((self C-measure))
   (tell  (beat-objects self) 'collect-all-chord-beat-leafs)
   *beat-leaf-objs*)
 
-;=======================================
+;;=======================================
 
 (defmethod calc-measure-pixel-x ((self C-measure) t-scfactor beg-x)
    (+ beg-x (calc-measure-length self t-scfactor)))
       
-;1 -> -2  2 -> -1  4 -> 0  8 -> 1  16 -> 2  32 -> 3  64 -> 4
+;;1 -> -2  2 -> -1  4 -> 0  8 -> 1  16 -> 2  32 -> 3  64 -> 4
 (defun give-low-number (low) (- (truncate (log low 2)) 2))
 
 (defmethod draw-all-beats ((self C-measure) obj C5 pixel-beat-unit beg-x y1 y2)
@@ -696,7 +696,7 @@ metronome units
 (defun draw-rtm-measure-line-ys (x C5)
   (let ((ys (ask-all (symbol-value (nth (1- *staff-num*) *global-staff-list*)) #'delta-y)))
      (draw-line x (- C5 (first ys) 16) x (- C5 (car (last ys)) 1))))
-;=================================
+;;=================================
 
 (defmethod replace-old-beat ((self C-measure) old-beat new-beat) 
    (setf (beat-objects self) (substitute new-beat old-beat (beat-objects self) :test 'eq)))
@@ -755,7 +755,7 @@ metronome units
               (list (eval *rtm-struct-selection-scrap*))
               (nthcdr (1+ nth-beat) (beat-objects self))))))) 
 
-;=================================
+;;=================================
 
 (defmethod add-beat-after ((self C-measure))  
   (when (super-measure-line self) (add-beat-after-myself (super-measure-line self) self)))
@@ -769,7 +769,7 @@ metronome units
     (remove-myself-from-measure (super-measure-line self) self)))
 
 
-;========================================================
+;;========================================================
 
 (defclass C-measure-line ()
   ((measures :initform () :initarg :measures :accessor measures) 
@@ -777,7 +777,7 @@ metronome units
 
 (defmethod decompile ((self C-measure-line))
   `(make-instance 'C-measure-line  
-        :measures (list ,.(ask-all (measures self) 'decompile))))
+        :measures (list ,@(ask-all (measures self) 'decompile))))
 
 (defmethod paste-beat-myself ((self C-measure-line) measure)  
  (when *measure-selection-scrap*
@@ -815,13 +815,13 @@ metronome units
               (draw-rtm-measure-line-ys (+ 2 beg-x) C5))))))
      measures))
 
-;=======================================
+;;=======================================
 (defmethod collect-all-chord-beat-leafs ((self C-measure-line))
   (setf *beat-leaf-objs* ())
   (tell  (apply 'append (ask-all (measures self) 'beat-objects)) 'collect-all-chord-beat-leafs)
   *beat-leaf-objs*)
 
-;=======================================
+;;=======================================
 (defmethod stop-measure-line ((self C-measure-line)) (setf *MN-play-flag* ()) (setf (stop-flag self) t))
 
 (defmethod play-measure-line-continue ((self C-measure-line) measures t-scfactor)
@@ -834,7 +834,7 @@ metronome units
   (setf (stop-flag self) nil)
   (play-measure-line-continue  self (measures self) t-scfactor))
 
-;================================ 
+;;================================ 
 (defun make-default-measure-object ()
   (make-instance 'C-measure  :low "4" :beat-objects  
     (list (beat-constructor 1 '(-1))(beat-constructor 1 '(-1))(beat-constructor 1 '(-1))(beat-constructor 1 '(-1)))))
@@ -858,7 +858,7 @@ metronome units
 (defmethod remove-myself-from-measure ((self C-measure-line) measure)  
   (setf (measures self) (remove measure (measures self) :test 'eq)))
 
-;========================================================
+;;========================================================
 
 (defmethod draw-beat-chord-5  ((self C-chord) beg-x C5 beat-zoom y-beat note-head)
  (setq *MN-note-ins-y* *MN-global-ins-y*)
@@ -875,7 +875,7 @@ metronome units
     (draw-ledger-lines self x y-min y-max C5)))
 
 (defvar *rtm-only-white-heads* ())
-;(setf *rtm-only-white-heads* ())
+;;(setf *rtm-only-white-heads* ())
 
 (defmethod draw-note-extra-stuff  ((self C-note) x C5 t-scfactor note-head)
   (declare (ignore x C5 t-scfactor note-head)))
@@ -918,8 +918,8 @@ metronome units
         (draw-note-symbolic-dynamic self x-now y-now))
       (if *mn-view-dur-flag*
         (draw-note-duration-line self x-now y-now t-scfactor))
-;      (if (and *mn-view-offset-flag* (not *mn-view-time-flag*))
-;        (draw-note-offset-line self x-now y-now t-scfactor))
+;;      (if (and *mn-view-offset-flag* (not *mn-view-time-flag*))
+;;        (draw-note-offset-line self x-now y-now t-scfactor))
  )
     (when (and (instrument self) *mn-view-ins-flag* t-scfactor) 
        (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
@@ -1008,13 +1008,13 @@ metronome units
         (x-now (+ x (delta-x self)))
         (alt (alteration self)))
      (draw-char x-now y-now #\w)
-;    (draw-char x-now y-now #\w)
+;;    (draw-char x-now y-now #\w)
     (when alt
       (unless (eq *staff-num* 7)   ; empty staff
         (draw-char (+ x (alt-delta-x self)) (1- y-now) alt)))))
 |#
-;=====================
-; t-time + duration
+;;=====================
+;; t-time + duration
 
 (defmethod calc-t-time-beat-continue ((self C-beat) beats beat-unit-ticks time-now &optional sel-chords)
   (when beats 
@@ -1024,7 +1024,7 @@ metronome units
 (defmethod calc-t-time-beat ((self C-beat) beat-unit-ticks time-now &optional sel-chords)
  (setq beat-unit-ticks (* (unit-length self) beat-unit-ticks))
  (let ((first-time time-now))
-; (print (list 'beat-unit-ticks beat-unit-ticks 'time time-now)))
+;; (print (list 'beat-unit-ticks beat-unit-ticks 'time time-now)))
   (if (beat-leaf? self) 
      (progn  
           (when (< beat-unit-ticks 0)  ;rest
@@ -1050,7 +1050,7 @@ metronome units
        (setq time-now (+ time-now ticks-incr))))
     (+ first-time (abs beat-unit-ticks))))
 ;
-;(print (list (t-time (beat-chord self)) (ask-all (notes  (beat-chord self)) 'midic))))   
+;;(print (list (t-time (beat-chord self)) (ask-all (notes  (beat-chord self)) 'midic))))   
 
  
 (defmethod calc-t-time-measure ((self C-measure) t-scfactor time-now &optional sel-chords)
@@ -1058,7 +1058,7 @@ metronome units
         (first-time time-now)
         (beats (beat-objects self))
         (beat-unit-ticks (/ measure-length (calc-high-value self))))
-;    (print (list 'measure-length measure-length 'beat-unit-ticks beat-unit-ticks))
+;;    (print (list 'measure-length measure-length 'beat-unit-ticks beat-unit-ticks))
   (while beats 
     (setq time-now (calc-t-time-beat (pop beats) beat-unit-ticks time-now sel-chords)))
   (+ first-time measure-length)))
@@ -1077,20 +1077,20 @@ metronome units
 (defun check-update-dur-flag (last-chord sel-chords)
   (if sel-chords (member last-chord sel-chords) t))
 
-;========================================================
+;;========================================================
 #|
 
 #|
 
-;(beat-constructor 1 '(1 2 (1 (1 1 1))))
-;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
-;(beat-constructor 1 '(1 2 1))
+;;(beat-constructor 1 '(1 2 (1 (1 1 1))))
+;;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
+;;(beat-constructor 1 '(1 2 1))
 (setq bs (make-instance 'C-beat :unit-length 1
     :rtm-list  
       (list (make-instance 'C-beat :unit-length 1)
             (make-instance 'C-beat :unit-length 2)
             (make-instance 'C-beat :unit-length 1))))
-;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
+;;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
 (setq bs2 (make-instance 'C-beat :unit-length 1
     :rtm-list  
       (list  (make-instance 'C-beat :unit-length 1)
@@ -1109,8 +1109,8 @@ metronome units
                         (make-instance 'C-beat :unit-length 1))))))
 |#
 
-;============================
-;____________________________
+;;============================
+;;____________________________
 
 (setq bc11 (beat-constructor 2 '((1 (3 4))  -1  (1 (1 (2 (1 1 1)))))))
 (setq bc12 (beat-constructor 1 '(1 -1 1)))
@@ -1120,7 +1120,7 @@ metronome units
 (setq bc16 (beat-constructor 1 '(1 4 1 1)))
 (setq bc17 (beat-constructor 1 '(1.0 -3 1 1 -1 1 1)))
 
-;(decompile bc17) 
+;;(decompile bc17) 
 
 
 (setq bed1 (make-instance 'C-beat-editor-panel :view-position (make-point 10 2) :view-size (make-point  690 140)))
@@ -1135,12 +1135,12 @@ metronome units
       (make-instance 'C-measure  :low "4" 
          :beat-objects (list bc17)))))
 
-;(setf (measure-line bed1) (eval (decompile (measure-line bed1))))
+;;(setf (measure-line bed1) (eval (decompile (measure-line bed1))))
 
-;(decompile  (beat-constructor 1 '((2 (1.0 1 3)) 1)))
+;;(decompile  (beat-constructor 1 '((2 (1.0 1 3)) 1)))
 
-;____________________________
-;(beat-constructor 1 '(1 (1)))  
+;;____________________________
+;;(beat-constructor 1 '(1 (1)))  
 (setq bc1 (beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1)) )))
 (setq bc2 (beat-constructor 1 '(1  (2 (1 3 1))  (1 (1 2)) 1 (2 (1 1 1)))))
 (setq bc3 (beat-constructor 1 '(1 (3 (1 1 1 3)) 1 (1 (1 1)) 1)))
@@ -1160,9 +1160,9 @@ metronome units
       (make-instance 'C-measure :low "4" 
          :beat-objects  
 (list ml6 ml7)))))
-;(list bc1 bc2 bc3 bc4 bc5)))))
+;;(list bc1 bc2 bc3 bc4 bc5)))))
 
-;====================================
+;;====================================
 (setq wws (make-instance 'C-rtm-editor-window :view-position (make-point 10 50) 
                                               :view-size (make-point 710 345) :window-title "Measure test"))
 
@@ -1173,6 +1173,6 @@ metronome units
 
 (add-subviews wws bedcol)
 
-;====================================
+;;====================================
 (window-select wws)
 |#

@@ -13,9 +13,7 @@
 
 (in-package "EPW")
 
-(import '(|CLPF-Util|::make-num-fun))
 
-(export '(arithm-ser average g-scaling distor distor-ext interpolation f-binary-search))
 
 (defunp arithm-ser ((begin fix/float) (step (fix/float (:value 1)))
                     (end (fix/float (:value 10)))) 
@@ -217,7 +215,7 @@ by the values proportionaly placed between <minout> and <maxout>."
                  (newl res (nreverse temp)) )
              (nreverse res))))
 
-;from Rhythms:Functions [magnus]
+;;from Rhythms:Functions [magnus]
 
 (defun -power-function (begin end time curve)
   (+ (* (- end begin) (expt time curve)) begin))
@@ -258,9 +256,9 @@ If format    is  'incl' the two extremes are included in the output. If  format 
   x)
 
 ;; ex : resolution de 2 ^ x + 3 ^ x = n
-; (setq fun2 #'(lambda (x) (+ (expt 2 x) (expt 3 x))))
-; (dicho-iter 0 100 100 fun2)
-; limite possible de la recherche : +-(log most-positive-fixnum) = 19.4
+;; (setq fun2 #'(lambda (x) (+ (expt 2 x) (expt 3 x))))
+;; (dicho-iter 0 100 100 fun2)
+;; limite possible de la recherche : +-(log most-positive-fixnum) = 19.4
 
 (defunp fun-bin-search ((xmin fix/float) (xmax fix/float (:value 100)) (value fix/float (:value 50))
                          (fun list (:value "(lambda(x)(* 2 x))"))) number

@@ -48,50 +48,62 @@
 ;;		fichier "2 - MidiShare-Extension.lisp"
 
 (defpackage "MIDISHARE" 
-  (:use "COMMON-LISP" "CCL"))
-  
+  (:use "COMMON-LISP")
+  (:export "TYPENOTE" "TYPEKEYON" "TYPEKEYOFF" "TYPEKEYPRESS"
+           "TYPECTRLCHANGE" "TYPEPROGCHANGE"  "TYPECHANPRESS"
+           "TYPEPITCHWHEEL" "TYPESONGPOS" "TYPESONGSEL" "TYPECLOCK"
+           "TYPESTART" "TYPECONTINUE" "TYPESTOP" "TYPETUNE"
+           "TYPEACTIVESENS" "TYPERESET" "TYPESYSEX" "TYPESTREAM"
+           "TYPEPRIVATE" "TYPEPROCESS" "TYPEDPROCESS" "TYPEQFRAME"
+           "TYPERESERVED" "TYPEDEAD" "TYPECTRL14B" "TYPENONREGPARAM"
+           "TYPEREGPARAM" "TYPESEQNUM" "TYPETEXT" "TYPECOPYRIGHT"
+           "TYPESEQNAME" "TYPEINSTRNAME" "TYPELYRIC" "TYPEMARKER"
+           "TYPECUEPOINT" "TYPECHANPREFIX"  "TYPEENDTRACK" "TYPETEMPO"
+           "TYPESMPTEOFFSET" "TYPETIMESIGN" "TYPEKEYSIGN"
+           "TYPESPECIFIC"
+           
+           "MIDIERRSPACE" "MIDIERRREFNUM" "MIDIERRBADTYPE"
+           "MIDIERRINDEX"
+           
+           "MODEMPORT" "PRINTERPORT"
+           
+           "MIDIEXTERNALSYNC" "MIDISYNCANYPORT"  "SMPTE24FR"
+           "SMPTE25FR" "SMPTE30DF" "SMPTE30FR"
+           
+           "MIDIOPENAPPL" "MIDICLOSEAPPL" "MIDICHGNAME"
+           "MIDICHGCONNECT" "MIDIOPENMODEM" "MIDICLOSEMODEM"
+           "MIDIOPENPRINTER" "MIDICLOSEPRINTER" "MIDISYNCSTART"
+           "MIDISYNCSTOP" "MIDICHANGESYNC"
+           
+           "MIDIGETVERSION" "MIDICOUNTAPPLS" "MIDIGETINDAPPL"
+           "MIDIGETNAMEDAPPL" "MIDIOPEN" "MIDICLOSE" "MIDIGETNAME"
+           "MIDISETNAME" "MIDIGETINFO" "MIDISETINFO" "MIDIGETFILTER"
+           "MIDISETFILTER" "MIDIGETRCVALARM" "MIDISETRCVALARM"
+           "MIDIGETAPPLALARM" "MIDISETAPPLALARM" "MIDICONNECT"
+           "MIDIISCONNECTED" "MIDIGETPORTSTATE" "MIDISETPORTSTATE"
+           "MIDIFREESPACE" "MIDINEWEV" "MIDICOPYEV" "MIDIFREEEV"
+           "MIDISETFIELD" "MIDIGETFIELD" "MIDIADDFIELD"
+           "MIDICOUNTFIELDS" "MIDINEWSEQ" "MIDIADDSEQ" "MIDIFREESEQ"
+           "MIDICLEARSEQ" "MIDIAPPLYSEQ" "MIDIGETTIME" "MIDISENDIM"
+           "MIDISEND" "MIDISENDAT" "MIDICOUNTEVS" "MIDIGETEV"
+           "MIDIAVAILEV" "MIDIFLUSHEVS" "MIDIREADSYNC" "MIDIWRITESYNC"
+           "MIDICALL" "MIDITASK" "MIDIDTASK" "MIDIFORGETTASK"
+           "MIDICOUNTDTASKS" "MIDIFLUSHDTASKS" "MIDIEXEC1DTASK"
+           "MIDINEWCELL" "MIDIFREECELL" "MIDITOTALSPACE"
+           "MIDIGROWSPACE" "MIDISHARE"
+           
+           "LINK" "DATE" "TYPE" "REF" "PORT" "CHAN" "XFIELD" "PITCH"
+           "VEL" "DUR" "XFIELDS" "TEXT"  "FIRSTEV" "LASTEV"
+           "FILTERBIT"  "ACCEPTPORT" "ACCEPTTYPE" "ACCEPTCHAN"))
 (in-package :midishare)
- 
+
+#||
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (let ((*warn-if-redefine* nil))
     (require :ff)))
+
+(defmacro defrecord (&rest args) (declare (ignore args)) (warn "ff defrecord stub"))
   
-
-(export '(typeNote typeKeyOn typeKeyOff typeKeyPress typeCtrlChange typeProgChange 
-          typeChanPress typePitchWheel typeSongPos typeSongSel typeClock typeStart
-          typeContinue typeStop typeTune typeActiveSens typeReset typeSysEx typeStream
-          typePrivate typeProcess typeDProcess typeQFrame typeReserved typeDead
-          typeCtrl14b typeNonRegParam typeRegParam typeSeqNum typeText typeCopyright 
-          typeSeqName typeInstrName typeLyric typeMarker typeCuePoint typeChanPrefix 
-          typeEndTrack typeTempo typeSMPTEOffset typeTimeSign typeKeySign typeSpecific
-          
-          MIDIerrSpace MIDIerrRefNum MIDIerrBadType MIDIerrIndex
-          
-          ModemPort PrinterPort
-          
-          MidiExternalSync MidiSyncAnyPort 
-          Smpte24Fr Smpte25Fr Smpte30DF Smpte30Fr
-          
-          MIDIOpenAppl MIDICloseAppl MIDIChgName MIDIChgConnect MIDIOpenModem MIDICloseModem
-          MIDIOpenPrinter MIDIClosePrinter MIDISyncStart MIDISyncStop MIDIChangeSync
-          
-          MidiGetVersion MidiCountAppls MidiGetIndAppl MidiGetNamedAppl MidiOpen MidiClose
-          MidiGetName MidiSetName MidiGetInfo MidiSetInfo MidiGetFilter MidiSetFilter
-          MidiGetRcvAlarm MidiSetRcvAlarm MidiGetApplAlarm MidiSetApplAlarm MidiConnect
-          MidiIsConnected MidiGetPortState MidiSetPortState MidiFreeSpace MidiNewEv MidiCopyEv
-          MidiFreeEv MidiSetField MidiGetField MidiAddField MidiCountFields MidiNewSeq
-          MidiAddSeq MidiFreeSeq MidiClearSeq MidiApplySeq MidiGetTime MidiSendIm MidiSend
-          MidiSendAt MidiCountEvs MidiGetEv MidiAvailEv MidiFlushEvs MidiReadSync MidiWriteSync
-          MidiCall MidiTask MidiDTask MidiForgetTask MidiCountDTasks MidiFlushDTasks MidiExec1DTask
-          MidiNewCell MidiFreeCell MidiTotalSpace MidiGrowSpace MidiShare
- 
-          link date type ref port chan xfield pitch vel dur xfields text 
-          firstEv lastEv FilterBit 
-          AcceptPort AcceptType AcceptChan))
-
-
-
-
 
 
 ;;---------------------------------------------------------------------------------
@@ -1111,7 +1123,7 @@
 
 ;;................................................................................: install-midishare-interface
 (defun install-midishare-interface ()
-  (ccl::def-load-pointers start-midi-share () (setf *midishare* (%get-ptr (%int-to-ptr #xB8))))
+  (ui::def-load-pointers start-midi-share () (setf *midishare* (%get-ptr (%int-to-ptr #xB8))))
   (unless (midishare) 
     (print "MidiShare not installed. PatchWork cannot play or record Midi.")))
 ;;;(error "MidiShare not installed")))
@@ -1128,3 +1140,4 @@
   (add-startup-action #'install-midishare-interface)
   (add-quit-action #'remove-midishare-interface)
   (install-midishare-interface))
+||#

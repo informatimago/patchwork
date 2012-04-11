@@ -12,8 +12,8 @@
 (provide 'BPF-MN-PW-interface)
 
 
-;=================================================================================================
-;=================================================================================================
+;;=================================================================================================
+;;=================================================================================================
 
 
 (defun interpol5 (time t1 t2 v1 v2)
@@ -45,9 +45,9 @@
        (+ (mod (* time-diff (/ time period)) time-diff)
                  (car points)) points)))
 
-;============================================
-; make-break-point-function from pointlists
-; tlist or vlist can be numbers or lists
+;;============================================
+;; make-break-point-function from pointlists
+;; tlist or vlist can be numbers or lists
 
 (defun cumul-diff-lst-sum-from-0 (diff-lst)
   (let ((res) (sum 0))
@@ -77,17 +77,17 @@
            ((numberp vlist)
               (setq vlist (make-list (length tlist) :initial-element vlist))))   
      (while (and vlist tlist)
-       (setq t-point (min (1- #,(expt 2 15)) (pop tlist))
-             v-point (min (1- #,(expt 2 15)) (pop vlist)))
+       (setq t-point (min #.(1- (expt 2 15)) (pop tlist))
+             v-point (min #.(1- (expt 2 15)) (pop vlist)))
        (push (make-point t-point v-point) points))
      (make-instance 'C-break-point-function 
           :break-point-list (nreverse points))))
 
-;(setq bp (make-break-point-function '(0 10 30) '(0 100 0)))
-;(x-points bp)
-;(y-points bp)
-;========================================================
-; MN
+;;(setq bp (make-break-point-function '(0 10 30) '(0 100 0)))
+;;(x-points bp)
+;;(y-points bp)
+;;========================================================
+;; MN
 
  (defun make-instrument-note (midic dur chan vel instrument &optional win)
    (let ((note (make-instance 'C-note 
@@ -99,6 +99,6 @@
  (defun make-instrument-chord (clock notes)
     (make-instance 'C-chord :t-time clock :notes notes))
 
-; =======================================================
+;; =======================================================
 
 

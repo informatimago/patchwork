@@ -18,7 +18,7 @@
 
 (in-package "EPW")
 
-;(import '(mc->f1 f->mc1)) ; etc.
+;;(import '(mc->f1 f->mc1)) ; etc.
 
 ;; =============================================================================-======
 ;; ==== chord filtering ====
@@ -72,11 +72,11 @@ of <ch2>."
     (declare (ignore ch))
     dist))
 
-;(mapcar #'- '(4700 5500 6000) '(6000 6300 6500))
-;(max-abs-idt '(4600 5600 6000) '(6000 6300 6500))
-;(max-abs-idt '(0 100 200 300) (mapcar #'1+ '(0 100 200 300)))
-;(max-abs-idt '(0 100 200 300) '(1 101 200 302))
-;(max-abs-idt '(0 100 200 300) '(1 101 195 311))
+;;(mapcar #'- '(4700 5500 6000) '(6000 6300 6500))
+;;(max-abs-idt '(4600 5600 6000) '(6000 6300 6500))
+;;(max-abs-idt '(0 100 200 300) (mapcar #'1+ '(0 100 200 300)))
+;;(max-abs-idt '(0 100 200 300) '(1 101 200 302))
+;;(max-abs-idt '(0 100 200 300) '(1 101 195 311))
 
 ;; ---- sum-abs-idt ----
 
@@ -131,7 +131,7 @@ the function closest-renv.
 This function should return 2 values: the distance and the best transposition.")
 
 
-;-----------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (defunp closest-inv ((regch chord) (intch chord (:value 6500))
                      &optional (fct (list (:value 1)))) chord
@@ -206,7 +206,7 @@ comparing the distorsions of <regch>."
     (values best-dist-min best-ch)))
 
 
-;------------------  fonctions du menu esquisse:intervals:treatments   ----------
+;;------------------  fonctions du menu esquisse:intervals:treatments   ----------
 
 (defunp best-transp ((ch1 list (:value '(4600 5600 6000))) 
                      (ch2 list (:value '(6000 6300 6500))) 

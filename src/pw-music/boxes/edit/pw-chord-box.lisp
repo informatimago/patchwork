@@ -7,11 +7,11 @@
 ;;;;
 ;;;;=========================================================
 
-;====================================================================================================
+;;====================================================================================================
 ;;
 ;;the chord box with Menu chosen functionalities. 
 ;
-;=======================================================================================
+;;=======================================================================================
 ;;;
 ;;; The Class of  chord box patch, with menu chosen output type
 ;;;Class-name: C-patch-chord-box-M
@@ -256,12 +256,12 @@ notation editor opened for more information.
 "
   (declare (ignore chord)))
 
-;(push-to-object-types 'chord)
+;;(push-to-object-types 'chord)
 
-;(setf *chord-box-M-pw-type*
-;  (make-instance 'C-pw-type :control-form 
-;                 `(make-instance 'C-chord-box  :view-size (make-point 38 120)
-;     :type-list '(list midic chord))))
+;;(setf *chord-box-M-pw-type*
+;;  (make-instance 'C-pw-type :control-form 
+;;                 `(make-instance 'C-chord-box  :view-size (make-point 38 120)
+;;     :type-list '(list midic chord))))
 
 ;;The new constructor function for the new chord box editor
 (defclass C-chordbox-Win (C-mn-window) ())

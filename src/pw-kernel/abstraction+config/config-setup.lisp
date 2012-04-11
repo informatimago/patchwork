@@ -89,7 +89,6 @@
 ;;;============================================================
 ;;for surrounding definitions in libraries
 (in-package :patch-work)
-(export '(eval-if-key))
 
 (defmacro eval-list (form-list)
   `(mapc #'eval ,form-list))

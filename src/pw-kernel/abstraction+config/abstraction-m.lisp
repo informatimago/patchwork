@@ -7,15 +7,15 @@
 ;;;;
 ;;;;=========================================================
 ;
-; CLASS: C-abstract-M,  for patch abstraction, with pop-up-menu-attached
-; METHODS:
-; User-Menu-Include,    creates a menu item for instanciating objects of the abstraction type.
+;; CLASS: C-abstract-M,  for patch abstraction, with pop-up-menu-attached
+;; METHODS:
+;; User-Menu-Include,    creates a menu item for instanciating objects of the abstraction type.
 ;
-; 
-;========================================================================
+;; 
+;;========================================================================
 (in-package :pw)
 
-;========================================================================
+;;========================================================================
 
 (defpackage "USER-ABSTRACTION")
 
@@ -51,7 +51,7 @@
   (unless menu
     (add-to-configuration  box-title)
     (setf *abs-code* (decompile self))
-    (add-menu-items  *pw-menu-patch*
+    (ui:add-menu-items  *pw-menu-patch*
        (new-leafmenu box-title
           (eval 
            `(function (lambda ()
@@ -93,7 +93,7 @@
             (setq in-docs-temp (get-absin-boxes-types-n patches in-boxes))
             (cond 
              ((member nil in-docs-temp)
-              (CCL:message-dialog 
+              (ui:message-dialog 
                "WARNING! absin box connected to irreducible types. ALL-type used")
               (mapcar #'(lambda (type-spec) '(nilNum)) in-docs-temp))
              (t in-docs-temp))))
@@ -101,7 +101,7 @@
           (make-std-patch-box (type-of self)  
                   (read-from-string title) in-put-docs win in-boxes)))
     (dmove-patch abstract-box (x self) (y self))
-;   connections
+;;   connections
     (make-abstract-box-connections *active-patch-window* 
                                    abstract-box out-box in-boxes win)
     (tell (controls *active-patch-window*) 'draw-connections t)
@@ -121,15 +121,15 @@
                                &optional (abstract-class 'C-abstract-M))
   (setf *si-record* nil)
   (if (not (active-patches self))
-    (CCL:message-dialog "No active patches!")
+    (ui:message-dialog "No active patches!")
     (let ((active-rect (find-active-rectangle self))
           (new-win)(patches)(abstract-box)(in-boxes) 
           (out-box (find-abstract-out-box self (active-patches self))))
       (cond 
        ((not out-box) 
-        (CCL:message-dialog "One abstract-out-box should be selected !"))
+        (ui:message-dialog "One abstract-out-box should be selected !"))
        ((> (length out-box) 1)
-        (CCL:message-dialog "Only one abstract-out-box should be selected !"))
+        (ui:message-dialog "Only one abstract-out-box should be selected !"))
        (t 
         (cut self)
         (setq patches (eval (patch-scrap self)))
@@ -202,7 +202,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
           (make-PW-standard-box class fun-name (make-point 15 15)
                                 (get-current-inbox-vals type-specs)))
         (progn
-          (CCL:message-dialog
+          (ui:message-dialog
            "Absin names and Absin numbers should be unique. Please correct this") nil)))))
       
 
@@ -412,7 +412,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
         arg)) )
   
 (defvar *active-config-object* ())  ;the patch holding the current configuration
-;(setf *active-config-object* ())
+;;(setf *active-config-object* ())
 
 (defvar *added-box-object* ())
 (defun no-add-patch-box (win box)
@@ -452,7 +452,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 (defmethod remove-from-config ((self C-patch-configurer))
   (let* ((lib&patches (mapcar #'car (file-path self)))
          (items 
-          (CCL:catch-cancel (CCL:select-item-from-list
+          (ui:catch-cancel (ui:select-item-from-list
                              (mapcar #'(lambda(path) (file-namestring path)) lib&patches)
                              :window-title "Please Select Abstract and Library Files"
                              :selection-type :disjoint))))
@@ -501,8 +501,8 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
                                 (read lib))))
            (if (and (consp lib-a-list) (consp (car lib-a-list))
                     (atom (caar lib-a-list)))
-             (CCL:catch-cancel
-              (CCL:select-item-from-list 
+             (ui:catch-cancel
+              (ui:select-item-from-list 
                (eval lib-a-list) 
                :window-title (format nil "please select ~A functions" (file-namestring file-name))
                :table-print-function #'(lambda(it &optional strm)(princ (cdr it) strm))
@@ -521,12 +521,12 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
       (dotimes (x (1- (length sub-dir-list)))
         (unless 
           (setq menu (find-menu-item current-sub-menu (car sub-dir-list)))
-          (add-menu-items current-sub-menu
+          (ui:add-menu-items current-sub-menu
                      (setq menu (new-menu (car sub-dir-list)))))                            
         (setq current-sub-menu menu)
         (pop sub-dir-list))
       (or (find-menu-item current-sub-menu (car sub-dir-list))
-          (add-menu-items current-sub-menu (new-leafmenu (car sub-dir-list) 
+          (ui:add-menu-items current-sub-menu (new-leafmenu (car sub-dir-list) 
                                                     (eval `(function (lambda () ,code))))))))
     
 (defun parse-file-name (name)

@@ -11,23 +11,23 @@
 
 (provide 'browse-typed-boxes)
 
-;====================================================================================================
-;====================================================================================================
+;;====================================================================================================
+;;====================================================================================================
 
 (setq *active-patch-window* ())
-;(make-new-pw-window)
+;;(make-new-pw-window)
 
 (defmethod browse ((self C-patch))(make-typed-box-list self)) 
 
-;(defun cancel-pop ())
+;;(defun cancel-pop ())
 
 (defun init-PW-box-instance-list ()
   (for (i 0 1 (1- (length *PW-box-instance-list*)))
     (when (eq (type-of (nth i *PW-box-instance-list*)) 'cons)
        (setf (nth i *PW-box-instance-list*) (funcall (nth i *PW-box-instance-list*))))))
 
-;Camilo..
-;(init-PW-box-instance-list)
+;;Camilo..
+;;(init-PW-box-instance-list)
 
 (defun make-typed-box-list (patch)
  (cond 

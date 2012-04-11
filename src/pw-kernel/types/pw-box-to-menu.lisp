@@ -21,19 +21,19 @@
   "append to the menu <menu> the PW module generator <fun>"
   (assert
    (or (null fun)
-       (typep fun 'CCL::menu-element)
+       (typep fun 'menu-element)
        (and (symbolp fun) (fboundp fun)))
    (fun) "~S is not a function or nil or a menu." fun)
   (cond
    ((null fun)
-    (CCL:add-menu-items menu
-          (make-instance 'CCL:menu-item :menu-item-title "-" :menu-item-action ())))
-   ((typep fun 'CCL::menu-element)
-    (CCL:add-menu-items menu fun))
+    (ui:add-menu-items menu
+          (make-instance 'ui:menu-item :menu-item-title "-" :menu-item-action ())))
+   ((typep fun 'menu-element)
+    (ui:add-menu-items menu fun))
    (t (if (defunp-function? fun)
         (new-PW-box-menu-item menu (string-downcase fun) fun box-class)
-        (CCL:add-menu-items menu
-                            (make-instance 'CCL:menu-item 
+        (ui:add-menu-items menu
+                            (make-instance 'ui:menu-item 
                               :menu-item-title (string-downcase fun)
                                            :menu-item-action
                                            #'(lambda () 
@@ -53,7 +53,7 @@
                     ',function))
             (sub-menu (find-menu-item main-menu mtitle)))
         (unless sub-menu
-          (add-menu-items main-menu
+          (ui:add-menu-items main-menu
                    (setq sub-menu (make-instance 'menu-item :menu-item-title mtitle))))
         (push (eval `(function(lambda () ,body))) *PW-box-instance-list*)
         (set-menu-item-action-function sub-menu

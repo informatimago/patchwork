@@ -1,7 +1,7 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-;========================================================
+;;========================================================
 
 ;;;;;;; paging
 
@@ -68,7 +68,7 @@
     (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self))))
   beat-number)
 
-;changed by aaa 28-08-95 from pw-modif
+;;changed by aaa 28-08-95 from pw-modif
 (defun play-rtms+scroll (self)
   (let ((editors (give-selected-editors self)))
     (calc-next-rtm-page+scroll (view-window self) 1)
@@ -107,7 +107,7 @@
 
 
 #|
-;(add-menu-items *RTM-menu* (new-leafmenu "Play-rtms+scroll" #'(lambda () (play-rtms+scroll (editor-collection-object *active-rtm-window*))))) 
+;;(ui:add-menu-items *RTM-menu* (new-leafmenu "Play-rtms+scroll" #'(lambda () (play-rtms+scroll (editor-collection-object *active-rtm-window*))))) 
 ;;; only polif
 (defun calc-next-rtm-page (self)  
   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))

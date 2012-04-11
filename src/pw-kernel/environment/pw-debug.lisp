@@ -9,7 +9,7 @@
 
 (in-package :pw)
  
-;==========================================================================================
+;;==========================================================================================
 (defvar *global-current-value-patch* ())
 
 #|
@@ -23,10 +23,10 @@
   (if rem-menu (remove-menu-items *PWoper-menu* rem-menu))
   (if show-menu (remove-menu-items *PWoper-menu* show-menu)))
 
-(add-menu-items  *PWoper-menu* *pw-debug-mode-menu*)
-(add-menu-items  *PWoper-menu* *pw-remove-debug-mode-menu* )
+(ui:add-menu-items  *PWoper-menu* *pw-debug-mode-menu*)
+(ui:add-menu-items  *PWoper-menu* *pw-remove-debug-mode-menu* )
 
-;==========================================================================================
+;;==========================================================================================
 (setf *break-on-errors* ())
 |#
 

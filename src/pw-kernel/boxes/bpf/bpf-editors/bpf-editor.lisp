@@ -9,17 +9,17 @@
 
 (in-package :pw)
 
-;================================================================================================================
+;;================================================================================================================
 
 (defvar *last-mouse-point* ())
 (defvar *global-last-mouse-point* ())
 (defvar *last-scroll-position* (make-point 0 0))
 (defvar *BPF-scrap* ())
 
-;==================================================================================================================
-;==================================================================================================================
+;;==================================================================================================================
+;;==================================================================================================================
 
-(defclass C-bpf-view (ccl::scroller)
+(defclass C-bpf-view (ui::scroller)
   ((break-point-function :initform nil :initarg :break-point-function 
      :accessor break-point-function)
    (edit-mode :initform "edit" :accessor edit-mode)
@@ -32,23 +32,23 @@
    (v-view-scaler :initform 1.0 :initarg :v-view-scaler :accessor v-view-scaler)))
 
 
-;=====================================
+;;=====================================
 
-;(defmethod scroll-bar-limits ((view C-bpf-view))
-;  (ccl::normal-scroll-bar-limits view 300 300))
+;;(defmethod scroll-bar-limits ((view C-bpf-view))
+;;  (ui::normal-scroll-bar-limits view 300 300))
 
-(defmethod ccl::normal-scroll-bar-limits ((view C-bpf-view) max-h &optional max-v)
+(defmethod ui::normal-scroll-bar-limits ((view C-bpf-view) max-h &optional max-v)
   (declare (ignore max-h max-v))
   (values (make-point -500 500)
           (make-point -500 500)))
 
-(defmethod ccl::scroll-bar-page-size ((view C-bpf-view))
+(defmethod ui::scroll-bar-page-size ((view C-bpf-view))
   (round (view-size view) 2))
 
 (defmethod reset-active-point ((self C-bpf-view)) (setf (active-point self) nil))
 
-;=====================================
-; selection
+;;=====================================
+;; selection
 
 (defmethod reset-selection-1 ((self C-bpf-view)) 
    (setf (sel-start self) 0)(setf (sel-end self) 0))
@@ -84,11 +84,11 @@
     (draw-selection self)
     (setf (sel-start self) (min x1-now x2-now))
     (setf (sel-end   self) (max x1-now x2-now))
-;    (print (list (sel-start self) (sel-end self)))
+;;    (print (list (sel-start self) (sel-end self)))
     (draw-selection self)))
      
-;=====================================
-; select-all cut copy paste
+;;=====================================
+;; select-all cut copy paste
 (defmethod select-all-bpf ((self C-bpf-view)) 
   (draw-selection self)
   (setf (sel-start self) (1- (car (x-points (break-point-function self)))))
@@ -103,7 +103,7 @@
           (sel-end self)
           (- (sel-start self) (sel-end self)))
       (reset-selection-1 self)
-;      (print (x-points (break-point-function self)))
+;;      (print (x-points (break-point-function self)))
       (update-bpf-view self))))
 
 (defmethod copy-bpf ((self C-bpf-view)) 
@@ -142,10 +142,10 @@
     (reset-selection-1 self)
     (update-bpf-view self))))
 
-;(mapcar 'point-h *BPF-scrap*)
-;(mapcar 'point-v *BPF-scrap*)
-;=====================================
-;   
+;;(mapcar 'point-h *BPF-scrap*)
+;;(mapcar 'point-v *BPF-scrap*)
+;;=====================================
+;;   
 
 #|(defmethod scale-selection-by-time ((self C-bpf-view) h-scaler)
   (when (selection? self)
@@ -215,8 +215,8 @@
 
 (defmethod shrink-selection-by-value ((self C-bpf-view)) (scale-selection-by-value self 0.95))
       
-;=====================================
-;moved dragged 
+;;=====================================
+;;moved dragged 
 
 ;;??
 (defmethod view-position-dragged ((self C-bpf-view))
@@ -231,19 +231,21 @@
      (update-bpf-scroll-bar-settings self)))
 
 (defmethod draw-zoom-hair-line ((self C-bpf-view) where)
-   (rlet ((user-rect :rect))
-      (#_pt2rect :long where
-                  :long (grow-gray-rect where 0 (wptr self) nil)
-                  :ptr user-rect)
-   (let ((rect-w (abs (- (point-h *last-mouse-point*)(point-h (view-mouse-position self)))))
-         (rect-h (abs (- (point-v *last-mouse-point*)(point-v (view-mouse-position self))))))
-     (setf (h-view-scaler self) (max 0.07 (/ rect-w (w self)))) 
-     (setf (v-view-scaler self) (max 0.07 (/ rect-h (h self))))  
-     (set-origin self 
-         (make-point (round (point-h *last-mouse-point*) (h-view-scaler self)) 
-                     (- (h self) (round (point-v *last-mouse-point*) (v-view-scaler self)))))
-    (update-bpf-scroll-bar-settings self)
-    (update-bpf-view self))))
+  (warn "~S ~S is not implemented" 'draw-zoom-hair-line 'C-bpf-view)
+   ;; (rlet ((user-rect :rect))
+   ;;    (#_pt2rect :long where
+   ;;                :long (grow-gray-rect where 0 (wptr self) nil)
+   ;;                :ptr user-rect)
+   ;; (let ((rect-w (abs (- (point-h *last-mouse-point*)(point-h (view-mouse-position self)))))
+   ;;       (rect-h (abs (- (point-v *last-mouse-point*)(point-v (view-mouse-position self))))))
+   ;;   (setf (h-view-scaler self) (max 0.07 (/ rect-w (w self)))) 
+   ;;   (setf (v-view-scaler self) (max 0.07 (/ rect-h (h self))))  
+   ;;   (set-origin self 
+   ;;       (make-point (round (point-h *last-mouse-point*) (h-view-scaler self)) 
+   ;;                   (- (h self) (round (point-v *last-mouse-point*) (v-view-scaler self)))))
+   ;;  (update-bpf-scroll-bar-settings self)
+   ;;  (update-bpf-view self)))
+   )
 
 (defmethod view-mouse-dragged ((self C-bpf-view) mouse)
  (setq mouse (view-mouse-position self))
@@ -271,10 +273,10 @@
 
 (defmethod view-mouse-up ((self C-bpf-view)) 
   (unless *bpf-view-draw-lock* (update-bpf-view self)))
-; (with-focused-view self
-;   (draw-bpf-function (break-point-function self) self t (h-view-scaler self)(v-view-scaler self))))
+;; (with-focused-view self
+;;   (draw-bpf-function (break-point-function self) self t (h-view-scaler self)(v-view-scaler self))))
 
-;(unless *bpf-view-draw-lock* (update-bpf-view self)))
+;;(unless *bpf-view-draw-lock* (update-bpf-view self)))
 
 (defmethod display-mouse-moved ((self C-bpf-view) mouse-h mouse-v)
   (set-dialog-item-text  (x-disp-ctrl (view-window self)) (format nil "~5D" mouse-h))
@@ -290,7 +292,7 @@
           (display-mouse-moved self (point-h (active-point self))(point-v (active-point self))))
       (display-mouse-moved self mouse-h mouse-v)))) 
 
-;=====================================
+;;=====================================
 
 (defmethod view-mouse-position ((self C-bpf-view))
   (let* ((mouse (call-next-method))
@@ -317,8 +319,8 @@
   (update-bpf-scroll-bar-settings self))
 
 
-;=====================================
-;draw
+;;=====================================
+;;draw
 (defvar *axis-strings* ())
 
 (progn
@@ -362,8 +364,8 @@
       (when (show-bpf-grid-fl self) (view-draw-axis self))
       (draw-bpf-function (break-point-function self) self t (h-view-scaler self)(v-view-scaler self))))
 
-;=====================================
-; events
+;;=====================================
+;; events
 
 (defmethod insert-by-new-point ((self C-bpf-view) new-point)
   (setf (active-point self) new-point) 
@@ -429,61 +431,62 @@
       (when (mini-view self) (update-mini-view (mini-view self))))))
 
 (defmethod update-bpf-scroll-bar-settings ((self C-bpf-view))
-   (set-scroll-bar-setting (ccl::h-scroller self) (point-h (view-scroll-position self)))   
-   (set-scroll-bar-setting (ccl::v-scroller self) (point-v (view-scroll-position self))))   
+   (set-scroll-bar-setting (ui::h-scroller self) (point-h (view-scroll-position self)))   
+   (set-scroll-bar-setting (ui::v-scroller self) (point-v (view-scroll-position self))))   
 
 (defmethod key-pressed-BPF-editor ((self C-bpf-view) char)
-  (cond ((eq char #\f) 
-           (scale-to-fit-in-rect self)
-           (update-bpf-scroll-bar-settings self)
-           (update-bpf-zoom-ctrls self)
-           (update-bpf-view self t)) 
-        ((eq char #\+)
-            (setf (h-view-scaler self) (max 0.07 (* 0.9 (h-view-scaler self))))
-            (setf (v-view-scaler self) (max 0.07 (* 0.9 (v-view-scaler self))))
-            (update-bpf-zoom-ctrls self)
-            (update-bpf-view self t)) 
-        ((eq char #\-) 
-            (setf (h-view-scaler self) (* 1.1 (h-view-scaler self)))
-            (setf (v-view-scaler self) (* 1.1 (v-view-scaler self)))
-            (update-bpf-zoom-ctrls self)
-            (update-bpf-view self t)) 
-        ((eq char #\K)
-            (kill-all-except-first (break-point-function self))
-            (update-bpf-view self)) 
-        ((eq char #\backspace) 
-           (when (active-point self)
-              (remove-point-from-bpf (break-point-function self) (active-point self))
-              (update-bpf-view self)))
-        ((eq char #\g) 
-           (setf (show-bpf-grid-fl self) (not (show-bpf-grid-fl self)))
-           (update-bpf-view self t)) 
-        ((eq char #\BackArrow) (shrink-selection-by-time self))
-        ((eq char #\ForwardArrow) (expand-selection-by-time self))
-        ((eq char #\DownArrow) (shrink-selection-by-value self))
-        ((eq char #\UpArrow) (expand-selection-by-value self))
-        ((eq char #\Tab)
-          (let* (ind 
-                 (ctrls (bpf-radio-ctrls (view-window self)))
-                 (len (length ctrls)))
-           (for (i 0 1 (1- len))
-               (when (radio-button-pushed-p (nth i ctrls))
-                 (setq ind (mod (1+ i) 4))
-                 (set-bpf-edit-mode (view-window self) (nth ind ctrls) (dialog-item-text (nth ind ctrls)))
-                 (setq i 100)))))
-;        ((eq char #\e) (set-bpf-edit-mode (view-window self) 
-;             (first (bpf-radio-ctrls (view-window self))) "edit"))
-;        ((eq char #\z) (set-bpf-edit-mode (view-window self) 
-;             (second (bpf-radio-ctrls (view-window self))) "zoom"))
-;        ((eq char #\s) (set-bpf-edit-mode (view-window self) 
-;             (third (bpf-radio-ctrls (view-window self))) "sel"))
-;        ((eq char #\d) (set-bpf-edit-mode (view-window self) 
-;             (fourth (bpf-radio-ctrls (view-window self))) "drag"))
-;        ((eq char #\a) (select-all-bpf self)) 
-;        ((eq char #\x) (cut-bpf self)) 
-;        ((eq char #\c) (copy-bpf self)) 
-;        ((eq char #\v) (paste-bpf self)) 
-        (t (ed-beep))))
+  (case char
+    ((#\f) 
+     (scale-to-fit-in-rect self)
+     (update-bpf-scroll-bar-settings self)
+     (update-bpf-zoom-ctrls self)
+     (update-bpf-view self t)) 
+    ((#\+)
+     (setf (h-view-scaler self) (max 0.07 (* 0.9 (h-view-scaler self))))
+     (setf (v-view-scaler self) (max 0.07 (* 0.9 (v-view-scaler self))))
+     (update-bpf-zoom-ctrls self)
+     (update-bpf-view self t)) 
+    ((#\-) 
+     (setf (h-view-scaler self) (* 1.1 (h-view-scaler self)))
+     (setf (v-view-scaler self) (* 1.1 (v-view-scaler self)))
+     (update-bpf-zoom-ctrls self)
+     (update-bpf-view self t)) 
+    ((#\K)
+     (kill-all-except-first (break-point-function self))
+     (update-bpf-view self)) 
+    ((:backspace) 
+     (when (active-point self)
+       (remove-point-from-bpf (break-point-function self) (active-point self))
+       (update-bpf-view self)))
+    ((#\g) 
+     (setf (show-bpf-grid-fl self) (not (show-bpf-grid-fl self)))
+     (update-bpf-view self t)) 
+    ((:BackArrow) (shrink-selection-by-time self))
+    ((:ForwardArrow) (expand-selection-by-time self))
+    ((:DownArrow) (shrink-selection-by-value self))
+    ((:UpArrow) (expand-selection-by-value self))
+    ((:Tab)
+     (let* (ind 
+            (ctrls (bpf-radio-ctrls (view-window self)))
+            (len (length ctrls)))
+       (for (i 0 1 (1- len))
+            (when (radio-button-pushed-p (nth i ctrls))
+              (setq ind (mod (1+ i) 4))
+              (set-bpf-edit-mode (view-window self) (nth ind ctrls) (dialog-item-text (nth ind ctrls)))
+              (setq i 100)))))
+    ;;        ((#\e) (set-bpf-edit-mode (view-window self) 
+    ;;             (first (bpf-radio-ctrls (view-window self))) "edit"))
+    ;;        ((#\z) (set-bpf-edit-mode (view-window self) 
+    ;;             (second (bpf-radio-ctrls (view-window self))) "zoom"))
+    ;;        ((#\s) (set-bpf-edit-mode (view-window self) 
+    ;;             (third (bpf-radio-ctrls (view-window self))) "sel"))
+    ;;        ((#\d) (set-bpf-edit-mode (view-window self) 
+    ;;             (fourth (bpf-radio-ctrls (view-window self))) "drag"))
+    ;;        ((#\a) (select-all-bpf self)) 
+    ;;        ((#\x) (cut-bpf self)) 
+    ;;        ((#\c) (copy-bpf self)) 
+    ;;        ((#\v) (paste-bpf self)) 
+    (otherwise (ed-beep))))
 
 (defmethod scroll-bar-changed :before ((view C-bpf-view) scroll-bar)
   (declare (ignore scroll-bar))
@@ -494,8 +497,8 @@
   (call-next-method)
   (update-bpf-origo-ctrls self))
 
-;=====================================================
-; BPF window ctrls
+;;=====================================================
+;; BPF window ctrls
 
 (defmethod update-bpf-zoom-ctrls ((self C-bpf-view))  
   (set-dialog-item-text-from-dialog (x-zoom-ctrl (view-window self)) 

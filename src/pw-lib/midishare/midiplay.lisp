@@ -31,23 +31,25 @@
           (cl-user::setalltrackplayer midi::*player* seq 480)
           (cl-user::startplayer midi::*player*)
           seq)))))
-;changed from paw-modifs 140397 aaa
+;;changed from paw-modifs 140397 aaa
 |#
 
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
-  (when (and  midi::*pw-refnum* midi::*player* )
-    (let ((playerIdle))
-      (rlet ((myState :PlayerState))  
-        (cl-user::getStatePlayer midi::*player* myState) 
-        (when (= (cl-user::s-state myState) cl-user::kIdle) (setf playerIdle t)))
-      (unless playerIdle (print "Wait end of previous play!"))
-      (when playerIdle
-        (let ((seq (midishare::midinewseq)))
-          (setf *MidiShare-start-time* 0)
-          (MidiPlay object 0 approx chanbase seq 1000)
-          (cl-user::setalltrackplayer midi::*player* seq 500)
-          (cl-user::startplayer midi::*player*)
-          seq)))))
+  (warn "~S ~S is not implemented yet" 'MidiPlayANy '((object t) &optional (approx 2) (chanbase 1)))
+  ;; (when (and  midi::*pw-refnum* midi::*player* )
+  ;;   (let ((playerIdle))
+  ;;     (rlet ((myState :PlayerState))  
+  ;;           (cl-user::getStatePlayer midi::*player* myState) 
+  ;;           (when (= (cl-user::s-state myState) cl-user::kIdle) (setf playerIdle t)))
+  ;;     (unless playerIdle (print "Wait end of previous play!"))
+  ;;     (when playerIdle
+  ;;       (let ((seq (midishare::midinewseq)))
+  ;;         (setf *MidiShare-start-time* 0)
+  ;;         (MidiPlay object 0 approx chanbase seq 1000)
+  ;;         (cl-user::setalltrackplayer midi::*player* seq 500)
+  ;;         (cl-user::startplayer midi::*player*)
+  ;;         seq))))
+  )
 
 #|
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
@@ -64,7 +66,7 @@
       (midishare::date event (+  *MidiShare-start-time* at))
       (midishare::MidiAddSeq seq event)
       )))
-;changed from paw-modifs 140397 aaa
+;;changed from paw-modifs 140397 aaa
 |#
 
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
@@ -117,14 +119,14 @@
           do (MidiPlay beat2 at approx chanbase seq unit/sec))))
 
 
-;=========
+;;=========
 
 (defun scale2approx (scale)
   (cond ((eq scale *1/4-tone-chromatic-scale*) 4)
                   ((eq scale *1/8-tone-chromatic-scale*) 8)
                   (t 2)))
 
-;====play Chord
+;;====play Chord
 
 (defmethod play ((self C-patch-chord-box-M ))
   (let ((approx (scale2approx (local-approx (car (subviews (mus-not-editor self))))))
@@ -156,7 +158,7 @@
     (MidiPlayAny arp-chord approx 0)))
 
 
-;=====play Chordseq and Multiseq
+;;=====play Chordseq and Multiseq
 
 (defmethod play ((self C-patch-midi)) 
   (play-all-staffs (car (subviews (application-object self)))))
@@ -174,7 +176,7 @@
 
 
 
-;====play rtm
+;;====play rtm
 
 (defmethod play ((self C-patch-application-rtm-editor)) (play-from-pw self))
 (defmethod play ((self C-patch-PolifRTM)) (play-from-pw self))
@@ -203,7 +205,7 @@
 
 
 
-;===stop-play
+;;===stop-play
 
 (defmethod stop-play ((self c-patch))
   (when midi::*player* (cl-user::stopplayer midi::*player*)))

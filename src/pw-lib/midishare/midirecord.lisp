@@ -32,7 +32,7 @@
                        :view-container self
                        :view-font '("monaco"  9  :srcor))))
 
-;====Record
+;;====Record
 
 (defclass C-patch-record (C-patch-Midi-Extern)
   ())
@@ -58,8 +58,8 @@
         (cl-user::startplayer *pw-recorder*)))))
 
 
-; (cl-user::closeplayer midi::*player*)
-; (setf midi::*player* (cl-user::open-player "PatchWorkPlayer"))
+;; (cl-user::closeplayer midi::*player*)
+;; (setf midi::*player* (cl-user::open-player "PatchWorkPlayer"))
 
 (defmethod stop-play ((self c-patch-record))
   (when *pw-recording-midi*
@@ -95,7 +95,7 @@ delta and output mode."
 
 
 
-;====Save
+;;====Save
 
 (defclass C-patch-save-midi (C-pw-resize-x)
   ())
@@ -131,29 +131,31 @@ delta and output mode."
       (MidiPlay object 0 (compute-approx) 0 seq 480)
       seq)))
 
-;changed from paw-modifs 140397 aaa
+;;changed from paw-modifs 140397 aaa
 |#
 
 (defmethod patch-value ((self C-patch-save-midi) obj)
   (declare (ignore obj))
-  (when (and  midi::*pw-refnum* midi::*player* )
-    (let ((name (CHOOSE-NEW-FILE-DIALOG)))
-      (when name
-        (let ((tempo-evnt (midishare::MidiNewEv midishare::typetempo))
-              recording-seq)
-          (midishare::date tempo-evnt 0)
-          (midishare::field tempo-evnt 0 1000000)
-          (rlet ((myInfo :MidiFileInfos))  
-            (rset myInfo :MidiFileInfos.format 1)
-            (rset myInfo :MidiFileInfos.timedef 0)
-            (rset myInfo :MidiFileInfos.clicks 500)
-            (rset myInfo :MidiFileInfos.tracks 2)
-            (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
-            (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
-            (midishare::firstEv recording-seq tempo-evnt)
-            (cl-user::midi-file-save (mac-namestring name) recording-seq  myInfo)
-            (set-mac-file-type (mac-namestring name) :|Midi|)
-            (midishare::midifreeseq recording-seq)))))))
+  (warn "~S ~S is not implemented yet" 'patch-value '((self C-patch-save-midi) obj))
+  ;; (when (and  midi::*pw-refnum* midi::*player* )
+  ;;   (let ((name (CHOOSE-NEW-FILE-DIALOG)))
+  ;;     (when name
+  ;;       (let ((tempo-evnt (midishare::MidiNewEv midishare::typetempo))
+  ;;             recording-seq)
+  ;;         (midishare::date tempo-evnt 0)
+  ;;         (midishare::field tempo-evnt 0 1000000)
+  ;;         (rlet ((myInfo :MidiFileInfos))  
+  ;;           (rset myInfo :MidiFileInfos.format 1)
+  ;;           (rset myInfo :MidiFileInfos.timedef 0)
+  ;;           (rset myInfo :MidiFileInfos.clicks 500)
+  ;;           (rset myInfo :MidiFileInfos.tracks 2)
+  ;;           (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
+  ;;           (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
+  ;;           (midishare::firstEv recording-seq tempo-evnt)
+  ;;           (cl-user::midi-file-save (mac-namestring name) recording-seq  myInfo)
+  ;;           (set-mac-file-type (mac-namestring name) :|Midi|)
+  ;;           (midishare::midifreeseq recording-seq))))))
+  )
 
 
 (defmethod MidiSaveAny ((object t))
@@ -179,7 +181,7 @@ Input may be any PatchWork object that could be played through play-object
   (declare (ignore objs)))
 
 
-;====Load
+;;====Load
 
 (defclass C-patch-load-midi (C-pw-resize-x)
   ())
@@ -187,20 +189,22 @@ Input may be any PatchWork object that could be played through play-object
 
 (defmethod patch-value ((self C-patch-load-midi) obj)
   (declare (ignore obj))
-  (when (and  midi::*pw-refnum* midi::*player* )
-    (let ((name (CHOOSE-FILE-DIALOG)))
-      (when name
-        (let ((recording-seq (midishare::midiNewSeq))
-              (delta (patch-value (first (input-objects self)) (first (input-objects self))))
-              rep)
-          (rlet ((myInfo :MidiFileInfos))  
-            (cl-user::midi-file-load (mac-namestring name) recording-seq  myInfo)
-            (when recording-seq
-              (print (list  "clicks" (cl-user::mf-clicks myInfo) "tracks" (cl-user::mf-tracks myInfo) "MidiFormat" (cl-user::mf-format myInfo)))
-              (let ((*midi-tempo* 1000000))
-                (setf rep (mievents2midilist recording-seq (cl-user::mf-clicks myInfo) )))
-              (midiseq2cl rep delta)
-              )))))))
+  (warn "~S ~S is not implemented yet" 'patch-value '((self C-patch-load-midi) obj))
+  ;; (when (and  midi::*pw-refnum* midi::*player* )
+  ;;   (let ((name (CHOOSE-FILE-DIALOG)))
+  ;;     (when name
+  ;;       (let ((recording-seq (midishare::midiNewSeq))
+  ;;             (delta (patch-value (first (input-objects self)) (first (input-objects self))))
+  ;;             rep)
+  ;;         (rlet ((myInfo :MidiFileInfos))  
+  ;;           (cl-user::midi-file-load (mac-namestring name) recording-seq  myInfo)
+  ;;           (when recording-seq
+  ;;             (print (list  "clicks" (cl-user::mf-clicks myInfo) "tracks" (cl-user::mf-tracks myInfo) "MidiFormat" (cl-user::mf-format myInfo)))
+  ;;             (let ((*midi-tempo* 1000000))
+  ;;               (setf rep (mievents2midilist recording-seq (cl-user::mf-clicks myInfo) )))
+  ;;             (midiseq2cl rep delta)
+  ;;             ))))))
+  )
 
 #|
 (defun logical-time (abstract-time cur-tempo tempo-change-abst-time tempo-change-log-time unit/sec)
@@ -266,7 +270,7 @@ Input may be any PatchWork object that could be played through play-object
     (let ((pos (position-if #'match list)))
       (when pos
         (setf (nth 1 (nth pos list))  (- data (nth 1 (nth pos list))))))))
-;changed from paw-modifs 140397 aaa
+;;changed from paw-modifs 140397 aaa
 |#
 
 (defun logical-time (abstract-time cur-tempo tempo-change-abst-time tempo-change-log-time unit/sec)
@@ -394,7 +398,7 @@ Output is a chord-line object.
 
 
 (PW-addmenu-fun *pw-Midi-menu* 'midi-record 'C-patch-record)
-(add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+(ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
 (PW-addmenu-fun *pw-Midi-menu* 'midi-load 'C-patch-load-midi)
 (PW-addmenu-fun *pw-Midi-menu* 'midi-save 'C-patch-save-midi)
 

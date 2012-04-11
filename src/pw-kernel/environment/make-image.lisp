@@ -1,5 +1,5 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
-(in-package :ccl)
+(in-package :pw)
 #|
 (defun do-save-application (d applic-p)
   (let ((menubar-popup (view-named 'menubar-popup d))
@@ -71,9 +71,9 @@
 (defun remove-protec-resource (resource-file)
   (declare (ignore resource-file))
   (let ((refnum (#_CurResfile)))
-    (ccl::with-pstrs ((name "Forum Owner"))
+    (ui::with-pstrs ((name "Forum Owner"))
       (let ((reshandle (#_getNamedResource :|fipr| name)))
-        (unless (ccl::%null-ptr-p reshandle)
+        (unless (ui::%null-ptr-p reshandle)
           (#_rmveresource reshandle))))
     (#_updateresfile refnum)))
 |#
@@ -82,14 +82,15 @@
 
 (in-package :pw)
 
-;(defun clear-patchwork ()
-;  (midi::midi-close))
+;;(defun clear-patchwork ()
+;;  (midi::midi-close))
 
 (defun save-dump-image (image-name &optional heap-size no-compiler)
   "Save an image"
   ;(clear-patchwork)
   (let ((file (choose-new-file-dialog
                :prompt "Save new image as:"
+
                :button-string  "Save"
                :directory "CL:images;PW.image"))
         (sizes (list (* 8500 1024)
@@ -98,9 +99,9 @@
      #'(lambda ()
          (save-application
           file
-          :application-class (find-class 'ccl::lisp-development-system)
+          :application-class (find-class 'ui::lisp-development-system)
           :size sizes
-          :resources (ccl::get-app-resources "CL:PW-inits;Drivers+Resources;CLPF.rsrc" :|CCL2|)
+          :resources (ui::get-app-resources "CL:PW-inits;Drivers+Resources;CLPF.rsrc" :|CCL2|)
           :init-file "image-init" 
           :clear-clos-caches t
           :creator :|CCL2|
@@ -111,7 +112,7 @@
 
 
 (defun load-protection ()
-  (unless (and (ccl:shift-key-p) (ccl:command-key-p) (ccl:control-key-p))
-    (ccl::without-interrupts (load "CL:pw-inits;drivers+resources;magic" :verbose nil :print nil)
-                             (ccl::check-protection))))
+  (unless (and (ui:shift-key-p) (ui:command-key-p) (ui:control-key-p))
+    (ui::without-interrupts (load "CL:pw-inits;drivers+resources;magic" :verbose nil :print nil)
+                             (ui::check-protection))))
 

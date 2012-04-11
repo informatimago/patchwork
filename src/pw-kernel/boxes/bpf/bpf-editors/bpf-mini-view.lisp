@@ -8,8 +8,9 @@
 ;;;;=========================================================
 
 (in-package :pw)
+(enable-patchwork-readtable)
 
-;==================================================================================================================
+;;==================================================================================================================
 
 #|
 (defun scale-to-fit-in-rect (view)
@@ -45,16 +46,16 @@
       (setf (v-view-scaler view) (/ (+ (- y-max y-min)(* (- y-max y-min).01)) (h view) )))
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
-    (when (or (> (abs x-min) #,(1- (expt 2 15))) (> (abs y-min) #,(1- (expt 2 15))))
+    (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
       (ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 
-                       (max (- #,(1- (expt 2 15))) x-min)
-                       (min #,(1- (expt 2 15)) x-min))
+                       (max (- #.(1- (expt 2 15))) x-min)
+                       (min #.(1- (expt 2 15)) x-min))
                      (if (minusp y-min)
-                       (max (- #,(1- (expt 2 15))) y-min)
-                       (min #,(1- (expt 2 15)) y-min)))))))
+                       (max (- #.(1- (expt 2 15))) y-min)
+                       (min #.(1- (expt 2 15)) y-min)))))))
 |#
 
 
@@ -76,16 +77,16 @@
       (setf (v-view-scaler view) (/ (+ (- y-max y-min)(* (- y-max y-min).01)) (h view) )))
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
-    (when (or (> (abs x-min) #,(1- (expt 2 15))) (> (abs y-min) #,(1- (expt 2 15))))
+    (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
       (ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 
-                       (max (- #,(1- (expt 2 15))) x-min)
-                       (min #,(1- (expt 2 15)) x-min))
+                       (max (- #.(1- (expt 2 15))) x-min)
+                       (min #.(1- (expt 2 15)) x-min))
                      (if (minusp y-min)
-                       (max (- #,(1- (expt 2 15))) y-min)
-                       (min #,(1- (expt 2 15)) y-min)))))))
+                       (max (- #.(1- (expt 2 15))) y-min)
+                       (min #.(1- (expt 2 15)) y-min)))))))
 |#
 
 
@@ -113,16 +114,16 @@
       (setf (v-view-scaler view) (/ (+ (- y-max y-min)(* (- y-max y-min).01)) (h view) )))
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
-    (when (or (> (abs x-min) #,(1- (expt 2 15))) (> (abs y-min) #,(1- (expt 2 15))))
+    (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
       (ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 
-                       (max (- #,(1- (expt 2 15))) x-min)
-                       (min #,(1- (expt 2 15)) x-min))
+                       (max (- #.(1- (expt 2 15))) x-min)
+                       (min #.(1- (expt 2 15)) x-min))
                      (if (minusp y-min)
-                       (max (- #,(1- (expt 2 15))) y-min)
-                       (min #,(1- (expt 2 15)) y-min)))))))
+                       (max (- #.(1- (expt 2 15))) y-min)
+                       (min #.(1- (expt 2 15)) y-min)))))))
 |#
 
 (defun flatt (list)
@@ -132,8 +133,8 @@
            (append (flatt (first list)) (flatt (rest list)))
            (cons (first list) (flatt (rest list)))))))
         
-; scales all bps not just the active one 
-;changed by aaa 28-08-95 from pw-modif
+;; scales all bps not just the active one 
+;;changed by aaa 28-08-95 from pw-modif
 (defun scale-to-fit-in-rect (view)
   (let* ((current-bpf (break-point-function view))
          (bpfs (cons current-bpf (break-point-functions view)))
@@ -151,21 +152,22 @@
       (setf (v-view-scaler view) (/ (+ (- y-max y-min)(* (- y-max y-min).01)) (h view) )))
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
-    (when (or (> (abs x-min) #,(1- (expt 2 15))) (> (abs y-min) #,(1- (expt 2 15))))
+    (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
       (ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 
-                       (max (- #,(1- (expt 2 15))) x-min)
-                       (min #,(1- (expt 2 15)) x-min))
+                       (max (- #.(1- (expt 2 15))) x-min)
+                       (min #.(1- (expt 2 15)) x-min))
                      (if (minusp y-min)
-                       (max (- #,(1- (expt 2 15))) y-min)
-                       (min #,(1- (expt 2 15)) y-min)))))))
+                       (max (- #.(1- (expt 2 15))) y-min)
+                       (min #.(1- (expt 2 15)) y-min)))))))
 
 
-;==================================================================================================================
+;;==================================================================================================================
 
-(defclass C-mini-bpf-view (view C-ttybox)
+(defclass C-mini-bpf-view (;; ui:view
+                           C-ttybox)
   ((break-point-function :initform nil :initarg :break-point-function 
      :accessor break-point-function)
    (h-view-scaler :initform 1.0 :initarg :h-view-scaler :accessor h-view-scaler)
@@ -196,8 +198,8 @@
   (scale-to-fit-in-rect self)
   (view-draw-contents self))
 
-;=====================================
-;draw
+;;=====================================
+;;draw
 
 (defmethod view-draw-contents ((self C-mini-bpf-view))
  (with-focused-view self
@@ -235,9 +237,9 @@
                  :view-position #@(5 145)
                  :view-size #@(60 100)))
 
-;(time (repeat 400 (view-draw-contents bm)))  
-;(time (repeat 100 (scale-to-fit-in-rect bm)))
-;(set-break-point-function-to-mini bm bb2)
+;;(time (repeat 400 (view-draw-contents bm)))  
+;;(time (repeat 100 (scale-to-fit-in-rect bm)))
+;;(set-break-point-function-to-mini bm bb2)
 
 |#    
 

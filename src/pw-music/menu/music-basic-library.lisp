@@ -11,41 +11,41 @@
 
 ;;===========================
 ;;Items for Music Edit Menu
-(add-menu-items *PWoper-menu* (new-leafmenu  "-" ()))
+(ui:add-menu-items *PWoper-menu* (new-leafmenu  "-" ()))
 
-(add-menu-items *PWoper-menu* 
+(ui:add-menu-items *PWoper-menu* 
                 (new-leafmenu "MIDI Reset" #'(lambda() (pw-reset-for-midi)))
                 (new-leafmenu "MIDI all-notes-off" #'(lambda() (all-off))))
 
 
 (PW-addmenu-fun *pw-MN-Edit-menu* 'chord 'C-patch-chord-box-M)
 
-;(PW-addmenu-fun *pw-MN-Edit-menu* 'collector 'C-patch-midi-Mod)
+;;(PW-addmenu-fun *pw-MN-Edit-menu* 'collector 'C-patch-midi-Mod)
 
-;(PW-addmenu-fun *pw-MN-Edit-menu* 'poly-coll 'C-patch-PolifMN-mod)
+;;(PW-addmenu-fun *pw-MN-Edit-menu* 'poly-coll 'C-patch-PolifMN-mod)
 
-;(PW-addmenu-fun *pw-MN-Edit-menu* 'stime 'C-pw-stop-time)
+;;(PW-addmenu-fun *pw-MN-Edit-menu* 'stime 'C-pw-stop-time)
 
 (PW-addmenu-fun *pw-MN-Edit-menu* 'mk-note 'C-patch-make-note)
 
 (PW-addmenu *pw-MN-Edit-menu* '(mk-chord))
 
-;(PW-addmenu-fun *pw-MN-Edit-menu* 'ch-l-build 'C-patch-chord-line:C-patch-chord-line)
+;;(PW-addmenu-fun *pw-MN-Edit-menu* 'ch-l-build 'C-patch-chord-line:C-patch-chord-line)
 
 (pw::pw-addmenu-fun *pw-MN-Edit-menu* 'chordseq 'C-patch-chord-line:C-patch-chord-line)
 
-;(PW-addmenu-fun *pw-MN-Edit-menu* 'epw::ascii-chord 'EPW::C-pw-ascii-chord-box)
+;;(PW-addmenu-fun *pw-MN-Edit-menu* 'epw::ascii-chord 'EPW::C-pw-ascii-chord-box)
 
 (PW-addmenu-fun *pw-MN-Edit-menu* 'multiseq 'C-patch-PolifMN-mod)
 
 ;;=================================
 ;;items for Conv-Approx menu
 
-(eval-when (eval compile load)
+(eval-when (:compile-toplevel :load-toplevel :execute)
   (shadowing-import
-   '(epw::f->mc epw::mc->f epw::mc->n epw::n->mc epw::int->symb epw::symb->int
-     epw::cents->coef epw::coef->cents epw::nbcents-f epw::approx-m
-     epw::lin->db)))
+   '(epw::F->MC epw::MC->F epw::MC->N epw::N->MC epw::INT->SYMB epw::SYMB->INT
+     epw::CENTS->COEF epw::COEF->CENTS epw::NBCENTS-F epw::APPROX-M
+     epw::LIN->DB)))
 
 (PW-addmenu *pw-Conv-approx-menu*
  '(f->mc mc->f mc->n n->mc int->symb symb->int cents->coef coef->cents approx-m
@@ -54,21 +54,21 @@
 ;;;============================
 ;;; Extern Items
 
-;(pw-addmenu-fun *pw-Music-Extern-menu* 'pw-clock 'C-pw-gclock)
+;;(pw-addmenu-fun *pw-Music-Extern-menu* 'pw-clock 'C-pw-gclock)
 
-;(pw-addmenu-fun *pw-Music-Extern-menu* 'str-dur 'C-structured-dur)
+;;(pw-addmenu-fun *pw-Music-Extern-menu* 'str-dur 'C-structured-dur)
 
-;(pw-addmenu-fun *pw-Music-Extern-menu* 'strout 'C-structured-outbox)
+;;(pw-addmenu-fun *pw-Music-Extern-menu* 'strout 'C-structured-outbox)
 
-;(new-PW-sub-menu-item *pw-Music-Extern-menu* "struct-abstraction" 'C-make-structured-abstraction 'strabs 
+;;(new-PW-sub-menu-item *pw-Music-Extern-menu* "struct-abstraction" 'C-make-structured-abstraction 'strabs 
 ;;  '(*string-pw-type* "strcoll") '(midi-ins) '("Strcoll"))
 
 ;;=========================
 ;;MIDI
 
-;(pw-addmenu *pw-Midi-menu* '(midi-o pgmout volume TXtune))
+;;(pw-addmenu *pw-Midi-menu* '(midi-o pgmout volume TXtune))
 
-;(pw-addmenu *pw-Midi-menu* '(bendout))
+;;(pw-addmenu *pw-Midi-menu* '(bendout))
 
 (pw-addmenu-fun *pw-Midi-menu* 'C-pw-send-midi-note::play-chords
                 'C-pw-send-midi-note:C-pw-send-midi-note)
@@ -78,24 +78,24 @@
 
 (pw-addmenu *pw-Midi-menu* '(play-object))
 
-;(PW-addmenu-fun *pw-Midi-menu* 'c-pw-midi-in::play/stop 'c-pw-midi-in::C-jouer/eteindre)
+;;(PW-addmenu-fun *pw-Midi-menu* 'c-pw-midi-in::play/stop 'c-pw-midi-in::C-jouer/eteindre)
 
 #|(PW-addmenu-fun *pw-Midi-menu* 'c-pw-midi-in::play/st-list
                 'c-pw-midi-in::C-play/stop-list)|#
 
-(add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+(ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
 
 (pw-addmenu *pw-Midi-menu* '(midi-o pgmout bendout volume))
 
-(add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+(ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
 
 (pw-addmenu-fun *pw-Midi-menu* 'C-pw-midi-in:delay 'C-pw-midi-in:C-pw-delay-box)
 
 (pw-addmenu *pw-Midi-menu* '(epw::microtone))
 
-(add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+(ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
 
-#|(add-menu-items *pw-Midi-menu* 
+#|(ui:add-menu-items *pw-Midi-menu* 
   (new-leafmenu "raw-in" 
      #'(lambda () 
        (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
@@ -141,14 +141,14 @@
        (setf (open-state (car (pw-controls loop)) ) nil)
        (tell (controls *active-patch-window*) 'draw-connections)))))|#
 
-;aaa (add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+;;aaa (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
 
-;aaa  (PW-addmenu *pw-Midi-menu* '())
+;;aaa  (PW-addmenu *pw-Midi-menu* '())
 
-;(add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+;;(ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
 
 
-;(pw-addmenu *pw-Midi-menu* '(epw::microtone))
+;;(pw-addmenu *pw-Midi-menu* '(epw::microtone))
 
 ;;===========================
 ;;Multidim Objects
@@ -164,12 +164,12 @@
 ;;Hardcopy printing
 
 (defvar *MN-print-setUp*
-  (new-leafmenu "Page Setup…" #'(lambda () (ccl::win-print-setUp *active-mn-window*))))
+  (new-leafmenu "Page Setup…" #'(lambda () (ui::win-print-setUp *active-mn-window*))))
 
 (defvar *print-MN-menu* 
-  (new-leafmenu "Print…" #'(lambda () (ccl::window-hardcopy *active-mn-window*))))
+  (new-leafmenu "Print…" #'(lambda () (ui::window-hardcopy *active-mn-window*))))
 
-(add-menu-items *MN-menu-file* *MN-print-setUp* *print-MN-menu*)
+(ui:add-menu-items *MN-menu-file* *MN-print-setUp* *print-MN-menu*)
 
 ;;;===================
 

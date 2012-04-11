@@ -9,8 +9,9 @@
 
 (in-package :pw)
 
-;============================================================================================
-(defclass  C-menubox-bpf (view C-menubox)  
+;;============================================================================================
+(defclass  C-menubox-bpf (;; ui:view
+                          C-menubox)  
   ((BPF-mini-view :initform (make-instance 'C-mini-bpf-view) :accessor BPF-mini-view)))
 
 (defmethod initialize-instance :after ((self C-menubox-bpf) &rest ctrls)
@@ -26,8 +27,8 @@
 (defmethod set-numbox-item-text  ((self C-menubox-bpf) value)
   (declare (ignore value)))
 
-;=========================
-;draw
+;;=========================
+;;draw
 
 (defmethod view-draw-contents ((self C-menubox-bpf))
   (with-focused-view self
@@ -57,11 +58,11 @@
                     (* (map-mouse-increment view) (- first-v (point-v last-mp)))))
             (view-draw-contents view)))))))
 
-;============================================================================================
+;;============================================================================================
 
 ;;(defmethod patch-value ((self C-menubox-bpf) obj) (value-str self))
 
-;============================================================================================
+;;============================================================================================
 
 (defclass C-pw-BPF-library ()
   ((bpf-lib-objects :initform nil :initarg :bpf-lib-objects :accessor bpf-lib-objects)
@@ -72,18 +73,18 @@
      ,(decompile self)))
 
 (defmethod decompile ((self C-pw-BPF-library))
-  `(progn ,.(ask-all (bpf-lib-objects self) 'library-decompile)))
+  `(progn ,@(ask-all (bpf-lib-objects self) 'library-decompile)))
 
 (defmethod add-new-bpf-lib-object ((self C-pw-BPF-library) lib-object)
   (push lib-object (bpf-lib-objects self)))
 
-;============================================================================================
+;;============================================================================================
 
-;(defvar *pw-BPF-library* ())
+;;(defvar *pw-BPF-library* ())
 
 (setf *pw-BPF-library* (make-instance 'C-pw-BPF-library :lib-name '*pw-BPF-library*))
 
-;(bpf-lib-objects *pw-BPF-library*)
+;;(bpf-lib-objects *pw-BPF-library*)
 
 (add-new-bpf-lib-object *pw-BPF-library*
    (make-instance 'C-break-point-function :break-point-list
@@ -133,10 +134,10 @@
     :view-position (make-point 140 5) :view-size (make-point 84 34) :doc-string "BPFlib"
                     :menu-box-list *pw-BPF-library*))
 (add-subviews w2 bpfmenu3)
-;(patch-value bpfmenu1 ())
+;;(patch-value bpfmenu1 ())
 
 |#
-;==============================================================================
+;;==============================================================================
 
 
 (defun add-BPF-to-lib (win lib)

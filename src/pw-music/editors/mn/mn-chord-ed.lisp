@@ -308,7 +308,7 @@
 
 (defmethod find-time-active-note ((self C-MN-panel-chordBox) x y)
   (find-arp-active-note self x y  (+ *MN-draw-offset* *MN-left-offset*)))
-; mouse-pressed 
+;; mouse-pressed 
 
 (defmethod view-click-event-handler ((self C-MN-panel-ChordBox) where)
   (call-next-method)
@@ -378,8 +378,8 @@
     (setf (selected-notes self) nil)
     (if (zone-selection? self) (undo-selection self))))
                 
-;___________
-; edit note information
+;;___________
+;; edit note information
 
 (defmethod edit-note-duration ((self C-MN-panel-ChordBox)  x y mouse-diff)
   (declare (ignore x y))
@@ -582,8 +582,8 @@
                (setf (active-note self) ())
                (erase+view-draw-contents self))
              ((ed-beep)))))
-;___________
-;key-pressed
+;;___________
+;;key-pressed
 
 (defmethod handle-key-event ((self C-MN-panel-ChordBox) char)
   (declare (special *global-music-notation-panel*))
@@ -592,9 +592,10 @@
              (#\a (change-arp-view (view-container self) 'arp) t)
              (#\t (change-arp-view (view-container self) 'time) t)
              (#\n (change-arp-view (view-container self) 'chord) t)
-             (#\Tab (circ-edit-dim self) t)))
+             ((:Tab) (circ-edit-dim self) t)))
           ((and (or active-note (selected-notes self))
-                (or (eq char #\UpArrow) (eq char #\DownArrow)))
+                (or (eq char :UpArrow)
+                    (eq char :DownArrow)))
            (transpose-selections self char)
            (if active-note (set-pitch&value self active-note))
            (update-chord (active-chord self))
@@ -633,14 +634,14 @@
                         (* (cond ((shift-key-p) 2)
                                  ((control-key-p) 24)  
                                  (t 1))
-                           (if (eq char #\UpArrow) 
+                           (if (eq char :UpArrow) 
                              (approx-factor *current-approx-scale*)
                              (- 0 (approx-factor *current-approx-scale*))))))
       (transpose-note (active-note self)
                         (* (cond ((shift-key-p) 2)
                                  ((control-key-p) 24)  
                                  (t 1))
-                           (if (eq char #\UpArrow) 
+                           (if (eq char :UpArrow) 
                              (approx-factor *current-approx-scale*)
                              (- 0 (approx-factor *current-approx-scale*))))))))
 
@@ -747,7 +748,7 @@
       (return nil))))
     
 
-;=========================================================
+;;=========================================================
 
 (defclass C-chord-mus-not-view (C-mus-not-view) 
   ((arp-ctrl :initform nil  :accessor arp-ctrl)
@@ -923,7 +924,7 @@
      (while (and chord-lines editors)
        (setf (chord-line (pop editors)) (pop chord-lines)))))
 
-;aaa from pw-modifs le 10-9-95
+;;aaa from pw-modifs le 10-9-95
 
 (defmethod play-all-staffs ((self C-chord-mus-not-view))
   (cond ((setting-of self :time)
@@ -985,8 +986,8 @@
         (re-dfuncall 30
                      self notes))))
 
-;______________________________________
-; 
+;;______________________________________
+;; 
 (defmethod monofonic-mn? ((self C-chord-mus-not-view)) 
  t)
 

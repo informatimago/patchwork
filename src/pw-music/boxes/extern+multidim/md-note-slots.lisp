@@ -12,11 +12,7 @@
 ;;;===========================================
 
 (defpackage "C-GET-NOTE-SLOTS"
-  (:use "COMMON-LISP")
-  (:import-from "PATCH-WORK"
-                "DEFUNP" "C-CHORD" "C-CHORD-LINE" "NOTES" "PW-CONTROLS"
-                "INPUT-OBJECTS" "PATCH-VALUE" "C-PATCH" "CHORDS" "CLASS-SLOT-NAMES"
-                "T-TIME" "LIST!" "UPDATE-NOTE")
+  (:use "COMMON-LISP" "PATCH-WORK")
   (:export "GET-NOTE-SLOTS" "SET-NOTE-SLOTS"))
 
 (in-package "C-GET-NOTE-SLOTS")
@@ -132,7 +128,7 @@ them the given <value(s)>."
   (:import-from "PATCH-WORK"
                 "DEFUNP" "C-PATCH-MIDI-MOD" "SAVED-SELECTED"
                 "APPLICATION-OBJECT" "C-PATCH" "PATCH-VALUE" "INPUT-OBJECTS")
-  (:import-from "CCL" "SUBVIEWS" "WPTR")
+  (:import-from "UI" "SUBVIEWS" "WPTR")
   (:export "GET-SELECTIONS"))
 
 (in-package "C-GET-SELECTIONS")
