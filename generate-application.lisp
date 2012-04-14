@@ -35,15 +35,29 @@
 (load #P"~/quicklisp/setup.lisp")
 
 (ccl::cd #P"/home/pjb/works/patchwork/patchwork/")
-(pushnew #P"/home/pjb/works/patchwork//patchwork/src/" asdf:*central-registry* :test (function equalp))
+(pushnew #P"/home/pjb/works/patchwork//patchwork/src/"
+         asdf:*central-registry* :test (function equalp))
 (ql:quickload :patchwork)
 
 (require :cocoa)
 (require :build-application)
+
+(defmethod  ccl:application-init-file :around (app)
+  (declare (ignorable app))
+  (make-pathname :name  "patchwork-init" :type "lisp"
+                 :defaults (user-homedir-pathname)))
+
 (ccl::build-application
  :name "PatchWork"
  :directory #P"~/Desktop/"
- :copy-ide-resources t)
+ :copy-ide-resources t
+ ;; :init-file "HOME:patchwork-init.lisp"
+ ;; '(pathname "~/application-init.lisp")
+ ;;  (lambda ()
+ ;;              (make-pathname :name  "patchwork-init" :type "lisp"
+ ;;                             :defaults (user-homedir-pathname)))
+ )
 
 
-;;;; THE END ;;;;
+
+;;;; the END ;;;;
