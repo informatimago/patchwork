@@ -1,29 +1,45 @@
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  (Several contributions by Tristan Murail)
-;;;;  © 1986-1992 IRCAM 
-;;;;
-
-;;;;  révision finale -  décembre 92 -  Tristan Murail
-;;;;=========================================================
-
-;; =============================================================================-======
-;; [jack] 910913               Chord-Filter.Lisp
-;; =============================================================================-======
-
-;; Chord Filtering -- CLPF V2.0 by Jacques Duthen © 1991 IRCAM
+;;;; -*- mode:lisp;coding:utf-8 -*-
+;;;;**************************************************************************
+;;;;FILE:               chord-filter.lisp
+;;;;LANGUAGE:           Common-Lisp
+;;;;SYSTEM:             Common-Lisp
+;;;;USER-INTERFACE:     MCL User Interface Classes
+;;;;DESCRIPTION
+;;;;    
+;;;;    XXX
+;;;;    
+;;;;AUTHORS
+;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
+;;;;    Mikael Laurson
+;;;;    Jacques Duthen
+;;;;    Camilo Rueda
+;;;;    Tristan Murail
+;;;;MODIFICATIONS
+;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
+;;;;    1992-12-25 Tristan Murail révision finale
+;;;;    1991-09-13 [jack] Chord Filtering -- CLPF V2.0
+;;;;    1991-06-12 [jack] after Magnus
+;;;;BUGS
+;;;;LEGAL
+;;;;    GPL3
+;;;;    
+;;;;    Copyright IRCAM 1986 - 2012
+;;;;    
+;;;;    This program is free software: you can redistribute it and/or modify
+;;;;    it under the terms of the GNU General Public License as published by
+;;;;    the Free Software Foundation, either version 3 of the License, or
+;;;;    (at your option) any later version.
+;;;;    
+;;;;    This program is distributed in the hope that it will be useful,
+;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;;;    GNU General Public License for more details.
+;;;;    
+;;;;    You should have received a copy of the GNU General Public License
+;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;;;**************************************************************************
 
 (in-package "EPW")
-
-;;(import '(mc->f1 f->mc1)) ; etc.
-
-;; =============================================================================-======
-;; ==== chord filtering ====
-
-;; [jack] 910612 after Magnus
 
 
 (defunp sort-mod ((chord midic)) list
@@ -284,3 +300,4 @@ Warning: <chord> can take only a single chord."
     (if (= format 2) (cdr (nreverse res)) (nreverse res))))
 
 
+;;;; THE END ;;;;

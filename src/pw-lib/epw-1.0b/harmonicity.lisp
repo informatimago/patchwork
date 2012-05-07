@@ -1,25 +1,43 @@
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;  révision finale -  décembre 92 -  Tristan Murail
-;;;;=========================================================
-
-;; =============================================================================-======
-;;                Harmonicity.Lisp
-;; =============================================================================-======
-
-;; Esquisse PW harmonicity functions -- CLPF V1.0 by Jacques Duthen © 1991 IRCAM
-
+;;;; -*- mode:lisp;coding:utf-8 -*-
+;;;;**************************************************************************
+;;;;FILE:               harmonicity.lisp
+;;;;LANGUAGE:           Common-Lisp
+;;;;SYSTEM:             Common-Lisp
+;;;;USER-INTERFACE:     MCL User Interface Classes
+;;;;DESCRIPTION
+;;;;    
+;;;;    XXX
+;;;;    
+;;;;AUTHORS
+;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
+;;;;    Mikael Laurson
+;;;;    Jacques Duthen
+;;;;    Camilo Rueda.
+;;;;MODIFICATIONS
+;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
+;;;;    1992-12-25 Tristan Murail révision finale 
+;;;;    1991       [jack] Esquisse PW harmonicity functions -- CLPF V1.0
+;;;;BUGS
+;;;;LEGAL
+;;;;    GPL3
+;;;;    
+;;;;    Copyright IRCAM 1986 - 2012
+;;;;    
+;;;;    This program is free software: you can redistribute it and/or modify
+;;;;    it under the terms of the GNU General Public License as published by
+;;;;    the Free Software Foundation, either version 3 of the License, or
+;;;;    (at your option) any later version.
+;;;;    
+;;;;    This program is distributed in the hope that it will be useful,
+;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;;;    GNU General Public License for more details.
+;;;;    
+;;;;    You should have received a copy of the GNU General Public License
+;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;;;**************************************************************************
 
 (in-package "EPW")
-
-
-
-;; =============================================================================-======
 
 ;; ==== harmonic distance ====
 
@@ -425,3 +443,5 @@ where equal elements according to <fun> are supposed to be contiguous in <l>."
       (while (and (cdr l) (funcall fun (first l) (second l)))
         (rplacd l (cddr l)))
       (nextl l))))
+
+;;;; THE END ;;;;
