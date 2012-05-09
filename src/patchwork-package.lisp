@@ -6,12 +6,13 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
-;;;;    
+;;;;    Defines some Patchwork packages.
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
+;;;;    2012-04-09 <PJB> Created.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -30,33 +31,6 @@
 ;;;;    
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp;coding:utf-8 -*-
-;;;;**************************************************************************
-;;;;FILE:               patchwork-package.lisp
-;;;;LANGUAGE:           Common-Lisp
-;;;;SYSTEM:             Common-Lisp
-;;;;USER-INTERFACE:     NONE
-;;;;DESCRIPTION
-;;;;    
-;;;;    Defines some Patchwork packages.
-;;;;  
-;;;;AUTHORS
-;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
-;;;;MODIFICATIONS
-;;;;    2012-04-09 <PJB> Created.
-;;;;BUGS
-;;;;LEGAL
-;;;;    Proprietary
-;;;;    
-;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
-;;;;    
-;;;;    All Rights Reserved.
-;;;;    
-;;;;    This program and its documentation constitute intellectual property 
-;;;;    of Pascal J. Bourguignon and is protected by the copyright laws of 
-;;;;    the European Union and other countries.
 ;;;;**************************************************************************
 
 (cl:defpackage "PW-MACOSX"
