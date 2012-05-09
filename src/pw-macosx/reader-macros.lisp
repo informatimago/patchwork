@@ -44,17 +44,20 @@
   (declare (ignore subchar arg))
   (let ((*readtable* *readtable-preserve*)
         (*package*   (find-package "FFI")))
-    ;; actual would return the name of a FFI function, variable or #define,
-    ;; we just return the preserved symbol, read in the FFI package..
-    (values (read stream))))
+    (if *read-suppress*
+        (progn (read stream)
+               (values))
+        ;; actual would return the name of a FFI function, variable or #define,
+        ;; we just return the preserved symbol, read in the FFI package..
+        (values (read stream)))))
 
 (defun sharp-at-dispatch-reader-macro (stream subchar arg)
   "#@(x y) reads a Point."
   (declare (ignore subchar arg))
-  (let* ((coord  (read stream))
-         (object (apply (function ui:make-point) coord)))
-    ;; (format *trace-output* "~& read #@~S as ~S~%" coord object)
-    (values object)))
+  (let ((coord  (read stream)))
+    (if *read-suppress*
+        (values)
+        (values (apply (function ui:make-point) coord)))))
 
 (defun sharp-dot-dispatch-reader-macro (stream subchar arg)
   "#. we read the expression in the host CL."
@@ -67,7 +70,10 @@
 
 (defun sharp-i-dispatch-reader-macro (stream char count)
   (declare (ignore char count))
-  (clpf-util:prefix-expr (read stream t nil t))) ; maybe (CLtLII p548)
+  (if *read-suppress*
+      (progn (read stream t nil t)
+             (values))
+      (values (clpf-util:prefix-expr (read stream t nil t))))) ; maybe (CLtLII p548)
 
 
 (defun setup ()
