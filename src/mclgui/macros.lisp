@@ -34,8 +34,10 @@
 
 (in-package "MCLGUI")
 
-(defmacro niy (item)
-  `(warn "~S is not implemented yet" ',item))
+(defmacro niy (item &rest vars)
+  `(locally
+     (declare (ignore ,@vars))
+     (warn "~S is not implemented yet" ',item)))
 
 
 ;;;; THE END ;;;;

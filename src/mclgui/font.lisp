@@ -151,15 +151,13 @@ RETURN:         The width in pixel of the STRING, as if it was
 
 FONT-SPEC:      If not supplied, the current font is used.
 "
-  (declare (ignore string font-spec))
-  (niy string-width))
+  (niy string-width  string font-spec))
 
 
 (defmacro grafport-write-string (string start end &optional ff ms color)
-  (declare (ignore string start end ff ms color))
-  (niy grafport-write-string)
+  (niy grafport-write-string string start end ff ms color)
   ;; `(grafport-write-unicode ,string ,start ,end ,ff ,ms ,color)
-  `(niy grafport-write-string))
+  `(niy grafport-write-string string start end ff ms color))
 
 
 (defun current-font-codes ()
@@ -171,8 +169,7 @@ RETURN: The font codes of the current font.
 
 
 (defun font-number-from-name (name)
-  (declare (ignore name))
-  (niy font-number-from-name)
+  (niy font-number-from-name name)
   ;; (if (equalp item (car (sys-font-spec)))
   ;;             (setf font (ash (car *sys-font-codes*) -16))
   ;;             ;; in OS 8 its the real font-num - earlier it's 0 
@@ -351,8 +348,7 @@ between lines. Only the font and font-size aspects of font-spec are
 used in the calculation. The font styles and transfer mode are not
 significant.
 "
-  (declare (ignore ff ms))
-  (niy font-codes-info)
+  (niy font-codes-info ff ms)
   (values 10 2 8 0))
 
 

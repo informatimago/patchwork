@@ -40,22 +40,24 @@
     :license "GPL3"
     :depends-on ()
     :components ((:file "package")
-                 (:file "macros"          :depends-on ("package"))
-                 (:file "variables"       :depends-on ("package"))
+                 (:file "macros"           :depends-on ("package"))
+                 (:file "variables"        :depends-on ("package"))
                  ;; Chapter 2:
-                 (:file "point"           :depends-on ("package"))
-                 (:file "font"            :depends-on ("package" "macros" "variables" "point" ))
+                 (:file "point"            :depends-on ("package"))
+                 (:file "font"             :depends-on ("package" "macros" "variables" "point" ))
                  ;; Chapter 3: Menus
-                 (:file "menu"            :depends-on ("package" "macros" "variables" "point" "font"))
+                 (:file "menu"             :depends-on ("package" "macros" "variables" "point" "font"))
+                 (:file "window-menu-item" :depends-on ("package" "menu" "window"))
                  ;; Chapter 4: Views and Windows
-                 ;; (:file "window"          :depends-on ("package" "macros" "variables" "point" "font"))
+                 
+                 ;; (:file "window"           :depends-on ("package" "macros" "variables" "point" "font"))
                  ;; Chapter 5: Dialog Items and Dialogs
                  ;; Chapter 6: Color
                  ;; Chapter 10: Events
-                 ;; (:file "event"           :depends-on ("package" "macros" "variables" "point"))
+                 ;; (:file "event"            :depends-on ("package" "macros" "variables" "point"))
                  ;; Chapter 11: Apple Events
                  
-                 (:file "mclgui"          :depends-on ("package"
+                 (:file "mclgui"           :depends-on ("package"
                                                        "macros" "variables"
                                                        "point" "font" "menu"
                                                        ;; "window"

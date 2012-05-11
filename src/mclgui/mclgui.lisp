@@ -51,6 +51,7 @@
   (initialize-font)
   (initialize-pattern)
   (initialize-screen)
+  (initialize-menu)
   (values))
 
 
