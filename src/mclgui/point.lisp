@@ -125,4 +125,27 @@ RETURN:         The point P as a list of coordinates (H V).
                  point-h point-v add-points subtract-points
                  point-list))
 
+
+
+(defun sharp-at-dispatch-reader-macro (stream subchar arg)
+  "#@(x y) reads a Point."
+  (declare (ignore subchar arg))
+  (let ((coord  (read stream)))
+    (if *read-suppress*
+        (values)
+        (values (apply (function make-point) coord)))))
+
+
+(defmacro enable-sharp-at-reader-macro ()
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (set-dispatch-macro-character #\# #\@ (function sharp-at-dispatch-reader-macro))
+     (values)))
+
+
+(defmacro disable-sharp-at-reader-macro ()
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (set-dispatch-macro-character #\# #\@ nil)
+     (values)))
+
+
 ;;;; THE END ;;;;

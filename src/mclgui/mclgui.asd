@@ -36,27 +36,41 @@
     :name "mclgui"
     :description "Macintosh Common Lisp Graphical User Interface for OpenStep"
     :author "Pascal J. Bourguignon"
-    :version "1.0.0"
+    :version "1.0.1"
     :license "GPL3"
     :depends-on ()
     :components ((:file "package")
                  (:file "macros"           :depends-on ("package"))
-                 (:file "variables"        :depends-on ("package"))
+                 (:file "variables"        :depends-on ("package" "point"))
+                 
                  ;; Chapter 2:
                  (:file "point"            :depends-on ("package"))
                  (:file "font"             :depends-on ("package" "macros" "variables" "point" ))
-                 ;; Chapter 3: Menus
-                 (:file "menu"             :depends-on ("package" "macros" "variables" "point" "font"))
-                 (:file "window-menu-item" :depends-on ("package" "menu" "window"))
-                 ;; Chapter 4: Views and Windows
                  
-                 ;; (:file "window"           :depends-on ("package" "macros" "variables" "point" "font"))
+                 ;; Chapter 3: Menus
+                 (:file "menu"             :depends-on ("package" "macros" "variables" "color" "point" "font"))
+                 (:file "window-menu-item" :depends-on ("package" "menu" "window"))
+                 
+                 ;; Chapter 4: Views and Windows
+                 (:file "view-classes"     :depends-on ("package" "macros" "variables" "color"))
+                 (:file "view"             :depends-on ("package" "macros" "variables" "color"
+                                                                  "point" "region" "font" 
+                                                                  "view-classes"))
+                 (:file "window"           :depends-on ("package" "macros" "variables" "color"
+                                                                  "point" "region" "font"
+                                                                  "view-classes" "view"))
+
                  ;; Chapter 5: Dialog Items and Dialogs
                  ;; Chapter 6: Color
                  ;; Chapter 10: Events
                  ;; (:file "event"            :depends-on ("package" "macros" "variables" "point"))
                  ;; Chapter 11: Apple Events
-                 
+
+                 ;; Appendix D: Quickdraw Graphics:
+                 (:file "region"           :depends-on ("package" "point"))
+                 (:file "color"            :depends-on ("package"))
+
+                 ;; MCLGUI:
                  (:file "mclgui"           :depends-on ("package"
                                                        "macros" "variables"
                                                        "point" "font" "menu"

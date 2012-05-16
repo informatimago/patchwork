@@ -405,8 +405,6 @@
                 :help-spec '(1110 1 2))  
   )
 
-(defmethod window-needs-saving-p ((w window))
-  nil)
 
 #|
 (defun confirmed-quit ()

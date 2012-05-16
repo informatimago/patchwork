@@ -1,17 +1,17 @@
 ;;;; -*- mode:lisp;coding:utf-8 -*-
 ;;;;**************************************************************************
-;;;;FILE:               macro.lisp
+;;;;FILE:               color.lisp
 ;;;;LANGUAGE:           Common-Lisp
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    MCLGUI internal macros.
+;;;;    Colors.
 ;;;;    
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
-;;;;    2012-05-09 <PJB> Created.
+;;;;    2012-05-15 <PJB> Extracted from menu.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -34,30 +34,47 @@
 
 (in-package "MCLGUI")
 
-(defmacro niy (item &rest vars)
-  `(locally
-     (declare (ignore ,@vars))
-     (warn "~S is not implemented yet" ',item)))
 
-(defmacro dovector ((var vector &optional result) &body body)
-  (let ((vvector (gensym "vector"))
-        (vindex  (gensym "index"))
-        (vlength (gensym "length")))
-    `(block nil
-       (let* ((,vvector ,vector)
-              (,vlength (length ,vvector))
-              (,vindex  -1))
-         (tagbody
-            (go :test)
-          :loop
-            (let ((,var (aref ,vvector ,vindex)))
-              ,@body)
-          :test
-            (incf ,vindex)
-            (if (< ,vindex ,vlength)
-                (go :loop))
-            (return ,result))))))
+(defclass colored ()
+  ((color-list :initform '()
+               :documentation "The property-list of key and colors for all the parts of the thing."
+               :reader part-color-list))
+  (:documentation "A mix-in for colored things."))
 
+
+
+(defgeneric part-color (thing key)
+  (:documentation "
+RETURN:         The color of the part KEY of the THING.
+")
+  (:method ((thing t) key)
+    (declare (ignore key))
+    nil)
+  (:method ((thing colored) key)
+    (getf (slot-value thing 'color-list) key nil)))
+
+
+(defgeneric set-part-color (thing key new-color)
+  (:documentation "
+DO:             Sets the color of the part KEY of the THING to NEW-COLOR,
+                or resets it if NEW-COLOR is NIL.
+")
+  (:method ((thing t) key new-color)
+    (declare (ignore key))
+    new-color)
+  (:method ((thing colored) key new-color)
+    (if new-color
+        (setf (getf (slot-value thing 'color-list) key) new-color)
+        (remf (slot-value thing 'color-list) key))
+    new-color))
+
+
+(defgeneric color-parts (thing)
+  (:documentation "
+RETURN:         A list of key parts that can be colored in the THING.
+")
+  (:method ((thing t))
+    '()))
 
 
 ;;;; THE END ;;;;

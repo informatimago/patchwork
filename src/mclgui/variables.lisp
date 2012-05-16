@@ -33,6 +33,7 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
+(enable-sharp-at-reader-macro)
 
 
 (defvar *font-list* '()
@@ -116,6 +117,11 @@ to the styles listed here.")
 (defvar *white-pattern*  nil)
 
 
+(defvar *arrow-cursor*  nil)
+(defvar *i-beam-cursor* nil)
+(defvar *watch-cursor*  nil)
+
+
 
 (defparameter *screen-width*  512
   "Width in pixels of the main screen.")
@@ -127,6 +133,59 @@ to the styles listed here.")
 (defparameter *pixels-per-inch-y* 72
   "Number of pixels per inch in the vertical direction on the main screen.")
 
+
+
+
+(defvar *current-view* nil
+  "
+The *CURRENT-VIEW* variable is bound to the view where drawing
+currently occurs. See FOCUS-VIEW and WITH-FOCUSED-VIEW.
+")
+
+
+(defvar *current-font-view* nil)
+
+
+(defvar *mouse-view* nil
+  "
+The *MOUSE-VIEW* variable is bound to the view that the mouse is
+over.  This variable is updated by the window-update-cursor generic
+function.
+The *mouse-view* view is the one whose view-cursor method decides
+which cursor to select.
+")
+
+(defvar *last-mouse-click-window* nil)
+
+
+(defvar *window-default-position*      #@(10 44)
+  "The default position of a newly opened window. The initial value is #@(6 44).")
+
+(defvar *window-default-size*          #@(502 188)
+  "The default size of a newly opened window. The initial value is #@(502 150).")
+
+(defvar *window-default-zoom-position* #@(6 44)
+  "The *WINDOW-DEFAULT-ZOOM-POSITION* variable stores the default
+zoom position of a window, that is, its new position after the user
+clicks the zoom box.
+This variable and *WINDOW-DEFAULT-ZOOM-SIZE* are initialized at
+startup to make a zoomed window fill the screen containing the menu
+bar with a 3-pixel border all around.")
+
+(defvar *window-default-zoom-size*     #@(502 150)
+  "The *WINDOW-DEFAULT-ZOOM-SIZE* variable stores the default zoom
+size of a window, that is, its new size after the user clicks the zoom
+box.
+This variable and *WINDOW-DEFAULT-ZOOM-POSITION* are initialized at
+startup to make a zoomed window fill the screen containing the menu
+bar with a 3-pixel border all around.")
+
+(defvar *selected-window* nil)
+
+(defvar *windoid-count*   0
+  "The number of visible floating windows currently in the MCL environment.")
+
+(defvar *default-font-spec* '(:monaco 9 :plain))
 
 
 ;;;; THE END ;;;;

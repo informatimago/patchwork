@@ -1,17 +1,17 @@
 ;;;; -*- mode:lisp;coding:utf-8 -*-
 ;;;;**************************************************************************
-;;;;FILE:               macro.lisp
+;;;;FILE:               region.lisp
 ;;;;LANGUAGE:           Common-Lisp
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    MCLGUI internal macros.
+;;;;    Regions.
 ;;;;    
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
-;;;;    2012-05-09 <PJB> Created.
+;;;;    2012-05-15 <PJB> Created.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -34,30 +34,23 @@
 
 (in-package "MCLGUI")
 
-(defmacro niy (item &rest vars)
-  `(locally
-     (declare (ignore ,@vars))
-     (warn "~S is not implemented yet" ',item)))
 
-(defmacro dovector ((var vector &optional result) &body body)
-  (let ((vvector (gensym "vector"))
-        (vindex  (gensym "index"))
-        (vlength (gensym "length")))
-    `(block nil
-       (let* ((,vvector ,vector)
-              (,vlength (length ,vvector))
-              (,vindex  -1))
-         (tagbody
-            (go :test)
-          :loop
-            (let ((,var (aref ,vvector ,vindex)))
-              ,@body)
-          :test
-            (incf ,vindex)
-            (if (< ,vindex ,vlength)
-                (go :loop))
-            (return ,result))))))
+(defvar *temp-rgn* nil)
 
+(defun new-rgn ()
+  (niy new-rgn)
+  nil)
+
+(defun set-rect-region (region left top right bottom)
+  (niy set-rect-region region left top right bottom))
+
+
+(defmacro with-temp-rgns ((&rest rgn-vars) &body body)
+  (niy with-temp-rgns rgn-vars)
+  `(progn
+     (niy with-temp-rgns rgn-vars)
+     ,@body))
 
 
 ;;;; THE END ;;;;
+

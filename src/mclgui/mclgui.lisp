@@ -58,11 +58,6 @@
 
 
 
-(defmethod view-font (view)
-  (niy view-font))
-
-(defmethod set-view-font (view font-spec)
-  (niy set-view-font))
 
 
 (defmethod view-font-codes (view)

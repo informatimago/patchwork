@@ -35,46 +35,6 @@
 
 (in-package "MCLGUI")
 
-(defclass colored ()
-  ((color-list :initform '()
-               :documentation "The property-list of key and colors for all the parts of the thing."
-               :reader part-color-list))
-  (:documentation "A mix-in for colored things."))
-
-
-
-(defgeneric part-color (thing key)
-  (:documentation "
-RETURN:         The color of the part KEY of the THING.
-")
-  (:method ((thing t) key)
-    (declare (ignore key))
-    nil)
-  (:method ((thing colored) key)
-    (getf (slot-value thing 'color-list) key nil)))
-
-
-(defgeneric set-part-color (thing key new-color)
-  (:documentation "
-DO:             Sets the color of the part KEY of the THING to NEW-COLOR,
-                or resets it if NEW-COLOR is NIL.
-")
-  (:method ((thing t) key new-color)
-    (declare (ignore key))
-    new-color)
-  (:method ((thing colored) key new-color)
-    (if new-color
-        (setf (getf (slot-value thing 'color-list) key) new-color)
-        (remf (slot-value thing 'color-list) key))
-    new-color))
-
-
-(defgeneric color-parts (thing)
-  (:documentation "
-RETURN:         A list of key parts that can be colored in the THING.
-")
-  (:method ((thing t))
-    '()))
 
 
 ;;;---------------------------------------------------------------------
@@ -626,7 +586,7 @@ RETURN:         NEW-MARK.
       (niy set-menu-item-check-mark))))
 
 
-(defgeneric set-menu-item-style (item newstyle &optional item-num)
+(defgeneric set-menu-item-style (item newstyle)
   (:documentation "
 DO:             Set the font style in which the menu item appears.
 
@@ -637,7 +597,7 @@ NEW-STYLES:     A keyword or list of keywords. Allowable keywords are
 ")
   (:method ((item menu-element) newstyle)
     (setf (slot-value item 'style) newstyle)
-    (niy set-menu-item-style)))
+    (niy set-menu-item-style item newstyle)))
 
 
 (defgeneric menu-item-update (item)

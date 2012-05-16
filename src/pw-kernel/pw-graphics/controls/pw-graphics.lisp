@@ -52,7 +52,7 @@
 
 
 (defun draw-char (x y cn)
-  (warn "~S ~S is not implemented yet" 'draw-char '(x y cn))
+  (niy draw-char '(x y cn))
   ;; (#_MoveTo :long (make-point x y))
   ;; (#_DrawChar cn)
   )
@@ -67,45 +67,45 @@
 ;;     (#_DrawString :ptr s)))
 
 (defun draw-string (x y str)
-  (warn "~S ~S is not implemented yet" 'draw-string '(x y str))
+  (niy draw-string x y str)
   ;; (#_MoveTo :long (make-point x y)) 
   ;; (dotimes (i (length str)) (#_DrawChar (elt str i)))
   )
 
 
 (defun draw-line (x1 y1 x2 y2)
-  (warn "~S ~S is not implemented yet" 'draw-line '(x1 y1 x2 y2))
+  (niy draw-line x1 y1 x2 y2)
   ;; (#_MoveTo :long (make-point x1 y1))
   ;; (#_LineTo :long (make-point x2 y2))
   )
 
 (defun draw-rect (x y w h)
-  (warn "~S ~S is not implemented yet" 'draw-rect '(x y w h))
+  (niy draw-rect x y w h)
   ;; (ui:rlet ((r :rect :left x :right (+ x w) :top y :bottom (+ y h)))
   ;;   (#_FrameRect :ptr r))
   )
 
 (defun fill-rect* (x y w h) 
-  (warn "~S ~S is not implemented yet" 'fill-rect* '(x y w h) )
+  (niy fill-rect* x y w h )
   ;; (ui:rlet ((r :rect :left x :right (+ x w) :top y :bottom (+ y h)))
   ;;   (#_PaintRect :ptr r))
   )
 
 (defun draw-point (x y)
-  (warn "~S ~S is not implemented yet" 'draw-point '(x y) )
+  (niy draw-point x y )
   ;; (let ((p (ui:make-point x y)))
   ;;     (#_MoveTo :long p)
   ;;     (#_LineTo :long p))
   )
 
 (defun draw-ellipse (x y w h)  
-  (warn "~S ~S is not implemented yet" 'draw-ellipse '(x y w h) )
+  (niy draw-ellipse x y w h )
   ;; (ui:rlet ((r :rect :left (- x w) :right (+ x w) :top (- y h) :bottom (+ y h)))
   ;;    (#_FrameOval :ptr r))
   )
 
 (defun fill-ellipse (x y w h)
-  (warn "~S ~S is not implemented yet" 'fill-ellipse '(x y w h) )
+  (niy fill-ellipse x y w h )
   ;; (ui:rlet ((r :rect :left (- x w) :right (+ x w) :top (- y h) :bottom (+ y h)))
   ;;    (#_PaintOval :ptr r))
   )
@@ -114,7 +114,7 @@
 ;; with-font-codes  
 
 (defun port-set-pen-state (&key location size mode pattern)
-  (warn "~S ~S is not implemented yet" 'port-set-pen-state '(&key location size mode pattern) )
+  (niy port-set-pen-state  location size mode pattern)
   ;; (rlet ((ps :PenState))
   ;;   (#_GetPenState ps)
   ;;   (when location
@@ -129,7 +129,7 @@
   )
 
 (defmacro with-pen-state ((&rest states) &body body)
-  (warn "~S ~S is not implemented yet" 'with-pen-state '((&rest states) &body body))
+  (niy with-pen-state states body)
   `(progn ,@body)
   ;; (let ((ps (gensym)))
   ;;   `(rlet ((,ps :PenState))
@@ -142,7 +142,7 @@
   )
 
 (defun make-pattern (&rest bytes)
-  (warn "~S ~S is not implemented yet" 'make-pattern '(&rest bytes))
+  (niy make-pattern bytes)
   ;; (let ((res (#_NewPtr 8))
   ;;       (i 0))
   ;;   (dolist (b bytes)
@@ -164,7 +164,7 @@
 ;;======================================
 
 (defun grow-gray-rect (anchor float port limit)
-  (warn "~S ~S is not implemented yet" 'grow-gray-rect '(anchor float port limit))
+  (niy grow-gray-rect anchor float port limit)
   ;; (setq float (add-points float anchor))
   ;; (let* ((old-mouse (view-mouse-position nil))
   ;;        (new-mouse old-mouse)
@@ -231,7 +231,7 @@
     self))
 
 (defmethod erase-draw-contents ((self simple-view))
-  (warn "~S ~S is not implemented yet" 'erase-draw-contents '((self simple-view)))
+  (niy erase-draw-contents self)
   ;; (let* ((pos (view-position self))
   ;;       (end (add-points pos (view-size self))))
   ;;   (rlet ((r :rect
@@ -255,7 +255,7 @@
   (view-draw-contents self))
 
 (defmethod view-draw-out-line ((self simple-view))
-  (warn "~S ~S is not implemented yet" 'view-draw-out-line '((self simple-view)))
+  (niy view-draw-out-line self)
   ;; (let ((topleft (view-position  self)))
   ;;   (rlet ((rect :rect :topleft topleft
   ;;                :bottomright (add-points topleft (view-size self))))
@@ -263,7 +263,7 @@
   )
 
 (defun inside-rectangle? (x1 y1 x y w h)
-  (warn "~S ~S is not implemented yet" 'inside-rectangle? '(x1 y1 x y w h))
+  (niy inside-rectangle? x1 y1 x y w h)
   ;; (let ((topleft (make-point x y)))
   ;;   (rlet ((rect :rect :topleft (make-point x y)
   ;;                :bottomright (add-points topleft (make-point w h))))
