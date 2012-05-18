@@ -47,8 +47,6 @@
 
 
 
-
-
 (defun message-dialog (message &key ok-text (size #@(330 110)) position)
   "
 The MESSAGE-DIALOG function displays a dialog box containing the

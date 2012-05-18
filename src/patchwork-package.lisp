@@ -33,6 +33,7 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 
+#-(and)
 (cl:defpackage "PW-MACOSX"
   (:nicknames "UI")
   (:use "COMMON-LISP")
@@ -40,7 +41,6 @@
 
    "COPY-FILE"
 
-   "*WARN-IF-REDEFINE*"
    "*LISP-CLEANUP-FUNCTIONS*"
    "CATCH-CANCEL" "RLET"
    "WITHOUT-INTERRUPTS" "*EVENTHOOK*" "EVENT-DISPATCH"
@@ -203,13 +203,7 @@
            
            "SCALE%" "RANDOM2" "MAPCAR-FUN" "CIRLIST" "CUMUL-SUM"
            "INTERPOL" "BREAK-POINT-FUN" "NTH-REMOVE"  "FIRSTN"
-
-           "*COMPILE-DEFINITIONS*"
            ))
-
-(in-package :pw)
-(defvar *COMPILE-DEFINITIONS* '())
-(in-package :cl-user)
 
 
 

@@ -51,6 +51,7 @@
         ;; we just return the preserved symbol, read in the FFI package..
         (values (read stream)))))
 
+#-(and)
 (defun sharp-at-dispatch-reader-macro (stream subchar arg)
   "#@(x y) reads a Point."
   (declare (ignore subchar arg))
@@ -59,6 +60,7 @@
         (values)
         (values (apply (function ui:make-point) coord)))))
 
+#-(and)
 (defun sharp-dot-dispatch-reader-macro (stream subchar arg)
   "#. we read the expression in the host CL."
   (declare (ignore subchar arg))
@@ -88,8 +90,9 @@ common-lisp:package and common-lisp:symbol.
   (let ((rt (copy-readtable nil)))
     (set-dispatch-macro-character #\# #\_ (function sharp-underline-dispatch-reader-macro) rt)
     (set-dispatch-macro-character #\# #\$ (function sharp-underline-dispatch-reader-macro) rt)
-    (set-dispatch-macro-character #\# #\@ (function sharp-at-dispatch-reader-macro)        rt)
-    (set-dispatch-macro-character #\# #\. (function sharp-dot-dispatch-reader-macro)       rt)
+    ;; (set-dispatch-macro-character #\# #\. (function sharp-dot-dispatch-reader-macro)       rt)
+    ;; (set-dispatch-macro-character #\# #\@ (function sharp-at-dispatch-reader-macro)        rt)
+    (let ((*readtable* rt)) (ui:enable-sharp-at-reader-macro))
     (set-dispatch-macro-character #\# #\i (function sharp-i-dispatch-reader-macro)         rt)
     (setf *readtable-preserve* (copy-readtable rt))
     (setf (readtable-case *readtable-preserve*) :preserve)
@@ -119,6 +122,7 @@ common-lisp:package and common-lisp:symbol.
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (setf *readtable* (copy-readtable nil))
      (values)))
+
 
 (eval-when (:load-toplevel :execute)
   (setup))

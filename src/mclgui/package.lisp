@@ -35,7 +35,7 @@
 
 (defpackage "MCLGUI"
   (:use "COMMON-LISP")
-  (:nickname "UI")
+  (:nicknames "UI")
   (:export
 
    ;; Extensions:
@@ -221,16 +221,36 @@
    "PRESS-BUTTON"
    "DIALOG-ITEM-ENABLED-P"
 
+   "MESSAGE-DIALOG"
    
    ;; ----------------------------------------
    ;; Chapter 6: Color
    ;; ----------------------------------------
 
-   "PART-COLOR" "SET-PART-COLOR"
+   "*COLOR-AVAILABLE*"
 
+   "MAKE-COLOR" "COLOR-RED" "COLOR-GREEN" "COLOR-BLUE" "COLOR-VALUES"
+   "REAL-COLOR-EQUAL" "USER-PICK-COLOR"
+
+   "SET-FORE-COLOR" "SET-BACK-COLOR" "GET-FORE-COLOR" "GET-BACK-COLOR"
+   "WITH-FORE-COLOR" "WITH-BACK-COLOR"
+
+   "PART-COLOR-LIST" "PART-COLOR" "SET-PART-COLOR"
+
+   ;; Not implemented:
+   ;; color-to-rgb rgb-to-color with-rgb *black-rgb* *white-rgb*
+   
    ;;  Extensions:
    "COLOR-PARTS"
 
+
+   ;; ----------------------------------------
+   ;; Chapter 8: File System Interface
+   ;; ----------------------------------------
+
+   "CHOOSE-FILE-DIALOG" "CHOOSE-NEW-FILE-DIALOG"
+   "CHOOSE-DIRECTORY-DIALOG" "CHOOSE-FILE-DEFAULT-DIRECTORY"
+   "SET-CHOOSE-FILE-DEFAULT-DIRECTORY"
    
    ;; ----------------------------------------
    ;; Chapter 10: Events
@@ -306,7 +326,7 @@
 
    ;; miscellaneous:
    "DEF-LOAD-POINTERS" ; this one won't be implemented, change the sources!
-   "WPTR"              ; this one won't be implemented, change the sources!
+   "WPTR"         ; this one won't be implemented, change the sources!
    )
   (:documentation "
 

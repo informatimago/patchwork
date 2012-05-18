@@ -78,6 +78,11 @@
                  
                  ;; Chapter 6: Color
                  (:file "color"            :depends-on ("package"))
+
+                 ;; Chapter 8: File System Interface
+                 (:file "file"             :depends-on ("package"))
+                 ;; We only implement the file chooser dialogs.
+                 ;; The rest is covered by CL.
                  
                  ;; Chapter 10: Events
 

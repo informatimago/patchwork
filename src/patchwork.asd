@@ -47,16 +47,13 @@
                  ((#:albert #:docbook #:template)  . "book")
                  ((#:albert #:docbook #:bgcolor)   . "white")
                  ((#:albert #:docbook #:textcolor) . "black"))
-    :depends-on ("alexandria")
+    :depends-on ("alexandria"
+                 "mclgui")
     :components ((:file "patchwork-package" 
                         :depends-on ("pw-kernel/environment/lelisp-macros"))
 
-                 (:file "pw-macosx/ui" 
-                        :depends-on ("patchwork-package"))
-                 
                  (:file "pw-macosx/reader-macros" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/ui"
                                      "pw-kernel/environment/clpf-utils"))
                  
                  
@@ -175,8 +172,7 @@
                  (:file "pw-kernel/drivers+resources/midi" 
                         :depends-on ("patchwork-package"
                                      "pw-lib/midishare/midishare"
-                                     "pw-lib/midishare/playerppc"
-                                     "pw-macosx/ui"))
+                                     "pw-lib/midishare/playerppc"))
                  
                  
                  (:file "pw-kernel/drivers+resources/scheduler" 
@@ -257,7 +253,6 @@
 
                  (:file "pw-kernel/boxes/data/file-buffer" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/ui" 
                                      "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
@@ -269,7 +264,6 @@
                  
                  (:file "pw-kernel/boxes/data/list-editor" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/ui"
                                      "pw-kernel/pw-graphics/window+menu/application-window"
                                      "pw-kernel/boxes/data/table-displayer"
                                      "pw-kernel/types/pw-type-scheme"))
@@ -280,7 +274,6 @@
                  (:file "pw-kernel/boxes/data/text-box" 
                         :depends-on ("patchwork-package"
                                      "pw-macosx/reader-macros"
-                                     "pw-macosx/ui"
                                      "pw-kernel/types/pw-types"
                                      "pw-kernel/types/pw-type-scheme"))
                  
@@ -627,7 +620,6 @@
                  
                  (:file "pw-music/editors/rhythm/beat-measure-measure-line" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/ui"
                                      "pw-music/editors/mn/mn-chord-ed"
                                      "pw-music/editors/mn/mn-collector-panel"
                                      "pw-music/editors/mn/mn-editor"

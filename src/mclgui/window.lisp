@@ -794,16 +794,50 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 
 
+(defmethod set-fore-color ((window window) color)
+  (when *color-available*
+    (niy get-fore-color window color)
+    ;; (with-rgb (rec color)
+    ;;   (with-port (wptr w)
+    ;;     (#_rgbforecolor rec)))
+    ))
 
 
-(defgeneric window-event-handler (window)
-  (:documentation "
-RETURN:   NIL, or the object that handles the window events.
-")
-  (:method ((window t))
-    nil)
-  (:method ((window window))
-    window))
+(defmethod set-back-color ((window window) color &optional (redisplay-p t))
+  (when *color-available*
+    (niy get-fore-color window color redisplay-p)
+    ;; (with-rgb (rec color)
+    ;;   (with-focused-view w
+    ;;     (#_rgbbackcolor rec)
+    ;;     (when redisplay-p
+    ;;       (invalidate-view w t))))
+    ))
+
+
+(defmethod get-fore-color ((window window))
+    (niy get-fore-color window)
+    ;; #-carbon-compat
+    ;; (with-port (wptr w)
+    ;;   (grafport-fore-color))
+    ;; #+carbon-compat
+    ;; (with-macptrs ((port (#_getwindowport (wptr w))))
+    ;;   (rlet ((color-rec :rgbcolor))
+    ;;     (#_getportforecolor port color-rec)
+    ;;     (rgb-to-color color-rec)))
+    )
+
+
+(defmethod get-back-color ((window window))
+    (niy get-back-color window)
+    ;; #-carbon-compat
+    ;; (with-port (wptr w)
+    ;;   (grafport-back-color))
+    ;; #+carbon-compat
+    ;; (with-macptrs ((port (#_getwindowport (wptr w))))
+    ;;   (rlet ((color-rec :rgbcolor))
+    ;;     (#_getportbackcolor port color-rec)
+    ;;     (rgb-to-color color-rec)))
+    )
 
 
 

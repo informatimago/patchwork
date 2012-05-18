@@ -114,6 +114,42 @@ by a bit (this encoding allows multiple styles).  You can derive a byte
 to pass to the Macintosh computer by adding the numbers corresponding
 to the styles listed here.")
 
+;; Colors:
+
+(defvar *color-available* t
+  "
+The *COLOR-AVAILABLE* variable returns a value indicating whether the
+Macintosh computer on which Macintosh Common Lisp is running supports
+Color QuickDraw.
+
+If the value of this variable is non-nil, then the Macintosh computer
+supports the Color QuickDraw command set. If 32-bit QuickDraw is
+available, its value is 32.
+
+If the value of this variable is NIL, then Color QuickDraw is not
+available.
+
+This variable should never be changed by a program.
+")
+
+
+(defvar *black-color*        nil) 
+(defvar *white-color*        nil) 
+(defvar *pink-color*         nil) 
+(defvar *red-color*          nil) 
+(defvar *orange-color*       nil) 
+(defvar *yellow-color*       nil) 
+(defvar *green-color*        nil) 
+(defvar *dark-green-color*   nil) 
+(defvar *light-blue-color*   nil) 
+(defvar *blue-color*         nil) 
+(defvar *purple-color*       nil) 
+(defvar *brown-color*        nil) 
+(defvar *tan-color*          nil) 
+(defvar *gray-color*         nil) 
+(defvar *light-gray-color*   nil) 
+(defvar *lighter-gray-color* nil) 
+(defvar *dark-gray-color*    nil)
 
 
 ;; Patterns:

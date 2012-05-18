@@ -53,8 +53,8 @@
       (list object)))
 
 
-(defun initialize-patterns ()
-  (niy initialize-patterns))
+(defun initialize-pattern ()
+  (niy initialize-pattern))
 
 (defun initialize-screen ()
   (niy initialize-screen))
@@ -63,6 +63,7 @@
 
 (defun initialize ()
   "Initialize the MCL GUI."
+  (initialize-color)
   (initialize-pattern)
   (initialize-cursor)
   (initialize-scrap)
@@ -77,5 +78,8 @@
   (values))
 
 
+(eval-when (:load-toplevel :execute)
+  ;; It should be better done at application launch…
+  (initialize))
 
 ;;;; THE END ;;;;

@@ -144,7 +144,7 @@ It cannot be changed, except in the source code.")
   `(task-logtime *current-task*))
 
 (in-package "SCHEDULER")
-(let ((ui:*warn-if-redefine* nil))
+(let (#+ccl(ccl:*warn-if-redefine* nil))
   (defun midi:midi-write (event)
     "New version"
     (midi-write-time event

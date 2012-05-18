@@ -244,7 +244,7 @@
 
 (defun PW-LOAD-PATCH ()
   (let ((name (CHOOSE-FILE-DIALOG :button-string "Open Patch"))
-        (*compile-definitions* ()))
+        #+ccl (ccl:*compile-definitions* nil))
     (unless *active-patch-window*
       (let ((win (make-instance 'c-pw-window)))
         (push win *pw-window-list*) 
@@ -401,7 +401,7 @@
       (tell patches 'deactivate-control)
       (record--ae :|core| :|clon| `((,:|----| ,:|csel| )))
       (setf *si-record* nil)
-      (let* ((*compile-definitions* ()) 
+      (let* (#+ccl (ccl:*compile-definitions* nil) 
              (new-patches (eval (patch-scrap self))))
         (tell new-patches 'dmove-patch 20 20)
         (apply #'add-subviews self  new-patches)

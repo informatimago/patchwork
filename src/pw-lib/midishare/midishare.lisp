@@ -99,7 +99,7 @@
 
 #||
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (let ((*warn-if-redefine* nil))
+  (let (#+ccl(ccl:*warn-if-redefine* nil))
     (require :ff)))
 
 (defmacro defrecord (&rest args) (declare (ignore args)) (warn "ff defrecord stub"))

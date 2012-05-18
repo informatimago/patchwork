@@ -109,5 +109,16 @@
             (view-key-event-handler *top-listener* key)))))
 
 
+(defgeneric window-event-handler (window)
+  (:documentation "
+RETURN:   NIL, or the object that handles the window events.
+")
+  (:method ((window t))
+    nil)
+  (:method ((window window))
+    window))
+
+
+
 
 ;;;; THE END ;;;;

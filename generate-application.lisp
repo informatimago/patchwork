@@ -46,7 +46,9 @@
 #+ccl       (ccl::cd #P"/home/pjb/works/patchwork/patchwork/")
 #+lispworks (ccl::cd #P"/home/pjb/works/patchwork/patchwork/")
 
-(pushnew #P"/home/pjb/works/patchwork//patchwork/src/"
+(pushnew #P"/home/pjb/works/patchwork/patchwork/src/"
+         asdf:*central-registry* :test (function equalp))
+(pushnew #P"/home/pjb/works/patchwork/patchwork/src/mclgui/"
          asdf:*central-registry* :test (function equalp))
 (ql:quickload :patchwork)
 
