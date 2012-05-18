@@ -166,10 +166,6 @@
   (defun get-lisp-function-arg-list (function)
     (make-lisp-function-arg-list function)))
 
-;; (defun foo (x) 3)
-;; (Patch-work::get-arglist 'foo)
-
-;; (&optional &rest &aux &key ui::&key* &allow-other-keys &body &environment &whole)
 
 (defvar *lisp-keywords-for-extension* '(&optional &rest &key &allow-other-keys))
 
@@ -210,7 +206,7 @@
                    (setq res (list* (string-downcase (string (pop arg-list)))
                                     '*symbol-test-type* res))
                    (decf nb-arg))
-                  ((&aux ui::&key* &body &environment &whole) (pop arg-list))
+                  ((&aux &body &environment &whole) (pop arg-list))
                   (&key
                    (setq res (list* (string-downcase (string (pop arg-list)))
                                     '*symbol-test-type* "key" '*symbol-test-type* res))

@@ -1016,102 +1016,6 @@ WHERE:          For a view, the cursor position of the view in the
     (view-contains-point-p view where)))
 
 
-(defgeneric view-activate-event-handler (v)
-  (:documentation "
-The generic function view-activate-event-handler is called by the
-event system when the window containing the view is made active.
-The definition for simple-view does nothing. The definition for view calls
-view-activate-event-handler on each subview. Specialize this generic
-function if your view needs to indicate visually that it is active.
-
-VIEW:           A simple view or view.
-")
-  (:method ((v simple-view))
-    (values))
-
-  (:method :before ((w window))
-           ;; This is a :before method to make it unlikely to be user-shadowed.
-           (view-remprop w :display-in-menu-when-hidden))
-  (:method ((w window))
-    (unless (or (not *foreground*) (window-active-p w))
-      (setf (window-active-p w) t)
-      (unless (typep w 'windoid)
-        (let ((attrs (view-get w 'bubble-attrs)))
-          (when attrs
-            (set-bubble-attributes w attrs))))
-      (call-next-method)
-      (let ((key (current-key-handler w)))
-        (when key
-          (dolist (v (key-handler-list w))
-            (unless (or (eq v key) (view-contains-p v key))
-              (view-deactivate-event-handler v))))))))
-
-
-(defgeneric view-deactivate-event-handler (view)
-  (:documentation "
-The generic function view-deactivate-event-handler is called by
-the event system to deactivate a view. It is called when the window
-containing the view is active and a different window is made active.
-The definition for simple-view does nothing. The definition for view calls
-view-deactivate-event-handler on each subview. Specialize this
-generic function if your view needs to indicate visually that it has been
-deactivated.
-
-VIEW:           A simple view or view.
-")
-  (:method ((view simple-view))
-    (values))
-
-  (:method ((w window))
-    (when (window-active-p w)
-      (setf (window-active-p w) nil)
-      (unless (or (typep w 'windoid) *disable-bubbles-on-inactive-windows*)
-        (let ((attrs (get-bubble-attributes w)))
-          (view-put w 'bubble-attrs attrs)
-          ;; if is collapsed, leave bubble so will uncollapse
-          (niy view-deactivate-event-handler view)
-          ;; (if (not (#_iswindowcollapsed wptr))
-          ;;     (clear-bubble-attributes w))
-          ))
-      ;; deactivate subviews
-      (call-next-method))))
-
-
-(defgeneric view-click-event-handler (view where)
-  (:documentation "
-The generic function VIEW-CLICK-EVENT-HANDLER is called by the
-event system when a mouse click occurs. The SIMPLE-VIEW method does
-nothing. The view method calls VIEW-CONVERT-COORDINATES-AND-CLICK
-on the first subview for which POINT-IN-CLICK-REGION-P
-returns T.
-
-The function VIEW-CLICK-EVENT-HANDLER scans subviews in the opposite
-order as does view-draw-contents. The first view added is the first one
-drawn but the last one to be queried during clicking.
-If you define any VIEW-CLICK-EVENT-HANDLER methods for window, they
-must call CALL-NEXT-METHOD.
-
-VIEW:           A simple view or view.
-
-WHERE:          For a view, the mouse click position (the position when
-                the mouse is clicked) of the view in the local coordinate
-                system. For a simple view, the mouse click position of the
-                simple view in the local coordinate system of the view’s
-                container.
-")
-  (:method ((view simple-view) where)
-    (declare (ignore where))
-    view)
-  (:method ((view view) where)
-    (loop
-      :for subview :across (view-subviews view)
-      :when (point-in-click-region-p subview where)
-      :do (progn
-            (view-convert-coordinates-and-click subview where view)
-            (return t))
-      :finally (return (call-next-method)))))
-
-
 
 (defgeneric view-convert-coordinates-and-click (view where container)
   (:documentation "
@@ -1138,7 +1042,7 @@ CONTAINER:      The container of the view.
 
 (defgeneric view-draw-contents (view)
   (:documentation "
-The generic function view-draw-contents is called by the event
+The generic function VIEW-DRAW-CONTENTS is called by the event
 system whenever a view needs to redraw any portion of its contents.
 The default simple-view method does nothing. It should be shadowed by
 views that need to redraw their contents. The default view method calls
@@ -1323,6 +1227,10 @@ RETURN:         The cursor shape to display when the mouse is at
       (if container
           (view-cursor container (convert-coordinates point view container))
           *arrow-cursor*))))
+
+
+(defun initialize-view ()
+  (niy initialize-view))
 
 
 ;;;; THE END ;;;;

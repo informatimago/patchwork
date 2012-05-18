@@ -693,7 +693,7 @@ DESCRIPTION:    The WINDOW-NEEDS-SAVING-P generic function determines
                             (generic-function-methods gf)))
          (class        (class-of view))
          (window-class (find-class 'window))
-         (cpl          (class-precedence-list class)))
+         (cpl          (closer-mop:class-precedence-list class)))
     (and methods
          (dolist (method methods nil)
            (when (and (null (method-qualifiers method))
@@ -804,6 +804,11 @@ RETURN:   NIL, or the object that handles the window events.
     nil)
   (:method ((window window))
     window))
+
+
+
+(defun initialize-window ()
+  (niy initialize-window))
 
 
 ;;;; THE END ;;;;

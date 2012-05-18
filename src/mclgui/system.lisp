@@ -1,17 +1,17 @@
 ;;;; -*- mode:lisp;coding:utf-8 -*-
 ;;;;**************************************************************************
-;;;;FILE:               mclgui.lisp
+;;;;FILE:               system.lisp
 ;;;;LANGUAGE:           Common-Lisp
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    Defines general MCLGUI functions.
+;;;;    System functions
 ;;;;    
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
-;;;;    2012-05-09 <PJB> Created.
+;;;;    2012-05-16 <PJB> Created.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -35,46 +35,9 @@
 (in-package "MCLGUI")
 
 
-(defmacro def-load-pointers (name lambda-list &body body)
-  ;; NOTE: we won't implement this, the sources will have to change.
-  (niy def-load-pointer name lambda-list body)
-  `(niy def-load-pointer ',name ',lambda-list ',body))
-
-(defun wptr (x)
-  ;; NOTE: we won't implement this, the sources will have to change.
-  (niy wptr x)
-  x)
-
-
-
-(defun ensure-list (object)
-  (if (listp object)
-      object
-      (list object)))
-
-
-(defun initialize-patterns ()
-  (niy initialize-patterns))
-
-(defun initialize-screen ()
-  (niy initialize-screen))
-
-
-
-(defun initialize ()
-  "Initialize the MCL GUI."
-  (initialize-pattern)
-  (initialize-cursor)
-  (initialize-scrap)
-  (initialize-font)
-  (initialize-screen)
-  (initialize-menu)
-  (initialize-view)
-  (initialize-window)
-  (initialize-event)
-  (initialize-eval)
-  (initialize-application)
-  (values))
+(defun ed-beep (&optional (duration 3) &rest args)
+  (declare (ignore args))
+  (sys-beep duration))
 
 
 
