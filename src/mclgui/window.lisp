@@ -768,26 +768,33 @@ RETURN:         A BOOLEAN value indicating whether view can perform
   (window-do-operation window 'hardcopy nil))
 
 
-(defmethod undo ((view window))
-  (window-do-operation view 'undo nil))
+(defgeneric undo (window)
+  (:method ((window window))
+    (window-do-operation window 'undo nil)))
 
-(defmethod undo-more ((view window))
-  (window-do-operation view 'undo-more nil))
+(defgeneric undo-more (window)
+  (:method ((window window))
+    (window-do-operation window 'undo-more nil)))
 
-(defmethod cut ((view window))
-  (window-do-operation view 'cut nil))
+(defgeneric cut (window)
+  (:method ((window window))
+    (window-do-operation window 'cut nil)))
 
-(defmethod copy ((view window))
-  (window-do-operation view 'copy nil))
+(defgeneric copy (window)
+  (:method ((window window))
+    (window-do-operation window 'copy nil)))
 
-(defmethod paste ((view window))
-  (window-do-operation view 'paste nil))
+(defgeneric paste (window)
+  (:method ((window window))
+    (window-do-operation window 'paste nil)))
 
-(defmethod clear ((view window))
-  (window-do-operation view 'clear nil))
+(defgeneric clear (window)
+  (:method ((window window))
+    (window-do-operation window 'clear nil)))
 
-(defmethod select-all ((view window))
-  (window-do-operation view 'select-all nil))
+(defgeneric select-all (window)
+  (:method ((window window))
+    (window-do-operation window 'select-all nil)))
 
 
 
@@ -841,8 +848,8 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 
 
-(defun initialize-window ()
-  (niy initialize-window))
+(defun initialize/window ()
+  (niy initialize/window))
 
 
 ;;;; THE END ;;;;

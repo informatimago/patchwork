@@ -136,8 +136,8 @@ SCRAP-HANDLER does nothing.
 
 
 
-(defun initialize-scrap ()
-  (niy initialize-scrap))
+(defun initialize/scrap ()
+  (niy initialize/scrap))
 
 
  ;;;; THE END ;;;;

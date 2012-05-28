@@ -659,8 +659,8 @@ HANDLERREFCON:  The handler reference constant, which is any Lisp object.
 
 
 
-(defun initialize-application ()
-  (niy initialize-application)
+(defun initialize/application ()
+  (niy initialize/application)
   (setf *application* (make-instance 'application))
   (install-appleevent-handler :|aevt| :|ansr| #'queued-reply-handler)
   (install-appleevent-handler :|aevt| :|oapp| #'open-application-handler)

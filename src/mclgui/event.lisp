@@ -112,123 +112,6 @@ KEY:            The current keystroke character.
 
 
 
-(defgeneric allow-tabs-p    (key-handler))
-(defgeneric allow-returns-p (key-handler))
-
-
-(defclass key-handler-mixin ()
-  ((allow-returns :initarg :allow-returns :initform nil :accessor allow-returns-p)
-   (allow-tabs    :initarg :allow-tabs    :initform nil :accessor allow-tabs-p))
-  (:documentation "
-The class key-handler-mixin should be mixed into any class that
-handles key events. The class fred-dialog-item includes keyhandler-
-mixin.
-"))
-
-
-
-
-(defgeneric key-handler-list (view)
-  (:documentation "
-RETURN:         The list of key handlers associated with view.
-VIEW:           A simple view or dialog item.
-"))
-
-
-(defgeneric current-key-handler (window)
-  (:documentation "
-RETURN:        The current key handler of window.
-"))
-
-
-(defgeneric set-current-key-handler (window item &optional select-all)
-  (:documentation "
-DO:            Set the current key handler of window to item.  If item
-               is not already the current key handler and SELECT-ALL
-               is true, SET-CURRENT-KEY-HANDLER selects all of the
-               WINDOW.
-
-WINDOW:        A window.
-
-ITEM:          A key handler.  If item is not a key handler, the
-               function signals an error.
-
-SELECT-ALL:    This parameter determines whether the entire text of
-               the key handler is highlighted when it is first
-               selected.  The default is T; that is, all the text is
-               highlighted and can be manipulated at once.
-"))
-
-
-(defgeneric add-key-handler (view &optional window)
-  (:documentation "
-The generic function add-key-handler adds a key handler to view. It is
-called by install-view-in-window when the view installed is a
-subclass of key-handler-mixin. If window has no current key handler,
-view becomes the current key handler.
-
-VIEW:           A simple view or dialog item.
-
-WINDOW:         A window to which to add the key handler. The default
-                value is (VIEW-WINDOW VIEW).
-"))
-
-
-(defgeneric remove-key-handler (view &optional window)
-  (:documentation "
-The generic function remove-key-handler removes a key handler from
-a window. It is called by the method of remove-view-from-window for
-key-handler-mixin.
-
-VIEW:           A simple view or dialog item.
-
-WINDOW:         A window to which to add the key handler. The default
-                value is (VIEW-WINDOW VIEW).
-"))
-
-
-
-(defgeneric change-key-handler (view)
-  (:documentation "
-The generic function change-key-handler changes the key handler of
-view to the next key handler on key-handler-list of view.
-
-VIEW:           A simple view or dialog item.
-"))
-
-
-
-(defgeneric key-handler-p (object)
-  (:documentation "
-The KEY-HANDLER-P generic function checks to see whether item is a key
-handler.  When KEY-HANDLER-P is called on an instance of a class one
-of whose superclasses is KEY-HANDLER-MIXIN, the function returns T
-unless the key handler is disabled.  The method for dialog-item
-returns NIL.
-")
-  (:method ((object t))                 nil)
-  (:method ((object key-handler-mixin)) t))
-
-
-(defgeneric key-handler-idle (view &optional dialog)
-  (:documentation "
-The KEY-HANDLER-IDLE generic function is called periodically via the
-default WINDOW-NULL-EVENT-HANDLER function to allow a key handler to
-blink a cursor or perform other periodic activities.  The method for
-FRED-DIALOG-ITEM blinks the insertion point and matches
-parentheses.  The method for SIMPLE-VIEW does nothing.
-
-VIEW:           A simple view.
-
-DIALOG:         An argument allowing a dialog to be specified. In
-                system-supplied methods, this argument is ignored.
-
-")
-  (:method ((view simple-view) &optional dialog)
-    (declare (ignore dialog))
-    view))
-
-
 (defgeneric window-null-event-handler (window)
   (:documentation "
 The generic function WINDOW-NULL-EVENT-HANDLER is called on the top
@@ -773,8 +656,8 @@ VIEW:           A simple view.
 
 
 
-(defun initialize-event ()
-  (niy initialize-event))
+(defun initialize/event ()
+  (niy initialize/event))
 
 
 ;;;; THE END ;;;;

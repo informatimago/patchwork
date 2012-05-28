@@ -457,8 +457,8 @@ DO:             Change the view font codes of view.  The font/face
 "))
 
 
-(defun initialize-font ()
-  (niy initialize-font))
+(defun initialize/font ()
+  (niy initialize/font))
 
 
 ;;;; THE END ;;;;

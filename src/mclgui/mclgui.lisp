@@ -53,28 +53,29 @@
       (list object)))
 
 
-(defun initialize-pattern ()
-  (niy initialize-pattern))
+(defun initialize/pattern ()
+  (niy initialize/pattern))
 
-(defun initialize-screen ()
-  (niy initialize-screen))
+(defun initialize/screen ()
+  (niy initialize/screen))
 
 
 
 (defun initialize ()
   "Initialize the MCL GUI."
-  (initialize-color)
-  (initialize-pattern)
-  (initialize-cursor)
-  (initialize-scrap)
-  (initialize-font)
-  (initialize-screen)
-  (initialize-menu)
-  (initialize-view)
-  (initialize-window)
-  (initialize-event)
-  (initialize-eval)
-  (initialize-application)
+  (initialize/color)
+  (initialize/pattern)
+  (initialize/cursor)
+  (initialize/scrap)
+  (initialize/font)
+  (initialize/screen)
+  (initialize/menu)
+  (initialize/view)
+  (initialize/window)
+  (initialize/table-dialog-item)
+  (initialize/event)
+  (initialize/eval)
+  (initialize/application)
   (values))
 
 

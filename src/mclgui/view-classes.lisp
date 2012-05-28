@@ -37,7 +37,7 @@
 
 ;;;---------------------------------------------------------------------
 
-(defclass simple-view (colored output-stream)
+(defclass simple-view (colored stream) ; output-stream TODO: We may want a gray-stream here.
   ((help-spec            :initform nil         :initarg  :help-spec            :accessor help-spec)
    (view-container       :initform nil                                         :reader view-container
                          :documentation "The view that contains this view.")
@@ -272,6 +272,10 @@ DO:             Remove the property KEY from the VIEW.
              (format stream "~?"
                      (simple-condition-format-control err)
                      (simple-condition-format-arguments err)))))
+
+
+(define-condition view-size-error (view-error)
+  ((size :initarg :size :reader view-error-size)))
 
 
 ;;;; THE END ;;;;

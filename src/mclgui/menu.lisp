@@ -793,7 +793,7 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 
 
-(defun initialize-menu ()
+(defun initialize/menu ()
   (setf *apple-menu* (make-instance 'apple-menu :title "Apple")
         ;; We should get the menus from the actual Openstep menus:
         *file-menu*  (make-instance 'menu :title "File")

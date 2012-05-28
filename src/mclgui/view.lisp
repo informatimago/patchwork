@@ -177,6 +177,7 @@ VIEW:           A view installed in a window, or NIL.  If NIL, the
 
 
 
+
 (defgeneric install-view-in-window (view window)
   (:documentation "
 DO:             Installs VIEW in the WINDOW window.
@@ -1229,8 +1230,31 @@ RETURN:         The cursor shape to display when the mouse is at
           *arrow-cursor*))))
 
 
-(defun initialize-view ()
-  (niy initialize-view))
+
+;;;---------------------------------------------------------------------
+;;; Internal functions.
+
+(defun view-is-invalid-p (view visrgn cliprgn)
+  (or (null visrgn)
+      (null cliprgn)
+      (multiple-value-bind (tl br) (view-corners view)
+        (without-interrupts
+            (niy view-is-invalid-p view visrgn cliprgn)
+            ;; (let ((rgn *temp-rgn*)) ; so *temp-rgn* belongs to us
+            ;;   (#_SetRectRgn rgn (point-h tl)(point-v tl) (point-h br)(point-v br))
+            ;;   (#_SectRgn rgn visrgn rgn)
+            ;;   (#_SectRgn rgn cliprgn rgn)                   
+            ;;   (not (#_EmptyRgn rgn)))
+          ))))
+
+
+(defgeneric frame-key-handler (view)
+  (:method ((view simple-view))
+    view))
+
+
+(defun initialize/view ()
+  (niy initialize/view))
 
 
 ;;;; THE END ;;;;

@@ -39,6 +39,11 @@
   (declare (ignore args))
   (sys-beep duration))
 
+(defun get-sys-font ()
+  0)
+
+(defun get-sys-just ()
+  0)
 
 
 ;;;; THE END ;;;;

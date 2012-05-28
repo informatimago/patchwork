@@ -89,7 +89,7 @@ CURSOR:         A cursor structure.
          (update-cursor)))))
 
 
-(defun initialize-cursor ()
-  (niy initialize-cursor))
+(defun initialize/cursor ()
+  (niy initialize/cursor))
 
 ;;;; THE END ;;;;

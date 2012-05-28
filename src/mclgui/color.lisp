@@ -306,7 +306,7 @@ RETURN:         A list of key parts that can be colored in the THING.
 
 
 
-(defun initialize-color ()
+(defun initialize/color ()
   (setf *black-color*        (make-color 0 0 0)
         *white-color*        (make-color 65280 65280 65280) 
         *pink-color*         (make-color 61952 2048 33792) 

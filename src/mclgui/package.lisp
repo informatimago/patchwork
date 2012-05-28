@@ -33,6 +33,7 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 
+
 (defpackage "MCLGUI"
   (:use "COMMON-LISP")
   (:nicknames "UI")
@@ -43,7 +44,6 @@
    "INITIALIZE"
 
    "*TEXT-MODES*"
-
 
    
    ;; ----------------------------------------
@@ -369,5 +369,11 @@ LEGAL:
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 "))
+
+
+
+
+
+
 
 ;;;; THE END ;;;;

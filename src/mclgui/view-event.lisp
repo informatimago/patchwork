@@ -39,7 +39,7 @@
   (values))
 
 (defmethod view-deactivate-event-handler ((view simple-view))
-    (values))
+  (values))
 
 
 
@@ -71,7 +71,9 @@
 (defmethod current-key-handler ((w window))
   (%get-current-key-handler w))
 
-(defmethod current-key-handler ((w (eql nil)))  nil)
+(defmethod current-key-handler ((w null))
+  nil)
+
 
 (defmacro %get-key-handler-list (window)
   `(view-get ,window '%key-handler-list))
@@ -86,6 +88,25 @@
 (defmacro %get-cancel-button (window)
   `(view-get ,window '%cancel-button))
 
+
+
+(defmethod add-key-handler ((item simple-view) &optional (dialog (view-window item)))
+  (let ((items (%get-key-handler-list dialog)))
+    (unless (member item items)
+      (setf (%get-key-handler-list dialog) (nconc items (list item)))))
+  (when (key-handler-p item)
+    (unless (current-key-handler dialog)
+      (set-current-key-handler dialog item))))
+
+
+(defmethod remove-key-handler ((item simple-view) &optional (dialog (view-window item)))
+  (without-interrupts
+      (when dialog
+        (when (eq item (%get-current-key-handler dialog))
+          (change-key-handler dialog)
+          (when (eq item (%get-current-key-handler dialog)) ;still current, so only one
+            (set-current-key-handler dialog nil)))
+        (setf (%get-key-handler-list dialog) (delete item (%get-key-handler-list dialog))))))
 
 
 

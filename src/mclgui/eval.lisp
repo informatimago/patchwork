@@ -71,8 +71,8 @@ EVAL=ENQUEUE.
 
 
 
-(defun initialize-eval ()
-  (niy initialize-eval))
+(defun initialize/eval ()
+  (niy initialize/eval))
 
 ;;;; THE END ;;;;
 

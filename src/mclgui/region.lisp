@@ -46,10 +46,44 @@
 
 
 (defmacro with-temp-rgns ((&rest rgn-vars) &body body)
+  #-(and)
+  `(with-macptrs ,rgn-vars
+     (unwind-protect
+          (progn
+            ,@(mapcar #'(lambda (var) `(%setf-macptr ,var (require-trap #_NewRgn))) rgn-vars)
+            ,@body)
+       ,@(mapcar #'(lambda (var) `(unless (%null-ptr-p ,var) (require-trap #_DisposeRgn ,var)))
+                 rgn-vars)))
   (niy with-temp-rgns rgn-vars)
   `(progn
      (niy with-temp-rgns rgn-vars)
      ,@body))
+
+
+(defmacro with-hilite-mode (&body body)
+  (niy with-hilite-mode body)
+  `(niy with-hilite-mode body)
+  #-(and)
+  `(progn
+     (let ((byte (require-trap #_lmgethilitemode)))
+       (require-trap #_lmsethilitemode (%ilogand2 #x7f byte)))
+     ,@body))
+
+
+(defmacro with-clip-region (region &body body)
+  (niy with-clip-region region body)
+  `(niy with-clip-region region body)
+  #-(and)
+  (let ((rgn  (gensym))
+        (rgn2 (gensym)))    
+    `(with-temp-rgns (,rgn ,rgn2)
+       (require-trap #_GetClip ,rgn)
+       (require-trap #_sectrgn ,rgn ,region ,rgn2)
+       (unwind-protect
+            (progn
+              (require-trap #_SetClip ,rgn2)
+              ,@body)
+         (require-trap #_SetClip ,rgn)))))
 
 
 ;;;; THE END ;;;;
