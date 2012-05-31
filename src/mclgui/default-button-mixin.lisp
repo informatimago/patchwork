@@ -90,5 +90,24 @@
              (setf (%get-cancel-button dialog) nil))))))
 
 
+(defmacro %get-default-button (window)
+  `(view-get ,window '%default-button))
+
+
+(defgeneric default-button (window)
+  (:documentation "
+The DEFAULT-BUTTON generic function returns the current default
+button, or NIL if the window has no default button.  The default button
+is the button whose action is run when the user presses Return or
+Enter. It is outlined with a heavy black border.
+
+If carriage returns are allowed in the current editable-text item,
+they are sent to that item rather than to the default button.
+")
+  (:method ((window window))
+    (%get-default-button window)))
+
+
+
 
 ;;;; THE END ;;;;

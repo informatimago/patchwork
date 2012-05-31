@@ -41,27 +41,78 @@
   ((procid                 :allocation :class
                            :initform 0 ; #$scrollBarProc
                            )
-   (direction              :initarg    :direction     :reader   scroll-bar-direction)  
-   (min                    :initarg    :min           :reader   scroll-bar-min)
-   (max                    :initarg    :max           :reader   scroll-bar-max)
-   (setting                :initarg    :setting       :reader   scroll-bar-setting)
-   (track-thumb-p          :initarg    :track-thumb-p :initform t
-                           :accessor   scroll-bar-track-thumb-p)
-   (page-size              :initarg    :page-size     :initform 5
-                           :accessor   scroll-bar-page-size)
-   (scroll-size            :initarg    :scroll-size   :initform 1
-                           :accessor   scroll-bar-scroll-size)
-   (scrollee               :initarg    :scrollee      :initform nil
-                           :reader     scroll-bar-scrollee)
-   (pane-splitter          :initform   nil            :accessor pane-splitter)
-   (pane-splitter-position :initform   nil            :initarg  :pane-splitter 
+   (direction              :initarg    :direction
+                           :reader     scroll-bar-direction)  
+   (min                    :initarg    :min
+                           :reader     scroll-bar-min
+                           :documentation "The minimum setting of item.")
+   (max                    :initarg    :max
+                           :reader     scroll-bar-max
+                           :documentation "The maximum setting of item.")
+   (setting                :initarg    :setting
+                           :reader     scroll-bar-setting
+                           :documentation "The current setting of item.")
+   (track-thumb-p          :initarg    :track-thumb-p
+                           :initform   t
+                           :accessor   scroll-bar-track-thumb-p
+                           :documentation "
+The SCROLL-BAR-TRACK-THUMB-P generic function returns a value
+indicating the behavior of item when the scroll box is dragged.  If true, the
+scroll box moves and the function SCROLL-BAR-CHANGED is called as the
+user drags the scroll box.  If NIL, only an outline of the scroll box moves
+and scrolling does not occur until the user releases the mouse button. The
+default value is NIL.
+")
+   (page-size              :initarg    :page-size
+                           :initform   5
+                           :accessor   scroll-bar-page-size
+                           :documentation "The page size of item.")
+   (scroll-size            :initarg    :scroll-size
+                           :initform   1
+                           :accessor   scroll-bar-scroll-size
+                           :documentation "The scroll size of item.")
+   (scrollee               :initarg    :scrollee
+                           :initform   nil
+                           :reader     scroll-bar-scrollee
+                           :documentation "The scrollee of item (that is, what item is scrolling).")
+   (pane-splitter          :initform   nil
+                           :accessor   pane-splitter)
+   (pane-splitter-position :initform   nil
+                           :initarg    :pane-splitter 
                            :reader     pane-splitter-position)))
 
 
-(defmethod set-scroll-bar-track-thumb-p ((item scroll-bar-dialog-item) value)
-  (setf (scroll-bar-track-thumb-p item) value))
+(defgeneric set-scroll-bar-track-thumb-p (item value)
+  (:documentation "
+
+The SET-SCROLL-BAR-TRACK-THUMB-P generic function sets the value
+controlling the behavior of item when the scroll box is dragged.  If
+true, the scroll box moves and the function SCROLL-BAR-CHANGED is
+called as the user drags the scroll box.  If NIL, only an outline of
+the scroll box moves and scrolling does not occur until the user
+releases the mouse button.
+
+ITEM:           A scroll-bar dialog item.
+
+VALUE:          A Boolean value.  If item does not have a scroll box,
+                the value is NIL.
+
+")
+  (:method ((item scroll-bar-dialog-item) value)
+    (setf (scroll-bar-track-thumb-p item) value)))
 
 
+(defgeneric set-scroll-bar-scrollee (item new-scrollee)
+  (:documentation "
+
+The SET-SCROLL-BAR-SCROLLEE generic function sets the scrollee of
+ITEM (that is, what item is scrolling) to NEW-SCROLLEE.
+
+ITEM:          A scroll-bar dialog item.
+
+NEW-SCROLLEE: The new scrollee of item.
+
+"))
 
 
 
@@ -78,8 +129,9 @@
                :reader   scroll-bar)))
 
 
-(defmethod set-scroll-bar-scrollee ((view pane-splitter) value)
-  (setf (slot-value view 'scrollee) value))
+
+(defmethod set-scroll-bar-scrollee ((item pane-splitter) new-scrollee)
+  (setf (slot-value item 'scrollee) new-scrollee))
 
 
 ;; These are initialized for real by a def-ccl-pointers in l1-edfrec
@@ -126,20 +178,20 @@
                                 pane-splitter (pane-splitter-length 7) view-size
                                 view-position view-container)
   (declare (dynamic-extent initargs))
-  (setq max (max min max)
+  (setf max (max min max)
         setting (min (max setting min) max))
   (if (and view-size (or length width))
       (error "Both ~s and ~s were specified."
              ':view-size (if length :length :width)))
   (unless length
-    (setq length
+    (setf length
           (if view-size
               (ecase direction
                 (:vertical (point-v view-size))
                 (:horizontal (point-h view-size)))
               100)))
   (unless width
-    (setq width
+    (setf width
           (if view-size
               (ecase direction
                 (:vertical (point-h view-size))
@@ -147,7 +199,7 @@
               16)))
   (when pane-splitter
     (when (not pane-splitter-cursor)
-      (setq pane-splitter-cursor
+      (setf pane-splitter-cursor
             (case direction
               (:vertical
                (case pane-splitter
@@ -177,7 +229,7 @@
                 (if (eq pane-splitter :top)
                     (progn
                       (set-view-position splitter view-position)
-                      (setq view-position (make-point p-h (+ p-v v))))
+                      (setf view-position (make-point p-h (+ p-v v))))
                     (progn
                       (set-view-position splitter p-h (+ p-v length)))))))
           (progn
@@ -188,7 +240,7 @@
                 (if (eq pane-splitter :left)
                     (progn
                       (set-view-position splitter view-position)
-                      (setq view-position (make-point (+ p-h h) p-v)))
+                      (setf view-position (make-point (+ p-h h) p-v)))
                     (progn
                       (set-view-position splitter (+ p-h length) p-v)))))))))  
   (apply #'call-next-method
@@ -241,10 +293,10 @@
 
 
 (defun mac-scroll-bar-min-max (min max &aux dif)
-  (unless (>= max min) (setq max min))
+  (unless (>= max min) (setf max min))
   (cond ((and (>= min (- $scroll-bar-max)) (<= max $scroll-bar-max))
          (values min max))
-        ((< (setq dif (- max min)) (+ $scroll-bar-max $scroll-bar-max))
+        ((< (setf dif (- max min)) (+ $scroll-bar-max $scroll-bar-max))
          (let ((min-return
                 (max (- $scroll-bar-max)
                      (min min (- $scroll-bar-max dif)))))
@@ -257,7 +309,7 @@
       min
       (progn
         (unless (and mac-min mac-max)
-          (multiple-value-setq (mac-min mac-max) (mac-scroll-bar-min-max min max)))
+          (multiple-value-setf (mac-min mac-max) (mac-scroll-bar-min-max min max)))
         (min mac-max
              (+ mac-min
                 (round (* (- setting min) (- mac-max mac-min)) (- max min)))))))
@@ -273,7 +325,7 @@
         (max (scroll-bar-max scroll-bar)))    
     (declare (fixnum mac-min mac-max))
     (when (and #|(osx-p)|# (not (scroll-bar-track-thumb-p scroll-bar))) ;(> (- mac-max mac-min) 3000)) ;; total kludge because osx sucks
-      (if (and (neq 0 mac-setting)(> (truncate (- mac-max mac-min) mac-setting) 100))(progn (setq mac-setting mac-min))))
+      (if (and (neq 0 mac-setting)(> (truncate (- mac-max mac-min) mac-setting) 100))(progn (setf mac-setting mac-min))))
     (if (eql mac-min mac-max)
         mac-min
         (+ min (round (* (- mac-setting mac-min) (- max min)) (- mac-max mac-min))))))
@@ -497,34 +549,34 @@
          width length old-mouse left right mouse setting)
                                         ; disable periodic tasks that draw
     (progn
-      (setq last-mouse
+      (setf last-mouse
             ;; global-to-local
             (add-points (view-origin item)
                         (subtract-points last-mouse (view-position (view-window item)))))
       (if horizontal?
-          (setq width (point-v size)
+          (setf width (point-v size)
                 length (- (point-h size) width width width)
                 left (+ (round (* width 3) 2) (point-h position))
                 old-mouse (point-h last-mouse))
-          (setq width (point-h size)
+          (setf width (point-h size)
                 length (- (point-v size) width width width)
                 left (+ (round (* width 3) 2) (point-v position))
                 old-mouse (point-v last-mouse)))
-      (setq right (+ left length))
+      (setf right (+ left length))
       (niy track-scroll-bar-thumb item)
       #-(and)
       (loop
         (when (not (#_stilldown))          
           (return))
-        (setq mouse (view-mouse-position item))
+        (setf mouse (view-mouse-position item))
         (when (eql mouse last-mouse)
           (when (not (wait-mouse-up-or-moved))            
             (return))
-          (setq mouse (view-mouse-position item)))
+          (setf mouse (view-mouse-position item)))
         (unless (eql mouse last-mouse)
-          (setq last-mouse mouse)
-          (setq mouse (if horizontal? (point-h mouse) (point-v mouse)))
-          (setq setting (min max
+          (setf last-mouse mouse)
+          (setf mouse (if horizontal? (point-h mouse) (point-v mouse)))
+          (setf setting (min max
                              (max min
                                   (+ old-setting
                                      (round (* (- mouse old-mouse) (- max min))
@@ -605,25 +657,43 @@
       (#_QDFlushPortBuffer port (%null-ptr)))))
 
 
-(defmethod scroll-bar-changed (view scroll-bar)
-  (declare (ignore view scroll-bar)))
+(defgeneric scroll-bar-changed (scrollee scroll-bar)
+  (:documentation "
+
+The SCROLL-BAR-CHANGED generic function is called by the
+DIALOG-ITEM-ACTION method for SCROLL-BAR-DIALOG-ITEM if the
+DIALOG-ITEM-ACTION-FUNCTION specified by the :dialog-item-action
+initialization argument is nil.  The scrollee argument is the value of
+(scroll-bar-scrollee scroll-bar), as set by SET-SCROLL-BAR-SCROLLEE or
+the :scrollee initialization argument for SCROLL-BAR.  The default
+method does nothing. 
+
+Writing a scroll-bar-changed method is an easy way to cause user mouse
+clicks on a scroll-bar dialog item to update another view. 
+
+
+SCROLLEE:       A scroll-bar scrollee; what is scrolled by the dialog item.
+
+SCROLL-BAR:     A scroll bar.
+
+")
+  (:method ((scrollee t) (scroll-bar t))
+    (values)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;(setf scroll-bar-setting)
 ;;
-;;a nice safe Lisp-level function for changing the value of the scroll-bar
-;;The accessor is defined by the DEFCLASS
+;; A nice safe Lisp-level function for changing the value of the scroll-bar
+;; The accessor is defined by the DEFCLASS
 ;;
 
 (defmethod (setf scroll-bar-setting) (new-value (item scroll-bar-dialog-item))
   (set-scroll-bar-setting item new-value))
 
-(defmethod set-scroll-bar-setting ((item scroll-bar-dialog-item) new-value)
-  (setq new-value (require-type new-value 'fixnum))
-  (%set-scroll-bar-setting item new-value t))
 
 (defun %set-scroll-bar-setting (item new-value only-if-new-value)
-  (setq new-value (max (scroll-bar-min item) (min (scroll-bar-max item) new-value)))
+  (setf new-value (max (scroll-bar-min item) (min (scroll-bar-max item) new-value)))
   (niy %set-scroll-bar-setting item new-value only-if-new-value)
   #-(and)
   (unless (and only-if-new-value (eql new-value (scroll-bar-setting item)))
@@ -639,19 +709,48 @@
     (setf (slot-value item 'setting) new-value))
   new-value)
 
+
+(defgeneric set-scroll-bar-setting (item new-setting)
+  (:documentation "
+
+The SET-SCROLL-BAR-SETTING generic function sets the setting of item
+to NEW-SETTING.  It does not call DIALOG-ITEM-ACTION.
+
+ITEM:           A scroll-bar dialog item.
+
+NEW-SETTING:    The new setting of item.
+
+")
+  (:method ((item scroll-bar-dialog-item) new-setting)
+    (check-type new-setting fixnum)
+    (%set-scroll-bar-setting item new-setting t)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;scroll-bar-min is a :reader for the class
 ;;here's the setter
 ;;
+
 (defmethod (setf scroll-bar-min) (new-value (item scroll-bar-dialog-item))
   (set-scroll-bar-min item new-value))
 
-(defmethod set-scroll-bar-min ((item scroll-bar-dialog-item) new-value)
-  (setq new-value (require-type new-value 'fixnum))
-  (unless (eql new-value (scroll-bar-min item))
-    (setf (slot-value item 'min) new-value)
-    (update-scroll-bar-max-min-setting item))
-  new-value)
+
+(defgeneric set-scroll-bar-min (item new-value)
+  (:documentation "
+
+The SET-SCROLL-BAR-MIN generic function sets the minimum setting of
+ITEM to NEW-VALUE.
+
+ITEM:          A scroll-bar dialog item.
+
+NEW-VALUE:     The new minimum setting of item.
+
+")
+  (:method ((item scroll-bar-dialog-item) new-value)
+    (setf new-value (require-type new-value 'fixnum))
+    (unless (eql new-value (scroll-bar-min item))
+      (setf (slot-value item 'min) new-value)
+      (update-scroll-bar-max-min-setting item))
+    new-value))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -662,12 +761,23 @@
   (set-scroll-bar-max item new-value))
 
 
-(defmethod set-scroll-bar-max ((item scroll-bar-dialog-item) new-value)
-  (setq new-value (require-type new-value 'fixnum))
-  (unless (eql new-value (scroll-bar-max item))
-    (setf (slot-value item 'max) new-value)
-    (update-scroll-bar-max-min-setting item))
-  new-value)
+(defgeneric set-scroll-bar-max (item new-value)
+  (:documentation "
+
+The SET-SCROLL-BAR-MAX generic function sets the maximum setting of
+ITEM to NEW-VALUE.
+
+ITEM:          A scroll-bar dialog item.
+
+NEW-VALUE:     The new maximum setting of item.
+
+")
+  (:method ((item scroll-bar-dialog-item) new-value)
+    (setf new-value (require-type new-value 'fixnum))
+    (unless (eql new-value (scroll-bar-max item))
+      (setf (slot-value item 'max) new-value)
+      (update-scroll-bar-max-min-setting item))
+    new-value))
 
 
 (defun update-scroll-bar-max-min-setting (item)
@@ -702,13 +812,17 @@
 ;;  of 16 pixels.
 ;;
 
-(defmethod scroll-bar-length ((item scroll-bar-dialog-item))
-  (let* ((size (view-size item))
-         (splitter (pane-splitter item))
-         (splitter-size (and splitter (view-size splitter))))
-    (if (eq (scroll-bar-direction item) :horizontal)
-        (+ (point-h size) (if splitter (point-h splitter-size) 0))
-        (+ (point-v size) (if splitter (point-v splitter-size) 0)))))
+(defgeneric scroll-bar-length (item)
+  (:documentation "
+The SCROLL-BAR-LENGTH generic function returns the length of item.
+")
+  (:method ((item scroll-bar-dialog-item))
+    (let* ((size (view-size item))
+           (splitter (pane-splitter item))
+           (splitter-size (and splitter (view-size splitter))))
+      (if (eq (scroll-bar-direction item) :horizontal)
+          (+ (point-h size) (if splitter (point-h splitter-size) 0))
+          (+ (point-v size) (if splitter (point-v splitter-size) 0))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -724,42 +838,59 @@
 (defun (setf scroll-bar-length) (new-length scroll-bar-dialog-item)
   (set-scroll-bar-length scroll-bar-dialog-item new-length))
 
-(defmethod set-scroll-bar-length ((item scroll-bar-dialog-item) new-length)
-  (let ((splitter (pane-splitter item))
-        (direction (scroll-bar-direction item))
-        (inner-length new-length))
-    (when splitter
-      (let ((size (view-size splitter)))
-        (decf inner-length
-              (min inner-length
-                   (if (eq direction :horizontal) (point-h size) (point-v size))))))
-    (set-view-size item (if (eq direction :horizontal)
-                            (make-point inner-length (scroll-bar-width item))
-                            (make-point (scroll-bar-width item) inner-length)))
-    (when splitter
-      (let ((dir (scroll-bar-direction splitter))
-            (pos (pane-splitter-position item))
-            (bar-pos (view-position item)))
-        (cond ((and (eq dir :vertical) (member pos '(:bottom  t)))
-               (set-view-position splitter  (make-point (point-h bar-pos)
-                                                        (+ (point-v bar-pos)
-                                                           inner-length))))
-              ((and (eq dir :horizontal) (member pos '(:right t)))
-               (set-view-position splitter (make-point (+ (point-h bar-pos)
-                                                          inner-length)
-                                                       (point-v bar-pos))))))))              
-  new-length)
+(defgeneric set-scroll-bar-length (item new-length)
+  (:documentation "
+
+The SET-SCROLL-BAR-LENGTH generic function sets the length of ITEM to
+NEW-LENGTH.
+
+ITEM:           A scroll-bar dialog item.
+
+NEW-LENGTH:     The new length of item.
+
+")
+  (:method ((item scroll-bar-dialog-item) new-length)
+    (let ((splitter (pane-splitter item))
+          (direction (scroll-bar-direction item))
+          (inner-length new-length))
+      (when splitter
+        (let ((size (view-size splitter)))
+          (decf inner-length
+                (min inner-length
+                     (if (eq direction :horizontal) (point-h size) (point-v size))))))
+      (set-view-size item (if (eq direction :horizontal)
+                              (make-point inner-length (scroll-bar-width item))
+                              (make-point (scroll-bar-width item) inner-length)))
+      (when splitter
+        (let ((dir (scroll-bar-direction splitter))
+              (pos (pane-splitter-position item))
+              (bar-pos (view-position item)))
+          (cond ((and (eq dir :vertical) (member pos '(:bottom  t)))
+                 (set-view-position splitter  (make-point (point-h bar-pos)
+                                                          (+ (point-v bar-pos)
+                                                             inner-length))))
+                ((and (eq dir :horizontal) (member pos '(:right t)))
+                 (set-view-position splitter (make-point (+ (point-h bar-pos)
+                                                            inner-length)
+                                                         (point-v bar-pos))))))))              
+    new-length))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;scroll-bar-width
 ;;
 ;; Sometimes you want a different width
 ;;
-(defmethod scroll-bar-width ((item scroll-bar-dialog-item))
-  (let ((size (view-size item)))
-    (if (eq (scroll-bar-direction item) :horizontal)
-        (point-v size)
-        (point-h size))))
+
+(defgeneric scroll-bar-width (item)
+  (:documentation "
+The scroll-bar-width generic function returns the width of item.
+")
+  (:method ((item scroll-bar-dialog-item))
+    (let ((size (view-size item)))
+      (if (eq (scroll-bar-direction item) :horizontal)
+          (point-v size)
+          (point-h size)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -772,21 +903,34 @@
 ;;set-scroll-bar-width, not by calling set-view-size directly
 ;;
 
-(defun (setf scroll-bar-width) (new-length scroll-bar-dialog-item)
-  (set-scroll-bar-width scroll-bar-dialog-item new-length))
+(defmethod (setf scroll-bar-width) (new-length (item scroll-bar-dialog-item))
+  (set-scroll-bar-width item new-length))
 
-(defmethod set-scroll-bar-width ((item scroll-bar-dialog-item) new-width)
-  (let ((size (view-size item)))
-    (set-view-size item (if (eq (scroll-bar-direction item) :horizontal)
-                            (make-point (point-h size) new-width)
-                            (make-point new-width (point-v size)))))
-  (let ((splitter (pane-splitter item)))
-    (if splitter
-        (let ((size (view-size splitter)))
-          (set-view-size splitter (if (eq (scroll-bar-direction splitter) :horizontal)
-                                      (make-point (point-h size) new-width)
-                                      (make-point new-width (point-v size)))))))
-  new-width)
+
+(defgeneric set-scroll-bar-width (item new-width)
+  (:documentation "
+
+The SET-SCROLL-BAR-WIDTH generic function sets the width of ITEM to
+NEW-WIDTH.
+
+ITEM:           A scroll-bar dialog item.
+
+NEW-VALUE:      The new width of item.
+
+")
+  (:method ((item scroll-bar-dialog-item) new-width)
+    (let ((size (view-size item)))
+      (set-view-size item (if (eq (scroll-bar-direction item) :horizontal)
+                              (make-point (point-h size) new-width)
+                              (make-point new-width (point-v size)))))
+    (let ((splitter (pane-splitter item)))
+      (if splitter
+          (let ((size (view-size splitter)))
+            (set-view-size splitter (if (eq (scroll-bar-direction splitter) :horizontal)
+                                        (make-point (point-h size) new-width)
+                                        (make-point new-width (point-v size)))))))
+    new-width))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;(setf scroll-bar-scrollee)
@@ -826,7 +970,7 @@
   (let ((pos (make-point h v))
         (splitter (pane-splitter item))
         (splitter-position (pane-splitter-position item)))
-    (setq h (point-h pos) v (point-v pos))
+    (setf h (point-h pos) v (point-v pos))
     (when splitter
       (let ((size (view-size item))
             (s-size (view-size splitter)))
@@ -923,13 +1067,13 @@
                (mouse-pos (convert-coordinates where (view-container item) container)) ;(view-mouse-position container))
                min max min-pos max-pos drawn pos-accessor line-direction delta pos)
           (if (eq direction :vertical)
-              (setq min (1+ (point-h s-tl))
+              (setf min (1+ (point-h s-tl))
                     max (- (point-h s-br) 2)
                     min-pos (1+ (point-v s-tl))
                     max-pos (- (point-v s-br) 2) 
                     pos-accessor #'point-v
                     line-direction :horizontal)
-              (setq min (1+ (point-v s-tl))
+              (setf min (1+ (point-v s-tl))
                     max (- (point-v s-br) 2)
                     min-pos (1+ (point-h s-tl))
                     max-pos (- (point-h s-br) 2)
@@ -938,7 +1082,7 @@
                                         ; Compute the initial position for the outline.
                                         ; All this rigamarole is to convert from the window's coordinate system
                                         ; to the scrollee's and back again.
-          (setq pos
+          (setf pos
                 (let ((pos (pane-splitter-outline-position 
                             scrollee scroll-bar
                             (convert-coordinates mouse-pos container scrollee))))
@@ -953,10 +1097,10 @@
                    (draw-pane-splitter-outline
                     scrollee scroll-bar pos min max line-direction)))
             (declare (dynamic-extent #'draw-line))
-            (multiple-value-setq (pos drawn)
+            (multiple-value-setf (pos drawn)
               (track-and-draw container #'draw-line pos direction delta min-pos max-pos)))
                                         ; Convert back to scrollee's coordinate system
-          (setq pos (funcall pos-accessor (convert-coordinates 
+          (setf pos (funcall pos-accessor (convert-coordinates 
                                            (if (eq direction :horizontal)
                                                (make-point pos 0)
                                                (make-point 0 pos))
@@ -992,7 +1136,7 @@
          (container (view-container scrollee)))
     (multiple-value-bind (tl br) (view-corners scrollee)
       (when (and container (neq container window))
-        (setq tl (convert-coordinates tl container window)
+        (setf tl (convert-coordinates tl container window)
               br (convert-coordinates br container window)))
       (values tl br))))
 
@@ -1063,8 +1207,8 @@
     (progn ;with-port (wptr w)
       (let ((window-pos))
                                         ;(#_globaltolocal wherep)
-                                        ;(setq window-pos (%get-point wherep))
-        (setq window-pos (view-mouse-position w))
+                                        ;(setf window-pos (%get-point wherep))
+        (setf window-pos (view-mouse-position w))
         (let ((scroll-bar (find-scroll-bar-controlling-point w direction window-pos)))
           (when scroll-bar
             (cond ((and (typep scroll-bar 'fred-v-scroll-bar) ; this is essential
@@ -1100,7 +1244,7 @@
                      (dotimes (count (abs delta)) 
                        (track-scroll-bar scroll-bar (scroll-bar-setting scroll-bar)
                                          (if (minusp delta) :in-down-button :in-up-button))))))
-            (setq res #$noerr)))))
+            (setf res #$noerr)))))
     res))
 
 #-(and)
@@ -1112,7 +1256,7 @@
            (wherep :point))
           (#_GetEventParameter eventref #$keventParamMouseWheelAxis #$typeMouseWheelAxis (%null-ptr) 2 (%null-ptr) axis)
           (let* ((the-axis (%get-word axis)))
-            (setq direction
+            (setf direction
                   (if (eq the-axis #$kEventMouseWheelAxisX)
                       :horizontal
                       (if (eq the-axis #$kEventMouseWheelAxisY)
@@ -1124,15 +1268,15 @@
             (rlet ((deltap :signed-long))
                   (#_GetEventParameter eventref #$kEventParamMouseWheelDelta #$typeLongInteger (%null-ptr)
                                        (record-length :signed-long)  (%null-ptr) deltap)
-                  (setq delta (%get-signed-long deltap)))
+                  (setf delta (%get-signed-long deltap)))
             (when (integerp *wheel-scroll-factor*)
-              (setq delta (* delta *wheel-scroll-factor*)))
+              (setf delta (* delta *wheel-scroll-factor*)))
                                         ; NB: delta is affected both by how fast you spin the wheel and by the Scrolling Speed setting
                                         ;     in the Mouse preference pane.
             (let ((w (find-view-containing-point nil (%get-point wherep) ))) ; Look for deepest view first.
                                         ; If it doesn't have its own handler, bounce back up to the window handler.
               (when w
-                (setq res (scroll-wheel-handler w delta direction wherep))
+                (setf res (scroll-wheel-handler w delta direction wherep))
                 ))))
     res     
     ))

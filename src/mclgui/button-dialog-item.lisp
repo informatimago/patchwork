@@ -72,6 +72,49 @@ keystrokes Return or Enter.
 "))
 
 
+(defgeneric set-default-button (window new-button)
+  (:documentation "
+
+The SET-DEFAULT-BUTTON generic function changes the default button
+according to the value of new-button and returns new-button.  If
+carriage returns are allowed in the current editable-text item, they
+are sent to that item rather than to the default button.
+
+WINDOW:         A window.
+
+NEW-BUTTON:     The button that should be made the default button, or
+                NIL, indicating that there should be no default button.
+")
+  (:method ((dialog window) new-button)
+    (let ((default-button (%get-default-button dialog)))
+      (unless (eq default-button new-button)
+        (without-interrupts
+            (when default-button
+              (invalidate-view-border default-button t)
+              (niy set-default-button window new-button)
+              #-(and)
+              (#_setwindowdefaultbutton (wptr dialog) (%null-ptr)))
+          (setf (%get-default-button dialog) new-button)
+          (when new-button
+            (when (dialog-item-handle new-button)
+              (if (dont-throb new-button) ;(and (osx-p)(neq (view-container new-button)(view-window new-button)))
+                  nil  ;; so we act like a default button but dont look like one
+                  (niy set-default-button window new-button)
+                  #-(and)
+                  (#_setwindowdefaultbutton (wptr dialog) (dialog-item-handle new-button))))
+            (invalidate-view-border new-button)))))
+    new-button))
+
+
+(defgeneric default-button-p (item)
+  (:documentation "
+The DEFAULT-BUTTON-P generic function returns true if item is the
+default button in the view-window of ITEM.  Otherwise it returns NIL.
+")
+  (:method ((item default-button-mixin))
+    (let ((window (view-window item)))
+      (and window (eq item (default-button window))))))
+
 
 
 (defmethod view-corners ((item button-dialog-item))

@@ -1145,18 +1145,12 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 
 
-
-
-
-
-
-
 (defmethod cell-contents-string ((item table-dialog-item) cell)
   (%cell-contents-string-new item cell nil))
 
 
 (defvar *default-cell-contents-string-combined-method* nil)
-(defvar *default-draw-table-cell-combined-method* nil)
+(defvar *default-draw-table-cell-combined-method*      nil)
 
 
 

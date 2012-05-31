@@ -201,29 +201,51 @@ which cursor to select.
 
 (defvar *last-mouse-click-window* nil)
 
+
 (defvar *window-default-position*      #@(10 44)
   "The default position of a newly opened window. The initial value is #@(6 44).")
+
 
 (defvar *window-default-size*          #@(502 188)
   "The default size of a newly opened window. The initial value is #@(502 150).")
 
+
 (defvar *window-default-zoom-position* #@(6 44)
-  "The *WINDOW-DEFAULT-ZOOM-POSITION* variable stores the default
-zoom position of a window, that is, its new position after the user
-clicks the zoom box.
+  "
+The *WINDOW-DEFAULT-ZOOM-POSITION* variable stores the default zoom
+position of a window, that is, its new position after the user clicks
+the zoom box.
+
 This variable and *WINDOW-DEFAULT-ZOOM-SIZE* are initialized at
 startup to make a zoomed window fill the screen containing the menu
-bar with a 3-pixel border all around.")
+bar with a 3-pixel border all around.
+")
+
 
 (defvar *window-default-zoom-size*     #@(502 150)
-  "The *WINDOW-DEFAULT-ZOOM-SIZE* variable stores the default zoom
-size of a window, that is, its new size after the user clicks the zoom
-box.
+  "
+The *WINDOW-DEFAULT-ZOOM-SIZE* variable stores the default zoom size
+of a window, that is, its new size after the user clicks the zoom box.
+
 This variable and *WINDOW-DEFAULT-ZOOM-POSITION* are initialized at
 startup to make a zoomed window fill the screen containing the menu
-bar with a 3-pixel border all around.")
+bar with a 3-pixel border all around.
+")
+
 
 (defvar *selected-window* nil)
+
+
+(defvar *modal-dialog-on-top* nil
+  "
+The *MODAL-DIALOG-ON-TOP* variable is true when a modal dialog is
+the frontmost window.  It is bound during the event processing done by
+the MODAL-DIALOG function.  Its value is used by the MCL window
+system code to determine the behavior of floating windows.  This value
+should not be modified by the user, but can be used to determine whether
+a modal dialog is being processed.
+")
+
 
 (defvar *windoid-count*   0
   "The number of visible floating windows currently in the MCL environment.")

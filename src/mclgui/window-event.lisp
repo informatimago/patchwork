@@ -119,6 +119,13 @@ RETURN:   NIL, or the object that handles the window events.
     window))
 
 
+(defmethod window-close :after ((window window))
+  (setf (slot-value window 'my-item) nil)
+  (let ((wm *windows-menu*))
+    (when (and (typep wm 'menu) (menu-enabled-p wm))
+      (update-windows-menu wm))
+    (let ((em (edit-menu)))
+      (when em (menu-update em)))))
 
 
 ;;;; THE END ;;;;

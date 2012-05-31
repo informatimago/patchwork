@@ -793,19 +793,83 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 
 
+
+(defun update-windows-menu (menu)
+  ;; if menu items are in the right order just leave them there
+  ;; conses less and  faster X 1.6 when order-ok, a bit slower when not ok
+  (if *modal-dialog-on-top* 
+      (menu-disable menu)
+      (progn
+        (menu-enable menu)
+        (niy update-window-menu menu)
+        #-(and)
+        (without-interrupts
+            (let* ((nwins     (length *window-object-alist*))
+                   (new-items (make-list nwins))
+                   (items     (cddr (slot-value menu 'item-list)))
+                   (nitems    0)
+                   (order-ok  t))
+              (let ((new-items new-items)
+                    (items     items))
+                (do-wptrs wptr
+                  (let* ((w (window-object wptr)))
+                    (when (and w (display-in-windows-menu w))
+                      (let ((item (window-menu-item w)))
+                        (when item
+                          (if (window-shown-p w)
+                              (set-menu-item-style item :plain)
+                              (progn (set-menu-item-style item :italic)
+                                     (menu-item-enable item)))
+                          (rplaca new-items item)
+                          (setf new-items (cdr new-items))
+                          (incf nitems)
+                          (when (and order-ok (neq item (car items)))
+                            (setf order-ok nil))
+                          (setf items (cdr items))))))))
+              (when (or (not order-ok)(neq nitems (length items))(command-key-p))
+                (dolist (item (slot-value menu 'item-list))
+                  (setf (slot-value item 'owner) nil)
+                                        ; always delete item 1 (they get "renumbered" !)
+                  (#_DeleteMenuItem menu-handle 1))
+                (setf (slot-value menu 'item-list) nil) 
+                (when t                ;(osx-p)
+                  (add-menu-items menu *bring-windows-front-item*)
+                  (add-menu-items menu (make-instance 'menu-item :menu-item-title "-")))
+                (when (command-key-p)
+                  ;; 2003-10-08TA - if command key is down then windows sorted alphabetically
+                  (let ((copy nil))
+                    (dolist (x new-items)
+                      (when x (push x copy)))
+                    (setf new-items (sort copy #'string-lessp :key #'ccl::menu-title))))
+                (dolist (item new-items)
+                  (when item ; windoid's & da-window's have no menu-item's                     
+                    (add-menu-items menu item)
+                    (unless (slot-value item 'enabledp)
+                      (menu-item-disable item))))))))))
+
+
+
+
+
+
+
 (defun initialize/menu ()
-  (setf *apple-menu* (make-instance 'apple-menu :title "Apple")
+  (setf *apple-menu*   (make-instance 'apple-menu :title "Apple")
         ;; We should get the menus from the actual Openstep menus:
-        *file-menu*  (make-instance 'menu :title "File")
-        *edit-menu*  (make-instance 'menu :title "Edit")
-        *lisp-menu*  (make-instance 'menu :title "Lisp")
-        *tool-menu*  (make-instance 'menu :title "Tools")
-        *menubar*    (make-instance 'menubar
-                         :menus (list *apple-menu*
-                                      *file-menu*
-                                      *edit-menu*
-                                      *lisp-menu*
-                                      *tool-menu*)))
+        *file-menu*    (make-instance 'menu :title "File")
+        *edit-menu*    (make-instance 'menu :title "Edit")
+        *lisp-menu*    (make-instance 'menu :title "Lisp")
+        *tool-menu*    (make-instance 'menu :title "Tools")
+        *window-menu*  (make-instance 'menu :menu-title "Windows"
+                                      :update-function 'update-windows-menu
+                                      :help-spec '(values 1500 (1501 1 2 1 3)))  
+        *menubar*      (make-instance 'menubar
+                           :menus (list *apple-menu*
+                                        *file-menu*
+                                        *edit-menu*
+                                        *lisp-menu*
+                                        *tool-menu*
+                                        *window-menu*)))
   (niy initialize-menu))
 
 

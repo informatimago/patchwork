@@ -154,7 +154,20 @@
                                      "dialog-item" "view-event" "key-handler-mixin"
                                      "scroll-bar-dialog-item"))
 
+                 (:file "sequence-dialog-item"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point" "system"
+                                     "view-classes" "view" "window" "event"
+                                     "dialog-item" "view-event" "key-handler-mixin"
+                                     "scroll-bar-dialog-item" "table-dialog-item"))
+
                  (:file "scroll-bar-dialog-item"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point" "system"
+                                     "view-classes" "view" "window" "event"
+                                     "dialog-item" "view-event"))
+
+                 (:file "pop-up-menu-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
                                      "view-classes" "view" "window" "event"
@@ -166,7 +179,36 @@
                                      "system"
                                      "view-classes" "view" "window" "event"
                                      "dialog-item" "key-handler-mixin"))
-                 
+
+                 (:file "y-or-n-dialog"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point"
+                                     "system"
+                                     "view-classes" "view" "window" "event"
+                                     "dialog-item" "key-handler-mixin"
+                                     "button-dialog-item" 
+                                     "static-text-dialog-item" "editable-text-dialog-item"
+                                     "dialog"))
+
+                 (:file "select-dialog"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point"
+                                     "system"
+                                     "view-classes" "view" "window" "event"
+                                     "dialog-item" "key-handler-mixin"
+                                     "button-dialog-item" 
+                                     "static-text-dialog-item" "editable-text-dialog-item"
+                                     "dialog"))
+
+                 (:file "message-dialog"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point"
+                                     "system"
+                                     "view-classes" "view" "window" "event"
+                                     "dialog-item" "key-handler-mixin"
+                                     "button-dialog-item" 
+                                     "static-text-dialog-item" "editable-text-dialog-item"
+                                     "dialog"))
                  
                  ;; Chapter 6: Color
 
@@ -236,6 +278,8 @@
                                      "radio-button-dialog-item" "static-text-dialog-item"
                                      "focus-rect-mixin" "editable-text-dialog-item"
                                      "table-dialog-item" "scroll-bar-dialog-item"
+                                     "pop-up-menu-dialog-item" "sequence-dialog-item"
+                                     "y-or-n-dialog" "message-dialog" "select-dialog"
                                      "event" "view-event" "window-event"
                                      "cursor" "scrap" "eval" "application"))))
 
