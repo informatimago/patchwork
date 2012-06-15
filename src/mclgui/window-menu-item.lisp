@@ -54,7 +54,9 @@
       (if (and wob
                (or (method-exists-p sym wob)
                    (let ((handler (current-key-handler wob)))
-                     (and handler (method-exists-p sym handler)))))
+                     (and handler
+                          #+ccl (method-exists-p sym handler)
+                          #-ccl (niy method-exists-p sym handler)))))
           (menu-item-enable item)
           (menu-item-disable item)))))
 

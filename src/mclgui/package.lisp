@@ -37,6 +37,7 @@
 (defpackage "MCLGUI"
   (:use "COMMON-LISP")
   (:nicknames "UI")
+  (:import-from "OCLO" "*NULL*" "NULLP")
   (:export
 
    ;; Extensions:
@@ -87,7 +88,8 @@
    ;; Chapter 3: Menus
    ;; ----------------------------------------
 
-   "MENUBAR" "*MENUBAR*" "*MENUBAR-FROZEN*" "*APPLE-MENU*"
+   "MENUBAR" "*MENUBAR*" "*MENUBAR-FROZEN*"
+   "*DEFAULT-MENUBAR*" "*APPLE-MENU*"
    "*FILE-MENU*" "*EDIT-MENU*" "*LISP-MENU*" "*TOOL-MENU*"
    "*WINDOW-MENU*"  "SET-MENUBAR" "FIND-MENU" "DRAW-MENUBAR-IF"
 
@@ -203,13 +205,18 @@
    "PASTE" "CLEAR" "SELECT-ALL" 
    
    
-   ;; Extension (not exported/documented in MCL AFAIK):
+   ;; Extension (not exported/documented in MCL 4.1):
    "VIEW-GET" "VIEW-PUT" "VIEW-GET" "VIEW-REMPROP"
+   "VIEW-CONTAINS-P"
    
    ;; Extension: condition:
    "VIEW-ERROR"
    "VIEW-ERROR-VIEW"
-   
+
+   ;; Extension: FRED-Window
+   ;; Actually, we implement them with NSText objects.
+   "FRED-WINDOW"
+
    
    ;; ----------------------------------------
    ;; Chapter 5: Dialog Items and Dialogs
@@ -256,6 +263,14 @@
 
    "POP-UP-MENU"
 
+   ;; 5.1
+   "SELECTED-ITEM" "POP-UP-MENU-ITEM-DISPLAY"
+   "POP-UP-MENU-DEFAULT-ITEM" "SET-POP-UP-MENU-DEFAULT-ITEM"
+   "POP-UP-MENU-AUTO-UPDATE-DEFAULT" "SET-POP-UP-ITEM-CHECK-MARK"
+   "PULL-DOWN-MENU" "TYPEIN-MENU" "ACTION-POP-UP-MENU"
+   "USE-POP-UP-CONTROL" "*USE-POP-UP-CONTROL*"
+
+   
    "SCROLL-BAR-DIALOG-ITEM" "SCROLL-BAR-LENGTH"
    "SET-SCROLL-BAR-LENGTH" "SCROLL-BAR-MAX" "SCROLL-BAR-MIN"
    "SET-SCROLL-BAR-MAX" "SET-SCROLL-BAR-MIN" "SCROLL-BAR-SCROLL-SIZE"
@@ -264,6 +279,15 @@
    "SCROLL-BAR-TRACK-THUMB-P" "SET-SCROLL-BAR-TRACK-THUMB-P"
    "SCROLL-BAR-WIDTH" "SET-SCROLL-BAR-WIDTH" "SCROLL-BAR-CHANGED"
 
+
+   ;; 5.1
+   "SCROLLER-MIXIN" "SCROLLER" "SCROLLER-PANE"
+   "SCROLL-BAR-LIMITS" "NORMAL-SCROLL-BAR-LIMITS"
+   "SCROLL-BAR-PAGE-SIZE" "SCROLL-BAR-SCROLL-SIZE"
+   "UPDATE-SCROLL-BARS" "UPDATE-SCROLL-BAR-LIMITS"
+   "UPDATE-THUMBS" "REPOSITION-SCROLL-BARS" "SCROLL-BAR-CHANGED"
+
+   
    "SEQUENCE-DIALOG-ITEM" "TABLE-SEQUENCE" "SET-TABLE-SEQUENCE"
    "CELL-TO-INDEX" "INDEX-TO-CELL"
 
@@ -292,6 +316,8 @@
    "WITH-FORE-COLOR" "WITH-BACK-COLOR"
 
    "PART-COLOR-LIST" "PART-COLOR" "SET-PART-COLOR"
+   ;; 5.1
+   "SET-PART-COLOR-LOOP"
 
    ;; Not implemented:
    ;; color-to-rgb rgb-to-color with-rgb *black-rgb* *white-rgb*
@@ -381,8 +407,13 @@
 
 
    ;; miscellaneous:
+   "ED-BEEP"
+
+   "FIXNUMP"
+   
    "DEF-LOAD-POINTERS" ; this one won't be implemented, change the sources!
-   "WPTR"         ; this one won't be implemented, change the sources!
+   "WPTR" ; this one won't be implemented, change the sources!
+   "NIY"
    )
   (:documentation "
 

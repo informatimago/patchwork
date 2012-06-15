@@ -543,7 +543,7 @@
 (defmethod set-staff-count ((self C-MN-view-mod) value)
   (if (not (monofonic-mn? self))
     (progn (format t "This is a poly-collector. Please do staff additions by box extension")
-           (ed-beep))
+           (ui:ed-beep))
       (let* ((all-panels (editor-objects self))
              (current-length (length all-panels)))
         (cond ((< value current-length)

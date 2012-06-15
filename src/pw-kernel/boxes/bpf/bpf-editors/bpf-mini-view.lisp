@@ -81,7 +81,7 @@
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
     (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
-      (ed-beep) 
+      (ui:ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 
@@ -112,7 +112,7 @@
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
     (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
-      (ed-beep) 
+      (ui:ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 
@@ -149,7 +149,7 @@
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
     (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
-      (ed-beep) 
+      (ui:ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 
@@ -187,7 +187,7 @@
     (setq x-min (round x-min (h-view-scaler view))
           y-min (- (h view) (round y-max (v-view-scaler view))))
     (when (or (> (abs x-min) #.(1- (expt 2 15))) (> (abs y-min) #.(1- (expt 2 15))))
-      (ed-beep) 
+      (ui:ed-beep) 
       (format t "Unable to scale BPF. Please decrease window size (hight) ~%"))
     (set-origin view 
          (make-point (if (minusp x-min) 

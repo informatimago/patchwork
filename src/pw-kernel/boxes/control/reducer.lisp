@@ -65,7 +65,7 @@
 
 (defmethod disconnect-ctrl ((self C-reducer) ctrl)
   (if (or (eq ctrl (car (pw-controls self)))(eq ctrl (nth 2 (pw-controls self))))
-     (progn (ed-beep)(format t "Disconnection of the first or third input is not allowed !"))
+     (progn (ui:ed-beep)(format t "Disconnection of the first or third input is not allowed !"))
      (call-next-method)))
 
 (defunp loop+accum ((c-red (symbol (:type-list (loop)))) 

@@ -119,6 +119,10 @@ RETURN:   NIL, or the object that handles the window events.
     window))
 
 
+(defun get-window-event-handler ()
+  (window-event-handler (front-window :include-windoids t)))
+
+
 (defmethod window-close :after ((window window))
   (setf (slot-value window 'my-item) nil)
   (let ((wm *windows-menu*))

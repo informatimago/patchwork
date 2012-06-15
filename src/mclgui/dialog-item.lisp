@@ -296,7 +296,7 @@ CLIPRGN:        Region records from the view’s wptr.  They are ignored.
 
 (defmethod set-view-position ((item dialog-item) h &optional v)
   (let ((new-position (make-point h v)))
-    (unless (point= new-position (view-position item))
+    (unless (eql new-position (view-position item))
       (with-focused-dialog-item (item)
         (without-interrupts
             (let ((window (view-window item)))
@@ -314,7 +314,7 @@ changes the size of the dialog item to the width and height
 represented by h and v, and returns the new size.
 "
   (let ((new-size (make-point h v)))
-    (unless (point= new-size (view-size item))
+    (unless (eql new-size (view-size item))
       (with-focused-dialog-item (item)
         (without-interrupts
             (let ((window (view-window item)))

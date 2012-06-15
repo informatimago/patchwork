@@ -755,7 +755,7 @@
                   'simple-string)))
         (target-file (full-pathname (merge-pathnames filename ".etf"))))    
     (format *error-output* "~%copying ~S to ~S~%"  template-file target-file)
-    (ui:copy-file template-file target-file :if-exists :overwrite)
+    (alexandria:copy-file template-file target-file :if-exists :overwrite)
     (format *error-output* "appending score desc. to ~S~%" target-file)
     (with-output-to-file (target-file :if-exists :append)
       (translate-to-enigma score))

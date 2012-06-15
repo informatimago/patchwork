@@ -637,7 +637,7 @@
       (add-subviews view *pw-controls-dialog-text-item*)
       (setf *current-small-inBox* (car (pw-controls view)))
       (change-menu-actions) )
-    (ed-beep)) )
+    (ui:ed-beep)) )
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch) str)
   (setf (pw-function-string view) (string-downcase str))

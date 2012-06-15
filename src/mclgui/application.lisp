@@ -36,7 +36,7 @@
 (in-package "MCLGUI")
 
 
-(defclass application ()
+(defclass application (wrapper)
   ())
 
 (defclass lisp-development-system (application)

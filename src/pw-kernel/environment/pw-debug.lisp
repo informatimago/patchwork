@@ -91,7 +91,7 @@
             #'deactivate-control)
       (activate-control (car *global-current-value-patch*))
       (setf *global-current-value-patch* ()))
-    (ed-beep)))
+    (ui:ed-beep)))
 
 
 (defun remove-PW-mode-method ()

@@ -209,7 +209,7 @@
     (progn 
       (setq *global-selected-note* self)
       (open-instrument-editor (instrument self) win x y))
-    (ed-beep)))
+    (ui:ed-beep)))
 
 (defmethod remove-instrument-item ((self C-note) x y)
   (when (instrument self) 

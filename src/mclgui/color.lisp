@@ -270,6 +270,13 @@ RETURN:         A list of key parts that can be colored in the THING.
     '()))
 
 
+(defgeneric set-part-color-loop (part colors)
+  (:method (part colors)
+    (loop
+      :for (key color) :on colors :by (function cddr)
+      :do (set-part-color part key color))))
+
+
 
 
 (defparameter *menubar-color-part-alist*

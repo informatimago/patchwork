@@ -77,8 +77,11 @@
 
 
 (defmethod set-view-font-codes :after ((button control-dialog-item) ff ms &optional m1 m2)
-  (declare (ignore ff ms m1 m2))  
-  (when (and (not (typep button 'scroll-bar-dialog-item))  (dialog-item-handle button))  ;; it's a reset
+  (declare (ignore ff ms m1 m2))
+  (niy set-view-font-codes :after button ff ms m1 m2)
+  #-(and)
+  (when (and (not (typep button 'scroll-bar-dialog-item))
+             (dialog-item-handle button))  ;; it's a reset
     ;(set-dialog-item-text button (dialog-item-text button))
     (fix-osx-dialog-item-font button)))
  
@@ -101,7 +104,6 @@
 (defmethod set-control-title-cfstring ((item control-dialog-item) text)
   (let* ((len (length text)))
     (declare (fixnum len))
-    (setf text (ensure-simple-string text))
     (%stack-block ((sb  (%i+ len len)))      
       (copy-string-to-ptr text 0 len sb)
       (with-macptrs ((cfstr (#_CFStringCreatewithCharacters (%null-ptr) sb len)))
@@ -137,7 +139,7 @@
 
 (defmethod set-view-position ((item control-dialog-item) h &optional v)
   (let ((new-pos (make-point h v)))
-    (unless (point= new-pos (view-position item))
+    (unless (eql new-pos (view-position item))
       (without-interrupts
           (invalidate-view item t)
         (setf (slot-value item 'view-position) new-pos)
@@ -148,8 +150,8 @@
             (let* ((handle (dialog-item-handle item)))           
               (#_MoveControl handle (point-h new-pos) (point-v new-pos))
               (validate-control-dialog-item item)
-              (invalidate-view item)))))))
-  new-pos)
+              (invalidate-view item))))))
+    new-pos))
 
 
 (defmethod validate-control-dialog-item ((item control-dialog-item))
@@ -158,7 +160,7 @@
 
 (defmethod set-view-size ((item control-dialog-item) h &optional v)
   (let ((new-size (make-point h v)))
-    (unless (point= new-size (view-size item))
+    (unless (eql new-size (view-size item))
       (without-interrupts
           (let ((size (view-size item)))
             (when (and size (view-position item))
@@ -172,8 +174,8 @@
               (invalidate-view item t)           
               (#_SizeControl handle (point-h new-size)(point-v new-size))
               ;; (validate-control-dialog-item item)   ; remove erase region - no dont <<
-              (invalidate-view item)))))))
-  new-size)
+              (invalidate-view item))))))
+    new-size))
 
 
 (defmethod remove-view-from-window :after ((item control-dialog-item))
@@ -245,6 +247,40 @@
   (unless (zerop ok)
     (dialog-item-action item)))
 
+
+
+
+
+(defparameter *eol-chars*
+  `(#\return #\linefeed ,(code-char #x2028) ,(code-char #x2029)))
+
+(defparameter *eol-char-codes*
+  (mapcar (function char-code) *eol-chars*))
+
+(defparameter *eol-string*
+  (coerce *eol-chars* 'string))
+
+(defun char-eolp (char)
+  (member char *eol-chars*))
+
+(defun char-code-eolp (code)
+  (member code *eol-char-codes*))
+
+(defun string-eol-position (string &optional (start 0) (end (length string)))
+  (position-if (function char-eolp) string :start start :end end))
+
+
+(defun font-codes-string-width-for-control (string ff ms &optional (start 0) (end (length string)))
+  (niy font-codes-string-width-for-control string ff ms start end)
+  #-(and) (with-port  %temp-port%
+            (with-font-codes ff ms
+                             (with-cfstrs-hairy ((x string start end))    
+                               (rlet ((bounds :point)
+                                      (baseline :signed-integer))
+                                     (#_GetThemeTextDimensions x #$kThemeCurrentPortFont #$kthemestateactive
+                                                               nil bounds baseline)
+                                     (point-h (%get-point bounds))))))
+  100)
 
 
 (defun font-codes-string-width-with-eol-for-control (string ff ms)  

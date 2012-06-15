@@ -197,7 +197,7 @@
             (if (check-box-checked-p e-ctrl)
                 (check-box-uncheck  e-ctrl) (check-box-check  e-ctrl))
             (set-edit-mode (editor-collection-object self) e-ctrl)))
-    (t (ed-beep))))
+    (t (ui:ed-beep))))
   
 ;;=================
 

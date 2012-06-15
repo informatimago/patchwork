@@ -37,7 +37,7 @@
 
 ;;;---------------------------------------------------------------------
 
-(defclass simple-view (colored stream) ; output-stream TODO: We may want a gray-stream here.
+(defclass simple-view (colored wrapper stream) ; output-stream TODO: We may want a gray-stream here.
   ((help-spec            :initform nil         :initarg  :help-spec            :accessor help-spec)
    (view-container       :initform nil                                         :reader view-container
                          :documentation "The view that contains this view.")
@@ -140,7 +140,7 @@ DO:             Remove the property KEY from the VIEW.
 (defmethod initialize-instance :after ((view view) &key &allow-other-keys)
   (let ((subviews (slot-value view 'view-subviews)))
     (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
-    (apply (function add-subviews) views subviews))
+    (apply (function add-subviews) view subviews))
   ;; (dolist (subview view-subviews)
   ;;   (set-view-container subview view))
   (values))
@@ -179,7 +179,7 @@ DO:             Remove the property KEY from the VIEW.
    (process                          :initform  nil                          
                                      :initarg  :process                        
                                      :accessor  window-process)
-   (queue                            :initform  (make-process-queue "Window")
+   (queue                            :initform  nil ; (make-process-queue "Window")
                                      :reader    window-process-queue)
    (auto-position                    :initarg   :auto-position               
                                      :initform  :noAutoCenter
@@ -214,7 +214,7 @@ DO:             Remove the property KEY from the VIEW.
    (window-layer                     :initform   0
                                      :initarg   :window-layer
                                      :type       integer)
-   (window-theme-background          :initform   nil                          
+   (theme-background                 :initform   nil                          
                                      :initarg    :theme-background 
                                      :accessor   window-theme-background 
                                      :accessor   theme-background)
@@ -233,6 +233,8 @@ DO:             Remove the property KEY from the VIEW.
                                      :initarg   :erase-anonymous-invalidations)))
 
 
+(defgeneric view-allocate-clip-region (window))
+
 
 (defmethod initialize-instance ((window window) &key (view-font (view-default-font window)) &allow-other-keys)
   (call-next-method)
@@ -242,17 +244,48 @@ DO:             Remove the property KEY from the VIEW.
              (not (slot-value window 'theme-background)))
     ;; only needed for non-theme color background
     (setf (window-invalid-region window) (new-rgn)))
-  (niy initialize-instance 'window window)
+  (let ((pos (view-position window))
+        (siz (view-size window)))
+    (setf (handle window)
+          [[NSWindow alloc]initWithContentRect:(ns:make-ns-rect (point-h pos) (point-v pos)
+                                                                (point-h siz) (point-v siz))
+           styleMask:(ecase (window-type window)
+                       ((:document
+                         :document-with-zoom)
+                        (logior #$NSTitledWindowMask
+                                #$NSMiniaturizableWindowMask
+                                (if (window-close-box-p window)
+                                    #$NSClosableWindowMask
+                                    0)))
+                       ((:document-with-grow)
+                        (logior #$NSTitledWindowMask
+                                #$NSMiniaturizableWindowMask
+                                (if (window-close-box-p window)
+                                    #$NSClosableWindowMask
+                                    0)
+                                #$NSResizableWindowMask))
+                       ((:double-edge-box
+                         :single-edge-box
+                         :shadow-edge-box)
+                        #$NSBorderlessWindowMask)
+                       ((:tool)
+                        (logior #$NSTitledWindowMask
+                                (if (window-close-box-p window)
+                                    #$NSClosableWindowMask
+                                    0))))
+           backing:0
+           defer:(not (window-visiblep window))]))
+  (set-window-title window (window-title window))
   (window-size-parts window)
-  (when window-show
+  (when (window-visiblep window)
+    (setf (slot-value window 'visiblep) nil)
     (window-show window))
   window)
 
 
 (defmethod print-object ((window window) stream)
-  (print-unreadable-object (window stream :identity t :type t)
-    (format stream "~S" (ignore-errors (window-title w))))
-  window)
+  (print-parseable-object (window stream :type t :identity t)
+                          (:title (ignore-errors (window-title window)))))
 
 
 ;;;---------------------------------------------------------------------

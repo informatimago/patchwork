@@ -35,15 +35,45 @@
 (in-package "MCLGUI")
 
 
+(defun fixnump (object)
+  (typep object 'fixnum))
+
+
 (defun ed-beep (&optional (duration 3) &rest args)
-  (declare (ignore args))
-  (sys-beep duration))
+  (declare (ignorable duration args))
+  #+ccl (#_NSBeep)
+  #-ccl (niy ed-beep duration args))
 
 (defun get-sys-font ()
   0)
 
 (defun get-sys-just ()
   0)
+
+
+
+(defun ensure-list (object)
+  "
+RETURN:         If OBJECT is a list then OBJECT, otherwise a fresh
+                list containing OBJECT.
+"
+  (if (listp object)
+      object
+      (list object)))
+
+
+(defun list-designator (object)
+  "
+RETURN:         If the OBJECT is a list containing a single non-NIL
+                atom, then this first element is returned, else OBJECT.
+"
+  (if (and (listp object)
+           object
+           (endp (rest object))
+           (first object)
+           (atom (first object)))
+      (first object)
+      object))
 
 
 ;;;; THE END ;;;;

@@ -36,28 +36,53 @@
 (enable-sharp-at-reader-macro)
 
 
+(defmethod view-allocate-clip-region ((view view))
+  (let ((rgn (view-clip-region view)))
+    (or rgn
+        (setf (view-clip-region-slot view) (new-rgn)))))
 
-;; (defgeneric call-with-focused-view (view function &optional font-view)
-;;   (:method (view function &optional font-view)
-;;     (let* ((old-view *current-view*)
-;;            (old-font-view *current-font-view*)
-;;            wptr ff ms old-fonts)
-;;       (if (and (eq view old-view)
-;;                (or (null font-view)
-;;                    (eq font-view old-font-view)))
-;;           (funcall function view)
-;;           (unwind-protect
-;;                (progn
-;;                  (when (and view (null old-font-view) font-view (setq wptr (wptr view)))
-;;                    (multiple-value-setq (ff ms) (wptr-font-codes wptr))
-;;                    (setq old-fonts t))
-;;                  (focus-view view font-view)
-;;                  (funcall function view))
-;;             (when (and (ok-wptr wptr) old-fonts)
-;;               (set-wptr-font-codes wptr ff ms))
-;;             (focus-view old-view old-font-view))))))
+(defmethod view-clip-region ((view view))
+  (let ((rgn (view-clip-region-slot view)))
+    (unless (or (null rgn) (view-valid-p view))
+      (let ((container (view-container view)))
+        (compute-view-origin view container)
+        (make-view-valid view)
+        (compute-view-region view rgn container)))
+    rgn))
+
+#-(and)
+(defmethod compute-view-region ((view window) rgn container)
+  (declare (ignore container))
+  (when rgn
+    (let* ((topleft (view-origin view))
+           (botright (add-points topleft (view-size view))))
+      (#_SetRectRgn rgn (point-h topleft) (point-v topleft) (point-h botright) (point-v botright))))
+  rgn)
 
 
+(defgeneric call-with-focused-view (view function &optional font-view)
+  (:method (view function &optional font-view)
+    (let* ((old-view      *current-view*)
+           (old-font-view *current-font-view*)
+           wptr ff ms old-fonts)
+      (if (and (eq view old-view)
+               (or (null font-view)
+                   (eq font-view old-font-view)))
+          (funcall function view)
+          (unwind-protect
+               (progn
+                 (niy call-with-focused-view view function font-view)
+                 #-(and)
+                 (when (and view (null old-font-view) font-view
+                            (setf wptr (wptr view)))
+                   (multiple-value-setq (ff ms) (wptr-font-codes wptr))
+                   (setf old-fonts t))
+                 (focus-view view font-view)
+                 (funcall function view))
+            #-(and)
+            (when (and (ok-wptr wptr) old-fonts)
+              (set-wptr-font-codes wptr ff ms))
+            (focus-view old-view old-font-view))))))
 
 
 
@@ -239,7 +264,7 @@ NEW-CONTAINER:  The new container of the view.
     (let ((old-container (view-container view)))
       (unless (eq new-container old-container)    
         (when new-container
-          (check-type new-container 'view)
+          (check-type new-container view)
           (when (or (eq new-container view)
                     (view-contains-p view new-container))
             (error 'view-error :view view
@@ -257,13 +282,13 @@ NEW-CONTAINER:  The new container of the view.
                   (delete view (view-subviews old-container) :test #'eq))
             (unless (eq new-window old-window)
               (remove-view-from-window view))
-            (set-view-container-slot view nil))
+            (setf (slot-value view 'view-container) nil))
           (when (and (null new-container) (eq *mouse-view* view))
             (setq *mouse-view* nil))
           (when new-container
             (let ((siblings (view-subviews new-container)))
               (vector-push-extend view siblings)
-              (set-view-container-slot view new-container)
+              (setf (slot-value view 'view-container) new-container)
               (unless (eq new-window old-window)
                 (install-view-in-window view new-window))
               (invalidate-view view)
@@ -316,6 +341,18 @@ SUBVIEWS:       A list of view or simple view, but not a window;
       (set-view-container subview nil))))
 
 
+
+(defgeneric view-contains-p (view contained-view)
+  (:documentation "Whether CONTAINED-VIEW is a sub+view of VIEW.")
+  (:method ((view simple-view) contained-view)
+    (loop
+      :for container = (view-container contained-view)
+      :then (view-container container)
+      :while container 
+      :thereis (eq container view)))
+  (:method ((view null) contained-view)
+    (declare (ignore contained-view))
+    nil))
 
 
 (defmacro do-subviews ((subview-var view &optional (subview-type t))
@@ -702,9 +739,9 @@ RETURN:         (make-point h v)
             (invalidate-view view t)         
             (setf (slot-value view 'view-position) pt)
             (invalidate-view view (maybe-erase view)) ; usually erase-p nil suffices
-            (make-view-invalid view)))))
-    (refocus-view view)
-    pt))
+            (make-view-invalid view))))
+      (refocus-view view)
+      pt)))
 
 
 (defgeneric view-default-position (view)
@@ -747,37 +784,37 @@ V:              The height of the new size, or NIL if the complete
 ")
   (:method ((view simple-view) h &optional v)
     (let ((pt (make-point h v)))
-     (unless (eql pt (view-size view))
-       (let ((container (view-container view)))
-         (unless container
-           (error 'view-error :view view
-                  :format-control "~S has no container"
-                  :format-arguments (list view)))
-         (niy set-view-size view h v)
-         #-(and)
-         (let ((clip-region (view-clip-region view))
-               (origin      (view-origin view))
-               (old-region  *temp-rgn*)
-               (temp-region *temp-rgn-2*))
-           (#_CopyRgn clip-region old-region)
-           (setf (slot-value view 'view-size) pt)
-           (make-view-invalid view)
+      (unless (eql pt (view-size view))
+        (let ((container (view-container view)))
+          (unless container
+            (error 'view-error :view view
+                   :format-control "~S has no container"
+                   :format-arguments (list view)))
+          (niy set-view-size view h v)
+          #-(and)
+          (let ((clip-region (view-clip-region view))
+                (origin      (view-origin view))
+                (old-region  *temp-rgn*)
+                (temp-region *temp-rgn-2*))
+            (#_CopyRgn clip-region old-region)
+            (setf (slot-value view 'view-size) pt)
+            (make-view-invalid view)
                                         ;           (adjust-view-region view clip-region container)
-           (setq clip-region (view-clip-region view)) ; for simple-views
-           (#_XorRgn clip-region old-region temp-region)
-           (let ((offset (subtract-points (view-origin container) origin)))
-             (#_OffsetRgn temp-region (point-h offset)(point-v offset)))
-           (with-focused-view container             
-             (#_invalWindowRgn (wptr view) temp-region)
-             (let* ((window (view-window view))
-                    (erase-rgn (window-erase-region window)))
-               (when erase-rgn
-                 (let ((offset (subtract-points (view-origin window)
-                                                (view-origin container))))
-                   (#_offsetrgn temp-region (point-h offset)(point-v offset)))
-                 (#_UnionRgn erase-rgn temp-region erase-rgn))))))))
-    (refocus-view view)
-    pt))
+            (setq clip-region (view-clip-region view)) ; for simple-views
+            (#_XorRgn clip-region old-region temp-region)
+            (let ((offset (subtract-points (view-origin container) origin)))
+              (#_OffsetRgn temp-region (point-h offset)(point-v offset)))
+            (with-focused-view container             
+              (#_invalWindowRgn (wptr view) temp-region)
+              (let* ((window (view-window view))
+                     (erase-rgn (window-erase-region window)))
+                (when erase-rgn
+                  (let ((offset (subtract-points (view-origin window)
+                                                 (view-origin container))))
+                    (#_offsetrgn temp-region (point-h offset)(point-v offset)))
+                  (#_UnionRgn erase-rgn temp-region erase-rgn)))))))
+      (refocus-view view)
+      pt)))
 
 
 (defgeneric view-default-size (view)

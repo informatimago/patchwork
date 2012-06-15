@@ -34,14 +34,14 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
-
+(objcl:enable-objcl-reader-macros)
 
 
 ;;;---------------------------------------------------------------------
 ;;; Menubar
 ;;;---------------------------------------------------------------------
 
-(defclass menubar (colored)
+(defclass menubar (colored wrapper)
   ((menus :initform '()
           :initarg :menus
           :accessor menubar-menus)))
@@ -53,8 +53,8 @@
 
 (defvar *menubar*         nil
   "
-The value of the *menubar* variable is the single instance of the
-menubar class.
+The value of the *MENUBAR* variable is the single instance of the
+MENUBAR class.
 ")
 
 
@@ -139,19 +139,20 @@ DRAW-MENUBAR-IF.  The menubar is not redrawn automatically.
 
 (defgeneric empty-menubar (menubar)
   (:method ((mb menubar))
+    ;; [[[NSApplication sharedApplication] mainMenu] removeAllItems]
     (dolist (menu (menubar-menus mb) mb)
       (unless (eq *apple-menu* menu)
         (menu-deinstall menu)))))
 
 (defgeneric menubar-add-menu (menubar menu)
   (:method ((mb menubar) menu)
-    (setf (menubar-menu mb) (nconc (menubar-menu mb) (list menu)))
+    (setf (menubar-menus mb) (nconc (menubar-menus mb) (list menu)))
     menu))
 
 (defgeneric  menubar-delete-menu (menubar menu)
   (:method ((mb menubar) menu)
     (unless (eq *apple-menu* menu)
-      (setf (menubar-menu mb) (delete menu (menubar-menu mb))))
+      (setf (menubar-menus mb) (delete menu (menubar-menus mb))))
     menu))
 
 
@@ -203,8 +204,10 @@ DO:             Redraw the menubar if the value of *MENUBAR-FROZEN* is
                 NIL.  If the value of *MENUBAR-FROZEN* is not nil, no
                 action is taken.
 "
-  (unless *menubar-frozen*
-    (niy draw-menubar-if)))
+  ;; Doesn't seem to be needed with OpenStep.
+  ;; (unless *menubar-frozen*
+  ;;   (n iy draw-menubar-if))
+  )
 
 
 
@@ -213,13 +216,15 @@ DO:             Redraw the menubar if the value of *MENUBAR-FROZEN* is
 ;;;---------------------------------------------------------------------
 
 
-(defclass menu-element (colored)
+(defclass menu-element (colored wrapper)
   ((color-list      :initform '()
                     :initarg :menu-item-colors
                     :initarg :menu-colors)
    (owner           :initform nil
                     :reader   menu-item-owner
-                    :reader   menu-owner)
+                    :reader   menu-owner
+                    :documentation "The MENU instance that owns this MENU-ELEMENT.
+Set and reset by ADD-MENU-ITEMS and REMOVE-MENU-ITEMS.")
    (title           :initform "Untitled"
                     :initarg :menu-item-title
                     :reader   menu-item-title
@@ -251,9 +256,15 @@ other styles.")
 
 
 (defmethod print-object ((self menu-element) stream)
-  (print-unreadable-object (self stream :type t)
-    (format stream "~S" (slot-value self 'title)))
-  self)
+  (print-parseable-object (self stream :type t :identity t)
+                          title enabledp checkedp)
+  ;; (print-unreadable-object (self stream :type t)
+  ;;   (format stream "~S ~:[disabled~;enabled~] ~:[~;checked~]"
+  ;;           (menu-item-title self)
+  ;;           (menu-item-enabled-p self)
+  ;;           (slot-value self 'checkedp)))
+  ;; self
+  )
 
 
 (defclass menu (menu-element)
@@ -262,7 +273,18 @@ other styles.")
                 :initarg :menu-font)))
 
 
-(defmethod initialize-instance :after ((menu menu) &key (menu-items ()) &allow-other-keys)
+(defmethod print-object ((self menu) stream)
+  (print-parseable-object (self stream :type t :identity t)
+                          title (:items (slot-value self 'item-list)))
+  ;; (print-unreadable-object (self stream :type t)
+  ;;   (format stream "~S (~{~S~^ ~})"
+  ;;           (menu-item-title self)
+  ;;           (slot-value self 'item-list)))
+  ;; self
+  )
+
+
+(defmethod initialize-instance :after ((menu menu) &key (menu-items '()) &allow-other-keys)
   (when menu-items
     (apply (function add-menu-items) menu menu-items)))
 
@@ -283,7 +305,6 @@ MENU-ITEM-CLASS:
                 in the list that is returned.
 ")
   (:method ((menu menu) &optional (menu-item-class 'menu-element))
-    
     (copy-seq (remove-if-not (lambda (item) (typep item menu-item-class))
                              (slot-value menu 'item-list)))))
 
@@ -304,12 +325,13 @@ DO:             Set the menu title to NEW-TITLE.  If the menu is
 RETURN:         NEW-TITLE
 ")
   (:method ((menu menu) new-title)
-
     (if (menu-owner menu)
         (set-menu-item-title menu new-title)
         (progn
           (setf (slot-value menu 'title) (copy-seq new-title))
-          (niy set-menu-title)))
+          (let ((nsmenu (handle menu)))
+            (when nsmenu
+              [nsmenu setTitle:(objcl:objcl-string new-title)]))))
     new-title))
 
 
@@ -321,9 +343,10 @@ RETURN:         T.
   (:method ((me menu-element))
     t)
   (:method ((menu menu))
-    (unless (slot-value menu 'owner)
-      (menubar-add-menu *menubar* menu))
-    (niy menu-install)
+    (unless (menu-owner menu)
+      (menubar-add-menu *menubar* menu)
+      (ns-attach-submenu [[NSApplication sharedApplication] mainMenu]
+                         menu))
     t))
 
 
@@ -335,11 +358,14 @@ RETURN:         NIL.
   (:method ((me menu-element))
     nil)
   (:method ((menu menu))
-    (dolist (item (slot-value menu 'item-list))
-      (when (typep item 'menu)
-        (menu-deinstall item)))
-    (menubar-delete-menu *menubar* menu)
-    (niy menu-deinstall)
+    (unless (menu-owner menu)
+      (menubar-delete-menu *menubar* menu)
+      (let ((item (if (typep menu 'menu)
+                      (handle-of-menu-item-of menu)
+                      (handle menu))))
+        (when item
+          [[[NSApplication sharedApplication] mainMenu] removeItem:item]))
+      (release menu))
     nil))
 
 
@@ -348,28 +374,13 @@ RETURN:         NIL.
 RETURN:         Whether the menu is installed.
 ")
   (:method ((menu menu))
-    (niy menu-installed-p)
-    nil))
+    (not (null (handle menu)))))
 
 
 
-
-(defgeneric menu-enable (menu)
-  (:documentation "
-DO:             Enable a menu, making it possible to choose its
-                items.  This function has no effect if the menu is
-                already enabled.  Menus can be enabled and disabled at
-                any time.  The effects are visible only when the menu
-                is installed in the current menubar.
-")
-  (:method ((menu menu))
-    (unless (menu-enabled-p menu)
-      (setf (slot-value menu 'enabledp) t)
-      ;; (let ((owner (slot-value menu 'owner)))
-      ;;   (if owner
-      ;;       ))
-      (niy menu-enable))
-    menu))
+(defun ns-set-enabled (nsitem enabled)
+  (when nsitem
+    [nsitem setEnabled:enabled]))
 
 
 (defgeneric menu-disable (menu)
@@ -383,8 +394,23 @@ DO:             Disable a menu.  Its items may still be viewed, but
 ")
   (:method ((menu menu))
     (when (menu-enabled-p menu)
-      (setf (slot-value menu 'enabledp) nil)
-      (niy menu-disable))
+      (ns-set-enabled (handle-of-menu-item-of menu)
+                      (setf (slot-value menu 'enabledp) nil)))
+    menu))
+
+
+(defgeneric menu-enable (menu)
+  (:documentation "
+DO:             Enable a menu, making it possible to choose its
+                items.  This function has no effect if the menu is
+                already enabled.  Menus can be enabled and disabled at
+                any time.  The effects are visible only when the menu
+                is installed in the current menubar.
+")
+  (:method ((menu menu))
+    (unless (menu-enabled-p menu)
+      (ns-set-enabled (handle-of-menu-item-of menu)
+                      (setf (slot-value menu 'enabledp) t)))
     menu))
 
 
@@ -429,6 +455,7 @@ the menu item, or NIL if the item is not currently checked.")
                           :documentation "The keyboard equivalent of the menu item.
 If there is no keyboard equivalent, then nil.")
    (menu-item-action      :initarg :menu-item-action
+                          :initform nil
                           :accessor menu-item-action-function
                           :documentation "The function that is called when the menu item is selected.")
    (menu-item-icon-num    :initform nil
@@ -451,6 +478,7 @@ If there is no keyboard equivalent, then nil.")
                           :reader   menu-item-script
                           :writer   (setf menu-item-script-slot))))
 
+
 (defmethod initialize-instance :after ((menu-item menu-item)
                                        &key disabled &allow-other-keys)
   (setf (slot-value menu-item 'enabledp) (not disabled)))
@@ -471,7 +499,8 @@ of MENU-ITEM.
     nil)
   (:method ((menu-item menu-item))
     (let ((action (menu-item-action-function menu-item)))
-      (when action (funcall action)))))
+      (when action
+        (funcall action)))))
 
 
 (defgeneric set-menu-item-action-function (menu-item new-function)
@@ -498,7 +527,9 @@ RETURN:         NEW-TITLE
       (when owner
         (when (string= new-title "-")
           (menu-item-disable item)))
-      (niy set-menu-item-title))
+      (let ((nsitem (handle item)))
+        (when nsitem
+          [nsitem setTitle:(objcl:objcl-string new-title)])))
     new-title))
 
 
@@ -509,9 +540,9 @@ DO:             Disable the menu ITEM so that it cannot be chosen.
                 disabled.
 ")
   (:method ((item menu-element))
-    (when (menu-item-enabled-p menu)
-      (setf (slot-value item 'enabledp) nil)
-      (niy menu-item-disable)))
+    (when (menu-item-enabled-p item)
+      (ns-set-enabled (handle item)
+                      (setf (slot-value item 'enabledp) nil))))
   (:method ((menu menu))
     (menu-disable menu)))
 
@@ -523,9 +554,9 @@ DO:             Enable the menu ITEM so that it cannot be chosen.
                 enabled.
 ")
   (:method ((item menu-element))
-    (unless (menu-item-enabled-p menu)
-      (setf (slot-value item 'enabledp) t)
-      (niy menu-item-enable)))
+    (unless (menu-item-enabled-p item)
+      (ns-set-enabled (handle item)
+                      (setf (slot-value item 'enabledp) t))))
   (:method ((menu menu))
     (menu-enable menu)))
 
@@ -542,6 +573,21 @@ RETURN:         FLAG.
     flag))
 
 
+(defun decode-command-key (command-key)
+  "
+RETURN:         two values: the key equivalent NSString and the key
+                modifier integer corresponding to the command-key
+                descriptor.
+"
+  (values (cond
+            ((null command-key)  (objcl:objcl-string ""))
+            ((consp command-key) (objcl:objcl-string (second command-key)))
+            (t                   (objcl:objcl-string command-key)))
+          (if (atom command-key)
+              0
+              (encode-key-mask (first command-key)))))
+
+
 (defgeneric set-command-key (item new-key)
   (:documentation "
 DO:             Set the keyboard equivalent of the menu item to
@@ -550,10 +596,12 @@ NEW-KEY:        NIL, or a character, or a list (modifier character).
                 modifier can be :shift, :option (or :meta), or :control.
 ")
   (:method  ((item menu-element) new-key)
-    (let ((mod (when (consp new-key) (first  new-key)))
-          (chr (when (consp new-key) (second new-key))))
-      (setf (slot-value item 'command-key) new-key)
-      (niy set-command-key mod chr))))
+    (setf (slot-value item 'command-key) new-key)
+    (let ((nsitem (handle item)))
+      (when nsitem
+        (multiple-value-bind (ke km) (decode-command-key (command-key item))
+          [nsitem setKeyEquivalent:ke]
+          [nsitem setKeyEquivalentModifierMask:km])))))
 
 
 
@@ -583,7 +631,38 @@ RETURN:         NEW-MARK.
                 ((null new-mark)       nil)))
     (unless (eql new-mark (menu-item-check-mark item))
       (setf (slot-value item 'checkedp) new-mark)
-      (niy set-menu-item-check-mark))))
+      (let ((nsitem (handle item)))
+        (when nsitem
+          [nsitem setState: (if (menu-item-check-mark item) 1 0)])))))
+
+
+(defun style-to-attributes (style)
+  "
+STYLES:         A keyword or list of keywords. Allowable keywords are
+                :plain, :bold, :italic, :shadow, :outline, :underline,
+                :condense, and :extend. The keyword :plain indicates
+                the absence of other styles.
+"
+  (let ((style (ensure-list style)))
+    (if (member :plain style)
+        nil
+        (let ((dict  [NSMutableDictionary dictionaryWithCapacity:8])
+              (one   [NSNumber numberWithInt:1]))
+          (when (member :bold style)
+            [dict setObject:[NSNumber numberWithFloat:-1.0f0] forKey:#$NSStrokeWidthAttributeName])
+          (when (member :italic style)
+            [dict setObject:[NSNumber numberWithFloat:0.1f0] forKey:#$NSObliquenessAttributeName])
+          (when (member :shadow style)
+            [dict setObject:one forKey:#$NSShadowAttributeName])
+          (when (member :outline style)
+            [dict setObject:[NSNumber numberWithFloat:3.0f0] forKey:#$NSStrokeWidthAttributeName])
+          (when (member :underline style)
+            [dict setObject:one forKey:#$NSUnderlineStyleAttributeName])
+          (when (member :condense style)
+            [dict setObject:[NSNumber numberWithFloat:0.9f0] forKey:#$NSKernAttributeName])
+          (when (member :extend style)
+            [dict setObject:[NSNumber numberWithFloat:1.1f0] forKey:#$NSKernAttributeName])
+          dict))))
 
 
 (defgeneric set-menu-item-style (item newstyle)
@@ -597,7 +676,11 @@ NEW-STYLES:     A keyword or list of keywords. Allowable keywords are
 ")
   (:method ((item menu-element) newstyle)
     (setf (slot-value item 'style) newstyle)
-    (niy set-menu-item-style item newstyle)))
+    (let ((nsitem (handle item)))
+      (when nsitem
+        [nsitem setAttributedTitle:[NSAttributedString
+                                    initWithString:(objcl:objcl-string (slot-value item 'title))
+                                    attributes:(style-to-attributes newstyle)]]))))
 
 
 (defgeneric menu-item-update (item)
@@ -651,11 +734,14 @@ DO:             Append menu-items to the menu.  The new items are
 RETURN:         NIL.
 ")
   (:method ((menu menu) &rest menu-items)
+    ;; Check before, so that we don't install half of them in case of errors.
     (let ((menu-items (mapcar (lambda (item)
                                 (check-type item menu-element)
-                                (when (typep item 'menu)
-                                  (when (menu-installed-p item)
-                                    (error 'menu-already-installed-error :menu item)))
+                                (when (and (typep item 'menu)
+                                           (menu-installed-p item)
+                                           (menu-owner item)
+                                           (not (eq menu (menu-owner item))))
+                                  (error 'menu-already-installed-error :menu item))
                                 item)
                               menu-items)))
       (loop
@@ -669,8 +755,8 @@ RETURN:         NIL.
               (when (typep item 'menu)
                 (when (menu-installed-p menu)
                   (menu-install item)))
-              (set-part-color-loop item (slot-value item 'color-list))
-              (niy add-menu-items))))))
+              (set-part-color-loop item (slot-value item 'color-list))))
+      (unwrap menu))))
 
 
 (defgeneric remove-menu-items (menu &rest menu-items)
@@ -693,7 +779,8 @@ RETURN:         NIL.
             (when (typep item 'menu)
               (let ((*menubar-frozen* t))
                 (menu-deinstall item)))
-            (setf (slot-value menu 'item-list) (delete item (slot-value menu 'item-list)))))))))
+            (setf (slot-value menu 'item-list) (delete item (slot-value menu 'item-list)))
+            (release item)))))))
 
 
 (defgeneric find-menu-item (menu title)
@@ -773,7 +860,7 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 (defgeneric menu-item-number (item)
   (:method ((item menu-element))
-    (let ((owner (slot-value item 'owner)))
+    (let ((owner (menu-owner item)))
       (when owner
         (position item (slot-value owner 'item-list))))))
 
@@ -823,13 +910,15 @@ This is the menu-item-update-function for the items in the Edit menu.
                           (rplaca new-items item)
                           (setf new-items (cdr new-items))
                           (incf nitems)
-                          (when (and order-ok (neq item (car items)))
+                          (when (and order-ok (not (eq item (car items))))
                             (setf order-ok nil))
                           (setf items (cdr items))))))))
-              (when (or (not order-ok)(neq nitems (length items))(command-key-p))
+              (when (or (not order-ok)
+                        (/= nitems (length items))
+                        (command-key-p))
                 (dolist (item (slot-value menu 'item-list))
                   (setf (slot-value item 'owner) nil)
-                                        ; always delete item 1 (they get "renumbered" !)
+                  ;; always delete item 1 (they get "renumbered" !)
                   (#_DeleteMenuItem menu-handle 1))
                 (setf (slot-value menu 'item-list) nil) 
                 (when t                ;(osx-p)
@@ -850,27 +939,281 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 
 
+;;;-----------------------------------------------------------
+;;; [menu]-0/1---------*-[menu-element]
+;;; [NSMenu]-0/1---------*-[NSMenuItem]-0/1-----0/1-[NSMenu]
 
+
+@[NSObject subClass:MenuItemTarget
+           slots: ((menu-item :initform nil
+                              :initarg :menu-item
+                              :accessor target-menu-item))]
+
+@[MenuItemTarget method:(menuItemSelected:(:id)sender)
+                 resultType:(:id)
+                 body:
+                 (declare (ignore sender))
+                 (menu-item-action (target-menu-item self))
+                 self]
+
+@[MenuItemTarget method:(validateMenuItem:(:id)menu-item)
+                 resultType:(:<BOOL>)
+                 body: (declare (ignore menu-item))
+                 1]
+
+
+
+(defmethod unwrap ((item menu-item))
+  (unwrapping item
+              ;; (format t "~&unwrap menu ~S~%" (objcl:objcl-string (menu-title item))) (finish-output)
+              (if (and (stringp (menu-item-title item))
+                       (string= (menu-item-title item) "-"))
+                  (setf (handle item) [NSMenuItem separatorItem])
+                  (multiple-value-bind (ke km) (decode-command-key (command-key item))
+                    (let ((nsitem (or (handle item)
+                                      [[NSMenuItem alloc]
+                                       initWithTitle:(objcl:objcl-string (menu-item-title item))
+                                       action:(oclo:@selector "menuItemSelected:")
+                                       keyEquivalent:ke])))
+                      [nsitem setKeyEquivalentModifierMask:km]
+                      (when (nullp [nsitem target]) ; otherwise we keep the old target.
+                        [nsitem setTarget:(make-instance 'menu-item-target :menu-item item)])
+                      (ns-set-enabled nsitem (menu-enabled-p item))
+                      [nsitem setState: (if (menu-item-check-mark item) 1 0)]
+                      (setf (handle item) nsitem))))))
+
+
+(defmethod handle-of-menu-item-of ((menu menu))
+  "
+RETURN: The handle of the menu-item that has (handle menu) as submenu.
+"
+  (when (handle menu)
+    (let ((supermenu [(handle menu) supermenu]))
+      (if (nullp supermenu)
+          nil
+          (let ((index [supermenu indexOfItemWithSubmenu:(handle menu)]))
+            (if (minusp index)
+                nil
+                [supermenu itemAtIndex:index]))))))
+
+
+(defun ns-add-item (nsmenu nsitem)
+  "
+DO:             Add the NSItem NSITEM to the NSMenu NSMENU.
+
+NOTE:           NSITEM is removed from its menu if it is in one
+                already, before being added to NSMENU.
+"
+  (unless (nullp [nsitem menu])
+    ;; (format t "~&  removing item ~S from menu ~S~%" (objcl:lisp-string  [nsitem title]) (objcl:lisp-string  [[nsitem menu] title])) (finish-output)
+    [[nsitem retain] autorelease]                             
+    [[nsitem menu] removeItem:nsitem])
+  ;; (format t "~&  adding item ~S to menu ~S~%" (objcl:lisp-string [nsitem title]) (objcl:lisp-string  [nsmenu title])) (finish-output)
+  [nsmenu addItem:nsitem])
+
+
+(defun ns-attach-submenu (nsmenu submenu)
+  "
+DO:             Add to the NSMenu of MENU a NSItem with the NSMenu of
+                SUBMENU as submenu.  If the NSMenu of the submenu
+                doesn't already have a NSMenuItem, one is created.
+"
+  (let ((nsitem (handle-of-menu-item-of submenu)))
+    ;;     menu -- menu -- item
+    ;;                  -- item
+    ;;          -- item
+    ;; maps to:
+    ;;     NSMenu -- NSItem -- NSMenu -- NSItem
+    ;;                                -- NSItem
+    ;;            -- NSItem
+    (if nsitem
+        (progn
+          (ns-add-item nsmenu nsitem)
+          [nsmenu setSubmenu:(unwrap submenu) forItem:nsitem])
+        (let ((nsitem [[NSMenuItem alloc]
+                            initWithTitle:(objcl:objcl-string (menu-title submenu))
+                            action:*null*
+                            keyEquivalent:(objcl:objcl-string "")]))
+          (ns-add-item nsmenu nsitem)
+          [nsmenu setSubmenu:(unwrap submenu) forItem:nsitem]))))
+
+
+(defmethod unwrap ((menu menu))
+  (unwrapping menu
+              (let ((nsmenu (or (handle menu)
+                                [[NSMenu alloc] initWithTitle:(objcl:objcl-string (menu-title menu))])))
+                ;; (format t "~&unwrap menu ~S~%" (menu-title menu)) (finish-output)
+                (when (slot-value menu 'menu-font)
+                  [nsmenu setFont:(unwrap (slot-value menu 'menu-font))])
+                (dolist (item (slot-value menu 'item-list))
+                  ;; (format t "~&item ~S~%"  (menu-title item)) (finish-output)
+                  (if (typep item 'menu)
+                      (ns-attach-submenu nsmenu item)
+                      (let ((item-handle (handle item)))
+                        (if item-handle
+                            (ns-add-item nsmenu item-handle)
+                            (ns-add-item nsmenu (unwrap item))))))
+                (setf (handle menu) nsmenu))))
+
+
+;; (defmethod release ((item menu-item))
+;;   (call-next-method)
+;;   item)
+
+(defmethod release ((menu menu))
+  ;; (let ((nsmenu (handle menu)))
+  ;;   (dolist (item (slot-value menu 'item-list))
+  ;;     (when (and nsmenu (handle item))
+  ;;       [[item menu] removeItem:(handle item)])
+  ;;     (release item)))
+  (dolist (item (slot-value menu 'item-list))
+    (release item))
+  (call-next-method))
+
+
+
+(defclass original-menu (menu)
+  ())
+
+(defmethod release ((menu original-menu))
+  nil)
+
+(defclass original-menu-item (menu-item)
+  ())
+
+(defmethod release ((menu original-menu-item))
+  nil)
+
+(defparameter *key-mask-alist*
+  `((:alpha-shift . ,#$NSAlphaShiftKeyMask )
+    (:shift       . ,#$NSShiftKeyMask      )
+    (:control     . ,#$NSControlKeyMask    )
+    (:option      . ,#$NSAlternateKeyMask  )
+    (:command     . ,#$NSCommandKeyMask    )
+    (:numeric-pad . ,#$NSNumericPadKeyMask )
+    (:help        . ,#$NSHelpKeyMask       )
+    (:function    . ,#$NSFunctionKeyMask   )))
+
+(defun decode-key-mask (nskeymask)
+  (list-designator (loop
+                     :for (symbol . mask) :in *key-mask-alist*
+                     :when (plusp (logand mask nskeymask))
+                     :collect symbol)))
+
+(defun encode-key-mask (modifiers)
+  (reduce (function logior) (ensure-list modifiers)
+          :key (lambda (modifier)
+                 (cdr (or (assoc modifier *key-mask-alist*)
+                          (error "Invalid key modifier ~S" modifier))))))
+
+
+
+(defun %wrap-items (nsmenu)
+  (let ((items '()))
+    (dotimes (i [nsmenu numberOfItems] (nreverse items))
+      (push (wrap-nsmenuitem [nsmenu itemAtIndex:i]) items))))
+
+
+(defun wrap-nsmenuitem (item)
+  "
+RETURN:         A new instance of MENUITEM representing the NSMenuItem ITEM.
+"
+  (wrapping
+   (let ((submenu [item submenu]))
+     (apply (function make-instance) (if (nullp submenu)
+                                         'original-menu-item
+                                         'original-menu)
+            :handle (if (nullp submenu)
+                        item
+                        submenu)
+            :menu-item-title (objcl:lisp-string [item title])
+            :enabledp [item isEnabled]
+            :checkedp (if (zerop [item state])
+                          nil
+                          *check-mark*)
+            (if (nullp submenu)
+                (list :command-key (let ((ke (objcl:lisp-string [item keyEquivalent])))
+                                     (if (zerop (length ke))
+                                         nil
+                                         (let ((km (decode-key-mask [item keyEquivalentModifierMask])))
+                                           (if km
+                                               (list km (aref ke 0))
+                                               (aref ke 0))))))
+                (list :menu-items (%wrap-items submenu)))))))
+
+
+(defun wrap-nsmenu (nsmenu)
+  "
+RETURN:         A new instance of MENU representing the NSMenu NSMENU.
+"
+  (wrapping
+   (make-instance 'original-menu
+       :handle nsmenu
+       :menu-title (objcl:lisp-string [nsmenu title])
+       :enabledp t
+       :checkedp nil
+       :menu-items (%wrap-items nsmenu)
+       :menu-font (wrap-font [nsmenu font]))))
+
+
+
+
+(defun fetch-current-menubar ()
+  "
+DO:             Inspect the application main menu, and build the
+                lisp-side view of the menu bar.  This updates the
+                variables *APPLE-MENU* *FILE-MENU* *EDIT-MENU*
+                *LISP-MENU* *TOOL-MENU* *WINDOW-MENU*.
+
+RETURN:         The list of MENUs collected.
+"
+  (let ((menubar (menu-items (wrap-nsmenu [[NSApplication sharedApplication] mainMenu]))))
+    (dolist (menu menubar)
+      (setf (slot-value menu 'owner) nil))
+    (setf *apple-menu*  (change-class (first menubar) 'apple-menu)
+          *file-menu*   (find "File"   menubar :key (function menu-title) :test (function string=))
+          *edit-menu*   (find "Edit"   menubar :key (function menu-title) :test (function string=))
+          *lisp-menu*   (find "Lisp"   menubar :key (function menu-title) :test (function string=))
+          *tool-menu*   (find "Tool"   menubar :key (function menu-title) :test (function string=))
+          *window-menu* (find "Window" menubar :key (function menu-title) :test (function string=)))
+    menubar))
 
 
 (defun initialize/menu ()
-  (setf *apple-menu*   (make-instance 'apple-menu :title "Apple")
-        ;; We should get the menus from the actual Openstep menus:
-        *file-menu*    (make-instance 'menu :title "File")
-        *edit-menu*    (make-instance 'menu :title "Edit")
-        *lisp-menu*    (make-instance 'menu :title "Lisp")
-        *tool-menu*    (make-instance 'menu :title "Tools")
-        *window-menu*  (make-instance 'menu :menu-title "Windows"
-                                      :update-function 'update-windows-menu
-                                      :help-spec '(values 1500 (1501 1 2 1 3)))  
-        *menubar*      (make-instance 'menubar
-                           :menus (list *apple-menu*
-                                        *file-menu*
-                                        *edit-menu*
-                                        *lisp-menu*
-                                        *tool-menu*
-                                        *window-menu*)))
-  (niy initialize-menu))
+  (setf *default-menubar* (fetch-current-menubar)
+        ;; Notice this menubar instance is immediately replaced by the following SET-MENUBAR call.
+        *menubar*      (make-instance 'menubar :menus (copy-list *default-menubar*)))
+  (dolist (item (list  (make-instance 'menu-item
+                           :menu-item-title "Abort"
+                           :menu-item-action (lambda () (invoke-restart 'abort)))
+                       (make-instance 'menu-item
+                           :menu-item-title "Break"
+                           :menu-item-action (lambda () (invoke-restart 'break)))
+                       (make-instance 'menu-item
+                           :menu-item-title "Continue"
+                           :menu-item-action (lambda () (invoke-restart 'continue)))
+                       (make-instance 'menu-item
+                           :menu-item-title "Force Quit"
+                           :menu-item-action (lambda () (ccl:quit)))))
+    (unless (find-menu-item *lisp-menu* (menu-item-title item))
+      (add-menu-items *lisp-menu* item)))
+  (values))
 
+
+;; (let ((bar [[NSApplication sharedApplication]mainMenu]))
+;;   (dotimes (i [bar numberOfItems])
+;;     [[[bar itemAtIndex:i] menu] setAutoenablesItems:t]
+;;     [[[bar itemAtIndex:i] menu] update]))
+;; 
+;; (dolist (menu *default-menubar*)
+;;   (menu-disable menu)
+;;   (menu-enable menu)
+;;   (dolist (item (menu-items menu))
+;;     (menu-item-disable item)
+;;     (menu-item-enable item)))
+;; 
+;; [(handle (find-menu-item (find-menu "Patchwork") "PW")) target]
+;; #<A Null Foreign Pointer>
+;; (menu-item :title "PW" :enabledp t :checkedp nil "x30200259B94D")
 
 ;;;; THE END ;;;;

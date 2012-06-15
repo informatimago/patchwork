@@ -317,7 +317,7 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
   (if (subtypep (type-of (first self)) 'C-break-point-function)
     (let ((y-vals (mapcar #'(lambda (bpf) (get-transfer-output bpf points)) self)))
       (if (rest y-vals) y-vals (first y-vals)))
-    (progn (format t "input is not a bpf or lists of bpfs ~%") (ed-beep))))
+    (progn (format t "input is not a bpf or lists of bpfs ~%") (ui:ed-beep))))
 
 (defunp bpf-sample ((bpf-ob0 list (:value 'nil :type-list (list patch-work::bpf)))
                     (echan1 fix>0 (:min-val 2 :value 2)) (xinit2 fix) (xend3 fix (:value 100))

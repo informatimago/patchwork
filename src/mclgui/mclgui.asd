@@ -38,7 +38,8 @@
     :author "Pascal J. Bourguignon"
     :version "1.0.3"
     :license "GPL3"
-    :depends-on ("closer-mop") ; window.lisp uses closer-mop:class-precedence-list
+    :depends-on ("closer-mop" ; window.lisp uses closer-mop:class-precedence-list, etc.
+                 "com.informatimago.objcl") 
     :components ((:file "package")
 
                  (:file "macros"
@@ -50,6 +51,9 @@
                  (:file "system"
                         :depends-on ("package"))
                  
+                 (:file "wrapper"
+                        :depends-on ("package"))
+                 
                  ;; Chapter 2:
 
                  (:file "point"
@@ -57,7 +61,7 @@
 
                  (:file "font"
                         :depends-on ("package" 
-                                     "macros" "variables"
+                                     "macros" "variables" "system"
                                      "point" ))
                  
                  ;; Chapter 3: Menus
@@ -65,7 +69,7 @@
                  (:file "menu"
                         :depends-on ("package" 
                                      "macros" "variables" "color"
-                                     "point" "font"))
+                                     "point" "font" "wrapper"))
 
                  (:file "window-menu-item"
                         :depends-on ("package" 
@@ -75,7 +79,8 @@
 
                  (:file "view-classes"
                         :depends-on ("package" 
-                                     "macros" "variables" "color"))
+                                     "macros" "variables" "color"
+                                     "wrapper"))
 
                  (:file "view"
                         :depends-on ("package" 
@@ -88,6 +93,12 @@
                                      "macros" "variables" "color"
                                      "point" "region" "font"
                                      "view-classes" "view"))
+
+                 (:file "fred-window"
+                        :depends-on ("package" 
+                                     "macros" "variables" "color"
+                                     "point" "region" "font"
+                                     "view-classes" "view" "window"))
 
                  ;; Chapter 5: Dialog Items and Dialogs
 
@@ -209,6 +220,15 @@
                                      "button-dialog-item" 
                                      "static-text-dialog-item" "editable-text-dialog-item"
                                      "dialog"))
+
+                 (:file "scroller"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point"
+                                     "system"
+                                     "view-classes" "view" "window" "event"
+                                     "dialog-item" "key-handler-mixin"
+                                     "scroll-bar-dialog-item"
+                                     "dialog"))
                  
                  ;; Chapter 6: Color
 
@@ -258,7 +278,7 @@
 
                  (:file "application"
                         :depends-on ("package" 
-                                     "macros" "variables"))
+                                     "macros" "variables" "wrapper"))
                  
                  ;; Appendix D: Quickdraw Graphics:
 
@@ -272,7 +292,7 @@
                         :depends-on ("package"
                                      "macros" "variables"
                                      "point" "font"
-                                     "menu" "view" "window" "dialog"
+                                     "menu" "view" "window" "dialog" "fred-window"
                                      "dialog-item" "control-dialog-item"
                                      "button-dialog-item" "check-box-dialog-item"
                                      "radio-button-dialog-item" "static-text-dialog-item"
@@ -280,6 +300,7 @@
                                      "table-dialog-item" "scroll-bar-dialog-item"
                                      "pop-up-menu-dialog-item" "sequence-dialog-item"
                                      "y-or-n-dialog" "message-dialog" "select-dialog"
+                                     "scroller"
                                      "event" "view-event" "window-event"
                                      "cursor" "scrap" "eval" "application"))))
 

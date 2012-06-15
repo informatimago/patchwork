@@ -309,7 +309,7 @@ NEW-SCROLLEE: The new scrollee of item.
       min
       (progn
         (unless (and mac-min mac-max)
-          (multiple-value-setf (mac-min mac-max) (mac-scroll-bar-min-max min max)))
+          (multiple-value-setq (mac-min mac-max) (mac-scroll-bar-min-max min max)))
         (min mac-max
              (+ mac-min
                 (round (* (- setting min) (- mac-max mac-min)) (- max min)))))))
@@ -325,7 +325,9 @@ NEW-SCROLLEE: The new scrollee of item.
         (max (scroll-bar-max scroll-bar)))    
     (declare (fixnum mac-min mac-max))
     (when (and #|(osx-p)|# (not (scroll-bar-track-thumb-p scroll-bar))) ;(> (- mac-max mac-min) 3000)) ;; total kludge because osx sucks
-      (if (and (neq 0 mac-setting)(> (truncate (- mac-max mac-min) mac-setting) 100))(progn (setf mac-setting mac-min))))
+      (if (and (/= 0 mac-setting)
+               (> (truncate (- mac-max mac-min) mac-setting) 100))
+          (progn (setf mac-setting mac-min))))
     (if (eql mac-min mac-max)
         mac-min
         (+ min (round (* (- mac-setting mac-min) (- max min)) (- mac-max mac-min))))))
@@ -746,7 +748,7 @@ NEW-VALUE:     The new minimum setting of item.
 
 ")
   (:method ((item scroll-bar-dialog-item) new-value)
-    (setf new-value (require-type new-value 'fixnum))
+    (check-type new-value fixnum)
     (unless (eql new-value (scroll-bar-min item))
       (setf (slot-value item 'min) new-value)
       (update-scroll-bar-max-min-setting item))
@@ -773,7 +775,7 @@ NEW-VALUE:     The new maximum setting of item.
 
 ")
   (:method ((item scroll-bar-dialog-item) new-value)
-    (setf new-value (require-type new-value 'fixnum))
+    (check-type new-value fixnum)
     (unless (eql new-value (scroll-bar-max item))
       (setf (slot-value item 'max) new-value)
       (update-scroll-bar-max-min-setting item))
@@ -961,7 +963,7 @@ NEW-VALUE:      The new width of item.
     (when splitter
       (set-view-container splitter new-container))
     (call-next-method)
-    (when (and new-container (neq old-container new-container)) 
+    (when (and new-container (not (eq old-container new-container))) 
       (multiple-value-bind (tl br) (scroll-bar-and-splitter-corners item)
         (invalidate-corners new-container tl br)))))
 
@@ -1097,7 +1099,7 @@ NEW-VALUE:      The new width of item.
                    (draw-pane-splitter-outline
                     scrollee scroll-bar pos min max line-direction)))
             (declare (dynamic-extent #'draw-line))
-            (multiple-value-setf (pos drawn)
+            (multiple-value-setq (pos drawn)
               (track-and-draw container #'draw-line pos direction delta min-pos max-pos)))
                                         ; Convert back to scrollee's coordinate system
           (setf pos (funcall pos-accessor (convert-coordinates 
@@ -1135,7 +1137,7 @@ NEW-VALUE:      The new width of item.
   (let* ((window (view-window scrollee))
          (container (view-container scrollee)))
     (multiple-value-bind (tl br) (view-corners scrollee)
-      (when (and container (neq container window))
+      (when (and container (not (eq container window)))
         (setf tl (convert-coordinates tl container window)
               br (convert-coordinates br container window)))
       (values tl br))))

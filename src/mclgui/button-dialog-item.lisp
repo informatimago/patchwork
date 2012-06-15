@@ -97,7 +97,7 @@ NEW-BUTTON:     The button that should be made the default button, or
           (setf (%get-default-button dialog) new-button)
           (when new-button
             (when (dialog-item-handle new-button)
-              (if (dont-throb new-button) ;(and (osx-p)(neq (view-container new-button)(view-window new-button)))
+              (if (dont-throb new-button) ;(and (osx-p) (neq (view-container new-button)(view-window new-button)))
                   nil  ;; so we act like a default button but dont look like one
                   (niy set-default-button window new-button)
                   #-(and)
@@ -140,7 +140,7 @@ default button in the view-window of ITEM.  Otherwise it returns NIL.
    (part-color item :body)        
    #+ignore ;; font seems to work - oops no it doesn't
    (and (default-button-p item)
-        (or (neq (view-window item)(view-container item))
+        (or (not (eq (view-window item)(view-container item)))
             #+ignore
             (multiple-value-bind (ff ms)(view-font-codes item)
               (declare (ignore-if-unused ms))

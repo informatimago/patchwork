@@ -35,16 +35,6 @@
 (in-package "MCLGUI")
 
 
-'(POP-up-menu selected-item pop-up-menu-item-display
-  pop-up-menu-default-item set-pop-up-menu-default-item
-  pop-up-menu-auto-update-default set-pop-up-item-check-mark
-  pull-down-menu
-  typein-menu action-pop-up-menu
-  use-pop-up-control
-  *use-pop-up-control*)
-
-
-
 (defclass pop-up-menu (menu simple-view)
   ((width-correction
     :allocation :class
@@ -139,13 +129,19 @@ default menu item.  Otherwise the value itself is displayed as if by
 
 
 (defmethod print-object ((thing pop-up-menu) stream)
-  (print-unreadable-object (thing stream)
-    (format stream "~S ~S"
-            (class-name (class-of thing))
-            (let ((title (menu-title  thing)))
-              (if (and title (not (equal title "")))
-                  title
-                  (get-menu-body-text thing))))))
+  (print-parseable-object (thing stream :type t :identity t)
+                          (:title (let ((title (menu-title  thing)))
+                                    (if (and title (not (equal title "")))
+                                        title
+                                        (get-menu-body-text thing)))))
+  ;; (print-unreadable-object (thing stream)
+  ;;   (format stream "~S ~S"
+  ;;           (class-name (class-of thing))
+  ;;           (let ((title (menu-title  thing)))
+  ;;             (if (and title (not (equal title "")))
+  ;;                 title
+  ;;                 (get-menu-body-text thing)))))
+  )
 
                                         ;------
 
@@ -168,7 +164,7 @@ default menu item.  Otherwise the value itself is displayed as if by
             (with-focused-dialog-item (menu window)
               (when handle
                 (cond 
-                  ((neq (view-container menu) window)
+                  ((not (eq (view-container menu) window))
                    (let ((old-rect (pop-up-menu-rect menu)))
                      (rlet ((gag-rect :rect))
                            (setf (rref gag-rect :rect.topleft) (convert-coordinates (rref old-rect :rect.topleft) (view-container menu) window))
@@ -207,7 +203,7 @@ default menu item.  Otherwise the value itself is displayed as if by
   (declare (ignore initargs))
   (when highlight-title (view-put menu :highlight-title t))
   (let ((default (pop-up-menu-default-item menu)))    
-    (when (and default (neq default 0))
+    (when (and default (/= default 0))
       (setf default (nth (1- default) (menu-items menu)))
       (when default (set-pop-up-item-check-mark default t)))))
 
@@ -553,8 +549,8 @@ default menu item.  Otherwise the value itself is displayed as if by
   (declare (dynamic-extent items))
   ;; fix this mess or nuke it and do in main method
   ;; nb changing the font of a menu on the fly wont do item style today
-  (let ((style-num (lsh (logand (view-font-codes menu) #xffff) -8)))
-    (unless (eq style-num #.(cdr (assoc :plain *style-alist*)))
+  (let ((style-num (ash (logand (view-font-codes menu) #xffff) -8)))
+    (unless (eq style-num (cdr (assoc :plain *style-alist*)))
       (let ((style (inverse-style-arg style-num)))
         (dolist (i items)
           (when (not (menu-item-style i))

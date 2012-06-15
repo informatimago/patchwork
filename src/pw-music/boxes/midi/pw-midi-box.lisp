@@ -234,7 +234,7 @@ channel
 
 (defmethod play-yourself-as-object ((object t) chan approx)
   (format t "don't know how to play object: ~S ~%" object)
-         (ed-beep))
+         (ui:ed-beep))
 |#
 
 

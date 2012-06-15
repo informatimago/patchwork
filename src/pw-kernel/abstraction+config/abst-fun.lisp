@@ -89,7 +89,7 @@
        (when exists?
          (warn "the name ' ~D ' already exists for an abstraction.
 A previous function called ~D will be redefined" new-name new-name)
-         (ed-beep))
+         (ui:ed-beep))
        (setf (pw-function self) new-name)
        (init-pw-function-string self)
        (delete-file comp-name)
@@ -335,7 +335,7 @@ A previous function called ~D will be redefined" new-name new-name)
 
 (defmethod compile-me ((self C-pw-test) obj)
   ;;(format t "PW WARNING: Compilation of a test box produces an (almost) equivalent
-;;function that evaluates all entries") (ed-beep)
+;;function that evaluates all entries") (ui:ed-beep)
   (let* ((objects (input-objects self))
          (controls (pw-controls self))
          (fun (if (eq (first objects) (first controls))

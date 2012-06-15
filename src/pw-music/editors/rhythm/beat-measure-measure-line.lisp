@@ -386,7 +386,7 @@
 (defmethod set-value-from-global-tty ((self C-beat) beat-string) 
   (let ((rtm-info (check-rtm-input-string beat-string)))
     (if (not rtm-info)
-      (ed-beep)
+      (ui:ed-beep)
       (progn 
         (setq rtm-info `(,(abs (car rtm-info)) ',@(cdr rtm-info))) ;to avoid "'" 
         (replace-old-beat (super-beat self) self (eval `(beat-constructor ,(car rtm-info) ,(second rtm-info))))
@@ -751,12 +751,12 @@ metronome units
  (let ((num-or-list (read-from-string beat-string)))
      (if (eq *measure-edit-mode* 'metr)
         (if (not (listp num-or-list))  
-          (ed-beep)
+          (ui:ed-beep)
           (progn 
             (setf (metronome-unit self) (first num-or-list))
             (setf (metronome self) (second num-or-list))))
          (if (not (numberp num-or-list))  
-           (ed-beep)
+           (ui:ed-beep)
            (setf (low self) beat-string)))
       (when *current-rtm-editor* 
         (erase+view-draw-contents *current-rtm-editor*))))

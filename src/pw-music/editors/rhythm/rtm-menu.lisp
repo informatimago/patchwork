@@ -125,8 +125,8 @@
               (window-select *active-RTM-window*)
               (enable-all-apps-menu-items)
               (menu-item-disable *apps-RTM-menu-item*))
-            (ed-beep))
-          (ed-beep)))))
+            (ui:ed-beep))
+          (ui:ed-beep)))))
 
 ;;============================================
 ;; printing 

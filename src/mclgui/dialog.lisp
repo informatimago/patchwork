@@ -534,7 +534,7 @@ STRING:         A string against which to compare the text of the
                    (key-handler-p item)))
     (error "~s is either disabled or is not a key-handler item of ~s" item dialog))
   (without-interrupts
-   (if (and (neq item (setf old (%get-current-key-handler dialog)))
+   (if (and (not (eq item (setf old (%get-current-key-handler dialog))))
             (if old 
               (when (exit-key-handler old item)
                 (multiple-value-bind (s e) (selection-range old)
@@ -673,7 +673,7 @@ STRING:         A string against which to compare the text of the
   (let ((start 0) 
         (end (length text)))
     (when (not (simple-string-p text))
-      (multiple-value-setf (text start end) (string-start-end text start end)))
+      (multiple-value-setq (text start end) (string-start-end text start end)))
     (niy draw-theme-text-box text rect text-justificiation truncwhere active-p)
     #-(and)
     (when (not (fixnump text-justification))
@@ -721,13 +721,13 @@ STRING:         A string against which to compare the text of the
   #-(and)
   (multiple-value-bind (ff ms)(grafport-font-codes)
     (let* ((foo (grafport-fore-color))) ;; 0 is black is 0    
-      (if (neq foo 0)(setf ff (logior (logand ff (lognot #xff)) (fred-palette-closest-entry foo))))
+      (if (not (eq foo 0)) (setf ff (logior (logand ff (lognot #xff)) (fred-palette-closest-entry foo))))
       (values ff ms))))
 
 (defun color->ff-index (color)
   (niy color->ff-index color)
   #-(and)
-   (if (and color (neq color *black-color*))
+   (if (and color (not (eq color *black-color*)))
      (fred-palette-closest-entry color)
      0))
 
@@ -765,11 +765,11 @@ STRING:         A string against which to compare the text of the
                                    (start 0)(end (length string))
                                    ff ms color)
   (when (not (and ff ms))
-    (multiple-value-setf (ff ms) (grafport-font-codes-with-color)))
+    (multiple-value-setq (ff ms) (grafport-font-codes-with-color)))
   (when color
     (setf ff (logior (logand ff (lognot #xff)) (color->ff-index color))))
   (when (not (simple-string-p string))
-    (multiple-value-setf (string start end) (string-start-end string start end)))
+    (multiple-value-setq (string start end) (string-start-end string start end)))
   (multiple-value-bind (line-ascent descent width leading)(font-codes-info ff ms)
     (declare (ignore width))
     (niy draw-string-in-rect string rect truncation justification compress-p start end ff ms color)
@@ -783,13 +783,13 @@ STRING:         A string against which to compare the text of the
           (%stack-block ((ubuff (%i+ numchars numchars)))
             (copy-string-to-ptr string start numchars ubuff)
             (with-atsu-layout (layout ubuff numchars ff ms)
-              (when (and truncation (neq truncation :none))
+              (when (and truncation (not (eq truncation :none)))
                 (set-layout-line-truncation-given-layout layout truncation (null compress-p))) ;; aha need no-squash-p                
               (set-layout-line-width-given-layout layout max-width)
               (when justification  ;; doesnt work - fixed now
                 (set-layout-line-justification-given-layout layout justification))
               (cond
-               ((and truncation (neq truncation :none))
+               ((and truncation (not (eq truncation :none)))
                 (errchk (#_atsudrawtext layout 0 numchars
                          (#_long2fix hpos)
                          (#_long2fix (%i+ vpos line-ascent)))))

@@ -282,7 +282,7 @@
 
 (defmethod update-wins-menu-items ((self C-pw-window))
   (when (wins-menu-item self)
-    (MENU-item-disABLE (wins-menu-item self)))) 
+    (menu-item-disable (wins-menu-item self)))) 
 
 #||
 (defmethod view-activate-event-handler :after ((self C-pw-window))
@@ -456,11 +456,11 @@
              (:Newline 
               (cond ((abstract-box self) (window-hide self) (window-select (view-window (abstract-box self))))
                     ((super-win self) (window-hide self) (window-select (super-win self)))
-                    (t (ed-beep) (setq no-change-flag t))))
+                    (t (ui:ed-beep) (setq no-change-flag t))))
              (:Enter  
               (cond ((abstract-box self) (window-select (view-window (abstract-box self))))
                     ((super-win self) (window-select (super-win self)))
-                    (t (ed-beep) (setq no-change-flag t))))
+                    (t (ui:ed-beep) (setq no-change-flag t))))
                                         ;(#\b  (if (active-patches self) (browse (car (active-patches self)))))
              (:Delete (cut-delete self))
              (#\h 
@@ -469,10 +469,10 @@
                   (make-PW-help-window))
               (window-select *PW-help-window*))
              (#\t     ;;tutorial patch
-              (if (active-patches self) (tell (active-patches self) #'get-tutorial-patch) (ed-beep)))
+              (if (active-patches self) (tell (active-patches self) #'get-tutorial-patch) (ui:ed-beep)))
              (#\R 
               (if (top-level-patch-win? self)
-                  (ed-beep)
+                  (ui:ed-beep)
                   (let ((title
                           (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
                                                  :initial-string (window-title self))))
@@ -482,7 +482,7 @@
                          (set-dialog-item-text-from-dialog (car (pw-controls (out-obj (abstract-box self)))) title))
                         ((super-win self)
                          (set-window-title self title)(erase+view-draw-contents (super-win self))))))))
-             (#\r (if (active-patches self) (rename-boxes self) (ed-beep)))
+             (#\r (if (active-patches self) (rename-boxes self) (ui:ed-beep)))
              (#\X (if (active-patches self) 
                       (allign-patches-to-x-y self) (setq no-change-flag t)))
              (#\Y (if (active-patches self) 
@@ -502,7 +502,7 @@
              (#\C 
               (if (super-note self)
                   (record-midi-out-boxes- self (give-structured-duration1 self 1))
-                  (ed-beep)))
+                  (ui:ed-beep)))
              (#\s (tell (controls self) 'stop-play))
              (#\v (run-boxes self))
              (otherwise (ED-BEEP)(setq no-change-flag t)))

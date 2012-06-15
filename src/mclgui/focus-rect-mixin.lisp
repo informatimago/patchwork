@@ -49,7 +49,7 @@
 
 (defmethod set-view-size ((item focus-rect-mixin) h &optional v)
   (let ((pt (make-point h v)))
-    (unless (point= pt (view-size item))
+    (unless (eql pt (view-size item))
       (with-focused-view (view-container item)
         (erase-focus-rect item)
         (call-next-method)
@@ -58,7 +58,7 @@
 
 (defmethod set-view-position ((item focus-rect-mixin) h &optional v)
   (let ((pt (make-point h v)))
-    (unless (point= pt (view-position item))
+    (unless (eql pt (view-position item))
       (with-focused-view (view-container item)    
         (erase-focus-rect item)
         (call-next-method)

@@ -195,7 +195,7 @@ editor opened for more information."
                      (error "measures ~S and beats do not agree" meas-sign)
                      (progn
                        (unless already-warned
-                         (ed-beep)
+                         (ui:ed-beep)
                          (warn "measures ~S and beats do not agree. Measure(s) will be changed" meas-sign)
                          (setq already-warned t))
                        (push (make-measure (low-of meas-sign) (nreverse beat-objs) 

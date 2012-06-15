@@ -217,7 +217,7 @@
     (when exists?
       (warn "the name ~D already exists for an abstraction.
 A unique name will be chosen (if not a 'redraw')" fun-name)
-      (ed-beep)
+      (ui:ed-beep)
       (setq fun-name (intern (string (gensym (string fun-name))) "USER-ABSTRACTION"))
       (set-window-title new-win (string fun-name)))
     (let ((arg-names (mapcar #'(lambda (absin) (read-from-string (doc-string absin)))

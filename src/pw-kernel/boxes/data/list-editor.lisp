@@ -320,7 +320,7 @@
           ((#\h) (open-application-help-window self))
           (otherwise 
            (set-array-item table selection (string char))
-           (edit-selected-cell table)  ;;;(ed-beep)
+           (edit-selected-cell table)  ;;;(ui:ed-beep)
            )))))
 
 (defvar *lst-ed-box-help-window* ())

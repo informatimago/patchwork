@@ -47,11 +47,6 @@
 
 
 
-(defun ensure-list (object)
-  (if (listp object)
-      object
-      (list object)))
-
 
 (defun initialize/pattern ()
   (niy initialize/pattern))
@@ -79,8 +74,8 @@
   (values))
 
 
-(eval-when (:load-toplevel :execute)
-  ;; It should be better done at application launch…
-  (initialize))
+;; (eval-when (:load-toplevel :execute)
+;;   ;; It should be better done at application launch…
+;;   (initialize))
 
 ;;;; THE END ;;;;

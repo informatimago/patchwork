@@ -37,6 +37,15 @@
 
 
 
+(defmethod view-allocate-clip-region ((window window))
+  ;; Note: It's important here that a view's WPTR gets set before its subview's
+  ;; WPTR's and that it gets cleared (set to NIL) after its subview's WPTR's.
+  ;; Otherwise (:method (setf wptr) (t dialog-item)) won't work.
+  (let ((rgn (view-clip-region-slot window)))
+    (or rgn
+        (setf (view-clip-region-slot window) (new-rgn)))))
+
+
 
 (defgeneric view-window (view)
   (:documentation "
@@ -109,7 +118,6 @@ INCLUDE-WINDOIDS
 RETURN:         the second window on the list of windows; it is
                 equivalent to (second (windows)).
 "
-  (niy target)
   (second (windows)))
 
 
@@ -179,7 +187,12 @@ The MCL event system calls WINDOW-CLOSE when the user clicks a window’s
 close box or chooses Close from the File menu.
 ")
   (:method ((window window))
-    (niy window-close window)))
+    (let ((handle (handle window)))
+      (when handle
+        [handle setReleasedWhenClosed:t]
+        [handle close]))
+    (release window)
+    (niy window-close window "need to remove the window from the *window-list*")))
 
 
 
@@ -268,22 +281,28 @@ V:              The vertical coordinate of the new position, or NIL if
                 the complete position is given by H.
 "
   (if (numberp h)
-      (progn
-        ;; (#_MoveWindow (wptr w) (point-h h) (point-v h) nil)
-        (niy set-view-position window (make-point h v))
-        h)
+      (let ((pos      (make-point h v))
+            (siz      (view-size window))
+            (mswindow (handle window)))
+        (setf (slot-value window 'view-position) pos)
+        (when mswindow
+          [mswindow setFrame:(ns:make-ns-rect (point-h pos) (point-v pos)
+                                              (point-h siz) (point-v siz))])
+        pos)
       (set-view-position window (center-window (view-size window) h))))
 
 
 (defmethod set-view-size ((window window) h &optional v)
-  (let ((new-size (make-point h v)))
-    (unless (eql new-size (view-size window))
-      (niy set-view-size window h v)
-      ;; (set-view-size-internal window new-size)
-      ;; (make-view-invalid window)
-      )
+  (let ((siz (make-point h v)))
+    (unless (eql siz (view-size window))
+      (let ((pos      (view-position window))
+            (mswindow (handle window)))
+        (setf (slot-value window 'view-size) siz)
+        (when mswindow
+          [mswindow setFrame:(ns:make-ns-rect (point-h pos) (point-v pos)
+                                              (point-h siz) (point-v siz))])))
     (refocus-view window)
-    new-size))
+    siz))
 
 
 (defgeneric window-size-parts (w)
@@ -335,8 +354,10 @@ NEW-TITLE:      A string to be used as the new title.
                :view window
                :format-control "Title ~S too long"
                :format-arguments (list new-title)))
-      (niy set-window-title new-title)
       (setf (slot-value window 'window-title) new-title)
+      (let ((nswindow (handle window)))
+        (when nswindow
+          [nswindow setTitle:(objcl:objcl-string new-title)]))
       new-title)))
 
 
@@ -354,14 +375,19 @@ NEW-TITLE:      A string to be used as the new title.
 (defgeneric window-show (window)
   (:method ((window window))
     (unless (window-visiblep window)
-      (niy window-show window)
-      (setf (slot-value window 'visiblep) t))
+      (setf (slot-value window 'visiblep) t)
+      (let ((nswindow (handle window)))
+        (when nswindow
+          [nswindow makeKeyAndOrderFront:nswindow])))
     window))
+
 
 (defgeneric window-hide (window)
   (:method ((window window))
     (when (window-visiblep window)
-      (niy window-hide window)
+      (let ((nswindow (handle window)))
+        (when nswindow
+          [nswindow orderOut:nswindow]))
       (setf (slot-value window 'visiblep) nil)
       (when (eq window *selected-window*)
         (window-select (front-window))))
@@ -528,18 +554,21 @@ DO:             Bring WINDOW to the front, activate it, and show
     (if (eq window *selected-window*)
         (unless (window-active-p window)
           (view-activate-event-handler window))
-        (when *selected-window*        
-          (view-deactivate-event-handler *selected-window*))
-        (niy window-select window)
-        (setf *selected-window* nil)
-        (reselect-windows)
-        (window-bring-to-front window)
-        (setf *selected-window* window)
-        (view-activate-event-handler window)
-        (menu-update (edit-menu)))))
+        (progn
+         (when *selected-window*        
+           (view-deactivate-event-handler *selected-window*))
+         (let ((handler (handler window)))
+           (when handler
+             [handler makeKeyAndOrderFront:handler]))
+         (setf *selected-window* nil)
+         (reselect-windows)
+         (window-bring-to-front window)
+         (setf *selected-window* window)
+         (view-activate-event-handler window)
+         (menu-update (edit-menu))))))
 
 
-
+ 
 (defgeneric window-zoom-position (window)
   (:documentation "
 RETURN:         The zoom position of WINDOW, that is, its position
@@ -764,7 +793,7 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 (defmethod window-revert ((window window))
   (window-do-operation window 'revert nil))
 
-(defmethod window-hardcopy ((window window))
+(defmethod window-hardcopy ((window window) &optional show-fl)
   (window-do-operation window 'hardcopy nil))
 
 
@@ -795,7 +824,6 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 (defgeneric select-all (window)
   (:method ((window window))
     (window-do-operation window 'select-all nil)))
-
 
 
 

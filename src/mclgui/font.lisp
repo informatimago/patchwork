@@ -301,11 +301,12 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
                   color-mask 255))))
         ((let ((temp (xfer-mode-arg item)))
            (when temp
-             (when mode
-               (error 'invalid-font-spec-error :font-spec font-spec 
-                      :reason :duplicate-text-mode  :option item))
-             (setf mode temp
-                   mode-mask -1))))
+             (if mode
+                 (unless (eq item :plain)
+                   (error 'invalid-font-spec-error :font-spec font-spec 
+                          :reason :duplicate-text-mode  :option item))
+                 (setf mode temp
+                       mode-mask -1)))))
         ((let ((entry (assoc item *style-alist*)))
            (when entry
              (when (eql (car entry) :plain)
@@ -318,15 +319,15 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
          (error 'invalid-font-spec-error :font-spec font-spec 
                 :reason :invalid-option :option item))))
     (let ((font  (or font  (point-v old-ff)))
-          (face  (if (and reset-stype-p face)
+          (face  (if (and reset-style-p face)
                      face
                      (logior (or face 0) (ldb (byte 8 8) (point-h old-ff)))))
           (color (or color (ldb (byte 8 0) (point-h old-ff))))
           (mode  (or mode  (point-v old-ms)))
           (size  (or size  (point-h old-ms))))
-      (values (make-point (dpb face (ldb (byte 8 8) color)) font)
+      (values (make-point (dpb face (byte 8 8) color) font)
               (make-point size mode)
-              (make-point (dpb face-mask (ldb (byte 8 8) color-mask)) font-mask)
+              (make-point (dpb face-mask (byte 8 8) color-mask) font-mask)
               (make-point size-mask mode-mask)))))
 
 
@@ -456,6 +457,11 @@ DO:             Change the view font codes of view.  The font/face
                 passing all bits of FF and MS.
 "))
 
+
+
+(defun wrap-font (nsfont)
+  (niy wrap-font nsfont)
+  nsfont)
 
 (defun initialize/font ()
   (niy initialize/font))

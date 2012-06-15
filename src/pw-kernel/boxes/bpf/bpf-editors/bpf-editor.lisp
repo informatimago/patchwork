@@ -520,7 +520,7 @@
     ;;        ((#\x) (cut-bpf self)) 
     ;;        ((#\c) (copy-bpf self)) 
     ;;        ((#\v) (paste-bpf self)) 
-    (otherwise (ed-beep))))
+    (otherwise (ui:ed-beep))))
 
 (defmethod scroll-bar-changed :before ((view C-bpf-view) scroll-bar)
   (declare (ignore scroll-bar))

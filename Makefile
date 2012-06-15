@@ -124,7 +124,7 @@ variables::
 help::
 	@printf "$(HELP_FORMAT)" "application" "Generates the application."
 application:clean
-	cd patchwork ; $(CCL_EXE) < generate-application.lisp
+	$(CCL_EXE) < generate-application.lisp
 
 # There's a bug in ccl when generating an application from a loaded file…
 # $(LISP) \

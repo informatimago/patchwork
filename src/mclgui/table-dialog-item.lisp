@@ -302,9 +302,9 @@ V:              Vertical index. If the value of v is NIL, h is assumed
            (#_DiffRgn  rgn rgn2 rgn)     
            (#_LMSetHiliteMode (%ilogand2 (%ilognot (ash 1 #$hiliteBit)) (#_LMGetHiliteMode)))
            (#_InvertRgn rgn))
-      (when (and rgn (not (%null-ptr-p rgn)))
+      (when (and rgn (not (oclo:nullp rgn)))
         (#_disposergn rgn))
-      (when (and rgn2 (not (%null-ptr-p rgn2)))
+      (when (and rgn2 (not (oclo:nullp rgn2)))
         (#_disposergn rgn2)))))
 
 
@@ -632,7 +632,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
         (setf (slot-value item 'visible-dimensions) nil)
         (setf (slot-value item 'cell-size) new-size)
         (when (installed-item-p item)
-          (if (point= (point-v new-size) (point-v old-cell-size))
+          (if (eql (point-v new-size) (point-v old-cell-size))
               (let ((inner-size (table-inner-size item)))
                 (invalidate-all-but-left-column item inner-size inner-size))
               (invalidate-view item t))
@@ -1179,7 +1179,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
             (return (%gf-dispatch-table-ref dt (the fixnum (1+ index))))
             (progn
               (when (null (%gf-dispatch-table-ref dt (the fixnum (1+ index))))
-                (if (or (neq table-wrapper (%unbound-marker-8))
+                (if (or (not (eq table-wrapper (%unbound-marker-8)))
                         (eql 0 flag))
                   (without-interrupts ; why?
                    (let ((gf (%gf-dispatch-table-gf dt)))
@@ -1435,11 +1435,13 @@ V:              Vertical index. If the value of v is NIL, h is assumed
         (invalidate-view item t)))))
 
 (defun string-width-for-focused-control (string ff ms)
+  (niy string-width-for-focused-control string ff ms)
+  #- (and)
   (let ((len (length string)))
-    (setf string (ensure-simple-string string))
     (%stack-block ((sb (%i+ len len)))
                   (copy-string-to-ptr string 0 len sb)
-                  (xtext-width sb len ff ms))))
+                  (xtext-width sb len ff ms)))
+  100)
 
 
 (defmethod default-cell-size ((item table-dialog-item) &optional width)
@@ -1834,26 +1836,22 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 
 (defmethod table-row-height ((item table-dialog-item) row)
-  (unless (integerp row)
-    (setq row (require-type row 'integer)))
+  (check-type row integer)
   (let ((row-heights-hash (row-heights-hash item)))
     (or (and row-heights-hash (gethash row row-heights-hash))
         (let ((cell-size (cell-size item)))
           (and cell-size (point-v cell-size))))))
 
 (defmethod table-column-width ((item table-dialog-item) column)
-  (unless (integerp column)
-    (setq column (require-type column 'integer)))
+  (check-type column integer)
   (let ((column-widths-hash (column-widths-hash item)))
     (or (and column-widths-hash (gethash column column-widths-hash))
         (let ((cell-size (cell-size item)))
           (and cell-size (point-h cell-size))))))
 
 (defmethod (setf table-row-height) (value (item table-dialog-item) row)
-  (unless (integerp row)
-    (setq row (require-type row 'integer)))
-  (unless (or (null value) (fixnump value))
-    (setq value (require-type value '(or null fixnum))))
+  (check-type row integer)
+  (check-type value (or null fixnum))
   (let ((hash (or (row-heights-hash item)
                   (and value (setf (row-heights-hash item) (make-hash-table :test 'eql))))))
     (if value
@@ -1872,10 +1870,8 @@ V:              Vertical index. If the value of v is NIL, h is assumed
   value)
 
 (defmethod (setf table-column-width) (value (item table-dialog-item) column)
-  (unless (integerp column)
-    (setq column (require-type column 'integer)))
-  (unless (or (null value) (fixnump value))
-    (setq value (require-type value '(or null fixnum))))
+  (check-type column integer)
+  (check-type value (or null fixnum))
   (let ((hash (or (column-widths-hash item)
                   (and value (setf (column-widths-hash item) (make-hash-table :test 'eql))))))
     (if value
@@ -2020,7 +2016,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
          (hscroll-setting (if hscroll (scroll-bar-setting hscroll) 0))
          (vscroll-setting (if vscroll (scroll-bar-setting vscroll) 0)))
     (scroll-to-cell item hscroll-setting vscroll-setting)
-    (when (and (wptr item) (neq scroll-bar t))  
+    (when (and (wptr item) (not (eq scroll-bar t)))  
       ;; dont bother (FROM FIXUP-SCROLL-BARS), it does invalidate view after this and further
       ;; when doing list-definitions-dialog the grafport-back-color is wrong at this point
       ;; because the dialog-item-action for the editable-text-dialog-item is called
@@ -2085,7 +2081,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 (defmethod first-selected-cell ((item table-dialog-item))
   (or (first-selected-cell-slot item)
       (let ((hash (table-selection-hash item)))
-        (when (and hash (neq 0 (hash-table-count hash)))
+        (when (and hash (plusp (hash-table-count hash)))
           (let ((min-h most-positive-fixnum)
                 (min-v most-positive-fixnum))
             ;; find min row in min column
@@ -2308,7 +2304,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                         #-(and)
                         (when (not (#_stilldown))
                           (return))
-                        (if (point= where (%get-local-mouse-position))                   
+                        (if (eql where (%get-local-mouse-position))                   
                             (unless (wait-mouse-up-or-moved) (return)))
                         (setq where (view-mouse-position container))))))
               (dialog-item-action item)))))))
@@ -2382,7 +2378,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 (defmethod colored-cells-p ((item table-dialog-item))
   (and (eq (cell-colors item) :background)
        (let ((hash (table-cell-color-hash item)))
-         (and hash (neq 0 (hash-table-count hash))))))
+         (and hash (plusp (hash-table-count hash))))))
 
 
 (defvar *last-auto-scroll-time* 0)

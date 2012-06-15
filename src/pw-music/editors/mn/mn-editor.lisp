@@ -751,30 +751,31 @@
 (defvar *MN-window-counter* 0)
 
 (defun make-music-notation-editor (window-class view-class panel-class w-size
-                                              &optional (staffs *g2-g-f-f2-staffs*)
-                                                      name)
-  (let* ((win-string (if name (string-downcase name)
-                         (format nil "MN~D" (incf *MN-window-counter*))))
-         (mn-window (make-instance window-class :close-box-p t :window-show nil
-                                   :window-title win-string
-                                   :view-position (make-point 10 50)
-                                   :view-size w-size ))   ;(make-point 600 170)))
+                                   &optional (staffs *g2-g-f-f2-staffs*)
+                                   name)
+  (let* ((win-string  (if name
+                          (string-downcase name)
+                          (format nil "MN~D" (incf *MN-window-counter*))))
+         (mn-window   (make-instance window-class :close-box-p t :window-show nil
+                                     :window-title win-string
+                                     :view-position (make-point 10 50)
+                                     :view-size w-size ))   ;(make-point 600 170)))
          (editor-view (make-instance view-class
-                                     :view-container mn-window
-                                     :view-position (make-point 2 2)
-                                     :view-size (subtract-points w-size (make-point 15 25)) ;(make-point 585 145)
-                                     :bottom-boarder 20
-                                     :v-scrollp nil
-                                     :track-thumb-p t)))
+                          :view-container mn-window
+                          :view-position (make-point 2 2)
+                          :view-size (subtract-points w-size (make-point 15 25)) ;(make-point 585 145)
+                          :bottom-boarder 20
+                          :v-scrollp nil
+                          :track-thumb-p t)))
     (setf (editor-objects editor-view)
           (list (make-instance panel-class
-                               :view-container editor-view
-                               :view-position (make-point 0 0)
-                               :view-size (subtract-points w-size (make-point 24 67))  ;(make-point 576 143)
-                               :h-scrollp nil
-                               :track-thumb-p t
-                               :view-font '("MusNot-j"  18  :srcor)
-                               :chord-line (make-instance 'C-chord-line))))
+                    :view-container editor-view
+                    :view-position (make-point 0 0)
+                    :view-size (subtract-points w-size (make-point 24 67))  ;(make-point 576 143)
+                    :h-scrollp nil
+                    :track-thumb-p t
+                    :view-font '("MusNot-j"  18  :srcor)
+                    :chord-line (make-instance 'C-chord-line))))
     (setf (staff-list (car (editor-objects editor-view))) staffs)
     mn-window))
 

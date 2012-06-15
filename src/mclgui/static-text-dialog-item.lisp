@@ -66,7 +66,6 @@
 
 
 (defmethod set-dialog-item-text ((item static-text-dialog-item) text)
-  (setq text (ensure-simple-string text))  
   (setf (slot-value item 'dialog-item-text) text)
   (invalidate-view item t)  
   text)

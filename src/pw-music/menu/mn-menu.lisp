@@ -164,5 +164,5 @@
               (window-select *active-MN-window*)
               (enable-all-apps-menu-items)
               (menu-item-disable *apps-MN-menu-item*))
-            (ed-beep))
-          (ed-beep)))))
+            (ui:ed-beep))
+          (ui:ed-beep)))))

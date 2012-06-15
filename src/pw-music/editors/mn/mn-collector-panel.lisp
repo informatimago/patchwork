@@ -519,7 +519,7 @@
               (setf *global-music-notation-panel* self)
               (remove-instrument-item (active-note self) 0 0)
               (erase+view-draw-contents self))) 
-      (t (ed-beep))))
+      (t (ui:ed-beep))))
 
 ;;;CUT COPY PASTE
 

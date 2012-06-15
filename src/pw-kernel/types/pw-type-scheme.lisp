@@ -492,7 +492,7 @@
                             res)))
          (setq nb-arg 0))
         (t (if (endp arg-list) 
-             (progn (ed-beep) (setq nb-arg 0))
+             (progn (ui:ed-beep) (setq nb-arg 0))
              ;(error "Function ~S cannot provide ~D extra argument~:P.~%"
                    ; function nb-arg))
            (ccase keyword

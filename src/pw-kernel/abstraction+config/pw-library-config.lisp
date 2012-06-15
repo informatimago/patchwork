@@ -184,7 +184,7 @@ GA 17/5/94
              (setf (logical-pathname-translations logical-dir-str) old-path))))
         (t (format t "can't find library in path: ~S" 
                    (full-pathname (format nil "~A:" logical-dir-str)))
-           (ed-beep))))
+           (ui:ed-beep))))
 
 (defun define-logical-path-dir (dir path)
   (setf (logical-pathname-translations dir)

@@ -615,7 +615,7 @@
               (remove-note  chord (active-note self)) 
                (setf (active-note self) ())
                (erase+view-draw-contents self))
-             ((ed-beep)))))
+             ((ui:ed-beep)))))
 ;;___________
 ;;key-pressed
 
@@ -653,7 +653,7 @@
           ((and (eq char #\e) (or active-note (selected-notes self)))
            (open-param-ctrl (view-container self)))
           ((eq char #\S) (reset-order self))
-          (t (ed-beep)))))
+          (t (ui:ed-beep)))))
 
 (defmethod reset-order ((self C-MN-panel-ChordBox))
   (let ((notes (notes (car (chords (chord-line self))))))
