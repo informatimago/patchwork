@@ -42,7 +42,7 @@
 ;;;;=========================================================
 
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 ;;====================================================================================================
 (defclass C-numbox-continuous-no-double-click (C-numbox-continuous) ())

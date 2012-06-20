@@ -33,14 +33,16 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
+(objcl:enable-objcl-reader-macros)
 
 
+(defvar *default-directory* nil)
 
 
 (defun choose-file-dialog (&key
-                           (directory *default-pathname-defaults*)
-                           mac-file-type
-                           (button-string "Open file")
+                           (directory *default-directory*)
+                           file-types
+                           (button-string "Open")
                            (prompt "Open a file"))
   "
 The CHOOSE-FILE-DIALOG function displays the standard Macintosh
@@ -52,7 +54,7 @@ DIRECTORY:      A pathname or string. Specifies the directory shown
                 last directory shown by the Choose File dialog box or
                 Choose New File dialog box.
 
-MAC-FILE-TYPE:  An os-type parameter or list of os-type parameters.  If
+FILE-TYPES:     An os-type parameter or list of os-type parameters.  If
                 specified, only files with the given Macintosh file type are
                 displayed in the dialog box.  Os-types are case sensitive.
 
@@ -62,12 +64,42 @@ BUTTON-STRING:  A string. Specifies the text that appears in the
 
 PROMPT:         A string, displayed as title of the choose file dialog.
 "
-  (niy choose-file-dialog directory mac-file-type button-string prompt))
+  (let ((panel [NSOpenPanel openPanel]))
+    [panel setCanChooseFiles:t]
+    [panel setCanChooseDirectories:nil]
+    [panel setResolvesAliases:t]
+    [panel setAllowsMultipleSelection:nil]
+    ;; ---
+    ;; [panel setTitle:(objcl:objcl-string title)]
+    ;; [panel setMessage:(objcl:objcl-string message)]
+    ;; [panel setNameFieldLabel:(objcl:objcl-string label)]
+    [panel setPrompt:(objcl:objcl-string prompt)]
+    [panel setCanCreateDirectories:nil]
+    [panel setCanSelectHiddenExtension:t]
+    [panel setExtensionHidden:nil]
+    [panel setTreatsFilePackagesAsDirectories:nil]
+    [panel setAllowsOtherFileTypes:t]
+    [panel setShowsHiddenFiles:nil]
+    (if file-types
+        [panel setAllowedFileTypes:(list-to-nsarray (ensure-list file-types))]
+        [panel setAllowedFileTypes:nil])
+    ;; --
+    [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
+    [panel setNameFieldStringValue:(objcl:objcl-string "")]
+    (when (= [panel runModal] #$NSFileHandlingPanelOKButton)
+      (setf *default-directory* (pathname (concatenate 'string (objcl:lisp-string [[panel directoryURL] path]) "/")))
+      (let* ((urls  (objc:send panel "URLs"))
+             (files '()))
+        (dotimes (i [urls count])
+          (push (pathname (objcl:lisp-string [[urls objectAtIndex:i] path])) files))
+        (if (endp (rest files))
+            (first files)
+            files)))))
 
 
 
 (defun choose-new-file-dialog (&key
-                               (directory *default-pathname-defaults*)
+                               (directory *default-directory*)
                                (prompt "Save a new file")
                                (button-string "Save file"))
   "
@@ -81,22 +113,35 @@ DIRECTORY:      A pathname or string. Specifies the directory shown
                 last directory shown by the Choose File dialog box or
                 Choose New File dialog box.
 
-MAC-FILE-TYPE:  An os-type parameter or list of os-type parameters.  If
-                specified, only files with the given Macintosh file type are
-                displayed in the dialog box.  Os-types are case sensitive.
-
 BUTTON-STRING:  A string. Specifies the text that appears in the
                 button that opens the chosen file. The default is
                 Save As.
 
 PROMPT:         A string, displayed as title of the choose new file dialog.
 "
-  (niy choose-new-file-dialog directory mac-file-type button-string prompt))
+  (let ((panel [NSSavePanel savePanel]))
+    ;; [panel setTitle:(objcl:objcl-string title)]
+    ;; [panel setMessage:(objcl:objcl-string message)]
+    ;; [panel setNameFieldLabel:(objcl:objcl-string label)]
+    [panel setPrompt:(objcl:objcl-string prompt)]
+    [panel setCanCreateDirectories:t]
+    [panel setCanSelectHiddenExtension:t]
+    [panel setExtensionHidden:nil]
+    [panel setTreatsFilePackagesAsDirectories:nil]
+    [panel setAllowsOtherFileTypes:t]
+    [panel setShowsHiddenFiles:nil]
+    [panel setAllowedFileTypes:nil]
+    ;; --
+    [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
+    [panel setNameFieldStringValue:(objcl:objcl-string "")]
+    (when (= [panel runModal] #$NSFileHandlingPanelOKButton)
+      (setf *default-directory* (pathname (concatenate 'string (objcl:lisp-string [[panel directoryURL] path]) "/")))
+      (pathname (objcl:lisp-string [(objc:send panel "URL") path])))))
 
 
 
 (defun choose-directory-dialog (&key
-                               (directory *default-pathname-defaults*)
+                               (directory *default-directory*)
                                (prompt "Select a directory"))
   "
 The function CHOOSE-DIRECTORY-DIALOG displays a variation of the
@@ -110,7 +155,35 @@ DIRECTORY:      A pathname or string. Specifies the directory shown
 
 PROMPT:         A string, displayed as title of the choose directory dialog.
 "
-  (niy choose-directory-dialog directory prompt))
+  (let ((panel [NSOpenPanel openPanel]))
+    [panel setCanChooseFiles:nil]
+    [panel setCanChooseDirectories:t]
+    [panel setResolvesAliases:t]
+    [panel setAllowsMultipleSelection:nil]
+    ;; ---
+    ;; [panel setTitle:(objcl:objcl-string title)]
+    ;; [panel setMessage:(objcl:objcl-string message)]
+    ;; [panel setNameFieldLabel:(objcl:objcl-string label)]
+    [panel setPrompt:(objcl:objcl-string prompt)]
+    [panel setCanCreateDirectories:t]
+    [panel setCanSelectHiddenExtension:t]
+    [panel setExtensionHidden:nil]
+    [panel setTreatsFilePackagesAsDirectories:nil]
+    [panel setAllowsOtherFileTypes:t]
+    [panel setShowsHiddenFiles:nil]
+    [panel setAllowedFileTypes:nil]
+    ;; --
+    [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
+    [panel setNameFieldStringValue:(objcl:objcl-string "")]
+    (when (= [panel runModal] #$NSFileHandlingPanelOKButton)
+      (setf *default-directory* (pathname (concatenate 'string (objcl:lisp-string [[panel directoryURL] path]) "/")))
+      (let* ((urls  (objc:send panel "URLs"))
+             (files '()))
+        (dotimes (i [urls count])
+          (push (pathname (concatenate 'string (objcl:lisp-string [[urls objectAtIndex:i] path]) "/")) files))
+        (if (endp (rest files))
+            (first files)
+            files)))))
 
 
 (defun choose-file-default-directory ()
@@ -120,7 +193,7 @@ the last directory selected by the CHOOSE-FILE-DIALOG,
 CHOOSE-NEW-FILE-DIALOG, or CHOOSE-DIRECTORY-DIALOG dialog box.
 Initially, this is the directory that is the translation of \"home:\".
 "
-  (niy choose-file-default-directory))
+  *default-directory*)
 
 
 (defun set-choose-file-default-directory (pathname)
@@ -129,8 +202,11 @@ The function SET-CHOOSE-FILE-DEFAULT-DIRECTORY sets the default
 directory used by the CHOOSE-FILE-DIALOG, CHOOSE-NEW-FILE-DIALOG, or
 CHOOSE-DIRECTORY-DIALOG dialog box to pathname.  It returns pathname.
 "
-  (niy set-choose-file-default-directory pathname))
+  (setf *default-directory* (pathname pathname)))
 
 
+
+(defun initialize/file ()
+  (setf *default-directory* (user-homedir-pathname)))
 
 ;;;; THE END ;;;;

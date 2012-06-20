@@ -131,11 +131,13 @@ dialog items. It is built on SIMPLE-VIEW.
 
 (defgeneric call-with-focused-dialog-item (item fn &optional container)
   (:method (item fn &optional container)
+    #-(and)
     (call-with-focused-view (or container (view-container item))
                             (lambda (container)
                               (declare (ignore container))
                               (funcall fn item))
-                            item)))
+                            item)
+    (call-with-focused-view item fn item)))
 
 
 (defmacro with-focused-dialog-item ((item &optional container) &body body)
@@ -283,15 +285,14 @@ VISRGN:         Region records from the view’s wptr.  They are ignored.
 CLIPRGN:        Region records from the view’s wptr.  They are ignored.
 "
   (declare (ignore visrgn cliprgn))
-  (unless (view-quieted-p item)
-    (without-interrupts
-     (with-focused-view (view-container item)
-       (with-temp-rgns (visrgn cliprgn)
-         (niy view-focus-and-draw-contents item visrgn cliprgn)
-         ;; (get-window-visrgn  (wptr item) visrgn)
-         ;; (get-window-cliprgn (wptr item) cliprgn)      
-         (when (view-is-invalid-p item visrgn cliprgn)
-           (call-with-focused-dialog-item item (function view-draw-contents))))))))
+  (without-interrupts
+      (with-focused-view (view-container item)
+        (with-temp-rgns (visrgn cliprgn)
+          (niy view-focus-and-draw-contents item visrgn cliprgn)
+          ;; (get-window-visrgn  (wptr item) visrgn)
+          ;; (get-window-cliprgn (wptr item) cliprgn)      
+          (when (view-is-invalid-p item visrgn cliprgn)
+            (call-with-focused-dialog-item item (function view-draw-contents)))))))
 
 
 (defmethod set-view-position ((item dialog-item) h &optional v)

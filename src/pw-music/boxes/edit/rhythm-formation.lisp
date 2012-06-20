@@ -196,7 +196,7 @@ editor opened for more information."
                      (progn
                        (unless already-warned
                          (ui:ed-beep)
-                         (warn "measures ~S and beats do not agree. Measure(s) will be changed" meas-sign)
+                         (ui:uiwarn "measures ~S and beats do not agree. Measure(s) will be changed" meas-sign)
                          (setq already-warned t))
                        (push (make-measure (low-of meas-sign) (nreverse beat-objs) 
                                            (or (pop tempi) def-tempo)) measures)

@@ -42,7 +42,7 @@
 ;;;;=========================================================
 
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 ;;=========================
 ;; dialog for tty-box and numbox
@@ -190,9 +190,9 @@
    (value :initform nil :initarg :value)
    (type-list :initform ()  :initarg :type-list :accessor type-list)))
 
+#-(and)
 (defmethod print-object ((self pw::c-ttybox) stream)
   (let ((*print-pretty* nil))
-    (format stream "~V<~>" ui::*view-indent*)
     (print-unreadable-object (self stream :identity t :type t)
       (format stream "~{~S~^ ~}"
               (list :open-state (pw::open-state self)

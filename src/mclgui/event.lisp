@@ -44,7 +44,10 @@ view-activate-event-handler on each subview. Specialize this generic
 function if your view needs to indicate visually that it is active.
 
 VIEW:           A simple view or view.
-"))
+")
+  (:method (view)
+    (declare (ignore view))
+    nil))
 
 
 (defgeneric view-deactivate-event-handler (view)
@@ -58,7 +61,10 @@ generic function if your view needs to indicate visually that it has been
 deactivated.
 
 VIEW:           A simple view or view.
-"))
+")
+  (:method (view)
+    (declare (ignore view))
+    nil))
 
 
 (defgeneric view-click-event-handler (view where)
@@ -87,7 +93,10 @@ WHERE:          For a view, the mouse click position (the position when
                 system. For a simple view, the mouse click position of the
                 simple view in the local coordinate system of the view’s
                 container.
-"))
+")
+  (:method (view where)
+    (declare (ignore view where))
+    nil))
 
 
 (defgeneric view-key-event-handler (view key)
@@ -106,7 +115,10 @@ call-next-method inside WITH-FOCUSED-VIEW and WITH-FORE-COLOR.
 VIEW:           A simple view.
 
 KEY:            The current keystroke character.
-"))
+")
+  (:method (view key)
+    (declare (ignore view key))
+    nil))
 
 
 
@@ -121,7 +133,10 @@ there is no top window, the unspecialized method simply updates the
 cursor.
 
 WINDOW:         A window.
-"))
+")
+  (:method (window)
+    (declare (ignore window))
+    nil))
 
 
 (defgeneric window-select-event-handler (window)
@@ -132,7 +147,10 @@ function may be specialized, for example, to make a window
 unselectable.
 
 WINDOW:         A window.
-"))
+")
+  (:method (window)
+    (declare (ignore window))
+    nil))
 
 
 (defgeneric window-key-up-event-handler (window)
@@ -150,7 +168,10 @@ that you must reset the event mask before exiting Lisp.  For details
 on event masks, see Macintosh Technical Note 202 and Inside Macintosh.
 
 WINDOW:         A window.
-"))
+")
+  (:method (window)
+    (declare (ignore window))
+    nil))
 
 
 (defgeneric window-mouse-up-event-handler (window)
@@ -160,7 +181,10 @@ the user releases the mouse button.  The method for WINDOW does
 nothing.
 
 WINDOW:         A window.
-"))
+")
+  (:method (window)
+    (declare (ignore window))
+    nil))
 
 
 (defgeneric window-grow-event-handler (window where)
@@ -174,7 +198,10 @@ WINDOW:         A window.
 
 WHERE:          The position in screen coordinates of the cursor when
                 the mouse button was pressed down.
-"))
+")
+  (:method (window where)
+    (declare (ignore window where))
+    nil))
 
 
 (defgeneric window-drag-event-handler (window where)
@@ -190,7 +217,10 @@ WINDOW:         A window.
 
 WHERE:          The position in screen coordinates of the cursor when
                 the mouse button was pressed down.
-"))
+")
+  (:method (window where)
+    (declare (ignore window where))
+    nil))
 
 
 (defgeneric window-zoom-event-handler (window message)
@@ -207,7 +237,10 @@ MESSAGE:        An keyword, :inZoomOut if the window should move to
                 the window’s zoom position and size, or :inZoomIn if
                 the window should move to the position and size it had
                 before zooming out.
-"))
+")
+  (:method (window message)
+    (declare (ignore window message))
+    nil))
 
 
 (defgeneric window-close-event-handler (window)
@@ -220,7 +253,10 @@ was pressed, window is hidden.  Otherwise, WINDOW-CLOSE is called on
 WINDOW.
 
 WINDOW:         A window.
-"))
+")
+  (:method (window)
+    (declare (ignore window))
+    nil))
 
 
 (defgeneric window-do-first-click (window)
@@ -239,7 +275,7 @@ WINDOW:         A window.
     nil))
 
 
-(defgeneric window-updapte-event-handler (window)
+(defgeneric window-update-event-handler (window)
   (:documentation "
 The generic function WINDOW-UPDATE-EVENT-HANDLER is called by the
 event system whenever any portion of the window needs to be redrawn.
@@ -266,7 +302,10 @@ has been updated. To get special drawing behavior, you should instead
 specialize VIEW-DRAW-CONTENTS.
 
 WINDOW:         A window.
-"))
+")
+  (:method (window)
+    (declare (ignore window))
+    nil))
 
 
 (defgeneric view-draw-contents (view)
@@ -275,7 +314,7 @@ The generic function VIEW-DRAW-CONTENTS is called whenever a view
 needs to redraw any portion of its contents.  The view method for
 VIEW-DRAW-CONTENTS erases the area in the window’s erase region (for
 new windows, this is the entire content area) and then calls
-view-drawcontents on each subview.  You can specialize this function
+VIEW-DRAW-CONTENTS on each subview.  You can specialize this function
 so that a user-defined view can be redrawn when portions of it are
 covered and uncovered.
 
@@ -285,7 +324,10 @@ be updated.  This normally includes areas that have been covered by
 other windows and then uncovered.
 
 VIEW:           A simple view.
-"))
+")
+  (:method (view)
+    (declare (ignore view))
+    nil))
 
 
 (defgeneric window-draw-grow-icon (window)
@@ -298,7 +340,10 @@ When a window is inactive (that is, not the frontmost window),
 WINDOW-DRAW-GROW-ICON erases the inside of the size box.
 
 WINDOW:         A window.
-"))
+")
+  (:method (window)
+    (declare (ignore window))
+    nil))
 
 
 (defgeneric view-mouse-position (view)
@@ -314,7 +359,10 @@ The function (VIEW-MOUSE-POSITION NIL) returns the cursor position
 expressed in screen coordinates.
 
 VIEW:           A simple view.
-"))
+")
+  (:method (view)
+    (declare (ignore view))
+    nil))
 
 
 

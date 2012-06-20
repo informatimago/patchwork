@@ -68,7 +68,7 @@
 |#
 
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
-  (warn "~S ~S is not implemented yet" 'MidiPlayANy '((object t) &optional (approx 2) (chanbase 1)))
+  (ui:uiwarn "~S ~S is not implemented yet" 'MidiPlayANy '((object t) &optional (approx 2) (chanbase 1)))
   ;; (when (and  midi::*pw-refnum* midi::*player* )
   ;;   (let ((playerIdle))
   ;;     (rlet ((myState :PlayerState))  

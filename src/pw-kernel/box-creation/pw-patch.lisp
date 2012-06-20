@@ -42,7 +42,7 @@
 ;;;;=========================================================
 
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 ;;=======================================================================================
 ;;=======================================================================================
@@ -468,7 +468,7 @@
   (inval-r-view-sides view))
 
 (defmethod inval-r-view-sides ((view C-patch) &optional top&left?)
-  (warn "~S ~S is not implemented yet" 'inval-r-view-sides '((view C-patch) &optional top&left?))
+  (ui:uiwarn "~S ~S is not implemented yet" 'inval-r-view-sides '((view C-patch) &optional top&left?))
   ;; (when (wptr view)
   ;;   (let* ((pos (view-scroll-position view))
   ;;          (size (view-size view))
@@ -832,22 +832,29 @@ tutorial file only if the names differ"
   (set-changes-to-file-flag win)
   (setf *position-new-box* nil)
   (record-patch (pw-function patch)  
-                  (list (point-h (view-position patch)) (point-v (view-position patch))) nil)
+                (list (point-h (view-position patch)) (point-v (view-position patch))) nil)
   patch) 
 
 (defvar *pw-window-counter* 0)
 
 (defun make-new-pw-window (&optional close-button)
-  (let ((win)
-        (win-string (concatenate  'string  "PW" (format nil "~D" (incf *pw-window-counter*)))))
-    (setq win (make-instance 'C-pw-window 
-                :window-title win-string :close-box-p close-button
-                :view-position (make-point 50 38) :view-size (make-point 500 300) :window-show t))
-    (ui:add-menu-items  *pw-windows-menu* 
-                     (setf (wins-menu-item win)
-                           (new-leafmenu win-string #'(lambda ()(window-select win)))))
-    (push win *pw-window-list*) 
-    (update-wins-menu-items win)
-    (record--ae :|core| :|crel| `((,:|kocl| ,:|cpat| )))
-    win))
+  (com.informatimago.common-lisp.cesarum.utility:tracing-let* ((win-string (format nil "PW~D" (incf *pw-window-counter*)))
+         (win        (make-instance 'C-pw-window 
+                         :window-title  win-string
+                         :close-box-p   close-button
+                         :view-position (make-point 50 38)
+                         :view-size     (make-point 500 300)
+                         :window-show   t)))
+    (com.informatimago.common-lisp.cesarum.utility:tracing
+     (ui:add-menu-items *pw-windows-menu* 
+                        (setf (wins-menu-item win)
+                              (new-leafmenu win-string (lambda () (window-select win)))))
+     (push win *pw-window-list*) 
+     (update-wins-menu-items win)
+     (record--ae :|core| :|crel| `((,:|kocl| ,:|cpat| )))
+     win)))
+
+
+;;;; THE END ;;;;
+
 

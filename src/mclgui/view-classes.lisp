@@ -58,14 +58,6 @@ coordinate of the upper-left corner of the view.")
 
 
 
-(defmethod initialize-instance :after ((view simple-view) &key &allow-other-keys)
-  (when (and (slot-value view 'view-font) (not (typep view 'window)))
-    (set-initial-view-font view (slot-value view 'view-font)))
-  (setf (slot-value view 'view-size)     (or (slot-value view 'view-size)     (view-default-size     view))
-        (slot-value view 'view-position) (or (slot-value view 'view-position) (view-default-position view)))
-  (set-view-container view (slot-value view 'view-container))
-  (values))
-
 
 (defgeneric view-subviews (view)
   (:documentation "
@@ -128,6 +120,7 @@ DO:             Remove the property KEY from the VIEW.
   ((view-origin          :initform #@(0 0)
                          :accessor view-origin-slot)
    (view-subviews        :initform nil
+                         :initarg :view-subviews
                          :reader   view-subviews
                          ;; Note: the vector is initialized in initialize-instance.
                          :documentation "A vector of subviews.")
@@ -136,14 +129,6 @@ DO:             Remove the property KEY from the VIEW.
    (view-clip-region     :initform nil
                          :accessor view-clip-region-slot)))
 
-
-(defmethod initialize-instance :after ((view view) &key &allow-other-keys)
-  (let ((subviews (slot-value view 'view-subviews)))
-    (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
-    (apply (function add-subviews) view subviews))
-  ;; (dolist (subview view-subviews)
-  ;;   (set-view-container subview view))
-  (values))
 
 
 ;;;---------------------------------------------------------------------
@@ -236,53 +221,6 @@ DO:             Remove the property KEY from the VIEW.
 (defgeneric view-allocate-clip-region (window))
 
 
-(defmethod initialize-instance ((window window) &key (view-font (view-default-font window)) &allow-other-keys)
-  (call-next-method)
-  (setf (view-valid window) (list nil))
-  (view-allocate-clip-region window)
-  (when (and (slot-value window 'erase-anonymous-invalidations)
-             (not (slot-value window 'theme-background)))
-    ;; only needed for non-theme color background
-    (setf (window-invalid-region window) (new-rgn)))
-  (let ((pos (view-position window))
-        (siz (view-size window)))
-    (setf (handle window)
-          [[NSWindow alloc]initWithContentRect:(ns:make-ns-rect (point-h pos) (point-v pos)
-                                                                (point-h siz) (point-v siz))
-           styleMask:(ecase (window-type window)
-                       ((:document
-                         :document-with-zoom)
-                        (logior #$NSTitledWindowMask
-                                #$NSMiniaturizableWindowMask
-                                (if (window-close-box-p window)
-                                    #$NSClosableWindowMask
-                                    0)))
-                       ((:document-with-grow)
-                        (logior #$NSTitledWindowMask
-                                #$NSMiniaturizableWindowMask
-                                (if (window-close-box-p window)
-                                    #$NSClosableWindowMask
-                                    0)
-                                #$NSResizableWindowMask))
-                       ((:double-edge-box
-                         :single-edge-box
-                         :shadow-edge-box)
-                        #$NSBorderlessWindowMask)
-                       ((:tool)
-                        (logior #$NSTitledWindowMask
-                                (if (window-close-box-p window)
-                                    #$NSClosableWindowMask
-                                    0))))
-           backing:0
-           defer:(not (window-visiblep window))]))
-  (set-window-title window (window-title window))
-  (window-size-parts window)
-  (when (window-visiblep window)
-    (setf (slot-value window 'visiblep) nil)
-    (window-show window))
-  window)
-
-
 (defmethod print-object ((window window) stream)
   (print-parseable-object (window stream :type t :identity t)
                           (:title (ignore-errors (window-title window)))))
@@ -294,6 +232,10 @@ DO:             Remove the property KEY from the VIEW.
 (defclass windoid (window)
   ((show-on-resume-p :initform nil))
   (:default-initargs :window-title "" :window-do-first-click t :window-type :windoid))
+
+(defgeneric windoid-p (window)
+  (:method ((self t))       nil)
+  (:method ((self windoid)) t))
 
 
 ;;;---------------------------------------------------------------------

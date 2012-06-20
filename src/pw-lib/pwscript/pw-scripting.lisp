@@ -45,7 +45,7 @@
 (defvar *charge?* nil)
 
 (defun put-appleevent-par (aevent param-key data)
-  (warn "~S is not implemented" 'put-appleevent-par)
+  (ui:uiwarn "~S is not implemented" 'put-appleevent-par)
   ;; (if (macptrp data) 
   ;;   (ae-error (#_AEPutParamDesc aevent param-key data))
   ;;   (ae-error (#_AEPutParamDesc aevent param-key (cl-user::getDescRecPtr (cl-user::asAEDesc  data))))
@@ -55,7 +55,7 @@
 ;;(cl-user::asAEDesc  100.0)
 
 (defun mkSO (a b c d)
-  (warn "~S is not implemented" 'mkso)
+  (format *trace-output*  "Not Implemented Yet ~S" 'mkso)
   ;; (make-instance 
   ;;   'cl-user::ObjectSpecifier
   ;;   :class     a
@@ -102,7 +102,7 @@
   (nth (- (read-from-string (subseq string 2)) 1) *list-pw-script-objects*))
 
 (defun AEresolve (theData)
-  (warn "~S is not implemented" 'AEresolve)
+  (ui:uiwarn "~S is not implemented" 'AEresolve)
   ;; (when TheData
   ;;   (let* ((clase  (cl-user::getclass TheData)))
   ;;     (cond
@@ -184,7 +184,7 @@
 
 (defmethod even-open ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-    (warn "~S is not implemented" 'even-open)
+    (ui:uiwarn "~S is not implemented" 'even-open)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePatch (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (Pname (AEresolve thePatch)))
@@ -201,7 +201,7 @@
 
 (defmethod even-close ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-  (warn "~S is not implemented" 'even-close)
+  (ui:uiwarn "~S is not implemented" 'even-close)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| :|type|)))
   ;;   (if (equal ThePara :|cpat|)
@@ -214,7 +214,7 @@
 ;;MAKE NEW
 (defmethod even-new ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon ))
-  (warn "~S is not implemented" 'even-new)
+  (ui:uiwarn "~S is not implemented" 'even-new)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (eltipo (cl-user::getparam AE-clos-Ob :|kocl| :|type|)))
   ;;   (cond
@@ -269,7 +269,7 @@
 
 (defmethod even-load ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-    (warn "~S is not implemented" 'even-new)
+  (ui:uiwarn "~S is not implemented" 'even-new)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| )) 
   ;;        (thetype (cl-user::getclass ThePara))
@@ -285,7 +285,7 @@
 ;;OPTIONS
 (defmethod even-options ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-    (warn "~S is not implemented" 'even-options)
+    (ui:uiwarn "~S is not implemented" 'even-options)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (Scale (cl-user::getparam AE-clos-Ob :|opsc| )) 
   ;;        (Appro (cl-user::getparam AE-clos-Ob :|opap| ))
@@ -311,7 +311,7 @@
 ;;SET
 (defmethod even-set ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-      (warn "~S is not implemented" 'even-set)
+      (ui:uiwarn "~S is not implemented" 'even-set)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| )) 
   ;;        (theinput (AEresolve thePara))
@@ -345,7 +345,7 @@
 ;;GET
 (defmethod even-get ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon))
-        (warn "~S is not implemented" 'even-get)
+        (ui:uiwarn "~S is not implemented" 'even-get)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (theinput (if (equal (cl-user::getclass thepara) :|prop|) (AEresolve (cl-user::getcontainer thepara)) 
@@ -392,7 +392,7 @@
 ;;CONNECT
 (defmethod even-connect ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-  (warn "~S is not implemented" 'even-connect)
+  (ui:uiwarn "~S is not implemented" 'even-connect)
  ;;     (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;      (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;      (thePara1 (cl-user::getparam AE-clos-Ob :|data| ))
@@ -407,7 +407,7 @@
 
 (defmethod even-unco ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-  (warn "~S is not implemented" 'even-unco)
+  (ui:uiwarn "~S is not implemented" 'even-unco)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;       (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;       (theinput (AEresolve thePara))
@@ -423,7 +423,7 @@
 
 (defmethod even-move ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-  (warn "~S is not implemented" 'even-move)
+  (ui:uiwarn "~S is not implemented" 'even-move)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (thePoint (cl-user::getparam AE-clos-Ob :|insh|  ))
@@ -443,7 +443,7 @@
 
 (defmethod even-save ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-  (warn "~S is not implemented" 'even-save)
+  (ui:uiwarn "~S is not implemented" 'even-save)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| )) 
   ;;        (thePatch (cond ((equal thePara :|conf|) nil)
@@ -472,7 +472,7 @@
 
 (defmethod even-eval ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon))
-  (warn "~S is not implemented" 'even-eval)
+  (ui:uiwarn "~S is not implemented" 'even-eval)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;       (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;       (thebox (AEresolve thePara))
@@ -535,7 +535,7 @@
 
 (defmethod even-sele ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-  (warn "~S is not implemented" 'even-sele)
+  (ui:uiwarn "~S is not implemented" 'even-sele)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (shift? (cl-user::getparam AE-clos-Ob :|chif| ))
@@ -560,7 +560,7 @@
 
 (defmethod even-rena ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon))
-    (warn "~S is not implemented" 'even-rena)
+    (ui:uiwarn "~S is not implemented" 'even-rena)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (thename (cl-user::getparam AE-clos-Ob :|newn| ))
@@ -586,7 +586,7 @@
 ;;LOCK
 (defmethod even-lock ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-      (warn "~S is not implemented" 'even-lock)
+      (ui:uiwarn "~S is not implemented" 'even-lock)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (thebox (AEresolve thePara)))
@@ -602,7 +602,7 @@
 ;;UNLOCK
 (defmethod even-unlo ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-        (warn "~S is not implemented" 'even-unlo)
+        (ui:uiwarn "~S is not implemented" 'even-unlo)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (thebox (AEresolve thePara)))
@@ -626,7 +626,7 @@
 
 (defmethod even-actv ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon theAppleEvent reply))
-          (warn "~S is not implemented" 'even-actv)
+          (ui:uiwarn "~S is not implemented" 'even-actv)
   ;; ;(if (null (position "PW-modifs" module::*loaded-modules* :test 'equal))
   ;; ;  (without-interrupts
   ;; ;  (tell *eval-queue* 'eval)
@@ -696,7 +696,7 @@
 
 (defmethod even-command ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
-  (warn "~S is not implemented" 'even-command)
+  (ui:uiwarn "~S is not implemented" 'even-command)
 
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
@@ -758,7 +758,7 @@
 ;;EXTEND
 (defmethod even-extend ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon ))
-  (warn "~S is not implemented" 'even-extend)
+  (ui:uiwarn "~S is not implemented" 'even-extend)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (thebox (AEresolve thePara))
@@ -771,7 +771,7 @@
 ;;PLAY 
 (defmethod even-play ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon))
-    (warn "~S is not implemented" 'even-play)
+    (ui:uiwarn "~S is not implemented" 'even-play)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (theobj (AEresolve thePara)))
@@ -785,7 +785,7 @@
 
 (defmethod even-stop ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon))
-    (warn "~S is not implemented" 'even-stop)
+    (ui:uiwarn "~S is not implemented" 'even-stop)
   ;; (let* ((AE-clos-Ob (make-instance 'cl-user::AppleEvent :descRecPtr theAppleEvent ))
   ;;        (thePara (cl-user::getparam AE-clos-Ob :|----| ))
   ;;        (theobj (AEresolve thePara)))

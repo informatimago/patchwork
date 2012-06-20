@@ -42,14 +42,14 @@
 ;;;;=========================================================
 
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 ;;=================================================================================================
 ;; 
 
 
 (defun load-lisp-res ()
-  (warn "~S is not implemented" 'load-lisp-res)
+  (ui:uiwarn "~S is not implemented" 'load-lisp-res)
   ;; (ui:with-pstrs ((name (mac-namestring "CL:PW-inits;Drivers+Resources;CLPF.rsrc")))
   ;;   (when (= -1 (#_OpenResFile :ptr name :word))
   ;;     (error "Cannot open resource file!")))
@@ -60,7 +60,7 @@
 (defvar *box-cursor* nil)
 
 (defun get-box-cursor ()
-  (warn "~S is not implemented" 'get-box-cursor)
+  (ui:uiwarn "~S is not implemented" 'get-box-cursor)
   ;; (ui::with-pstrs ((name "box-cursor"))
   ;; (setf *box-cursor* (#_getnamedresource :|CURS| name)))
   )
@@ -79,7 +79,7 @@
 ;;======================================
 
 (defun make-cursor (data-string mask-string hotspot)
-  (warn "~S is not implemented" 'make-cursor)
+  (ui:uiwarn "~S is not implemented" 'make-cursor)
   ;; (when (or (> (length (string data-string)) 64)
   ;;           (> (length (string mask-string)) 64))
   ;;   (error "data-string & mask-string must be < 64 chars long"))

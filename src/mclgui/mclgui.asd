@@ -53,6 +53,14 @@
                  
                  (:file "wrapper"
                         :depends-on ("package"))
+
+                 (:file "notification"
+                        :depends-on ("package"
+                                     "wrapper"))
+
+                 (:file "objc-classes"
+                        :depends-on ("package"
+                                     "wrapper"))
                  
                  ;; Chapter 2:
 
@@ -69,7 +77,7 @@
                  (:file "menu"
                         :depends-on ("package" 
                                      "macros" "variables" "color"
-                                     "point" "font" "wrapper"))
+                                     "point" "font" "wrapper" "notification"))
 
                  (:file "window-menu-item"
                         :depends-on ("package" 
@@ -86,13 +94,14 @@
                         :depends-on ("package" 
                                      "macros" "variables" "color"
                                      "point" "region" "font" 
-                                     "view-classes"))
+                                     "wrapper" "view-classes" "objc-classes"))
 
                  (:file "window"
                         :depends-on ("package" 
                                      "macros" "variables" "color"
                                      "point" "region" "font"
-                                     "view-classes" "view"))
+                                     "view-classes" "objc-classes"
+                                     "wrapper" "view" "notification"))
 
                  (:file "fred-window"
                         :depends-on ("package" 
@@ -108,6 +117,11 @@
                                      "macros" "variables" "point" "system"
                                      "view-classes" "view" "window" "event"))
 
+                 (:file "default-button-mixin"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point" "system"
+                                     "view-classes" "view" "window" "event"))
+
                  (:file "control-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
@@ -118,7 +132,8 @@
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
                                      "view-classes" "view" "window" "event"
-                                     "dialog-item" "control-dialog-item"))
+                                     "dialog-item" "control-dialog-item"
+                                     "default-button-mixin"))
 
                  (:file "check-box-dialog-item"
                         :depends-on ("package" 
@@ -262,7 +277,7 @@
                         :depends-on ("package" 
                                      "macros" "variables" "point"
                                      "system" "view-classes" "window"
-                                     "view-event" "event"))
+                                     "view-event" "event" "application"))
 
                  (:file "cursor"
                         :depends-on ("package" 
@@ -284,7 +299,7 @@
 
                  (:file "region"
                         :depends-on ("package" 
-                                     "point"))
+                                     "macros" "point"))
 
                  ;; MCLGUI:
 

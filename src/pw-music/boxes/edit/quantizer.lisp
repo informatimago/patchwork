@@ -507,7 +507,7 @@ becomes prev-slur in the next call)."
 
 (defun select-tempo (durs)
   (declare (ignore durs))
-  (warn "Automatic tempo option is no longuer available") '(60))
+  (ui:uiwarn "Automatic tempo option is no longuer available") '(60))
 
 (defunp quant-edit ((durs list) (tempi fix/fl/list (:value 60)) (measures list (:value '(4  4)))
                         (max/ fix/float (:value 8 :min-val 1))

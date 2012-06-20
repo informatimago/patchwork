@@ -114,7 +114,7 @@
 ;
 (defun choose-appleevent-target (the-desc &key prompt title)
   ; You must eventually AEDisposeDesc the result of choose-appleevent-target!
-  (warn "~S ~S is not implemented yet" 'choose-appleevent-target '(the-desc &key prompt title))
+  (ui:uiwarn "~S ~S is not implemented yet" 'choose-appleevent-target '(the-desc &key prompt title))
   ;; (rlet ((port-info :PortInfoRec)
   ;;        (target-id :TargetID))
   ;;   (choose-process-dialog
@@ -198,7 +198,7 @@
 ;
 (defun create-self-target (&optional the-desc)
   (unless the-desc (setq the-desc (make-record :AEDesc)))
-  (warn "~S ~S is not implemented yet" 'create-self-target '(&optional the-desc))
+  (ui:uiwarn "~S ~S is not implemented yet" 'create-self-target '(&optional the-desc))
   ;; (rlet ((psn :ProcessSerialNumber 
   ;;             :highLongOfPSN 0
   ;;             :lowLongOfPSN #$kCurrentProcess))
@@ -248,7 +248,7 @@
 ;; Return value: the-desc
 ;
 (defun create-psn-target (the-desc psnhigh psnlow)
-  (warn "~S ~S is not implemented yet" 'create-psn-target '(the-desc psnhigh psnlow))
+  (ui:uiwarn "~S ~S is not implemented yet" 'create-psn-target '(the-desc psnhigh psnlow))
   ;; (rlet ((psn ProcessSerialNumber))
   ;;   (rset psn ProcessSerialNumber.HighLongOfPSN psnhigh)
   ;;   (rset psn ProcessSerialNumber.LowLongOfPSN psnlow)
@@ -281,7 +281,7 @@
        (%do-processes ,thunk ,(not (null inforec-var))))))
 
 (defun %do-processes (thunk inforec-p)
-  (warn "~S ~S is not implemented yet" '%do-processes '(thunk inforec-p))
+  (ui:uiwarn "~S ~S is not implemented yet" '%do-processes '(thunk inforec-p))
   ;; (rlet ((psn :ProcessSerialNumber)
   ;;        (inforec :ProcessInfoRec)
   ;;        (fss :fsspec)
@@ -359,7 +359,7 @@
 ;
 (defun create-alias-list (the-desc paths)
   (ae-error (#_AECreateList (%null-ptr) 0 nil the-desc))
-  (warn "~S ~S is not implemented yet" 'create-alias-list '(the-desc paths))
+  (ui:uiwarn "~S ~S is not implemented yet" 'create-alias-list '(the-desc paths))
   ;; (rlet ((alias :aliashandle))
   ;;   (dolist (path paths)
   ;;     (let ((namestring (mac-namestring path)))

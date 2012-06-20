@@ -55,25 +55,25 @@
   (when (and (not (typep button 'scroll-bar-dialog-item)))
     (let ((text (dialog-item-text button)))
       (when text
+        (niy install-view-in-window :after button w)
         #+ignore ;; done earlier
         (when (not (7bit-ascii-p text))  ;; fix it
-          (set-dialog-item-text button text))
-        (fix-osx-dialog-item-font button)))))
+          (set-dialog-item-text button text))))))
 
 
 (defmethod fix-osx-dialog-item-font ((button control-dialog-item))
+  (niy fix-osx-dialog-item-font button)
+  #-(and)
   (when (dialog-item-handle button)
     (multiple-value-bind (ff ms) (view-font-codes button)  ;; dont bother if eql sys-font?
-      (niy fix-osx-dialog-item-font button)
-      #-(and)
       (rlet ((fsrec :controlfontstylerec))
-        (setf (pref fsrec :controlfontstylerec.flags) (logior #$kControlUseFontMask #$kControlUseFaceMask
-                                                              #$kControlUseSizeMask #$kControlUseModeMask)
-              (pref fsrec :controlfontstylerec.font) (ash ff -16)
-              (pref fsrec :controlfontstylerec.size) (logand ms #xffff)
-              (pref fsrec :controlfontstylerec.style) (ash (logand ff #xffff) -8)
-              (pref fsrec :controlfontstylerec.mode) (ash ms -16))
-        (#_SetControlFontStyle (dialog-item-handle button) fsrec)))))
+            (setf (pref fsrec :controlfontstylerec.flags) (logior #$kControlUseFontMask #$kControlUseFaceMask
+                                                                  #$kControlUseSizeMask #$kControlUseModeMask)
+                  (pref fsrec :controlfontstylerec.font) (ash ff -16)
+                  (pref fsrec :controlfontstylerec.size) (logand ms #xffff)
+                  (pref fsrec :controlfontstylerec.style) (ash (logand ff #xffff) -8)
+                  (pref fsrec :controlfontstylerec.mode) (ash ms -16))
+            (#_SetControlFontStyle (dialog-item-handle button) fsrec)))))
 
 
 (defmethod set-view-font-codes :after ((button control-dialog-item) ff ms &optional m1 m2)

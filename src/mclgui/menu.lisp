@@ -50,6 +50,13 @@
 (defmethod color-parts ((thing menubar))
   '(:menubar :default-item-title :default-menu-background :default-menu-title))
 
+(defvar *menubar-bottom*  20
+  "
+The *MENUBAR-BOTTOM* variable holds the vertical coordinate of the
+first QuickDraw point below the menu bar. It is provided so that windows
+do not draw themselves in the area taken up by the menu bar, but use only
+the area below the bottom of the menu bar.
+")
 
 (defvar *menubar*         nil
   "
@@ -112,9 +119,9 @@ menubar.
 ")
 
 
-(defvar *window-menu*       nil
+(defvar *windows-menu*       nil
   "
-The variable *WINDOW-MENU* contains the Window menu from the initial
+The variable *WINDOWS-MENU* contains the Window menu from the initial
 menubar.
 ")
 
@@ -577,15 +584,16 @@ RETURN:         FLAG.
   "
 RETURN:         two values: the key equivalent NSString and the key
                 modifier integer corresponding to the command-key
-                descriptor.
+                descriptor.  If no modifier is provided, :command is
+                returned by default.
 "
   (values (cond
             ((null command-key)  (objcl:objcl-string ""))
             ((consp command-key) (objcl:objcl-string (second command-key)))
             (t                   (objcl:objcl-string command-key)))
-          (if (atom command-key)
-              0
-              (encode-key-mask (first command-key)))))
+          (encode-key-mask (if (atom command-key)
+                               :command
+                               (first command-key)))))
 
 
 (defgeneric set-command-key (item new-key)
@@ -773,14 +781,15 @@ RETURN:         NIL.
       (when item
         (let ((owner (menu-item-owner item)))
           (when owner
-            (unless (eq owner menu)
-              (error 'menu-item-not-owned-error :menu menu :item item))
-            (setf (slot-value item 'owner) nil)
-            (when (typep item 'menu)
-              (let ((*menubar-frozen* t))
-                (menu-deinstall item)))
-            (setf (slot-value menu 'item-list) (delete item (slot-value menu 'item-list)))
-            (release item)))))))
+            (if (eq owner menu)
+                (progn
+                  (setf (slot-value item 'owner) nil)
+                  (when (typep item 'menu)
+                    (let ((*menubar-frozen* t))
+                      (menu-deinstall item)))
+                  (setf (slot-value menu 'item-list) (delete item (slot-value menu 'item-list)))
+                  (release item))
+                (cerror "Continue" 'menu-item-not-owned-error :menu menu :item item))))))))
 
 
 (defgeneric find-menu-item (menu title)
@@ -1163,23 +1172,24 @@ RETURN:         A new instance of MENU representing the NSMenu NSMENU.
 DO:             Inspect the application main menu, and build the
                 lisp-side view of the menu bar.  This updates the
                 variables *APPLE-MENU* *FILE-MENU* *EDIT-MENU*
-                *LISP-MENU* *TOOL-MENU* *WINDOW-MENU*.
+                *LISP-MENU* *TOOL-MENU* *WINDOWS-MENU*.
 
 RETURN:         The list of MENUs collected.
 "
   (let ((menubar (menu-items (wrap-nsmenu [[NSApplication sharedApplication] mainMenu]))))
     (dolist (menu menubar)
       (setf (slot-value menu 'owner) nil))
-    (setf *apple-menu*  (change-class (first menubar) 'apple-menu)
-          *file-menu*   (find "File"   menubar :key (function menu-title) :test (function string=))
-          *edit-menu*   (find "Edit"   menubar :key (function menu-title) :test (function string=))
-          *lisp-menu*   (find "Lisp"   menubar :key (function menu-title) :test (function string=))
-          *tool-menu*   (find "Tool"   menubar :key (function menu-title) :test (function string=))
-          *window-menu* (find "Window" menubar :key (function menu-title) :test (function string=)))
+    (setf *apple-menu*   (change-class (first menubar) 'apple-menu)
+          *file-menu*    (find "File"    menubar :key (function menu-title) :test (function string=))
+          *edit-menu*    (find "Edit"    menubar :key (function menu-title) :test (function string=))
+          *lisp-menu*    (find "Lisp"    menubar :key (function menu-title) :test (function string=))
+          *tool-menu*    (find "Tool"    menubar :key (function menu-title) :test (function string=))
+          *windows-menu* (find "Windows" menubar :key (function menu-title) :test (function string=)))
     menubar))
 
 
 (defun initialize/menu ()
+  (setf *menubar-bottom* (ceiling [[[NSApplication sharedApplication]mainMenu]menuBarHeight]))
   (setf *default-menubar* (fetch-current-menubar)
         ;; Notice this menubar instance is immediately replaced by the following SET-MENUBAR call.
         *menubar*      (make-instance 'menubar :menus (copy-list *default-menubar*)))
@@ -1199,6 +1209,10 @@ RETURN:         The list of MENUs collected.
       (add-menu-items *lisp-menu* item)))
   (values))
 
+
+(defun edit-menu ()
+  (warn "EDIT-MENU: this is not correct.")
+  (find-menu "Edit"))
 
 ;; (let ((bar [[NSApplication sharedApplication]mainMenu]))
 ;;   (dotimes (i [bar numberOfItems])

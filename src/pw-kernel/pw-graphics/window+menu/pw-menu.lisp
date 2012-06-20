@@ -208,6 +208,47 @@
   (tell  *pw-window-list* 'kill-patch-window))
 
 
+
+(defmacro handling-errors (&body body)
+  "
+DO:       Execute the BODY with a handler for CONDITION and
+          SIMPLE-CONDITION reporting the conditions.
+"
+  `(handler-case (progn ,@body)
+     (simple-error  (err) 
+       (format *trace-output* "~&~A: ~%" (class-name (class-of err)))
+       (apply (function format) *trace-output*
+              (simple-condition-format-control   err)
+              (simple-condition-format-arguments err))
+       (format *trace-output* "~&")
+       (finish-output))
+     (error (err) 
+       (format *trace-output* "~&~A: ~%  ~S~%" (class-name (class-of err)) err)
+       (finish-output))))
+
+(defun lisp-menu-action ()
+  (niy lisp-menu-action)
+  #-(and)
+  (let ((listener (find-if (lambda (w)
+                             (subtypep (type-of w) 'listener))
+                           (windows))))
+    (when listener
+      (window-select listener)))
+  (enable-all-apps-menu-items)
+  (menu-item-disable *apps-lisp-menu-item*))
+
+(defun pw-menu-action ()
+  (com.informatimago.common-lisp.cesarum.utility:tracing
+   (format *trace-output* "~&~S --> ~S~%" '*active-patch-window* *active-patch-window*)
+   (if *active-patch-window* 
+       (if (window-visiblep *active-patch-window*) 
+           (window-select *active-patch-window*)
+           (search-for-next-pw-window)) 
+       (make-new-pw-window t))
+   (enable-all-apps-menu-items)
+   (menu-item-disable *apps-PW-menu-item*)))
+
+
 (defun initialize-menus ()
   ;;------------------------------
   (setf *pw-menu-apps*         (new-menu "Patchwork"))
@@ -215,58 +256,36 @@
                                       *pw-menu-apps*
                                       (rest *original-CCL-menubar*)))
   ;;------------------------------
-  (setf *apps-lisp-menu-item* 
-        (add-apps-item-to-apps-menu "Lisp"
-                                    (lambda () 
-                                      (let ((listener (find-if (lambda (w)
-                                                                 (subtypep (type-of w) 'listener))
-                                                               (windows))))
-                                        (when listener
-                                          (window-select listener)))
-                                      (enable-all-apps-menu-items)
-                                      (menu-item-disable *apps-lisp-menu-item*))))
+  (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
   ;;------------------------------
-  (setf *apps-PW-menu-item*
-        (add-apps-item-to-apps-menu "PW"
-                                    (lambda ()
-                                      (if *active-patch-window* 
-                                          (if (window-visiblep *active-patch-window*) 
-                                              (window-select *active-patch-window*)
-                                              (search-for-next-pw-window)) 
-                                          (make-new-pw-window t)) 
-                                      (enable-all-apps-menu-items)
-                                      (menu-item-disable *apps-PW-menu-item*))))
+  (setf *apps-PW-menu-item* (add-apps-item-to-apps-menu "PW"  'pw-menu-action))
   ;;------------------------------
   (setf *pw-menu-file* (new-menu "File"))
   (let ((menu-now))
     (add-menu-items  *pw-menu-file* 
-                     (setf menu-now (new-leafmenu "New" (lambda() (make-new-pw-window t)))))
+                     (setf menu-now (new-leafmenu "New"        (lambda() (make-new-pw-window t)))))
     (set-command-key menu-now #\N)
-    (add-menu-items  *pw-menu-file* (setf menu-now (new-leafmenu "Open patch..." 
-                                                                 (lambda () (PW-LOAD-PATCH)))))
+    (add-menu-items  *pw-menu-file*
+                     (setf menu-now
+                           (new-leafmenu "Open patch..."       (lambda () (PW-LOAD-PATCH)))))
     (set-command-key menu-now #\O)
     (add-menu-items  *pw-menu-file* 
                      (setf *pw-menu-file-close-item*
-                           (new-leafmenu "Close" 
-                                         (lambda () (kill-patch-window *active-patch-window*)))))
+                           (new-leafmenu "Close"               (lambda () (kill-patch-window *active-patch-window*)))))
     (set-command-key *pw-menu-file-close-item* #\W)
     (add-menu-items  *pw-menu-file* 
                      (setf *pw-menu-file-only-Save-item*
-                           (new-leafmenu "Save" 
-                                         (lambda () (PW-WINDOW-SAVE *active-patch-window*)))))
+                           (new-leafmenu "Save"                (lambda () (PW-WINDOW-SAVE *active-patch-window*)))))
     (set-command-key *pw-menu-file-only-Save-item* #\S)
     (add-menu-items  *pw-menu-file* 
                      (setf *pw-menu-file-only-SaveMN-item*
-                           (new-leafmenu "Save with MN" 
-                                         (lambda () (PW-WINDOW-SAVE-MN *active-patch-window*)))))
+                           (new-leafmenu "Save with MN"        (lambda () (PW-WINDOW-SAVE-MN *active-patch-window*)))))
     (add-menu-items  *pw-menu-file* 
                      (setf *pw-menu-file-Save-item*
-                           (new-leafmenu "Save as..." 
-                                         (lambda () (PW-WINDOW-SAVE-as *active-patch-window*)))))
+                           (new-leafmenu "Save as..."          (lambda () (PW-WINDOW-SAVE-as *active-patch-window*)))))
     (add-menu-items  *pw-menu-file* 
                      (setf *pw-menu-file-SaveMN-item*
-                           (new-leafmenu "Save with MN as..." 
-                                         (lambda () (PW-WINDOW-SAVE-MN-as *active-patch-window*))))))
+                           (new-leafmenu "Save with MN as..."  (lambda () (PW-WINDOW-SAVE-MN-as *active-patch-window*))))))
   ;;------------------------------
   (setf *pw-menu-edit* (new-menu "Edit"))
   (let ((menu-now))
@@ -355,30 +374,28 @@
   ;;------------------------------
   (add-menu-items *PWoper-menu* 
                   (new-leafmenu "-" nil)
-                  (setf *pw-debug-menu*
-                        (new-leafmenu "PW-debug-ON"
-                                      (lambda () (flip-pw-debug))))
+                  (setf *pw-debug-menu* (new-leafmenu "PW-debug-ON" (lambda () (flip-pw-debug))))
                   (new-leafmenu "show error box" 'activate-current-patch-value-patch)
                   (new-leafmenu "-" nil)
                   (new-menu "Global options"
                             (new-menu "Scale" *g-option-c-major* *g-option-chromatic*)
-                            (new-menu "Approximation" *semitone-menu*
-                                      (prog1  *quartertone-menu*
-                                        (set-menu-item-check-mark *quartertone-menu* t))
+                            (new-menu "Approximation"
+                                      *semitone-menu*
+                                      (prog1 *quartertone-menu* (set-menu-item-check-mark *quartertone-menu* t))
                                       *eighthtone-menu*)
-                            (new-menu "Play Option" *play-Pbend-menu* *play-Multichan-menu*)
-                            (new-menu "Evaluation" *option-click-menu* *click-menu*))
+                            (new-menu "Play Option"
+                                      *play-Pbend-menu*
+                                      *play-Multichan-menu*)
+                            (new-menu "Evaluation"
+                                      *option-click-menu*
+                                      *click-menu*))
                   (new-leafmenu "-" nil)
-                  (new-leafmenu "Load Library…"
-                                (lambda () (load-library-config)))
-                  (new-leafmenu "Load Abstracts…"
-                                (lambda () (load-abstr-config)))
-                  (new-leafmenu "Save Current Config"
-                                (lambda () (remember-config)))
-                  (new-leafmenu "Delete Config"
-                                (lambda () (forget-all-config)))
+                  (new-leafmenu "Load Library…"       (lambda () (load-library-config)))
+                  (new-leafmenu "Load Abstracts…"     (lambda () (load-abstr-config)))
+                  (new-leafmenu "Save Current Config" (lambda () (remember-config)))
+                  (new-leafmenu "Delete Config"       (lambda () (forget-all-config)))
                   (new-leafmenu "-" nil)
-                  (new-leafmenu "Save Image" (lambda () (save-special-pw-image))))
+                  (new-leafmenu "Save Image"          (lambda () (save-special-pw-image))))
   ;;------------------------------
   (setf *patch-work-menu-root* (list
                                 *pw-menu-apps*

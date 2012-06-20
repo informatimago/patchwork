@@ -33,7 +33,7 @@
 ;;;;**************************************************************************
 
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 (defvar *record-enable* nil)
 
@@ -57,7 +57,7 @@
                             (timeout #$kAEDefaultTimeout)
                             (idleproc appleevent-idle)
                             filterproc)
-  (warn "~S is not implemented" 'pw::send-appleevent)
+  (ui:niy 'pw::send-appleevent)
   ;;   (let ((mode (+ (ecase reply-mode
   ;;                    (:no-reply #$kAENoReply)
   ;;                    (:queue-reply #$kAEQueueReply)
@@ -88,7 +88,7 @@
 
 
 (defun record--ae (class keyword lis)
-  (warn "~S is not implemented" 'record--ae)
+  (ui::niy 'record--ae)
   ;; (when (and *si-record* *record-enable*)
   ;; (with-aedescs (event reply target )
   ;;   (create-self-target target)
@@ -100,7 +100,7 @@
 
 
 (defun record-select-list (lista)
-  (warn "~S is not implemented" 'record-select-list)
+  (ui:niy 'record-select-list)
   ;; (when (and *si-record* *record-enable*)
   ;; (with-aedescs (event reply target )
   ;;     (create-self-target target)
@@ -116,7 +116,7 @@
 
 ;;RENAME
 (defmethod set-dialog-item-text-from-dialog ((view C-patch) str)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
   ;;                                     (,:|newn| ,(string-downcase str))))
   ;; (setf (pw-function-string view) (string-downcase str))
@@ -125,7 +125,7 @@
   )
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch-application) str)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (let ((win (application-object view)))
   ;;   (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
   ;;                                           (,:|newn| ,(string-downcase str))))
@@ -140,7 +140,7 @@
 ;;SET
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-out) text)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
   ;;                                                :|indx| 1))
   ;;                               (,:|data| ,text)))
@@ -149,7 +149,7 @@
   )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-in-box) text)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
   ;;                                                :|indx| 1))
   ;;                               (,:|data| ,text)))
@@ -157,14 +157,14 @@
   )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-instrument) text)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (set-dialog-item-text self text)
   ;; (when (dialog-item-action-function self)
   ;;    (funcall (dialog-item-action-function  self) self))
   )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-absin) text)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (set-dialog-item-text self text)
   ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
   ;;                                                :|indx| (+ (position self (pw-controls (view-container self))) 1)))
@@ -173,7 +173,7 @@
   )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-absout) text)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (set-dialog-item-text self text)
   ;; (setf (doc-string self) text)
   ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
@@ -184,7 +184,7 @@
 
 
 (defmethod item-action-after-drag ((self C-numbox))
-  (warn "~S is not implemented" 'item-action-after-drag)
+  (ui:niy 'item-action-after-drag)
   ;; (if (patch-type-p (view-container self))
   ;;   (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
   ;;                                                        :|indx| (+ (position self (pw-controls (view-container self))) 1)))
@@ -194,7 +194,7 @@
   )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox) text)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
   ;;                                                     :|indx| (+ (position self (pw-controls (view-container self))) 1)))
   ;;                                     (,:|data| ,text)))
@@ -202,7 +202,7 @@
   )
 
 (defmethod set-dialog-item-text-from-dialog ((self C-numbox) text)
-  (warn "~S is not implemented" 'set-dialog-item-text-from-dialog)
+  (ui:niy 'set-dialog-item-text-from-dialog)
   ;; (let ((value (read-from-string text)))
   ;;   (when (numberp value)
   ;;     (setf (value self) value)
@@ -284,7 +284,7 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (warn "~S is not implemented" 'delete-extra-inputs)
+    (ui:niy 'delete-extra-inputs)
     ;; (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
     box-now)
   )
@@ -389,7 +389,7 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (warn "~S is not implemented" 'mouse-pressed-no-active-extra)
+    (ui:niy 'mouse-pressed-no-active-extra)
     ;; (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
     box-now)) 
 
@@ -416,7 +416,7 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (warn "~S is not implemented" 'mouse-pressed-no-active-extra)
+    (ui:niy 'mouse-pressed-no-active-extra)
     ;;(record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
     box-now))
 
@@ -445,7 +445,7 @@
     (setf *si-record* t)
     (tell (controls *active-patch-window*) 'connect-new-patch? self box-now)
     (tell (controls *active-patch-window*) 'draw-connections)
-    (warn "~S is not implemented" 'mouse-pressed-no-active-extra)
+    (ui:niy 'mouse-pressed-no-active-extra)
     ;; (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
     box-now))
 
@@ -458,7 +458,7 @@
 (in-package "C-PATCH-BUFFER")
 (defmethod get-lock-button-fun ((self C-patch-buffer))
   #'(lambda (item)
-      (warn "~S is not implemented" 'get-lock-button-fun)
+      (ui:niy 'get-lock-button-fun)
       ;; (if (value (view-container item))
       ;;   (progn 
       ;;       (set-dialog-item-text item "o")
@@ -472,7 +472,7 @@
 (in-package :pw)
 (defmethod get-lock-button-fun ((self c-patch-accum:c-patch-accum))
   (eval `(function (lambda (item)
-           (warn "~S is not implemented" 'get-lock-button-fun)
+           (ui:niy 'get-lock-button-fun)
            ;; (if (value (view-container item))
            ;;   (progn (set-dialog-item-text item "o") 
            ;;          (record--ae :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))
@@ -504,7 +504,7 @@
 
 
 (defun record-patch (clase posi name)
-  (warn "~S is not implemented" 'record-patch)
+  (ui:niy 'record-patch)
   ;; (when (and *si-record* *record-enable*)
   ;;   (if (equal (string-downcase clase) "text")
   ;;     (setf clase "Window Comment"))
@@ -652,7 +652,7 @@
                                     (application-window-name self "chordseq")))
   (if  (give-MN-editor self)
        (setf (chord-line (give-MN-editor self)) (chord-seq self))
-       (warn "in ~S ~S,  (give-MN-editor self) is nil" 'make-application-object '((self C-patch-midi-Mod))))
+       (ui:uiwarn "in ~S ~S,  (give-MN-editor self) is nil" 'make-application-object '((self C-patch-midi-Mod))))
   (application-object self))
 
 
@@ -747,7 +747,7 @@
         )))
 
 (defun record-menu  (title para self)
-  (warn "~S is not implemented" 'record-menu)
+  (ui:niy 'record-menu)
   ;; (if para
   ;;   (record--ae :|PWst| :|come| `((,:|----| ,(mkSO :|cmen| (mkSO :|cbox| nil :|name| (pw-function-string self)) :|name| 
   ;;                                                  title))
@@ -822,7 +822,8 @@
         ;; (with-cursor *box-cursor*
         ;;   (while (null (mouse-down-p)) t))
         ;; (setf *position-new-box* (view-mouse-position win))
-        (warn "~S sets a random position" 'init-patch-pos)
+        (ui:uiwarn "~S sets a random position" 'init-patch-pos
+         )
         (if win
             (setf *position-new-box* (add-points (view-position win)
                                                  (make-point (random (point-h (view-size win)))

@@ -215,7 +215,7 @@
   (multiple-value-bind (fun-name exists?)
     (intern (string fun-string) "USER-ABSTRACTION")
     (when exists?
-      (warn "the name ~D already exists for an abstraction.
+      (ui:uiwarn "the name ~D already exists for an abstraction.
 A unique name will be chosen (if not a 'redraw')" fun-name)
       (ui:ed-beep)
       (setq fun-name (intern (string (gensym (string fun-name))) "USER-ABSTRACTION"))

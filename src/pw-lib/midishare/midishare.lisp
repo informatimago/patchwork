@@ -102,7 +102,7 @@
   (let (#+ccl(ccl:*warn-if-redefine* nil))
     (require :ff)))
 
-(defmacro defrecord (&rest args) (declare (ignore args)) (warn "ff defrecord stub"))
+(defmacro defrecord (&rest args) (declare (ignore args)) (ui:uiwarn "ff defrecord stub"))
   
 
 

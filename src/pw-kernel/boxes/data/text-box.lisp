@@ -41,7 +41,7 @@
 ;;;;
 ;;;;=========================================================
 
-(pw:enable-patchwork-readtable)
+(pw:enable-patchwork-reader-macros)
 
 ;;=======================================
 ;;A text box for PW Windows

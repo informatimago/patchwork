@@ -1,6 +1,6 @@
 ;;;; -*- mode:lisp;coding:utf-8 -*-
 ;;;;**************************************************************************
-;;;;FILE:               keystroke-action-dialog.lisp
+;;;;FILE:               y-or-n-dialog.lisp
 ;;;;LANGUAGE:           Common-Lisp
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
@@ -31,7 +31,9 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
+
+(in-package "MCLGUI")
+
 
 (defclass keystroke-action-dialog (dialog)
   ())
@@ -68,7 +70,7 @@
 The Y-OR-N-DIALOG function displays a dialog box containing Yes, No,
 and Cancel buttons. The display of the dialog box is modal.
 If the user clicks the Yes button, the function returns t. If the user clicks the No
-button, the function returns nil. If the user clicks the Cancel button, a throwcancel
+button, the function returns nil. If the user clicks the Cancel button, a throw cancel
 occurs. The default button is the Yes button.
 
 MESSAGE: A string to be displayed as the message in the dialog box.
@@ -102,6 +104,18 @@ the No button. In the following example, typing R activates the Cancel
 button.
 
 "
+  (declare (ignore size position help-spec back-color theme-background window-type))
+  (case (#_NSRunInformationalAlertPanel (objcl:objcl-string window-title)
+                                        (objcl:objcl-string message)
+                                        (objcl:objcl-string (or yes-text "OK"))
+                                        (when cancel-text
+                                          (objcl:objcl-string cancel-text))
+                                        (when no-text
+                                          (objcl:objcl-string no-text)))
+    ((-1) nil)
+    ((0)  (throw-cancel))
+    ((+1) t))
+  #-(and)
   (if window-title-supp
       (let ((the-dialog (make-instance 'keystroke-action-dialog
                             :window-type (or window-type :movable-dialog) 
@@ -158,4 +172,3 @@ button.
                              :cancel-text cancel-text)))
 
 ;;;; THE END ;;;;
-

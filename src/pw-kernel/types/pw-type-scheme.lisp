@@ -48,7 +48,7 @@
 ;;=====================================================
 
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 
 (defclass C-PW-type-set ()
@@ -292,7 +292,7 @@
 (defun add-output-type (name type-list)
   (if (assoc name *pw-all-out-types*)
     (progn
-      (warn "output type ~A already exists!" name))
+      (ui:uiwarn "output type ~A already exists!" name))
     (push (cons name type-list) *pw-all-out-types*))
   nil)
 
@@ -529,11 +529,12 @@
 
 (defun make-PW-standard-box (class-name pw-function 
                              &optional (position (make-point 15 15)) value-list size)
-  (let ((input-boxes-types 
-         (make-defunp-function-arg-list pw-function 
-                                        (if value-list (length value-list) 0)))
-        (y-now 5) (index 0)
-        input-boxes module)
+  (let ((input-boxes-types  (print (make-defunp-function-arg-list pw-function 
+                                                            (if value-list (length value-list) 0))))
+        (y-now 5)
+        (index 0)
+        (input-boxes '())
+        (module))
     (while input-boxes-types
       (push (apply 'make-instance (pop input-boxes-types)) input-boxes)
       (setf (doc-string (car input-boxes)) (pop input-boxes-types)))

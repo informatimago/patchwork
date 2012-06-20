@@ -47,7 +47,7 @@ weight 15-0.
 RETURN:         If V is given then the encoded point #@(H V), else H.
 "
   (if v
-      (dpb (ldb (byte 16 0) h) (byte 16 16) (ldb (byte 16 0) v))
+      (dpb (ldb (byte 16 0) v) (byte 16 16) (ldb (byte 16 0) h))
       h))
 
 

@@ -127,8 +127,8 @@ explicitly through the function FONT-SPEC.
 RETURN:         A font specification created from the font codes.
 
 FF-CODE:        The font-face code, a 32-bit integer combining the
-                 encoded name of the font and its face (plain, bold,
-                 italic, etc).
+                encoded name of the font and its face (plain, bold,
+                italic, etc).
 
 MS-CODE:        The mode-size code, a 32-bit integer indicating the
                 font mode (inclusive-or, exclusive-or, complemented,
@@ -457,6 +457,9 @@ DO:             Change the view font codes of view.  The font/face
                 passing all bits of FF and MS.
 "))
 
+
+(defun sys-font-spec ()
+  (font-spec (get-sys-font) 0))
 
 
 (defun wrap-font (nsfont)

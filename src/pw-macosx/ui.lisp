@@ -541,13 +541,13 @@
                             view-container
                             view-font
                             &allow-other-keys)
-  (warn "~S is not implemented, called with ~S" 'make-popupbox args)
+  (ui:uiwarn "~S is not implemented, called with ~S" 'make-popupbox args)
   (make-instance 'view))
 
 
 
 (defun pw::mkso (a b c patch-path)
-  (warn "~S called while scripting is disabled." 'pw::mkso)
+  (ui:uiwarn "~S called while scripting is disabled." 'pw::mkso)
   ;; see pw-lib/pwscript/pw-scripting.lisp
   '(:|cpat|
     nil
@@ -556,7 +556,7 @@
   nil) 
 
 (defun pw::record--ae (&rest args)
-  (warn "~S called while scripting is disabled." 'pw::record--ae)
+  (ui:uiwarn "~S called while scripting is disabled." 'pw::record--ae)
   '(:|aevt|
     :|odoc|
     ((:----
@@ -580,7 +580,7 @@
 
 (defmacro def-load-pointers (name lambda-list &body body)
   (declare (ignore name lambda-list body))
-  (warn "~S not implemented" 'def-load-pointers))
+  (ui:uiwarn "~S not implemented" 'def-load-pointers))
 
 
 ;;;; THE END ;;;;

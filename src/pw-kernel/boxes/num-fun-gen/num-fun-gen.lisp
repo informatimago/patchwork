@@ -40,7 +40,7 @@
 ;;;
 
 (in-package "EPW")
-(pw:enable-patchwork-readtable)
+(pw:enable-patchwork-reader-macros)
 
 ;; (eval-when (eval compile load)
 ;;   (import '(|CLPF-UTIL|:make-num-lambda |CLPF-UTIL|:prefix-expr

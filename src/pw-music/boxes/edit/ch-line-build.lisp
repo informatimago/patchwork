@@ -46,7 +46,7 @@
   (:export "C-PATCH-CHORD-LINE" "CHORD-SEQN"))
 
 (in-package "C-PATCH-CHORD-LINE")
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 (defclass C-patch-chord-line (C-patch-midi-Mod )())
 

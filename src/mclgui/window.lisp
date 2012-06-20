@@ -34,6 +34,70 @@
 
 (in-package "MCLGUI")
 (enable-sharp-at-reader-macro)
+(objcl:enable-objcl-reader-macros)
+
+
+
+
+(defvar *window-list* '()
+  "A list of window instances.")
+
+
+
+(defmethod initialize-instance ((window window) &key (view-font (view-default-font window)) &allow-other-keys)
+  (declare (ignorable view-font)) ; used by call-next-method.
+  (com.informatimago.common-lisp.cesarum.utility:tracing
+   (call-next-method)
+   (setf (view-valid window) (list nil))
+   (view-allocate-clip-region window)
+   (when (and (slot-value window 'erase-anonymous-invalidations)
+              (not (slot-value window 'theme-background)))
+     ;; only needed for non-theme color background
+     (setf (window-invalid-region window) (new-rgn)))
+   (add-to-list *window-list* window)
+   (let ((winh [[NSWindow alloc]initWithContentRect:(window-to-nswindow-frame (view-position window)
+                                                                              (view-size window))
+                styleMask:(ecase (window-type window)
+                            ((:document
+                              :document-with-zoom)
+                             (logior #$NSTitledWindowMask
+                                     #$NSMiniaturizableWindowMask
+                                     (if (window-close-box-p window)
+                                         #$NSClosableWindowMask
+                                         0)))
+                            ((:document-with-grow)
+                             (logior #$NSTitledWindowMask
+                                     #$NSMiniaturizableWindowMask
+                                     (if (window-close-box-p window)
+                                         #$NSClosableWindowMask
+                                         0)
+                                     #$NSResizableWindowMask))
+                            ((:double-edge-box
+                              :single-edge-box
+                              :shadow-edge-box)
+                             #$NSBorderlessWindowMask)
+                            ((:tool)
+                             (logior #$NSTitledWindowMask
+                                     (if (window-close-box-p window)
+                                         #$NSClosableWindowMask
+                                         0))))
+                backing:0
+                defer:(not (window-visiblep window))]))
+     (let ((viewh [[MclguiView alloc]
+                   initWithFrame:(window-to-nswindow-frame (make-point 0 0)
+                                                           (view-size window))]))
+       [winh setContentView:viewh]
+       (slot-value viewh 'view) window)
+     (setf (handle window) winh) ; must be done before setDelegate.
+     [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)])
+   (set-window-title window (window-title window))
+   (format *trace-output* "~&created window ~S ~S ~S ~S~%" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
+   (window-size-parts window)
+   (when (window-visiblep window)
+     (com.informatimago.common-lisp.cesarum.utility:tracing
+      (setf (slot-value window 'visiblep) nil)
+      (window-show window)))
+   window))
 
 
 
@@ -83,8 +147,15 @@ INCLUDE-WINDOIDS
                 included.  Floating windows are also included if the
                 value of the CLASS argument is WINDOID.
 "
-  (niy windows class include-invisibles include-windoids)
-  '())
+  (delete-if (lambda (window)
+               (not (and (if include-windoids
+                             (or (typep window class)
+                                 (typep window 'windoid))
+                             (typep window class))
+                         (or include-invisibles
+                             (window-visiblep window)))))
+             (copy-list *window-list*)))
+
 
 
 (defun front-window (&key (class 'window) include-invisibles include-windoids)
@@ -108,9 +179,9 @@ INCLUDE-WINDOIDS
                 included.  Floating windows are also included if the
                 value of the CLASS argument is WINDOID.
 "
-  (niy front-window class include-invisibles include-windoids)
-  '())
-
+  (first (windows :class class
+                  :include-invisible include-invisibles
+                  :include-windoids include-windoids)))
 
 
 (defun target ()
@@ -192,7 +263,7 @@ close box or chooses Close from the File menu.
         [handle setReleasedWhenClosed:t]
         [handle close]))
     (release window)
-    (niy window-close window "need to remove the window from the *window-list*")))
+    (delete-from-list *window-list* window)))
 
 
 
@@ -282,25 +353,26 @@ V:              The vertical coordinate of the new position, or NIL if
 "
   (if (numberp h)
       (let ((pos      (make-point h v))
-            (siz      (view-size window))
             (mswindow (handle window)))
         (setf (slot-value window 'view-position) pos)
         (when mswindow
-          [mswindow setFrame:(ns:make-ns-rect (point-h pos) (point-v pos)
-                                              (point-h siz) (point-v siz))])
+          [mswindow setFrameOrigin:(window-to-nswindow-origin (view-position window)
+                                                              (view-size window))])
         pos)
       (set-view-position window (center-window (view-size window) h))))
 
 
+
 (defmethod set-view-size ((window window) h &optional v)
   (let ((siz (make-point h v)))
-    (unless (eql siz (view-size window))
+    (unless (eql siz  (view-size window))
       (let ((pos      (view-position window))
             (mswindow (handle window)))
         (setf (slot-value window 'view-size) siz)
         (when mswindow
-          [mswindow setFrame:(ns:make-ns-rect (point-h pos) (point-v pos)
-                                              (point-h siz) (point-v siz))])))
+          [mswindow setFrame:(window-to-nswindow-frame (view-position window)
+                                                       (view-size window))
+                    display:t])))
     (refocus-view window)
     siz))
 
@@ -376,9 +448,7 @@ NEW-TITLE:      A string to be used as the new title.
   (:method ((window window))
     (unless (window-visiblep window)
       (setf (slot-value window 'visiblep) t)
-      (let ((nswindow (handle window)))
-        (when nswindow
-          [nswindow makeKeyAndOrderFront:nswindow])))
+      (window-bring-to-front window))
     window))
 
 
@@ -472,8 +542,7 @@ INCLUDE-INVISIBLES:
                 windows.
 ")
   (:method ((window window) &optional include-invisibles)
-    (niy window-layer window include-invisible)
-    0))
+    (position window (windows :include-invisibles include-invisibles))))
 
 
 (defgeneric set-window-layer (window new-layer &optional include-invisibles)
@@ -503,7 +572,20 @@ INCLUDE-INVISIBLES:
                 are counted.
 ")
   (:method ((window window) new-layer &optional include-invisibles)
-    (niy window new-layer include-invisibles)
+    (let ((handle (handle window)))
+      (when handle
+        (if (plusp new-layer)
+            (let ((other-window (or (elt *window-list* new-layer)
+                                     (first (last *window-list*)))))
+              (window-send-behind window other-window))
+            (window-bring-to-front window)
+            ;; (if (eql window (first *window-list*))
+            ;;     [handle makeKeyAndOrderFront:handle]
+            ;;     (let ((other (handle (first *window-list*))))
+            ;;       (when other
+            ;;         [handle orderWindow:#$NSWindowAbove
+            ;;                 relativeTo:[other windowNumber]])))
+            )))
     ;; (without-interrupts
     ;;     (let* ((wptr (wptr w)))    
     ;;       (when wptr
@@ -534,6 +616,69 @@ INCLUDE-INVISIBLES:
 
 
 
+(defvar *last-windoid* nil)
+
+(defun window-bring-to-front (window)
+  "
+DO:             Order the WINDOW above every other.
+"
+  (delete-from-list *window-list* window)
+  (insert-into-list *window-list* 0 window)
+  (let ((handle (handle window)))
+    (when handle
+      [handle makeKeyAndOrderFront:handle])))
+
+
+(defun window-send-behind (window other-window)
+  "
+DO:             Order the WINDOW behind the OTHER-WINDOW.
+"
+  (let ((winh (handle window))
+        (wino (handle other-window)))
+    (delete-from-list *window-list* window)
+    (insert-into-list *window-list*
+                      (or (position other-window *window-list*)
+                          (length *window-list*))
+                      window)
+    (when (and winh wino)
+      [winh orderWindow:#$NSWindowBelow relativeTo:[wino windowNumber]])))
+
+
+(defun reselect-windows ()
+  "Hilite & activate the windows.
+Move windoids to the front.
+If *selected-window* is a DA, pick a non-DA to select.
+If *selected-window* is nil, leave it that way.
+Update *last-windoid* and *windoid-count*
+"
+  (let ((selected *selected-window*)
+        (last-windoid        nil)
+        (found-non-windoid?  nil)
+        (windoid-count 0))
+    (dolist (window *window-list*)
+      (when (window-visiblep window)
+        (cond ((windoid-p window)
+               (when found-non-windoid?
+                 (if last-windoid
+                     (window-send-behind window last-windoid)
+                     (window-bring-to-front window)))
+               (setf last-windoid window)
+               (unless (window-active-p window)
+                 (view-activate-event-handler window))
+               (incf windoid-count))
+              (t
+               (setf found-non-windoid? t)))))
+    (setf *windoid-count* windoid-count
+          *last-windoid* last-windoid)
+    (when *selected-window*           ; maybe nobody is selected
+      (setf *selected-window* selected)
+      (if last-windoid
+          (window-send-behind selected last-windoid )
+          (window-bring-to-front selected))
+      (unless (window-active-p selected)
+        (view-activate-event-handler selected)))))
+
+
 (defgeneric window-select (window)
   (:documentation "
 DO:             Bring WINDOW to the front, activate it, and show
@@ -557,9 +702,7 @@ DO:             Bring WINDOW to the front, activate it, and show
         (progn
          (when *selected-window*        
            (view-deactivate-event-handler *selected-window*))
-         (let ((handler (handler window)))
-           (when handler
-             [handler makeKeyAndOrderFront:handler]))
+         (window-bring-to-front window)
          (setf *selected-window* nil)
          (reselect-windows)
          (window-bring-to-front window)
@@ -778,7 +921,8 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 
 
-(defmethod window-close ((window window))
+(defmethod window-close :after ((window window))
+  ;; window is a subclass* of STREAM.
   (window-do-operation window 'close nil))
 
 (defmethod window-save ((window window))
@@ -877,7 +1021,7 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 
 (defun initialize/window ()
-  (niy initialize/window))
+  (setf *window-list* '()))
 
 
 ;;;; THE END ;;;;

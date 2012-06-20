@@ -151,6 +151,7 @@ This variable should never be changed by a program.
 (defvar *lighter-gray-color* nil) 
 (defvar *dark-gray-color*    nil)
 
+(defvar *tool-back-color*    nil)
 
 ;; Patterns:
 

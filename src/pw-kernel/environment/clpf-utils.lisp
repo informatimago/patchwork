@@ -117,7 +117,7 @@
              (eq (first p1) (first p2)))
         (setf *package* (first p1))
         (print `(in-package ,(package-name (first p1))) output-stream))
-       (t (warn "~S has packages ~S, while~%~S has packages ~S." file1 p1 file2 p2)))
+       (t (ui:uiwarn "~S has packages ~S, while~%~S has packages ~S." file1 p1 file2 p2)))
     (list-compare l1 l2 output-stream))))
 
 (defun read-lists-from (infile)
@@ -404,7 +404,7 @@ The resulting function is a lambda list not compiled."
     (rw-vars-expr expr)
     (setq *rvars* (nreverse *rvars*))
     (when (and args-p (not (equal args *rvars*)))
-      (warn "Found other free variables ~S not in ~S~%in expression ~S."
+      (ui:uiwarn "Found other free variables ~S not in ~S~%in expression ~S."
             (set-difference *rvars* args) args expr)
       (setq *rvars* args))
     (values *rvars* *wvars*)))

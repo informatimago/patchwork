@@ -64,6 +64,16 @@
   new-handle)
 
 
+(defmacro with-handle ((handle-var wrapper) &body body)
+  "
+DO:  Binds HANDLE-VAR to (handle WRAPPER) and then executes BODY only
+     when the handle of the WRAPPER is not NULL.
+"
+  `(let ((,handle-var (handle ,wrapper)))
+     (when ,handle-var
+       ,@body)))
+
+
 (defgeneric unwrap (wrapper)
   (:documentation "
 DO:             Create and initialize the underlying object and bind
@@ -128,5 +138,114 @@ DO:             Execute BODY, unless a wrapping is occuring, in which
              handle)
            (progn
              ,@body)))))
+
+
+
+
+(defun wrap (nsobject)
+  ;; Note: circular ns structures not implemented yet.
+  (cond
+    ;; Atoms:
+    ((nullp nsobject)
+     nil)
+    ([nsobject isKindOfClass:(oclo:@class "NSString")]
+     (objcl:lisp-string nsobject))
+    ([nsobject isKindOfClass:(oclo:@class "NSNumber")]
+     (let ((objctype (aref (objcl:lisp-string [nsobject objCType]) 0)))
+       (cond
+         ((find objctype #.(vector #$_C_FLT #$_C_DBL))
+          [nsobject doubleValue])
+         ((find objctype #.(vector #$_C_UCHR #$_C_USHT #$_C_UINT #$_C_ULNG #$_C_ULNG_LNG))
+          [nsobject unsignedLongLongValue])
+         ((find objctype #.(vector #$_C_CHR #$_C_SHT #$_C_INT #$_C_LNG #$_C_LNG_LNG #$_C_BOOL))
+          [nsobject unsignedLongLongValue])
+         (t
+          nsobject))))
+    (t
+     ;; Compound objects:
+     ;; (let ((*wrap-objects* (or *wrap-objects* (make-hash-table))))
+     (cond
+       ([nsobject isKindOfClass:(oclo:@class "NSArray")]
+        (wrap-nsarray nsobject))
+       ([nsobject isKindOfClass:(oclo:@class "NSMenu")]
+        (wrap-nsmenu nsobject))
+       ([nsobject isKindOfClass:(oclo:@class "NSMenuItem")]
+        (wrap-nsmenuitem nsobject))
+       ([nsobject isKindOfClass:(oclo:@class "NSWindow")]
+        (wrap-nswindow nsobject))
+       ([nsobject isKindOfClass:(oclo:@class "NSDictionary")]
+        (wrap-nsdictionary nsobject))
+       ([nsobject isKindOfClass:(oclo:@class "NSNotification")]
+        (wrap-nsnotification nsobject))
+       (t
+        nsobject))
+     ;;)
+     )))
+
+
+
+(defun wrap-nsdictionary (nsdictionary)
+   "
+RETURN:         A fresh P-list containing the NSDICTIONARY entries.
+
+DO:             Keys are converted to keywords; the values are
+                converted to lisp type if possible, or else left as
+                foreign types.
+
+NOTE:           It's expected the dictionary is small, hence the P-list.
+"
+   (wrapping
+    (if (nullp nsdictionary)
+        nil
+        (loop
+          :with keyword = (find-package "KEYWORD")
+          :with enum =  [nsdictionary keyEnumerator]
+          :for key = [enum nextObject]
+          :until (nullp key)
+          :collect (intern (objcl:lisp-string key) keyword)
+          :collect (wrap [nsdictionary objectForKey:key])))))
+
+
+(defun wrap-nsarray (nsarray)
+  (wrapping
+   (let ((result '()))
+     (dotimes (i [nsarray count] (nreverse result))
+       (push (wrap [nsarray objectAtIndex:i]) result)))))
+
+
+
+(defmethod unwrap ((item symbol))
+  (unwrapping
+   (objcl:objcl-string (symbol-name item))))
+
+(defmethod unwrap ((item string))
+  (unwrapping
+   (objcl:objcl-string item)))
+
+(defmethod unwrap ((item integer))
+  (unwrapping
+   [NSNumber numberWithLongLong:item]))
+
+(defmethod unwrap ((item real))
+  (unwrapping
+   [NSNumber numberWithDouble:(coerce item 'double-float)]))
+
+(defmethod unwrap ((list cons))
+  (unwrapping
+   (let ((nsarray [NSMutableArray arrayWithCapacity:(length list)]))
+     (dolist (element list nsarray)
+       [nsarray addObject:(unwrap element)]))))
+
+
+
+
+(defun nsarray-to-list (nsarray)
+  (wrap-nsarray nsarray))
+
+(defun list-to-nsarray (list)
+  (if list
+      (unwrap list)
+      [NSMutableArray arrayWithCapacity:0]))
+
 
 ;;;; THE END ;;;;

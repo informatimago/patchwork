@@ -100,7 +100,7 @@
   (setf (active-mode box) mode)
   (if  (give-MN-editor box)
        (setf (chord-line (give-MN-editor box)) (chord-seq box))
-       (warn "in ~S ~S,  (give-MN-editor box) is nil" 'make-pw-chord-line-box '(box mode chords-form)))
+       (ui:uiwarn "in ~S ~S,  (give-MN-editor box) is nil" 'make-pw-chord-line-box '(box mode chords-form)))
   box)
 
 (defmethod yourself-if-collecting ((self C-patch-midi)) self)

@@ -35,8 +35,64 @@
 (in-package "MCLGUI")
 
 (defmacro niy (item &rest vars)
-  `(locally
-     (warn "(~S ~{~S~^ ~}) is not implemented yet" ',item (list ,@vars))))
+  `(format *trace-output* "~&Not Implemented Yet: (~S~{ ~S~})~%" ',item (list ,@vars)))
+
+(defmacro uiwarn (control-string &rest args)
+  `(format *trace-output* "~&~?~%" ',control-string' (list ,@args)))
+
+
+
+;; From Alexandria:
+(define-modify-macro appendf (&rest args) 
+  append "Append onto list")
+(declaim (inline delete/swapped-arguments))
+(defun delete/swapped-arguments (sequence item &rest keyword-arguments)
+  (apply #'delete item sequence keyword-arguments))
+(define-modify-macro deletef (item &rest remove-keywords)
+  delete/swapped-arguments
+  "Modify-macro for DELETE. Sets place designated by the first argument to
+the result of calling DELETE with ITEM, place, and the REMOVE-KEYWORDS.")
+
+
+(defmacro add-to-list (list-place element)
+    "
+DO:             Destructively add the ELEMENT to the LIST-PLACE in the
+                last position.
+"
+  `(appendf ,list-place (list ,element)))
+
+
+(defmacro delete-from-list (list-place element)
+  "
+DO:             Destructuvely delete from the list stored in place
+                LIST-PLACE the ELEMENT.
+"
+  `(deletef ,list-place ,element))
+
+(defmacro insert-into-list (&whole whole &environment env
+                            list-place position element)
+  "
+DO:             Destructively insert into the LIST-PLACE the ELEMENT
+                in the given position.
+
+POSITION:       0 means insert in front of the list.
+                n means after the n-th element.
+"
+  (multiple-value-bind (dummies vals new setter getter) (get-setf-expansion list-place env)
+    (when (cdr new) (error "Can't expand ~S" whole))
+    (let ((vposition (gensym))
+          (velement  (gensym))
+          (vplace    (car new)))
+      `(let* (,@(mapcar #'list dummies vals) (,vplace ,getter)
+                (,vposition ,position)
+                (,velement  ,element))
+         (if (zerop ,vposition)
+             (push ,velement ,vplace)
+             (push ,velement (cdr (or (nthcdr (1- ,vposition) ,vplace)
+                                      (last ,vplace)))))
+         ,setter))))
+
+
 
 (defmacro dovector ((var vector &optional result) &body body)
   (let ((vvector (gensym "vector"))
@@ -67,9 +123,10 @@ RETURN:         A string containing the object identity as printed by
                 PRINT-UNREADABLE-OBJECT.
 "
   (let ((*print-readably* nil))
-    (string-trim "#< >"
-     (with-output-to-string (stream)
-       (print-unreadable-object (object stream :type nil :identity t))))))
+    (let ((ident
+           (with-output-to-string (stream)
+             (print-unreadable-object (object stream :type nil :identity t)))))
+      (subseq ident 3 (1- (length ident))))))
 
 
 (defun call-print-parseable-object (object stream type identity thunk)
@@ -135,7 +192,6 @@ RETURN:         The object that bas been printed (so that you can use
                 it in tail position in PRINT-OBJECT conformingly).
 
 "
-  
   (if (symbolp object)
       `(call-print-parseable-object ,object ,stream ,type ,identity
                                     (lambda (,object)
@@ -147,6 +203,7 @@ RETURN:         The object that bas been printed (so that you can use
                                         (lambda (,ovar)
                                           (declare (ignorable ,ovar))
                                           ,(extract-slots object slots)))))))
+
 
 
 

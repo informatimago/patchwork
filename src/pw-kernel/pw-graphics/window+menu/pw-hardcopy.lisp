@@ -75,7 +75,7 @@
  (tell (subviews self) 'set-window-hardcopy-wptr wptr))
 
 (defmethod win-print-setUp ((self window))
-  (warn "~S ~S is not implemented yet" 'win-print-setUp '((self window)))
+  (ui:uiwarn "~S ~S is not implemented yet" 'win-print-setUp '((self window)))
   ;; (unwind-protect
   ;;   (with-cursor *arrow-cursor*
   ;;     (#_PrOpen)
@@ -85,7 +85,7 @@
   )
   
 (defmethod window-hardcopy ((self pw::C-pw-window) &optional show-fl)
-  (warn "~S ~S is not implemented yet" 'window-hardcopy '((self pw::C-pw-window) &optional show-fl))
+  (ui:uiwarn "~S ~S is not implemented yet" 'window-hardcopy '((self pw::C-pw-window) &optional show-fl))
 
   show-fl
   ;; (unwind-protect

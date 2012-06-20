@@ -93,7 +93,7 @@
   (when (eq  (call-next-method) self)  ; click inside window
     (if *current-small-inBox* (kill-text-item) )          ;;(see pw-controls)
     (unless (shift-key-p)(tell (controls self) #'deactivate-control))
-    (warn "~S ~S is not implemented yet" 'view-click-event-handler '((self C-pw-window) where))
+    (ui:uiwarn "~S ~S is not implemented yet" 'view-click-event-handler '((self C-pw-window) where))
     ;; (rlet ((user-rect :rect)
     ;;        (scratch-rect :rect)
     ;;        (i-rect :rect))
@@ -242,8 +242,8 @@
      (load name :verbose t :external-format :mac-roman))
     (PW-update-wins-menu name)))
 
-(defun PW-LOAD-PATCH ()
-  (let ((name (CHOOSE-FILE-DIALOG :button-string "Open Patch"))
+(defun pw-load-patch ()
+  (let ((name (choose-file-dialog :button-string "Open Patch"))
         #+ccl (ccl:*compile-definitions* nil))
     (unless *active-patch-window*
       (let ((win (make-instance 'c-pw-window)))
@@ -259,7 +259,7 @@
             (format t "~&Error: ~A~%" err)
             (return-from pw-load-patch :error))))
       (format t "~&File ~S loaded.~%" name) (finish-output)
-      (record--ae :|aevt| :|odoc| `((,:|----| ,(mkSO :|cpat| nil :|name| (namestring name))))) 
+      (record--ae :|aevt| :|odoc| `((,:|----| ,(mkso :|cpat| nil :|name| (namestring name))))) 
       (pw-update-wins-menu name))))
 
 (defun PW-update-wins-menu (&optional pathname)

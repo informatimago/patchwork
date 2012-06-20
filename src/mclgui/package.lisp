@@ -302,6 +302,7 @@
   
    "FIND-DIALOG-ITEM"
    
+   "Y-OR-N-DIALOG"
    
    ;; ----------------------------------------
    ;; Chapter 6: Color
@@ -348,7 +349,7 @@
    "WINDOW-MOUSE-UP-EVENT-HANDLER" "WINDOW-GROW-EVENT-HANDLER"
    "WINDOW-DRAG-EVENT-HANDLER" "WINDOW-ZOOM-EVENT-HANDLER"
    "WINDOW-CLOSE-EVENT-HANDLER" "WINDOW-DO-FIRST-CLICK"
-   "WINDOW-UPDAPTE-EVENT-HANDLER" "VIEW-DRAW-CONTENTS"
+   "WINDOW-UPDATE-EVENT-HANDLER" "VIEW-DRAW-CONTENTS"
    "WINDOW-DRAW-GROW-ICON" "VIEW-MOUSE-POSITION" "MOUSE-DOWN-P"
    "DOUBLE-CLICK-P" "DOUBLE-CLICK-SPACING-P"
    "COMMAND-KEY-P" "CONTROL-KEY-P" "OPTION-KEY-P" "SHIFT-KEY-P"
@@ -414,6 +415,7 @@
    "DEF-LOAD-POINTERS" ; this one won't be implemented, change the sources!
    "WPTR" ; this one won't be implemented, change the sources!
    "NIY"
+   "UIWARN"
    )
   (:documentation "
 

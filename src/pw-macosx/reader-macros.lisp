@@ -37,9 +37,12 @@
 (in-package "PW")
 
 
+#-(and)
 (defvar *readtable-patchwork*)
+#-(and)
 (defvar *readtable-preserve*)
 
+#-(and)
 (defun sharp-underline-dispatch-reader-macro (stream subchar arg)
   (declare (ignore subchar arg))
   (let ((*readtable* *readtable-preserve*)
@@ -78,6 +81,7 @@
       (values (clpf-util:prefix-expr (read stream t nil t))))) ; maybe (CLtLII p548)
 
 
+#-(and)
 (defun setup ()
   "
 Configure a com.informatimago.common-lisp.lisp-reader.reader:readtable
@@ -88,8 +92,8 @@ common-lisp:package and common-lisp:symbol.
 "
   (setf *read-eval* t)
   (let ((rt (copy-readtable nil)))
-    (set-dispatch-macro-character #\# #\_ (function sharp-underline-dispatch-reader-macro) rt)
-    (set-dispatch-macro-character #\# #\$ (function sharp-underline-dispatch-reader-macro) rt)
+    ;; (set-dispatch-macro-character #\# #\_ (function sharp-underline-dispatch-reader-macro) rt)
+    ;; (set-dispatch-macro-character #\# #\$ (function sharp-underline-dispatch-reader-macro) rt)
     ;; (set-dispatch-macro-character #\# #\. (function sharp-dot-dispatch-reader-macro)       rt)
     ;; (set-dispatch-macro-character #\# #\@ (function sharp-at-dispatch-reader-macro)        rt)
     (let ((*readtable* rt)) (ui:enable-sharp-at-reader-macro))
@@ -104,28 +108,35 @@ common-lisp:package and common-lisp:symbol.
   *readtable-patchwork*)
 
 
+(defun set-patchwork-reader-macros ()
+  ;; (set-dispatch-macro-character #\# #\_ (function sharp-underline-dispatch-reader-macro))
+  ;; (set-dispatch-macro-character #\# #\$ (function sharp-underline-dispatch-reader-macro))
+  ;; (set-dispatch-macro-character #\# #\. (function sharp-dot-dispatch-reader-macro))
+  ;; (set-dispatch-macro-character #\# #\@ (function sharp-at-dispatch-reader-macro))
+  (set-dispatch-macro-character #\# #\i (function sharp-i-dispatch-reader-macro))
+  (ui:enable-sharp-at-reader-macro)
+  (values))
 
-(defmacro enable-patchwork-readtable ()
+(defun reset-patchwork-reader-macros ()
+  ;; (set-dispatch-macro-character #\# #\_ nil)
+  ;; (set-dispatch-macro-character #\# #\$ nil)
+  ;; (set-dispatch-macro-character #\# #\. nil)
+  ;; (set-dispatch-macro-character #\# #\@ nil)
+  (set-dispatch-macro-character #\# #\i nil)
+  (ui:disable-sharp-at-reader-macro)
+  (values))
+
+enable-patchwork-readtable
+(defmacro enable-patchwork-reader-macros ()
   `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (setup)
-     (setf *readtable* (copy-readtable *readtable-patchwork*))
-     ;; (terpri)
-     ;; (print (or *load-pathname* *compile-file-pathname*))
-     ;; (print (get-dispatch-macro-character #\# #\@ *readtable*))
-     ;; (print (let ((pt (read-from-string "#@(1 2)")))
-     ;;          (list (typep pt 'ui:point)
-     ;;                pt)))
-     ;; (terpri)
+     (set-patchwork-reader-macros)
      (values)))
 
-(defmacro disable-patchwork-readtable ()
+(defmacro disable-patchwork-reader-macros ()
   `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (setf *readtable* (copy-readtable nil))
+     (reset-patchwork-reader-macros)
      (values)))
 
-
-(eval-when (:load-toplevel :execute)
-  (setup))
 
 ;;;; THE END ;;;;
 

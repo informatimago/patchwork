@@ -68,6 +68,7 @@
   (initialize/view)
   (initialize/window)
   (initialize/table-dialog-item)
+  (initialize/file)
   (initialize/event)
   (initialize/eval)
   (initialize/application)

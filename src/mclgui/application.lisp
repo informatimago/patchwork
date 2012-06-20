@@ -36,6 +36,13 @@
 (in-package "MCLGUI")
 
 
+(defun application-is-active ()
+  [[NSApplication sharedApplication] isActive])
+
+(define-symbol-macro *foreground*
+    (application-is-active))
+
+
 (defclass application (wrapper)
   ())
 

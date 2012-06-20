@@ -50,7 +50,7 @@
 ;;;  patch-value          ;builds a chord object
 ;;;============================================
 (in-package :patch-work)
-(enable-patchwork-readtable)
+(pw:enable-patchwork-reader-macros)
 
 (defunp Chbuild ((midics (fixs (:dialog-item-text "()" :type-list (fixnum list))))
                  (durs (fixs (:dialog-item-text "()" :type-list (fixnum list))))

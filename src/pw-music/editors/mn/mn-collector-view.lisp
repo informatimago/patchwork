@@ -60,7 +60,7 @@
 ;;;   accell-selection          ;affects chord fields of selected chords
 ;;;   
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 (defvar *MN-common-popUpMenu* ())
 (defun make-chord-collector-pops ()

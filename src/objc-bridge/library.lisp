@@ -165,7 +165,7 @@
 
 
   (defun find-cfstring-sections ()
-    (warn "~s is obsolete" 'find-cfstring-sections)))
+    (ui:uiwarn "~s is obsolete" 'find-cfstring-sections)))
 
 
 #+gnu-objc

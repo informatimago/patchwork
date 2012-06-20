@@ -80,7 +80,7 @@ located in the x,y position specified by the &rest key arguments"
   (unwind-protect
     (progn
       (ui:add-menu-items *pw-menu-apps* (menu self))    ;adds the PUMenu in the menu-bar
-      (warn "~S ~S is not implemented entirely yet" 'view-click-event-handler '((self C-PopUpbox) mouse))
+      (ui:uiwarn "~S ~S is not implemented entirely yet" 'view-click-event-handler '((self C-PopUpbox) mouse))
       ;; (let ((hdl (menu-handle (menu self)))
       ;;       (selection) (ID) (item) (menu-object)
       ;;       (global (local-to-global self (view-mouse-position  self))))

@@ -70,7 +70,7 @@
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  #-ccl (warn "Export stuff from NS and NSFUN")
+  #-ccl (ui:uiwarn "Export stuff from NS and NSFUN")
   ;; Force all symbols interned in the NS package to be external
   #+ccl (ccl::package-force-export "NS")
   #+ccl (ccl::package-force-export "NEXTSTEP-FUNCTIONS"))

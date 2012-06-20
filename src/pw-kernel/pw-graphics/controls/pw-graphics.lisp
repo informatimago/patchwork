@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 ;;;;=========================================================
 ;;;;
 ;;;;  PATCH-WORK
@@ -41,8 +39,8 @@
 ;;;;
 ;;;;=========================================================
 (in-package :pw)
-(enable-patchwork-readtable)
-
+(enable-patchwork-reader-macros)
+(objcl:enable-objcl-reader-macros)
 
 ;;=================================================================================================
 ;;(with-pen-saved   
@@ -74,41 +72,30 @@
 
 
 (defun draw-line (x1 y1 x2 y2)
-  (niy draw-line x1 y1 x2 y2)
-  ;; (#_MoveTo :long (make-point x1 y1))
-  ;; (#_LineTo :long (make-point x2 y2))
-  )
+  (let ((path [NSBezierPath bezierPath]))
+    [path moveToPoint:(ns:make-ns-point x1 y1)]
+    [path lineToPoint:(ns:make-ns-point x2 y2)]
+    [path stroke]))
+
+(defun erase-rect (x y w h)
+  (#_NSEraseRect (ns:make-ns-rect x y w h)))
 
 (defun draw-rect (x y w h)
-  (niy draw-rect x y w h)
-  ;; (ui:rlet ((r :rect :left x :right (+ x w) :top y :bottom (+ y h)))
-  ;;   (#_FrameRect :ptr r))
-  )
+  (#_NSFrameRect (ns:make-ns-rect x y w h)))
 
-(defun fill-rect* (x y w h) 
-  (niy fill-rect* x y w h )
-  ;; (ui:rlet ((r :rect :left x :right (+ x w) :top y :bottom (+ y h)))
-  ;;   (#_PaintRect :ptr r))
-  )
+(defun fill-rect* (x y w h)
+  (#_NSRectFill (ns:make-ns-rect x y w h)))
 
 (defun draw-point (x y)
-  (niy draw-point x y )
-  ;; (let ((p (ui:make-point x y)))
-  ;;     (#_MoveTo :long p)
-  ;;     (#_LineTo :long p))
-  )
+  (#_NSRectFill (ns:make-ns-rect x y 1 1)))
 
-(defun draw-ellipse (x y w h)  
-  (niy draw-ellipse x y w h )
-  ;; (ui:rlet ((r :rect :left (- x w) :right (+ x w) :top (- y h) :bottom (+ y h)))
-  ;;    (#_FrameOval :ptr r))
-  )
+
+(defun draw-ellipse (x y w h)
+  [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] stroke])
 
 (defun fill-ellipse (x y w h)
-  (niy fill-ellipse x y w h )
-  ;; (ui:rlet ((r :rect :left (- x w) :right (+ x w) :top (- y h) :bottom (+ y h)))
-  ;;    (#_PaintOval :ptr r))
-  )
+  [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] fill])
+
 
 ;; let-window-pen,let-window-font
 ;; with-font-codes  
@@ -230,15 +217,8 @@
   (when (view-contains-point-p self mouse)
     self))
 
-(defmethod erase-draw-contents ((self simple-view))
-  (niy erase-draw-contents self)
-  ;; (let* ((pos (view-position self))
-  ;;       (end (add-points pos (view-size self))))
-  ;;   (rlet ((r :rect
-  ;;             :topleft pos
-  ;;             :bottomright end))
-  ;;     (#_EraseRect r)))
-  )
+(defmethod erase-draw-contents ((self simple-view))  
+  (ui::with-view-frame (x y w h) self (erase-rect )))
 
 (defmethod erase-view-inside-rect ((self simple-view))
   (with-pen-state (:pattern *white-pattern* :mode :patcopy)
@@ -263,12 +243,7 @@
   )
 
 (defun inside-rectangle? (x1 y1 x y w h)
-  (niy inside-rectangle? x1 y1 x y w h)
-  ;; (let ((topleft (make-point x y)))
-  ;;   (rlet ((rect :rect :topleft (make-point x y)
-  ;;                :bottomright (add-points topleft (make-point w h))))
-  ;;         (point-in-rect-p rect x1 y1)))
-  )
+  (and (<= x x1 (+ x w)) (<= y y1 (+ y h))))
 
 (defmethod view-window-grown ((self simple-view)))
 

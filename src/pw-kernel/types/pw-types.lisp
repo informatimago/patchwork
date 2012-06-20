@@ -47,7 +47,7 @@
 ;;;
 
 (in-package :pw)
-(enable-patchwork-readtable)
+(enable-patchwork-reader-macros)
 
 
 

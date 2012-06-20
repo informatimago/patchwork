@@ -36,7 +36,7 @@
 (in-package :pw)
 
 (defmethod window-hardcopy ((self pw::C-rtm-editor-window) &optional show-fl)
-  (warn "~S ~S is not implemented yet" 'window-hardcopy '((self pw::C-rtm-editor-window) &optional show-fl))
+  (ui:uiwarn "~S ~S is not implemented yet" 'window-hardcopy '((self pw::C-rtm-editor-window) &optional show-fl))
   ;; show-fl
   ;; (unwind-protect
   ;;   (with-cursor *arrow-cursor*

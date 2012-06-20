@@ -43,6 +43,7 @@
 (defmethod view-activate-event-handler ((window window))
   (unless (or (not *foreground*) (window-active-p window))
     (setf (window-active-p window) t)
+    #-(and)
     (unless (typep window 'windoid)
       (let ((attrs (view-get window 'bubble-attrs)))
         (when attrs
@@ -58,6 +59,7 @@
 (defmethod view-deactivate-event-handler ((window window))
   (when (window-active-p window)
     (setf (window-active-p window) nil)
+    #-(and)
     (unless (or (typep window 'windoid) *disable-bubbles-on-inactive-windows*)
       (let ((attrs (get-bubble-attributes window)))
         (view-put window 'bubble-attrs attrs)

@@ -87,7 +87,7 @@
                          (intern (trim-extension (string-downcase (pathname-name comp-name)))
                                  "USER-COMP-ABSTR")
        (when exists?
-         (warn "the name ' ~D ' already exists for an abstraction.
+         (ui:uiwarn "the name ' ~D ' already exists for an abstraction.
 A previous function called ~D will be redefined" new-name new-name)
          (ui:ed-beep))
        (setf (pw-function self) new-name)
