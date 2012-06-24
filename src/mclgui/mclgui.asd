@@ -39,7 +39,9 @@
     :version "1.0.3"
     :license "GPL3"
     :depends-on ("closer-mop" ; window.lisp uses closer-mop:class-precedence-list, etc.
-                 "com.informatimago.objcl") 
+                 "com.informatimago.objcl"
+                 ;; While developping:
+                 "com.informatimago.common-lisp.cesarum") 
     :components ((:file "package")
 
                  (:file "macros"
