@@ -121,6 +121,7 @@ DO:             Remove the property KEY from the VIEW.
                          :accessor view-origin-slot)
    (view-subviews        :initform nil
                          :initarg :view-subviews
+                         :initarg :subviews
                          :reader   view-subviews
                          ;; Note: the vector is initialized in initialize-instance.
                          :documentation "A vector of subviews.")
@@ -132,6 +133,8 @@ DO:             Remove the property KEY from the VIEW.
 
 
 ;;;---------------------------------------------------------------------
+
+(defvar *next-window-ptr* 0)
 
 (defclass window (view)
   ((window-cursor                    :initform  *arrow-cursor*
@@ -215,7 +218,9 @@ DO:             Remove the property KEY from the VIEW.
                                                          :tool)
                                      :accessor   window-type)
    (erase-anonymous-invalidations    :initform   t
-                                     :initarg   :erase-anonymous-invalidations)))
+                                     :initarg   :erase-anonymous-invalidations)
+   (window-ptr                       :initform (incf *next-window-ptr*)
+                                     :reader window-ptr)))
 
 
 (defgeneric view-allocate-clip-region (window))

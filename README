@@ -1,0 +1,89 @@
+;; -*- mode:rst; coding:utf-8 -*-
+
+En cours de développement
+=========================
+
+make application
+----------------
+
+`make application` ne donne pas un exécutable utilisable (des pointeurs
+mac sont enregistrés dans l'image qui ne peuvent pas être utilisés au
+chargement.  
+
+Deux solutions:
+
+- rassembler dans des fonctions d'initialisation toutes les
+  expressions créant ces pointeurs mac, et appeler ces fonctions au
+  lancement de l'image exécutable.  (Voir par exemple initialize-menus dans
+  #P"PATCHWORK:src;pw-kernel;pw-graphics;window+menu;pw-menu.lisp").
+
+      + simplicité.
+
+      + portabilité.
+
+      - ne résoud pas le problème de la commande/menu "Save Image".
+
+
+- utiliser ccl:*lisp-cleanup-functions*.
+
+      - plus complexe: il faudrait ajouter des fonctions
+        d'hibernation/réveil pour tous les objets qui ont un NSObject
+        handle.
+
+      - pas portable.
+
+      + résoud le problème de la commande/menu "Save Image".
+
+      + facilite la génération de l'application en cours de développement.
+
+
+
+Chargement du programme
+-----------------------
+
+0- Installer quicklisp.
+
+1- Obtenir les sources.
+
+1.1- Obtenir les sources de Patchwork via fossil.
+     Voir: http://fossil.informatimago.com:8002/patchwork/home
+
+1.2- Obtenir une version à jour de informatimago via git:
+
+        cd ~/quicklisp/local-projects
+        git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
+
+     Normalement ils sont obtenu automatiquement via quicklisp, mais
+     il y a des modifications nécessaires pour Patchwork dans le
+     repository git, qui ne seront prises en compte par quicklisp qu'à
+     la prochaine itération mensuelle.  
+
+2- Voir 'generate-application.lisp' ou 'loader.lisp'.  Editer
+   ~/LOGHOSTS/PATCHWORK pour indiqure où sont installés les sources de
+   Patchwork ; par exemple:
+
+      ;;-*- mode:lisp; coding:utf-8; -*-
+
+      #.(list
+         (list "PATCHWORK:**;*.*.*"
+               (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
+                                #P"/home/pjb/" nil))
+         (list "PATCHWORK:**;*.*"
+               (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
+                                #P"/home/pjb/" nil))
+         (list "PATCHWORK:**;*"
+               (merge-pathnames #P"works/patchwork/patchwork/**/*"
+                                #P"/home/pjb/" nil)))
+
+
+3- Lancer Clozure.app (AppStore), ou une autre version de ccl >= 1.7.
+
+4- (cd #P/repertoire/ou/sont/installes/les/sources/de/patchwork/")
+
+5- (load "loader.lisp")
+
+
+-- 
+__Pascal Bourguignon__
+Sun Jun 24 04:49:50 CEST 2012
+

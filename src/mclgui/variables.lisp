@@ -116,7 +116,7 @@ to the styles listed here.")
 
 ;; Colors:
 
-(defvar *color-available* t
+(defvar *color-available* nil
   "
 The *COLOR-AVAILABLE* variable returns a value indicating whether the
 Macintosh computer on which Macintosh Common Lisp is running supports
@@ -258,16 +258,6 @@ a modal dialog is being processed.
 
 (defvar *top-listener* nil)
 
-(defvar *multi-click-count* 0
-  "
-The *MULTI-CLICK-COUNT* variable is incremented during event
-processing if the current event is part of a series of multiple
-clicks. It is reset to 1 when there is a mouse click that is not part
-of a series.
-
-Determination of whether a click is part of a series is done as for
-DOUBLE-CLICK-P.
-")
 
 
 (defvar *current-event* nil

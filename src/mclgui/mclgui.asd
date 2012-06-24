@@ -60,7 +60,7 @@
 
                  (:file "objc-classes"
                         :depends-on ("package"
-                                     "wrapper"))
+                                     "macros" "wrapper"))
                  
                  ;; Chapter 2:
 
@@ -115,7 +115,8 @@
                  (:file "dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"))
+                                     "view-classes" "view" "window" "event"
+                                     "region"))
 
                  (:file "default-button-mixin"
                         :depends-on ("package" 
@@ -263,9 +264,9 @@
 
                  (:file "event"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system" "view-classes" "view"
-                                     "window"))
+                                     "macros" "variables" "point" "system"
+                                     "objc-classes"
+                                     "view-classes" "view" "window"))
                  
                  (:file "view-event"
                         :depends-on ("package" 

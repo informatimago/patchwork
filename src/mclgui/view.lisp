@@ -78,6 +78,7 @@
 
 
 
+
 (defmethod initialize-instance :after ((view simple-view) &key &allow-other-keys)
   (when (and (slot-value view 'view-font) (not (typep view 'window)))
     (set-initial-view-font view (slot-value view 'view-font)))
@@ -97,9 +98,24 @@
 
 (defmethod initialize-instance :after ((view view) &key &allow-other-keys)
   (let ((subviews (slot-value view 'view-subviews)))
+    (format-trace "initialize-instance" view subviews)
     (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
     (apply (function add-subviews) view (coerce subviews 'list)))
   (values))
+
+
+(defgeneric wptr (simple-view)
+  (:documentation "
+The wptr generic function holds the pointer to a window record on the
+Macintosh heap. 
+This generic function returns a window pointer if the view is contained in a
+window, or nil if the view is not contained in a window.
+All views contained in a given window have the same wptr.
+")
+  (:method ((view simple-view))
+    (let ((window (view-window view)))
+      (when (and window (handle window))
+        (window-ptr window)))))
 
 
 
@@ -147,6 +163,7 @@
                        (*current-font-view* (or font-view *current-font-view*)))
                    (if (setf unlock [handle lockFocusIfCanDraw])
                        (progn
+                         (format-trace "did lockFocusIfCanDraw" view)
                          (focus-view *current-view* *current-font-view*)
                          #-(and)
                          (when (and view (null old-font-view) font-view
@@ -154,8 +171,10 @@
                            (multiple-value-setq (ff ms) (wptr-font-codes wptr))
                            (setf old-fonts t))
                          (funcall function view))
-                       (format *trace-output* "~&Could not lockFocusIfCanDraw ~S~%" view)))
-              (when unlock [handle unlockFocus])
+                       (format-trace "could not lockFocusIfCanDraw" view)))
+              (when unlock
+                [handle unlockFocus]
+                (format-trace "did unlockFocusIfCanDraw" view))
               (focus-view *current-view* *current-font-view*)))))))
 
 
@@ -297,7 +316,7 @@ RETURN:         VIEW.
         (vector-push-extend view siblings))
       (setf (slot-value view 'view-container) container)
       (when (and viewh superh)
-        [superh addSubview:viewh])
+        (on-main-thread [superh addSubview:viewh]))
       view))
   (:method ((view simple-view) (container window))
     (let ((viewh         (handle view))
@@ -306,7 +325,7 @@ RETURN:         VIEW.
         (vector-push-extend view siblings))
       (setf (slot-value view 'view-container) container)
       (when (and viewh winh)
-        [[winh contentView] addSubview:viewh])
+        (on-main-thread [[winh contentView] addSubview:viewh]))
       view)))
 
 
@@ -324,7 +343,7 @@ RETURN:         VIEW.
       (let ((old-container (view-container view)))
         (deletef (slot-value old-container 'view-subviews) view)
         (when viewh
-          [viewh removeFromSuperview]))
+          (on-main-thread [viewh removeFromSuperview])))
       view)))
 
 
@@ -485,7 +504,7 @@ FUNCTION:       A function.
 
 SUBVIEW-TYPE:   A Common Lisp type specifier.
 ")
-  (:method ((simple-view view) function &optional (subview-type t))
+  (:method ((view simple-view) function &optional (subview-type t))
     (do-subviews (subview view subview-type)
       (funcall function subview))))
 
@@ -521,7 +540,7 @@ NAME:           Any object, but usually a symbol.  Nicknames are
 VIEW:           A view.
 ")
   (:method (name (view simple-view))
-    (dovector (subview (view-subviews parent))
+    (dovector (subview (view-subviews view))
               (if (eq name (view-nick-name subview))
                   (return subview)))))
 
@@ -640,9 +659,9 @@ ERASE-P:        A value indicating whether or not to add the
 ")
   (:method ((view simple-view) region &optional erase-p)
     (declare (ignore region erase-p)) ; TODO: for now we invalidate everything.
-    (format *trace-output* "~&invalidate-region       ~S~%" view)
+    (format-trace "invalidate-region" view)
     (with-handle (viewh view)
-      [viewh setNeedsDisplay:t])
+      [viewh setNeedsDisplay:yes])
     #-(and)
     (let* ((wptr (wptr view)))
       (when wptr
@@ -679,11 +698,12 @@ ERASE-P:        A value indicating whether or not to add the
                                         ; view coordinates
                   (when offset (#_offsetrgn  rgn (point-h offset)(point-v offset))) ; to window coords
                   (#_UnionRgn rgn invalid-rgn invalid-rgn)))))))))
+  
   (:method ((window window) region &optional erase-p)
     (declare (ignore region erase-p))
-    (format *trace-output* "~&invalidate-region       ~S~%" window)
+    (format-trace "invalidate-region" window)
     (with-handle (winh window)
-      [winh setViewsNeedDisplay:t])))
+      [winh setViewsNeedDisplay:yes])))
 
 
 (defgeneric invalidate-corners (view topleft bottomright &optional erase-p)
@@ -702,17 +722,17 @@ ERASE-P:        A value indicating whether or not to add the
 ")
   (:method ((view simple-view) topleft bottomright &optional erase-p)
     (declare (ignore erase-p))
-    (format *trace-output* "~&invalidate-corners      ~S~%" view)
+    (format-trace "invalidate-corners" view)
     (with-handle (viewh view)
       [viewh setNeedsDisplayInRect:(ns:make-ns-rect (point-h topleft) (point-v topleft)
                                                     (- (point-h bottomright) (point-h topleft))
                                                     (- (point-v bottomright) (point-v topleft)))])
     nil)
   (:method ((window window) topleft bottomright &optional erase-p)
-    (declare (ignore erase-p))
-    (format *trace-output* "~&invalidate-corners      ~S~%" window)
+    (declare (ignore topleft bottomright erase-p))
+    (format-trace "invalidate-corners" window)
     (with-handle (winh window)
-      [winh setViewsNeedDisplay:t])))
+      [winh setViewsNeedDisplay:yes])))
 
 
 (defgeneric invalidate-view (view &optional erase-p)
@@ -728,15 +748,15 @@ ERASE-P:        A value indicating whether or not to add the
 ")
   (:method ((view simple-view) &optional erase-p)
     (declare (ignore erase-p))
-    (format *trace-output* "~&invalidate-view         ~S~%" view)
+    (format-trace "invalidate-view" view)
     (with-handle (viewh view)
-      [viewh setNeedsDisplay:t]))
+      [viewh setNeedsDisplay:yes]))
 
   (:method ((window window) &optional erase-p)
     (declare (ignore erase-p))
-    (format *trace-output* "~&invalidate-view         ~S~%" window)
+    (format-trace "invalidate-view" window)
     (with-handle (winh window)
-      [winh setViewsNeedDisplay:t])))
+      [winh setViewsNeedDisplay:yes])))
 
     
 
@@ -753,25 +773,9 @@ REGION:         A region. The region must be a Macintosh region handle,
                 that is, the result of (#_NewRgn).
 ")
   (:method ((view simple-view) region)
-    (niy validate-region view region)
-    #-(and)
-    (when (wptr view)
-      (with-focused-view view
-        (without-interrupts
-            (let* ((rgn *temp-rgn*))
-              (#_SectRgn region (view-clip-region view) rgn)         
-              (#_validWindowRgn (wptr view) rgn)
-              (let* ((window (view-window view))
-                     (erase-rgn (window-erase-region window))
-                     (invalid-rgn (window-invalid-region window))
-                     (org (view-origin view)))
-                (unless (eql #@(0 0) org)
-                  (let ((offset (subtract-points (view-origin window) org)))
-                    (#_OffsetRgn rgn (point-h offset)(point-v offset)))) 
-                (when erase-rgn
-                  (#_DiffRgn erase-rgn rgn erase-rgn))
-                (when invalid-rgn
-                  (#_DiffRgn invalid-rgn rgn invalid-rgn)))))))))
+    (declare (ignore region))
+    #| Nothing to do. |#
+    (values)))
 
 
 (defgeneric validate-corners (view topleft bottomright)
@@ -834,22 +838,49 @@ V:              The vertical coordinate of the new position, or NIL if
 RETURN:         (make-point h v)
 ")
   (:method ((view simple-view) h &optional v)
-    (let ((pt           (make-point h v))
-          (old-position (view-position view)))
-      (unless (eql pt old-position)
-        (let ((container (view-container view)))         
-          (if container
-              ;; (error 'view-error :view view
-              ;;        :format-control "~S has no container"
-              ;;        :format-arguments (list view))
-              (with-focused-view container
-                (invalidate-view view t)         
-                (setf (slot-value view 'view-position) pt)
-                (invalidate-view view (maybe-erase view)) ; usually erase-p nil suffices
-                (make-view-invalid view))
-              (setf (slot-value view 'view-position) pt))))
+    (let ((pos (make-point h v)))
+      (unless (eql pos (view-position view))
+        (com.informatimago.common-lisp.cesarum.utility:tracing
+         (invalidate-view view t)         
+         (setf (slot-value view 'view-position) pos)
+         (invalidate-view view t)
+         (with-handle (viewh view)
+           [viewh setFrameOrigin: (nspoint pos)]
+           #-(and)
+           (com.informatimago.common-lisp.cesarum.utility:tracing
+            view viewh pos
+            (on-main-thread [viewh setFrameOrigin: (nspoint pos)])))))
       (refocus-view view)
-      pt)))
+      pos)))
+
+
+(defgeneric set-view-size (view h &optional v)
+  (:documentation "
+DO:             Set the size of the view.
+
+VIEW:           A simple view or subclass of simple-view.
+
+H:              The width of the new size, or the complete size
+                (encoded as an integer) if V is NIL or not supplied.
+
+V:              The height of the new size, or NIL if the complete
+                size is given by H.
+")
+  (:method ((view simple-view) h &optional v)
+    (let ((siz (make-point h v)))
+      (unless (eql siz (view-size view))
+        (invalidate-view view t)
+        (setf (slot-value view 'view-size) siz)
+        (invalidate-view view t)
+        (with-handle (viewh view)
+          [viewh setFrameSize: (nssize siz)]
+          [viewh setBounds: (nssize siz)]
+          #-(and)
+          (progn
+            (on-main-thread [viewh setFrameSize: (nssize siz)])
+            (on-main-thread [viewh setBounds: (nssize siz)]))))
+      (refocus-view view)
+      siz)))
 
 
 (defgeneric view-default-position (view)
@@ -876,56 +907,6 @@ VIEW:           A simple-view or subclass of simple-view.
 ")
   (:method ((view simple-view))
     #@(0 0)))
-
-
-(defgeneric set-view-size (view h &optional v)
-  (:documentation "
-DO:             Set the size of the view.
-
-VIEW:           A simple view or subclass of simple-view.
-
-H:              The width of the new size, or the complete size
-                (encoded as an integer) if V is NIL or not supplied.
-
-V:              The height of the new size, or NIL if the complete
-                size is given by H.
-")
-  (:method ((view simple-view) h &optional v)
-    (let ((pt (make-point h v)))
-      (unless (eql pt (view-size view))
-        (let ((container (view-container view)))
-          (if container
-              ;; (error 'view-error :view view
-              ;;      :format-control "~S has no container"
-              ;;      :format-arguments (list view))
-              (progn
-                (setf (slot-value view 'view-position) pt)
-                (niy set-view-size view h v))
-              (setf (slot-value view 'view-position) pt))
-          #-(and)
-          (let ((clip-region (view-clip-region view))
-                (origin      (view-origin view))
-                (old-region  *temp-rgn*)
-                (temp-region *temp-rgn-2*))
-            (#_CopyRgn clip-region old-region)
-            (setf (slot-value view 'view-size) pt)
-            (make-view-invalid view)
-                                        ;           (adjust-view-region view clip-region container)
-            (setq clip-region (view-clip-region view)) ; for simple-views
-            (#_XorRgn clip-region old-region temp-region)
-            (let ((offset (subtract-points (view-origin container) origin)))
-              (#_OffsetRgn temp-region (point-h offset)(point-v offset)))
-            (with-focused-view container             
-              (#_invalWindowRgn (wptr view) temp-region)
-              (let* ((window (view-window view))
-                     (erase-rgn (window-erase-region window)))
-                (when erase-rgn
-                  (let ((offset (subtract-points (view-origin window)
-                                                 (view-origin container))))
-                    (#_offsetrgn temp-region (point-h offset)(point-v offset)))
-                  (#_UnionRgn erase-rgn temp-region erase-rgn)))))))
-      (refocus-view view)
-      pt)))
 
 
 (defgeneric view-default-size (view)
@@ -979,19 +960,19 @@ RETURN:         (make-point h v)
 ")
   (:method ((view view) h &optional v (scroll-visibly t))
     (let* ((pt         (make-point h v))
-           (container  (view-container view))
+           ;; (container  (view-container view))
            (old-sc-pos (view-scroll-position view))
            (delta      (subtract-points old-sc-pos pt)))
       (with-focused-view view
         (unless (eql delta #@(0 0))
           (if scroll-visibly
-              (let* ((rgn         *temp-rgn*)
+              (let* (;; (rgn         *temp-rgn*)
                      (window      (view-window view))
                      (erase-rgn   (window-erase-region window))
                      (invalid-rgn (window-invalid-region window))
-                     (view-rgn    (and (or erase-rgn invalid-rgn)
-                                       (view-clip-region view)))
-                     (size        (view-size view)))
+                     ;; (view-rgn    (and (or erase-rgn invalid-rgn) (view-clip-region view)))
+                     ;; (size        (view-size view))
+                     )
                 (niy set-view-scroll-position view h v scroll-visibly)
                 #-(and)
                 (if container
@@ -1027,8 +1008,8 @@ RETURN:         (make-point h v)
               (invalidate-view view t))))
       (make-view-invalid view)
       (setf (view-scroll-position view) pt)
-      (refocus-view view))
-    pt))
+      (refocus-view view)
+      pt)))
 
 
  
@@ -1210,9 +1191,9 @@ The generic function VIEW-DRAW-CONTENTS is called by the event
 system whenever a view needs to redraw any portion of its contents.
 The default simple-view method does nothing. It should be shadowed by
 views that need to redraw their contents. The default view method calls
-view-focus-and-draw-contents on each of the view’s subviews.
+VIEW-FOCUS-AND-DRAW-CONTENTS on each of the view’s subviews.
 
-When view-draw-contents is called by the event system, the view’s clip
+When VIEW-DRAW-CONTENTS is called by the event system, the view’s clip
 region is set so that drawing occurs only in the portions that need to be
 updated. This normally includes areas that have been covered by other
 windows and then uncovered.
@@ -1221,13 +1202,14 @@ VIEW:           A simple view or view.
 ")
   (:method ((view simple-view))
     ;; DEBUG:
+    #-(and)
     (with-view-frame (x y w h) view
-      (#/NSFrameRect (ns:make-ns-rect (1+ x) (1+ y) (min 2 (- w 2)) (min 2 (- h 2)))))
+      (#_NSFrameRect (ns:make-ns-rect (1+ x) (1+ y) (min 2 (- w 2)) (min 2 (- h 2)))))
     (values))
   (:method ((view view))
+    (call-next-method)
     (dovector (subview (view-subviews view))
-              (view-focus-and-draw-contents subview))
-    (call-next-method)))
+              (view-focus-and-draw-contents subview))))
 
 
 
@@ -1249,6 +1231,8 @@ VISRGN, CLIPRGN Region records from the view’s wptr.
         (niy view-focus-and-draw-contents view visrgn cliprgn)
         ;; (get-window-visrgn wptr visrgn)
         ;; (get-window-cliprgn wptr cliprgn)
+        (view-draw-contents view)
+        #-(and)
         (when (view-is-invalid-p view visrgn cliprgn)
           (view-draw-contents view)))))
 
@@ -1258,6 +1242,8 @@ VISRGN, CLIPRGN Region records from the view’s wptr.
         (niy view-focus-and-draw-contents view visrgn cliprgn)
         ;; (get-window-visrgn wptr visrgn)
         ;; (get-window-cliprgn wptr cliprgn)
+        (view-draw-contents view)
+        #-(and)
         (when (regions-overlap-p visrgn cliprgn)
           (view-draw-contents view))))))
 
@@ -1313,9 +1299,9 @@ VISRGN, CLIPRGN Region records from the view’s wptr.
         (let* ((old-ff (car codes))
                (old-ms (cdr codes))
                (ff (if ff-mask
-                       ff
                        (logior (logand ff ff-mask) 
-                               (logandc2 old-ff  ff-mask))))
+                               (logandc2 old-ff  ff-mask))
+                       ff))
                (ms (if ms-mask
                        (logior (logand ms ms-mask) 
                                (logandc2 old-ms ms-mask))
@@ -1371,6 +1357,15 @@ VIEW:           A simple view.
 
 (defgeneric view-cursor (view point)
   (:documentation "
+
+The VIEW-CURSOR generic function determines the cursor shape whenever
+the window containing the view is active and the cursor is over it.
+The VIEW-CURSOR function is called by WINDOW-UPDATE-CURSOR.
+
+VIEW:           A view or simple view.
+
+POINT:          The position of the cursor, expressed as a point.
+
 RETURN:         The cursor shape to display when the mouse is at
                 point, a point in view. It is called by
                 WINDOW-UPDATE-CURSOR as part of the default
@@ -1388,6 +1383,7 @@ RETURN:         The cursor shape to display when the mouse is at
                 *WATCH-CURSOR* The watch-face shape shown during
                 time-consuming operations, when event processing is
                 disabled.
+
 ")
   (:method ((view simple-view) point)
     (let ((container (view-container view)))
@@ -1409,7 +1405,7 @@ RETURN:         The cursor shape to display when the mouse is at
       (null cliprgn)
       (multiple-value-bind (tl br) (view-corners view)
         (without-interrupts
-            (niy view-is-invalid-p view visrgn cliprgn)
+            (niy view-is-invalid-p view visrgn cliprgn tl br)
             ;; (let ((rgn *temp-rgn*)) ; so *temp-rgn* belongs to us
             ;;   (#_SetRectRgn rgn (point-h tl)(point-v tl) (point-h br)(point-v br))
             ;;   (#_SectRgn rgn visrgn rgn)

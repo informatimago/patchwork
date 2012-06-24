@@ -37,7 +37,8 @@
 (defpackage "MCLGUI"
   (:use "COMMON-LISP")
   (:nicknames "UI")
-  (:import-from "OCLO" "*NULL*" "NULLP")
+  (:import-from "OCLO"  "*NULL*" "NULLP")
+  (:import-from "OBJCL" "YES" "NO")
   (:export
 
    ;; Extensions:

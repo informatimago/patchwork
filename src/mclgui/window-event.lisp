@@ -111,6 +111,57 @@
             (view-key-event-handler *top-listener* key)))))
 
 
+;;; --- window closing ----
+
+(defmethod window-close-event-handler ((w window))
+  "
+NOTE:       It's called by -[MclguiWindow windowShouldClose:]
+RETURN:     Whether the window should be closed (YES unless canceled).
+"
+  (catch-cancel
+   (cond ((option-key-p)
+          (let ((class (class-of w)))
+            (dolist (w (nreverse (windows :class class :include-invisibles t)))
+              (if (eq (class-of w) class)
+                  (window-close w))))
+          (return-from window-close-event-handler t))
+         ((control-key-p)
+          (view-put w :display-in-menu-when-hidden t)
+          (window-hide w)
+          (return-from window-close-event-handler nil))
+         (t
+          (window-close w)
+          (return-from window-close-event-handler t))))
+  nil)
+
+
+(defmethod window-close :after ((window window))
+  (setf (slot-value window 'my-item) nil)
+  (let ((wm *windows-menu*))
+    (when (and (typep wm 'menu) (menu-enabled-p wm))
+      (update-windows-menu wm))
+    (let ((em (edit-menu)))
+      (when em (menu-update em)))))
+
+
+;;; --- window zooming ----
+
+(defgeneric window-do-zoom (window)
+  (:documentation "Internal.
+Called by -[MclguiWindow zoom:] which is called from WINDOW-ZOOM-EVENT-HANDLER.")
+  (:method ((window window))
+    (window-size-parts window)))
+
+(defmethod window-zoom-event-handler ((window window) message)
+  (with-handle (winh window)
+    (when (xor [winh isZoomed] (eq :inZoomIn message))
+      (on-main-thread [winh zoom:winh] :wait t)))
+  nil)
+
+
+
+;;; --- window events ----
+
 (defgeneric window-event-handler (window)
   (:documentation "
 RETURN:   NIL, or the object that handles the window events.
@@ -125,13 +176,6 @@ RETURN:   NIL, or the object that handles the window events.
   (window-event-handler (front-window :include-windoids t)))
 
 
-(defmethod window-close :after ((window window))
-  (setf (slot-value window 'my-item) nil)
-  (let ((wm *windows-menu*))
-    (when (and (typep wm 'menu) (menu-enabled-p wm))
-      (update-windows-menu wm))
-    (let ((em (edit-menu)))
-      (when em (menu-update em)))))
 
 
 ;;;; THE END ;;;;

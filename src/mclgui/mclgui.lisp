@@ -40,11 +40,6 @@
   (niy def-load-pointer name lambda-list body)
   `(niy def-load-pointer ',name ',lambda-list ',body))
 
-(defun wptr (x)
-  ;; NOTE: we won't implement this, the sources will have to change.
-  (niy wptr x)
-  x)
-
 
 
 

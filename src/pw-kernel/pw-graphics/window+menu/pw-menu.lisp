@@ -159,14 +159,27 @@
   (let ((file (choose-new-file-dialog
                :prompt "Save new image as:"
                :button-string  "Save"
-               :directory "CL:images;Pw.image"))
+               :directory (merge-pathnames "Desktop/" (user-homedir-pathname))
+               #-(and)"CL:images;Pw.image"))
         (sizes (list (* 8500 1024)
                      (* 6500  1024))))
     (when file
-      ;;(clear-patchwork)
-      ;;(setf ui::*lisp-cleanup-functions* (list (car ui::*lisp-cleanup-functions* )))
+      (clear-patchwork)
+      #+ccl (setf ccl:*lisp-cleanup-functions* (list (car ccl:*lisp-cleanup-functions*)))
       (eval-enqueue        
        (lambda ()
+         #+ccl (ccl::build-application
+                :name (file-namestring file)
+                :directory (make-pathname :name nil :type nil :version nil :defaults file)
+                :copy-ide-resources t
+                ;; :init-file "HOME:patchwork-init.lisp"
+                ;; '(pathname "~/application-init.lisp")
+                ;;  (lambda ()
+                ;;              (make-pathname :name  "patchwork-init" :type "lisp"
+                ;;                             :defaults (user-homedir-pathname)))
+                )
+         #-ccl (error "Not implemented yet on ~A" (lisp-implementation-type))
+         #-(and)
          (save-application
           file
           :application-class (find-class 'ui::lisp-development-system)
@@ -176,7 +189,7 @@
           ;;:init-file "PW:PW-lib;PWscript;image-init" GA 230996
           :init-file "image-init" 
           :clear-clos-caches t
-          :excise-compiler   nil ))))))
+          :excise-compiler   nil))))))
 
 
 (defun dis/enable-menu-item (menu-item fl)
@@ -237,6 +250,7 @@ DO:       Execute the BODY with a handler for CONDITION and
   (enable-all-apps-menu-items)
   (menu-item-disable *apps-lisp-menu-item*))
 
+
 (defun pw-menu-action ()
   (com.informatimago.common-lisp.cesarum.utility:tracing
    (format *trace-output* "~&~S --> ~S~%" '*active-patch-window* *active-patch-window*)
@@ -258,7 +272,7 @@ DO:       Execute the BODY with a handler for CONDITION and
   ;;------------------------------
   (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
   ;;------------------------------
-  (setf *apps-PW-menu-item* (add-apps-item-to-apps-menu "PW"  'pw-menu-action))
+  (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"  'pw-menu-action))
   ;;------------------------------
   (setf *pw-menu-file* (new-menu "File"))
   (let ((menu-now))
@@ -403,12 +417,13 @@ DO:       Execute the BODY with a handler for CONDITION and
                                 *PWoper-menu* *pw-kernel-menu* *pw-menu-patch*
                                 *pw-windows-menu*))
   ;;------------------------------
-  (ui:set-menubar *default-CCL-menubar*)
+  (set-menubar       *default-CCL-menubar*)
   (menu-item-disable *apps-lisp-menu-item*)
-  (set-command-key *apps-lisp-menu-item* #\L)
-  (set-command-key *apps-PW-menu-item*   #\1)
+  (set-command-key   *apps-lisp-menu-item* #\L)
+  (set-command-key   *apps-PW-menu-item*   #\1)
   ;;------------------------------
-  (pushnew (function cleanup-PW-wins) *lisp-cleanup-functions*))
+  #+ccl (pushnew (function cleanup-PW-wins) ccl:*lisp-cleanup-functions*)
+  #-ccl (niy *lisp-cleanup-functions*))
 
 
 (initialize-menus)

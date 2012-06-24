@@ -155,7 +155,7 @@
   (let* ((new-win (application-object new-box))
          (new-editor
           (car (pw::editor-objects (car (subviews new-win))))))
-    (if (wptr (application-object self)) (window-close(application-object self)))
+    (if (wptr (application-object self)) (window-close (application-object self)))
     (setf (chord-seq new-box) (chord-seq self))
     (setf (chord-line new-editor) (chord-seq new-box))
     (pw::put-window-state new-box new-win (pw::window-state self))))

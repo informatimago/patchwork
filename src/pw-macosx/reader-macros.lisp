@@ -37,8 +37,7 @@
 (in-package "PW")
 
 
-#-(and)
-(defvar *readtable-patchwork*)
+
 #-(and)
 (defvar *readtable-preserve*)
 
@@ -126,7 +125,11 @@ common-lisp:package and common-lisp:symbol.
   (ui:disable-sharp-at-reader-macro)
   (values))
 
-enable-patchwork-readtable
+(defparameter *readtable-patchwork*
+  (let ((*readtable* (copy-readtable))) ; we want ccl reader macros for cocoa.
+    (set-patchwork-reader-macros)
+    *readtable*))
+
 (defmacro enable-patchwork-reader-macros ()
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (set-patchwork-reader-macros)

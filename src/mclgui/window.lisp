@@ -55,17 +55,17 @@
      ;; only needed for non-theme color background
      (setf (window-invalid-region window) (new-rgn)))
    (add-to-list *window-list* window)
-   (let ((winh [[NSWindow alloc]initWithContentRect:(window-to-nswindow-frame (view-position window)
-                                                                              (view-size window))
+   (let ((winh [[MclguiWindow alloc]initWithContentRect:(window-to-nswindow-frame (view-position window)
+                                                                                  (view-size window))
                 styleMask:(ecase (window-type window)
-                            ((:document
-                              :document-with-zoom)
+                            ((:document)
                              (logior #$NSTitledWindowMask
                                      #$NSMiniaturizableWindowMask
                                      (if (window-close-box-p window)
                                          #$NSClosableWindowMask
                                          0)))
-                            ((:document-with-grow)
+                            ((:document-with-zoom
+                              :document-with-grow)
                              (logior #$NSTitledWindowMask
                                      #$NSMiniaturizableWindowMask
                                      (if (window-close-box-p window)
@@ -83,15 +83,20 @@
                                          0))))
                 backing:0
                 defer:(not (window-visiblep window))]))
+     (setf (slot-value winh 'window) window)
+     (setf (handle window) winh) ; must be done before setDelegate.
      (let ((viewh [[MclguiView alloc]
                    initWithFrame:(window-to-nswindow-frame (make-point 0 0)
                                                            (view-size window))]))
        [winh setContentView:viewh]
        (slot-value viewh 'view) window)
-     (setf (handle window) winh) ; must be done before setDelegate.
-     [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)])
-   (set-window-title window (window-title window))
-   (format *trace-output* "~&created window ~S ~S ~S ~S~%" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
+     [winh setReleasedWhenClosed:YES]
+     [winh setHasShadow:yes]
+     [winh invalidateShadow]
+     [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)]
+     (set-window-title window (window-title window))
+     [winh update])
+   (format-trace "created window" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
    (window-size-parts window)
    (when (window-visiblep window)
      (com.informatimago.common-lisp.cesarum.utility:tracing
@@ -180,8 +185,8 @@ INCLUDE-WINDOIDS
                 value of the CLASS argument is WINDOID.
 "
   (first (windows :class class
-                  :include-invisible include-invisibles
-                  :include-windoids include-windoids)))
+                  :include-invisibles include-invisibles
+                  :include-windoids   include-windoids)))
 
 
 (defun target ()
@@ -247,7 +252,6 @@ CLASS:          A class used to filter the result. The frontmost
 
 
 
-
 (defgeneric window-close (window)
   (:documentation "
 The WINDOW-CLOSE generic function closes the window.  The associated
@@ -258,13 +262,11 @@ The MCL event system calls WINDOW-CLOSE when the user clicks a window’s
 close box or chooses Close from the File menu.
 ")
   (:method ((window window))
-    (let ((handle (handle window)))
-      (when handle
-        [handle setReleasedWhenClosed:t]
-        [handle close]))
+    (with-handle (handle window)
+      [handle doClose])
+    (delete-from-list *window-list* window)
     (release window)
-    (delete-from-list *window-list* window)))
-
+    (values)))
 
 
 
@@ -352,12 +354,15 @@ V:              The vertical coordinate of the new position, or NIL if
                 the complete position is given by H.
 "
   (if (numberp h)
-      (let ((pos      (make-point h v))
-            (mswindow (handle window)))
+      (let ((pos      (make-point h v)))
         (setf (slot-value window 'view-position) pos)
-        (when mswindow
-          [mswindow setFrameOrigin:(window-to-nswindow-origin (view-position window)
-                                                              (view-size window))])
+        (with-handle (mswindow window)
+          (format-trace "Before mswindow setFrameOrigin:")
+          (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin (view-position window)
+                                                                              (view-size window))])
+          (format-trace "Before mswindow invalidateShadow")
+          (on-main-thread [mswindow invalidateShadow])
+          (format-trace "After"))
         pos)
       (set-view-position window (center-window (view-size window) h))))
 
@@ -370,9 +375,8 @@ V:              The vertical coordinate of the new position, or NIL if
             (mswindow (handle window)))
         (setf (slot-value window 'view-size) siz)
         (when mswindow
-          [mswindow setFrame:(window-to-nswindow-frame (view-position window)
-                                                       (view-size window))
-                    display:t])))
+          (on-main-thread [mswindow setFrame:(window-to-nswindow-frame pos siz)])
+          (on-main-thread [mswindow invalidateShadow]))))
     (refocus-view window)
     siz))
 
@@ -395,10 +399,8 @@ bars as well as the main text area of the window.
 
 WINDOW:    A window or Fred window.
 ")
-  (:method ((w window))
-    (values))
-  (:method :before ((w window))
-           (make-view-invalid w)))
+  (:method         ((w window)) (values))
+  (:method :before ((w window)) (invalidate-view w)))
 
 
 
@@ -429,12 +431,12 @@ NEW-TITLE:      A string to be used as the new title.
       (setf (slot-value window 'window-title) new-title)
       (let ((nswindow (handle window)))
         (when nswindow
-          [nswindow setTitle:(objcl:objcl-string new-title)]))
+          (on-main-thread [nswindow setTitle:(objcl:objcl-string new-title)])))
       new-title)))
 
 
 (defmethod set-view-font-codes ((window window) ff ms &optional ff-mask ms-mask)
-  (declare (ignore ff ms ff-mask ms-mask))
+  (declare (ignorable ff ms ff-mask ms-mask))
   (multiple-value-bind (new-ff new-ms) (call-next-method)
     (niy set-view-font-codes window ff ms ff-mask ms-mask)
     (values new-ff new-ms)))
@@ -457,7 +459,7 @@ NEW-TITLE:      A string to be used as the new title.
     (when (window-visiblep window)
       (let ((nswindow (handle window)))
         (when nswindow
-          [nswindow orderOut:nswindow]))
+          (on-main-thread [nswindow orderOut:nswindow])))
       (setf (slot-value window 'visiblep) nil)
       (when (eq window *selected-window*)
         (window-select (front-window))))
@@ -473,22 +475,30 @@ NEW-TITLE:      A string to be used as the new title.
     #@(502 147)))
 
 
+(defgeneric window-screen-frame (window)
+  (:documentation "RETURN: a list with position and size of the screen of the window.")
+  (:method ((window window))
+    (with-handle (winh window)
+      (multiple-value-bind (x y w h) (frame [[winh screen] frame])
+        (list (make-point (round x) (round y))
+              (make-point (round w) (round h)))))))
+
+
 (defgeneric window-on-screen-p (window)
   (:documentation "
 RETURN:         Whether all of window is on the screen.
+NOTE:           This may return true even if the window is invisible,
+                if the window has a screen.
 ")
   (:method ((window window))
-    ;; (with-macptrs (rgn)
-    ;;   (unwind-protect
-    ;;        (let* ((topleft (view-position window))
-    ;;               (bottomright (add-points topleft (view-size window))))
-    ;;          (%setf-macptr rgn (#_NewRgn))
-    ;;          (unless (%null-ptr-p rgn)
-    ;;            (#_SetRectRgn rgn (point-h topleft) (point-v topleft) (point-h bottomright) (point-v bottomright))
-    ;;            (#_DiffRgn rgn #-carbon-compat (#_LMGetGrayRgn) #+carbon-compat (#_getgrayrgn) rgn)
-    ;;            (#_EmptyRgn rgn)))
-    ;;     (unless (%null-ptr-p rgn) (#_DisposeRgn rgn))))
-    nil))
+    ;; Note: on MacOS, regions are used for screens.
+    (let ((screen-frame (window-screen-frame window)))
+      (when screen-frame
+        (let ((pos (view-position window))
+              (siz (view-size window)))
+          (and (point<= (first screen-frame) pos)
+               (point<= (add-points pos siz)
+                        (add-points (first screen-frame) (second screen-frame)))))))))
 
 
 (defgeneric window-ensure-on-screen (window &optional default-position default-size)
@@ -575,8 +585,9 @@ INCLUDE-INVISIBLES:
     (let ((handle (handle window)))
       (when handle
         (if (plusp new-layer)
-            (let ((other-window (or (elt *window-list* new-layer)
-                                     (first (last *window-list*)))))
+            (let ((other-window
+                   (or (elt (windows :include-invisibles include-invisibles) new-layer)
+                       (first (last *window-list*)))))
               (window-send-behind window other-window))
             (window-bring-to-front window)
             ;; (if (eql window (first *window-list*))
@@ -626,7 +637,7 @@ DO:             Order the WINDOW above every other.
   (insert-into-list *window-list* 0 window)
   (let ((handle (handle window)))
     (when handle
-      [handle makeKeyAndOrderFront:handle])))
+      (on-main-thread [handle makeKeyAndOrderFront:handle]))))
 
 
 (defun window-send-behind (window other-window)
@@ -641,7 +652,7 @@ DO:             Order the WINDOW behind the OTHER-WINDOW.
                           (length *window-list*))
                       window)
     (when (and winh wino)
-      [winh orderWindow:#$NSWindowBelow relativeTo:[wino windowNumber]])))
+      (on-main-thread [winh orderBelow:wino]))))
 
 
 (defun reselect-windows ()
@@ -938,6 +949,7 @@ RETURN:         A BOOLEAN value indicating whether view can perform
   (window-do-operation window 'revert nil))
 
 (defmethod window-hardcopy ((window window) &optional show-fl)
+  (declare (ignore show-fl))
   (window-do-operation window 'hardcopy nil))
 
 

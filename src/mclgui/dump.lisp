@@ -91,6 +91,10 @@
                '()
                (list object))))
 
+(defmethod object-slots append ((wrapper wrapper))
+  (collect-slots wrapper
+                 (:handle (princ-to-string (handle wrapper)))))
+
 (defmethod object-slots append ((view simple-view))
   (collect-slots view
                  (:view-container       (dump-object-slots (slot-value view 'view-container)))
@@ -142,9 +146,26 @@
 
 
 
+(defgeneric collect-views (view)
+  (:method ((view simple-view))
+    (list view))
+  (:method ((view view))
+    (cons view (mapcan (function collect-views)
+                       (coerce (view-subviews view) 'list)))))
 
 
 
+#||
+(mapcar (lambda (v) [(ui::handle v) lockFocusIfCanDraw])
+        (rest (ui::collect-views (first (windows)))))
 
+(mapcar (lambda (v) [(ui::handle v) unlockFocus])
+        (reverse (rest (ui::collect-views (first (windows))))))
+
+(mapcar (lambda (w) (with-handle (h w) [h hasShadow])) (windows))
+(mapcar (lambda (w) (with-handle (h w) [h isReleasedWhenClosed])) (windows :include-invisibles t))
+
+
+||#
 
 ;;;; THE END ;;;;

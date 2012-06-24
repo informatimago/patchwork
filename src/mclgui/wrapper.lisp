@@ -50,6 +50,7 @@
   self)
 
 
+
 (defmethod (setf handle) (new-handle (wrapper wrapper))
   (let ((old-handle (handle wrapper)))
     (if new-handle
@@ -66,8 +67,11 @@
 
 (defmacro with-handle ((handle-var wrapper) &body body)
   "
-DO:  Binds HANDLE-VAR to (handle WRAPPER) and then executes BODY only
-     when the handle of the WRAPPER is not NULL.
+DO:             Binds HANDLE-VAR to (handle WRAPPER) and then executes
+                BODY only when the handle of the WRAPPER is not NULL.
+
+RETURN:         The result of BODY if the WRAPPER has a handle, NIL
+                otherwise.
 "
   `(let ((,handle-var (handle ,wrapper)))
      (when ,handle-var

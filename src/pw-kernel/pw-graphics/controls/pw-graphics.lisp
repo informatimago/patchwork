@@ -50,50 +50,43 @@
 
 
 (defun draw-char (x y cn)
-  (niy draw-char '(x y cn))
-  ;; (#_MoveTo :long (make-point x y))
-  ;; (#_DrawChar cn)
-  )
-
-
-;;;  GA 17/5/94
-;;; this crashes sometimes due to the fact that _drawString builds the image
-;;; in the stack. 
-;;(defun draw-string (x y str)  
-;;   (with-pstrs ((s str))
-;;     (#_MoveTo :long (make-point x y))
-;;     (#_DrawString :ptr s)))
+  (draw-string x y (string cn)))
 
 (defun draw-string (x y str)
-  (niy draw-string x y str)
-  ;; (#_MoveTo :long (make-point x y)) 
-  ;; (dotimes (i (length str)) (#_DrawChar (elt str i)))
-  )
+  (format *trace-output* "~&draw-string                  ~A ~A ~S~%" x y str)
+  [(objcl:objcl-string str) drawAtPoint: (ns:make-ns-point x y) withAttributes: ui::*null*])
 
 
 (defun draw-line (x1 y1 x2 y2)
+  (format *trace-output* "~&draw-line                    ~A ~A ~A ~A~%" x1 y1 x2 y2)
   (let ((path [NSBezierPath bezierPath]))
     [path moveToPoint:(ns:make-ns-point x1 y1)]
     [path lineToPoint:(ns:make-ns-point x2 y2)]
     [path stroke]))
 
 (defun erase-rect (x y w h)
+  (format *trace-output* "~&erase-rect                   ~A ~A ~A ~A~%" x y w h)
   (#_NSEraseRect (ns:make-ns-rect x y w h)))
 
 (defun draw-rect (x y w h)
+  (format *trace-output* "~&draw-rect                    ~A ~A ~A ~A~%" x y w h)
   (#_NSFrameRect (ns:make-ns-rect x y w h)))
 
 (defun fill-rect* (x y w h)
+  (format *trace-output* "~&fill-rect*                   ~A ~A ~A ~A~%" x y w h)
   (#_NSRectFill (ns:make-ns-rect x y w h)))
 
 (defun draw-point (x y)
+  (format *trace-output* "~&draw-point                   ~A ~A~%" x y)
   (#_NSRectFill (ns:make-ns-rect x y 1 1)))
 
 
 (defun draw-ellipse (x y w h)
+  (format *trace-output* "~&draw-ellipse                 ~A ~A ~A ~A~%" x y w h)
   [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] stroke])
 
 (defun fill-ellipse (x y w h)
+  (format *trace-output* "~&fill-ellipse                 ~A ~A ~A ~A~%" x y w h)
   [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] fill])
 
 
@@ -235,12 +228,10 @@
   (view-draw-contents self))
 
 (defmethod view-draw-out-line ((self simple-view))
-  (niy view-draw-out-line self)
-  ;; (let ((topleft (view-position  self)))
-  ;;   (rlet ((rect :rect :topleft topleft
-  ;;                :bottomright (add-points topleft (view-size self))))
-  ;;         (#_FrameRect rect)))
-  )
+  (let* ((topleft     (view-position  self))
+         (bottomright (add-points topleft (view-size self))))
+    (draw-rect  (point-h topleft)     (point-v topleft)
+                (point-h bottomright) (point-v bottomright))))
 
 (defun inside-rectangle? (x1 y1 x y w h)
   (and (<= x x1 (+ x w)) (<= y y1 (+ y h))))
@@ -304,5 +295,4 @@
   (window-select *pw-pop-menu-window*))
 
 
-
-
+;;;; THE END ;;;;

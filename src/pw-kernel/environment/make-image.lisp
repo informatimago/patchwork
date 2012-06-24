@@ -116,12 +116,13 @@
 
 (in-package :pw)
 
-;;(defun clear-patchwork ()
-;;  (midi::midi-close))
+(defun clear-patchwork ()
+  (niy clear-patchwork)
+  #-(and) (midi::midi-close))
 
 (defun save-dump-image (image-name &optional heap-size no-compiler)
   "Save an image"
-  ;(clear-patchwork)
+  (clear-patchwork)
   (let ((file (choose-new-file-dialog
                :prompt "Save new image as:"
 

@@ -33,11 +33,13 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
+(objcl:enable-objcl-reader-macros)
+
 
 (defstruct (color
              (:constructor %make-color)
              (:conc-name %color-))
-  red green blue)
+  red green blue (alpha 1.0f0))
 
 
 (defun make-color (red green blue)
@@ -55,9 +57,9 @@ GREEN:          The green component of the color. This should be an
 BLUE:           The blue component of the color. This should be an
                 integer in the range 0–65535.
 "
-  (%make-color :red   (/ red   65535.0)
-               :green (/ green 65535.0)
-               :blue  (/ blue  65535.0)))
+  (%make-color :red   (coerce (/ red   65535.0f0) 'single-float)
+               :green (coerce (/ green 65535.0f0) 'single-float)
+               :blue  (coerce (/ blue  65535.0f0) 'single-float)))
 
 
 (defun color-red   (color)
@@ -110,6 +112,14 @@ RGB colors into Macintosh color-table entries, see Inside Macintosh.
        (= (color-blue  color1) (color-blue  color2))))
 
 
+(defun wrap-nscolor (nscolor)
+  (wrapping
+   (make-color :red [nscolor redComponent]
+               :green [nscolor greenComponent]
+               :blue [nscolor blueComponent]
+               :alpha [nscolor alphaComponent])))
+
+
 (defun user-pick-color (&key (color *black-color*) (prompt "Pick a color") position)
   "
 The USER-PICK-COLOR function displays the standard Macintosh Color
@@ -128,9 +138,18 @@ POSITION:       The position of the Color Picker on screen. The
                 default is calculated by Macintosh Common Lisp.
 
 "
-  (niy user-pick-color color prompt position))
-
-
+  (let ((panel [NSColorPanel sharedColorPanel]))
+    [panel setShowsAlpha:YES]
+    [panel setMode:#$NSWheelModeColorPanel]
+    [panel setColor:[NSColor colorWithCalibratedRed: (color-red color)
+                             green: (color-green color)
+                             blue: (color-blue color)
+                             alpha: (color-alpha color)]]
+    [panel makeKeyAndOrderFront:panel]
+    (when (= [[NSApplication sharedApplication]runModalForWindow:panel]
+             #$NSRunAbortedResponse)
+      (throw-cancel))
+    (wrap-nscolor [panel color])))
 
 
 
@@ -175,20 +194,29 @@ REDISPLAY-P:    If the value of this is true (the default), this
 
 (defun call-with-fore-color (color function)
   (if (or (null color) (not *color-available*))
+      (funcall function)
+      (let ((*background-color* [NSColor colorWithCalibratedRed: (color-red color)
+                                         green: (color-green color)
+                                         blue: (color-blue color)
+                                         alpha: (color-alpha color)]))
+
+        (funcall function))))
+
+(defun call-with-fore-color (color function)
+  (if (or (null color) (not *color-available*))
     (funcall function)
-    (progn
-      (niy call-with-fore-color color function)
-      (funcall function))
-    ;; (rlet ((old-fore :rgbcolor))
-    ;;   (with-theme-state-preserved
-    ;;     (unwind-protect
-    ;;       (progn              
-    ;;         (#_getforecolor old-fore)
-    ;;         (with-rgb (rec color)
-    ;;           (#_rgbforecolor rec))          
-    ;;         (funcall function))
-    ;;       (#_rgbforecolor old-fore))))
-    ))
+    (unwind-protect
+         (progn
+           [NSGraphicsContext saveGraphicsState]
+           (let ((color [NSColor colorWithCalibratedRed: (color-red color)
+                                 green: (color-green color)
+                                 blue: (color-blue color)
+                                 alpha: (color-alpha color)]))
+             [color set]
+             [color setFill]
+             [color setStroke])
+           (funcall function))
+      [NSGraphicsContext restoreGraphicsState])))
 
 
 (defmacro with-fore-color (color &body body)
@@ -196,24 +224,6 @@ REDISPLAY-P:    If the value of this is true (the default), this
     `(let ((,vcolor ,color))
        (call-with-fore-color ,vcolor (lambda () ,@body)))))
 
-
-
-(defun call-with-back-color (color function)
-  (if (or (null color) (not *color-available*))
-    (funcall function)
-    (progn
-      (niy call-with-back-color color function)
-      (funcall function))
-    ;; (rlet ((old-back :rgbcolor))
-    ;;   (with-theme-state-preserved
-    ;;     (unwind-protect
-    ;;       (progn              
-    ;;         (#_getbackcolor old-back)
-    ;;         (with-rgb (rec color)
-    ;;           (#_rgbbackcolor rec))          
-    ;;         (funcall function))
-    ;;       (#_rgbbackcolor old-back))))
-    ))
 
 
 (defmacro with-back-color (color &body body)

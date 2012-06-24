@@ -33,9 +33,12 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
+(objcl:enable-objcl-reader-macros)
 
 (defmacro niy (item &rest vars)
-  `(format *trace-output* "~&Not Implemented Yet: (~S~{ ~S~})~%" ',item (list ,@vars)))
+  `(format *trace-output* "~&~40A (~S~{ ~S~})~%"
+           "not implemented yet:"
+           ',item (list ,@vars)))
 
 (defmacro uiwarn (control-string &rest args)
   `(format *trace-output* "~&~?~%" ',control-string' (list ,@args)))
@@ -204,6 +207,70 @@ RETURN:         The object that bas been printed (so that you can use
                                           (declare (ignorable ,ovar))
                                           ,(extract-slots object slots)))))))
 
+
+
+
+
+(define-condition simple-program-error (simple-error program-error)
+  ())
+
+(defmacro on-main-thread (&whole whole form &key (wait nil))
+  "
+
+FORM:   Should be an Objective-C message send with zerop or one argument.
+        Examples: [view drawRect:rect]
+                 [super drawRect:rect]
+                 (objc:send view :draw-rect rect)
+                 (objc:objc-message-send-super :draw-rect rect)
+
+WAIT:   Whether we must wait for the message to return from the main
+        thread.
+
+RETURN: A form sending
+        performSelectorOnMainThread:withObject:waitUntilDone: message
+        to the recipient in the FORM, with the selector of the message
+        in the FORM, and the argument object in the FORM. 
+
+"
+  (let ((varg (gensym)))
+    (flet ((objcmsg (message)
+             (cond
+               ((keywordp message)
+                (oclo:lisp-to-objc-message (list message)))
+               ((and (listp message)
+                     (eq 'quote (first message))
+                     (symbolp (second message)))
+                (oclo:lisp-to-objc-message (list (second message))))
+               (t
+                (check-type message (or keyword (cons symbol null))))))
+           (objarg (argument)
+             (if (null argument)
+                 '*null*
+                 `(let ((,varg ,argument))
+                   (if (numberp ,varg)
+                       (ccl:%int-to-ptr ,varg)
+                       ,varg)))))
+      (cond
+        ((and (listp form)
+              (<= 3 (length form) 4)
+              (eq 'objc:send (first form)))
+         (destructuring-bind (send recipient message &optional argument) form
+           (declare (ignore send))
+           `[,recipient performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
+                        withObject: ,(objarg argument)
+                        waitUntilDone: ,wait]))
+        ((and (listp form)
+              (<= 2 (length form) 3)
+              (eq 'objc:objc-message-send-super (first form)))
+         (destructuring-bind (send message &optional argument) form
+           (declare (ignore send))
+           `[super performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
+                   withObject: ,(objarg argument)
+                   waitUntilDone: ,wait]))
+        (t
+         (error 'simple-program-error
+                :format-control "The ~S form in ~S must be an Objective-C message send with a single argument."
+                :format-arguments (list form whole)))))))
 
 
 

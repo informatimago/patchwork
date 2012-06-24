@@ -838,7 +838,7 @@ tutorial file only if the names differ"
 (defvar *pw-window-counter* 0)
 
 (defun make-new-pw-window (&optional close-button)
-  (com.informatimago.common-lisp.cesarum.utility:tracing-let* ((win-string (format nil "PW~D" (incf *pw-window-counter*)))
+  (let* ((win-string (format nil "PW~D" (incf *pw-window-counter*)))
          (win        (make-instance 'C-pw-window 
                          :window-title  win-string
                          :close-box-p   close-button

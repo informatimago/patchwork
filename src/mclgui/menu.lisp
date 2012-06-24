@@ -897,42 +897,34 @@ This is the menu-item-update-function for the items in the Edit menu.
       (menu-disable menu)
       (progn
         (menu-enable menu)
-        (niy update-window-menu menu)
-        #-(and)
         (without-interrupts
-            (let* ((nwins     (length *window-object-alist*))
+            (let* ((nwins     (length (windows)))
                    (new-items (make-list nwins))
                    (items     (cddr (slot-value menu 'item-list)))
                    (nitems    0)
                    (order-ok  t))
               (let ((new-items new-items)
                     (items     items))
-                (do-wptrs wptr
-                  (let* ((w (window-object wptr)))
-                    (when (and w (display-in-windows-menu w))
-                      (let ((item (window-menu-item w)))
-                        (when item
-                          (if (window-shown-p w)
-                              (set-menu-item-style item :plain)
-                              (progn (set-menu-item-style item :italic)
-                                     (menu-item-enable item)))
-                          (rplaca new-items item)
-                          (setf new-items (cdr new-items))
-                          (incf nitems)
-                          (when (and order-ok (not (eq item (car items))))
-                            (setf order-ok nil))
-                          (setf items (cdr items))))))))
+                (dolist (w (windows))
+                  (when (and w (display-in-windows-menu w))
+                    (let ((item (window-menu-item w)))
+                      (when item
+                        (if (window-shown-p w)
+                            (set-menu-item-style item :plain)
+                            (progn (set-menu-item-style item :italic)
+                                   (menu-item-enable item)))
+                        (rplaca new-items item)
+                        (setf new-items (cdr new-items))
+                        (incf nitems)
+                        (when (and order-ok (not (eq item (car items))))
+                          (setf order-ok nil))
+                        (setf items (cdr items)))))))
               (when (or (not order-ok)
                         (/= nitems (length items))
                         (command-key-p))
-                (dolist (item (slot-value menu 'item-list))
-                  (setf (slot-value item 'owner) nil)
-                  ;; always delete item 1 (they get "renumbered" !)
-                  (#_DeleteMenuItem menu-handle 1))
-                (setf (slot-value menu 'item-list) nil) 
-                (when t                ;(osx-p)
-                  (add-menu-items menu *bring-windows-front-item*)
-                  (add-menu-items menu (make-instance 'menu-item :menu-item-title "-")))
+                (dolist (item (copy-list (slot-value menu 'item-list)))
+                  (remove-menu-items menu item))
+                (add-menu-items menu *bring-windows-front-item*)
                 (when (command-key-p)
                   ;; 2003-10-08TA - if command key is down then windows sorted alphabetically
                   (let ((copy nil))
@@ -1166,6 +1158,17 @@ RETURN:         A new instance of MENU representing the NSMenu NSMENU.
 
 
 
+(defun bring-all-windows-front ()
+  (let ((windows [[NSApplication sharedApplication] windows]))
+    (loop
+      :for i :from (1- [windows count]) :downto 0
+      :for window = [windows objectAtIndex:i]
+      :when [window isVisible]
+      :do [window orderFront:window])))
+
+
+(defvar *bring-windows-front-item*  nil)
+
 
 (defun fetch-current-menubar ()
   "
@@ -1188,11 +1191,15 @@ RETURN:         The list of MENUs collected.
     menubar))
 
 
+
 (defun initialize/menu ()
   (setf *menubar-bottom* (ceiling [[[NSApplication sharedApplication]mainMenu]menuBarHeight]))
   (setf *default-menubar* (fetch-current-menubar)
         ;; Notice this menubar instance is immediately replaced by the following SET-MENUBAR call.
         *menubar*      (make-instance 'menubar :menus (copy-list *default-menubar*)))
+  (setf *bring-windows-front-item* (make-instance 'menu-item
+                                       :menu-item-title "Bring All to Front"
+                                       :menu-item-action 'bring-all-windows-front))
   (dolist (item (list  (make-instance 'menu-item
                            :menu-item-title "Abort"
                            :menu-item-action (lambda () (invoke-restart 'abort)))
@@ -1211,12 +1218,12 @@ RETURN:         The list of MENUs collected.
 
 
 (defun edit-menu ()
-  (warn "EDIT-MENU: this is not correct.")
+  (format-trace "edit-menu" "this is not correct")
   (find-menu "Edit"))
 
 ;; (let ((bar [[NSApplication sharedApplication]mainMenu]))
 ;;   (dotimes (i [bar numberOfItems])
-;;     [[[bar itemAtIndex:i] menu] setAutoenablesItems:t]
+;;     [[[bar itemAtIndex:i] menu] setAutoenablesItems:YES]
 ;;     [[[bar itemAtIndex:i] menu] update]))
 ;; 
 ;; (dolist (menu *default-menubar*)

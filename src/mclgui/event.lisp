@@ -209,7 +209,7 @@ WHERE:          The position in screen coordinates of the cursor when
 The generic function WINDOW-DRAG-EVENT-HANDLER is called by the event
 system whenever a window needs to be dragged.  It calls #_SetClip and
 #_ClipAbove on the region of the window, copies the contents of the
-region to the new location of window, and calls set-viewposition on
+region to the new location of window, and calls SET-VIEW-POSITION on
 the window and the new position of the upper-left corner of the
 window.
 
@@ -373,8 +373,30 @@ RETURN:         T if the mouse button is pressed and NIL
                 otherwise. This function may be called at any time,
                 not only during event processing.
 "
-  (niy mouse-down-p)
-  nil)
+  (not (zerop [NSEvent pressedMouseButtons])))
+
+
+
+(defun multi-click-count ()
+  (let ((nsevent [[NSApplication sharedApplication] currentEvent]))
+    (if (and nsevent
+             (find [nsevent type] '#.(list #$NSLeftMouseDown #$NSRightMouseDown #$NSOtherMouseDown)))
+        [nsevent clickCount]
+        (if (zerop [NSEvent pressedMouseButtons])
+            0
+            1))))
+
+(define-symbol-macro *multi-click-count* (multi-click-count))
+(setf (documentation '*multi-click-count* 'variable)
+      "
+The *MULTI-CLICK-COUNT* variable is incremented during event
+processing if the current event is part of a series of multiple
+clicks. It is reset to 1 when there is a mouse click that is not part
+of a series.
+
+Determination of whether a click is part of a series is done as for
+DOUBLE-CLICK-P.
+")
 
 
 
@@ -392,8 +414,11 @@ RETURN:         T if the click currently being processed was the
                 WINDOW-DO-FIRST-CLICK is false.
 
 "
-  (niy double-click-p)
-  nil)
+  (let ((nsevent [[NSApplication sharedApplication] currentEvent]))
+    (and nsevent
+         (find [nsevent type] '#.(list #$NSLeftMouseDown #$NSRightMouseDown #$NSOtherMouseDown))
+         (= 2 [nsevent clickCount])
+         t)))
 
 
 
@@ -416,8 +441,10 @@ POINT1:         The cursor position during the first click.
 
 POINT2:         The cursor position during the second click.
 "
-  (niy double-click-spacing-p)
-  nil)
+  (or (and (point<= point1 point2)
+           (point<= point2 (add-point point1 (make-point 4 4))))
+      (and (point<= point2 point1)
+           (point<= point1 (add-point point2 (make-point 4 4))))))
 
 
 (defun command-key-p ()
@@ -430,8 +457,7 @@ RETURN:         If called during event processing, return true if the
                 the command key is currently pressed; otherwise,
                 return NIL.
 "
-  (niy command-key-p)
-  nil)
+  (not (zerop (logand [NSEvent modifierFlags] #$NSCommandKeyMask))))
 
 
 (defun control-key-p ()
@@ -444,8 +470,7 @@ RETURN:         If called during event processing, return true if the
                 the control key is currently pressed; otherwise,
                 return NIL.
 "
-  (niy control-key-p)
-  nil)
+  (not (zerop (logand [NSEvent modifierFlags] #$NSControlKeyMask))))
 
 
 (defun option-key-p ()
@@ -458,8 +483,7 @@ RETURN:         If called during event processing, return true if the
                 the option key is currently pressed; otherwise,
                 return NIL.
 "
-  (niy option-key-p)
-  nil)
+  (not (zerop (logand [NSEvent modifierFlags] #$NSAlternateKeyMask))))
 
 
 (defun shift-key-p ()
@@ -472,8 +496,7 @@ RETURN:         If called during event processing, return true if the
                 the shift key is currently pressed; otherwise,
                 return NIL.
 "
-  (niy shift-key-p)
-  nil)
+  (not (zerop (logand [NSEvent modifierFlags] #$NSShiftKeyMask))))
 
 
 (defun caps-lock-key-p ()
@@ -486,18 +509,10 @@ RETURN:         If called during event processing, return true if the
                 the caps-lock key is currently pressed; otherwise,
                 return NIL.
 "
-  (niy caps-lock-key-p)
-  nil)
+  (not (zerop (logand [NSEvent modifierFlags] #$NSAlphaShiftKeyMask))))
 
 
 
-
-(defstruct event
-  (what      0 :type integer)
-  (message   0 :type integer)
-  (when      0 :type integer)
-  (where     0 :type point)
-  (modifiers 0 :type integer))
 
 
 
@@ -523,11 +538,14 @@ IDLE:           An argument representing whether the main Lisp process
                 otherwise.  The function EVENT-DISPATCH calls
                 GET-NEXT-EVENT with an event and the value of IDLE.
 "
-  (niy event-dispatch idle)
-  nil)
+  (let ((*current-event* (make-event)))
+    (when (get-next-event *current-event* idle)
+      (when (and *eventhook*  (funcall *eventhook*))
+        (return-from event-dispatch))
+      (process-event *current-event*))))
 
 
-(defun get-next-event (event &optional (idle *idle*) (sleep-ticks 1))
+(defun get-next-event (event &optional (idle *idle*) sleep-ticks)
   "
 DESCRIPTION:    The GET-NEXT-EVENT function calls #_WaitNextEvent to
                 get an event.  It disables and reenables the clock
@@ -556,15 +574,32 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
                 *BACKGROUND-SLEEP-TICKS*.  If Macintosh Common Lisp is
                 running in the foreground, then the default is
                 *IDLE-SLEEP-TICKS* if the value of idle is true;
-                otherwise, the default is *FOREGROUND-SLEEPTICKS*.  If
+                otherwise, the default is *FOREGROUND-SLEEP-TICKS*.  If
                 Macintosh Common Lisp is running in the background,
-                then the default is *BACKGROUND-SLEEPTICKS* unless
+                then the default is *BACKGROUND-SLEEP-TICKS* unless
                 that value is NIL, in which case the default is the
                 same as when Macintosh Common Lisp is running in the
                 foreground.
 "
-  (niy get-next-event event idle sleep-ticks)
-  nil)
+  
+  (let ((nsevent [[NSApplication sharedApplication]
+                  nextEventMatchingMask: (mac-event-mask-to-ns-event-mask)
+                  untilDate: [NSDate dateWithTimeIntervalSinceNow: (* 60
+                                                                      (or sleep-ticks
+                                                                          (if *foreground* 
+                                                                              (if idle
+                                                                                  *idle-sleep-ticks*
+                                                                                  *foreground-sleep-ticks*)
+                                                                              *background-sleep-ticks*)))]
+                  inMode:#$NSDefaultRunLoopMode
+                  dequeue:YES]))
+    (when nsevent
+      (assign-event event (wrap-nsevent))
+      event)))
+
+
+
+(defvar *event-ticks* *foreground-event-ticks*)
 
 
 (defun event-ticks ()
@@ -578,10 +613,7 @@ RETURN:         The number of ticks (sixtieths of a second) between
                 the values in *FOREGROUND-EVENT-TICKS* and
                 *BACKGROUND-EVENT-TICKS*.
 "
-  (niy event-ticks)
-  ;; (let ((task *event-dispatch-task*))
-  ;;   (when task (pref (ptask.state task) ptaskstate.interval)))
-  1)
+  *event-ticks*)
 
 
 (defun set-event-ticks (n)
@@ -603,11 +635,7 @@ DO:             Set the number of ticks between calls to
 
 N:              An integer determining the number of ticks.
 "
-  (niy set-event-ticks n)
-  ;; (setq n (require-type n '(integer 0 3767)))   ;  Why this weird limit ? - do we mean 32767
-  ;; (let ((task *event-dispatch-task*))
-  ;;   (when task (setf (pref (ptask.state task) ptaskstate.interval) n)))
-  )
+  (setf *event-ticks* n))
 
 
 (defgeneric window-event (window)
@@ -639,16 +667,6 @@ redisplays.
   ;; Note: the mcl implementation doesn't seem to do anything more:
   `(progn ,@body))
 
-
-(defgeneric view-cursor (view point)
-  (:documentation "
-The VIEW-CURSOR generic function determines the cursor shape whenever
-the window containing the view is active and the cursor is over it.
-The VIEW-CURSOR function is called by WINDOW-UPDATE-CURSOR.
-
-VIEW:           A view or simple view.
-POINT:          The position of the cursor, expressed as a point.
-"))
 
 
 (defgeneric window-update-cursor (window point)
@@ -705,7 +723,8 @@ VIEW:           A simple view.
 
 
 (defun initialize/event ()
-  (niy initialize/event))
+  #| nothing |#
+  (values))
 
 
 ;;;; THE END ;;;;
