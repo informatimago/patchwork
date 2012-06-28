@@ -35,6 +35,16 @@
 
 (in-package "COMMON-LISP-USER")
 
+#||
+
+(progn (ql:quickload :swank) (eval (read-from-string
+ "(let ((swank::*loopback-interface* \"192.168.7.4\")) (swank:create-server))")))
+
+(ql:quickload :swank)
+(let ((swank::*loopback-interface* "192.168.7.4")) (swank:create-server))
+
+||#
+
 #+ccl (setf ccl:*default-external-format*           :unix
             ccl:*default-file-character-encoding*   :utf-8
             ccl:*default-line-termination*          :unix

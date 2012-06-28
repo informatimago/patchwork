@@ -94,14 +94,32 @@
 (defclass test-window (window)
   ())
 
+(defmethod set-view-size ((window test-window) h &optional v)
+  (declare (ignorable h v))
+  (let ((old-size (view-size window)))
+    (call-next-method)
+    (let ((new-size (view-size window)))
+      (when (/= old-size new-size)
+        (let ((diff (subtract-points new-size old-size))
+              (subview (aref (view-subviews window) 0)))
+          (set-view-size subview (add-points (view-size subview) diff)))))))
+
+
 (defclass test-view (view)
   ())
 
 (defmethod view-draw-contents ((view test-view))
   (with-focused-view view
-    (format-trace "~&drawing test-view contents.~%")
-    (frame-rect  10 10 190 20)
-    (frame-rect  10 10 20 90)))
+    (flet ((line (x1 y1 x2 y2)
+             (frame-rect x1 y1 (- x2 x1) (- y2 y1))))
+     (let* ((pos (view-position view))
+            (siz (view-size     view))
+            (br  (add-points pos siz)))
+       (format-trace "drawing test-view contents" (point-to-list pos) (point-to-list  siz) (point-to-list  br))
+       (line (+ (point-h pos) 10) (+ (point-v pos) 10) (- (point-h br)  10) (+ (point-v pos) 10))
+       (line (+ (point-h pos) 10) (+ (point-v pos) 10) (+ (point-h pos) 10) (- (point-v br)  10))
+       (line (+ (point-h pos) 10) (- (point-v br)  10) (- (point-h br)  10) (- (point-v br)  10))
+       (line (- (point-h br)  10) (+ (point-v pos) 10) (- (point-h br)  10) (- (point-v br)  10))))))
 
 (defun test/1 ()
   (let* ((view (make-instance 'test-view
@@ -115,27 +133,6 @@
     win))
 
 
-#||
-
-
-(let ((wins [[NSApplication sharedApplication] windows]))
-      (dotimes (i [wins count] (terpri))
-        (print (objcl:lisp-string [[wins objectAtIndex:i]title]))))
-
-
-
-||#
-
-(defun nswindow-list ()
- (let ((wins [[NSApplication sharedApplication] windows])
-       (list '()))
-   (dotimes (i [wins count] list)
-     (push [wins objectAtIndex:i] list))))
-
-;; (mapcar (lambda (nsw) (objcl:lisp-string [nsw title])) (nswindow-list))
-;; ("Test Window" "Test Window" "Test Window" "Test Window" "MN1" "start-swank.lisp" "Listener")
-;; (dolist (w (subseq (nswindow-list) 0 4))
-;;   [w close])
 
 
 

@@ -44,10 +44,10 @@
    (width-correction :allocation :class
                      :initform 10))
   (:documentation "
-This is the class used to make buttons. Clicking a button usually has an
-immediate result. Buttons are generally given a function for dialogitem-
-action-function via the :dialog-item-action
-initialization argument.
+This is the class used to  make buttons. Clicking a button usually has
+an  immediate  result. Buttons  are  generally  given  a function  for
+DIALOG-ITEM-ACTION-FUNCTION via the :dialog-item-action initialization
+argument.
 "))
 
 

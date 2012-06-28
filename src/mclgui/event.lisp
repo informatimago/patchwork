@@ -311,7 +311,7 @@ WINDOW:         A window.
 (defgeneric view-draw-contents (view)
   (:documentation "
 The generic function VIEW-DRAW-CONTENTS is called whenever a view
-needs to redraw any portion of its contents.  The view method for
+needs to redraw any portion of its contents.  The VIEW method for
 VIEW-DRAW-CONTENTS erases the area in the window’s erase region (for
 new windows, this is the entire content area) and then calls
 VIEW-DRAW-CONTENTS on each subview.  You can specialize this function
@@ -442,9 +442,9 @@ POINT1:         The cursor position during the first click.
 POINT2:         The cursor position during the second click.
 "
   (or (and (point<= point1 point2)
-           (point<= point2 (add-point point1 (make-point 4 4))))
+           (point<= point2 (add-points point1 (make-point 4 4))))
       (and (point<= point2 point1)
-           (point<= point1 (add-point point2 (make-point 4 4))))))
+           (point<= point1 (add-points point2 (make-point 4 4))))))
 
 
 (defun command-key-p ()

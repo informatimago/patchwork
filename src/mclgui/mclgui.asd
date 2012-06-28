@@ -62,7 +62,7 @@
 
                  (:file "objc-classes"
                         :depends-on ("package"
-                                     "macros" "wrapper"))
+                                     "macros" "wrapper" "point"))
                  
                  ;; Chapter 2:
 
@@ -178,7 +178,7 @@
 
                  (:file "table-dialog-item"
                         :depends-on ("package" 
-                                     "macros" "variables" "point" "system"
+                                     "macros" "variables" "point" "system" "region"
                                      "view-classes" "view" "window" "event"
                                      "dialog-item" "view-event" "key-handler-mixin"
                                      "scroll-bar-dialog-item"))

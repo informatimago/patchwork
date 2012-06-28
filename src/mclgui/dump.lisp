@@ -166,6 +166,52 @@
 (mapcar (lambda (w) (with-handle (h w) [h isReleasedWhenClosed])) (windows :include-invisibles t))
 
 
+
+(let ((wins [[NSApplication sharedApplication] windows]))
+      (dotimes (i [wins count] (terpri))
+        (print (objcl:lisp-string [[wins objectAtIndex:i]title]))))
+
+
+
+(mapcar (lambda (nsw) (objcl:lisp-string [nsw title])) (nswindow-list))
+("Test Window" "Test Window" "Test Window" "Test Window" "MN1" "start-swank.lisp" "Listener")
+(dolist (w (subseq (nswindow-list) 0 4))
+  [w close])
+
 ||#
+
+(defun nswindow-subviews (nswindow)
+  (let ((views [[nswindow contentView] subviews])
+        (list '()))
+    (dotimes (i [views count] list)
+      (push [views objectAtIndex:i] list))))
+
+(defun nsview-subviews (nsview)
+  (let ((views [nsview subviews])
+        (list '()))
+    (dotimes (i [views count] list)
+      (push [views objectAtIndex:i] list))))
+
+;; (nsview-view (first (nswindow-subviews (handle (first (windows)))))) 
+;; #<test-view #xEFBA5B6>
+
+(defun nswindow-list ()
+ (let ((wins [[NSApplication sharedApplication] windows])
+       (list '()))
+   (dotimes (i [wins count] list)
+     (push [wins objectAtIndex:i] list))))
+
+(defun dump-nsview-subviews (nsview &optional (level 0))
+  (format t "~V<~>~S ~S~%" level nsview (get-nsrect [nsview frame]))
+  (format t "~V<~>~S~%" level (nsview-view nsview))
+  (let ((nssubviews [nsview subviews]))
+   (dotimes (i [nssubviews count] (values))
+     (dump-nsview-subviews [nssubviews objectAtIndex:i] (+ 4 level)))))
+
+(defun dump-nswindow-subviews (nswindow)
+  (format t "window: ~S ~S~%" nswindow (get-nsrect [nswindow frame]))
+  (format t "        ~S~%" (nswindow-window nswindow))
+  (format t "  contentView: ")
+  (dump-nsview-subviews [nswindow contentView]))
 
 ;;;; THE END ;;;;

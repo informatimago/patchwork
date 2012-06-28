@@ -166,6 +166,10 @@
 (declaim (inline nsrect-to-list nsrect nspoint nssize))
 
 
+(defmacro get-nsrect (call)
+  (let ((vframe (gensym)))
+    `(oclo:slet ((,vframe ,call)) (wrap-nsrect ,vframe))))
+
 
 
 ;;;------------------------------------------------------------
@@ -294,11 +298,11 @@
 DO:             Copies the fields of SRC event to DST event.
 RETURN:         DST.
 "
-  (setf (event-what dst)       (event-what src)
-        (event-what message)   (event-what message)
-        (event-what when)      (event-what when)
-        (event-what where)     (event-what where)
-        (event-what modifiers) (event-what modifiers))
+  (setf (event-what      dst) (event-what      src)
+        (event-message   dst) (event-message   src)
+        (event-when      dst) (event-when      src)
+        (event-where     dst) (event-where     src)
+        (event-modifiers dst) (event-modifiers src))
   dst)
 
 
@@ -385,6 +389,7 @@ RETURN:         DST.
 
 
 
+
 ;; wx = sx + vh
 ;; wy = sy - vv - sv
 ;; 
@@ -446,7 +451,7 @@ RETURN:         Position and size of the main screen.
 @[NSObject subClass:MclguiWindowDelegate
            slots:((window :initform nil
                           :initarg :window
-                          :accessor delegate-window))]
+                          :reader delegate-window))]
 
 
 @[MclguiWindowDelegate
@@ -458,9 +463,9 @@ RETURN:         Position and size of the main screen.
       (let* ((window (delegate-window self)))
         (format-trace "-[MclguiWindowDelegate windowDidMove:]" window)
         (with-handle (handle  window)
-          (setf (slot-value window 'view-position)
-                (nswindow-to-window-position (multiple-value-list (frame [handle frame]))
-                                             (view-size window))))))]
+          (window-move-event-handler window
+                                     (nswindow-to-window-position (multiple-value-list (frame [handle frame]))
+                                                                  (view-size window))))))]
 
 
 
@@ -470,12 +475,9 @@ RETURN:         Position and size of the main screen.
   body:
   (declare (ignore nsnotification))
   (report-errors
-      (let* ((window (delegate-window self)))
+      (let ((window (delegate-window self)))
         (format-trace "-[MclguiWindowDelegate windowDidResize:]" window)
-        (with-handle (handle  window)
-          (multiple-value-bind (x y w h) (frame [handle frame])
-            (declare (ignore x y))
-            (setf (slot-value window 'view-size) (make-point (round w) (round h)))))))]
+        (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
 
 
 
@@ -486,7 +488,7 @@ RETURN:         Position and size of the main screen.
 @[NSWindow subClass:MclguiWindow
            slots:((window :initform nil
                           :initarg :view
-                          :accessor nswindow-window))]
+                          :reader nswindow-window))]
 
 @[MclguiWindow
   method:(setFrame:(:<NSR>ect)rect)
@@ -569,6 +571,7 @@ RETURN:         Position and size of the main screen.
 
 (defvar *window-list* '())
 
+
 @[MclguiWindow
   method:(becomeMainWindow)
   resultType:(:void)
@@ -618,7 +621,7 @@ RETURN:         Position and size of the main screen.
 @[NSView subClass:MclguiView
          slots:((view :initform nil
                       :initarg :view
-                      :accessor nsview-view))]
+                      :reader nsview-view))]
 
 @[MclguiView
   method:(isFlipped)
@@ -631,7 +634,7 @@ RETURN:         Position and size of the main screen.
   resultType:(:void)
   body:
   (declare (ignore rect))
-  (format-trace "-[MclguiView drawRect:]" (nsview-view self))
+  (format-trace "-[MclguiView drawRect:]" self (nsview-view self))
   (when (nsview-view self)
     (view-draw-contents (nsview-view self)))]
 

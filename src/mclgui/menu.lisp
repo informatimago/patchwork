@@ -1212,7 +1212,8 @@ RETURN:         The list of MENUs collected.
                        (make-instance 'menu-item
                            :menu-item-title "Force Quit"
                            :menu-item-action (lambda () (ccl:quit)))))
-    (unless (find-menu-item *lisp-menu* (menu-item-title item))
+    (when (and *lisp-menu*
+               (not (find-menu-item *lisp-menu* (menu-item-title item))))
       (add-menu-items *lisp-menu* item)))
   (values))
 

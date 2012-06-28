@@ -114,8 +114,8 @@
   (tell (subviews self) #'view-mouse-up))
 
 #|    
-(ui:defobfun (ui:window-null-event-handler *CCL-internal-window*) ()
-   (declare (ui:object-variable clpf-object clicked))
+(defobfun (window-null-event-handler *CCL-internal-window*) ()
+   (declare (ccl::object-variable clpf-object clicked))
    (let ((mouse (ui:window-mouse-position)))
      (unless (eq *last-mouse* mouse)
        (setq *last-mouse* mouse)

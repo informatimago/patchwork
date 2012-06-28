@@ -170,7 +170,8 @@ All views contained in a given window have the same wptr.
                                     (setf wptr (wptr view)))
                            (multiple-value-setq (ff ms) (wptr-font-codes wptr))
                            (setf old-fonts t))
-                         (funcall function view))
+                         (funcall function view)
+                         [[NSGraphicsContext currentContext] flushGraphics])
                        (format-trace "could not lockFocusIfCanDraw" view)))
               (when unlock
                 [handle unlockFocus]
@@ -1030,7 +1031,7 @@ NEW-NAME:       A name, usually a symbol or string.
 (defgeneric view-contains-point-p (view point)
   (:documentation "
 RETURN:         Whether VIEW contains POINT.  The method for
-                simple-view takes where in the coordinates of the
+                simple-view takes POINT in the coordinates of the
                 container view; the method for window uses its own
                 coordinates.
 ")
@@ -1045,12 +1046,8 @@ RETURN:         Whether VIEW contains POINT.  The method for
                   (let ((size  (view-size view)))
                     (and (< h  (+ ph (point-h size)))
                          (< v  (+ pv (point-v size))))))))))
-  (:method ((view window) point)
-    (niy view-contains-point-p view point)
-    #-(and)
-    (let ((rgn3 *temp-rgn-3*))
-      (#_getwindowregion (wptr view) #$kwindowstructurergn rgn3)
-      (#_PtInRgn point rgn3))))
+  (:method ((window window) point)
+    (and (point<= 0 point) (point<= point (view-size window)))))
 
 
 
@@ -1207,9 +1204,10 @@ VIEW:           A simple view or view.
       (#_NSFrameRect (ns:make-ns-rect (1+ x) (1+ y) (min 2 (- w 2)) (min 2 (- h 2)))))
     (values))
   (:method ((view view))
-    (call-next-method)
-    (dovector (subview (view-subviews view))
-              (view-focus-and-draw-contents subview))))
+    (com.informatimago.common-lisp.cesarum.utility:tracing
+     (call-next-method)
+     (dovector (subview (view-subviews view))
+               (view-focus-and-draw-contents subview)))))
 
 
 

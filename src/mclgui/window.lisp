@@ -81,27 +81,27 @@
                                      (if (window-close-box-p window)
                                          #$NSClosableWindowMask
                                          0))))
-                backing:0
-                defer:(not (window-visiblep window))]))
+                backing:#$NSBackingStoreBuffered
+                defer:NO]))
      (setf (slot-value winh 'window) window)
      (setf (handle window) winh) ; must be done before setDelegate.
-     (let ((viewh [[MclguiView alloc]
+     (let ((cviewh [[MclguiView alloc]
                    initWithFrame:(window-to-nswindow-frame (make-point 0 0)
                                                            (view-size window))]))
-       [winh setContentView:viewh]
-       (slot-value viewh 'view) window)
+       (setf (slot-value cviewh 'view) window)
+       [cviewh setAutoresizingMask:(logior #$NSViewWidthSizable #$NSViewHeightSizable)]
+       [winh setContentView:cviewh] window)
      [winh setReleasedWhenClosed:YES]
      [winh setHasShadow:yes]
      [winh invalidateShadow]
      [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)]
      (set-window-title window (window-title window))
-     [winh update])
+     [winh display])
    (format-trace "created window" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
    (window-size-parts window)
    (when (window-visiblep window)
-     (com.informatimago.common-lisp.cesarum.utility:tracing
-      (setf (slot-value window 'visiblep) nil)
-      (window-show window)))
+     (setf (slot-value window 'visiblep) nil)
+     (window-show window))
    window))
 
 
@@ -308,6 +308,9 @@ close box or chooses Close from the File menu.
                              :format-arguments (list '(:top :bottom :left :right) constraint))))))))))
 
 
+(defvar *window-moving* nil
+  "Disable calling the handle in SET-VIEW-POSITION.")
+
 (defmethod set-view-position ((window window) h &optional v)
   "
 DO:             Move the window.
@@ -354,12 +357,13 @@ V:              The vertical coordinate of the new position, or NIL if
                 the complete position is given by H.
 "
   (if (numberp h)
-      (let ((pos      (make-point h v)))
+      (let ((pos      (make-point h v))
+            (siz      (make-point h v))
+            (mswindow (handle window)))
         (setf (slot-value window 'view-position) pos)
-        (with-handle (mswindow window)
+        (when (and (not *window-moving*) mswindow)
           (format-trace "Before mswindow setFrameOrigin:")
-          (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin (view-position window)
-                                                                              (view-size window))])
+          (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin pos siz)])
           (format-trace "Before mswindow invalidateShadow")
           (on-main-thread [mswindow invalidateShadow])
           (format-trace "After"))
@@ -367,16 +371,18 @@ V:              The vertical coordinate of the new position, or NIL if
       (set-view-position window (center-window (view-size window) h))))
 
 
+(defvar *window-growing* nil
+  "Disable calling the handle in SET-VIEW-SIZE.")
 
 (defmethod set-view-size ((window window) h &optional v)
-  (let ((siz (make-point h v)))
-    (unless (eql siz  (view-size window))
-      (let ((pos      (view-position window))
-            (mswindow (handle window)))
-        (setf (slot-value window 'view-size) siz)
-        (when mswindow
-          (on-main-thread [mswindow setFrame:(window-to-nswindow-frame pos siz)])
-          (on-main-thread [mswindow invalidateShadow]))))
+  (let ((pos      (view-position window))
+        (siz      (make-point h v))
+        (mswindow (handle window)))
+    (setf (slot-value window 'view-size) siz)
+    (when (and (not *window-growing*) mswindow)
+      (on-main-thread [mswindow setFrame:(window-to-nswindow-frame pos siz)])
+      (on-main-thread [mswindow invalidateShadow]))
+    (call-next-method)
     (refocus-view window)
     siz))
 

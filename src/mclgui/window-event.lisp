@@ -159,6 +159,33 @@ Called by -[MclguiWindow zoom:] which is called from WINDOW-ZOOM-EVENT-HANDLER."
   nil)
 
 
+;;; --- window growing ----
+
+(defmethod window-grow-event-handler ((window window) where)
+  (let ((*window-growing* t))
+    (with-handle (handle  window)
+      (multiple-value-bind (x y w h) (frame [handle frame])
+        (declare (ignore x y))
+        (set-view-size window (make-point (round w) (round h)))))))
+
+
+;;; --- window moving ----
+
+(defmethod window-move-event-handler ((window window) new-position)
+  (let ((*window-moving* t))
+    (set-view-position window new-position)))
+
+
+;;; --- window update ----
+
+(defmethod window-update-event-handler ((window window))
+  (with-focused-view window
+    (view-draw-contents window)))
+
+;;; --- window select ----
+
+(defmethod window-select-event-handler ((window window))
+  (window-select window))
 
 ;;; --- window events ----
 

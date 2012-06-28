@@ -56,7 +56,7 @@
                  rgn-vars)))
   (niy with-temp-rgns rgn-vars)
   `(progn
-     (niy 'with-temp-rgns ,rgn-vars)
+     (niy 'with-temp-rgns ',rgn-vars)
      ,@body))
 
 
