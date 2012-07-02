@@ -1154,7 +1154,7 @@ RETURN:         A new instance of MENU representing the NSMenu NSMENU.
        :enabledp t
        :checkedp nil
        :menu-items (%wrap-items nsmenu)
-       :menu-font (wrap-font [nsmenu font]))))
+       :menu-font (wrap-nsfont [nsmenu font]))))
 
 
 

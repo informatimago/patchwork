@@ -608,7 +608,6 @@ between lines.  Only the font and font-size aspects of font-spec are
 used in the calculation.  The font styles and transfer mode are not
 significant.
 "
-  (let ((font-spec (or font-spec (current-font)))))
   (multiple-value-bind (ff ms) (if font-spec
                                    (font-codes font-spec)
                                    (current-font-codes))
@@ -632,10 +631,6 @@ significant.
 
 
 
-(defmacro grafport-write-string (string start end &optional ff ms color)
-  (niy grafport-write-string string start end ff ms color)
-  ;; `(grafport-write-unicode ,string ,start ,end ,ff ,ms ,color)
-  `(niy grafport-write-string string start end ff ms color))
 
 (defvar NSFontSymbolicTrait            "") ; dict
 (defvar NSFontNameAttribute            "") ; NSString
@@ -703,6 +698,43 @@ MS:             Mode/Size code.
                      (subseq string start end))))
     (nssize-width (get-nssize [(objcl:objcl-string string)
                                sizeWithAttributes:[(font-descriptor-from-codes ff ms) fontAttributes]]))))
+
+
+(defvar *current-point* (make-point 0 0)) ; TODO: where's the current point in NSView?
+
+(defun font-code-draw-string (string ff ms &optional
+                              (start 0)
+                              (end (length string))
+                              color)
+  "
+DO:             Draw the substring of STRING from START to END using
+                the font specified by FF and MS.
+
+FF:             Font/Face code.
+
+MS:             Mode/Size code.
+"
+  (check-type start fixnum "a start index in the string")
+  (check-type end   fixnum "an end position in the string")
+  (let ((string  (if (and (zerop start) (= end (length string)))
+                     string
+                     (subseq string start end))))
+    ;; TODO: if color, then insert it into ff
+    (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
+      (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
+      [(objcl:objcl-string string) drawAtPoint:*current-point* withAttributes:[descriptor fontAttributes]])))
+
+
+(defmacro grafport-write-string (string start end &optional ff ms color)
+  (let ((vstart (gensym))
+        (vend   (gensym))
+        (vff    (gensym))
+        (vms    (gensym)))
+    `(let ((,vstart ,start)
+           (,vend   ,end)
+           (,vff    ,ff)
+           (,vms    ,ms))
+       (font-code-draw-string ,string ,vff ,vms ,fstart ,vend ,color))))
 
 
 (defun string-width (string &optional font-spec)
@@ -793,9 +825,8 @@ DO:             Change the view font codes of view.  The font/face
 
 
 
-(defun wrap-font (nsfont)
-  (niy wrap-font nsfont)
-  nsfont)
+(defun wrap-nsfont (nsfont)
+  (make-instance 'wrapper :handle nsfont))
 
 
 (defun initialize/font ()

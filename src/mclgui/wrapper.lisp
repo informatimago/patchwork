@@ -97,7 +97,12 @@ NOTE:           Subclasses should define a method, calling
                 (unwrapping object …).
 
 SEE ALSO:       UNWRAPPING, WRAPPING.
-"))
+")
+  (:method ((wrapper wrapper))
+    (unwrapping wrapper
+     (or (handle wrapper)
+         (progn (cerror "Continue" "Unwrapping an empty wrapper ~S." wrapper)
+                *null*)))))
 
 
 (defgeneric release (wrapper)
