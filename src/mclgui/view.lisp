@@ -238,20 +238,8 @@ DO:             The macro with-font-focused-view focuses on the font
 VIEW:           A view installed in a window, or NIL.  If NIL, the
                 current GrafPort is set to an invisible GrafPort.
 "
-  (niy with-font-focused-view view body env)
-  `(with-focused-view ,view ,@body)
-  ;; (let ((sym (if (and view (symbolp view) (eq view (macroexpand view env)))
-  ;;                view
-  ;;                (gensym)))
-  ;;       (fn (gensym)))
-  ;;   `(let (,@(unless (eq view sym)
-  ;;                    `((,sym ,view)))
-  ;;          (,fn #'(lambda (,sym)
-  ;;                   (declare (ignore-if-unused ,sym))
-  ;;                   ,@body)))
-  ;;      (declare (dynamic-extent ,fn))
-  ;;      (call-with-focused-view ,sym ,fn ,sym)))
-  )
+  `(let ((*current-font-view* view))
+     (with-focused-view ,view ,@body)))
 
 
 (defun refocus-view (view)
@@ -1282,8 +1270,6 @@ VISRGN, CLIPRGN Region records from the view’s wptr.
     view))
 
 
-
-
 (defmethod view-font-codes ((view simple-view))
   (let ((codes (view-get view 'view-font-codes)))
     (if codes
@@ -1345,7 +1331,7 @@ VIEW:           A simple view.
 
 
 (defmethod view-font-codes-info ((view simple-view))
-  (multiple-value-call #'font-codes-info (view-font-codes view)))
+  (multiple-value-call (function font-codes-info) (view-font-codes view)))
 
 (defgeneric set-initial-view-font (view font-spec)
   (:method ((view simple-view) font-spec)

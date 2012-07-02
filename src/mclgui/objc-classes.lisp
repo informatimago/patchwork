@@ -55,25 +55,25 @@
   (or (and a (not b)) (and (not a) b)))
 
 (defun coord   (value) (round value))
-(defun nscoord (value) (coerce value 'single-float))
+(defun nscoord (value) (coerce value 'double-float))
 
 (defstruct nspoint
-  (x      0.0f0 :type single-float)
-  (y      0.0f0 :type single-float))
+  (x      0.0d0 :type double-float)
+  (y      0.0d0 :type double-float))
 
 (defstruct nssize
-  (width  0.0f0 :type single-float)
-  (height 0.0f0 :type single-float))
+  (width  0.0d0 :type double-float)
+  (height 0.0d0 :type double-float))
 
 (defstruct (nsrect
              (:constructor %make-nsrect))
-  (x      0.0f0 :type single-float)
-  (y      0.0f0 :type single-float)
-  (width  0.0f0 :type single-float)
-  (height 0.0f0 :type single-float))
+  (x      0.0d0 :type double-float)
+  (y      0.0d0 :type double-float)
+  (width  0.0d0 :type double-float)
+  (height 0.0d0 :type double-float))
 
 
-(defun make-nsrect (&key (x 0.0 xp) (y 0.0 yp) (width 0.0 widthp) (height 0.0 heightp) origin size)
+(defun make-nsrect (&key (x 0.0d0 xp) (y 0.0d0 yp) (width 0.0d0 widthp) (height 0.0d0 heightp) origin size)
   (assert (xor (or xp yp) origin))
   (assert (xor (or widthp heightp) size))
   (if origin
@@ -112,7 +112,7 @@
 
 (defun nsrect-to-rect (nsrect)
   "RETURN: A list of POINTs: position and size."
-  (list (make-point (coord (nsrect-x nsrect))  (coord (nsrect-y nsrect)))
+  (list (make-point (coord (nsrect-x nsrect))      (coord (nsrect-y nsrect)))
         (make-point (coord (nsrect-width nsrect))  (coord (nsrect-height nsrect)))))
 
 
@@ -169,6 +169,10 @@
 (defmacro get-nsrect (call)
   (let ((vframe (gensym)))
     `(oclo:slet ((,vframe ,call)) (wrap-nsrect ,vframe))))
+
+(defmacro get-nssize (call)
+  (let ((vsize (gensym)))
+    `(oclo:slet ((,vsize ,call)) (wrap-nssize ,vsize))))
 
 
 

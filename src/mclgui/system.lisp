@@ -44,8 +44,6 @@
   #+ccl (#_NSBeep)
   #-ccl (niy ed-beep duration args))
 
-(defun get-sys-font ()
-  0)
 
 (defun get-sys-just ()
   0)

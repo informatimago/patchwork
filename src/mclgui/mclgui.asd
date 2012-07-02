@@ -72,7 +72,7 @@
                  (:file "font"
                         :depends-on ("package" 
                                      "macros" "variables" "system"
-                                     "point" ))
+                                     "point" "objc-classes"))
                  
                  ;; Chapter 3: Menus
 

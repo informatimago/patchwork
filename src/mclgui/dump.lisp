@@ -214,4 +214,17 @@
   (format t "  contentView: ")
   (dump-nsview-subviews [nswindow contentView]))
 
+
+
+
+(defun find-tree (item tree)
+  (cond
+    ((null tree) tree)
+    ((equalp item tree) tree)
+    ((atom tree) nil)
+    (t (or (find-tree item (car tree))
+           (find-tree item (cdr tree))))))
+
+
+
 ;;;; THE END ;;;;

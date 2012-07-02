@@ -33,67 +33,320 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
+(objcl:enable-objcl-reader-macros)
 
-(defun real-font (&optional font-spec)
+
+
+(defun available-fonts ()
   "
-RETURN:         Whether the FONT-SPEC corresponds to a font or
-                font-size that actually exists in the system, and is
-                not a calculated font.
-
-FONT-SPEC:      A font specification.  The default is the current
-                font.
+RETURN:         A list of font names (STRING)
 "
-  ;; (cond 
-  ;;  ((null font-spec)
-  ;;   ;; still stupid but never called this way though is documented
-  ;;   (with-port-macptr port     
-  ;;     (let* ((font (#_getporttextfont port))             
-  ;;            (size (#_getporttextsize port)))
-  ;;       (#_realfont font size))))
-  ;;  (t 
-  ;;   (setq family (if (consp font-spec)
-  ;;                  (dolist (x font-spec) (when (stringp x) (return x)))
-  ;;                  (when (stringp font-spec) font-spec)))
-  ;;   (when (and family
-  ;;              (eq 0 (rlet ((fnum :integer))
-  ;;                      (with-pstrs ((np family))
-  ;;                        (#_GetFNum np fnum))
-  ;;                      (%get-word fnum)))
-  ;;              (not (equalp family (car (sys-font-spec)))))
-  ;;     (return-from real-font nil))
-  ;;   (multiple-value-setq (ff ms) (font-codes font-spec))
-  ;;   (#_RealFont (ash ff -16) (logand ms #xff))))
-  (niy real-font)
-  nil)
+  (nsarray-to-list [[NSFontManager sharedFontManager]
+                    availableFonts]))
 
 
-#-(and) "
+(defun available-font-families ()
+  "
+RETURN:         A list of font family names (STRING).
+"
+  (nsarray-to-list [[NSFontManager sharedFontManager]
+                    availableFontFamilies]))
 
-Font-face layout:
-+------------------------------+---------------+---------------+
-|      txFont                  |   txFace      |   unused      |
-+------------------------------+---------------+---------------+
- 31                          16 15            8 7             0
 
-Mode-size layout:
-+------------------------------+-------------------------------+
-|      txMode                  |         txSize                |
-+------------------------------+-------------------------------+
- 31                          16 15                            0
+(defun available-members-of-font-family (family)
+  "
+RETURN:         A list of FONT-DESCRIPTION lists for members of the font FAMILY:
+                0. The PostScript font name, as a STRING.
+                1. The part of the font name used in the font panel
+                   that’s not the font name, as an STRING
+                   object. This value is not localized—for example,
+                   \"Roman\", \"Italic\", or \"Bold\".
+                2. The font’s weight (integer).
+                3. The font’s traits (integer).
+"
+  (nsarray-to-list [[NSFontManager sharedFontManager]
+                    availableMembersOfFontFamily:(objcl:objcl-string family)]))
 
+
+
+(defstruct (font-description
+             (:type list)
+             (:conc-name fd-))
+  name
+  variant
+  weight
+  traits)
+
+
+(defvar *font-families* nil
+  "An A-List mapping font family names (STRING) to a list of FONT-DESCRIPTION.")
+
+(defvar *font-traits* nil
+  "An A-List mapping NS font traits masks to NS font-trait keywords.")
+
+;; *font-traits*
+;; ((1 . :italic) (2 . :bold) (4 . :unbold) (8 . :non-standard-character-set)
+;;  (16 . :narrow) (32 . :expanded) (64 . :condensed) (128 . :small-caps)
+;;  (256 . :poster) (512 . :compressed) (1024 . :fixed-pitch)
+;;  (16777216 . :unitalic))
+;; 
+;; *style-alist*
+;; ((:plain . 0) (:bold . 1) (:italic . 2) (:underline . 4) (:outline . 8)
+;;  (:shadow . 16) (:condense . 32) (:extend . 64))
+
+;; (font-traits-to-style '(:italic :bold :unbold
+;;                         :non-standard-character-set :narrow :expanded
+;;                         :condensed :small-caps :poster :compressed
+;;                         :fixed-pitch :unitalic))
+;; -->
+;; (:italic :bold :condense :extend :condense :condense)
+;; (:unbold :non-standard-character-set :small-caps :poster :fixed-pitch :unitalic)
+
+
+;; (style-to-font-traits '(:plain :bold :italic :underline :outline :shadow :condense :extend))
+;; -->
+;; (:expanded :compressed :italic :bold)
+;; (:shadow :outline :underline :plain)
+
+
+(defvar *font-traits-to-style*
+  '((:italic     . :italic)
+    (:bold       . :bold)
+    (:condensed  . :condense) ; must come before the other :condense.
+    (:compressed . :condense)
+    (:narrow     . :condense)
+    (:expanded   . :extend))
+  "An A-List mapping NS font-trait keywords to Mac style keywords")
+
+;; Note: :underline, :outline and :shadow must be processed separately
+;; on OpenStep, they're not encoded into the font, but are implemented
+;; as transformations on the font.
+
+
+(defun mask-to-font-traits (mask)
+  "
+MASK:           A NS font traits mask integer.
+RETURN:         A list of NS font traits keywords.
+EXAMPLE:        (mask-to-font-traits #x13) --> (:italic :bold :narrow)
+"
+  (loop
+    :for (bit . key) :in *font-traits*
+    :when (plusp (logand bit mask))
+    :collect key))
+
+
+(defun font-traits-to-style (traits)
+  "
+TRAITS:         A list of NS font trait keywords.
+RETURN:         A list of style keywords ; a list of remaining NS font trait keywords.
+EXAMPLE:        (font-traits-to-style '(:italic :bold :narrow)) --> (:italic :bold :condense) ; nil
 "
 
-(defvar *script-font-alist*      nil)
-(defvar *font-name-number-alist* nil)
+  (loop
+    :for trait :in traits
+    :for entry = (assoc trait *font-traits-to-style*)
+    :if entry :collect (cdr entry) :into style
+    :else     :collect trait :into remaining
+    :finally (return (values (or style '(:plain))
+                             remaining))))
 
-(defun font-name-from-number (font-code)
-  (or (car (rassoc font-code *font-name-number-alist*))
-      (%get-font-name font-code)))
-  
+
+(defun style-to-mask (style)
+  "
+STYLE:          A list of Mac style keywords.
+RETURN:         A Mac style mask.
+EXAMPLE:        (style-to-mask '(:bold :italic :underline :outline :shadow :condense :extend)) --> 127
+"
+  (loop
+    :with mask = 0
+    :for style :in (ensure-list style)
+    :for entry = (assoc style *style-alist*)
+    :when entry
+    :do (setf mask (logior mask (cdr entry)))
+    :finally (return mask)))
+
+
+(defun mask-to-style (mask)
+  "
+MASK:          A Mac style mask.
+RETURN:        A list of Mac style keywords.
+EXAMPLE:       (mask-to-style #x7f) --> (:bold :italic :underline :outline :shadow :condense :extend)
+"
+  (or (loop
+        :for (style . bit) :in *style-alist*
+        :when (plusp (logand bit mask))
+        :collect style)
+      '(:plain)))
+
+
+(defun style-to-font-traits (style)
+  "
+STYLE:          A Mac style list.
+RETURN:         A list of font-traits keywords ; a list of remaining Mac style keywords.
+EXAMPLE:        (style-to-font-traits '(:italic :bold :underline :outline :extend))
+                --> (:expanded :italic :bold)
+                    (:outline :underline)
+"
+  (loop
+    :with font-traits = '()
+    :with remaining   = '()
+    :with style = (ensure-list style)
+    :for (key . nil) :in *style-alist*
+    :when (member key style)
+    :do (let ((entry (rassoc key *font-traits-to-style*)))
+          (if entry
+              (push (car entry) font-traits)
+              (push key remaining)))
+    :finally (return (values font-traits remaining))))
+
+
+(defun font-traits-to-mask (font-traits)
+  (loop
+    :with mask = 0
+    :for trait :in font-traits
+    :for entry = (rassoc trait *font-traits*)
+    :when entry
+    :do (setf mask (logior mask (car entry)))
+    :finally (return mask)))
+
+
+;; (font-traits-to-style (mask-to-font-traits #x13))
+;; --> (:italic :bold :condense)
+;;
+;; (font-traits-to-mask
+;;  (style-to-font-traits
+;;   (mask-to-style
+;;    (style-to-mask
+;;     (font-traits-to-style
+;;      (mask-to-font-traits
+;;       #x13))))))
+;; --> 515
+
+
+;; (mapcar (lambda (family)
+;;           (mapcar (lambda (fd)
+;;                     (multiple-value-list (font-traits-mask-to-style (fd-traits fd))))
+;;                   (cdr family)))
+;;         *font-families*)
+
+
+
+
+
+
+
+;;;---------------------------------------------------------------------
+;;; Macintosh font numbers (cf. Inside Macintosh I, page  I-219):
+;;;---------------------------------------------------------------------
+;;;
+;;; 0          system font
+;;; 1          application font
+;;; 2 .. 24    pre-defined font numbers 
+;;; 25 .. 127  apple fonts
+;;; 128 .. 255 third-party fonts
+;;;
+
+(defun font-family (font-name)
+  (find font-name *font-families*
+        :key (function cdr)
+        :test (lambda (o e) (find o e
+                                  :key (function car)
+                                  :test (function string-equal)))))
+
+(defun system-font-name ()
+  (car (font-family (objcl:lisp-string [[NSFont systemFontOfSize:12.0d0] fontName]))))
+
+(defun application-font-name ()
+  (car (font-family (objcl:lisp-string [[NSFont userFontOfSize:12.0d0] fontName]))))
+
+
+(defvar *mac-font-names*
+  '((:newyork    . "Times")
+    (:geneva     . "Geneva")
+    (:monaco     . "Monaco")
+    (:venice     . "Geneva")
+    (:london     . "Times")
+    (:athens     . "Geneva")
+    (:sanfran    . "Geneva")
+    (:toronto    . "Times")
+    (:cairo      . "Geneva")
+    (:losangeles . "Geneva")
+    (:times      . "Times")
+    (:helvetica  . "Helvetica")
+    (:courier    . "Courier")
+    (:symbol     . "Symbol")
+    (:taliesin   . "Geneva")))
+
+
+(defconstant +font-number-base+ 32)
+
+(defun font-name-from-number (font-number)
+  (case font-number
+    ((0) (system-font-name))
+    ((1) (application-font-name))
+    (otherwise
+     (if (< font-number +font-number-base+)
+         (let ((name (cdr (nth (- font-number 2) *mac-font-names*))))
+           (if (member name *font-list* :test (function string-equal))
+               name
+               (application-font-name)))
+         (or (nth (- font-number +font-number-base+) *font-list*)
+             (application-font-name))))))
+
+
+(defun font-number-from-name (font-name)
+  (let ((num (position font-name *mac-font-names*
+                       :test (function string-equal)
+                       :key (function car))))
+    (if num
+        (+ 2 num)
+        (let ((num (position font-name *font-families*
+                             :test (lambda (o ff)
+                                     (or (string-equal o (car ff))
+                                         (find o (cdr ff)
+                                               :key (function car)
+                                               :test (function string-equal)))))))
+          (if num
+              (+ num +font-number-base+)
+              0)))))
+
+
+
+
+
+
+(defvar *current-font-codes* (list 0 0)
+  "Current font codes.")
+
+(defun current-font-codes ()
+  "RETURN: The font codes of the current font."
+  (values-list *current-font-codes*))
+
+(defun set-current-font-codes (ff ms)
+  "DO: Set the current font codes."
+  (setf (first  *current-font-codes*) ff
+        (second *current-font-codes*) ms)
+  (values ff ms))
+
+
+
+
+;; Font-face layout:
+;; +------------------------------+---------------+---------------+
+;; |      txFont                  |   txFace      |   color       |
+;; +------------------------------+---------------+---------------+
+;;  31                          16 15            8 7             0
+;; 
+;; Mode-size layout:
+;; +------------------------------+-------------------------------+
+;; |      txMode                  |         txSize                |
+;; +------------------------------+-------------------------------+
+;;  31                          16 15                            0
+
 
 (defun font-values (ff-code ms-code)
   "
-RETURN: the five font values: font-code, size, mode, face and color.
+RETURN: the five font values: font, size, mode, face and color.
 "
   (let* ((ff-code   (or ff-code 0))
          (ms-code   (or ms-code 0))
@@ -108,8 +361,8 @@ RETURN: the five font values: font-code, size, mode, face and color.
                         (loop 
                           :for (style . code) :in *style-alist*
                           :when (plusp (logand code ff-code))
-                          :collect style)))))
-  (values font size mode face color))
+                          :collect style))))
+    (values font size mode face color)))
 
 
 (defun font-spec (ff-code ms-code)
@@ -141,64 +394,8 @@ MS-CODE:        The mode-size code, a 32-bit integer indicating the
                        style)
                    (list (list :color-index color))))))
 
-
-(defun string-width (string &optional font-spec)
-  "
-
-RETURN:         The width in pixel of the STRING, as if it was
-                displayed in the font, size and style of the
-                FONT-SPEC.
-
-FONT-SPEC:      If not supplied, the current font is used.
-"
-  (niy string-width  string font-spec))
-
-
-(defmacro grafport-write-string (string start end &optional ff ms color)
-  (niy grafport-write-string string start end ff ms color)
-  ;; `(grafport-write-unicode ,string ,start ,end ,ff ,ms ,color)
-  `(niy grafport-write-string string start end ff ms color))
-
-
-(defun current-font-codes ()
-  "
-RETURN: The font codes of the current font.
-"
-  (niy current-font-codes)
-  (values 0 0))
-
-
-(defun font-number-from-name (name)
-  (niy font-number-from-name name)
-  ;; (if (equalp item (car (sys-font-spec)))
-  ;;             (setf font (ash (car *sys-font-codes*) -16))
-  ;;             ;; in OS 8 its the real font-num - earlier it's 0 
-  ;;             (let ((num (font-number-from-name item)))
-  ;;               ;; so what do you do if it doesnt exist?
-  ;;               (setf font (or num
-  ;;                              (ash (car *sys-font-codes*) -16)))))
-  0)
-
-
-(defun font-info (&optional font-spec)
-  "
-RETURN:         four values that represent (in pixels) the ascent,
-                descent, maximum width, and leading of font-spec.
-
-FONT-SPEC:      If not supplied, the current font is used.
-
-The ascent is the distance from the baseline to the highest ascender
-of the font, the descent is the distance from the baseline to the
-lowest descender of the font, the maximum width is that of the widest
-character in the font, and the leading is the suggested spacing
-between lines.  Only the font and font-size aspects of font-spec are
-used in the calculation.  The font styles and transfer mode are not
-significant.
-"
-  (multiple-value-bind (ff ms) (if font-spec
-                                   (font-codes font-spec)
-                                   (current-font-codes))
-    (font-codes-info ff ms)))
+(defun sys-font-spec ()
+  (font-spec 0 0))
 
 
 
@@ -269,7 +466,7 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
          (old-ms     (or old-ms (make-point 0 (xfer-mode-arg :srcOr)))))
     (dolist (item items)
       (cond
-        ((fixnump item)
+        ((realp item)
          (when size 
            (error 'invalid-font-spec-error :font-spec font-spec 
                   :reason :duplicate-size  :option item))
@@ -300,7 +497,7 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
             (setf color (color->ff-index (second item))
                   color-mask 255))))
         ((let ((temp (xfer-mode-arg item)))
-           (when temp
+           (when (and temp (plusp temp))
              (if mode
                  (unless (eq item :plain)
                    (error 'invalid-font-spec-error :font-spec font-spec 
@@ -331,6 +528,33 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
               (make-point size-mask mode-mask)))))
 
 
+(defun real-font (&optional font-spec)
+  "
+RETURN:         Whether the FONT-SPEC corresponds to a font or
+                font-size that actually exists in the system, and is
+                not a calculated font.
+
+FONT-SPEC:      A font specification.  The default is the current
+                font.
+"
+  (if font-spec
+      (let ((font-name (find-if (function stringp) font-spec)))
+        (and font-name (first (font-family font-name))))
+      (values (multiple-value-call (function font-values) (current-font-codes)))))
+
+
+
+(defun nsfont-from-codes (ff ms)
+  (multiple-value-bind (name size mode face color) (font-values ff ms)
+    (multiple-value-bind (traits others) (style-to-font-traits face)
+      (values
+       [[NSFontManager sharedFontManager]
+        convertFont:[NSFont fontWithName:(objcl:objcl-string name)
+                            size: (coerce size 'double-float)]
+        toHaveTrait:(font-traits-to-mask traits)]
+       mode color others))))
+
+
 (defun font-codes-info (ff ms)
   "
 RETURN:         Four values that represent (in pixels) the ascent,
@@ -349,8 +573,11 @@ between lines. Only the font and font-size aspects of font-spec are
 used in the calculation. The font styles and transfer mode are not
 significant.
 "
-  (niy font-codes-info ff ms)
-  (values 10 2 8 0))
+  (let ((font (nsfont-from-codes ff ms)))
+    (values [font ascender]
+            [font descender]
+            (nsrect-width (get-nsrect [font boundingRectForFont]))
+            [font leading])))
 
 
 (defun font-codes-line-height (ff ms)
@@ -366,6 +593,98 @@ MS:             Mode/Size code.
     (+ a d l)))
 
 
+(defun font-info (&optional font-spec)
+  "
+RETURN:         four values that represent (in pixels) the ascent,
+                descent, maximum width, and leading of font-spec.
+
+FONT-SPEC:      If not supplied, the current font is used.
+
+The ascent is the distance from the baseline to the highest ascender
+of the font, the descent is the distance from the baseline to the
+lowest descender of the font, the maximum width is that of the widest
+character in the font, and the leading is the suggested spacing
+between lines.  Only the font and font-size aspects of font-spec are
+used in the calculation.  The font styles and transfer mode are not
+significant.
+"
+  (let ((font-spec (or font-spec (current-font)))))
+  (multiple-value-bind (ff ms) (if font-spec
+                                   (font-codes font-spec)
+                                   (current-font-codes))
+    (font-codes-info ff ms)))
+
+
+(defun font-line-height (&optional font-spec)
+  (multiple-value-bind (a d w l) (font-info font-spec)
+    (declare (ignore w))
+    (+ a d l)))
+
+
+
+;; (multiple-value-bind (ff ms)  (font-codes '("Times" 12 :italic :bold (:color "blue")))
+;;   (values (multiple-value-list (nsfont-from-codes ff ms))
+;;           (multiple-value-list (font-codes-info ff ms))))
+;; (#<ns-font "Times-BoldItalic 12.00 pt. P [] (0x6129bf0) fobj=0x1cb4f0, spc=3.00" (#x1CC0B0)> :srcor 0 nil)
+;; (9.0D0 -3.0D0 23.173828 0.0D0)
+;; (#<ns-font "Times-BoldItalic 12.00 pt. P [] (0x6129bf0) fobj=0x1cb4f0, spc=3.00" (#x1CC0B0)> :srcor 0 nil)
+;; (9.0D0 -3.0D0 23.173828 0.0D0)
+
+
+
+(defmacro grafport-write-string (string start end &optional ff ms color)
+  (niy grafport-write-string string start end ff ms color)
+  ;; `(grafport-write-unicode ,string ,start ,end ,ff ,ms ,color)
+  `(niy grafport-write-string string start end ff ms color))
+
+(defvar NSFontSymbolicTrait            "") ; dict
+(defvar NSFontNameAttribute            "") ; NSString
+(defvar NSFontSizeAttribute            "") ; 12.0d0
+(defvar NSUnderlineStyleAttributeName  "") ; 0/1
+(defvar NSShadowAttributeName          "") ; nil or NSShadow
+(defvar NSStrokeWidthAttributeName     "") ; 0.0d0 or 3.0d0
+(defvar NSForegroundColorAttributeName "") ; NSColor
+
+(defstruct shadow
+  (blur-radius 1.0f0)
+  (color       (make-color 0 0 0 1/3))
+  (offset      (make-nssize :width 1.0f0 :height 1.0f0)))
+
+(defmethod unwrap ((self shadow))
+  (unwrapping self
+              (let ((shadow [[NSShadow alloc] init]))
+                [shadow setShadowOffset:(unwrap (shadow-offset self))]
+                [shadow setShadowBlurRadius:(shadow-blur-radius self)]
+                [shadow setShadowColor:(unwrap (shadow-color self))]
+                shadow)))
+
+
+(defvar *default-shadow* nil)
+
+(defun font-descriptor-from-codes (ff ms)
+  (multiple-value-bind (name size mode face color) (font-values ff ms)
+    (multiple-value-bind (traits others) (style-to-font-traits face)
+      ;; (print (list name size mode traits others color))
+      (let* ((attributes (list
+                          NSFontNameAttribute            name
+                          NSFontSizeAttribute            (coerce size 'double-float)
+                          NSForegroundColorAttributeName (if (zerop color)
+                                                             (make-color 0 0 0)
+                                                             (error "Color for font not implemented yet."))
+                          NSFontSymbolicTrait            (font-traits-to-mask traits)
+                          NSUnderlineStyleAttributeName  (if (member :underline others) 1 0)
+                          NSShadowAttributeName          (if (member :shadow    others) *default-shadow* nil)
+                          NSStrokeWidthAttributeName     (if (member :outline   others) 3.0f0 0.0f0))))
+        (values [NSFontDescriptor fontDescriptorWithFontAttributes:(unwrap-plist attributes)]
+                mode
+                size)))))
+
+
+(defun font-from-codes (ff ms)
+  (multiple-value-bind (descriptor mode size) (font-descriptor-from-codes ff ms)
+    (values [NSFont fontWithDescriptor:descriptor size:size] mode)))
+
+
 (defun font-codes-string-width (string ff ms &optional
                                 (start 0)
                                 (end (length string)))
@@ -379,14 +698,27 @@ MS:             Mode/Size code.
 "
   (check-type start fixnum "a start index in the string")
   (check-type end   fixnum "an end position in the string")
-  (niy font-codes-string-width)
-  (* 8 (- end start)))
+  (let ((string  (if (and (zerop start) (= end (length string)))
+                     string
+                     (subseq string start end))))
+    (nssize-width (get-nssize [(objcl:objcl-string string)
+                               sizeWithAttributes:[(font-descriptor-from-codes ff ms) fontAttributes]]))))
 
 
-(defun font-line-height (&optional font-spec)
-  (multiple-value-bind (a d w l) (font-info font-spec)
-    (declare (ignore w))
-    (+ a d l)))
+(defun string-width (string &optional font-spec)
+  "
+RETURN:         The width in pixel of the STRING, as if it was
+                displayed in the font, size and style of the
+                FONT-SPEC.
+
+FONT-SPEC:      If not supplied, the current font is used.
+"
+  (multiple-value-bind (ff ms) (if font-spec
+                                   (multiple-value-call (function font-codes)
+                                     font-spec (current-font-codes))
+                                   (current-font-codes))
+    (font-codes-string-width string ff ms)))
+
 
 
 (defun merge-font-codes (old-ff-code old-ms-code ff-code ms-code &optional ff-mask ms-mask)
@@ -415,10 +747,10 @@ MS-MASK:        A mask that allows merge-font-codes to look only at
                 certain bits of the mode/size integer.
 "
   (values (if ff-mask
-              (logior (logand ff-code ff-mask) (logand old-ff-code (lognot ff-mask)))
+              (logior (logand ff-code ff-mask) (logandc2 old-ff-code ff-mask))
               ff-code)
           (if ms-mask
-              (logior (logand ms-code ms-mask) (logand old-ms-code (lognot ms-mask)))
+              (logior (logand ms-code ms-mask) (logandc2 old-ms-code  ms-mask))
               ms-code)))
 
 
@@ -458,16 +790,48 @@ DO:             Change the view font codes of view.  The font/face
 "))
 
 
-(defun sys-font-spec ()
-  (font-spec (get-sys-font) 0))
+
 
 
 (defun wrap-font (nsfont)
   (niy wrap-font nsfont)
   nsfont)
 
+
 (defun initialize/font ()
-  (niy initialize/font))
+  (setf NSFontSymbolicTrait            (objcl:lisp-string #$NSFontSymbolicTrait)
+        NSFontNameAttribute            (objcl:lisp-string #$NSFontNameAttribute)
+        NSFontSizeAttribute            (objcl:lisp-string #$NSFontSizeAttribute)
+        NSUnderlineStyleAttributeName  (objcl:lisp-string #$NSUnderlineStyleAttributeName)
+        NSShadowAttributeName          (objcl:lisp-string #$NSShadowAttributeName)
+        NSStrokeWidthAttributeName     (objcl:lisp-string #$NSStrokeWidthAttributeName)
+        NSForegroundColorAttributeName (objcl:lisp-string #$NSForegroundColorAttributeName))
+  (setf *default-shadow* (make-shadow :blur-radius 2.0d0 :offset (make-nssize :width 2.0f0 :height 2.0f0)))
+  (setf *font-traits*
+        `((,#$NSItalicFontMask                  . :italic)
+          (,#$NSBoldFontMask                    . :bold)
+          (,#$NSUnboldFontMask                  . :unbold)
+          (,#$NSNonStandardCharacterSetFontMask . :non-standard-character-set)
+          (,#$NSNarrowFontMask                  . :narrow)
+          (,#$NSExpandedFontMask                . :expanded)
+          (,#$NSCondensedFontMask               . :condensed)
+          (,#$NSSmallCapsFontMask               . :small-caps)
+          (,#$NSPosterFontMask                  . :poster)
+          (,#$NSCompressedFontMask              . :compressed)
+          (,#$NSFixedPitchFontMask              . :fixed-pitch)
+          (,#$NSUnitalicFontMask                . :unitalic)))
+  (setf *font-list*     (sort (available-font-families) (function string<)))
+  (setf *font-families* (mapcar (lambda (family) (cons family (available-members-of-font-family family)))
+                                *font-list*))
+  (setf *current-font-codes* (list 0 0)))
+
+;; (initialize/font)
+;; (multiple-value-bind (ff ms) (font-codes  '("Times" 32)
+;;                                           #-(and)
+;;                                           '("Times" 12  :bold :italic :underline
+;;                                            :outline :shadow :condense :extend))
+;;   [(font-descriptor-from-codes ff ms) fontAttributes])
+;; (string-width "Hello World! Hello World!" '("American Typewriter" 12))
 
 
 ;;;; THE END ;;;;

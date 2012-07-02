@@ -42,7 +42,7 @@
   red green blue (alpha 1.0f0))
 
 
-(defun make-color (red green blue)
+(defun make-color (red green blue &optional (alpha 1.0f0))
   "
 RETURN:         An encoded color, with components red, green, and
                 blue.  The components should be in the range 0–65535.
@@ -59,7 +59,8 @@ BLUE:           The blue component of the color. This should be an
 "
   (%make-color :red   (coerce (/ red   65535.0f0) 'single-float)
                :green (coerce (/ green 65535.0f0) 'single-float)
-               :blue  (coerce (/ blue  65535.0f0) 'single-float)))
+               :blue  (coerce (/ blue  65535.0f0) 'single-float)
+               :alpha (coerce alpha 'single-float)))
 
 
 (defun color-red   (color)
@@ -84,6 +85,14 @@ RETURN:         the blue component of color as an integer in the range
                 0–65535.
 "
   (truncate (%color-blue  color) 1/65535))
+
+
+(defun color-alpha   (color)
+  "
+RETURN:         the alpha component of color as an integer in the range
+                0–65535.
+"
+  (truncate (%color-alpha   color) 1/65535))
 
 
 (defun color-values (color)
@@ -114,10 +123,17 @@ RGB colors into Macintosh color-table entries, see Inside Macintosh.
 
 (defun wrap-nscolor (nscolor)
   (wrapping
-   (make-color :red [nscolor redComponent]
-               :green [nscolor greenComponent]
-               :blue [nscolor blueComponent]
-               :alpha [nscolor alphaComponent])))
+   (make-color [nscolor redComponent]
+               [nscolor greenComponent]
+               [nscolor blueComponent]
+               [nscolor alphaComponent])))
+
+(defmethod unwrap ((self color))
+  (unwrapping self
+              [NSColor colorWithCalibratedRed: (coerce (%color-red self) 'double-float)
+                       green: (coerce (%color-green self) 'double-float)
+                       blue:  (coerce (%color-blue self) 'double-float)
+                       alpha: (coerce (%color-alpha self) 'double-float)]))
 
 
 (defun user-pick-color (&key (color *black-color*) (prompt "Pick a color") position)

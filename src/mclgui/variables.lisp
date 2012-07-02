@@ -42,7 +42,7 @@
   "Contains a list of all the fonts installed in the
 current Macintosh Operating System, sorted alphabetically.")
 
-(defvar *default-font-spec* '(:monaco 9 :plain))
+(defvar *default-font-spec* '("Monaco" 9 :plain))
 
 
 ;; Quickdraw:

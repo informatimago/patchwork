@@ -155,7 +155,10 @@ DO:             Execute BODY, unless a wrapping is occuring, in which
     ([nsobject isKindOfClass:(oclo:@class "NSString")]
      (objcl:lisp-string nsobject))
     ([nsobject isKindOfClass:(oclo:@class "NSNumber")]
-     (let ((objctype (aref (objcl:lisp-string [nsobject objCType]) 0)))
+     (let ((objctype (char-code
+                      (aref #+ccl (ccl:%get-cstring [nsobject objCType])
+                            #-ccl (error "Decoding [nsobject objCType] is not implemented in ~S" (lisp-implementation-type))
+                            0))))
        (cond
          ((find objctype #.(vector #$_C_FLT #$_C_DBL))
           [nsobject doubleValue])
@@ -219,27 +222,59 @@ NOTE:           It's expected the dictionary is small, hence the P-list.
 
 
 (defmethod unwrap ((item symbol))
-  (unwrapping
+  (unwrapping item
    (objcl:objcl-string (symbol-name item))))
 
 (defmethod unwrap ((item string))
-  (unwrapping
+  (unwrapping item
    (objcl:objcl-string item)))
 
-(defmethod unwrap ((item integer))
-  (unwrapping
-   [NSNumber numberWithLongLong:item]))
-
 (defmethod unwrap ((item real))
-  (unwrapping
+  (unwrapping item
    [NSNumber numberWithDouble:(coerce item 'double-float)]))
 
-(defmethod unwrap ((list cons))
-  (unwrapping
-   (let ((nsarray [NSMutableArray arrayWithCapacity:(length list)]))
-     (dolist (element list nsarray)
-       [nsarray addObject:(unwrap element)]))))
+(defmethod unwrap ((item single-float))
+  (unwrapping item
+   [NSNumber numberWithFloat:(coerce item 'single-float)]))
 
+(defmethod unwrap ((item integer))
+  (unwrapping item
+   [NSNumber numberWithLongLong:item]))
+
+(defmethod unwrap ((seq cons))
+  (unwrapping seq
+   (loop
+     :with nsarray = [NSMutableArray arrayWithCapacity:(length seq)]
+     :for element :in seq
+     :do [nsarray addObject:(unwrap element)]
+     :finally (return nsarray))))
+
+(defmethod unwrap ((seq vector))
+  (unwrapping seq
+   (loop
+     :with nsarray = [NSMutableArray arrayWithCapacity:(length seq)]
+     :for element :across seq
+     :do [nsarray addObject:(unwrap element)]
+     :finally (return nsarray))))
+
+(defmethod unwrap ((dict hash-table))
+  (let ((objects '())
+        (keys    '()))
+    (maphash (lambda (k v) (push k keys) (push v objects)) dict)
+    (unwrapping dict
+                [NSDictionary
+                 dictionaryWithObjects: (unwrap objects)
+                 forKeys: (unwrap keys)])))
+
+(defun unwrap-plist (plist)
+  (loop
+    :for (k v) :on plist :by (function cddr)
+    :collect k :into keys
+    :collect v :into objects
+    :finally (return (unwrapping plist
+                                 [NSDictionary
+                                  dictionaryWithObjects: (unwrap objects)
+                                  forKeys: (unwrap keys)]))))
 
 
 
