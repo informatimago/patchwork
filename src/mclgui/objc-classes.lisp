@@ -57,13 +57,23 @@
 (defun coord   (value) (round value))
 (defun nscoord (value) (coerce value 'double-float))
 
-(defstruct nspoint
+(defstruct (nspoint
+             (:constructor %make-nspoint))
   (x      0.0d0 :type double-float)
   (y      0.0d0 :type double-float))
 
-(defstruct nssize
+(defun make-nspoint (&key (x 0.0d0) (y 0.0d0))
+  (%make-nspoint :x (nscoord x) :y (nscoord y)))
+
+
+(defstruct (nssize
+             (:constructor %make-nssize))
   (width  0.0d0 :type double-float)
   (height 0.0d0 :type double-float))
+
+(defun make-nssize (&key (width 0.0d0) (height 0.0d0))
+  (%make-nssize :width (nscoord width) :height (nscoord height)))
+
 
 (defstruct (nsrect
              (:constructor %make-nsrect))
@@ -87,6 +97,7 @@
                         :width (nssize-width size) :height (nssize-height size))
           (%make-nsrect :x     (nscoord x)         :y      (nscoord y)
                         :width (nscoord width)     :height (nscoord height)))))
+
 
 (defun point-to-nspoint (point)   (make-nspoint :x (nscoord (point-h point)) :y (nscoord (point-v point))))
 (defun nspoint-to-point (nspoint) (make-point (coord (nspoint-x nspoint)) (coord (nspoint-y nspoint))))
@@ -451,37 +462,37 @@ RETURN:         Position and size of the main screen.
 
 ;;;------------------------------------------------------------
 ;;; MclguiWindowDelegate
+;;; Not anymore, MclguiWindow is its own delegate.
 
-@[NSObject subClass:MclguiWindowDelegate
-           slots:((window :initform nil
-                          :initarg :window
-                          :reader delegate-window))]
-
-
-@[MclguiWindowDelegate
-  method:(windowDidMove:(:id)nsnotification)
-  resultType:(:void)
-  body:
-  (declare (ignore nsnotification))
-  (report-errors
-      (let* ((window (delegate-window self)))
-        (format-trace "-[MclguiWindowDelegate windowDidMove:]" window)
-        (with-handle (handle  window)
-          (window-move-event-handler window
-                                     (nswindow-to-window-position (multiple-value-list (frame [handle frame]))
-                                                                  (view-size window))))))]
-
-
-
-@[MclguiWindowDelegate
-  method:(windowDidResize:(:id)nsnotification)
-  resultType:(:void)
-  body:
-  (declare (ignore nsnotification))
-  (report-errors
-      (let ((window (delegate-window self)))
-        (format-trace "-[MclguiWindowDelegate windowDidResize:]" window)
-        (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
+;; @[NSObject subClass:MclguiWindowDelegate
+;;            slots:((window :initform nil
+;;                           :initarg :window
+;;                           :reader delegate-window))]
+;; 
+;; 
+;; @[MclguiWindowDelegate
+;;   method:(windowDidMove:(:id)nsnotification)
+;;   resultType:(:void)
+;;   body:
+;;   (declare (ignore nsnotification))
+;;   (report-errors
+;;       (let* ((window (delegate-window self)))
+;;         (format-trace "-[MclguiWindowDelegate windowDidMove:]" window)
+;;         (with-handle (handle  window)
+;;           (window-move-event-handler window
+;;                                      (nswindow-to-window-position (multiple-value-list (frame [handle frame]))
+;;                                                                   (view-size window))))))]
+;; 
+;; 
+;; @[MclguiWindowDelegate
+;;   method:(windowDidResize:(:id)nsnotification)
+;;   resultType:(:void)
+;;   body:
+;;   (declare (ignore nsnotification))
+;;   (report-errors
+;;       (let ((window (delegate-window self)))
+;;         (format-trace "-[MclguiWindowDelegate windowDidResize:]" window)
+;;         (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
 
 
 
@@ -508,6 +519,33 @@ RETURN:         Position and size of the main screen.
   body:
   (format-trace "-[MclguiWindow orderBelow:]")
   [self orderWindow:#$NSWindowBelow relativeTo:[otherWindow windowNumber]]]
+
+
+
+@[MclguiWindow
+  method:(windowDidMove:(:id)nsnotification)
+  resultType:(:void)
+  body:
+  (declare (ignore nsnotification))
+  (report-errors
+      (let* ((window (nswindow-window self)))
+        (format-trace "-[MclguiWindow windowDidMove:]" window)
+        (with-handle (handle  window)
+          (window-move-event-handler window
+                                     (nswindow-to-window-position (multiple-value-list (frame [handle frame]))
+                                                                  (view-size window))))))]
+
+
+@[MclguiWindow
+  method:(windowDidResize:(:id)nsnotification)
+  resultType:(:void)
+  body:
+  (declare (ignore nsnotification))
+  (report-errors
+      (let ((window (nswindow-window self)))
+        (format-trace "-[MclguiWindow windowDidResize:]" window)
+        (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
+
 
 
 @[MclguiWindow
@@ -573,8 +611,6 @@ RETURN:         Position and size of the main screen.
 
 
 
-(defvar *window-list* '())
-
 
 @[MclguiWindow
   method:(becomeMainWindow)
@@ -586,9 +622,9 @@ RETURN:         Position and size of the main screen.
         (format-trace "-[MclguiWindow becomeMainWindow]" window)
         ;; TODO: move after windoids.
         (when window
-         (delete-from-list *window-list* window)
-         (insert-into-list *window-list* 0 window)
-         (view-activate-event-handler window))))]
+          (delete-from-list *window-list* window)
+          (insert-into-list *window-list* 0 window)
+          (view-activate-event-handler window))))]
 
 
 @[MclguiWindow

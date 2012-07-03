@@ -134,5 +134,9 @@
 
 
 
+(defun test/draw-string ()
+ (set-view-font  (first (windows)) '("Times" 12))
+ (with-font-focused-view (first (windows))
+   (pw::draw-string 10 20 "Hello World")))
 
 

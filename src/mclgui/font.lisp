@@ -590,7 +590,7 @@ MS:             Mode/Size code.
 "
   (multiple-value-bind (a d w l) (font-codes-info ff ms)
     (declare (ignore w))
-    (+ a d l)))
+    (round (+ a d l))))
 
 
 (defun font-info (&optional font-spec)
@@ -617,7 +617,7 @@ significant.
 (defun font-line-height (&optional font-spec)
   (multiple-value-bind (a d w l) (font-info font-spec)
     (declare (ignore w))
-    (+ a d l)))
+    (round (+ a d l))))
 
 
 
@@ -677,7 +677,7 @@ significant.
 
 (defun font-from-codes (ff ms)
   (multiple-value-bind (descriptor mode size) (font-descriptor-from-codes ff ms)
-    (values [NSFont fontWithDescriptor:descriptor size:size] mode)))
+    (values [NSFont fontWithDescriptor:descriptor size:(nscoord size)] mode)))
 
 
 (defun font-codes-string-width (string ff ms &optional
@@ -696,8 +696,8 @@ MS:             Mode/Size code.
   (let ((string  (if (and (zerop start) (= end (length string)))
                      string
                      (subseq string start end))))
-    (nssize-width (get-nssize [(objcl:objcl-string string)
-                               sizeWithAttributes:[(font-descriptor-from-codes ff ms) fontAttributes]]))))
+    (round (nssize-width (get-nssize [(objcl:objcl-string string)
+                                      sizeWithAttributes:[(font-descriptor-from-codes ff ms) fontAttributes]])))))
 
 
 (defvar *current-point* (make-point 0 0)) ; TODO: where's the current point in NSView?

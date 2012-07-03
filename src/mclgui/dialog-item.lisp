@@ -455,11 +455,11 @@ DO:             Enable or disable the dialog ITEM depending on ENABLED-P.
         (max 0))
     (declare (fixnum nlines))
     (loop
-      (if (setq nextpos (string-eol-position string pos))
+      (if (setf nextpos (string-eol-position string pos))
         (progn
-          (setq max (max max (font-codes-string-width string ff ms pos nextpos)))
-          (setq nlines (1+ nlines))
-          (setq pos (1+ nextpos)))
+          (setf max (max max (font-codes-string-width string ff ms pos nextpos)))
+          (setf nlines (1+ nlines))
+          (setf pos    (1+ nextpos)))
         (return (values (max max (font-codes-string-width string ff ms pos))
                         nlines))))))
 

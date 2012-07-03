@@ -236,6 +236,9 @@ bar with a 3-pixel border all around.
 
 (defvar *selected-window* nil)
 
+(defvar *window-list* '())
+;; *selected-window* should be (first *window-list*)
+
 
 (defvar *modal-dialog-on-top* nil
   "
@@ -250,6 +253,7 @@ a modal dialog is being processed.
 
 (defvar *windoid-count*   0
   "The number of visible floating windows currently in the MCL environment.")
+
 
 
 ;; Events:

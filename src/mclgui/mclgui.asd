@@ -62,7 +62,7 @@
 
                  (:file "objc-classes"
                         :depends-on ("package"
-                                     "macros" "wrapper" "point"))
+                                     "macros" "wrapper" "point" "variables"))
                  
                  ;; Chapter 2:
 

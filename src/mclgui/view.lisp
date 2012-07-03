@@ -143,6 +143,22 @@ All views contained in a given window have the same wptr.
   rgn)
 
 
+(defun set-font (font-view)
+  "
+FONT-VIEW: a view or NIL.
+DO:        Set the view-font as the current font in the graphic environment.
+RETURN:    the view-font-codes of the font-view or of the application-font.
+"
+  (multiple-value-bind (ff ms) (if font-view
+                                   (view-font-codes font-view)
+                                   (values 65536 0)) ; application-font
+    (multiple-value-bind (font mode) (font-from-codes ff ms)
+      (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
+      ;; (print font)
+      [font set])
+    (list ff ms)))
+
+
 (defgeneric call-with-focused-view (view function &optional font-view)
   (:method ((view simple-view) function &optional font-view)
     (let* ((handle   (handle view))
@@ -150,33 +166,34 @@ All views contained in a given window have the same wptr.
                        (if (typep view 'window)
                            [handle contentView]
                            handle)))
-           (unlock   nil)
-           ff ms
-           old-fonts
-           old-fonts-view)
+           (unlock   nil))
       (when handle
-        (if (and (eq view *current-view*)
-                 #-(and) (or (null font-view) (eq font-view old-font-view)))
-            (funcall function view)
-            (unwind-protect
-                 (let ((*current-view* view)
-                       (*current-font-view* (or font-view *current-font-view*)))
-                   (if (setf unlock [handle lockFocusIfCanDraw])
-                       (progn
-                         (format-trace "did lockFocusIfCanDraw" view)
-                         (focus-view *current-view* *current-font-view*)
-                         #-(and)
-                         (when (and view (null old-font-view) font-view
-                                    (setf wptr (wptr view)))
-                           (multiple-value-setq (ff ms) (wptr-font-codes wptr))
-                           (setf old-fonts t))
-                         (funcall function view)
-                         [[NSGraphicsContext currentContext] flushGraphics])
-                       (format-trace "could not lockFocusIfCanDraw" view)))
-              (when unlock
-                [handle unlockFocus]
-                (format-trace "did unlockFocusIfCanDraw" view))
-              (focus-view *current-view* *current-font-view*)))))))
+        #-(and) (or (null font-view) (eq font-view old-font-view))
+        (if  (eq view *current-view*)
+             (if (eq font-view *current-font-view*)
+                 (funcall function view)
+                 (unwind-protect
+                      (let* ((*current-font-view*  font-view)
+                             (*current-font-codes* (set-font *current-font-view*))) ; change font
+                        (funcall function view))
+                   (set-font *current-font-view*))) ; revert font
+             (unwind-protect
+                  (let ((*current-view* view)
+                        (*current-font-view* (or font-view *current-font-view*))
+                        (*current-font-codes* (copy-list *current-font-codes*)))
+                    (if (setf unlock [handle lockFocusIfCanDraw])
+                        (progn
+                          (format-trace "did lockFocusIfCanDraw" view)
+                          (focus-view *current-view* *current-font-view*)
+                          (apply (function set-current-font-codes) (set-font *current-font-view*))
+                          (funcall function view)
+                          [[NSGraphicsContext currentContext] flushGraphics])
+                        (format-trace "could not lockFocusIfCanDraw" view)))
+               (when unlock
+                 (set-font *current-font-view*)
+                 [handle unlockFocus]
+                 (format-trace "did unlockFocusIfCanDraw" view))
+               (focus-view *current-view* *current-font-view*)))))))
 
 
 
@@ -203,8 +220,9 @@ FONT-VIEW:      A view or NIL. If NIL, the font is unchanged.  If
           *current-view* nil))
   (:method ((view simple-view) &optional font-view)
     (if  (handle view)
-         (setf *current-font-view* font-view
-               *current-view* view)
+         (progn
+           (setf *current-font-view* font-view
+                 *current-view* view))
          (focus-view nil font-view))))
 
 
@@ -224,9 +242,10 @@ VIEW:           A view installed in a window, or NIL.  If NIL, the
   (let ((sym (if (and view (symbolp view) (eq view (macroexpand view env)))
                  view
                  (gensym))))
-    `(call-with-focused-view ,view (lambda (,sym)
-                                     (declare (ignorable ,sym))
-                                     ,@body))))
+    `(call-with-focused-view ,view
+                             (lambda (,sym)
+                               (declare (ignorable ,sym))
+                               ,@body))))
 
 
 
@@ -238,8 +257,16 @@ DO:             The macro with-font-focused-view focuses on the font
 VIEW:           A view installed in a window, or NIL.  If NIL, the
                 current GrafPort is set to an invisible GrafPort.
 "
-  `(let ((*current-font-view* view))
-     (with-focused-view ,view ,@body)))
+  (let ((sym (if (and view (symbolp view) (eq view (macroexpand view env)))
+                 view
+                 (gensym)))
+        (vview (gensym)))
+    `(let ((,vview ,view))
+       (call-with-focused-view ,vview
+                               (lambda (,sym)
+                                 (declare (ignorable ,sym))
+                                 ,@body)
+                               ,vview))))
 
 
 (defun refocus-view (view)

@@ -238,6 +238,7 @@
        (draw-string 3 9 (doc-string self)))
    (draw-rect 0 0 (w self)(h self))))
 
+
 (defmethod set-open-state ((self C-ttybox) fl)
   (setf (open-state self) fl)
   (with-focused-view self

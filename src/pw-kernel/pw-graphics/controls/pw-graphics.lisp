@@ -54,7 +54,14 @@
 
 (defun draw-string (x y str)
   (format *trace-output* "~&draw-string                  ~A ~A ~S~%" x y str)
-  [(objcl:objcl-string str) drawAtPoint: (ns:make-ns-point x y) withAttributes: ui::*null*])
+  [(objcl:objcl-string str)
+   drawAtPoint: (ns:make-ns-point x y)
+   withAttributes: (destructuring-bind (ff ms) ui::*current-font-codes*
+                     (multiple-value-bind (descriptor mode) (ui::font-descriptor-from-codes ff ms)
+                       (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
+                       ;; (print descriptor)
+                       [descriptor fontAttributes]))]
+  str)
 
 
 (defun draw-line (x1 y1 x2 y2)

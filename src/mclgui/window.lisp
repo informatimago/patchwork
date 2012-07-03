@@ -94,7 +94,8 @@
      [winh setReleasedWhenClosed:YES]
      [winh setHasShadow:yes]
      [winh invalidateShadow]
-     [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)]
+     ;; [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)]
+     [winh setDelegate:winh]
      (set-window-title window (window-title window))
      [winh display])
    (format-trace "created window" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
@@ -441,12 +442,6 @@ NEW-TITLE:      A string to be used as the new title.
       new-title)))
 
 
-(defmethod set-view-font-codes ((window window) ff ms &optional ff-mask ms-mask)
-  (declare (ignorable ff ms ff-mask ms-mask))
-  (multiple-value-bind (new-ff new-ms) (call-next-method)
-    (niy set-view-font-codes window ff ms ff-mask ms-mask)
-    (values new-ff new-ms)))
-
 
 (defmethod view-default-font ((window window))
   *default-font-spec*)
@@ -641,6 +636,7 @@ DO:             Order the WINDOW above every other.
 "
   (delete-from-list *window-list* window)
   (insert-into-list *window-list* 0 window)
+  (setf (slot-value window 'visiblep) t)
   (let ((handle (handle window)))
     (when handle
       (on-main-thread [handle makeKeyAndOrderFront:handle]))))
