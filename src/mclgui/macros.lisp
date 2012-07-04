@@ -36,9 +36,10 @@
 (objcl:enable-objcl-reader-macros)
 
 (defmacro niy (item &rest vars)
-  `(format *trace-output* "~&~40A (~S~{ ~S~})~%"
+  `(format *trace-output* "~&~40A (~S~:{(~S ~S)~^ ~})~%"
            "not implemented yet:"
-           ',item (list ,@vars)))
+           ',item (mapcar (lambda (var) (list var (type-of var)))
+                          (list ,@vars))))
 
 (defmacro uiwarn (control-string &rest args)
   `(format *trace-output* "~&~?~%" ',control-string' (list ,@args)))

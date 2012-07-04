@@ -49,7 +49,7 @@
 
 (defmethod view-click-event-handler ((view view) where)
   (loop
-    :for subview :across (reverse subviews)
+    :for subview :across (reverse (view-subviews view))
     :when (point-in-click-region-p subview where)
     :do (progn
           (view-convert-coordinates-and-click subview where view)

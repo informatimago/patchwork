@@ -154,6 +154,12 @@
                        (coerce (view-subviews view) 'list)))))
 
 
+(defgeneric subview-tree (view)
+  (:method ((view simple-view))
+    (list view))
+  (:method ((view view))
+    (cons view (mapcar (function subview-tree)
+                       (coerce (view-subviews view) 'list)))))
 
 #||
 (mapcar (lambda (v) [(ui::handle v) lockFocusIfCanDraw])

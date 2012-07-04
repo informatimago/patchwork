@@ -128,16 +128,14 @@ Message Mapping
     (defgeneric view-deactivate-event-handler (view))         <-- -[MclguiWindow resignMain]
     (defgeneric view-draw-contents (view))                    <-- -[MclguiWindow drawRect:(:<NSR>ect)rect]
     (defgeneric view-key-event-handler (view key))            <-- -[MclguiWindow keyDown:]
-    (defgeneric view-click-event-handler (view where))        
-    (defgeneric view-mouse-position (view))
+    (defgeneric view-click-event-handler (view where))        <-- -[MclguiView mouseDown:]
+    (defgeneric view-mouse-position (view))                   --> +[NSEvent mouseLocation] + coordinate convertions.
 
     (defgeneric window-close-event-handler (window))          <-- -[MclguiWindow windowShouldClose:]
     (defgeneric window-zoom-event-handler (window message))   --> -[MclguiWindow zoom:]
     (defgeneric window-grow-event-handler (window where))     --> set-view-size --> [MclguiWindow setFrame:]
 
-
-
-    (defgeneric window-mouse-up-event-handler (window))          (used in patchwork)
+    (defgeneric window-mouse-up-event-handler (window))       <-- -[MclguiView mouseUp:]   (used in patchwork)
     (defgeneric window-null-event-handler (window))              (used in patchwork as mouse moved)
     (defgeneric window-key-up-event-handler (window))            (not used in patchwork)
     (defgeneric window-drag-event-handler (window where))        (not used in patchwork)

@@ -50,6 +50,7 @@
             ccl:*default-line-termination*          :unix
             ccl:*default-socket-character-encoding* :utf-8)
 
+(setf *print-right-margin* 110)
 
 ;; The logical host PATCHWORK should be set so that the  _FOSSIL_ file
 ;; should be  at its root:

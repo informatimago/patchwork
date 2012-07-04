@@ -54,10 +54,10 @@
   "Return A ⊻ B"
   (or (and a (not b)) (and (not a) b)))
 
-(defun gcfloat    (value) (coerce value 'ns:cgfloat))
+(defun cgfloat    (value) (coerce value 'ns:cgfloat))
 (defun fontsize   (value) (round  value))
 (defun coord      (value) (round  value))
-(declaim (inline gcfloat fontsize coord))
+(declaim (inline cgfloat fontsize coord))
 
 
 (defstruct (nspoint
@@ -66,7 +66,7 @@
   (y      0.0d0 :type double-float))
 
 (defun make-nspoint (&key (x 0.0d0) (y 0.0d0))
-  (%make-nspoint :x (gcfloat x) :y (gcfloat y)))
+  (%make-nspoint :x (cgfloat x) :y (cgfloat y)))
 
 
 (defstruct (nssize
@@ -75,7 +75,7 @@
   (height 0.0d0 :type double-float))
 
 (defun make-nssize (&key (width 0.0d0) (height 0.0d0))
-  (%make-nssize :width (gcfloat width) :height (gcfloat height)))
+  (%make-nssize :width (cgfloat width) :height (cgfloat height)))
 
 
 (defstruct (nsrect
@@ -94,18 +94,18 @@
           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
                         :width (nssize-width size) :height (nssize-height size))
           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
-                        :width (gcfloat width)     :height (gcfloat height)))
+                        :width (cgfloat width)     :height (cgfloat height)))
       (if size
-          (%make-nsrect :x     (gcfloat x)         :y      (gcfloat y)
+          (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
                         :width (nssize-width size) :height (nssize-height size))
-          (%make-nsrect :x     (gcfloat x)         :y      (gcfloat y)
-                        :width (gcfloat width)     :height (gcfloat height)))))
+          (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
+                        :width (cgfloat width)     :height (cgfloat height)))))
 
 
-(defun point-to-nspoint (point)   (make-nspoint :x (gcfloat (point-h point)) :y (gcfloat (point-v point))))
+(defun point-to-nspoint (point)   (make-nspoint :x (cgfloat (point-h point)) :y (cgfloat (point-v point))))
 (defun nspoint-to-point (nspoint) (make-point (coord (nspoint-x nspoint)) (coord (nspoint-y nspoint))))
 
-(defun size-to-nssize (size)   (make-nssize :width (gcfloat (point-h size)) :height (gcfloat (point-v size))))
+(defun size-to-nssize (size)   (make-nssize :width (cgfloat (point-h size)) :height (cgfloat (point-v size))))
 (defun nssize-to-size (nssize) (make-point (coord (nssize-width nssize)) (coord (nssize-height nssize))))
 
 (defun nsrect-origin (nsrect) (make-nspoint :x     (nsrect-x nsrect)     :y      (nsrect-y nsrect)))
@@ -119,10 +119,10 @@
         (nsrect-height nsrect) (nssize-height nssize)))
 
 (defun rect-to-nsrect (position size)
-  (make-nsrect :x (gcfloat (point-h position))
-               :y (gcfloat (point-v position))
-               :width  (gcfloat (point-h size))
-               :height (gcfloat (point-v size))))
+  (make-nsrect :x (cgfloat (point-h position))
+               :y (cgfloat (point-v position))
+               :width  (cgfloat (point-h size))
+               :height (cgfloat (point-v size))))
 
 (defun nsrect-to-rect (nsrect)
   "RETURN: A list of POINTs: position and size."
@@ -180,13 +180,17 @@
 (declaim (inline nsrect-to-list nsrect nspoint nssize))
 
 
-(defmacro get-nsrect (call)
-  (let ((vframe (gensym)))
-    `(oclo:slet ((,vframe ,call)) (wrap-nsrect ,vframe))))
+(defmacro get-nspoint (call)
+  (let ((vpoint (gensym)))
+    `(oclo:slet ((,vpoint ,call)) (wrap-nspoint ,vpoint))))
 
 (defmacro get-nssize (call)
   (let ((vsize (gensym)))
     `(oclo:slet ((,vsize ,call)) (wrap-nssize ,vsize))))
+
+(defmacro get-nsrect (call)
+  (let ((vframe (gensym)))
+    `(oclo:slet ((,vframe ,call)) (wrap-nsrect ,vframe))))
 
 
 
@@ -270,7 +274,7 @@
     :with ns-mask = 0
     :for (ns-event . mac-event) :in *event-map*
     :do (when (and (/= null-event mac-event)
-                   (zerop (logand (ash 1 mac-event) mac-mask)))
+                   (plusp (logand (ash 1 mac-event) mac-mask)))
           (setf ns-mask (logior ns-mask (ash 1 ns-event))))
     :finally (return ns-mask)))
 
@@ -300,7 +304,7 @@
     :sum (if (zerop (logand macmod macmodifier))
              0
              nsmod)))
-
+ 
 
 
 (defstruct event
@@ -323,6 +327,7 @@ RETURN:         DST.
         (event-modifiers dst) (event-modifiers src))
   dst)
 
+(defconstant +tick-per-second+ 60 "Number of ticks per second.")
 
 (defun wrap-nsevent (nsevent)
   (wrapping
@@ -368,12 +373,11 @@ RETURN:         DST.
                          (let ((characters (objcl:lisp-string [nsevent characters])))
                            (if (zerop (length characters))
                                0
-                               (char-code (aref characters 0)))))))
-      :when      [nsevent timestamp]
-      :where     (oclo:slet ((point [nsevent locationInWindow]))
-                            (nspoint-to-point point))
+                               (char-code (aref characters 0))))))
+                   (otherwise 0))
+      :when      (truncate [nsevent timestamp] (/ +tick-per-second+))
+      :where     (nspoint-to-point (get-nspoint [nsevent locationInWindow]))
       :modifiers (nsmodifier-to-macmodifier [nsevent modifierFlags])))))
-   
 
 ;;;------------------------------------------------------------
 
@@ -680,6 +684,36 @@ RETURN:         Position and size of the main screen.
   (format-trace "-[MclguiView drawRect:]" self (nsview-view self))
   (when (nsview-view self)
     (view-draw-contents (nsview-view self)))]
+
+
+@[MclguiView
+  method: (mouseDown:(:id)theEvent)
+  resultType: (:void)
+  body:
+  (format-trace "-[MclguiView mouseDown:]" self (nsview-view self) theEvent)
+  (when (nsview-view self)
+    (let ((*current-event* (wrap-nsevent theEvent)))
+      (view-click-event-handler (nsview-view self)
+                                (nspoint-to-point (get-nspoint [theEvent locationInWindow])))))]
+
+@[MclguiView
+  method: (mouseUp:(:id)theEvent)
+  resultType: (:void)
+  body:
+  (format-trace "-[MclguiView mouseUp:]" self (nsview-view self) theEvent)
+  (when (nsview-view self)
+    (let ((*current-event* (wrap-nsevent theEvent)))
+      (window-mouse-up-event-handler (view-window (nsview-view self)))))]
+
+@[MclguiView
+  method: (mouseMoved:(:id)theEvent)
+  resultType: (:void)
+  body:
+  (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) theEvent)
+  (when (nsview-view self)
+    (let ((*current-event* (wrap-nsevent theEvent)))
+      (window-null-event-handler (view-window (nsview-view self)))))]
+
 
 
 

@@ -56,7 +56,11 @@ coordinate of the upper-left corner of the view.")
    (view-alist           :initform nil                                         :accessor view-alist)))
 
 
-
+(defmethod print-object ((view simple-view) stream)
+  (print-parseable-object (view stream :type t :identity t)
+                          (:view-position (point-to-list (view-position view)))
+                          (:view-size (point-to-list (view-size view)))
+                          (:view-scroll-position (point-to-list (view-scroll-position view)))))
 
 
 (defgeneric view-subviews (view)
@@ -228,7 +232,9 @@ DO:             Remove the property KEY from the VIEW.
 
 (defmethod print-object ((window window) stream)
   (print-parseable-object (window stream :type t :identity t)
-                          (:title (ignore-errors (window-title window)))))
+                          (:title (ignore-errors (window-title window)))
+                          (:view-position (point-to-list (view-position window)))
+                          (:view-size (point-to-list (view-size window)))))
 
 
 ;;;---------------------------------------------------------------------

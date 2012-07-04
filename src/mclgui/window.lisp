@@ -94,6 +94,7 @@
      [winh setReleasedWhenClosed:YES]
      [winh setHasShadow:yes]
      [winh invalidateShadow]
+     [winh setAcceptsMouseMovedEvents:YES]
      ;; [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)]
      [winh setDelegate:winh]
      (set-window-title window (window-title window))

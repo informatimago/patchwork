@@ -71,7 +71,7 @@ VIEW:           A simple view or view.
   (:documentation "
 The generic function VIEW-CLICK-EVENT-HANDLER is called by the
 event system when a mouse click occurs. The SIMPLE-VIEW method does
-nothing. The view method calls VIEW-CONVERT-COORDINATES-AND-CLICK
+nothing.  The view method calls VIEW-CONVERT-COORDINATES-AND-CLICK
 on the first subview for which POINT-IN-CLICK-REGION-P
 returns T.
 
@@ -362,10 +362,32 @@ VIEW:           A simple view.
 ")
   (:method (view)
     (declare (ignore view))
-    nil))
+    nil)
+  (:method ((screen null))
+    (nspoint-to-point (get-nspoint [NSEvent mouseLocation])))
+  (:method ((view simple-view))
+    (if (handle view)
+        (with-handle (winh (view-window view))
+          (let* ((viewh (if (typep view 'window)
+                            [winh contentView]
+                            (handle view)))
+                 (pt   (get-nspoint [NSEvent mouseLocation]))
+                 #-(and) ; only for 10.6+
+                 (winr (get-nsrect [winh convertRectFromScreen:(ns:make-ns-rect (nspoint-x pt)
+                                                                                (nspoint-y pt)
+                                                                                1 1)]))
+                 (winpt (get-nspoint [winh convertScreenToBase:(ns:make-ns-rect (nspoint-x pt)
+                                                                                (nspoint-y pt)
+                                                                                1 1)])))
+            
+            (nspoint-to-point (get-nspoint [viewh convertPoint:#-(and) (ns:make-ns-point (nsrect-x winr)
+                                                                                         (nsrect-y winr))
+                                                  (unwrap winpt)
+                                                  fromView:*null*]))))
+        (nspoint-to-point (get-nspoint [NSEvent mouseLocation])))))
 
-
-
+;; (point-to-list (view-mouse-position nil))
+;; (view-convert-coordinates-and-click subview where view)
 
 (defun mouse-down-p ()
   "
@@ -385,6 +407,7 @@ RETURN:         T if the mouse button is pressed and NIL
         (if (zerop [NSEvent pressedMouseButtons])
             0
             1))))
+
 
 (define-symbol-macro *multi-click-count* (multi-click-count))
 (setf (documentation '*multi-click-count* 'variable)
@@ -419,7 +442,6 @@ RETURN:         T if the click currently being processed was the
          (find [nsevent type] '#.(list #$NSLeftMouseDown #$NSRightMouseDown #$NSOtherMouseDown))
          (= 2 [nsevent clickCount])
          t)))
-
 
 
 (defun double-click-spacing-p (point1 point2)
@@ -512,6 +534,19 @@ RETURN:         If called during event processing, return true if the
   (not (zerop (logand [NSEvent modifierFlags] #$NSAlphaShiftKeyMask))))
 
 
+(defun test/event/1 ()
+  (loop
+    (sleep 1)
+    (format t "~12A ~:[     ~;mouse~] ~2D ~:[      ~;dblclk~] ~:[   ~;cmd~] ~:[    ~;ctrl~] ~:[   ~;opt~] ~:[     ~;shift~] ~:[    ~;caps~]~%"
+            (point-to-list (view-mouse-position nil))
+            (mouse-down-p)
+            (multi-click-count)
+            (double-click-p)
+            (command-key-p)
+            (control-key-p)
+            (option-key-p)
+            (shift-key-p)
+            (caps-lock-key-p))))
 
 
 
@@ -583,18 +618,18 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
 "
   
   (let ((nsevent [[NSApplication sharedApplication]
-                  nextEventMatchingMask: (mac-event-mask-to-ns-event-mask)
-                  untilDate: [NSDate dateWithTimeIntervalSinceNow: (* 60
-                                                                      (or sleep-ticks
-                                                                          (if *foreground* 
-                                                                              (if idle
-                                                                                  *idle-sleep-ticks*
-                                                                                  *foreground-sleep-ticks*)
-                                                                              *background-sleep-ticks*)))]
+                  nextEventMatchingMask: (mac-event-mask-to-ns-event-mask every-event)
+                  untilDate: [NSDate dateWithTimeIntervalSinceNow: (cgfloat (* 60
+                                                                               (or sleep-ticks
+                                                                                   (if *foreground* 
+                                                                                       (if idle
+                                                                                           *idle-sleep-ticks*
+                                                                                           *foreground-sleep-ticks*)
+                                                                                       *background-sleep-ticks*))))]
                   inMode:#$NSDefaultRunLoopMode
                   dequeue:YES]))
     (when nsevent
-      (assign-event event (wrap-nsevent))
+      (assign-event event (wrap-nsevent nsevent))
       event)))
 
 

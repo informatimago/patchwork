@@ -550,7 +550,7 @@ FONT-SPEC:      A font specification.  The default is the current
       (values
        [[NSFontManager sharedFontManager]
         convertFont:[NSFont fontWithName:(objcl:objcl-string name)
-                            size: (gcfloat size)]
+                            size: (cgfloat size)]
         toHaveTrait:(font-traits-to-mask traits)]
        mode color others))))
 
@@ -677,7 +677,7 @@ significant.
 
 (defun font-from-codes (ff ms)
   (multiple-value-bind (descriptor mode size) (font-descriptor-from-codes ff ms)
-    (values [NSFont fontWithDescriptor:descriptor size:(gcfloat size)] mode)))
+    (values [NSFont fontWithDescriptor:descriptor size:(cgfloat size)] mode)))
 
 
 (defun font-codes-string-width (string ff ms &optional

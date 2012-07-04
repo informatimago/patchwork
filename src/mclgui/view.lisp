@@ -154,7 +154,6 @@ RETURN:    the view-font-codes of the font-view or of the application-font.
                                    (values 65536 0)) ; application-font
     (multiple-value-bind (font mode) (font-from-codes ff ms)
       (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
-      ;; (print font)
       [font set])
     (list ff ms)))
 
@@ -1422,7 +1421,7 @@ RETURN:         The cursor shape to display when the mouse is at
             ;;   (#_SectRgn rgn visrgn rgn)
             ;;   (#_SectRgn rgn cliprgn rgn)                   
             ;;   (not (#_EmptyRgn rgn)))
-          ))))
+          t))))
 
 
 (defgeneric frame-key-handler (view)
