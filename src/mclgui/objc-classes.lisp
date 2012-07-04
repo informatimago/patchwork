@@ -54,8 +54,11 @@
   "Return A ⊻ B"
   (or (and a (not b)) (and (not a) b)))
 
-(defun coord   (value) (round value))
-(defun nscoord (value) (coerce value 'double-float))
+(defun gcfloat    (value) (coerce value 'ns:cgfloat))
+(defun fontsize   (value) (round  value))
+(defun coord      (value) (round  value))
+(declaim (inline gcfloat fontsize coord))
+
 
 (defstruct (nspoint
              (:constructor %make-nspoint))
@@ -63,7 +66,7 @@
   (y      0.0d0 :type double-float))
 
 (defun make-nspoint (&key (x 0.0d0) (y 0.0d0))
-  (%make-nspoint :x (nscoord x) :y (nscoord y)))
+  (%make-nspoint :x (gcfloat x) :y (gcfloat y)))
 
 
 (defstruct (nssize
@@ -72,7 +75,7 @@
   (height 0.0d0 :type double-float))
 
 (defun make-nssize (&key (width 0.0d0) (height 0.0d0))
-  (%make-nssize :width (nscoord width) :height (nscoord height)))
+  (%make-nssize :width (gcfloat width) :height (gcfloat height)))
 
 
 (defstruct (nsrect
@@ -91,18 +94,18 @@
           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
                         :width (nssize-width size) :height (nssize-height size))
           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
-                        :width (nscoord width)     :height (nscoord height)))
+                        :width (gcfloat width)     :height (gcfloat height)))
       (if size
-          (%make-nsrect :x     (nscoord x)         :y      (nscoord y)
+          (%make-nsrect :x     (gcfloat x)         :y      (gcfloat y)
                         :width (nssize-width size) :height (nssize-height size))
-          (%make-nsrect :x     (nscoord x)         :y      (nscoord y)
-                        :width (nscoord width)     :height (nscoord height)))))
+          (%make-nsrect :x     (gcfloat x)         :y      (gcfloat y)
+                        :width (gcfloat width)     :height (gcfloat height)))))
 
 
-(defun point-to-nspoint (point)   (make-nspoint :x (nscoord (point-h point)) :y (nscoord (point-v point))))
+(defun point-to-nspoint (point)   (make-nspoint :x (gcfloat (point-h point)) :y (gcfloat (point-v point))))
 (defun nspoint-to-point (nspoint) (make-point (coord (nspoint-x nspoint)) (coord (nspoint-y nspoint))))
 
-(defun size-to-nssize (size)   (make-nssize :width (nscoord (point-h size)) :height (nscoord (point-v size))))
+(defun size-to-nssize (size)   (make-nssize :width (gcfloat (point-h size)) :height (gcfloat (point-v size))))
 (defun nssize-to-size (nssize) (make-point (coord (nssize-width nssize)) (coord (nssize-height nssize))))
 
 (defun nsrect-origin (nsrect) (make-nspoint :x     (nsrect-x nsrect)     :y      (nsrect-y nsrect)))
@@ -116,10 +119,10 @@
         (nsrect-height nsrect) (nssize-height nssize)))
 
 (defun rect-to-nsrect (position size)
-  (make-nsrect :x (nscoord (point-h position))
-               :y (nscoord (point-v position))
-               :width  (nscoord (point-h size))
-               :height (nscoord (point-v size))))
+  (make-nsrect :x (gcfloat (point-h position))
+               :y (gcfloat (point-v position))
+               :width  (gcfloat (point-h size))
+               :height (gcfloat (point-v size))))
 
 (defun nsrect-to-rect (nsrect)
   "RETURN: A list of POINTs: position and size."

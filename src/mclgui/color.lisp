@@ -130,10 +130,10 @@ RGB colors into Macintosh color-table entries, see Inside Macintosh.
 
 (defmethod unwrap ((self color))
   (unwrapping self
-              [NSColor colorWithCalibratedRed: (coerce (%color-red self) 'double-float)
-                       green: (coerce (%color-green self) 'double-float)
-                       blue:  (coerce (%color-blue self) 'double-float)
-                       alpha: (coerce (%color-alpha self) 'double-float)]))
+              [NSColor colorWithCalibratedRed: (gcfloat (%color-red self))
+                       green: (gcfloat (%color-green self))
+                       blue:  (gcfloat (%color-blue self))
+                       alpha: (gcfloat (%color-alpha self))]))
 
 
 (defun user-pick-color (&key (color *black-color*) (prompt "Pick a color") position)
@@ -228,6 +228,7 @@ REDISPLAY-P:    If the value of this is true (the default), this
                                  green: (color-green color)
                                  blue: (color-blue color)
                                  alpha: (color-alpha color)]))
+             (print (type-of color))
              [color set]
              [color setFill]
              [color setStroke])
