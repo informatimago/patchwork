@@ -53,14 +53,11 @@
 
 
 (defmethod view-draw-contents ((self box-dialog-item))
-  (let* ((pos (view-position self))
-        (end (add-points pos (view-size self))))
-    (niy view-draw-contents self)
-    #-(and)
-    (rlet ((r :rect
-              :topleft pos
-              :bottomright end))
-      (#_FrameRect r))))
+  (let ((pos (view-position self))
+        (siz (view-size self)))
+    (frame-rect (point-h pos) (point-v pos) (point-h siz) (point-v size))))
+
+
 
 
 (defclass scroller-mixin ()
@@ -374,12 +371,8 @@
 
 (defmethod view-draw-contents :before ((self scroller-pane))
   (when (draw-scroller-outline self)
-    (niy view-draw-contents self)
-    #-(and)
-    (rlet ((rect :rect
-                 :topleft #@(0 0)
-                 :botright (view-size self)))
-      (#_FrameRect rect))))
+    (let ((siz (view-size self)))
+      (frame-rect 0 0 (point-h siz) (point-v size)))))
 
 
 (defmethod set-view-size ((self scroller-pane) h &optional v)

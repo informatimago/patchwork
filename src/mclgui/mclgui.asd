@@ -63,6 +63,9 @@
                  (:file "objc-classes"
                         :depends-on ("package"
                                      "macros" "wrapper" "point" "variables"))
+                 (:file "graphics"
+                        :depends-on ("package"
+                                     "macros" "point"))
                  
                  ;; Chapter 2:
 
@@ -242,7 +245,7 @@
                  (:file "scroller"
                         :depends-on ("package" 
                                      "macros" "variables" "point"
-                                     "system"
+                                     "system" "graphics"
                                      "view-classes" "view" "window" "event"
                                      "dialog-item" "key-handler-mixin"
                                      "scroll-bar-dialog-item"
