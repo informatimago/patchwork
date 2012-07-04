@@ -64,14 +64,20 @@ EXAMPLE:        (point-string (make-point 10 20)) --> \"#@(10 20)\"
   "
 RETURN:         The horizontal coordinate of POINT.
 "
-  (ldb (byte 16  0) point))
+  (let ((u (ldb (byte 16  0) point)))
+    (if (< 32767 u)
+        (- u 65536)
+        u)))
 
 
 (defun point-v (point)
   "
 RETURN:         The vertical coordinate of POINT.
 "
-  (ldb (byte 16 16) point))
+  (let ((u (ldb (byte 16 16) point)))
+    (if (< 32767 u)
+        (- u 65536)
+        u)))
 
 
 (defun point<= (point &rest other-points)
