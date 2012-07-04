@@ -153,7 +153,8 @@
                  (:file "pw-kernel/environment/pw-scheduler" 
                         :depends-on ("patchwork-package"
                                      "pw-kernel/environment/lelisp-macros"
-                                     "pw-kernel/drivers+resources/midi"))
+                                     "pw-kernel/drivers+resources/midi"
+                                     "pw-kernel/drivers+resources/scheduler" ))
                  
                  (:file "pw-kernel/environment/pw-symbolic-types" 
                         :depends-on ("patchwork-package"
@@ -304,7 +305,8 @@
                  (:file "pw-kernel/boxes/vision/oscilloscope" 
                         :depends-on ("patchwork-package"
                                      "pw-kernel/types/pw-types"
-                                     "pw-kernel/types/pw-type-scheme"))
+                                     "pw-kernel/types/pw-type-scheme"
+                                     "pw-kernel/drivers+resources/scheduler"))
                  
                  (:file "pw-kernel/boxes/vision/points-view" 
                         :depends-on ("patchwork-package"
@@ -556,6 +558,7 @@
                  (:file "pw-music/boxes/edit/midi-instrument-editors" 
                         :depends-on ("patchwork-package"
                                      "pw-macosx/reader-macros"
+                                     "pw-kernel/drivers+resources/scheduler" 
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view"))
                  
@@ -613,6 +616,7 @@
                         :depends-on ("patchwork-package"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/types/pw-box-to-menu"
+                                     "pw-kernel/drivers+resources/scheduler" 
                                      "pw-kernel/pw-graphics/window+menu/pw-window"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-music/menu/mn-menu"
@@ -632,6 +636,7 @@
                                      "pw-music/editors/mn/mn-collector-panel"
                                      "pw-music/editors/mn/mn-editor"
                                      ;; "pw-music/editors/rhythm/rtm-window"
+                                     "pw-kernel/drivers+resources/scheduler" 
                                      "pw-kernel/pw-graphics/controls/popupmenu"))
                  
                  (:file "pw-music/editors/rhythm/print-rtm" 
@@ -653,6 +658,7 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-editor" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"
                                      "pw-music/editors/mn/mn-note-chord-chordline"))
@@ -669,9 +675,10 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-paging+kill" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/drivers+resources/scheduler"
+                                     "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-music/boxes/edit/rtm-patch"
-                                     "pw-music/editors/rhythm/beat-measure-measure-line"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
+                                     "pw-music/editors/rhythm/beat-measure-measure-line"))
                  
                  (:file "pw-music/editors/rhythm/rtm-selection-button" 
                         :depends-on ("patchwork-package"
@@ -679,6 +686,7 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-window" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/drivers+resources/scheduler" 
                                      "pw-kernel/pw-graphics/window+menu/application-window"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"))
 
@@ -692,6 +700,7 @@
                  (:file "pw-music/editors/mn/mn-chord-ed" 
                         :depends-on ("patchwork-package"
                                      "pw-music/editors/mn/mn-editor"
+                                     "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
@@ -706,19 +715,20 @@
                  (:file "pw-music/editors/mn/mn-collector-view" 
                         :depends-on ("patchwork-package"
                                      "pw-macosx/reader-macros"
+                                     "pw-kernel/drivers+resources/scheduler"
+                                     "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-music/editors/mn/mn-window"
                                      "pw-music/editors/mn/mn-editor"
-                                     "pw-music/editors/mn/mn-note-chord-chordline"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
+                                     "pw-music/editors/mn/mn-note-chord-chordline"))
                  
                  (:file "pw-music/editors/mn/mn-editor" 
                         :depends-on ("patchwork-package"
                                      "pw-macosx/reader-macros"
-                                     "pw-kernel/pw-graphics/controls/pw-graphics"
-                                     "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/environment/epw-package"
+                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-music/editors/mn/mn-window"
                                      "pw-music/editors/mn/mn-note-chord-chordline"))
                  
@@ -727,6 +737,7 @@
                  
                  (:file "pw-music/editors/mn/mn-note-chord-chordline"
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/environment/epw-package"))
 
