@@ -162,8 +162,8 @@ RETURN:         A form building a plist of slot values.
                           (intern (symbol-name slot) "KEYWORD")
                           `(quote ,(first slot)))
             :collect  (if (symbolp slot)
-                          `(slot-value ,ovar ',slot)
-                          (second slot))))))
+                        `(ignore-errors (slot-value ,ovar ',slot))
+                        `(ignore-errors ,(second slot)))))))
 
 
 (defmacro print-parseable-object ((object stream &key (type t) identity) &rest slots)

@@ -83,6 +83,22 @@ RETURN:         The result of BODY if the WRAPPER has a handle, NIL
        ,@body)))
 
 
+
+(defgeneric update-handle (wrapper)
+  (:documentation "
+Some subclasses need to compute a new NS instance when the lisp
+instance state changes.  This method compute and sets the new (handle
+wrapper).
+
+UNWRAP of a subclass could be implemented as:
+
+    (defmethod unwrap ((self some-class))
+       (unwrapping self
+          (or (handle self) (update-handle self))))
+
+"))
+
+
 (defgeneric unwrap (wrapper)
   (:documentation "
 DO:             Create and initialize the underlying object and bind
@@ -188,8 +204,8 @@ DO:             Execute BODY, unless a wrapping is occuring, in which
         (wrap-nsmenu nsobject))
        ([nsobject isKindOfClass:(oclo:@class "NSMenuItem")]
         (wrap-nsmenuitem nsobject))
-       ([nsobject isKindOfClass:(oclo:@class "NSWindow")]
-        (wrap-nswindow nsobject))
+       ;; ([nsobject isKindOfClass:(oclo:@class "NSWindow")]
+       ;;  (wrap-nswindow nsobject))
        ([nsobject isKindOfClass:(oclo:@class "NSDictionary")]
         (wrap-nsdictionary nsobject))
        ([nsobject isKindOfClass:(oclo:@class "NSNotification")]

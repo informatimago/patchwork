@@ -55,7 +55,7 @@
 (defmethod view-draw-contents ((self box-dialog-item))
   (let ((pos (view-position self))
         (siz (view-size self)))
-    (frame-rect (point-h pos) (point-v pos) (point-h siz) (point-v size))))
+    (draw-rect (point-h pos) (point-v pos) (point-h siz) (point-v siz))))
 
 
 

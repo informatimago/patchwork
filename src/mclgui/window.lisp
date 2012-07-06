@@ -48,6 +48,7 @@
   (declare (ignorable view-font)) ; used by call-next-method.
   (com.informatimago.common-lisp.cesarum.utility:tracing
    (call-next-method)
+   (setf (slot-value window 'view-position) (center-window (view-size window) (view-position window)))
    (setf (view-valid window) (list nil))
    (view-allocate-clip-region window)
    (when (and (slot-value window 'erase-anonymous-invalidations)
@@ -55,22 +56,23 @@
      ;; only needed for non-theme color background
      (setf (window-invalid-region window) (new-rgn)))
    (add-to-list *window-list* window)
-   (let ((winh [[MclguiWindow alloc]initWithContentRect:(window-to-nswindow-frame (view-position window)
-                                                                                  (view-size window))
+   (let ((winh [[MclguiWindow alloc]
+                initWithContentRect:(window-to-nswindow-frame (view-position window)
+                                                              (view-size window))
                 styleMask:(ecase (window-type window)
                             ((:document)
                              (logior #$NSTitledWindowMask
                                      #$NSMiniaturizableWindowMask
                                      (if (window-close-box-p window)
-                                         #$NSClosableWindowMask
-                                         0)))
+                                       #$NSClosableWindowMask
+                                       0)))
                             ((:document-with-zoom
                               :document-with-grow)
                              (logior #$NSTitledWindowMask
                                      #$NSMiniaturizableWindowMask
                                      (if (window-close-box-p window)
-                                         #$NSClosableWindowMask
-                                         0)
+                                       #$NSClosableWindowMask
+                                       0)
                                      #$NSResizableWindowMask))
                             ((:double-edge-box
                               :single-edge-box
@@ -79,15 +81,15 @@
                             ((:tool)
                              (logior #$NSTitledWindowMask
                                      (if (window-close-box-p window)
-                                         #$NSClosableWindowMask
-                                         0))))
+                                       #$NSClosableWindowMask
+                                       0))))
                 backing:#$NSBackingStoreBuffered
                 defer:NO]))
      (setf (slot-value winh 'window) window)
      (setf (handle window) winh) ; must be done before setDelegate.
      (let ((cviewh [[MclguiView alloc]
-                   initWithFrame:(window-to-nswindow-frame (make-point 0 0)
-                                                           (view-size window))]))
+                    initWithFrame:(window-to-nswindow-frame (make-point 0 0)
+                                                            (view-size window))]))
        (setf (slot-value cviewh 'view) window)
        [cviewh setAutoresizingMask:(logior #$NSViewWidthSizable #$NSViewHeightSizable)]
        [winh setContentView:cviewh] window)

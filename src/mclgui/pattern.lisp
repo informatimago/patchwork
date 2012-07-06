@@ -33,6 +33,8 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
+(objcl:enable-objcl-reader-macros)
+
 
 (defgeneric update-handle (wrapper)
   (:documentation "
@@ -156,7 +158,7 @@ PIXEL-HEIGHT:   Height of the bitmap (array-dimension bitmap 0).
       (bitmap-to-bytes (pattern-data pattern)
                        (let ((data  [imagerep bitmapData])
                              (i     -1))
-                         (lambda (byte) (setf (ccl::%get-unsigned-byte data (incf i)) byte))))
+                         (lambda (byte) (setf (cffi:mem-aref data ':uint8 (incf i)) byte))))
       [image addRepresentation:[imagerep autorelease]]
       (setf (handle pattern) [NSColor colorWithPatternImage:[image autorelease]]))))
 

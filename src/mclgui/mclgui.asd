@@ -39,6 +39,7 @@
     :version "1.0.3"
     :license "GPL3"
     :depends-on ("closer-mop" ; window.lisp uses closer-mop:class-precedence-list, etc.
+                 "cffi"
                  "com.informatimago.objcl"
                  ;; While developping:
                  "com.informatimago.common-lisp.cesarum") 
@@ -77,6 +78,11 @@
                                      "macros" "variables" "system"
                                      "point" "objc-classes"))
                  
+                 (:file "pattern"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point"
+                                     "wrapper"))
+
                  ;; Chapter 3: Menus
 
                  (:file "menu"
@@ -285,10 +291,6 @@
                                      "system" "view-classes" "window"
                                      "view-event" "event" "application"))
 
-                 (:file "pattern"
-                        :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "wrapper"))
                  
                  (:file "cursor"
                         :depends-on ("package" 

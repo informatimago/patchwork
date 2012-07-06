@@ -58,8 +58,8 @@ coordinate of the upper-left corner of the view.")
 
 (defmethod print-object ((view simple-view) stream)
   (print-parseable-object (view stream :type t :identity t)
-                          (:view-position (point-to-list (view-position view)))
-                          (:view-size (point-to-list (view-size view)))
+                          (:view-position        (point-to-list (view-position view)))
+                          (:view-size            (point-to-list (view-size view)))
                           (:view-scroll-position (point-to-list (view-scroll-position view)))))
 
 

@@ -1192,7 +1192,8 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 
 (defun find-1st-arg-combined-method (gf arg)
-  (niy find-1st-arg-combined-method gf arg)
+  ;; TODO:
+  #-ccl (niy find-1st-arg-combined-method gf arg)
   #+ccl (ccl::%find-1st-arg-combined-method (ccl::%gf-dispatch-table gf) arg))
 
 

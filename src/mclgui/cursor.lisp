@@ -33,16 +33,28 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
+(objcl:enable-objcl-reader-macros)
 
+(defvar *current-cursor* nil)
 
 (defclass cursor (wrapper)
   ((data     :initarg :data     :initform (make-bits16 0)  :type bits16 :accessor cursor-data)
    (mask     :initarg :mask     :initform (make-bits16 1)  :type bits16 :accessor cursor-mask)
-   (hot-spot :initarg :hot-spot :initform (make-point 0 0) :type point  :accessor cursor-hot-spot))
+   (hot-spot :initarg :hot-spot :initform (make-point 0 0) :type point  :accessor cursor-hot-spot)
+   (name     :initarg :name     :initform "Cursor"         :type string :accessor cursor-name))
   (:documentation "A Quickdraw cursor"))
+
+(defmethod print-object ((cursor cursor) stream)
+  (print-unreadable-object (cursor stream :identity t :type t)
+    (format stream "~S" (cursor-name cursor)))
+  cursor)
 
 
 (defun cursor-premultiplied-data (cursor)
+  "
+RETURN:         A newly allocated bit16 containing the data of the
+                cursor premultiplied by its mask (alpha).
+"
   (let* ((data (cursor-data cursor))
          (mask (cursor-mask cursor))
          (prem (make-array (array-dimensions data)
@@ -73,16 +85,16 @@
                         bytesPerRow: rowBytes
                         bitsPerPixel: 1])
              (image [[NSImage alloc] initWithSize:(ns:make-ns-size width height)]))
-        (ccl:rletz ((planes (:array (:* (:unsigned 8)) 5)))
+        (cffi:with-foreign-object (planes '(:pointer :uint8) 5)
           [imagerep getBitmapDataPlanes:planes]
           (bitmap-to-bytes prem
-                           (let ((data (ccl::%get-ptr planes 0))
-                                 (i     -1)))
-                           (lambda (byte) (setf (ccl::%get-unsigned-byte data (incf i)) byte)))
+                           (let ((data (cffi:mem-aref planes '(:pointer :uint8) 0))
+                                 (i     -1))
+                             (lambda (byte) (setf (cffi:mem-aref data ':uint8 (incf i)) byte))))
           (bitmap-to-bytes (cursor-mask cursor)
-                           (let ((data (ccl::%get-ptr planes 1))
-                                 (i     -1)))
-                           (lambda (byte) (setf (ccl::%get-unsigned-byte data (incf i)) byte))))
+                           (let ((data (cffi:mem-aref planes '(:pointer :uint8) 1))
+                                 (i     -1))
+                             (lambda (byte) (setf (cffi:mem-aref data ':uint8 (incf i)) byte)))))
         [image addRepresentation:[imagerep autorelease]]
         (setf (handle cursor) [[NSCursor alloc]
                                initWithImage:[image autorelease]
@@ -90,30 +102,30 @@
                                                          (point-v (cursor-hot-spot cursor)))])))))
 
 
+
+
 (defmethod initialize-instance :after ((cursor cursor) &key &allow-other-keys)
   (unless (handle cursor)
     (update-handle cursor)))
 
-(defun wrap-nscursor (nscursor)
-  (let* ((representations [[nscursor image] representations])
-         (bitmap-class [NSBitmapImageRep class])
-         (rep (dotimes (i [representations count] [representations objectAtIndex:0])
-                (let ((rep [representations objectAtIndex:i]))
-                  (when [rep isKindOfClass:bitmap-class]
-                    (return rep))))))
-    rep
-    #-(and)    
-    (make-instance 'cursor
-      :handle nscursor
-      :hot-spot (nspoint-to-point (get-nspoint [nscursor hotSpot]))
-      :data
-      :mask)))
-
-;; '[NSCursor IBeamCursor]
-;; (macroexpand '(objc:send ns:ns-cursor '<ib>eam<c>ursor)(objc:send ns:ns-cursor '<ib>eam<c>ursor))
-;; 
-;; (wrap-nscursor [NSCursor IBeamCursor])
-;; #<ns-bitmap-image-rep NSBitmapImageRep 0x35af080 Size={20, 24} ColorSpace=Generic RGB colorspace BPS=8 BPP=32 Pixels=20x24 Alpha=YES Planar=NO Format=0 CurrentBacking=<NSMutableData: 0x35aeff0> (#x35AF080)>
+;; Not needed for now.  In anycase, NS cursors can be any size, and in
+;; color, so in general we cannot convert them back to a Macintosh
+;; cursor bitmap (16x16 black-and-white + mask).
+;;
+;; (defun wrap-nscursor (nscursor)
+;;   (let* ((representations [[nscursor image] representations])
+;;          (bitmap-class [NSBitmapImageRep class])
+;;          (rep (dotimes (i [representations count] [representations objectAtIndex:0])
+;;                 (let ((rep [representations objectAtIndex:i]))
+;;                   (when [rep isKindOfClass:bitmap-class]
+;;                     (return rep))))))
+;;     rep
+;;     #-(and)    
+;;     (make-instance 'cursor
+;;       :handle nscursor
+;;       :hot-spot (nspoint-to-point (get-nspoint [nscursor hotSpot]))
+;;       :data
+;;       :mask)))
 
 
 
@@ -137,9 +149,12 @@ NOTE:           If set-cursor is called from anywhere except within a
   (:method ((cursor t))
     (error "~S: Setting a cursor by resource ID is not implemented." 'set-cursor))
   (:method ((cursor cursor))
+    (format-trace "set-cursor" cursor)
     (setf *current-cursor* cursor)
+    (unless (handle cursor)
+      (setf (handle cursor) (update-handle cursor)))
     (with-handle (nscursor cursor)
-       [nscursor set])))
+      [nscursor set])))
 
 
 (defun update-cursor (&optional (hook *cursorhook*))
@@ -156,26 +171,37 @@ is correct at a particular time.
 HOOK:           A function, symbol, or cursor. The default value is
                 *CURSORHOOK*.
 "
+  (format-trace "update-cursor" hook)
   (if (or (functionp hook) (symbolp hook))
     (funcall hook)
     (set-cursor hook)))
 
 
 (defun call-with-cursor (cursor thunk)
+  "
+DO:             Calls the THUNK with the *cursorhook* bound to cursor.
+                The cursor is temporarily set to *cursorhook* (or
+                *cursorhook* is called if it's a function to set it).
+                When THUNK is completed, the old cursor is reset (or
+                if the old *cursorhook* was a function, it's called to
+                reset the old cursor).
+"
   (unwind-protect 
-      (let ((*cursorhook* cursor)) 
+      (let ((*cursorhook* cursor))
+        (format-trace "call-with-cursor push" cursor)
         (if (or (functionp cursor) (symbolp cursor))
           (progn ; a function.
             [[NSCursor arrowCursor] push]
             (funcall cursor)) ; set up the cursor.
           (progn ; a cursor.
             (unless (handle cursor)
-              (setf (handle cursor) (unwrap cursor)))
+              (setf (handle cursor) (update-handle cursor)))
             [(handle cursor) push]))
         (funcall thunk)) ; eval the body.
     ;; The previous cursor is reverted automatically by pop, but  if
     ;; *cursorhook* is a function designator we call it to let it
     ;; know.
+    (format-trace "call-with-cursor pop" cursor)
     [NSCursor pop]
     (when (or (functionp *cursorhook*) (symbolp *cursorhook*))
       (funcall *cursorhook*))))
@@ -186,17 +212,97 @@ HOOK:           A function, symbol, or cursor. The default value is
 The WITH-CURSOR macro executes zero or more forms with
 *CURSORHOOK* bound to cursor.
 
-CURSOR:         A cursor structure.
+CURSOR:         A cursor structure, or a cursor hook function used to
+                set the cursor.
 "
   `(call-with-cursor ,cursor (lambda () ,@body)))
 
 
 
 (defun initialize/cursor ()
-  (setf *arrow-cursor*  (wrap-nscursor [NSCursor arrowCursor])
-        ;; *i-beam-cursor* (wrap-nscursor [NSCursor IBeamCursor])
+  (setf *arrow-cursor*  (make-instance 'cursor
+                          :handle [NSCursor arrowCursor]
+                          :name "Arrow"
+                          :hot-spot (make-point 1 1)
+                          :data (make-array '(16 16)
+                                            :element-type 'bit
+                                            :initial-contents '(#*0000000000000000
+                                                                #*0100000000000000
+                                                                #*0110000000000000
+                                                                #*0111000000000000
+                                                                #*0111100000000000
+                                                                #*0111110000000000
+                                                                #*0111111000000000
+                                                                #*0111111100000000
+                                                                #*0111111110000000
+                                                                #*0111111111000000
+                                                                #*0111111111100000
+                                                                #*0111011000000000
+                                                                #*0110011000000000
+                                                                #*0100001100000000
+                                                                #*0000001100000000
+                                                                #*0000000000000000))
+                          :mask (make-array '(16 16)
+                                            :element-type 'bit
+                                            :initial-contents '(#*1100000000000000
+                                                                #*1110000000000000
+                                                                #*1111000000000000
+                                                                #*1111100000000000
+                                                                #*1111110000000000
+                                                                #*1111111000000000
+                                                                #*1111111100000000
+                                                                #*1111111110000000
+                                                                #*1111111111000000
+                                                                #*1111111111100000
+                                                                #*1111111111110000
+                                                                #*1111111111110000
+                                                                #*1111111100000000
+                                                                #*1110011110000000
+                                                                #*1100011110000000
+                                                                #*0000011110000000)))
+        *i-beam-cursor* (make-instance 'cursor
+                          :handle  (objc:send ns:ns-cursor :perform-Selector (objc:@selector #/IBeamCursor))
+                          :name "I-Beam"
+                          :hot-spot (make-point 9 9)
+                          :data (make-array '(16 16)
+                                            :element-type 'bit
+                                            :initial-contents '(#*0000000000000000
+                                                                #*0000010001000000
+                                                                #*0000001110000000
+                                                                #*0000000100000000
+                                                                #*0000000100000000
+                                                                #*0000000100000000
+                                                                #*0000000100000000
+                                                                #*0000000100000000
+                                                                #*0000000100000000
+                                                                #*0000001110000000
+                                                                #*0000000100000000
+                                                                #*0000000100000000
+                                                                #*0000000100000000
+                                                                #*0000001110000000
+                                                                #*0000010001000000
+                                                                #*0000000000000000))
+                          :mask (make-array '(16 16)
+                                            :element-type 'bit
+                                            :initial-contents '(#*0000111011100000
+                                                                #*0000111111100000
+                                                                #*0000011111000000
+                                                                #*0000001110000000
+                                                                #*0000001110000000
+                                                                #*0000001110000000
+                                                                #*0000001110000000
+                                                                #*0000001110000000
+                                                                #*0000011111000000
+                                                                #*0000011111000000
+                                                                #*0000011111000000
+                                                                #*0000001110000000
+                                                                #*0000001110000000
+                                                                #*0000011111000000
+                                                                #*0000111111100000
+                                                                #*0000111011100000)))
         *watch-cursor*  (make-instance 'cursor
-                          :hot-spot (make-point 3 0)
+                          :name "Watch"
+                          :hot-spot (make-point 11 7)
                           :data (make-array '(16 16)
                                             :element-type 'bit
                                             :initial-contents '(#*0001111110000000
@@ -233,7 +339,9 @@ CURSOR:         A cursor structure.
                                                                 #*0011111111000000
                                                                 #*0011111111000000
                                                                 #*0011111111000000)))
-        *cursorhook* *arrow-cursor*))
+        *cursorhook*     *arrow-cursor*
+        *current-cursor* *arrow-cursor*)
+    (update-cursor))
 
 
 ;;;; THE END ;;;;

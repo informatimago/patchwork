@@ -229,23 +229,22 @@
 
 (defmethod view-draw-contents ((item control-dialog-item))
   (when (installed-item-p item)
-    (let ((handle (dialog-item-handle item)))
-      (when handle
-        (niy view-draw-contents item)
-        #-(and)
-        (if (#_iscontrolvisible handle)
-            (#_Draw1Control handle)
-            (#_ShowControl handle))))))
+    (with-handle (handle item)
+      (niy view-draw-contents item)
+      #-(and)
+      (if (#_iscontrolvisible handle)
+        (#_Draw1Control handle)
+        (#_ShowControl handle)))))
 
 
 (defmethod view-click-event-handler ((item control-dialog-item) where)
-  (let ((handle (dialog-item-handle item))
-        (ok 0))
-    (niy view-click-event-handler item where)
-    #-(and)
-    (setf ok (#_TrackControl handle where (%null-ptr))))
-  (unless (zerop ok)
-    (dialog-item-action item)))
+  (with-handle (handle item)
+    (niy view-click-event-handler item where))
+  #-(and)
+  (progn
+    (setf ok (#_TrackControl handle where (%null-ptr)))
+    (unless (zerop ok)
+    (dialog-item-action item))))
 
 
 
