@@ -45,9 +45,14 @@
 
 
 (defmethod initialize-instance :after ((self wrapper) &key &allow-other-keys)
+  #+ccl (ccl:terminate-when-unreachable self)
   (when (handle self)
     [(handle self) retain])
   self)
+
+
+#+ccl (defmethod ccl:terminate ((self wrapper))
+        (setf (handle self) nil))
 
 
 
