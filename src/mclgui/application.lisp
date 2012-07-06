@@ -227,11 +227,15 @@ APPLICATION:    The application.  MCL standard event handling always
 FORM:           A symbol, function or lisp form.
 ")
   (:method ((application application) form)
-    (typecase form
-      ((or symbol function) (funcall form))
-      (otherwise (eval form))))
+    (let ((evaluator [[MclguiEvaluator alloc] init]))
+      (setf (evaluator-thunk evaluator)
+            (typecase form
+              ((or symbol function) form)
+              (otherwise            (lambda () (eval form)))))
+      (on-main-thread [evaluator evaluate])
+      [evaluator autorelease]))
   (:method ((application lisp-development-system) form)
-    (niy application-eval-enqueue application form)
+    ;; TODO: see how to integrate with ccl::lisp-development-system
     (call-next-method)))
 
 
@@ -667,8 +671,7 @@ HANDLERREFCON:  The handler reference constant, which is any Lisp object.
 
 
 (defun initialize/application ()
-  (niy initialize/application)
-  (setf *application* (make-instance 'application))
+  (setf *application* (make-instance 'application :handle [NSApplication sharedApplication]))
   (install-appleevent-handler :|aevt| :|ansr| #'queued-reply-handler)
   (install-appleevent-handler :|aevt| :|oapp| #'open-application-handler)
   (install-appleevent-handler :|aevt| :|quit| #'quit-application-handler)

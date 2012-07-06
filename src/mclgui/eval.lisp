@@ -53,7 +53,7 @@ Note that EVAL-ENQUEUE is a function, and so its argument is
 evaluated.  The result of this evaluation is put into the
 read-eval-print loop.
 "
-  (niy eval-enqueue form))
+  (application-eval-enqueue *application* form))
 
 
 (defun get-next-queued-form ()
@@ -67,12 +67,15 @@ During programming sessions, queued-up forms include text entered in
 the Listener and evaluated from buffers as well as forms passed to
 EVAL=ENQUEUE.
 "
-  (niy get-next-queued-form))
+  ;; Since application-eval-enqueue uses MclguiEvaluator objects, we
+  ;; don't manage the queue ourselves.
+  (values nil nil))
 
 
 
 (defun initialize/eval ()
-  (niy initialize/eval))
+  (values))
+
 
 ;;;; THE END ;;;;
 

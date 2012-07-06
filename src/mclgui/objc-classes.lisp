@@ -715,6 +715,19 @@ RETURN:         Position and size of the main screen.
       (window-null-event-handler (view-window (nsview-view self)))))]
 
 
+;;;------------------------------------------------------------
+;;; MclguiEvaluator
+
+
+@[NSObject subClass:MclguiEvaluator
+           slots:((thunk :initform nil
+                         :initarg :think
+                         :reader evaluator-thunk))]
+
+@[MclguiView
+  method:(evaluate)
+  resultType:(:void)
+  body:(funcall (evaluator-thunk self))]
 
 
 ;;;; THE END ;;;;
