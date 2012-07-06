@@ -43,9 +43,6 @@
 
 
 
-(defun initialize/pattern ()
-  (niy initialize/pattern))
-
 (defun initialize/screen ()
   (niy initialize/screen))
 

@@ -178,3 +178,5 @@
   (loop repeat 100 do
    (print lv)
    (update-ball lv (make-nsrect :x 10 :y 10 :width 80 :height 80))))
+
+

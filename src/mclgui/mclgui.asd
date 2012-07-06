@@ -285,12 +285,20 @@
                                      "system" "view-classes" "window"
                                      "view-event" "event" "application"))
 
+                 (:file "pattern"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point"
+                                     "wrapper"))
+                 
                  (:file "cursor"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"))
+                                     "macros" "variables" "point"
+                                     "wrapper" "pattern"))
+                 
                  (:file "scrap"
                         :depends-on ("package" 
                                      "macros" "variables" "point"))
+                 
                  (:file "eval"
                         :depends-on ("package" 
                                      "macros" "variables" "application"))
@@ -299,7 +307,8 @@
 
                  (:file "application"
                         :depends-on ("package" 
-                                     "macros" "variables" "wrapper"))
+                                     "macros" "variables" "wrapper"
+                                     "objc-classes"))
                  
                  ;; Appendix D: Quickdraw Graphics:
 

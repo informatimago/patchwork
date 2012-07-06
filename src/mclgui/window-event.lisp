@@ -64,7 +64,7 @@
       (let ((attrs (get-bubble-attributes window)))
         (view-put window 'bubble-attrs attrs)
         ;; if is collapsed, leave bubble so will uncollapse
-        (niy view-deactivate-event-handler view)
+        (not-implemented-yet view-deactivate-event-handler view)
         ;; (if (not (#_iswindowcollapsed wptr))
         ;;     (clear-bubble-attributes window))
         ))
