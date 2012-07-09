@@ -139,6 +139,11 @@ PIXEL-HEIGHT:   Height of the bitmap (array-dimension bitmap 0).
   ((data :initarg :data :initform (make-bits8 0) :type bits8 :accessor pattern-data))
   (:documentation "A Quickdraw Pattern."))
 
+(defmethod copy-object-from ((dst pattern) (src pattern))
+  (setf (handle dst)       (handle src)
+        (pattern-data dst) (alexandria:copy-array (pattern-data src)))
+  dst)
+
 
 (defmethod update-handle ((pattern pattern))
   (multiple-value-bind (totalBytes rowBytes width height) (bitmap-to-bytes (pattern-data pattern) nil)
@@ -165,6 +170,28 @@ PIXEL-HEIGHT:   Height of the bitmap (array-dimension bitmap 0).
 (defmethod initialize-instance :after ((pattern pattern) &key &allow-other-keys)
   (unless (handle pattern)
     (update-handle pattern)))
+
+(defmethod print-object ((pattern pattern) stream)
+  (print-parseable-object (pattern stream :type t :identity t)
+                          (:data
+                           (with-output-to-string (out)
+                             (bitmap-to-bytes (pattern-data pattern)
+                                              (lambda (byte)
+                                                  (format out "~%~8,'0B" byte))))))
+  pattern)
+
+(defun make-pattern (&rest bytes)
+  (loop
+    :with bits = (make-bits8)
+    :for y :below 8
+    :for byte = (or (pop bytes) 0)
+    :do (loop
+          :for x :below 8
+          :for i = 1 :then (ash i 1)
+          :do (when (plusp (logand i byte)) (setf (aref bits y x) 1)))
+    :finally (return (make-instance 'pattern :data bits))))
+
+
 
 
 
