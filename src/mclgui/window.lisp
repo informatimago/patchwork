@@ -101,7 +101,7 @@
      [winh setDelegate:winh]
      (set-window-title window (window-title window))
      [winh display])
-   (format-trace "created window" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
+   ;; (format-trace "created window" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
    (window-size-parts window)
    (when (window-visiblep window)
      (setf (slot-value window 'visiblep) nil)
@@ -366,11 +366,12 @@ V:              The vertical coordinate of the new position, or NIL if
             (mswindow (handle window)))
         (setf (slot-value window 'view-position) pos)
         (when (and (not *window-moving*) mswindow)
-          (format-trace "Before mswindow setFrameOrigin:")
-          (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin pos siz)])
-          (format-trace "Before mswindow invalidateShadow")
-          (on-main-thread [mswindow invalidateShadow])
-          (format-trace "After"))
+          ;; (format-trace "Before mswindow setFrameOrigin:")
+           (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin pos siz)])
+           ;; (format-trace "Before mswindow invalidateShadow")
+           (on-main-thread [mswindow invalidateShadow])
+           ;; (format-trace "After")
+          )
         pos)
       (set-view-position window (center-window (view-size window) h))))
 
@@ -874,23 +875,6 @@ DESCRIPTION:    The WINDOW-NEEDS-SAVING-P generic function determines
 (defgeneric window-can-undo-p (window)
   (:documentation "Obsolete"))
 
-
-(defun non-window-method-exists-p (op view)
-  (let* ((gf           (and (symbolp op) (fboundp op)))
-         (methods      (and (standard-generic-function-p gf)
-                            (generic-function-methods gf)))
-         (class        (class-of view))
-         (window-class (find-class 'window))
-         (cpl          (closer-mop:class-precedence-list class)))
-    (and methods
-         (dolist (method methods nil)
-           (when (and (null (method-qualifiers method))
-                      (let ((spec (car (method-specializers method))))
-                        (and (not (eq spec window-class))
-                             (if (typep spec 'eql-specializer)
-                                 (eql (eql-specializer-object spec) view)
-                                 (member spec cpl)))))
-             (return t))))))
 
 
 (defgeneric window-can-do-operation (window op &optional item)
