@@ -34,7 +34,7 @@
 
 (in-package "MCLGUI")
 
-
+(deftype point () '(unsigned-byte 32))
 
 (defun make-point (h &optional v)
   "
