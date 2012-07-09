@@ -497,7 +497,7 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
             (setf color (color->ff-index (second item))
                   color-mask 255))))
         ((let ((temp (xfer-mode-arg item)))
-           (when (and temp (plusp temp))
+           (when temp
              (if mode
                  (unless (eq item :plain)
                    (error 'invalid-font-spec-error :font-spec font-spec 
@@ -680,6 +680,7 @@ significant.
     (values [NSFont fontWithDescriptor:descriptor size:(cgfloat size)] mode)))
 
 
+
 (defun font-codes-string-width (string ff ms &optional
                                 (start 0)
                                 (end (length string)))
@@ -693,9 +694,7 @@ MS:             Mode/Size code.
 "
   (check-type start fixnum "a start index in the string")
   (check-type end   fixnum "an end position in the string")
-  (let ((string  (if (and (zerop start) (= end (length string)))
-                     string
-                     (subseq string start end))))
+  (let ((string (nsubseq string start end)))
     (round (nssize-width (get-nssize [(objcl:objcl-string string)
                                       sizeWithAttributes:[(font-descriptor-from-codes ff ms) fontAttributes]])))))
 
@@ -716,9 +715,7 @@ MS:             Mode/Size code.
 "
   (check-type start fixnum "a start index in the string")
   (check-type end   fixnum "an end position in the string")
-  (let ((string  (if (and (zerop start) (= end (length string)))
-                     string
-                     (subseq string start end))))
+  (let ((string  (nsubseq string start end)))
     ;; TODO: if color, then insert it into ff
     (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
       (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
