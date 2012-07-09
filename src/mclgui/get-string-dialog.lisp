@@ -76,7 +76,8 @@
           (let ((empties (slot-value d 'allow-empty-strings)))
             (if (or (eq empties t)
                     (dolist (item text-items t) ; enables if no text-items but there should be some
-                      (unless (and (consp empties)(memq (view-nick-name item) empties))
+                      (unless (and (consp empties)
+                                   (member (view-nick-name item) empties))
                         (when (eq 0 (dialog-item-text-length item))
                           (return nil)))))
               (dialog-item-enable debutton)
@@ -101,68 +102,67 @@
                              (action-function #'identity)
                              (cancel-function nil)
                              (theme-background t))
-  (let (dialog
+  (let ((dialog)
         (delta 20)
-        message-item
-        (message-len 0)))
-  (when message 
-    (setf message-item (make-instance 'static-text-dialog-item
-                         :text-truncation :end
-                         :view-position (make-point 6 (- (point-v size) 54 delta))
-                         :dialog-item-text message))
-    (let* ((msize (view-default-size message-item))
-           (mh    (min (point-h msize) (- (point-h size) 100)))) 
-      (set-view-size message-item (make-point mh (point-v msize))))
-    (setf message-len (+ 6 (point-h (view-size message-item)))))
-  (flet ((act-on-text (item)
-           (let ((e-item (find-subview-of-type (view-container item)
-                                               'editable-text-dialog-item)))
-             (funcall action-function (dialog-item-text e-item)))))
-    (setf dialog (make-instance 
-                   'get-string-dialog
-                   :view-position position
-                   :view-size size
-                   :close-box-p (if modeless t nil)
-                   :grow-box-p t
-                   :window-type window-type
-                   :window-title window-title
-                   :window-show nil
-                   :back-color back-color
-                   :theme-background theme-background
-                   :allow-empty-strings allow-empty-strings
-                   :view-subviews
-                   (list
-                    (make-dialog-item 'default-button-dialog-item
-                                      (make-point (- (point-h size) 74)
-                                                  (- (point-v size) 20 delta))
-                                      #@(62 20)
-                                      ok-text
-                                      (if (not modeless)
+        (message-item)
+        (message-len 0))
+    (when message 
+      (setf message-item (make-instance 'static-text-dialog-item
+                           :text-truncation :end
+                           :view-position (make-point 6 (- (point-v size) 54 delta))
+                           :dialog-item-text message))
+      (let* ((msize (view-default-size message-item))
+             (mh    (min (point-h msize) (- (point-h size) 100)))) 
+        (set-view-size message-item (make-point mh (point-v msize))))
+      (setf message-len (+ 6 (point-h (view-size message-item)))))
+    (flet ((act-on-text (item)
+             (let ((e-item (find-subview-of-type (view-container item)
+                                                 'editable-text-dialog-item)))
+               (funcall action-function (dialog-item-text e-item)))))
+      (setf dialog (make-instance 'get-string-dialog
+                      :view-position position
+                     :view-size size
+                     :close-box-p (if modeless t nil)
+                     :grow-box-p t
+                     :window-type window-type
+                     :window-title window-title
+                     :window-show nil
+                     :back-color back-color
+                     :theme-background theme-background
+                     :allow-empty-strings allow-empty-strings
+                     :view-subviews
+                     (list
+                      (make-dialog-item 'default-button-dialog-item
+                                        (make-point (- (point-h size) 74)
+                                                    (- (point-v size) 20 delta))
+                                        #@(62 20)
+                                        ok-text
+                                        (if (not modeless)
                                           #'(lambda (item)
-                                              (return-from-modal-dialog (act-on-text item)))
+                                                (return-from-modal-dialog (act-on-text item)))
                                           #'act-on-text))                     
-                     (make-dialog-item 'button-dialog-item
-                                       (make-point (- (point-h size) 154)
-                                                   (- (point-v size) 20 delta))
-                                       #@(62 20)
-                                       cancel-text
-                                       (or cancel-function
-                                       #'(lambda (item)
-                                           (if (not modeless) 
-                                             (return-from-modal-dialog :cancel)
-                                             (window-close (view-window item)))))
-                                       :cancel-button t)
-                     (make-dialog-item 'editable-text-dialog-item
+                      (make-dialog-item 'button-dialog-item
+                                        (make-point (- (point-h size) 154)
+                                                    (- (point-v size) 20 delta))
+                                        #@(62 20)
+                                        cancel-text
+                                        (or cancel-function
+                                            #'(lambda (item)
+                                                  (if (not modeless) 
+                                                    (return-from-modal-dialog :cancel)
+                                                    (window-close (view-window item)))))
+                                        :cancel-button t)
+                      (make-dialog-item 'editable-text-dialog-item
                                         (make-point (+ 6 message-len) (- (point-v size) 54 delta))
                                         (make-point (- (point-h size) delta message-len) 16)
                                         initial-string))))
-    (when message
-      (add-subviews dialog message-item))
-    (update-default-button dialog)
-    (cond ((not modeless)         
-           (modal-dialog dialog))
-          (t (window-show dialog)
-             dialog))))
+      (when message
+        (add-subviews dialog message-item))
+      (update-default-button dialog)
+      (cond ((not modeless)         
+             (modal-dialog dialog))
+            (t (window-show dialog)
+               dialog)))))
 
 
 

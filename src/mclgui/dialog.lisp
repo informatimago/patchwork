@@ -151,7 +151,7 @@ recent outstanding catch-cancel.
                              *eventhook*)))
             (unless (and eventhook
                          (flet ((process-eventhook (hook)
-                                  (unless (memq hook *eventhooks-in-progress*)
+                                  (unless (member hook *eventhooks-in-progress*)
                                     (let ((*eventhooks-in-progress*
                                            (cons hook *eventhooks-in-progress*)))
                                       (declare (dynamic-extent *eventhooks-in-progress*))
@@ -541,7 +541,7 @@ STRING:         A string against which to compare the text of the
 (defmethod set-current-key-handler ((dialog window) item &optional (select-all t)
                                       &aux old)
   (unless (or (null item)
-              (and (memq item (%get-key-handler-list dialog))
+              (and (member item (%get-key-handler-list dialog) :test (function eq))
                    (key-handler-p item)))
     (error "~s is either disabled or is not a key-handler item of ~s" item dialog))
   (without-interrupts
@@ -580,7 +580,7 @@ STRING:         A string against which to compare the text of the
   (let* ((dialog (view-window view))
          (items (%get-key-handler-list dialog))
          (old-handler (current-key-handler dialog))
-         (rest (memq old-handler items)))
+         (rest (member old-handler items)))
     (set-current-key-handler 
      dialog
      (or 

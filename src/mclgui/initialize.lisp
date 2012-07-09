@@ -245,7 +245,7 @@
            (menu-item-enable item)
            (dolist (p *all-processes*)
              (unless (or (eq p *event-processor*)
-                         (not (memq p *active-processes*))
+                         (not (member p *active-processes*))
                          ; process-active-p true for blocked processes
                          (symbol-value-in-process '*in-read-loop* p)
                          ; ignore startup process; see %save-application-internal
@@ -455,7 +455,7 @@
 
 (defmethod find-edit-menu ((application application))
   (let ((menus (cdr %menubar)))
-    (if (memq *edit-menu* menus)
+    (if (member *edit-menu* menus)
       *edit-menu*
       (dolist (menu menus *edit-menu*)
         (dolist (item (slot-value menu 'item-list))
@@ -510,7 +510,7 @@
                           (and (not (eq spec window-class))
                                (if (typep spec 'eql-specializer)
                                  (eql (eql-specializer-object spec) w)
-                                 (memq spec cpl)))))
+                                 (member spec cpl)))))
                (return t))))))
 
 (defmethod cut ((w window))

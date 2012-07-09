@@ -158,7 +158,7 @@ the editable-text dialog item.
   (let ((my-dialog (view-window item)))
     (when my-dialog
       (unless (current-key-handler my-dialog)
-        (when (and (memq item (%get-key-handler-list my-dialog))
+        (when (and (member item (%get-key-handler-list my-dialog))
                    (key-handler-p item))
           (set-current-key-handler my-dialog item))))))
 
