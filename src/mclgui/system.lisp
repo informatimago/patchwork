@@ -74,4 +74,36 @@ RETURN:         If the OBJECT is a list containing a single non-NIL
       object))
 
 
+;; Note: taken from com.informatimago.common-lisp.cesarum.utility
+(defun nsubseq (sequence start &optional (end nil))
+  "
+RETURN:  When the SEQUENCE is a vector, the SEQUENCE itself, or a dispaced
+         array to the SEQUENCE.
+         When the SEQUENCE is a list, it may destroy the list and reuse the
+         cons cells to make the subsequence.
+"
+  (if (vectorp sequence)
+      (if (and (zerop start) (or (null end) (= end (length sequence))))
+          sequence
+          (make-array (- (if end
+                             (min end (length sequence))
+                             (length sequence))
+                         start)
+                      :element-type (array-element-type sequence)
+                      :displaced-to sequence
+                      :displaced-index-offset start))
+      (let ((result (nthcdr start sequence)))
+        (when end
+          (setf (cdr (nthcdr (- end start -1) sequence)) nil))
+        result)))
+
+
+(defun standard-generic-function-p (object)
+  (typep object 'common-lisp:standard-generic-function))
+
+
+(defun method-exists-p (op object)
+  #+ccl (ccl:method-exists-p op object)
+  #-ccl (error "method-exists-p not implemented on ~S" (lisp-implementation-type)))
+
 ;;;; THE END ;;;;
