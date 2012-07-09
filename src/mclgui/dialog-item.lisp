@@ -137,7 +137,7 @@ dialog items. It is built on SIMPLE-VIEW.
                               (declare (ignore container))
                               (funcall fn item))
                             item)
-    (call-with-focused-view item fn item)))
+    (call-with-focused-view (or container (view-container item)) fn item)))
 
 
 (defmacro with-focused-dialog-item ((item &optional container) &body body)
