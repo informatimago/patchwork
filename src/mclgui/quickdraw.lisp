@@ -6,12 +6,12 @@
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    The drawing functions of QuickDraw.
 ;;;;    
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
-;;;;    2012-06-11 <PJB> 
+;;;;    2012-06-11 <PJB> Created.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -35,8 +35,8 @@
 (in-package "MCLGUI")
 
 
-;;-*- Mode: Lisp; Package: CCL -*-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 ;;  Quickdraw.lisp
 ;;
 ;;  version 2.0
@@ -56,30 +56,8 @@
 ;;  once, and then issue a series of drawing commands.  You can use
 ;;  this file as an example of how to call the Quickdraw traps directly
 ;;  in such a situation.
-
-#-(and)
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (export '(clip-region set-clip-region clip-rect pen-show pen-hide
-            pen-shown-p pen-position pen-size set-pen-size pen-mode
-            set-pen-mode pen-pattern set-pen-pattern pen-state
-            set-pen-state pen-normal move-to move line-to line
-            offset-rect inset-rect intersect-rect union-rect point-in-rect-p
-            points-to-rect point-to-angle equal-rect empty-rect-p frame-rect
-            paint-rect erase-rect invert-rect fill-rect frame-oval paint-oval
-            erase-oval invert-oval fill-oval frame-round-rect paint-round-rect
-            erase-round-rect invert-round-rect fill-round-rect frame-arc
-            paint-arc erase-arc invert-arc fill-arc new-region dispose-region
-            copy-region set-empty-region set-rect-region open-region close-region
-            offset-region inset-region intersect-region union-region
-            difference-region xor-region point-in-region-p rect-in-region-p
-            equal-region-p empty-region-p frame-region paint-region erase-region
-            invert-region fill-region start-picture get-picture draw-picture
-            kill-picture start-polygon get-polygon kill-polygon offset-polygon
-            frame-polygon paint-polygon erase-polygon invert-polygon fill-polygon
-            local-to-global global-to-local get-pixel scale-point map-point
-            map-rect map-region map-polygon make-bitmap copy-bits scroll-rect
-            origin set-origin)
-          :ccl))
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 #-(and)
@@ -151,163 +129,9 @@ body is evaluated with VAR bound to that rectangle."
       ))
   nil)
 
-(defmethod pen-show ((view simple-view))
-  ;;(setf (pref (wptr view) grafport.pnvis) 0)
-  nil)
-
-(defmethod pen-show ((view simple-view))
-  (if (not (pen-shown-p view))
-    (with-port (wptr view)
-      ;; increments visibility counter
-      ;;(#_showpen)
-      ))
-  nil)
-
-(defmethod pen-hide ((view simple-view))
-  (if (pen-shown-p view)
-    (with-port (wptr view)
-      ;;(#_hidepen)
-      ))
-  nil)
-
-
-(defmethod pen-shown-p ((view simple-view))
-  (let ((wptr (wptr view)))
-    ;; (with-macptrs ((port (#_getwindowport wptr)))
-    ;;   (let ((vis (#_getportpenvisibility port)))
-    ;;     (> vis  -1)))
-    ))
-
-(defmethod pen-position ((view simple-view))
-  (with-focused-view view
-    ;; (rlet ((pos :long))
-    ;;   (#_GetPen pos)
-    ;;   (%get-long pos))
-    ))
-
-
-(defmethod pen-size ((view simple-view))
-  (let ((wptr (wptr view)))
-    ;; (with-macptrs ((port (#_getwindowport wptr)))
-    ;;   (rlet ((foo :point))
-    ;;     (%get-point (#_getportpensize port foo))))
-    ))
-
-(defmethod set-pen-size ((view simple-view) h &optional v &aux (pt (make-point h v)))
-  (with-port (wptr view)
-    ;;(#_PenSize :long pt)
-    )
-  pt)
-
-(defmethod pen-mode ((view simple-view))
-  (let ((wptr (wptr view)))
-    ;; (with-macptrs ((port (#_getwindowport wptr)))
-    ;;   (let ((mode (#_getportpenmode port)))
-    ;;     (cond ((< mode #.(length *pen-modes*))
-    ;;            (elt *pen-modes* mode))
-    ;;           (t
-    ;;            (first (rassoc mode *pen-modes-alist*))))))
-    ))
-
-
-(defmethod set-pen-mode ((view simple-view) new-mode)
-  (with-port (wptr view)
-    ;; (#_PenMode (mode-arg new-mode))
-    ))
-
-(defmethod pen-pattern ((view simple-view) &optional
-                        (save-pat (make-record (:pattern :storage :pointer))))
-  ;; (rlet ((state :PenState))
-  ;;   (with-focused-view view
-  ;;     (#_GetPenState state))
-  ;;   (copy-record
-  ;;    (pref state PenState.pnpat) (:pattern :storage :pointer) save-pat))
-  )
-
-(defmethod set-pen-pattern ((view simple-view) new-pattern)
-  ;; (with-port (wptr view)
-  ;;   (#_PenPat new-pattern))
-  new-pattern)
-
-(defmethod pen-state ((view simple-view) &optional (save-state (make-record :penstate)))
- (with-focused-view view
-   ;; (#_GetPenState save-state)
-   )
- save-state)
-
-(defmethod set-pen-state ((view simple-view) new-state)
-  (with-focused-view view
-    ;; (#_SetPenState new-state)
-    )
-  new-state)
-
-(defmethod pen-normal ((view simple-view))
-  (with-focused-view view
-    ;; (#_PenNormal)
-    ))
-
-(defmethod move-to ((view simple-view) h &optional v)
-  (with-focused-view view
-    ;; (#_MoveTo :long (setq h (make-point h v)))
-    )
-  h)
-
-(defmethod move ((view simple-view) h &optional v)
-  (with-focused-view view
-    ;; (#_Move :long (setq h (make-point h v)))
-    )
-  h)
-
-(defmethod line-to ((view simple-view) h &optional v)
-  (with-focused-view view
-    ;; (#_LineTo :long (setq h (make-point h v)))
-    )
-  h)
-
-(defmethod line ((view simple-view) h &optional v)
-  (with-focused-view view
-    ;; (#_Line :long (setq h (make-point h v)))
-    )
-  h)
-
-(defun offset-rect (rect h &optional v)
-  ;; (#_OffsetRect :ptr rect :long (make-point h v))
-  rect)
-
-(defun inset-rect (rect h &optional v)
-  ;; (#_InsetRect :ptr rect :long (make-point h v))
-  rect)
-
-(defun intersect-rect (rect1 rect2 dest-rect)
-  ;; (#_SectRect rect1 rect2 dest-rect)
-  dest-rect)
-
-(defun union-rect (rect1 rect2 dest-rect)
-  ;; (#_UnionRect rect1 rect2 dest-rect)
-  dest-rect)
-
-(defun point-in-rect-p (rect h &optional v)
-  ;; (#_PtInRect (make-point h v) rect)
-  )
-
-(defun points-to-rect (point1 point2 dest-rect)
-  ;; (#_Pt2Rect (make-point point1 nil) (make-point point2 nil) dest-rect)
-  dest-rect)
-
-(defun point-to-angle (rect h &optional v)
-  ;; (%stack-block ((ip 4))
-  ;;   (#_PtToAngle rect (make-point h v) ip)
-  ;;   (%get-word ip))
-  )
-
-(defun equal-rect (rect1 rect2)
-  ;; (#_EqualRect rect1 rect2)
-  )
-
-(defun empty-rect-p (left &optional top right bot)
-  ;; (with-rectangle-arg (r left top right bot)
-  ;;   (#_EmptyRect r))
-  )
+;;;---------------------------------------------------------------------
+;;; Drawing Rectangles
+;;;---------------------------------------------------------------------
 
 (defmethod frame-rect ((view simple-view) left &optional top right bot)
  (with-focused-view view
@@ -439,91 +263,10 @@ body is evaluated with VAR bound to that rectangle."
       ;; (#_FillArc r start-angle arc-angle pattern)
       )))
 
-;;;Regions
 
-(defun new-region ()
-  ;; (#_NewRgn)
-  )
-
-(defun dispose-region (region)
-  ;; (#_DisposeRgn region)
-  )
-
-(defun copy-region (region &optional (dest-region (new-region)))
-  ;; (#_CopyRgn region dest-region)
-  dest-region)
-
-(defun set-empty-region (region)
-  ;; (#_SetEmptyRgn region)
-  region)
-
-(defun set-rect-region (region left &optional top right bot)
-  (with-rectangle-arg (r left top right bot)
-    ;; (#_RectRgn region r)
-    )
-  region)
-
-(defmethod open-region ((view simple-view))
-  (let ((wptr (wptr view)))
-    ;; (with-macptrs ((port (#_getwindowport wptr)))
-    ;;   (when (#_isportregionbeingdefined port)
-    ;;     (error "Region already open for window: ~a" view))
-    ;;   (with-port wptr (#_OpenRgn)))
-    ))
-
-
-(defmethod close-region ((view simple-view) &optional (dest-region (new-region) dp))
-  (let ((wptr (wptr view)))
-    ;; (with-macptrs ((port (#_getwindowport wptr)))
-    ;;   (when (not (#_isportregionbeingdefined port))
-    ;;     (progn 
-    ;;       (if (not dp) (dispose-region dest-region))
-    ;;       (error "Region is not open for window: ~a" view)))
-    ;;   (with-port wptr
-    ;;     (#_CloseRgn dest-region)))
-    )
-  dest-region)
-
-(defun offset-region (region h &optional v)
-  ;; (#_OffsetRgn :ptr region :long (make-point h v))
-  region)
-
-(defun inset-region (region h &optional v)
-  ;; (#_InsetRgn :ptr region :long (make-point h v))
-  region)
-
-(defun intersect-region (region1 region2 &optional (dest-region (new-region)))
-  ;; (#_SectRgn region1 region2 dest-region)
-  dest-region)
-
-(defun union-region (region1 region2 &optional (dest-region (new-region)))
-  ;; (#_UnionRgn region1 region2 dest-region)
-  dest-region)
-
-(defun difference-region (region1 region2 &optional (dest-region (new-region)))
-  ;; (#_DiffRgn region1 region2 dest-region)
-  dest-region)
-
-(defun xor-region (region1 region2 &optional (dest-region (new-region)))
-  ;; (#_XorRgn region1 region2 dest-region)
-  dest-region)
-
-(defun point-in-region-p (region h &optional v)
-  ;; (#_PtInRgn (make-point h v) region)
-  )
-
-(defun rect-in-region-p (region left &optional top right bot)
- (with-rectangle-arg (r left top right bot)
-   ;; (#_RectInRgn r region)
-   ))
-
-(defun equal-region-p (region1 region2)
-  ;; (#_EqualRgn region1 region2)
-  )
-
-(defun empty-region-p (region)
-  ;; (#_EmptyRgn region)
-  )
+;;;---------------------------------------------------------------------
+;;; Regions
+;;;---------------------------------------------------------------------
 
 (defmethod frame-region ((view simple-view) region)
   (with-focused-view view
@@ -549,6 +292,11 @@ body is evaluated with VAR bound to that rectangle."
   (with-focused-view view 
     ;; (#_FillRgn region pattern)
     ))
+
+
+;;;---------------------------------------------------------------------
+;;; Pictures
+;;;---------------------------------------------------------------------
 
 (defmethod start-picture ((view simple-view) &optional left top right bottom) 
   (let ((wptr (wptr view)))
@@ -604,6 +352,11 @@ body is evaluated with VAR bound to that rectangle."
   ;; (#_KillPicture picture)
   )
 
+
+;;;---------------------------------------------------------------------
+;;; Polygons
+;;;---------------------------------------------------------------------
+
 (defmethod start-polygon ((view simple-view))
   (let ((wptr (wptr view)))
     (when (view-get view 'my-poly)
@@ -658,6 +411,10 @@ body is evaluated with VAR bound to that rectangle."
    ;; (#_FillPoly polygon pattern)
    ))
 
+
+;;;---------------------------------------------------------------------
+;;; Coordinates
+;;;---------------------------------------------------------------------
 
 
 (defmethod local-to-global ((view simple-view) h &optional v)
@@ -744,12 +501,6 @@ body is evaluated with VAR bound to that rectangle."
   ;;     (inval-window-rgn (wptr view) reg)
   ;;     (#_disposergn reg)))
   )
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 
 ;;;; THE END ;;;;

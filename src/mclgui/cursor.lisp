@@ -149,7 +149,7 @@ NOTE:           If set-cursor is called from anywhere except within a
   (:method ((cursor t))
     (error "~S: Setting a cursor by resource ID is not implemented." 'set-cursor))
   (:method ((cursor cursor))
-    (format-trace "set-cursor" cursor)
+    ;; (format-trace "set-cursor" cursor)
     (setf *current-cursor* cursor)
     (unless (handle cursor)
       (setf (handle cursor) (update-handle cursor)))
@@ -171,7 +171,7 @@ is correct at a particular time.
 HOOK:           A function, symbol, or cursor. The default value is
                 *CURSORHOOK*.
 "
-  (format-trace "update-cursor" hook)
+  ;; (format-trace "update-cursor" hook)
   (if (or (functionp hook) (symbolp hook))
     (funcall hook)
     (set-cursor hook)))
@@ -188,7 +188,7 @@ DO:             Calls the THUNK with the *cursorhook* bound to cursor.
 "
   (unwind-protect 
       (let ((*cursorhook* cursor))
-        (format-trace "call-with-cursor push" cursor)
+        ;; (format-trace "call-with-cursor push" cursor)
         (if (or (functionp cursor) (symbolp cursor))
           (progn ; a function.
             [[NSCursor arrowCursor] push]
@@ -201,7 +201,7 @@ DO:             Calls the THUNK with the *cursorhook* bound to cursor.
     ;; The previous cursor is reverted automatically by pop, but  if
     ;; *cursorhook* is a function designator we call it to let it
     ;; know.
-    (format-trace "call-with-cursor pop" cursor)
+    ;; (format-trace "call-with-cursor pop" cursor)
     [NSCursor pop]
     (when (or (functionp *cursorhook*) (symbolp *cursorhook*))
       (funcall *cursorhook*))))
@@ -261,7 +261,8 @@ CURSOR:         A cursor structure, or a cursor hook function used to
                                                                 #*1100011110000000
                                                                 #*0000011110000000)))
         *i-beam-cursor* (make-instance 'cursor
-                          :handle  (objc:send ns:ns-cursor :perform-Selector (objc:@selector #/IBeamCursor))
+                          :handle (#/IBeamCursor ns:ns-cursor)
+                          ;; (objc:send ns:ns-cursor :perform-Selector (objc:@selector #/IBeamCursor))
                           :name "I-Beam"
                           :hot-spot (make-point 9 9)
                           :data (make-array '(16 16)

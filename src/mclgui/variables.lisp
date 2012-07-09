@@ -47,6 +47,43 @@ current Macintosh Operating System, sorted alphabetically.")
 
 ;; Quickdraw:
 
+
+(define-condition invalid-value-designator-error (error)
+  ())
+
+(define-condition invalid-value-error (error)
+  ())
+
+
+
+
+(define-condition invalid-pen-mode-error (invalid-value-designator-error)
+  ((mode :initarg :mode :accessor invalid-pen-mode))
+  (:report (lambda (err stream)
+             (format stream "Invalid pen mode ~S"
+                     (invalid-pen-mode err)))))
+
+(define-condition invalid-pen-mode-value-error (invalid-value-error)
+  ((value :initarg :value :accessor invalid-pen-mode-value))
+  (:report (lambda (err stream)
+             (format stream "Invalid pen mode value ~S"
+                     (invalid-pen-mode-value err)))))
+
+
+(define-condition invalid-transfer-mode-error (invalid-value-designator-error)
+  ((mode :initarg :mode :accessor invalid-transfer-mode))
+  (:report (lambda (err stream)
+             (format stream "Invalid transfer mode ~S"
+                     (invalid-transfer-mode err)))))
+
+(define-condition invalid-transfer-value-error (invalid-value-error)
+  ((value :initarg :value :accessor invalid-transfer-mode-value))
+  (:report (lambda (err stream)
+             (format stream "Invalid transfer mode value ~S"
+                     (invalid-transfer-mode-value err)))))
+
+
+
 (defparameter *pen-modes*
   '(:srcCopy    :srcOr    :srcXor    :srcBic
     :notSrcCopy :notSrcOr :notSrcXor :notsrcbic
@@ -59,11 +96,23 @@ The inverse operation (turning a pen-mode integer into
 a keyword) can be performed with the Common Lisp function ELT.")
 
 
+(defun pen-mode-arg (name &optional error-p)
+  (or (and (keywordp name) (position name *pen-modes*))
+      (and (integerp name) (< -1 name (length *pen-modes*)) name)
+      (when error-p (error 'invalid-pen-mode-error :mode name))
+      0)) ; :srcCopy by default.
+
+
+(defun pen-mode-to-name (mode)
+  (if (< -1 mode (length *pen-modes*))
+      (elt *pen-modes* mode)
+      (error 'invalid-transfer-value-error :value mode)))
+
+
 (defparameter *text-modes*
   '(:blend :addPin :addOver :subPin :transparent
     :addMax :subOver :addMin :grayishTextOr
     :hilite :ditherCopy))
-
 
 
 (defparameter *transfer-modes*
@@ -73,28 +122,17 @@ a keyword) can be performed with the Common Lisp function ELT.")
     (make-array (length modes) :initial-contents modes)))
 
 
-(define-condition unknown-transfer-mode (error)
-  ((mode :initarg :mode :accessor unknown-transfer-mode))
-  (:report (lambda (err stream)
-             (format stream "Unknown transfer mode ~S"
-                     (unknown-transfer-mode err)))))
-
 (defun xfer-mode-arg (name &optional error-p)
-  (or (position name *transfer-modes*)
-      (when error-p (error 'unknown-transfer-mode :mode name))
+  (or (and (keywordp name) (position name *transfer-modes*))
+      (and (integerp name) (< -1 name (length *transfer-modes*)) name)
+      (when error-p (error 'invalid-transfer-mode-error :mode name))
       0)) ; :srcCopy by default.
 
-
-(define-condition unknown-transfer-value (error)
-  ((value :initarg :value :accessor unknown-transfer-value))
-  (:report (lambda (err stream)
-             (format stream "Unknown transfer mode value ~S"
-                     (unknown-transfer-value err)))))
 
 (defun xfer-mode-to-name (mode)
   (if (array-in-bounds-p *transfer-modes* mode)
       (aref *transfer-modes* mode)
-      (error 'unknown-transfer-value :value mode)))
+      (error 'invalid-transfer-value-error :value mode)))
 
 
 

@@ -50,8 +50,10 @@
 
 (defun initialize ()
   "Initialize the MCL GUI."
+  (initialize/region)
   (initialize/color)
   (initialize/pattern)
+  (initialize/pen)
   (initialize/cursor)
   (initialize/scrap)
   (initialize/font)

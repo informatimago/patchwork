@@ -275,4 +275,18 @@ RETURN: A form sending
 
 
 
+(defgeneric copy-object-from (dst src)
+  (:documentation "
+DO:             Perform a deep copy of the slots of the SRC object to
+                the DST object.  Methods are usually specialized  only
+                for DST and SRC of the same class.
+
+DST:            An instance.
+
+SRC:            An instance.
+
+RETURN:         DST
+"))
+
+
 ;;;; THE END ;;;;

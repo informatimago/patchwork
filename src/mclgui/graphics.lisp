@@ -30,61 +30,100 @@
 ;;;;    
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-;;;;**************************************************************************
+ ;;;;**************************************************************************
 
 (in-package "MCLGUI")
 (objcl:enable-objcl-reader-macros)
+(enable-sharp-at-reader-macro)
 
 
 (defun draw-char (x y cn)
   (draw-string x y (string cn)))
 
 (defun draw-string (x y str)
-  (format *trace-output* "~&draw-string                  ~A ~A ~S~%" x y str)
+  (format-trace "draw-string" x y str *current-view* (when *current-view* (view-window *current-view*)))
   [(objcl:objcl-string str)
    drawAtPoint: (ns:make-ns-point x y)
    withAttributes: (destructuring-bind (ff ms) ui::*current-font-codes*
                      (multiple-value-bind (descriptor mode) (ui::font-descriptor-from-codes ff ms)
                        (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
                        ;; (print descriptor)
+                       ;; [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))] 
                        [descriptor fontAttributes]))]
   str)
 
 
 (defun draw-point (x y)
-  (format *trace-output* "~&draw-point                   ~A ~A~%" x y)
-  (#_NSRectFill (ns:make-ns-rect x y 1 1)))
+  (format-trace "draw-point" x y *current-view* (when *current-view* (view-window *current-view*)))
+  (when *current-view*
+    (let ((window  (view-window *current-view*))))
+    (when window
+      (let ((siz     (pen-size (window-pen window))))
+        (#_NSRectFill (ns:make-ns-rect x y (point-h siz) (point-v siz)))))))
 
 
 (defun draw-line (x1 y1 x2 y2)
-  (format *trace-output* "~&draw-line                    ~A ~A ~A ~A~%" x1 y1 x2 y2)
-  (let ((path [NSBezierPath bezierPath]))
-    [path moveToPoint:(ns:make-ns-point x1 y1)]
-    [path lineToPoint:(ns:make-ns-point x2 y2)]
-    [path stroke]))
+  (format-trace "draw-line" x1 y1 x2 y2 *current-view* (when *current-view* (view-window *current-view*)))
+  (when *current-view*
+    (let ((window  (view-window *current-view*)))
+      (when window
+        (let* ((pen  (window-pen window))
+               (size (pen-size pen))
+               (path [NSBezierPath bezierPath]))
+          [path setLineCapStyle:#$NSSquareLineCapStyle]
+          (if (and (= #@(1 1) size)
+                   (eq *black-pattern* (pen-state-pattern pen)))
+            (let ((sx (point-h size))
+                  (sy (point-v size)))
+              (unless (< x1 x2)
+                (rotatef x1 x2)
+                (rotatef y1 y2))
+              (if (< y1 y2)
+                (progn
+                  [path moveToPoint:(ns:make-ns-point x1 y1)]
+                  [path lineToPoint:(ns:make-ns-point (+ x1 sx) y1)]
+                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
+                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
+                  [path lineToPoint:(ns:make-ns-point x2 (+ y2 sy))]
+                  [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))])
+                (progn
+                  [path moveToPoint:(ns:make-ns-point x1 y1)]
+                  [path lineToPoint:(ns:make-ns-point x2 y2)]
+                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
+                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
+                  [path lineToPoint:(ns:make-ns-point (+ x1 sx) (+ y1 sy))]
+                  [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))]))
+              [path closePath]
+              [path fill])))))))
 
 
 
 (defun draw-rect (x y w h)
-  (format *trace-output* "~&draw-rect                    ~A ~A ~A ~A~%" x y w h)
+  (format-trace "draw-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (#_NSFrameRect (ns:make-ns-rect x y w h)))
 
 (defun fill-rect (x y w h)
-  (format *trace-output* "~&fill-rect*                   ~A ~A ~A ~A~%" x y w h)
-  (#_NSRectFill (ns:make-ns-rect x y w h)))
+  (format-trace "fill-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  (when *current-view*
+    (let ((window  (view-window *current-view*)))
+      (when window
+        (let* ((pen  (window-pen window)))
+          (#_NSRectFillUsingOperation (ns:make-ns-rect x y w h)
+                                      (mode-to-compositing-operation (pen-mode pen)))))))
+  #-(and) (#_NSRectFill (ns:make-ns-rect x y w h)))
 
 (defun erase-rect (x y w h)
-  (format *trace-output* "~&erase-rect                   ~A ~A ~A ~A~%" x y w h)
+  (format-trace "erase-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (#_NSEraseRect (ns:make-ns-rect x y w h)))
 
 
 
 (defun draw-ellipse (x y w h)
-  (format *trace-output* "~&draw-ellipse                 ~A ~A ~A ~A~%" x y w h)
+  (format-trace "draw-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] stroke])
 
 (defun fill-ellipse (x y w h)
-  (format *trace-output* "~&fill-ellipse                 ~A ~A ~A ~A~%" x y w h)
+  (format-trace "fill-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] fill])
 
 ;;;; THE END ;;;;

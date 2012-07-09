@@ -98,7 +98,7 @@
 
 (defmethod initialize-instance :after ((view view) &key &allow-other-keys)
   (let ((subviews (slot-value view 'view-subviews)))
-    (format-trace "initialize-instance" view subviews)
+    ;; (format-trace "initialize-instance" view subviews)
     (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
     (apply (function add-subviews) view (coerce subviews 'list)))
   (values))
@@ -177,17 +177,18 @@ RETURN:    the view-font-codes of the font-view or of the application-font.
                         (funcall function view))
                    (set-font *current-font-view*))) ; revert font
              (unwind-protect
-                  (let ((*current-view* view)
-                        (*current-font-view* (or font-view *current-font-view*))
-                        (*current-font-codes* (copy-list *current-font-codes*)))
-                    (if (setf unlock [handle lockFocusIfCanDraw])
-                        (progn
-                          (format-trace "did lockFocusIfCanDraw" view)
-                          (focus-view *current-view* *current-font-view*)
-                          (apply (function set-current-font-codes) (set-font *current-font-view*))
-                          (funcall function view)
-                          [[NSGraphicsContext currentContext] flushGraphics])
-                        (format-trace "could not lockFocusIfCanDraw" view)))
+                 (let ((*current-view* view)
+                       (*current-font-view* (or font-view *current-font-view*))
+                       (*current-font-codes* (copy-list *current-font-codes*)))
+                   (if (setf unlock [handle lockFocusIfCanDraw])
+                     (progn
+                       (format-trace "did lockFocusIfCanDraw" view)
+                       (focus-view *current-view* *current-font-view*)
+                       (apply (function set-current-font-codes) (set-font *current-font-view*))
+                       (call-with-pen-state (lambda () (funcall function view))
+                                            (window-pen (view-window *current-view*)))
+                       [[NSGraphicsContext currentContext] flushGraphics])
+                     (format-trace "could not lockFocusIfCanDraw" view)))
                (when unlock
                  (set-font *current-font-view*)
                  [handle unlockFocus]
@@ -500,9 +501,9 @@ SUBVIEW-TYPE:   A Common Lisp type specifier.
   (let ((vview         (gensym "view"))
         (vsubview-type (gensym "subview-type"))
         (vsubviews     (gensym "subviews")))
-    `(let ((,vview         ,view)
-           (,vsubview-type ,subview-type)
-           (,vsubviews     (copy-seq (view-subviews ,vview))))
+    `(let* ((,vview         ,view)
+            (,vsubview-type ,subview-type)
+            (,vsubviews     (copy-seq (view-subviews ,vview))))
        (dovector (,subview-var ,vsubviews (values))
                  (when (typep ,subview-var ,vsubview-type)
                    ,@body)))))
@@ -522,6 +523,8 @@ SUBVIEW-TYPE:   A Common Lisp type specifier.
   (:method ((view simple-view) function &optional (subview-type t))
     (do-subviews (subview view subview-type)
       (funcall function subview))))
+
+
 
 
 (defgeneric subviews (view &optional subview-type)
@@ -674,7 +677,7 @@ ERASE-P:        A value indicating whether or not to add the
 ")
   (:method ((view simple-view) region &optional erase-p)
     (declare (ignore region erase-p)) ; TODO: for now we invalidate everything.
-    (format-trace "invalidate-region" view)
+    ;; (format-trace "invalidate-region" view)
     (with-handle (viewh view)
       [viewh setNeedsDisplay:yes])
     #-(and)
@@ -716,7 +719,7 @@ ERASE-P:        A value indicating whether or not to add the
   
   (:method ((window window) region &optional erase-p)
     (declare (ignore region erase-p))
-    (format-trace "invalidate-region" window)
+    ;; (format-trace "invalidate-region" window)
     (with-handle (winh window)
       [winh setViewsNeedDisplay:yes])))
 
@@ -737,7 +740,7 @@ ERASE-P:        A value indicating whether or not to add the
 ")
   (:method ((view simple-view) topleft bottomright &optional erase-p)
     (declare (ignore erase-p))
-    (format-trace "invalidate-corners" view)
+    ;; (format-trace "invalidate-corners" view)
     (with-handle (viewh view)
       [viewh setNeedsDisplayInRect:(ns:make-ns-rect (point-h topleft) (point-v topleft)
                                                     (- (point-h bottomright) (point-h topleft))
@@ -745,7 +748,7 @@ ERASE-P:        A value indicating whether or not to add the
     nil)
   (:method ((window window) topleft bottomright &optional erase-p)
     (declare (ignore topleft bottomright erase-p))
-    (format-trace "invalidate-corners" window)
+    ;; (format-trace "invalidate-corners" window)
     (with-handle (winh window)
       [winh setViewsNeedDisplay:yes])))
 
@@ -763,13 +766,13 @@ ERASE-P:        A value indicating whether or not to add the
 ")
   (:method ((view simple-view) &optional erase-p)
     (declare (ignore erase-p))
-    (format-trace "invalidate-view" view)
+    ;; (format-trace "invalidate-view" view)
     (with-handle (viewh view)
       [viewh setNeedsDisplay:yes]))
 
   (:method ((window window) &optional erase-p)
     (declare (ignore erase-p))
-    (format-trace "invalidate-view" window)
+    ;; (format-trace "invalidate-view" window)
     (with-handle (winh window)
       [winh setViewsNeedDisplay:yes])))
 
@@ -1194,34 +1197,6 @@ CONTAINER:      The container of the view.
             (,w (point-h ,vsiz))
             (,h (point-v ,vsiz)))
        ,@body)))
-
-
-(defgeneric view-draw-contents (view)
-  (:documentation "
-The generic function VIEW-DRAW-CONTENTS is called by the event
-system whenever a view needs to redraw any portion of its contents.
-The default simple-view method does nothing. It should be shadowed by
-views that need to redraw their contents. The default view method calls
-VIEW-FOCUS-AND-DRAW-CONTENTS on each of the view’s subviews.
-
-When VIEW-DRAW-CONTENTS is called by the event system, the view’s clip
-region is set so that drawing occurs only in the portions that need to be
-updated. This normally includes areas that have been covered by other
-windows and then uncovered.
-
-VIEW:           A simple view or view.
-")
-  (:method ((view simple-view))
-    ;; DEBUG:
-    #-(and)
-    (with-view-frame (x y w h) view
-      (#_NSFrameRect (ns:make-ns-rect (1+ x) (1+ y) (min 2 (- w 2)) (min 2 (- h 2)))))
-    (values))
-  (:method ((view view))
-    (com.informatimago.common-lisp.cesarum.utility:tracing
-     (call-next-method)
-     (dovector (subview (view-subviews view))
-               (view-focus-and-draw-contents subview)))))
 
 
 

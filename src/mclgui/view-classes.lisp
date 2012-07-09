@@ -37,7 +37,7 @@
 
 ;;;---------------------------------------------------------------------
 
-(defclass simple-view (colored wrapper stream) ; output-stream TODO: We may want a gray-stream here.
+(defclass simple-view (colored wrapper fundamental-character-output-stream)
   ((help-spec            :initform nil         :initarg  :help-spec            :accessor help-spec)
    (view-container       :initform nil                                         :reader view-container
                          :documentation "The view that contains this view.")
@@ -143,6 +143,8 @@ DO:             Remove the property KEY from the VIEW.
 (defclass window (view)
   ((window-cursor                    :initform  *arrow-cursor*
                                      :reader    window-cursor)
+   (window-pen                       :initform  (make-instance 'pen-state)
+                                     :reader    window-pen)
    (window-grow-rect                 :initform  nil
                                      :reader    window-grow-rect)
    (window-drag-rect                 :initform  nil
@@ -223,6 +225,8 @@ DO:             Remove the property KEY from the VIEW.
                                      :accessor   window-type)
    (erase-anonymous-invalidations    :initform   t
                                      :initarg   :erase-anonymous-invalidations)
+   ;; WINDOW-PTR is a simulated handle (a mere integer identifying the window).
+   ;; It's reset to NIL when the real window handle is released.
    (window-ptr                       :initform (incf *next-window-ptr*)
                                      :reader window-ptr)))
 

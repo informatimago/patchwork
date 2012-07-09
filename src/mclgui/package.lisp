@@ -35,8 +35,13 @@
 
 
 (defpackage "MCLGUI"
-  (:use "COMMON-LISP")
+  (:use "COMMON-LISP"
+        "TRIVIAL-GRAY-STREAMS"
+        "CLOSER-MOP")
   (:nicknames "UI")
+  (:shadowing-import-from "CLOSER-MOP"
+                          "STANDARD-CLASS" "STANDARD-METHOD" "STANDARD-GENERIC-FUNCTION"
+                          "DEFMETHOD" "DEFGENERIC")
   (:import-from "OCLO"  "*NULL*" "NULLP")
   (:import-from "OBJCL" "YES" "NO")
   (:export
@@ -44,6 +49,7 @@
    ;; Extensions:
    
    "INITIALIZE"
+   "COPY-OBJECT-FROM"
 
    "*TEXT-MODES*"
 
@@ -74,7 +80,12 @@
    "VIEW-FONT-CODES" "SET-VIEW-FONT-CODES"
 
    ;; Extension: conditions.
-   "UNKNOWN-TRANSFER-MODE" "UNKNOWN-TRANSFER-VALUE"
+   
+   "INVALID-VALUE-DESIGNATOR-ERROR" "INVALID-VALUE-ERROR"
+   "INVALID-PEN-MODE-ERROR" "INVALID-PEN-MODE"
+   "INVALID-PEN-MODE-VALUE-ERROR" "INVALID-PEN-MODE-VALUE"
+   "INVALID-TRANSFER-MODE-ERROR" "INVALID-TRANSFER-MODE"
+   "INVALID-TRANSFER-VALUE-ERROR" "INVALID-TRANSFER-MODE-VALUE"
    "INVALID-FONT-SPEC-ERROR" "INVALID-FONT-SPEC"
    "INVALID-FONT-SPEC-REASON" "INVALID-FONT-SPEC-OPTION"
 
@@ -407,14 +418,59 @@
    "AE-GET-ATTRIBUTE-LONGINTEGER" "INSTALL-QUEUED-REPLY-HANDLER"
    "NO-QUEUED-REPLY-HANDLER" "QUEUED-REPLY-HANDLER"
 
+   ;; ----------------------------------------
+   ;; Annex D: QuickDraw
+   ;; ----------------------------------------
 
+   
+   "PATTERN" "PATTERN-DATA" "MAKE-PATTERN"
+   
+   "PEN-SHOW" "PEN-HIDE" "PEN-SHOWN-P" "PEN-SIZE" "SET-PEN-SIZE"
+   "PEN-PATTERN" "SET-PEN-PATTERN" "PEN-MODE" "SET-PEN-MODE" "PEN-STATE"
+   "SET-PEN-STATE" "PEN-NORMAL"
+   
+   "PEN-STATE" "WITH-PEN-STATE"
+
+   "STREAM-TYO"
+
+   "MOVE-TO" "MOVE" "LINE-TO" "LINE"
+   "DRAW-CHAR"
+   "DRAW-STRING"
+   "DRAW-POINT"
+   "DRAW-LINE"
+   "DRAW-RECT"
+   "FILL-RECT"
+   "ERASE-RECT"
+   "DRAW-ELLIPSE"
+   "FILL-ELLIPSE"
+
+
+   "*TEMP-RGN*" "WITH-TEMP-RGNS" "WITH-HILITE-MODE" "WITH-CLIP-REGION"
+   "REGION" "REGIONP" "NEW-REGION" "NEW-RGN" "DISPOSE-REGION"
+   "COPY-REGION" "SET-EMPTY-REGION" "SET-RECT-REGION" "OPEN-REGION"
+   "CLOSE-REGION" "OFFSET-REGION" "INSET-REGION" "INTERSECT-REGION"
+   "UNION-REGION" "DIFFERENCE-REGION" "XOR-REGION" "POINT-IN-REGION-P"
+   "RECT-IN-REGION-P" "EQUAL-REGION-P" "EMPTY-REGION-P"
+
+
+   
+
+   
+   ;; Extension:
+   "WINDOW-PEN"
+
+   
+
+   ;; ----------------------------------------
    ;; miscellaneous:
+   ;; ----------------------------------------
+
    "ED-BEEP"
 
    "FIXNUMP"
    
    "DEF-LOAD-POINTERS" ; this one won't be implemented, change the sources!
-   "WPTR" ; this one won't be implemented, change the sources!
+   "WPTR"         ; this one won't be implemented, change the sources!
    "NIY"
    "UIWARN"
    )
@@ -437,7 +493,8 @@ Chapter 4: Views and Windows
 Chapter 5: Dialog Items and Dialogs
 Chapter 6: Color
 Chapter 10: Events
-hapter 11: Apple Events
+Chapter 11: Apple Events
+Annex D: QuickDraw
 
 LEGAL:
 

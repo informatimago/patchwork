@@ -39,7 +39,9 @@
     :version "1.0.3"
     :license "GPL3"
     :depends-on ("closer-mop" ; window.lisp uses closer-mop:class-precedence-list, etc.
-                 "cffi"
+                 "cffi" 
+                 "trivial-gray-streams"
+                 "alexandria"
                  "com.informatimago.objcl"
                  ;; While developping:
                  "com.informatimago.common-lisp.cesarum") 
@@ -63,10 +65,10 @@
 
                  (:file "objc-classes"
                         :depends-on ("package"
-                                     "macros" "wrapper" "point" "variables"))
+                                      "macros" "wrapper" "variables" "point"))
                  (:file "graphics"
                         :depends-on ("package"
-                                     "macros" "point"))
+                                     "macros" "variables" "point"))
                  
                  ;; Chapter 2:
 
@@ -104,8 +106,13 @@
                  (:file "view"
                         :depends-on ("package" 
                                      "macros" "variables" "color"
-                                     "point" "region" "font" 
+                                     "point" "region" "font" "pen"
                                      "wrapper" "view-classes" "objc-classes"))
+
+                 (:file "view-stream"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point" "font" "pen"
+                                     "view-classes" "view" "graphics"))
 
                  (:file "window"
                         :depends-on ("package" 
@@ -248,6 +255,16 @@
                                      "static-text-dialog-item" "editable-text-dialog-item"
                                      "dialog"))
 
+                 (:file "get-string-dialog"
+                        :depends-on ("package" 
+                                     "macros" "variables" "point"
+                                     "system"
+                                     "view-classes" "view" "window" "event"
+                                     "dialog-item" "key-handler-mixin"
+                                     "button-dialog-item" 
+                                     "static-text-dialog-item" "editable-text-dialog-item"
+                                     "dialog"))
+
                  (:file "scroller"
                         :depends-on ("package" 
                                      "macros" "variables" "point"
@@ -314,16 +331,26 @@
                  
                  ;; Appendix D: Quickdraw Graphics:
 
+                 (:file "rect"
+                        :depends-on ("package" "point"))
+
                  (:file "region"
-                        :depends-on ("package" 
-                                     "macros" "point"))
+                        :depends-on ("package" "macros" "variables" "point"))
+
+                 (:file "pen"
+                        :depends-on ("package"
+                                     "macros" "variables" "point" 
+                                     "objc-classes" "view-classes"
+                                     "pattern"
+                                     "rect"))
+
 
                  ;; MCLGUI:
 
                  (:file "mclgui"
                         :depends-on ("package"
                                      "macros" "variables"
-                                     "point" "font"
+                                     "point" "font" "pen" "pattern" "cursor" "view-stream"
                                      "menu" "view" "window" "dialog" "fred-window"
                                      "dialog-item" "control-dialog-item"
                                      "button-dialog-item" "check-box-dialog-item"
@@ -331,7 +358,8 @@
                                      "focus-rect-mixin" "editable-text-dialog-item"
                                      "table-dialog-item" "scroll-bar-dialog-item"
                                      "pop-up-menu-dialog-item" "sequence-dialog-item"
-                                     "y-or-n-dialog" "message-dialog" "select-dialog"
+                                     "y-or-n-dialog" "message-dialog" "get-string-dialog"
+                                     "select-dialog"
                                      "scroller"
                                      "event" "view-event" "window-event"
                                      "cursor" "scrap" "eval" "application"))))

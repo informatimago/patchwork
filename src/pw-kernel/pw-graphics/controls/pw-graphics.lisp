@@ -47,101 +47,13 @@
 ;;  (#_PenMode :word (position :patxor *pen-modes*))
 ;;  (#_PenPat :ptr *gray-pattern*))
 
-
-
-(defun draw-char (x y cn)
-  (draw-string x y (string cn)))
-
-(defun draw-string (x y str)
-  (format *trace-output* "~&draw-string                  ~A ~A ~S~%" x y str)
-  [(objcl:objcl-string str)
-   drawAtPoint: (ns:make-ns-point x y)
-   withAttributes: (destructuring-bind (ff ms) ui::*current-font-codes*
-                     (multiple-value-bind (descriptor mode) (ui::font-descriptor-from-codes ff ms)
-                       (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
-                       ;; (print descriptor)
-                       [descriptor fontAttributes]))]
-  str)
-
-
-(defun draw-line (x1 y1 x2 y2)
-  (format *trace-output* "~&draw-line                    ~A ~A ~A ~A~%" x1 y1 x2 y2)
-  (let ((path [NSBezierPath bezierPath]))
-    [path moveToPoint:(ns:make-ns-point x1 y1)]
-    [path lineToPoint:(ns:make-ns-point x2 y2)]
-    [path stroke]))
-
-(defun erase-rect (x y w h)
-  (format *trace-output* "~&erase-rect                   ~A ~A ~A ~A~%" x y w h)
-  (#_NSEraseRect (ns:make-ns-rect x y w h)))
-
-(defun draw-rect (x y w h)
-  (format *trace-output* "~&draw-rect                    ~A ~A ~A ~A~%" x y w h)
-  (#_NSFrameRect (ns:make-ns-rect x y w h)))
-
-(defun fill-rect* (x y w h)
-  (format *trace-output* "~&fill-rect*                   ~A ~A ~A ~A~%" x y w h)
-  (#_NSRectFill (ns:make-ns-rect x y w h)))
-
-(defun draw-point (x y)
-  (format *trace-output* "~&draw-point                   ~A ~A~%" x y)
-  (#_NSRectFill (ns:make-ns-rect x y 1 1)))
-
-
-(defun draw-ellipse (x y w h)
-  (format *trace-output* "~&draw-ellipse                 ~A ~A ~A ~A~%" x y w h)
-  [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] stroke])
-
-(defun fill-ellipse (x y w h)
-  (format *trace-output* "~&fill-ellipse                 ~A ~A ~A ~A~%" x y w h)
-  [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] fill])
-
-
 ;; let-window-pen,let-window-font
 ;; with-font-codes  
 
-(defun port-set-pen-state (&key location size mode pattern)
-  (niy port-set-pen-state  location size mode pattern)
-  ;; (rlet ((ps :PenState))
-  ;;   (#_GetPenState ps)
-  ;;   (when location
-  ;;     (rset ps PenState.pnLoc location))
-  ;;   (when size
-  ;;     (rset ps PenState.pnSize size))
-  ;;   (when mode
-  ;;     (rset ps PenState.pnMode (position mode *pen-modes*)))
-  ;;   (when pattern
-  ;;     (rset ps PenState.pnPat pattern))
-  ;;   (#_SetPenState ps))
-  )
 
-(defmacro with-pen-state ((&rest states) &body body)
-  (niy with-pen-state states body)
-  `(progn ,@body)
-  ;; (let ((ps (gensym)))
-  ;;   `(rlet ((,ps :PenState))
-  ;;      (require-trap #_GetPenState ,ps)
-  ;;      (unwind-protect
-  ;;        (progn
-  ;;          (port-set-pen-state ,@states)
-  ;;          ,@body)
-  ;;        (require-trap #_SetPenState ,ps))))
-  )
 
-(defun make-pattern (&rest bytes)
-  (niy make-pattern bytes)
-  ;; (let ((res (#_NewPtr 8))
-  ;;       (i 0))
-  ;;   (dolist (b bytes)
-  ;;     (%put-byte res b i)
-  ;;     (if (>= (incf i) 8) (return)))
-  ;;   (loop 
-  ;;     (unless (< i 8) (return))
-  ;;     (%put-byte res 0 i)
-  ;;     (incf i))
-  ;;   res)
-  )
-
+(defun fill-rect*  (x y w h) (fill-rect x y w h))
+(declaim (inline fill-rect*))
 
 
 (defvar *r-view-temp-region* nil)
