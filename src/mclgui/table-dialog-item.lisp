@@ -1202,11 +1202,11 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
    *default-cell-contents-string-combined-method*
    (find-1st-arg-combined-method (function cell-contents-string)
-                                 (closer-mop:class-prototype (find-class 'table-dialog-item)))
+                                 (class-prototype (find-class 'table-dialog-item)))
    
    *default-draw-table-cell-combined-method*
    (find-1st-arg-combined-method (function draw-table-cell)
-                                 (closer-mop:class-prototype (find-class 'table-dialog-item)))))
+                                 (class-prototype (find-class 'table-dialog-item)))))
 
 
 
