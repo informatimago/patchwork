@@ -64,7 +64,7 @@
                       (back-color *tool-back-color*)
                       (theme-background t)
                       window-type
-                      (window-title "" window-title-supp))
+                      (window-title ""))
   "
 
 The Y-OR-N-DIALOG function displays a dialog box containing Yes, No,
