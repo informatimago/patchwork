@@ -43,8 +43,8 @@
 
 
 (defmethod view-default-size ((item basic-editable-text-dialog-item))
-  (let ((pt    (call-next-method))
-        (width (point-h pt)))
+  (let* ((pt    (call-next-method))
+         (width (point-h pt)))
     (make-point (- (ash width 1) (ash width -1)) (point-v pt))))
 
 
