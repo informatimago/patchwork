@@ -39,12 +39,13 @@
 
 
 (defmethod erase-focus-rect ((item focus-rect-mixin))
-  (let ((window (view-window item))
-        (pos    (view-position item)))
-    (niy w erase-focus-rect item)
-    ;; (rlet ((rect :rect :topleft pos :bottomright (add-points pos (view-size item))))
-    ;;       (draw-nil-theme-focus-rect window rect))
-    ))
+  (let* ((window (view-window   item))
+         (pos    (view-position item))
+         (siz    (view-size     item))
+         (rect   (make-rect :topLeft pos :bottomRight (add-points pos siz))))
+    (inset-rect rect -3 -3)
+    (with-back-color (or (slot-value window 'back-color) *white-color*)
+      (erase-rect (rect-left rect) (rect-top rect) (rect-right rect) (rect-bottom rect)))))
 
 
 (defmethod set-view-size ((item focus-rect-mixin) h &optional v)

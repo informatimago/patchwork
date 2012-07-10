@@ -81,9 +81,9 @@ RETURN:         A list of two lists containing the coordinates of the
   (setf  (rect-topleft     rect) (make-point value  (point-v (rect-topleft     rect)))))
 (defun (setf rect-top)    (value rect)
   (setf  (rect-topleft     rect) (make-point (point-h (rect-topleft     rect))  value)))
-(defun (setf rect-left)   (value rect)
+(defun (setf rect-right)   (value rect)
   (setf  (rect-bottomright rect) (make-point value  (point-v (rect-bottomright rect)))))
-(defun (setf rect-top)    (value rect)
+(defun (setf rect-bottom)    (value rect)
   (setf  (rect-bottomright rect) (make-point (point-h (rect-bottomright rect))  value)))
 
 

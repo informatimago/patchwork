@@ -52,7 +52,6 @@
 coordinate of the upper-left corner of the view.")
    (view-nick-name       :initform nil         :initarg  :view-nick-name       :reader view-nick-name
                          :documentation "The nickname of the view.")
-   (view-font            :initform nil         :initarg  :view-font            :reader view-font)
    (view-alist           :initform nil                                         :accessor view-alist)))
 
 
@@ -141,94 +140,95 @@ DO:             Remove the property KEY from the VIEW.
 (defvar *next-window-ptr* 0)
 
 (defclass window (view)
-  ((window-cursor                    :initform  *arrow-cursor*
-                                     :reader    window-cursor)
-   (window-pen                       :initform  (make-instance 'pen-state)
-                                     :reader    window-pen)
-   (window-grow-rect                 :initform  nil
-                                     :reader    window-grow-rect)
-   (window-drag-rect                 :initform  nil
-                                     :reader    window-drag-rect)
-   (color-list                       :initform  nil                          
-                                     :reader    window-color-list)
+  ((window-cursor                    :reader    window-cursor
+                                     :initform  *arrow-cursor*)
+   (view-pen                         :reader    view-pen
+                                     :initform  (make-instance 'pen-state))
+   (window-grow-rect                 :reader    window-grow-rect
+                                     :initform  nil)
+   (window-drag-rect                 :reader    window-drag-rect
+                                     :initform  nil)
+   (color-list                       :reader    window-color-list
+                                     :initform  nil)
    (back-color                       :initform  nil)
    (my-item                          :initform  nil)
-   (window-do-first-click            :initform  nil                          
-                                     :accessor  window-do-first-click
-                                     :initarg   :window-do-first-click)
-   (window-other-attributes          :initform  0                            
-                                     :accessor  window-other-attributes
-                                     :initarg   :window-other-attributes) 
-   (window-active-p                  :initform  nil                          
-                                     :accessor  window-active-p)
+   (window-do-first-click            :accessor  window-do-first-click
+                                     :initarg   :window-do-first-click
+                                     :initform  nil)
+   (window-other-attributes          :accessor  window-other-attributes
+                                     :initarg   :window-other-attributes
+                                     :initform  0) 
+   (window-active-p                  :accessor  window-active-p
+                                     :initform  nil)
    ;; The window-active-p generic function returns t if window is the active
    ;; window, nil otherwise.
    ;; Except when Macintosh Common Lisp is not the active application, it returns
    ;; t for all floating windows and for the frontmost non-floating visible window.
    
-   (window-erase-region              :initform  (new-rgn)
-                                     :accessor  window-erase-region)
+   (window-erase-region              :accessor  window-erase-region
+                                     :initform  (new-rgn))
    (window-invalid-region            :initform  nil                          
                                      :accessor  window-invalid-region)
-   (process                          :initform  nil                          
-                                     :initarg  :process                        
-                                     :accessor  window-process)
-   (queue                            :initform  nil ; (make-process-queue "Window")
-                                     :reader    window-process-queue)
+   (process                          :accessor  window-process
+                                     :initarg  :process
+                                     :initform  nil)
+   (queue                            :reader    window-process-queue
+                                     :initform  nil) ; (make-process-queue "Window")
    (auto-position                    :initarg   :auto-position               
                                      :initform  :noAutoCenter
-                                     :type      (member nil :noAutoCenter
-                                                       :alertPositionParentWindow
-                                                       :centerMainScreen
-                                                       :staggerParentWindow
-                                                       :alertPositionMainScreen
-                                                       :centerParentWindowScreen
-                                                       :staggerMainScreen
-                                                       :alertPositionParentWindowScreen
-                                                       :centerParentWindow
-                                                       :staggerParentWindowScreen))
-   (window-title                     :initform   "Untitled"
+                                     :type      (member nil
+                                                        :noAutoCenter
+                                                        :alertPositionParentWindow
+                                                        :centerMainScreen
+                                                        :staggerParentWindow
+                                                        :alertPositionMainScreen
+                                                        :centerParentWindowScreen
+                                                        :staggerMainScreen
+                                                        :alertPositionParentWindowScreen
+                                                        :centerParentWindow
+                                                        :staggerParentWindowScreen))
+   (window-title                     :reader     window-title
                                      :initarg    :window-title
-                                     :reader     window-title)
-   (visiblep                         :initform   t
-                                     :initarg    :window-show
+                                     :initform   "Untitled")
+   (visiblep                         :reader     window-visiblep
                                      :initarg    :visiblep
-                                     :reader     window-visiblep
-                                     :reader     window-shown-p)
-   (colorp                           :initform   nil
-                                     :initarg    :color-p
+                                     :reader     window-shown-p
+                                     :initarg    :window-show
+                                     :initform   t)
+   (colorp                           :reader     window-colorp
                                      :initarg    :colorp
-                                     :reader     window-colorp)
-   (close-box-p                      :initform   t
+                                     :initarg    :color-p
+                                     :initform   nil)
+   (close-box-p                      :reader     window-close-box-p
                                      :initarg   :close-box-p
-                                     :reader     window-close-box-p)
-   (grow-icon-p                      :initform   nil
+                                     :initform   t)
+   (grow-icon-p                      :reader     window-grow-icon-p
                                      :initarg   :grow-icon-p
-                                     :reader     window-grow-icon-p)
-   (window-layer                     :initform   0
-                                     :initarg   :window-layer
-                                     :type       integer)
-   (theme-background                 :initform   nil                          
-                                     :initarg    :theme-background 
-                                     :accessor   window-theme-background 
-                                     :accessor   theme-background)
-   (window-prior-theme-drawing-state :initform   nil                          
-                                     :accessor   window-prior-theme-drawing-state)
-   (window-type                      :initform   :document-with-zoom
+                                     :initform   nil)
+   (window-layer                     :initarg   :window-layer
+                                     :type       integer
+                                     :initform   0)
+   (theme-background                 :accessor   window-theme-background 
+                                     :accessor   theme-background
+                                     :initarg    :theme-background
+                                     :initform   nil)
+   (window-prior-theme-drawing-state :accessor   window-prior-theme-drawing-state
+                                     :initform   nil)
+   (window-type                      :accessor   window-type
+                                     :initform   :document-with-zoom
                                      :type       (member :document
                                                          :document-with-grow
                                                          :document-with-zoom
                                                          :double-edge-box
                                                          :single-edge-box
                                                          :shadow-edge-box
-                                                         :tool)
-                                     :accessor   window-type)
+                                                         :tool))
    (erase-anonymous-invalidations    :initform   t
                                      :initarg   :erase-anonymous-invalidations)
    ;; WINDOW-PTR is a simulated handle (a mere integer identifying the window).
    ;; It's reset to NIL when the real window handle is released.
-   (window-ptr                       :initform (incf *next-window-ptr*)
-                                     :reader window-ptr)))
+   (window-ptr                       :reader window-ptr
+                                     :initform (incf *next-window-ptr*))))
 
 
 (defgeneric view-allocate-clip-region (window))

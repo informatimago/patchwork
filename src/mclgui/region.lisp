@@ -35,6 +35,13 @@
 (in-package "MCLGUI")
 
 
+(defgeneric window-open-region (window)
+  (:documentation "RETURN: NIL or the open region of the window"))
+(defgeneric (setf window-open-region) (new-region window)
+  (:documentation "DO: Sets the open-region of the window.
+NEW-REGION: a region or NIL."))
+
+
 (defvar *temp-rgn* nil)
 
 
@@ -84,7 +91,8 @@
 ;;;Regions
 
 (defstruct (region
-             (:predicate regionp))
+             (:predicate regionp)
+             (:copier nil))
   (bounds (make-rect 0 0 0 0) :type rect)
   (rects  '()                 :type list))
 
@@ -98,7 +106,10 @@
 
 (defun dispose-region (region)
   "The dispose-region function reclaims storage space used by region and returns NIL."
+  (declare (ignore region))
   nil)
+
+(declaim (inline new-region new-rgn dispose-region))
 
 
 (defun copy-region (region &optional (dest-region (new-region)))
@@ -302,7 +313,7 @@ H:              Horizontal position.
 V:              Vertical position.  If V is NIL (the default), H is
                 assumed to represent a point.
 "
-  (niy point-in-region-p region1 region2 dest-region))
+  (niy point-in-region-p region h v))
 
 
 (defun rect-in-region-p (region left &optional top right bot)

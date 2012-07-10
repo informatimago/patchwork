@@ -713,10 +713,11 @@ FF:             Font/Face code.
 
 MS:             Mode/Size code.
 "
+  (declare (ignore color))
+  ;; TODO: if color, then insert it into ff
   (check-type start fixnum "a start index in the string")
   (check-type end   fixnum "an end position in the string")
   (let ((string  (nsubseq string start end)))
-    ;; TODO: if color, then insert it into ff
     (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
       (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
       [(objcl:objcl-string string) drawAtPoint:*current-point* withAttributes:[descriptor fontAttributes]])))
@@ -731,7 +732,7 @@ MS:             Mode/Size code.
            (,vend   ,end)
            (,vff    ,ff)
            (,vms    ,ms))
-       (font-code-draw-string ,string ,vff ,vms ,fstart ,vend ,color))))
+       (font-code-draw-string ,string ,vff ,vms ,vstart ,vend ,color))))
 
 
 (defun string-width (string &optional font-spec)

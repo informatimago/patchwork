@@ -529,8 +529,8 @@
 
 (defun make-PW-standard-box (class-name pw-function 
                              &optional (position (make-point 15 15)) value-list size)
-  (let ((input-boxes-types  (print (make-defunp-function-arg-list pw-function 
-                                                            (if value-list (length value-list) 0))))
+  (let ((input-boxes-types (make-defunp-function-arg-list pw-function 
+                                                          (if value-list (length value-list) 0)))
         (y-now 5)
         (index 0)
         (input-boxes '())
@@ -550,14 +550,14 @@
     (if (not (zerop index)) (incf y-now (+ 2 (h (car (last input-boxes))))))
     (setq module
           (make-instance class-name :view-position position 
-                 :view-size  (make-point 
-                              (+ 5 
-                                 (if input-boxes
-                                   (apply #'max (ask-all input-boxes 'x+w)) 42))
-                              (+ 13 y-now))
-                 :pw-function pw-function
-                 :type-list (get-out-type-list pw-function)
-                 :VIEW-SUBVIEWS input-boxes))
+                         :view-size  (make-point 
+                                      (+ 5 
+                                         (if input-boxes
+                                           (apply #'max (ask-all input-boxes 'x+w)) 42))
+                                      (+ 13 y-now))
+                         :pw-function pw-function
+                         :type-list (get-out-type-list pw-function)
+                         :VIEW-SUBVIEWS input-boxes))
     (if size (resize-patch-box module size 0))
     module))
 
@@ -583,7 +583,8 @@
               (setf (value box) val)
               (set-dialog-item-text box 
                    (if (or (numberp val) (listp val))
-                     (format () "~D" val)  val               ;(string-downcase val)
+                     (format () "~D" val)
+                     val  ; (string-downcase val)
                      ))
               (set-special-text box val)))
         boxes values))

@@ -372,7 +372,7 @@
 (defmethod view-draw-contents :before ((self scroller-pane))
   (when (draw-scroller-outline self)
     (let ((siz (view-size self)))
-      (frame-rect 0 0 (point-h siz) (point-v size)))))
+      (draw-rect 0 0 (point-h siz) (point-v siz)))))
 
 
 (defmethod set-view-size ((self scroller-pane) h &optional v)

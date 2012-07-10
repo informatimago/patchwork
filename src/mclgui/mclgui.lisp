@@ -46,31 +46,31 @@
 (defun initialize/screen ()
   (niy initialize/screen))
 
-
+(defvar *initialized* nil)
 
 (defun initialize ()
   "Initialize the MCL GUI."
-  (initialize/region)
-  (initialize/color)
-  (initialize/pattern)
-  (initialize/pen)
-  (initialize/cursor)
-  (initialize/scrap)
-  (initialize/font)
-  (initialize/screen)
-  (initialize/menu)
-  (initialize/view)
-  (initialize/window)
-  (initialize/table-dialog-item)
-  (initialize/file)
-  (initialize/event)
-  (initialize/eval)
-  (initialize/application)
+  (unless *initialized*
+    (initialize/region)
+    (initialize/color)
+    (initialize/pattern)
+    (initialize/pen)
+    (initialize/cursor)
+    (initialize/scrap)
+    (initialize/font)
+    (initialize/screen)
+    (initialize/menu)
+    (initialize/view)
+    (initialize/window)
+    (initialize/table-dialog-item)
+    (initialize/file)
+    (initialize/event)
+    (initialize/eval)
+    (initialize/application)
+    (setf *initialized* t))
   (values))
 
 
-;; (eval-when (:load-toplevel :execute)
-;;   ;; It should be better done at application launch…
-;;   (initialize))
+(initialize) ; It should be better done at application launch…
 
 ;;;; THE END ;;;;

@@ -154,6 +154,7 @@ POSITION:       The position of the Color Picker on screen. The
                 default is calculated by Macintosh Common Lisp.
 
 "
+  (declare (ignore prompt position))
   (let ((panel [NSColorPanel sharedColorPanel]))
     [panel setShowsAlpha:YES]
     [panel setMode:#$NSWheelModeColorPanel]
@@ -208,15 +209,7 @@ REDISPLAY-P:    If the value of this is true (the default), this
   (:documentation ""))
 
 
-(defun call-with-fore-color (color function)
-  (if (or (null color) (not *color-available*))
-      (funcall function)
-      (let ((*background-color* [NSColor colorWithCalibratedRed: (color-red color)
-                                         green: (color-green color)
-                                         blue: (color-blue color)
-                                         alpha: (color-alpha color)]))
 
-        (funcall function))))
 
 (defun call-with-fore-color (color function)
   (if (or (null color) (not *color-available*))
@@ -236,11 +229,21 @@ REDISPLAY-P:    If the value of this is true (the default), this
       [NSGraphicsContext restoreGraphicsState])))
 
 
+(defun call-with-back-color (color function)
+  (if (or (null color) (not *color-available*))
+      (funcall function)
+      (let ((*background-color* [NSColor colorWithCalibratedRed: (color-red color)
+                                         green: (color-green color)
+                                         blue: (color-blue color)
+                                         alpha: (color-alpha color)]))
+
+        (funcall function))))
+
+
 (defmacro with-fore-color (color &body body)
   (let  ((vcolor (gensym "color")))
     `(let ((,vcolor ,color))
        (call-with-fore-color ,vcolor (lambda () ,@body)))))
-
 
 
 (defmacro with-back-color (color &body body)

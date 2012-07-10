@@ -91,7 +91,7 @@ NEW-BUTTON:     The button that should be made the default button, or
         (without-interrupts
             (when default-button
               (invalidate-view-border default-button t)
-              (niy set-default-button window new-button)
+              (niy set-default-button dialog new-button)
               #-(and)
               (#_setwindowdefaultbutton (wptr dialog) (%null-ptr)))
           (setf (%get-default-button dialog) new-button)
@@ -99,7 +99,7 @@ NEW-BUTTON:     The button that should be made the default button, or
             (when (dialog-item-handle new-button)
               (if (dont-throb new-button) ;(and (osx-p) (neq (view-container new-button)(view-window new-button)))
                   nil  ;; so we act like a default button but dont look like one
-                  (niy set-default-button window new-button)
+                  (niy set-default-button dialog new-button)
                   #-(and)
                   (#_setwindowdefaultbutton (wptr dialog) (dialog-item-handle new-button))))
             (invalidate-view-border new-button)))))

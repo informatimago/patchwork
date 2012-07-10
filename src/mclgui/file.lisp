@@ -64,6 +64,7 @@ BUTTON-STRING:  A string. Specifies the text that appears in the
 
 PROMPT:         A string, displayed as title of the choose file dialog.
 "
+  (declare (ignore button-string))
   (let ((panel [NSOpenPanel openPanel]))
     [panel setCanChooseFiles:t]
     [panel setCanChooseDirectories:nil]
@@ -119,6 +120,7 @@ BUTTON-STRING:  A string. Specifies the text that appears in the
 
 PROMPT:         A string, displayed as title of the choose new file dialog.
 "
+  (declare (ignore button-string))
   (let ((panel [NSSavePanel savePanel]))
     ;; [panel setTitle:(objcl:objcl-string title)]
     ;; [panel setMessage:(objcl:objcl-string message)]

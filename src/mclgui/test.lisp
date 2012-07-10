@@ -132,19 +132,24 @@
                    :view-subviews (list view))))
     win))
 
-
-
-(defun test/draw-string ()
- (set-view-font  (first (windows)) '("Times" 12))
- (with-font-focused-view (first (windows))
-   (pw::draw-string 10 20 "Hello World")))
-
-
-(view-subviews) (front-window)
+;; (test/1) 
+;; (view-subviews (front-window))
+;; [[[(handle(front-window)) contentView] subviews] count]
+;;(dump-nswindow-subviews (handle (first (windows))))
 
 
 
-;; write a test with subviews to check the bounds.
+(defun test/draw-string (&optional (string "Hello World!"))
+  (com.informatimago.common-lisp.cesarum.utility:tracing
+   (set-view-font (front-window) '("Monaco" 9 :srcCopy))
+   (with-font-focused-view (aref (view-subviews (front-window)) 0)
+     (draw-string 10 20 string))))
+
+;; (test/draw-string)
+
+
+;;; write a test with subviews to check the bounds.
+
 (defclass lv (view)
   ((pos :initform (make-point 0 0)
         :accessor little-pos)
@@ -154,29 +159,49 @@
 
 (defmethod update-ball ((self lv))
   (let* ((pos (view-position self))
-        (siz (view-size self))
-        (br  (add-points pos siz)))
-   (setf (little-pos self) (add-points (little-pos self) (little-vel self)))
-   (when (and (< (point-h (little-pos self)) (nsrect-x r))
-              (minusp (point-h (little-vel self))))
-     (setf  (little-vel self) (make-point (- (point-h (little-vel self)))
+         (siz (view-size self))
+         (br  (add-points pos siz)))
+    (setf (little-pos self) (add-points (little-pos self) (little-vel self)))
+    (when (and (< (point-h (little-pos self)) (point-h pos))
+               (minusp (point-h (little-vel self))))
+      (setf (little-vel self) (make-point (- (point-h (little-vel self)))
+                                           (point-v (little-vel self)))))
+    (when (and (< (+ (point-h pos) (point-h siz)) (point-h (little-pos self)))
+               (plusp (point-h (little-vel self))))
+      (setf (little-vel self) (make-point (- (point-h (little-vel self)))
                                           (point-v (little-vel self)))))
-   (when (and (< (+ (nsrect-x r) (nsrect-width r)) (point-h (little-pos self)))
-              (plusp (point-h (little-vel self))))
-     (setf (little-vel self) (make-point (- (point-h (little-vel self)))
-                                         (point-v (little-vel self)))))
-   (when (and (< (point-v (little-pos self)) (nsrect-y r))
-              (minusp (point-v (little-vel self))))
-     (setf (little-vel self) (make-point (point-h (little-vel self))
-                                         (- (point-v (little-vel self))))))
-   (when (and (< (+ (nsrect-y r) (nsrect-height r)) (point-v (little-pos self)))
-              (plusp (point-v (little-vel self))))
-     (setf (little-vel self) (make-point (point-h (little-vel self))
-                                         (- (point-v (little-vel self))))))))
+    (when (and (< (point-v (little-pos self)) (point-v pos))
+               (minusp (point-v (little-vel self))))
+      (setf (little-vel self) (make-point (point-h (little-vel self))
+                                          (- (point-v (little-vel self))))))
+    (when (and (< (+ (point-v pos) (point-v siz)) (point-v (little-pos self)))
+               (plusp (point-v (little-vel self))))
+      (setf (little-vel self) (make-point (point-h (little-vel self))
+                                          (- (point-v (little-vel self))))))))
 
-(let ((lv (make-instance 'lv)))
-  (loop repeat 100 do
-   (print lv)
-   (update-ball lv (make-nsrect :x 10 :y 10 :width 80 :height 80))))
+
+
+(defmethod view-draw-contents ((view lv))
+  (with-focused-view view
+    (let ((pos (view-position view))
+          (siz (view-size     view))
+          (bal (little-pos    view)))
+      (erase-rect (point-h pos) (point-v pos) (point-h siz) (point-v siz))
+      (draw-rect  (point-h pos) (point-v pos) (point-h siz) (point-v siz))
+      (fill-ellipse (- (point-h bal) 4) (- (point-v bal) 4) 8 8))))
+
+
+
+(add-subviews (front-window) (make-instance 'lv
+                               :view-position (make-point 20 20)
+                               :view-size     (make-point 100 100)))
+
+(loop repeat 100 do
+     (let ((view (aref (view-subviews (front-window)) 1)))
+       (update-ball view)
+       (view-draw-contents view)))
+
+
+;; (dump-nswindow-subviews (handle (first (windows))))
 
 

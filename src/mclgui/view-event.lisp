@@ -82,12 +82,9 @@
   (let ((w (view-window view)))
     (and w (%get-key-handler-list w))))
 
-(defmacro %get-default-button (window)
-  `(view-get ,window '%default-button))
 
 (defmacro %get-cancel-button (window)
   `(view-get ,window '%cancel-button))
-
 
 
 (defmethod add-key-handler ((item simple-view) &optional (dialog (view-window item)))

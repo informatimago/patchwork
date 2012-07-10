@@ -112,6 +112,11 @@ keystroke of the current event and runs the Fred command associated
 with the keystroke.  The method for FRED-DIALOG-ITEM calls
 call-next-method inside WITH-FOCUSED-VIEW and WITH-FORE-COLOR.
 
+The generic function VIEW-KEY-EVENT-HANDLER is called with
+*APPLICATION* as the first argument when there are no active windows
+and the user presses a key on the keyboard.  The method for
+application sounds a beeps.
+
 VIEW:           A simple view.
 
 KEY:            The current keystroke character.
@@ -532,6 +537,25 @@ RETURN:         If called during event processing, return true if the
                 return NIL.
 "
   (not (zerop (logand [NSEvent modifierFlags] #$NSAlphaShiftKeyMask))))
+
+
+(defun any-modifier-keys-p ()
+    "
+RETURN:         If called during event processing, return true if
+                any modifier key was pressed during the event;
+                otherwise, return NIL.
+
+                If called outside of event processing, return true if
+                any modifier key is currently pressed; otherwise,
+                return NIL.
+"
+  (not (zerop (logand [NSEvent modifierFlags]
+                      (logior #$NSCommandKeyMask
+                              #$NSControlKeyMask
+                              #$NSAlternateKeyMask
+                              #$NSShiftKeyMask
+                              #$NSAlphaShiftKeyMask)))))
+
 
 
 (defun test/event/1 ()

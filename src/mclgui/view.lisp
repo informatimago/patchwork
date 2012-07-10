@@ -80,28 +80,35 @@
 
 
 (defmethod initialize-instance :after ((view simple-view) &key &allow-other-keys)
-  (when (and (slot-value view 'view-font) (not (typep view 'window)))
-    (set-initial-view-font view (slot-value view 'view-font)))
-  (setf (slot-value view 'view-size)     (or (slot-value view 'view-size)     (view-default-size     view))
-        (slot-value view 'view-position) (or (slot-value view 'view-position) (view-default-position view)))
-  (unless (typep view 'window)
-    (setf (handle view) [[MclguiView alloc]
-                         initWithFrame:(ns:make-ns-rect (point-h (slot-value view 'view-position))
-                                                        (point-v (slot-value view 'view-position))
-                                                        (point-h (slot-value view 'view-size))
-                                                        (point-v (slot-value view 'view-size)))]
-          (slot-value (handle view) 'view) view))
-  (set-view-container view (slot-value view 'view-container))
-  (values))
+    ;; We need to do that after the subclasses such as windows have initialized.
+  (com.informatimago.common-lisp.cesarum.utility:tracing
+   (format-trace "initialize-instance" view)
+   (when (and (slot-value view 'view-font) (not (typep view 'window)))
+     (set-initial-view-font view (slot-value view 'view-font)))
+   (setf (slot-value view 'view-size)     (or (slot-value view 'view-size)     (view-default-size     view))
+         (slot-value view 'view-position) (or (slot-value view 'view-position) (view-default-position view)))
+   (unless (typep view 'window)
+     (setf (handle view) [[MclguiView alloc]
+                          initWithFrame:(ns:make-ns-rect (point-h (slot-value view 'view-position))
+                                                         (point-v (slot-value view 'view-position))
+                                                         (point-h (slot-value view 'view-size))
+                                                         (point-v (slot-value view 'view-size)))]
+           (slot-value (handle view) 'view) view))
+   (set-view-container view (slot-value view 'view-container))
+   view))
 
 
 
 (defmethod initialize-instance :after ((view view) &key &allow-other-keys)
-  (let ((subviews (slot-value view 'view-subviews)))
-    ;; (format-trace "initialize-instance" view subviews)
+  ;; We need to do that after the subclasses such as windows have initialized.
+  (let ((subviews  (slot-value view 'view-subviews)))
+    (format-trace "initialize-instance" view subviews)
     (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
     (apply (function add-subviews) view (coerce subviews 'list)))
-  (values))
+  view)
+
+
+
 
 
 (defgeneric wptr (simple-view)
@@ -163,37 +170,41 @@ RETURN:    the view-font-codes of the font-view or of the application-font.
     (let* ((handle   (handle view))
            (handle   (when handle
                        (if (typep view 'window)
-                           [handle contentView]
-                           handle)))
+                         [handle contentView]
+                         handle)))
            (unlock   nil))
       (when handle
         #-(and) (or (null font-view) (eq font-view old-font-view))
-        (if  (eq view *current-view*)
-             (if (eq font-view *current-font-view*)
-                 (funcall function view)
-                 (unwind-protect
-                      (let* ((*current-font-view*  font-view)
-                             (*current-font-codes* (set-font *current-font-view*))) ; change font
-                        (funcall function view))
-                   (set-font *current-font-view*))) ; revert font
-             (unwind-protect
-                 (let ((*current-view* view)
-                       (*current-font-view* (or font-view *current-font-view*))
-                       (*current-font-codes* (copy-list *current-font-codes*)))
-                   (if (setf unlock [handle lockFocusIfCanDraw])
-                     (progn
-                       (format-trace "did lockFocusIfCanDraw" view)
-                       (focus-view *current-view* *current-font-view*)
-                       (apply (function set-current-font-codes) (set-font *current-font-view*))
-                       (call-with-pen-state (lambda () (funcall function view))
-                                            (window-pen (view-window *current-view*)))
-                       [[NSGraphicsContext currentContext] flushGraphics])
-                     (format-trace "could not lockFocusIfCanDraw" view)))
-               (when unlock
-                 (set-font *current-font-view*)
-                 [handle unlockFocus]
-                 (format-trace "did unlockFocusIfCanDraw" view))
-               (focus-view *current-view* *current-font-view*)))))))
+        (if  (or (eq view *current-view*) *view-draw-contents-from-drawRect*)
+          (if (eq font-view *current-font-view*)
+            (let ((*current-view* view))
+              (call-with-pen-state (lambda () (funcall function view))
+                                   (view-pen view)))
+            (unwind-protect
+                (let* ((*current-view* view)
+                       (*current-font-view*  font-view)
+                       (*current-font-codes* (set-font *current-font-view*))) ; change font
+                  (call-with-pen-state (lambda () (funcall function view))
+                                       (view-pen view)))
+              (set-font *current-font-view*))) ; revert font
+          (unwind-protect
+              (let ((*current-view* view)
+                    (*current-font-view* (or font-view *current-font-view*))
+                    (*current-font-codes* (copy-list *current-font-codes*)))
+                (if (setf unlock [handle lockFocusIfCanDraw])
+                  (progn
+                    (format-trace "did lockFocusIfCanDraw" view)
+                    (focus-view *current-view* *current-font-view*)
+                    (apply (function set-current-font-codes) (set-font *current-font-view*))
+                    (call-with-pen-state (lambda () (funcall function view))
+                                         (view-pen view))
+                    [[NSGraphicsContext currentContext] flushGraphics])
+                  (format-trace "could not lockFocusIfCanDraw" view)))
+            (when unlock
+              (set-font *current-font-view*)
+              [handle unlockFocus]
+              (format-trace "did unlockFocusIfCanDraw" view))
+            (focus-view *current-view* *current-font-view*)))))))
 
 
 
@@ -985,9 +996,9 @@ RETURN:         (make-point h v)
         (unless (eql delta #@(0 0))
           (if scroll-visibly
               (let* (;; (rgn         *temp-rgn*)
-                     (window      (view-window view))
-                     (erase-rgn   (window-erase-region window))
-                     (invalid-rgn (window-invalid-region window))
+                     ;; (window      (view-window view))
+                     ;; (erase-rgn   (window-erase-region window))
+                     ;; (invalid-rgn (window-invalid-region window))
                      ;; (view-rgn    (and (or erase-rgn invalid-rgn) (view-clip-region view)))
                      ;; (size        (view-size view))
                      )

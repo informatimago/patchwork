@@ -36,19 +36,6 @@
 (objcl:enable-objcl-reader-macros)
 
 
-(defgeneric update-handle (wrapper)
-  (:documentation "
-
-Compute and set a new instance of a NSObject subclass to be the handle
-of the WRAPPER.
-
-After modifying the wrapper state, this method should be called to
-compute the new handle.  other OpenStep methods may have to be called
-to install the new handle.
-
-"))
-
-
 (defun bitmap-get-byte (bitmap x y)
   (loop
     :with width = (array-dimension bitmap 1)

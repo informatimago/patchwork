@@ -676,6 +676,8 @@ RETURN:         Position and size of the main screen.
   body:YES]
 
 
+(defvar *view-draw-contents-from-drawRect* nil)
+
 @[MclguiView
   method:(drawRect:(:<nsr>ect)rect)
   resultType:(:void)
@@ -683,7 +685,8 @@ RETURN:         Position and size of the main screen.
   (declare (ignore rect))
   (format-trace "-[MclguiView drawRect:]" self (nsview-view self))
   (when (nsview-view self)
-    (view-draw-contents (nsview-view self)))]
+    (let ((*view-draw-contents-from-drawRect* t))
+      (view-draw-contents (nsview-view self))))]
 
 
 @[MclguiView
@@ -722,12 +725,15 @@ RETURN:         Position and size of the main screen.
 @[NSObject subClass:MclguiEvaluator
            slots:((thunk :initform nil
                          :initarg :think
-                         :reader evaluator-thunk))]
+                         :accessor evaluator-thunk))]
 
 @[MclguiView
   method:(evaluate)
   resultType:(:void)
-  body:(funcall (evaluator-thunk self))]
+  body:
+  (format-trace "evaluate")
+  (format-trace "evaluate"  (evaluator-thunk self))
+  (funcall (evaluator-thunk self))]
 
 
 ;;;; THE END ;;;;

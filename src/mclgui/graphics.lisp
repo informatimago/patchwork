@@ -56,10 +56,10 @@
 (defun draw-point (x y)
   (format-trace "draw-point" x y *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
-    (let ((window  (view-window *current-view*))))
-    (when window
-      (let ((siz     (pen-size (window-pen window))))
-        (#_NSRectFill (ns:make-ns-rect x y (point-h siz) (point-v siz)))))))
+    (let ((window  (view-window *current-view*)))
+      (when window
+        (let ((siz     (pen-size (view-pen window))))
+          (#_NSRectFill (ns:make-ns-rect x y (point-h siz) (point-v siz))))))))
 
 
 (defun draw-line (x1 y1 x2 y2)
@@ -67,7 +67,7 @@
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
-        (let* ((pen  (window-pen window))
+        (let* ((pen  (view-pen window))
                (size (pen-size pen))
                (path [NSBezierPath bezierPath]))
           [path setLineCapStyle:#$NSSquareLineCapStyle]
@@ -107,7 +107,7 @@
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
-        (let* ((pen  (window-pen window)))
+        (let* ((pen  (view-pen window)))
           (#_NSRectFillUsingOperation (ns:make-ns-rect x y w h)
                                       (mode-to-compositing-operation (pen-mode pen)))))))
   #-(and) (#_NSRectFill (ns:make-ns-rect x y w h)))

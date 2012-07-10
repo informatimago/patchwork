@@ -113,8 +113,8 @@ APPLICATION:    The application.  MCL standard event handling always
     (niy find-edit-menu)))
 
 
-(defgeneric view-key-event-handler (application key)
-  (:documentation "
+(defmethod view-key-event-handler ((application application) key)
+  "
 The generic function VIEW-KEY-EVENT-HANDLER is called with
 *APPLICATION* as the first argument when there are no active windows
 and the user presses a key on the keyboard.  The method for
@@ -124,10 +124,9 @@ APPLICATION:    The application.  MCL standard event handling always
                 uses the value of *APPLICATION*.
 
 KEY:            The current keystroke character.
-")
-  (:method ((application application) key)
-    (declare (ignore key))
-    (ed-beep)))
+"
+  (declare (ignore key))
+  (ed-beep))
 
 
 (defgeneric application-name (application)
@@ -146,13 +145,13 @@ APPLICATION:    The application.  MCL standard event handling always
   (:documentation "
 RETURN:         a four-character string or symbol for Finder file
                 creator type.  The default value is :|????| (the value
-                of the constant DEFAULT-APPLICATION-CREATOR).
+                of the constant DEFAULT-APPL-CREATOR).
 
 APPLICATION:    The application.  MCL standard event handling always
                 uses the value of *APPLICATION*.
 ")
   (:method ((application application))
-    default-application-creator))
+    default-appl-creator))
 
 
 (defgeneric application-about-view (application)
@@ -235,6 +234,7 @@ FORM:           A symbol, function or lisp form.
       (on-main-thread [evaluator evaluate])
       [evaluator autorelease]))
   (:method ((application lisp-development-system) form)
+    (declare (ignorable form))
     ;; TODO: see how to integrate with ccl::lisp-development-system
     (call-next-method)))
 

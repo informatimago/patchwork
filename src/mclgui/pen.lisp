@@ -36,10 +36,14 @@
 (objcl:enable-objcl-reader-macros)
 
 
-(defgeneric window-pen (window)
+(defgeneric view-pen (view)
   (:documentation "
-RETURN:         The pen-state of the WINDOW.
-"))
+RETURN:         The pen-state of the WINDOW of the VIEW.
+")
+  (:method ((view simple-view))
+    ;; there's a method specialized on window.
+    (view-pen (view-window view))))
+
 
 (defgeneric pen-show (view)
   (:documentation "
@@ -49,7 +53,7 @@ the pen is shown.
 VIEW:           A window or a view contained in a window.
 ")
   (:method ((view simple-view))
-    (pen-show (window-pen (view-window view)))))
+    (pen-show (view-pen view))))
 
 
 (defgeneric pen-hide (view)
@@ -60,7 +64,7 @@ the pen is shown.
 VIEW:           A window or a view contained in a window.
 ")
   (:method ((view simple-view))
-    (pen-hide (window-pen (view-window view)))))
+    (pen-hide (view-pen view))))
 
 
 (defgeneric pen-shown-p (view)
@@ -71,7 +75,7 @@ if the pen is hidden.
 VIEW:           A window or a view contained in a window.
 ")
   (:method ((view simple-view))
-    (pen-shown-p (window-pen (view-window view)))))
+    (pen-shown-p (view-pen view))))
 
 
 (defgeneric pen-size (view)
@@ -82,7 +86,7 @@ The PEN-SIZE generic function returns the current pen size as a point
 VIEW:           A window or a view contained in a window.
 ")
   (:method ((view simple-view))
-    (pen-size (window-pen (view-window view)))))
+    (pen-size (view-pen view))))
 
 
 (defgeneric set-pen-size (view h &optional v)
@@ -98,7 +102,7 @@ H:              The width of the new pen size (or a point representing
 V:              The height of the new pen size.
 ")
   (:method ((view simple-view) h &optional v)
-    (setf (pen-size (window-pen (view-window view))) (make-point h v))))
+    (setf (pen-size (view-pen view)) (make-point h v))))
 
 
 (defgeneric pen-pattern (view &optional save-pattern)
@@ -113,7 +117,7 @@ SAVE-PATTERN    A pattern record; the pattern is returned in this record. If
 ")
   (:method ((view simple-view) &optional save-pattern)
     (copy-object-from (or save-pattern (make-instance 'pattern))
-                      (pen-state-pattern (window-pen (view-window view))))))
+                      (pen-state-pattern (view-pen view)))))
 
 
 (defgeneric set-pen-pattern (view new-pattern)
@@ -129,7 +133,7 @@ NEW-PATTERN:    A PATTERN object.
                 bytes or four words.
 ")
   (:method ((view simple-view) new-pattern)
-    (copy-object-from (setf (pen-state-pattern (window-pen (view-window view)))
+    (copy-object-from (setf (pen-state-pattern (view-pen view))
                             (make-instance 'pattern))
                       new-pattern)))
 
@@ -142,7 +146,7 @@ window’s current pen mode.
 VIEW:           A window or a view contained in a window.
 ")
   (:method ((view simple-view))
-    (pen-mode-to-name (pen-mode (window-pen (view-window view))))))
+    (pen-mode-to-name (pen-mode (view-pen view)))))
 
 
 (defgeneric set-pen-mode (view new-mode)
@@ -157,7 +161,7 @@ NEW-MODE:       The new pen mode. This value should be one of the
                 :notPatBic.
 ")
   (:method ((view simple-view) new-mode)
-    (setf (pen-mode (window-pen (view-window view))) (pen-mode-arg new-mode t))))
+    (setf (pen-mode (view-pen view)) (pen-mode-arg new-mode t))))
 
 
 (defgeneric pen-state (view &optional save-pen-state)
@@ -173,7 +177,7 @@ SAVE-PEN-STATE: A PEN-STATE instance; the returned state is stored in
 ")
   (:method ((view simple-view) &optional save-pen-state)
     (copy-object-from (or save-pen-state (make-instance 'pen-state))
-                      (window-pen (view-window view)))))
+                      (view-pen view))))
 
 (defgeneric set-pen-state (view new-state)
   (:documentation "
@@ -184,7 +188,7 @@ VIEW:           A window or a view contained in a window.
 NEW-STATE:      A PEN-STATE object.
 ")
   (:method ((view simple-view) new-state)
-    (copy-object-from (window-pen (view-window view)) new-state)))
+    (copy-object-from (view-pen view) new-state)))
 
 
 (defgeneric pen-normal (view)
@@ -198,7 +202,7 @@ VIEW:           A window or a view contained in a window.
 NEW-STATE:      A PEN-STATE object.
 ")
   (:method ((view simple-view))
-    (pen-normal (window-pen (view-window view)))))
+    (pen-normal (view-pen view))))
 
 
 (defgeneric move-to (view h &optional v)
@@ -215,7 +219,7 @@ V:              Vertical position.  If V is NIL (the default), H is
                 assumed to represent a point.
 ")
   (:method ((view simple-view) h &optional v)
-    (setf (pen-position (window-pen (view-window view))) (make-point h v))))
+    (setf (pen-position (view-pen view)) (make-point h v))))
 
 
 (defgeneric move (view h &optional v)
@@ -231,7 +235,7 @@ V:              Vertical position.  If V is NIL (the default), H is
                 assumed to represent a point.
 ")
   (:method ((view simple-view) h &optional v)
-    (let ((pen (window-pen (view-window view))))
+    (let ((pen (view-pen view)))
       (setf (pen-position pen) (add-points (pen-position pen) (make-point h v))))))
 
 
@@ -248,7 +252,7 @@ V:              Vertical position.  If V is NIL (the default), H is
                 assumed to represent a point.
 ")
   (:method ((view simple-view) h &optional v)
-    (let* ((pen (window-pen (view-window view)))
+    (let* ((pen (view-pen view))
            (src (pen-position pen))
            (dst (make-point h v)))
       (niy line-to view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
@@ -271,7 +275,7 @@ V:              Vertical position.  If V is NIL (the default), H is
                 assumed to represent a point.
 ")
   (:method ((view simple-view) h &optional v)  
-    (let* ((pen (window-pen (view-window view)))
+    (let* ((pen (view-pen view))
            (src (pen-position pen))
            (dst (add-points src (make-point h v))))
       (niy line view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
@@ -302,11 +306,12 @@ not normally called directly but instead by stream output functions.
 ;;;
 
 (defclass pen-state ()
-  ((visiblep :initarg :visible  :initform t :type boolean  :reader pen-shown-p)
-   (position :initarg :position :initform (make-point 0 0) :type point   :accessor pen-position)
-   (size     :initarg :size     :initform (make-point 1 1) :type point   :accessor pen-size)
-   (mode     :initarg :mode     :initform 8                :type fixnum  :accessor pen-mode)
-   (pattern  :initarg :pattern  :initform *black-pattern*  :type pattern :accessor pen-state-pattern))
+  ((visiblep   :initarg :visible  :initform t :type boolean  :reader pen-shown-p)
+   (position   :initarg :position :initform (make-point 0 0) :type point   :accessor pen-position)
+   (size       :initarg :size     :initform (make-point 1 1) :type point   :accessor pen-size)
+   (mode       :initarg :mode     :initform 8                :type fixnum  :accessor pen-mode)
+   (pattern    :initarg :pattern  :initform *black-pattern*  :type pattern :accessor pen-state-pattern)
+   (background ))
   (:documentation "A Quickdraw Pen."))
 
 
@@ -330,9 +335,9 @@ not normally called directly but instead by stream output functions.
 
 
 (defmethod pen-normal ((pen pen-state))
-  (setf (pen-size     dst)           (make-point 1 1)
-        (pen-mode     dst)           8
-        (pen-state-pattern dst)      *black-pattern*)
+  (setf (pen-size          pen) (make-point 1 1)
+        (pen-mode          pen) 8
+        (pen-state-pattern pen) *black-pattern*)
   pen)
 
 
@@ -391,13 +396,13 @@ not normally called directly but instead by stream output functions.
 (defun call-with-pen-state (thunk pen)
   (when *current-view*
     (let* ((window       (view-window *current-view*))
-           (original-pen (window-pen window)))
+           (original-pen (view-pen window)))
       (with-handle (winh window)
         (let ((context [winh graphicsContext]))
           (unwind-protect
               (progn
                 [context saveGraphicsState]
-                (setf (slot-value window 'window-pen) pen)
+                (setf (slot-value window 'view-pen) pen)
                 (with-handle (color (pen-state-pattern pen))
                   [color setFill]
                   [color setStroke]
@@ -405,8 +410,8 @@ not normally called directly but instead by stream output functions.
                 [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))]
                 (funcall thunk))
             [context restoreGraphicsState]
-            (unless (eq original-pen (window-pen window))
-              (setf (slot-value window 'window-pen) pen))))))))
+            (unless (eq original-pen (view-pen window))
+              (setf (slot-value window 'view-pen) pen))))))))
 
 
 (defmacro with-pen-state ((&key location size mode pattern) &body body)
@@ -414,19 +419,18 @@ not normally called directly but instead by stream output functions.
 WITH-PEN-STATE can be called only in the dynamic context of a
 WITH-FOCUSED-VIEW.
 
-It sets temporarily the window-pen of the focused view.
+It sets temporarily the view-pen of the focused view.
 "
-  (let ((vpen (gensym))
-        (vwindow (gensym)))
-   `(when *current-view*
-      (let ((,vwindow (view-window *current-view*)))
-        (when ,vwindow
-          (call-with-pen-state (lambda () ,@body)
-                               (pen-shadow (window-pen ,vwindow)
-                                           :position ,location
-                                           :size ,size
-                                           :mode ,mode
-                                           :pattern ,pattern)))))))
+  (let ((vwindow (gensym)))
+    `(when *current-view*
+       (let ((,vwindow (view-window *current-view*)))
+         (when ,vwindow
+           (call-with-pen-state (lambda () ,@body)
+                                (pen-shadow (view-pen ,vwindow)
+                                            :position ,location
+                                            :size ,size
+                                            :mode ,mode
+                                            :pattern ,pattern)))))))
 
 
 (defun initialize/pen ()

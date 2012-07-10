@@ -257,6 +257,7 @@ RETURN: A form sending
               (eq 'objc:send (first form)))
          (destructuring-bind (send recipient message &optional argument) form
            (declare (ignore send))
+           (format-trace "performSelectorOnMainThread" recipient message argument wait)
            `[,recipient performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
                         withObject: ,(objarg argument)
                         waitUntilDone: ,wait]))
@@ -265,6 +266,7 @@ RETURN: A form sending
               (eq 'objc:objc-message-send-super (first form)))
          (destructuring-bind (send message &optional argument) form
            (declare (ignore send))
+           (format-trace "performSelectorOnMainThread" 'super message argument wait)
            `[super performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
                    withObject: ,(objarg argument)
                    waitUntilDone: ,wait]))

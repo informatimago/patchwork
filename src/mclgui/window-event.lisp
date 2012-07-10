@@ -87,6 +87,7 @@
                   (press-button x)
                   (return-from view-key-event-handler key)))))))      
     (unless (or (any-modifier-keys-p)
+                #-(and)
                 (and key-hdlr 
                      (eq (fred-shadowing-comtab key-hdlr) ;; nil if not fred-mixin
                          *control-q-comtab*)))
@@ -95,8 +96,7 @@
          (unless (and key-hdlr (allow-tabs-p key-hdlr))
            (change-key-handler window)
            (setq key-hdlr nil)))
-        ((#\return
-          #.(ignore-errors (read-from-string "#\\enter")))
+        ((#\return :enter #.(ignore-errors (read-from-string "#\\enter")))
          (let ((d-button (default-button window)))
            (cond
              ((and (eql key #\return)
@@ -162,6 +162,7 @@ Called by -[MclguiWindow zoom:] which is called from WINDOW-ZOOM-EVENT-HANDLER."
 ;;; --- window growing ----
 
 (defmethod window-grow-event-handler ((window window) where)
+  (declare (ignore where))
   (let ((*window-growing* t))
     (with-handle (handle  window)
       (multiple-value-bind (x y w h) (frame [handle frame])

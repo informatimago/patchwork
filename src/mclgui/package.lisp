@@ -457,7 +457,7 @@
 
    
    ;; Extension:
-   "WINDOW-PEN"
+   "VIEW-PEN"
 
    
 

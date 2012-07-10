@@ -1036,18 +1036,17 @@ NEW-VALUE:      The new width of item.
            :direction direction
            initargs)))
 
+
 (defparameter *gray-color*      #x808080) ;; from color.lisp - boot prob
 (defparameter *dark-gray-color* #x404040) ;; ditto
 
 (defmethod view-draw-contents ((item pane-splitter))
-  (let ((active-p (window-active-p (view-window item))))
-    (let* ((tl (view-position item))
-           (br (add-points tl (view-size item))))
-      (niy view-draw-contents item)
-      #-(and)
-      (rlet ((r :rect :topleft tl :botright br))
-            (with-fore-color (if active-p *dark-gray-color* *gray-color*)
-              (#_paintrect r))))))
+  (let* ((active-p (window-active-p (view-window item)))
+         (tl       (view-position item))
+         (br       (add-points tl (view-size item)))
+         (rect     (make-rect :topLeft tl :bottomRight br)))
+    (with-fore-color (if active-p *dark-gray-color* *gray-color*)
+      (fill-rect (rect-left rect) (rect-top rect) (rect-right rect) (rect-bottom rect)))))
 
 
 (defmethod pane-splitter-limiting-container ((scrollee simple-view))

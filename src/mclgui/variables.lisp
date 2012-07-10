@@ -446,7 +446,7 @@ entries for them to this list.
 
 ;; Application:
 
-(defconstant default-app-creator :|????|)
+(defconstant default-appl-creator :|????|)
 
 
 (defvar *application* nil)

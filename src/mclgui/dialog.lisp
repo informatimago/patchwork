@@ -365,6 +365,11 @@ VALUES:         Any values.  The following two values have special
 
 
 
+(defun return-cancel (i)
+  (declare (ignore i))
+  (return-from-modal-dialog :cancel))
+
+
 
 
 
@@ -440,88 +445,6 @@ STRING:         A string against which to compare the text of the
   (declare (ignore dialog))
   )
 
-
-; Overwrites method in l1-windows
-(defmethod view-key-event-handler ((window window) char &aux 
-                                   (key-hdlr (current-key-handler window))
-                                   ;(d-button (default-button window))
-                                   )  
-  (when (and (eql char #\esc) (not (any-modifier-keys-p))) ; (not key-hdlr))
-    (let ((cancel-button (cancel-button window)))
-      (if cancel-button
-        (when (dialog-item-enabled-p cancel-button)
-          (press-button cancel-button)
-          (return-from view-key-event-handler char))
-        (when (not key-hdlr) ;; ??  -        
-          (let ((x (look-for-a-button-named-cancel window)))
-            (when (and x (dialog-item-enabled-p x))
-              (press-button x)
-              (return-from view-key-event-handler char)))))))      
-  (unless (or (any-modifier-keys-p)
-              (and key-hdlr 
-                   (eq (fred-shadowing-comtab key-hdlr) ;; nil if not fred-mixin
-                       *control-q-comtab*)))
-    (case char
-      (#\tab
-       (unless (and key-hdlr (allow-tabs-p key-hdlr))
-         (change-key-handler window)
-         (setf key-hdlr nil)))
-      ((#\return :enter)
-       (let ((d-button (default-button window)))
-         (cond
-          ((and (eql char #\return)
-                key-hdlr
-                (or (allow-returns-p key-hdlr) (setf key-hdlr nil))))
-          ((and d-button (dialog-item-enabled-p d-button))
-           (press-button d-button)
-           (setf key-hdlr nil)))))))
-  (if key-hdlr
-    (view-key-event-handler key-hdlr char)
-    (if *top-listener*
-      (view-key-event-handler *top-listener* char))))
-
-
-
-(defmacro do-subviews ((subview-var view &optional subview-type)
-                       &body body)
-  (let* ((type-var-p        (not (or (symbolp subview-type) (constantp subview-type))))
-         (type-var          (when type-var-p (gensym)))
-         (subviews-var      (gensym))
-         (len-var           (gensym))
-         (i                 (gensym))
-         (subviews-copy-var (gensym)))
-    `(let* (,@(if type-var-p `((,type-var ,subview-type)))
-            (,subviews-var      (view-subviews ,view))
-              (,len-var           (length ,subviews-var))
-              (,subviews-copy-var (make-array ,len-var))
-              ,subview-var)
-       (dotimes (,i ,len-var)
-         (setf (aref ,subviews-copy-var ,i) (aref ,subviews-var ,i)))
-       (dotimes (,i ,len-var)
-         (setf ,subview-var (aref ,subviews-copy-var ,i))
-         (when ,(if subview-type
-                    `(typep ,subview-var ,(if type-var-p type-var subview-type))
-                    t)
-           ,@body)))))
-
-(defmethod map-subviews ((view view) function &optional subview-type)
-  (if subview-type
-    (do-subviews (subview view subview-type)
-      (funcall function subview))
-    (do-subviews (subview view)
-      (funcall function subview))))
-
-(defmethod subviews ((view simple-view) &optional subview-type)
-  (declare (ignore subview-type))
-  nil)
-
-(defmethod subviews ((view view) &optional subview-type)
-  (let ((res nil))
-    (let* ((add-em #'(lambda (subview)  (push subview res))))
-      (declare (dynamic-extent add-em))
-      (map-subviews view add-em subview-type))
-    (nreverse res)))
-
 (defmethod find-subview-of-type ((view view) subview-type)
   (let ((subs (view-subviews view)))
     (when subs 
@@ -533,7 +456,6 @@ STRING:         A string against which to compare the text of the
 (defmethod find-subview-of-type ((view simple-view) subview-type)
   nil)
         
-
 
 
 
@@ -613,23 +535,10 @@ STRING:         A string against which to compare the text of the
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 (defmethod view-convert-coordinates-and-click ((item dialog-item) where container)
   (when (dialog-item-enabled-p item)
     (with-focused-dialog-item (item container)
       (view-click-event-handler item where))))
-
-
 
 
 ;;;Button dialog items
