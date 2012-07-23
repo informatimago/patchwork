@@ -326,6 +326,7 @@
                         :depends-on ("patchwork-package"
                                      "pw-macosx/reader-macros"
                                      "pw-kernel/types/pw-types"
+                                     "pw-kernel/environment/epw-package"  
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/boxes/data/buffer-box"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-menu+library"
