@@ -376,10 +376,21 @@ RETURN:         DST.
                                (char-code (aref characters 0))))))
                    (otherwise 0))
       :when      (truncate [nsevent timestamp] (/ +tick-per-second+))
-      :where     (nspoint-to-point (get-nspoint [nsevent locationInWindow]))
+      :where     (let ((winh [nsevent window]))
+                   (if (nullp winh)
+                     ;; If the event has no window, let's leave it in
+                     ;; screen coordinates (not quite useful yet,
+                     ;; since screen coordinates are not flipped).
+                     (nspoint-to-point (get-nspoint [nsevent locationInWindow]))
+                     ;; If the event has a window, convert the
+                     ;; coordinates to contentView coordinate system.
+                     (let ((viewh [winh contentView]))
+                       (nspoint-to-point (get-nspoint [viewh convertPoint:[nsevent locationInWindow]
+                                                             fromView:*null*])))))
       :modifiers (nsmodifier-to-macmodifier [nsevent modifierFlags])))))
 
 ;;;------------------------------------------------------------
+
 
 (defmacro report-errors (&body body)
   `(handler-case
@@ -574,6 +585,7 @@ RETURN:         Position and size of the main screen.
   [super close]]
 
 
+
 @[MclguiWindow
   method:(close)
   resultType:(:void)
@@ -697,7 +709,10 @@ RETURN:         Position and size of the main screen.
   (when (nsview-view self)
     (let ((*current-event* (wrap-nsevent theEvent)))
       (view-click-event-handler (nsview-view self)
-                                (nspoint-to-point (get-nspoint [theEvent locationInWindow])))))]
+                                (nspoint-to-point
+                                 (get-nspoint
+                                  [self convertPoint:[theEvent locationInWindow]
+                                        fromView:*null*])))))]
 
 @[MclguiView
   method: (mouseUp:(:id)theEvent)
@@ -713,6 +728,15 @@ RETURN:         Position and size of the main screen.
   resultType: (:void)
   body:
   (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) theEvent)
+  (when (nsview-view self)
+    (let ((*current-event* (wrap-nsevent theEvent)))
+      (window-null-event-handler (view-window (nsview-view self)))))]
+
+@[MclguiView
+  method: (mouseDragged:(:id)theEvent)
+  resultType: (:void)
+  body:
+  (format-trace "-[MclguiView mouseDragged]" self (nsview-view self) theEvent)
   (when (nsview-view self)
     (let ((*current-event* (wrap-nsevent theEvent)))
       (window-null-event-handler (view-window (nsview-view self)))))]

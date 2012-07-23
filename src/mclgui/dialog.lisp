@@ -588,6 +588,20 @@ STRING:         A string against which to compare the text of the
             (#_isportcolor port)))
 
 
+(defun string-start-end (string &optional start end)
+  (let* ((string (string string))
+         (len    (length string))
+         (start  (or start 0))
+         (end    (or end len)))
+    (flet ((are (a i) (error "Array index ~S out of bounds for ~S." i a)))    
+      (unless (<= 0 end len)   (are string end))
+      (unless (<= 0 start len) (are string start))
+      (unless (<= start end)
+        (error "Start ~S exceeds end ~S for a string operation." start end))
+      (multiple-value-bind (str off) (array-displacement string)
+        (values (or str string) (+ off start) (+ off end))))))
+
+
 (defun draw-theme-text-box (text rect &optional (text-justification :center) truncwhere (active-p t))
   ;; could add a truncate option and use TruncateThemeText
   (let ((start 0) 
@@ -690,7 +704,7 @@ STRING:         A string against which to compare the text of the
     (setf ff (logior (logand ff (lognot #xff)) (color->ff-index color))))
   (when (not (simple-string-p string))
     (multiple-value-setq (string start end) (string-start-end string start end)))
-  (multiple-value-bind (line-ascent descent width leading)(font-codes-info ff ms)
+  (multiple-value-bind (line-ascent descent width leading) (font-codes-info ff ms)
     (declare (ignore width))
     (niy draw-string-in-rect string rect truncation justification compress-p start end ff ms color)
     #-(and)

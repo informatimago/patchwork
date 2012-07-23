@@ -590,7 +590,7 @@ MS:             Mode/Size code.
 "
   (multiple-value-bind (a d w l) (font-codes-info ff ms)
     (declare (ignore w))
-    (round (+ a d l))))
+    (values (round (+ a d l)))))
 
 
 (defun font-info (&optional font-spec)
@@ -617,7 +617,7 @@ significant.
 (defun font-line-height (&optional font-spec)
   (multiple-value-bind (a d w l) (font-info font-spec)
     (declare (ignore w))
-    (round (+ a d l))))
+    (values (round (+ a d l)))))
 
 
 
@@ -631,14 +631,63 @@ significant.
 
 
 
+;; NSFontDescriptor:
 
-(defvar NSFontSymbolicTrait            "") ; dict
-(defvar NSFontNameAttribute            "") ; NSString
-(defvar NSFontSizeAttribute            "") ; 12.0d0
+(defvar NSFontFamilyAttribute          ""
+  "An optional NSString object that specifies the font family.")
+(defvar NSFontNameAttribute            ""
+  "An optional NSString object that specifies the font name.")
+(defvar NSFontFaceAttribute            ""
+  "An optional NSString object that specifies the font face.")
+(defvar NSFontSizeAttribute            ""
+  "An optional NSString object, containing a float value, that specifies the font size.")
+(defvar NSFontVisibleNameAttribute     ""
+  "An optional NSString object that specifies the font’s visible name.")
+(defvar NSForegroundColorAttributeName "")
+;; (defvar NSFontColorAttribute           ""
+;;   "An optional NSData object that specifies the font color.
+;;  (Deprecated. Use NSForegroundColorAttributeName instead.)")
+(defvar NSFontMatrixAttribute          ""
+  "An NSAffineTransform instance that specifies the font’s transformation matrix.
+The default value is the identity matrix.")
+(defvar NSFontVariationAttribute       ""
+    "An NSDictionary instance that describes the font’s variation axis.
+The default value is supplied by the font. See “Font variation axis dictionary keys” for dictionary keys.")
+(defvar NSFontCharacterSetAttribute    ""
+  "An NSCharacterSet instance that represents the set of Unicode characters covered by the font.
+The default value is supplied by the font.")
+(defvar NSFontCascadeListAttribute     ""
+  "An NSArray instance—each member of the array is a sub-descriptor.
+The default value is the system default cascading list for user's locale.")
+(defvar NSFontTraitsAttribute          ""
+  "An NSDictionary instance instance fully describing font traits.
+The default value is supplied by the font. See “Font traits dictionary keys” for dictionary keys.")
+(defvar NSFontFixedAdvanceAttribute    ""
+  "An NSNumber instance containing a float value that overrides the glyph advancement specified by the font.
+The default value is 0.0.")
+(defvar NSFontFeatureSettingsAttribute ""
+  "An array of dictionaries representing non-default font feature settings.
+Each dictionary contains NSFontFeatureTypeIdentifierKey and NSFontFeatureSelectorIdentifierKey.")
+
+;; Font Traits Attributes:
+(defvar NSFontSymbolicTrait ""
+  "The symbolic traits value as an NSNumber object.")
+(defvar NSFontWeightTrait   ""
+  "The normalized weight value as an NSNumber object.
+The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to the regular or medium font weight.")
+(defvar NSFontWidthTrait    ""
+  "The relative inter-glyph spacing value as an NSNumber object.
+The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to the regular glyph spacing.")
+(defvar NSFontSlantTrait    ""
+  "The relative slant angle value as an NSNumber object.
+The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to 0 degree clockwise rotation from the vertical and 1.0 corresponds to 30 degrees clockwise rotation.")
+
+;; ?
 (defvar NSUnderlineStyleAttributeName  "") ; 0/1
 (defvar NSShadowAttributeName          "") ; nil or NSShadow
 (defvar NSStrokeWidthAttributeName     "") ; 0.0d0 or 3.0d0
-(defvar NSForegroundColorAttributeName "") ; NSColor
+
+
 
 (defstruct shadow
   (blur-radius 1.0f0)
@@ -656,23 +705,39 @@ significant.
 
 (defvar *default-shadow* nil)
 
+(defstruct descriptor-cache ff ms descriptor)
+(defvar *descriptor-cache* (make-descriptor-cache))
+;; (setf *descriptor-cache* (make-descriptor-cache))
+
 (defun font-descriptor-from-codes (ff ms)
-  (multiple-value-bind (name size mode face color) (font-values ff ms)
-    (multiple-value-bind (traits others) (style-to-font-traits face)
-      ;; (print (list name size mode traits others color))
-      (let* ((attributes (list
-                          NSFontNameAttribute            name
-                          NSFontSizeAttribute            (coerce size 'double-float)
-                          NSForegroundColorAttributeName (if (zerop color)
-                                                             (make-color 0 0 0)
-                                                             (error "Color for font not implemented yet."))
-                          NSFontSymbolicTrait            (font-traits-to-mask traits)
-                          NSUnderlineStyleAttributeName  (if (member :underline others) 1 0)
-                          NSShadowAttributeName          (if (member :shadow    others) *default-shadow* nil)
-                          NSStrokeWidthAttributeName     (if (member :outline   others) 3.0f0 0.0f0))))
-        (values [NSFontDescriptor fontDescriptorWithFontAttributes:(unwrap-plist attributes)]
-                mode
-                size)))))
+  (unless (and (eql ff (descriptor-cache-ff *descriptor-cache*))
+               (eql ms (descriptor-cache-ms *descriptor-cache*)))
+    (setf  (descriptor-cache-ff *descriptor-cache*) ff
+           (descriptor-cache-ms *descriptor-cache*) ms
+           (descriptor-cache-descriptor *descriptor-cache*)
+           (multiple-value-bind (name size mode face color) (font-values ff ms)
+             (multiple-value-bind (traits others) (style-to-font-traits face)
+               ;; (print (list name size mode traits others color))
+               (let* ((attributes
+                       (list
+                        NSFontNameAttribute            name
+                        NSFontSizeAttribute            (coerce size 'double-float)
+                        NSForegroundColorAttributeName (if (zerop color)
+                                                         (make-color 65535 0 0)
+                                                         (error "Color for font not implemented yet."))
+                        NSFontTraitsAttribute          (unwrap-plist
+                                                        (list NSFontSymbolicTrait  (font-traits-to-mask traits)))
+                        ;; NSUnderlineStyleAttributeName  (if (member :underline others) 1 0)
+                        ;; NSShadowAttributeName          (if (member :shadow    others) *default-shadow* nil)
+                        ;; NSStrokeWidthAttributeName     (if (member :outline   others) 3.0f0 0.0f0)
+                        )))
+                 (list (make-instance 'wrapper
+                         :handle [NSFontDescriptor
+                                  fontDescriptorWithFontAttributes:(unwrap-plist attributes)])
+                       mode
+                       size))))))
+  (values-list (list* (handle (first (descriptor-cache-descriptor *descriptor-cache*)))
+                      (rest (descriptor-cache-descriptor *descriptor-cache*)))))
 
 
 (defun font-from-codes (ff ms)
@@ -695,11 +760,10 @@ MS:             Mode/Size code.
   (check-type start fixnum "a start index in the string")
   (check-type end   fixnum "an end position in the string")
   (let ((string (nsubseq string start end)))
-    (round (nssize-width (get-nssize [(objcl:objcl-string string)
-                                      sizeWithAttributes:[(font-descriptor-from-codes ff ms) fontAttributes]])))))
+    (round (nssize-width
+            (get-nssize [(objcl:objcl-string string)
+                         sizeWithAttributes:[(font-descriptor-from-codes ff ms) fontAttributes]])))))
 
-
-(defvar *current-point* (make-point 0 0)) ; TODO: where's the current point in NSView?
 
 (defun font-code-draw-string (string ff ms &optional
                               (start 0)
@@ -713,14 +777,16 @@ FF:             Font/Face code.
 
 MS:             Mode/Size code.
 "
-  (declare (ignore color))
-  ;; TODO: if color, then insert it into ff
   (check-type start fixnum "a start index in the string")
   (check-type end   fixnum "an end position in the string")
-  (let ((string  (nsubseq string start end)))
-    (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
-      (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
-      [(objcl:objcl-string string) drawAtPoint:*current-point* withAttributes:[descriptor fontAttributes]])))
+  (let* ((string               (nsubseq string start end))
+         (width                (font-codes-string-width string ff ms))
+         (pos                  (pen-position (view-pen *current-view*)))
+         (*current-font-codes* (list ff ms)))
+    (with-fore-color color
+      (draw-string (point-h pos) (point-v pos) string))
+    (move *current-view* width 0)
+    (values string width)))
 
 
 (defmacro grafport-write-string (string start end &optional ff ms color)
@@ -828,13 +894,30 @@ DO:             Change the view font codes of view.  The font/face
 
 
 (defun initialize/font ()
-  (setf NSFontSymbolicTrait            (objcl:lisp-string #$NSFontSymbolicTrait)
-        NSFontNameAttribute            (objcl:lisp-string #$NSFontNameAttribute)
-        NSFontSizeAttribute            (objcl:lisp-string #$NSFontSizeAttribute)
-        NSUnderlineStyleAttributeName  (objcl:lisp-string #$NSUnderlineStyleAttributeName)
+  ;; Font Attributes
+  (setf NSFontFamilyAttribute            (objcl:lisp-string #$NSFontFamilyAttribute)
+        NSFontNameAttribute              (objcl:lisp-string #$NSFontNameAttribute)
+        NSFontFaceAttribute              (objcl:lisp-string #$NSFontFaceAttribute)
+        NSFontSizeAttribute              (objcl:lisp-string #$NSFontSizeAttribute)
+        NSFontVisibleNameAttribute       (objcl:lisp-string #$NSFontVisibleNameAttribute)
+        NSForegroundColorAttributeName   (objcl:lisp-string #$NSForegroundColorAttributeName)
+        NSFontMatrixAttribute            (objcl:lisp-string #$NSFontMatrixAttribute)
+        NSFontVariationAttribute         (objcl:lisp-string #$NSFontVariationAttribute)
+        NSFontCharacterSetAttribute      (objcl:lisp-string #$NSFontCharacterSetAttribute)
+        NSFontCascadeListAttribute       (objcl:lisp-string #$NSFontCascadeListAttribute)
+        NSFontTraitsAttribute            (objcl:lisp-string #$NSFontTraitsAttribute)
+        NSFontFixedAdvanceAttribute      (objcl:lisp-string #$NSFontFixedAdvanceAttribute)
+        NSFontFeatureSettingsAttribute   (objcl:lisp-string #$NSFontFeatureSettingsAttribute))
+  ;; Font Traits Attributes
+  (setf NSFontSymbolicTrait              (objcl:lisp-string #$NSFontSymbolicTrait)
+        NSFontWeightTrait                (objcl:lisp-string #$NSFontWeightTrait)
+        NSFontWidthTrait                 (objcl:lisp-string #$NSFontWidthTrait)
+        NSFontSlantTrait                 (objcl:lisp-string #$NSFontSlantTrait))
+  ;; NSAttributedString Attributes:
+  (setf NSUnderlineStyleAttributeName  (objcl:lisp-string #$NSUnderlineStyleAttributeName)
         NSShadowAttributeName          (objcl:lisp-string #$NSShadowAttributeName)
-        NSStrokeWidthAttributeName     (objcl:lisp-string #$NSStrokeWidthAttributeName)
-        NSForegroundColorAttributeName (objcl:lisp-string #$NSForegroundColorAttributeName))
+        NSStrokeWidthAttributeName     (objcl:lisp-string #$NSStrokeWidthAttributeName))
+  ;; -- 
   (setf *default-shadow* (make-shadow :blur-radius 2.0d0 :offset (make-nssize :width 2.0f0 :height 2.0f0)))
   (setf *font-traits*
         `((,#$NSItalicFontMask                  . :italic)
@@ -852,7 +935,8 @@ DO:             Change the view font codes of view.  The font/face
   (setf *font-list*     (sort (available-font-families) (function string<)))
   (setf *font-families* (mapcar (lambda (family) (cons family (available-members-of-font-family family)))
                                 *font-list*))
-  (setf *current-font-codes* (list 0 0)))
+  (setf *current-font-codes* (list 0 0))
+  (values))
 
 ;; (initialize/font)
 ;; (multiple-value-bind (ff ms) (font-codes  '("Times" 32)

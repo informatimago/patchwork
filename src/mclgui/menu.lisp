@@ -888,6 +888,8 @@ This is the menu-item-update-function for the items in the Edit menu.
   nil)
 
 
+(defgeneric window-menu-item (w)
+  (:documentation "RETURN: A window-menu menu-item for the window W."))
 
 
 (defun update-windows-menu (menu)

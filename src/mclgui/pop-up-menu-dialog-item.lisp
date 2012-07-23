@@ -830,7 +830,7 @@ default menu item.  Otherwise the value itself is displayed as if by
     (multiple-value-bind (ff ms)(view-font-codes menu)
       (with-focused-dialog-item (menu)  ; << focus she said
         ;; redraw with back-color black and fore-color white, or fore and back switched?
-        (niy view-click-event-handler)
+        (niy view-click-event-handler menu where)
         #-(and)
         (let ((orig-back (or (part-color menu :menu-body) *white-color*))
               (orig-fore  (or (part-color menu :menu-title) *black-color*)))

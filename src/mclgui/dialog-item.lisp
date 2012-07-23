@@ -289,10 +289,11 @@ CLIPRGN:        Region records from the view’s wptr.  They are ignored.
   (declare (ignore visrgn cliprgn))
   (without-interrupts
       (with-focused-view (view-container item)
+        (call-with-focused-dialog-item item (function view-draw-contents))
+        #-(and)
         (with-temp-rgns (visrgn cliprgn)
-          (niy view-focus-and-draw-contents item visrgn cliprgn)
-          ;; (get-window-visrgn  (wptr item) visrgn)
-          ;; (get-window-cliprgn (wptr item) cliprgn)      
+          (get-window-visrgn  (wptr item) visrgn)
+          (get-window-cliprgn (wptr item) cliprgn)      
           (when (view-is-invalid-p item visrgn cliprgn)
             (call-with-focused-dialog-item item (function view-draw-contents)))))))
 

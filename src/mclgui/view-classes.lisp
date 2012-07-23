@@ -42,14 +42,27 @@
    (view-container       :initform nil                                         :reader view-container
                          :documentation "The view that contains this view.")
    (view-position        :initform #@(0 0)     :initarg  :view-position        :reader view-position
-                         :documentation "The position of the view in its container.")
+                         :documentation "
+The position of the view in its container, in the coordinate system of
+the container.
+")
    (view-size            :initform #@(100 100) :initarg  :view-size            :reader view-size
                          :documentation "The size of the view.")
    (view-scroll-position :initform #@(0 0)
                          :initarg :view-scroll-position
                          :accessor view-scroll-position
-                         :documentation "The current scroll position of the view, which is the
-coordinate of the upper-left corner of the view.")
+                         :documentation "
+The current scroll position of the view, which is the coordinate of
+the origin of the view, in the coordinate system of the container.
+")
+   (view-origin          :initform #@(0 0)
+                         :accessor view-origin-slot
+                         :documentation "
+This is the vector to the origin of the view in the view coordinate
+system, relative to the top-left corner of the view.  (The coordinate
+of the top-left corner of the view, in the view coordinate system, is
+the opposite of view-origin.)
+")
    (view-nick-name       :initform nil         :initarg  :view-nick-name       :reader view-nick-name
                          :documentation "The nickname of the view.")
    (view-alist           :initform nil                                         :accessor view-alist)))
@@ -120,9 +133,7 @@ DO:             Remove the property KEY from the VIEW.
 ;;;---------------------------------------------------------------------
 
 (defclass view (simple-view)
-  ((view-origin          :initform #@(0 0)
-                         :accessor view-origin-slot)
-   (view-subviews        :initform nil
+  ((view-subviews        :initform nil
                          :initarg :view-subviews
                          :initarg :subviews
                          :reader   view-subviews

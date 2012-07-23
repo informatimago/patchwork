@@ -88,4 +88,23 @@
             (incf n)))))))
 
 
+
+;;;---------------------------------------------------------------------
+
+(defmethod window-menu-item ((w window))
+  (when (null (slot-value w 'my-item))
+    (setf (slot-value w 'my-item) (make-instance 'windows-menu-menu-item :window w)))
+  (let* ((enable (and (window-shown-p w)
+                      (or (not (eq w (front-window)))
+                          (not (window-active-p w)))))
+         (my-item (slot-value w 'my-item))
+         (name (window-title w)))
+    (when (> (length name) 60) ; chosen at random sort of - doesnt send it left on powerbook
+      (setf name (concatenate 'string (subseq name 0 60) "…")))
+    (set-menu-item-title my-item name)
+    (if enable
+      (menu-item-enable my-item)
+      (menu-item-disable my-item))
+    my-item))
+
 ;;;; THE END ;;;;

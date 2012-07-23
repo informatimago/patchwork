@@ -79,35 +79,39 @@
 
 
 
-(defmethod initialize-instance :after ((view simple-view) &key &allow-other-keys)
-    ;; We need to do that after the subclasses such as windows have initialized.
-  (com.informatimago.common-lisp.cesarum.utility:tracing
-   (format-trace "initialize-instance" view)
-   (when (and (slot-value view 'view-font) (not (typep view 'window)))
-     (set-initial-view-font view (slot-value view 'view-font)))
-   (setf (slot-value view 'view-size)     (or (slot-value view 'view-size)     (view-default-size     view))
-         (slot-value view 'view-position) (or (slot-value view 'view-position) (view-default-position view)))
-   (unless (typep view 'window)
-     (setf (handle view) [[MclguiView alloc]
-                          initWithFrame:(ns:make-ns-rect (point-h (slot-value view 'view-position))
-                                                         (point-v (slot-value view 'view-position))
-                                                         (point-h (slot-value view 'view-size))
-                                                         (point-v (slot-value view 'view-size)))]
-           (slot-value (handle view) 'view) view))
-   (set-view-container view (slot-value view 'view-container))
-   view))
-
-
-
-(defmethod initialize-instance :after ((view view) &key &allow-other-keys)
+(defmethod initialize-instance :after ((view simple-view) &key view-font &allow-other-keys)
   ;; We need to do that after the subclasses such as windows have initialized.
-  (let ((subviews  (slot-value view 'view-subviews)))
+  (when (and view-font (not (typep view 'window)))
+    (set-initial-view-font view view-font))
+  (setf (slot-value view 'view-size)     (or (slot-value view 'view-size)     (view-default-size     view))
+        (slot-value view 'view-position) (or (slot-value view 'view-position) (view-default-position view)))
+  (unless (typep view 'window)
+    (setf (handle view) [[MclguiView alloc]
+                         initWithFrame:(ns:make-ns-rect (point-h (slot-value view 'view-position))
+                                                        (point-v (slot-value view 'view-position))
+                                                        (point-h (slot-value view 'view-size))
+                                                        (point-v (slot-value view 'view-size)))]
+          (slot-value (handle view) 'view) view))
+  (set-view-container view (slot-value view 'view-container))
+  view)
+
+(defmethod initialize-instance ((view view) &key &allow-other-keys)
+  ;; We need to do that after the subclasses such as windows have initialized.
+  (call-next-method)
+  (setf (slot-value view 'view-subviews) #())
+  view)
+
+(defmethod initialize-instance :after  ((view view) &key view-subviews subviews &allow-other-keys)
+  ;; We need to do that after the subclasses such as windows have initialized.
+  (let ((subviews (or view-subviews subviews)))
     (format-trace "initialize-instance" view subviews)
     (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
     (apply (function add-subviews) view (coerce subviews 'list)))
   view)
 
 
+;; (remove-method (function initialize-instance)
+;;                (find-method (function initialize-instance) '(:after) '(view)))
 
 
 
@@ -126,28 +130,55 @@ All views contained in a given window have the same wptr.
 
 
 
-(defmethod view-allocate-clip-region ((view view))
-  (let ((rgn (view-clip-region view)))
-    (or rgn
-        (setf (view-clip-region-slot view) (new-rgn)))))
+;; if container
+;; (view-origin view) = (view-scroll-position view) - (view-position view) +  (view-origin container)
+;; else
+;; (view-origin view) = (view-scroll-position view)
 
-(defmethod view-clip-region ((view view))
-  (let ((rgn (view-clip-region-slot view)))
-    (unless (or (null rgn) (view-valid-p view))
-      (let ((container (view-container view)))
-        (compute-view-origin view container)
-        (make-view-valid view)
-        (compute-view-region view rgn container)))
+(defgeneric compute-view-origin (view container)
+  (:method ((view view) container)
+    (setf (view-origin-slot view)
+          (if container
+              (add-points (subtract-points (view-scroll-position view)
+                                           (view-position view))
+                          (view-origin container))
+              (view-scroll-position view)))))
+
+(defgeneric view-origin (view)
+  (:method ((view simple-view))
+    (if (view-valid-p view)
+        (view-origin-slot view)
+        (let ((container (view-container view)))
+          (prog1 (compute-view-origin view container)
+            (make-view-valid view)
+            (compute-view-region view (view-clip-region-slot view) container))))))
+
+
+(defgeneric view-allocate-clip-region (view)
+  (:method ((view view))
+    (let ((rgn (view-clip-region view)))
+      (or rgn
+          (setf (view-clip-region-slot view) (new-rgn))))))
+
+(defgeneric view-clip-region (view)
+  (:method ((view view))
+    (let ((rgn (view-clip-region-slot view)))
+      (unless (or (null rgn) (view-valid-p view))
+        (let ((container (view-container view)))
+          (compute-view-origin view container)
+          (make-view-valid view)
+          (compute-view-region view rgn container)))
+      rgn)))
+
+
+(defgeneric compute-view-region (view rgn container)
+  (:method ((view window) rgn container)
+    (declare (ignore container))
+    (when rgn
+      (let* ((topleft (view-origin view))
+             (botright (add-points topleft (view-size view))))
+        (set-rect-region rgn (point-h topleft) (point-v topleft) (point-h botright) (point-v botright))))
     rgn))
-
-#-(and)
-(defmethod compute-view-region ((view window) rgn container)
-  (declare (ignore container))
-  (when rgn
-    (let* ((topleft (view-origin view))
-           (botright (add-points topleft (view-size view))))
-      (#_SetRectRgn rgn (point-h topleft) (point-v topleft) (point-h botright) (point-v botright))))
-  rgn)
 
 
 (defun set-font (font-view)
@@ -156,55 +187,80 @@ FONT-VIEW: a view or NIL.
 DO:        Set the view-font as the current font in the graphic environment.
 RETURN:    the view-font-codes of the font-view or of the application-font.
 "
-  (multiple-value-bind (ff ms) (if font-view
-                                   (view-font-codes font-view)
-                                   (values 65536 0)) ; application-font
-    (multiple-value-bind (font mode) (font-from-codes ff ms)
-      (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
-      [font set])
-    (list ff ms)))
+  (multiple-value-bind (ff ms) (when font-view
+                                 (view-font-codes font-view))
+    (let ((ff (or ff 65536)) ; application-font
+          (ms (or ms 0)))
+        (format-trace "set-font" :ff ff :ms ms)
+        (finish-output *trace-output*)
+      (multiple-value-bind (font mode) (font-from-codes ff ms)
+        (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
+        (format-trace "set-font" font mode)
+        (finish-output *trace-output*)
+        [font set]
+        (format-trace "[font set]" 'done)
+        (finish-output *trace-output*))
+      (list ff ms))))
+
+;; [(font-from-codes 65536 0) set]
+
+
+(defmacro with-view-handle ((handle view-or-window) &body body)
+  "
+VIEW-OR-WINDOW: An instance of VIEW, that can be a WINDOW.
+
+HANDLE:         A variable.
+
+DO:             Evaluates the BODY in a lexical environment where
+                HANDLE is bound to the handle of the view or of the
+                contentView of the window.
+"
+  (let ((vov (gensym)))
+    `(let* ((,vov      ,view-or-window)
+            (,handle   (handle ,vov)))
+       (when ,handle
+         (let ((,handle (if (typep ,vov 'window)
+                            [,handle contentView]
+                            ,handle)))
+           ,@body)))))
 
 
 (defgeneric call-with-focused-view (view function &optional font-view)
   (:method ((view simple-view) function &optional font-view)
-    (let* ((handle   (handle view))
-           (handle   (when handle
-                       (if (typep view 'window)
-                         [handle contentView]
-                         handle)))
-           (unlock   nil))
-      (when handle
-        #-(and) (or (null font-view) (eq font-view old-font-view))
-        (if  (or (eq view *current-view*) *view-draw-contents-from-drawRect*)
-          (if (eq font-view *current-font-view*)
-            (let ((*current-view* view))
-              (call-with-pen-state (lambda () (funcall function view))
-                                   (view-pen view)))
-            (unwind-protect
-                (let* ((*current-view* view)
-                       (*current-font-view*  font-view)
-                       (*current-font-codes* (set-font *current-font-view*))) ; change font
-                  (call-with-pen-state (lambda () (funcall function view))
-                                       (view-pen view)))
-              (set-font *current-font-view*))) ; revert font
-          (unwind-protect
-              (let ((*current-view* view)
-                    (*current-font-view* (or font-view *current-font-view*))
-                    (*current-font-codes* (copy-list *current-font-codes*)))
-                (if (setf unlock [handle lockFocusIfCanDraw])
-                  (progn
-                    (format-trace "did lockFocusIfCanDraw" view)
-                    (focus-view *current-view* *current-font-view*)
-                    (apply (function set-current-font-codes) (set-font *current-font-view*))
-                    (call-with-pen-state (lambda () (funcall function view))
-                                         (view-pen view))
-                    [[NSGraphicsContext currentContext] flushGraphics])
-                  (format-trace "could not lockFocusIfCanDraw" view)))
-            (when unlock
-              (set-font *current-font-view*)
-              [handle unlockFocus]
-              (format-trace "did unlockFocusIfCanDraw" view))
-            (focus-view *current-view* *current-font-view*)))))))
+    (with-view-handle (handle view)
+      (let ((unlock   nil))
+        (when handle
+          #-(and) (or (null font-view) (eq font-view old-font-view))
+          (if  (or (eq view *current-view*) *view-draw-contents-from-drawRect*)
+               (if (eq font-view *current-font-view*)
+                   (let ((*current-view* view))
+                     (call-with-pen-state (lambda () (funcall function view))
+                                          (view-pen view)))
+                   (unwind-protect
+                        (let* ((*current-view* view)
+                               (*current-font-view*  font-view)
+                               (*current-font-codes* (set-font *current-font-view*))) ; change font
+                          (call-with-pen-state (lambda () (funcall function view))
+                                               (view-pen view)))
+                     (set-font *current-font-view*))) ; revert font
+               (unwind-protect
+                    (let ((*current-view* view)
+                          (*current-font-view* (or font-view *current-font-view*))
+                          (*current-font-codes* (copy-list *current-font-codes*)))
+                      (if (setf unlock [handle lockFocusIfCanDraw])
+                          (progn
+                            (format-trace "did lockFocusIfCanDraw" view)
+                            (focus-view *current-view* *current-font-view*)
+                            (apply (function set-current-font-codes) (set-font *current-font-view*))
+                            (call-with-pen-state (lambda () (funcall function view))
+                                                 (view-pen view))
+                            [[NSGraphicsContext currentContext] flushGraphics])
+                          (format-trace "could not lockFocusIfCanDraw" view)))
+                 (when unlock
+                   (set-font *current-font-view*)
+                   [handle unlockFocus]
+                   (format-trace "did unlockFocusIfCanDraw" view))
+                 (focus-view *current-view* *current-font-view*))))))))
 
 
 
@@ -869,16 +925,15 @@ RETURN:         (make-point h v)
   (:method ((view simple-view) h &optional v)
     (let ((pos (make-point h v)))
       (unless (eql pos (view-position view))
-        (com.informatimago.common-lisp.cesarum.utility:tracing
-         (invalidate-view view t)         
-         (setf (slot-value view 'view-position) pos)
-         (invalidate-view view t)
-         (with-handle (viewh view)
-           [viewh setFrameOrigin: (nspoint pos)]
-           #-(and)
-           (com.informatimago.common-lisp.cesarum.utility:tracing
-            view viewh pos
-            (on-main-thread [viewh setFrameOrigin: (nspoint pos)])))))
+        (invalidate-view view t)         
+        (setf (slot-value view 'view-position) pos)
+        (invalidate-view view t)
+        (with-handle (viewh view)
+          [viewh setFrameOrigin: (nspoint pos)]
+          #-(and)
+          (com.informatimago.common-lisp.cesarum.utility:tracing
+           view viewh pos
+           (on-main-thread [viewh setFrameOrigin: (nspoint pos)]))))
       (refocus-view view)
       pos)))
 
@@ -903,11 +958,11 @@ V:              The height of the new size, or NIL if the complete
         (invalidate-view view t)
         (with-handle (viewh view)
           [viewh setFrameSize: (nssize siz)]
-          [viewh setBounds: (nssize siz)]
+          [viewh setBounds: (nsrect (make-point 0 0) siz)]
           #-(and)
           (progn
             (on-main-thread [viewh setFrameSize: (nssize siz)])
-            (on-main-thread [viewh setBounds: (nssize siz)]))))
+            (on-main-thread [viewh setBounds: (nsrect (make-point 0 0) siz)]))))
       (refocus-view view)
       siz)))
 
@@ -994,47 +1049,15 @@ RETURN:         (make-point h v)
            (delta      (subtract-points old-sc-pos pt)))
       (with-focused-view view
         (unless (eql delta #@(0 0))
-          (if scroll-visibly
-              (let* (;; (rgn         *temp-rgn*)
-                     ;; (window      (view-window view))
-                     ;; (erase-rgn   (window-erase-region window))
-                     ;; (invalid-rgn (window-invalid-region window))
-                     ;; (view-rgn    (and (or erase-rgn invalid-rgn) (view-clip-region view)))
-                     ;; (size        (view-size view))
-                     )
-                (niy set-view-scroll-position view h v scroll-visibly)
-                #-(and)
-                (if container
-                    (rlet ((r :rect
-                              :topleft old-sc-pos
-                              :bottomright (add-points old-sc-pos size)))
-                          (#_ScrollRect  r (point-h delta)(point-v delta)  rgn)                 
-                          (#_invalWindowRgn wptr rgn)
-                          (when view-rgn
-                            (let ((offset (subtract-points #@(0 0) (view-origin view))))
-                              (#_OffsetRgn view-rgn (point-h offset)(point-v offset)))))
-                    (progn                
-                      (rlet ((arect :rect))
-                            (#_getwindowportbounds wptr  arect)
-                            (#_scrollrect arect (point-h delta)(point-v delta)  rgn))                 
-                      (#_invalWindowRgn wptr rgn)))
-                #-(and)
-                (when view-rgn
-                  (when (and erase-rgn (not (#_EmptyRgn erase-rgn)))
-                    (#_CopyRgn erase-rgn rgn)
-                    (#_SectRgn rgn view-rgn rgn)
-                    (#_DiffRgn erase-rgn rgn erase-rgn)
-                    (#_OffsetRgn rgn (point-h delta)(point-v delta))
-                    (#_SectRgn rgn view-rgn rgn)
-                    (#_UnionRgn rgn erase-rgn erase-rgn))
-                  (when (and invalid-rgn (not (#_EmptyRgn invalid-rgn)))
-                    (#_CopyRgn invalid-rgn rgn)
-                    (#_SectRgn rgn view-rgn rgn)
-                    (#_DiffRgn erase-rgn rgn invalid-rgn)
-                    (#_OffsetRgn rgn (point-h delta)(point-v delta))
-                    (#_SectRgn rgn view-rgn rgn)
-                    (#_UnionRgn rgn invalid-rgn invalid-rgn))))
-              (invalidate-view view t))))
+          (with-handle (viewh (if (typep view 'window)
+                                  view))
+            (if scroll-visibly
+              (let ((old-bounds (get-nsrect [viewh bounds])))
+                [viewh scrollRect:old-bounds by: (nspoint delta)]
+                [viewh setBoundsOrigin:(nspoint pt)])
+              (progn
+                [viewh setBoundsOrigin:(nspoint pt)])))
+          (invalidate-view view t))) ; calls [viewh setNeedsDisplay:YES].
       (make-view-invalid view)
       (setf (view-scroll-position view) pt)
       (refocus-view view)
@@ -1091,8 +1114,22 @@ POINT:          A point, encoded as an integer.
 
 SOURCE-VIEW:    A view in whose coordinate system point is given.
 "
-  (add-points point (subtract-points (view-origin destination-view)
-                                     (view-origin source-view))))
+  (labels ((convert-to-window (view pt)
+             (if (or (typep view 'window)
+                     (null (view-container view)))
+               pt
+               (convert-to-window (view-container view)
+                                  (add-points (view-position view) pt)))))
+    (let* ((src-offset (convert-to-window source-view      (view-origin source-view)))
+           (dst-offset (convert-to-window destination-view (view-origin destination-view)))
+           (result (add-points point (subtract-points src-offset dst-offset))))
+      #-(and)
+      (format-trace "convert-coordinates"
+                    (point-to-list point) :+ (point-to-list src-offset) :- (point-to-list dst-offset)
+                    :--> (point-to-list result)
+                    :source source-view
+                    :destination destination-view)
+      result)))
 
 
 (defgeneric find-view-containing-point (view h &optional v direct-subviews-only)
@@ -1171,7 +1208,6 @@ WHERE:          For a view, the cursor position of the view in the
     (view-contains-point-p view where)))
 
 
-
 (defgeneric view-convert-coordinates-and-click (view where container)
   (:documentation "
 DO:             Run VIEW-CLICK-EVENT-HANDLER on the cursor position
@@ -1193,7 +1229,6 @@ CONTAINER:      The container of the view.
 
   (:method ((view view) where container)
     (view-click-event-handler view (convert-coordinates where container view))))
-
 
 
 (defmacro with-view-frame ((x y w h) view &body body)
@@ -1225,23 +1260,15 @@ VISRGN, CLIPRGN Region records from the view’s wptr.
 ")
   (:method ((view simple-view) &optional visrgn cliprgn)
     (with-focused-view (view-container view)
-      (with-temp-rgns (visrgn cliprgn)
-        (niy view-focus-and-draw-contents view visrgn cliprgn)
-        ;; (get-window-visrgn wptr visrgn)
-        ;; (get-window-cliprgn wptr cliprgn)
-        (view-draw-contents view)
-        #-(and)
-        (when (view-is-invalid-p view visrgn cliprgn)
-          (view-draw-contents view)))))
+      (view-draw-contents view)))
 
   (:method ((view view) &optional visrgn cliprgn)
     (with-focused-view view
+      (view-draw-contents view)
+      #-(and)
       (with-temp-rgns (visrgn cliprgn)
-        (niy view-focus-and-draw-contents view visrgn cliprgn)
-        ;; (get-window-visrgn wptr visrgn)
-        ;; (get-window-cliprgn wptr cliprgn)
-        (view-draw-contents view)
-        #-(and)
+        (get-window-visrgn wptr visrgn)
+        (get-window-cliprgn wptr cliprgn)
         (when (regions-overlap-p visrgn cliprgn)
           (view-draw-contents view))))))
 
@@ -1400,14 +1427,15 @@ RETURN:         The cursor shape to display when the mouse is at
   (or (null visrgn)
       (null cliprgn)
       (multiple-value-bind (tl br) (view-corners view)
-        (without-interrupts
-            (niy view-is-invalid-p view visrgn cliprgn tl br)
-            ;; (let ((rgn *temp-rgn*)) ; so *temp-rgn* belongs to us
-            ;;   (#_SetRectRgn rgn (point-h tl)(point-v tl) (point-h br)(point-v br))
-            ;;   (#_SectRgn rgn visrgn rgn)
-            ;;   (#_SectRgn rgn cliprgn rgn)                   
-            ;;   (not (#_EmptyRgn rgn)))
-          t))))
+        (niy view-is-invalid-p view visrgn cliprgn tl br)
+        ;; (without-interrupts
+        ;;   ;; (let ((rgn *temp-rgn*)) ; so *temp-rgn* belongs to us
+        ;;   ;;   (#_SetRectRgn rgn (point-h tl)(point-v tl) (point-h br)(point-v br))
+        ;;   ;;   (#_SectRgn rgn visrgn rgn)
+        ;;   ;;   (#_SectRgn rgn cliprgn rgn)                   
+        ;;   ;;   (not (#_EmptyRgn rgn)))
+        ;; t)
+        t)))
 
 
 (defgeneric frame-key-handler (view)

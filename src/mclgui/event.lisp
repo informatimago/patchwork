@@ -372,27 +372,25 @@ VIEW:           A simple view.
     (nspoint-to-point (get-nspoint [NSEvent mouseLocation])))
   (:method ((view simple-view))
     (if (handle view)
-        (with-handle (winh (view-window view))
-          (let* ((viewh (if (typep view 'window)
-                            [winh contentView]
-                            (handle view)))
-                 (pt   (get-nspoint [NSEvent mouseLocation]))
-                 #-(and) ; only for 10.6+
-                 (winr (get-nsrect [winh convertRectFromScreen:(ns:make-ns-rect (nspoint-x pt)
-                                                                                (nspoint-y pt)
-                                                                                1 1)]))
-                 (winpt (get-nspoint [winh convertScreenToBase:(ns:make-ns-rect (nspoint-x pt)
-                                                                                (nspoint-y pt)
-                                                                                1 1)])))
-            
-            (nspoint-to-point (get-nspoint [viewh convertPoint:#-(and) (ns:make-ns-point (nsrect-x winr)
-                                                                                         (nsrect-y winr))
-                                                  (unwrap winpt)
-                                                  fromView:*null*]))))
-        (nspoint-to-point (get-nspoint [NSEvent mouseLocation])))))
+      ;; We don't use the *current-event* since it may not be an event
+      ;; relative to (view-window view).
+      (let* ((winpt  (with-handle (winh (view-window view))
+                       #-(and)    ; only for 10.6+
+                       (get-nsrect [winh convertRectFromScreen:(ns:make-ns-rect (nspoint-x pt) (nspoint-y pt) 1 1)])
+                       ;; deprecated, but 10.6+ doesn't work on ccl-1.8.
+                       (get-nspoint [winh convertScreenToBase:[NSEvent mouseLocation]]))))
+        (print winpt)
+        (with-view-handle (viewh view)
+          (nspoint-to-point (get-nspoint [viewh convertPoint:(unwrap winpt)
+                                                fromView:*null*]))))
+
+      ;; The following is not very meaningful, but then why a view
+      ;; without a handle would need a view-mouse-position?
+      (call-next-method))))
 
 ;; (point-to-list (view-mouse-position nil))
 ;; (view-convert-coordinates-and-click subview where view)
+
 
 (defun mouse-down-p ()
   "

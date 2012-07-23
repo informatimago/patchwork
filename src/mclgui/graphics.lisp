@@ -42,14 +42,14 @@
 
 (defun draw-string (x y str)
   (format-trace "draw-string" x y str *current-view* (when *current-view* (view-window *current-view*)))
-  [(objcl:objcl-string str)
-   drawAtPoint: (ns:make-ns-point x y)
-   withAttributes: (destructuring-bind (ff ms) ui::*current-font-codes*
-                     (multiple-value-bind (descriptor mode) (ui::font-descriptor-from-codes ff ms)
-                       (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
-                       ;; (print descriptor)
-                       ;; [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))] 
-                       [descriptor fontAttributes]))]
+  (destructuring-bind (ff ms) *current-font-codes*
+    (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
+      (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
+      (print descriptor)
+      ;; [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))]
+      [(objcl:objcl-string str)
+       drawAtPoint: (ns:make-ns-point x y)
+       withAttributes:  [descriptor fontAttributes]]))
   str)
 
 
@@ -73,33 +73,38 @@
           [path setLineCapStyle:#$NSSquareLineCapStyle]
           (if (and (= #@(1 1) size)
                    (eq *black-pattern* (pen-state-pattern pen)))
-            (let ((sx (point-h size))
-                  (sy (point-v size)))
-              (unless (< x1 x2)
-                (rotatef x1 x2)
-                (rotatef y1 y2))
-              (if (< y1 y2)
-                (progn
-                  [path moveToPoint:(ns:make-ns-point x1 y1)]
-                  [path lineToPoint:(ns:make-ns-point (+ x1 sx) y1)]
-                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
-                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
-                  [path lineToPoint:(ns:make-ns-point x2 (+ y2 sy))]
-                  [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))])
-                (progn
-                  [path moveToPoint:(ns:make-ns-point x1 y1)]
-                  [path lineToPoint:(ns:make-ns-point x2 y2)]
-                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
-                  [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
-                  [path lineToPoint:(ns:make-ns-point (+ x1 sx) (+ y1 sy))]
-                  [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))]))
-              [path closePath]
-              [path fill])))))))
+              (progn
+                [path moveToPoint:(ns:make-ns-point x1 y1)]
+                [path lineToPoint:(ns:make-ns-point x2 y2)]
+                [path stroke])
+              (let ((sx (point-h size))
+                    (sy (point-v size)))
+                (unless (< x1 x2)
+                  (rotatef x1 x2)
+                  (rotatef y1 y2))
+                (if (< y1 y2)
+                    (progn
+                      [path moveToPoint:(ns:make-ns-point x1 y1)]
+                      [path lineToPoint:(ns:make-ns-point (+ x1 sx) y1)]
+                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
+                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
+                      [path lineToPoint:(ns:make-ns-point x2 (+ y2 sy))]
+                      [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))])
+                    (progn
+                      [path moveToPoint:(ns:make-ns-point x1 y1)]
+                      [path lineToPoint:(ns:make-ns-point x2 y2)]
+                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
+                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
+                      [path lineToPoint:(ns:make-ns-point (+ x1 sx) (+ y1 sy))]
+                      [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))]))
+                [path closePath]
+                [path fill])))))))
 
 
 
 (defun draw-rect (x y w h)
   (format-trace "draw-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; TODO: draw the frame with the pen.
   (#_NSFrameRect (ns:make-ns-rect x y w h)))
 
 (defun fill-rect (x y w h)
@@ -109,17 +114,18 @@
       (when window
         (let* ((pen  (view-pen window)))
           (#_NSRectFillUsingOperation (ns:make-ns-rect x y w h)
-                                      (mode-to-compositing-operation (pen-mode pen)))))))
-  #-(and) (#_NSRectFill (ns:make-ns-rect x y w h)))
+                                      (mode-to-compositing-operation (pen-mode pen))))))))
 
 (defun erase-rect (x y w h)
   (format-trace "erase-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; TODO: erase the rect with the background color/pattern.
   (#_NSEraseRect (ns:make-ns-rect x y w h)))
 
 
 
 (defun draw-ellipse (x y w h)
   (format-trace "draw-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; TODO: use the pen.
   [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] stroke])
 
 (defun fill-ellipse (x y w h)

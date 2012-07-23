@@ -135,15 +135,6 @@ RETURN:     Whether the window should be closed (YES unless canceled).
   nil)
 
 
-(defmethod window-close :after ((window window))
-  (setf (slot-value window 'my-item) nil)
-  (let ((wm *windows-menu*))
-    (when (and (typep wm 'menu) (menu-enabled-p wm))
-      (update-windows-menu wm))
-    (let ((em (edit-menu)))
-      (when em (menu-update em)))))
-
-
 ;;; --- window zooming ----
 
 (defgeneric window-do-zoom (window)
@@ -165,7 +156,7 @@ Called by -[MclguiWindow zoom:] which is called from WINDOW-ZOOM-EVENT-HANDLER."
   (declare (ignore where))
   (let ((*window-growing* t))
     (with-handle (handle  window)
-      (multiple-value-bind (x y w h) (frame [handle frame])
+      (multiple-value-bind (x y w h) (frame [[handle contentView] bounds])
         (declare (ignore x y))
         (set-view-size window (make-point (round w) (round h)))))))
 

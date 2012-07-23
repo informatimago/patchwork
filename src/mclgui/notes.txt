@@ -135,8 +135,9 @@ Message Mapping
     (defgeneric window-zoom-event-handler (window message))   --> -[MclguiWindow zoom:]
     (defgeneric window-grow-event-handler (window where))     --> set-view-size --> [MclguiWindow setFrame:]
 
-    (defgeneric window-mouse-up-event-handler (window))       <-- -[MclguiView mouseUp:]   (used in patchwork)
-    (defgeneric window-null-event-handler (window))              (used in patchwork as mouse moved)
+    (defgeneric window-mouse-up-event-handler (window))       <-- -[MclguiView mouseUp:]      (used in patchwork)
+    (defgeneric window-null-event-handler (window))           <-- -[MclguiView mouseDragged:] (used in patchwork as mouse moved)
+                                                          
     (defgeneric window-key-up-event-handler (window))            (not used in patchwork)
     (defgeneric window-drag-event-handler (window where))        (not used in patchwork)
 

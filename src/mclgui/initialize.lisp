@@ -480,6 +480,7 @@
  ; Can't DEFGENERIC at level-1 time
  (defgeneric window-can-undo-p (window)))
 
+
 ; window-can-do-operation needs to check for an applicable primary
 ; method other than the one that is specialized on the class
 ; named window rather than just calling method-exists-p

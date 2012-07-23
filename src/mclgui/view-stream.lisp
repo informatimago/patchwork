@@ -36,10 +36,12 @@
 
 
 (defmethod stream-tyo ((view simple-view) (char character))
-  (with-focused-view view
-    (let ((pos (pen-position (view-pen view))))
-      (draw-char (point-h pos) (point-v pos) char)
-      (move (view-pen view) (string-width (string char)) 0)))
+  (if (char= char #\Newline)
+    (stream-terpri view)
+    (with-focused-view view
+      (let ((pos (pen-position (view-pen view))))
+        (draw-char (point-h pos) (point-v pos) char)
+        (move view (string-width (string char)) 0))))
   char)
 
 
@@ -59,17 +61,38 @@
 
 
 (defmethod stream-write-string ((view simple-view) (string string) &optional (start 0) end)
-  (let ((string (nsubseq string start end)))
-    (with-focused-view view
-      (let ((pos (pen-position (view-pen view))))
-        (draw-string (point-h pos) (point-v pos) string)
-        (move (view-pen view) (string-width string) 0))))
-  string)
+  (with-focused-view view
+    (let ((string      (nsubseq string start end))
+          (pos         (pen-position (view-pen view))))
+      (if (find #\Newline string)
+        (loop ; there's at least one newline.
+          :with line-height   = (font-line-height (view-font view))
+          :with len           = (length string)
+          :for previous-start = nil :then start
+          :for previous-end   = nil :then end
+          :for start = 0 :then (1+ end)
+          :for end   = (or (position #\Newline string :start start) len)
+          :while (< start len)
+          :do (progn
+                (draw-string (point-h pos) (point-v pos) (nsubseq string start end))
+                (when (< end len)
+                  (setf pos (make-point 0 (+ (point-v pos) line-height)))))
+          :finally  (setf pos (make-point (+ (string-width (nsubseq string
+                                                                    previous-start
+                                                                    previous-end))
+                                             (point-h pos))
+                                          (point-v pos))))
+        (progn
+          (draw-string (point-h pos) (point-v pos) string)
+          (setf pos (make-point (+ (string-width string) (point-h pos))
+                                (point-v pos)))))
+      (move-to view (point-h pos) (point-v pos))
+      string)))
 
 
 (defmethod stream-terpri ((view simple-view))
-  (move-to (view-pen view) 0 (+ (point-v (pen-position (view-pen view)))
-                                (font-line-height)))
+  (move-to view 0 (+ (point-v (pen-position (view-pen view)))
+                     (font-line-height (view-font view))))
   nil)
 
 
@@ -86,7 +109,7 @@
 ;;   (values))
 
 (defmethod stream-advance-to-column ((view simple-view) column)
-  (move (view-pen view)
+  (move view
         (* column (string-width "m"))
         (point-v (pen-position (view-pen view))))
   t)

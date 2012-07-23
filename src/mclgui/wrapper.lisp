@@ -302,6 +302,8 @@ NOTE:           It's expected the dictionary is small, hence the P-list.
                                   dictionaryWithObjects: (unwrap objects)
                                   forKeys: (unwrap keys)]))))
 
+(defmethod unwrap ((self ns:ns-object))
+  self)
 
 
 (defun nsarray-to-list (nsarray)

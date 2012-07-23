@@ -159,8 +159,8 @@ V:              Vertical position.  If V is NIL (the default), H is
                 assumed to represent a point.
 "
   (let ((d  (make-point h v)))
-    (setf (rect-topleft     rect) (add-points (rect-topleft          rect) d)
-          (rect-bottomright rect) (add-points (rect-rect-bottomright rect) d))
+    (setf (rect-topleft     rect) (add-points (rect-topleft     rect) d)
+          (rect-bottomright rect) (add-points (rect-bottomright rect) d))
     rect))
 
 
@@ -179,8 +179,8 @@ V:              Vertical position.  If V is NIL (the default), H is
                 assumed to represent a point.
 "
   (let ((d (make-point h v)))
-    (setf (rect-topleft     rect) (add-points      (rect-topleft          rect) d)
-          (rect-bottomright rect) (subtract-points (rect-rect-bottomright rect) d))
+    (setf (rect-topleft     rect) (add-points      (rect-topleft     rect) d)
+          (rect-bottomright rect) (subtract-points (rect-bottomright rect) d))
     rect))
 
 

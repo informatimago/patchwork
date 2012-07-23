@@ -164,7 +164,7 @@ PIXEL-HEIGHT:   Height of the bitmap (array-dimension bitmap 0).
                            (with-output-to-string (out)
                              (bitmap-to-bytes (pattern-data pattern)
                                               (lambda (byte)
-                                                  (format out "~%~8,'0B" byte))))))
+                                                (format out "~%~8,'0B" byte))))))
   pattern)
 
 (defun make-pattern (&rest bytes)
@@ -184,60 +184,60 @@ PIXEL-HEIGHT:   Height of the bitmap (array-dimension bitmap 0).
 
 (defun initialize/pattern ()
   (setf *black-pattern*  (make-instance 'pattern
-                           :data (make-array '(8 8)
-                                             :element-type 'bit
-                                             :initial-contents '(#*11111111
-                                                                 #*11111111
-                                                                 #*11111111
-                                                                 #*11111111
-                                                                 #*11111111
-                                                                 #*11111111
-                                                                 #*11111111
-                                                                 #*11111111)))
-        *dkgray-pattern*  (make-instance 'pattern
-                            :data (make-array '(8 8)
-                                              :element-type 'bit
-                                              :initial-contents '(#*10111011
-                                                                  #*11111111
-                                                                  #*11101110
-                                                                  #*11111111
-                                                                  #*10111011
-                                                                  #*11111111
-                                                                  #*11101110
-                                                                  #*11111111)))
+                             :data (make-array '(8 8)
+                                               :element-type 'bit
+                                               :initial-contents '(#*11111111
+                                                                   #*11111111
+                                                                   #*11111111
+                                                                   #*11111111
+                                                                   #*11111111
+                                                                   #*11111111
+                                                                   #*11111111
+                                                                   #*11111111)))
+        *dark-gray-pattern*  (make-instance 'pattern
+                                 :data (make-array '(8 8)
+                                                   :element-type 'bit
+                                                   :initial-contents '(#*10111011
+                                                                       #*11111111
+                                                                       #*11101110
+                                                                       #*11111111
+                                                                       #*10111011
+                                                                       #*11111111
+                                                                       #*11101110
+                                                                       #*11111111)))
         *gray-pattern*  (make-instance 'pattern
-                          :data (make-array '(8 8)
-                                            :element-type 'bit
-                                            :initial-contents '(#*10101010
-                                                                #*01010101
-                                                                #*10101010
-                                                                #*01010101
-                                                                #*10101010
-                                                                #*01010101
-                                                                #*10101010
-                                                                #*01010101)))
-        *ltgray-pattern*  (make-instance 'pattern
                             :data (make-array '(8 8)
                                               :element-type 'bit
-                                              :initial-contents '(#*01000100
-                                                                  #*00000000
-                                                                  #*00010001
-                                                                  #*00000000
-                                                                  #*01000100
-                                                                  #*00000000
-                                                                  #*00010001
-                                                                  #*00000000)))
+                                              :initial-contents '(#*10101010
+                                                                  #*01010101
+                                                                  #*10101010
+                                                                  #*01010101
+                                                                  #*10101010
+                                                                  #*01010101
+                                                                  #*10101010
+                                                                  #*01010101)))
+        *light-gray-pattern*  (make-instance 'pattern
+                                  :data (make-array '(8 8)
+                                                    :element-type 'bit
+                                                    :initial-contents '(#*01000100
+                                                                        #*00000000
+                                                                        #*00010001
+                                                                        #*00000000
+                                                                        #*01000100
+                                                                        #*00000000
+                                                                        #*00010001
+                                                                        #*00000000)))
         *white-pattern*  (make-instance 'pattern
-                           :data (make-array '(8 8)
-                                             :element-type 'bit
-                                             :initial-contents '(#*00000000
-                                                                 #*00000000
-                                                                 #*00000000
-                                                                 #*00000000
-                                                                 #*00000000
-                                                                 #*00000000
-                                                                 #*00000000
-                                                                 #*00000000)))))
+                             :data (make-array '(8 8)
+                                               :element-type 'bit
+                                               :initial-contents '(#*00000000
+                                                                   #*00000000
+                                                                   #*00000000
+                                                                   #*00000000
+                                                                   #*00000000
+                                                                   #*00000000
+                                                                   #*00000000
+                                                                   #*00000000)))))
 
 
 

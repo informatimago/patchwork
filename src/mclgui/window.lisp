@@ -256,6 +256,11 @@ CLASS:          A class used to filter the result. The frontmost
 
 
 
+
+(objc:define-objc-method ((:void do-close) mclgui-window)
+    (format-trace "-[MclguiWindow doClose]")
+  (objc:send-super 'close))
+
 (defgeneric window-close (window)
   (:documentation "
 The WINDOW-CLOSE generic function closes the window.  The associated
@@ -873,8 +878,26 @@ DESCRIPTION:    The WINDOW-NEEDS-SAVING-P generic function determines
 
 
 (defgeneric window-can-undo-p (window)
-  (:documentation "Obsolete"))
+  (:documentation "Obsolete? Used in window-can-do-operation"))
 
+
+
+(defun non-window-method-exists-p (op w)
+  (let* ((gf           (and (symbolp op) (fboundp op)))
+         (methods      (and (standard-generic-function-p gf)
+                            (generic-function-methods gf)))
+         (class        (class-of w))
+         (window-class (find-class 'window))
+         (cpl          (class-precedence-list class)))
+    (and methods
+         (dolist (method methods)
+           (when (and (null (method-qualifiers method))
+                      (let ((spec (car (method-specializers method))))
+                        (and (not (eq spec window-class))
+                             (if (typep spec 'eql-specializer)
+                                 (eql (eql-specializer-object spec) w)
+                                 (member spec cpl)))))
+             (return t))))))
 
 
 (defgeneric window-can-do-operation (window op &optional item)
@@ -894,6 +917,9 @@ RETURN:         A BOOLEAN value indicating whether view can perform
                 not, it returns NIL.
 ")
   (:method ((view window) op &optional item)
+    ;; window-can-do-operation needs to check for an applicable primary
+    ;; method other than the one that is specialized on the class
+    ;; named window rather than just calling method-exists-p
     (cond
       ((and (eq op 'undo)
             (method-exists-p 'window-can-undo-p view))
@@ -923,7 +949,14 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 (defmethod window-close :after ((window window))
   ;; window is a subclass* of STREAM.
-  (window-do-operation window 'close nil))
+  (window-do-operation window 'close nil)
+  ;; --
+  (setf (slot-value window 'my-item) nil)
+  (let ((wm *windows-menu*))
+    (when (and (typep wm 'menu) (menu-enabled-p wm))
+      (update-windows-menu wm))
+    (let ((em (edit-menu)))
+      (when em (menu-update em)))))
 
 (defmethod window-save ((window window))
   (window-do-operation window 'save nil))

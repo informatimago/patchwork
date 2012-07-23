@@ -212,7 +212,12 @@
   (format t "~V<~>~S~%" level (nsview-view nsview))
   (let ((nssubviews [nsview subviews]))
    (dotimes (i [nssubviews count] (values))
-     (dump-nsview-subviews [nssubviews objectAtIndex:i] (+ 4 level)))))
+     (let ((subview  [nssubviews objectAtIndex:i])
+           (level (+ 4 level)))
+       (format t "~%")
+       (format t "~V<~>frame =~S~%" level (get-nsrect [subview frame]))
+       (format t "~V<~>bounds=~S~%" level (get-nsrect [subview bounds]))
+       (dump-nsview-subviews subview level)))))
 
 (defun dump-nswindow-subviews (nswindow)
   (format t "window: ~S ~S~%" nswindow (get-nsrect [nswindow frame]))

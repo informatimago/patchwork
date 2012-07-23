@@ -109,8 +109,9 @@
 
 (defmethod view-draw-contents ((view view))
   (call-next-method)
-  (dovector (subview (view-subviews view))
-            (view-focus-and-draw-contents subview)))
+  (unless *view-draw-contents-from-drawRect*
+    (dovector (subview (view-subviews view))
+              (view-focus-and-draw-contents subview))))
 
 
 ;;;; THE END ;;;;

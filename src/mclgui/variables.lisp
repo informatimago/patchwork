@@ -193,11 +193,11 @@ This variable should never be changed by a program.
 
 ;; Patterns:
 
-(defvar *black-pattern*  nil)
-(defvar *dkgray-pattern* nil)
-(defvar *gray-pattern*   nil)
-(defvar *ltgray-pattern* nil)
-(defvar *white-pattern*  nil)
+(defvar *black-pattern*      nil)
+(defvar *dark-gray-pattern*  nil)
+(defvar *gray-pattern*       nil)
+(defvar *light-gray-pattern* nil)
+(defvar *white-pattern*      nil)
 
 
 ;; Screens:

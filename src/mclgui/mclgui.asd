@@ -42,6 +42,7 @@
                  "cffi" 
                  "trivial-gray-streams"
                  "alexandria"
+                 "split-sequence"
                  "com.informatimago.objcl"
                  ;; While developping:
                  "com.informatimago.common-lisp.cesarum") 
@@ -78,7 +79,7 @@
                  (:file "font"
                         :depends-on ("package" 
                                      "macros" "variables" "system"
-                                     "point" "objc-classes"))
+                                     "point" "objc-classes" "color"))
                  
                  (:file "pattern"
                         :depends-on ("package" 
@@ -90,7 +91,8 @@
                  (:file "menu"
                         :depends-on ("package" 
                                      "macros" "variables" "color"
-                                     "point" "font" "wrapper" "notification"))
+                                     "point" "font" "wrapper" "notification"
+                                     "event"))
 
                  (:file "window-menu-item"
                         :depends-on ("package" 
