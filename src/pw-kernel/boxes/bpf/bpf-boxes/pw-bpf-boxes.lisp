@@ -155,9 +155,10 @@
   (set-box-title (popUpBox self) "  "))
 
 (defmethod draw-appl-label ((self C-patch-function) label)
-  (if label
-    (with-font-focused-view self '("monaco"  9  :plain :srccopy)
-                            (draw-char (- (w self) 8) (- (h self) 4) label))))
+  (when label
+    (set-view-font self '("monaco"  9  :plain :srccopy))
+    (with-font-focused-view self
+      (draw-char (- (w self) 8) (- (h self) 4) label))))
 
 (defmethod draw-patch-extra ((self C-patch-function))
   (when (application-object self)
@@ -171,8 +172,7 @@
         (progn 
           (draw-connections patch t)
           (disconnect-my-self patch self)
-          (draw-connections patch ))))
-    ))
+          (draw-connections patch ))))))
 
 (defmethod set-the-points-view ((self C-patch-function))
   (setf (points-state self) (not (points-state self)))
