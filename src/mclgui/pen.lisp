@@ -310,8 +310,7 @@ not normally called directly but instead by stream output functions.
    (position   :initarg :position :initform (make-point 0 0) :type point   :accessor pen-position)
    (size       :initarg :size     :initform (make-point 1 1) :type point   :accessor pen-size)
    (mode       :initarg :mode     :initform 8                :type fixnum  :accessor pen-mode)
-   (pattern    :initarg :pattern  :initform *black-pattern*  :type pattern :accessor pen-state-pattern)
-   (background ))
+   (pattern    :initarg :pattern  :initform *black-pattern*  :type pattern :accessor pen-state-pattern))
   (:documentation "A Quickdraw Pen."))
 
 

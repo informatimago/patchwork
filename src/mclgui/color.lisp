@@ -217,7 +217,8 @@ REDISPLAY-P:    If the value of this is true (the default), this
     (unwind-protect
          (progn
            [NSGraphicsContext saveGraphicsState]
-           (let ((color [NSColor colorWithCalibratedRed: (color-red color)
+           (let ((color (unwrap color)
+                        #-(and) [NSColor colorWithCalibratedRed: (color-red color)
                                  green: (color-green color)
                                  blue: (color-blue color)
                                  alpha: (color-alpha color)]))
@@ -228,16 +229,25 @@ REDISPLAY-P:    If the value of this is true (the default), this
            (funcall function))
       [NSGraphicsContext restoreGraphicsState])))
 
+(defvar *background-color*  nil)
 
 (defun call-with-back-color (color function)
-  (if (or (null color) (not *color-available*))
-      (funcall function)
-      (let ((*background-color* [NSColor colorWithCalibratedRed: (color-red color)
-                                         green: (color-green color)
-                                         blue: (color-blue color)
-                                         alpha: (color-alpha color)]))
-
-        (funcall function))))
+  (if (or (null color)
+          (not *color-available*)
+          (null *current-view*)
+          (null (view-window *current-view*)))
+    (funcall function)
+    (let ((*background-color* (unwrap color)
+                              #-(and) [NSColor colorWithCalibratedRed: (color-red color)
+                                               green: (color-green color)
+                                               blue: (color-blue color)
+                                               alpha: (color-alpha color)])
+          (old-color (slot-value (view-window *current-view*) 'back-color)))
+      (unwind-protect
+          (progn
+            (setf (slot-value (view-window *current-view*) 'back-color) *background-color*)
+            (funcall function))
+        (setf (slot-value (view-window *current-view*) 'back-color) old-color)))))
 
 
 (defmacro with-fore-color (color &body body)
@@ -360,7 +370,8 @@ RETURN:         A list of key parts that can be colored in the THING.
         *gray-color*         (make-color 32768 32768 32768) 
         *light-gray-color*   (make-color 49152 49152 49152) 
         *lighter-gray-color* (make-color 56576 56576 56576) 
-        *dark-gray-color*    (make-color 16384 16384 16384)))
+        *dark-gray-color*    (make-color 16384 16384 16384)
+        *background-color*   *white-color*))
 
 
 ;;;; THE END ;;;;

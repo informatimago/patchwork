@@ -45,7 +45,7 @@
   (destructuring-bind (ff ms) *current-font-codes*
     (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
       (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
-      (print descriptor)
+      ;; (print descriptor)
       ;; [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))]
       [(objcl:objcl-string str)
        drawAtPoint: (ns:make-ns-point x y)
@@ -104,8 +104,56 @@
 
 (defun draw-rect (x y w h)
   (format-trace "draw-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
-  ;; TODO: draw the frame with the pen.
-  (#_NSFrameRect (ns:make-ns-rect x y w h)))
+  (when *current-view*
+    (let ((window  (view-window *current-view*)))
+      (when window
+        (let* ((pen  (view-pen window))
+               (size (pen-size pen)))
+          
+          (if (and (= #@(1 1) size)
+                   (eq *black-pattern* (pen-state-pattern pen)))
+            (#_NSFrameRect (ns:make-ns-rect x y w h))
+            (let ((path [NSBezierPath bezierPath])
+                  (sx (point-h size))
+                  (sy (point-v size)))
+              [path setLineCapStyle:#$NSSquareLineCapStyle]
+              ;; external border
+              [path moveToPoint:(ns:make-ns-point x y)]
+              [path lineToPoint:(ns:make-ns-point (+ x w) y)]
+              [path lineToPoint:(ns:make-ns-point (+ x w) (+ y h))]
+              [path lineToPoint:(ns:make-ns-point x (+ y h))]
+              [path lineToPoint:(ns:make-ns-point x y)]
+              ;; internal border
+              [path moveToPoint:(ns:make-ns-point (+ x sx)       (+ y sy))]
+              [path lineToPoint:(ns:make-ns-point (+ x sx)       (- (+ y h) sy))]
+              [path lineToPoint:(ns:make-ns-point (- (+ x w) sx) (- (+ y h) sy))]
+              [path lineToPoint:(ns:make-ns-point (- (+ x w) sx) (+ y sy))]
+              [path lineToPoint:(ns:make-ns-point (+ x sx)       (+ y sy))]
+              [path closePath]
+              [path fill])))))))
+
+
+#-(and)
+(loop
+  :for mode :in '(:srcCopy :srcOr :srcXor :srcBic
+                  :notSrcCopy :notSrcOr :notSrcXor :notSrcBic
+                  :patCopy :patOr :patXor :patBic
+                  :notPatCopy :notPatOr :notPatXor :notPatBic)
+  :do (with-focused-view (front-window)
+        (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
+                                  :mode :srcCopy)
+          (draw-rect 10 20 100 200))
+        (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
+                                  :mode mode)
+          (draw-rect 10 20 100 200)))
+  (sleep 3))
+
+#-(and)
+(with-focused-view (front-window)
+  (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10)
+                            :mode :srcCopy)
+    (draw-rect 10 20 200 100)))
+
 
 (defun fill-rect (x y w h)
   (format-trace "fill-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
@@ -118,18 +166,56 @@
 
 (defun erase-rect (x y w h)
   (format-trace "erase-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
-  ;; TODO: erase the rect with the background color/pattern.
-  (#_NSEraseRect (ns:make-ns-rect x y w h)))
+  (let ((color (unwrap (or (and *current-view*
+                                (view-window *current-view*)
+                                (slot-value (view-window *current-view*) 'back-color))
+                           *background-color*))))
+    [NSGraphicsContext saveGraphicsState]
+    (unwind-protect
+        (progn
+          [color setFill]
+          (#_NSRectFill (ns:make-ns-rect x y w h)))
+      [NSGraphicsContext restoreGraphicsState])))
 
+;; (setf *color-available* t)
+;; (with-focused-view (front-window)
+;;   (with-back-color *orange-color*
+;;    (erase-rect 0 0 100 200)))
+;; (with-focused-view (front-window)
+;;   (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10))
+;;     (with-fore-color *blue-color*
+;;       (draw-ellipse 20 20 200 100))))
 
 
 (defun draw-ellipse (x y w h)
   (format-trace "draw-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
-  ;; TODO: use the pen.
-  [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] stroke])
+  (when *current-view*
+    (let ((window  (view-window *current-view*)))
+      (when window
+        (let* ((pen  (view-pen window))
+               (size (pen-size pen)))
+          (if (and (= #@(1 1) size)
+                   (eq *black-pattern* (pen-state-pattern pen)))
+            [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] stroke]
+            (let ((path [NSBezierPath bezierPath])
+                  (sx (point-h size))
+                  (sy (point-v size)))
+              ;; TODO: use the pen-pattern
+              [path setWindingRule:#$NSEvenOddWindingRule]
+              ;; external border
+              [path appendBezierPathWithOvalInRect:(ns:make-ns-rect x y w h)]
+              ;; internal border
+              [path appendBezierPathWithOvalInRect:(ns:make-ns-rect (+ x sx) (+ y sy)
+                                                                    (- w sx sx) (- h sy sy))]
+              [path fill])))))))
+
 
 (defun fill-ellipse (x y w h)
   (format-trace "fill-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
-  [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] fill])
+  (when *current-view*
+    (let ((window  (view-window *current-view*)))
+      (when window
+        ;; TODO: use pen-pattern
+        [[NSBezierPath bezierPathWithOvalInRect: (ns:make-ns-rect x y w h)] fill]))))
 
 ;;;; THE END ;;;;
