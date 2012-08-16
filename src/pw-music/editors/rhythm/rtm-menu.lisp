@@ -44,7 +44,7 @@
 (defvar *RTM-menu-file* (new-menu "File"))
 
 (ui:add-menu-items  *RTM-menu-file* (new-leafmenu "Save as midifile..."  
-    #'(lambda () (RTM-midi-file-SAVE))))
+    (lambda () (RTM-midi-file-SAVE))))
 
 ;;=========================================
 ;; edit
@@ -58,7 +58,7 @@
 (let ((menu-now))
   (ui:add-menu-items  *RTM-menu-edit* 
      (setq menu-now (new-leafmenu "Cut" 
-       #'(lambda () 
+       (lambda () 
            (when (get-current-rtm-selection)
                 (setf *rtm-struct-selection-scrap* (decompile (get-current-rtm-selection)))
                 (remove-beat-from-measure (get-current-rtm-selection))
@@ -67,7 +67,7 @@
    (set-command-key menu-now #\X)
    (ui:add-menu-items  *RTM-menu-edit* 
       (setq menu-now (new-leafmenu "Copy" 
-        #'(lambda () 
+        (lambda () 
             (when (get-current-rtm-selection) 
               (cond ((eq 'C-measure (class-name (class-of (get-current-rtm-selection))))
                         (setf *measure-selection-scrap* (decompile (get-current-rtm-selection))))
@@ -81,7 +81,7 @@
    (set-command-key menu-now #\C)
    (ui:add-menu-items  *RTM-menu-edit* 
       (setq menu-now (new-leafmenu "Paste" 
-       #'(lambda ()    
+       (lambda ()    
            (when (get-current-rtm-selection) 
                (kill-chords (get-current-rtm-selection))
                (paste-beat (get-current-rtm-selection))
@@ -102,40 +102,38 @@
 ;;============================================
 ;; menubar for RTM
 
-(setf *RTM-menu-root*
-  (list 
-     *pw-menu-apps*
-     *RTM-menu-file* 
-     *RTM-menu-edit*
-     (fifth (ui:menubar) )
-     (sixth (ui:menubar) )
-     *RTM-menu* 
- ))
+(defparameter *RTM-menu-root*
+  (list *pw-menu-apps*
+        *RTM-menu-file* 
+        *RTM-menu-edit*
+        (fifth (ui:menubar))
+        (sixth (ui:menubar))
+        *RTM-menu*))
 
 ;;============================================
 ;; application 
 
 
-(setf *apps-RTM-menu-item* 
-   (add-apps-item-to-apps-menu  "RTM"
-     #'(lambda () 
-        (if *active-RTM-window* 
-          (if (wptr *active-RTM-window*)
-            (progn 
-              (window-select *active-RTM-window*)
-              (enable-all-apps-menu-items)
-              (menu-item-disable *apps-RTM-menu-item*))
-            (ui:ed-beep))
-          (ui:ed-beep)))))
+(defparameter *apps-RTM-menu-item* 
+  (add-apps-item-to-apps-menu  "RTM"
+                               (lambda () 
+                                   (if *active-RTM-window* 
+                                     (if (wptr *active-RTM-window*)
+                                       (progn 
+                                         (window-select *active-RTM-window*)
+                                         (enable-all-apps-menu-items)
+                                         (menu-item-disable *apps-RTM-menu-item*))
+                                       (ui:ed-beep))
+                                     (ui:ed-beep)))))
 
 ;;============================================
 ;; printing 
 
 (defvar *rtm-print-setUp*
-  (new-leafmenu "Page Setup…" #'(lambda () (ui::win-print-setUp *active-rtm-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-rtm-window*))))
 
 (defvar *print-rtm-menu* 
-  (new-leafmenu "Print…" #'(lambda () (ui::window-hardcopy *active-rtm-window*))))
+  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy *active-rtm-window*))))
 
 (ui:add-menu-items *rtm-menu-file* *rtm-print-setUp* *print-rtm-menu*)
 

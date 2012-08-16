@@ -93,7 +93,7 @@
   ;; (with-aedescs (event reply target )
   ;;   (create-self-target target)
   ;;   (create-appleevent event class keyword target)
-  ;;   (mapcar #'(lambda (par)
+  ;;   (mapcar (lambda (par)
   ;;               (put-appleevent-par event (first par) (second par))) lis)
   ;;   (send-appleevent event reply :interact-mode :notexecute)))
   )
@@ -457,7 +457,7 @@
 ;;LOCK
 (in-package "C-PATCH-BUFFER")
 (defmethod get-lock-button-fun ((self C-patch-buffer))
-  #'(lambda (item)
+  (lambda (item)
       (ui:niy 'get-lock-button-fun)
       ;; (if (value (view-container item))
       ;;   (progn 
@@ -757,16 +757,17 @@
   )
 
 (defun make-box-menu-recordables (theboxmenu)
-  (mapc #'(lambda (par) 
+  (mapc (lambda (par) 
             (if (not (or (igual (menu-item-title par) "Save Chord")
                          (igual (menu-item-title par) "Save")
                          (igual (menu-item-title par) "Open")
                          (igual (menu-item-title par) "Open File")))
-                (let* ((fun (menu-item-action-function par)))
-                  (set-menu-item-action-function par 
-                                                 #'(lambda () 
-                                                     (record-menu (menu-item-title par) nil *target-action-object*)
-                                                     (funcall fun)))))) (menu-items theboxmenu)))
+              (let* ((fun (menu-item-action-function par)))
+                (set-menu-item-action-function par 
+                                               (lambda () 
+                                                   (record-menu (menu-item-title par) nil *target-action-object*)
+                                                 (funcall fun))))))
+        (menu-items theboxmenu)))
 
 
 (defmethod redraw-patch ((self C-abstract-M))
@@ -783,7 +784,7 @@
               ((member nil in-docs-temp)
                (ui:message-dialog 
                 "WARNING! absin box connected to irreducible types. ALL-type used")
-               (mapcar #'(lambda (type-spec) (declare (ignore type-spec)) '(nilNum)) in-docs-temp))
+               (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum)) in-docs-temp))
               (t in-docs-temp))))
          (abstract-box 
           (make-std-patch-box (type-of self)  

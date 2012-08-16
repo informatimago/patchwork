@@ -78,7 +78,7 @@
 (defclass C-enum-collect-sink (C-patch) ())
 
 (defmethod patch-value ((self C-enum-collect-sink) obj)
-  (mapcar #'(lambda (val)
+  (mapcar (lambda (val)
               (store-buffer (first (input-objects self)) val)
               (patch-value (second (input-objects self)) obj))
           (get-list (first (input-objects self)) obj)))
@@ -88,16 +88,16 @@
      (progn (ui:ed-beep)(format t "Disconnection of the first input is not allowed !"))
      (call-next-method)))
 
-(setf *enum-collect-type*
-       (make-instance 'C-pw-type
-  :control-form 
-  `(make-instance 'C-ttybox :view-size (make-point 36 12) 
-        :dialog-item-text "coll" :type-list '(collector))))
+(defparameter *enum-collect-type*
+  (make-instance 'C-pw-type
+    :control-form 
+    `(make-instance 'C-ttybox :view-size (make-point 36 12) 
+                    :dialog-item-text "coll" :type-list '(collector))))
 
-(setf *MD-object-type*
-       (make-instance 'C-pw-type
-  :control-form `(make-instance 'C-ttybox :view-size (make-point 36 12)
-      :dialog-item-text "coll" :type-list '())))
+(defparameter *MD-object-type*
+  (make-instance 'C-pw-type
+    :control-form `(make-instance 'C-ttybox :view-size (make-point 36 12)
+                                  :dialog-item-text "coll" :type-list '())))
 
 (defunp enum+loop ((en-ob (symbol (:type-list (loop))))
                    (patch (list (:type-list ())))) list

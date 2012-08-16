@@ -83,31 +83,31 @@
         (make-instance 'C-menubox-val
           :view-position (make-point 2 17)  
           :view-size (make-point 48 16)
-          :dialog-item-action #'(lambda (item) (update-status (view-window item) item))
+          :dialog-item-action (lambda (item) (update-status (view-window item) item))
           :menu-box-list 
             '((" paftr" . #xA0) (" contr". #xB0) (" prog" . #xC0) (" maftr" . #xD0) (" ptchb" . #xE0)))) 
      (setf (controller-ctrl self) 
          (make-instance 'C-numbox
            :view-position (make-point 52 17)  
            :view-size (make-point 40 14)
-           :dialog-item-action #'(lambda (item) (update-controller (view-window item) item))
+           :dialog-item-action (lambda (item) (update-controller (view-window item) item))
            :min-val 0 :max-val 127)) 
      (setf (value-ctrl self) 
          (make-instance 'C-numbox
            :view-position (make-point 97 17)  
            :view-size (make-point 40 14)
-           :dialog-item-action #'(lambda (item) (update-value (view-window item) item))
+           :dialog-item-action (lambda (item) (update-value (view-window item) item))
            :min-val 0 :max-val 127)) 
      (setf (label-ctrl self) 
           (make-instance 'C-ttybox-instrument
            :view-position (make-point 142 17)  
            :view-size (make-point 40 14)
-           :dialog-item-action #'(lambda (item) (update-label (view-window item) item))
+           :dialog-item-action (lambda (item) (update-label (view-window item) item))
            :dialog-item-text "label")) 
      (setf (note-play-ctrl self) (make-instance 'BUTTON-DIALOG-ITEM
            :view-position (make-point 200 17)  
            :view-size (make-point 45 18)
-           :dialog-item-action #'(lambda (item) (declare (ignore item))(play-note *global-selected-note*))
+           :dialog-item-action (lambda (item) (declare (ignore item))(play-note *global-selected-note*))
            :view-font '("Monaco" 9 :SRCOR :PLAIN)
            :dialog-item-text "Play"))))
 
@@ -238,37 +238,37 @@
          :dialog-item-text " low   high  status contr ticks "))
     (setf (label-ctrl self) (make-instance 'C-ttybox-instrument
          :view-size (make-point 40 14)
-         :dialog-item-action #'(lambda (item) (update-label (view-window item) item))
+         :dialog-item-action (lambda (item) (update-label (view-window item) item))
          :dialog-item-text "label")) 
     (setf (low-limit-ctrl self) 
        (make-instance 'C-numbox
          :view-size (make-point 40 14)
-         :dialog-item-action #'(lambda (item) (update-low-limit (view-window item) item))
+         :dialog-item-action (lambda (item) (update-low-limit (view-window item) item))
          :min-val 0 :max-val 127)) 
     (setf (high-limit-ctrl self) 
         (make-instance 'C-numbox
          :view-size (make-point 40 14)
-         :dialog-item-action #'(lambda (item) (update-high-limit (view-window item) item))
+         :dialog-item-action (lambda (item) (update-high-limit (view-window item) item))
          :min-val 0 :max-val 127)) 
     (setf (status-ctrl self) 
         (make-instance 'C-menubox-val
          :view-size (make-point 40 14)
-         :dialog-item-action #'(lambda (item) (update-status (view-window item) item))
+         :dialog-item-action (lambda (item) (update-status (view-window item) item))
          :menu-box-list 
             '(("paftr" . #xA0) ("contr". #xB0) ("prog" . #xC0) ("maftr" . #xD0) ("ptchb" . #xE0)))) 
     (setf (controller-ctrl self) 
         (make-instance 'C-numbox
          :view-size (make-point 40 14)
-         :dialog-item-action #'(lambda (item) (update-controller (view-window item) item))
+         :dialog-item-action (lambda (item) (update-controller (view-window item) item))
          :min-val 0 :max-val 127)) 
     (setf (sample-rate-ctrl self) 
          (make-instance 'C-numbox
           :view-size (make-point 40 14)
-          :dialog-item-action #'(lambda (item) (update-sample-rate (view-window item) item))
+          :dialog-item-action (lambda (item) (update-sample-rate (view-window item) item))
           :min-val 1 :max-val 1000)) 
      (setf (note-play-ctrl self) 
          (make-instance 'BUTTON-DIALOG-ITEM
-          :dialog-item-action #'(lambda (item) (declare (ignore item))(play-note *global-selected-note*))
+          :dialog-item-action (lambda (item) (declare (ignore item))(play-note *global-selected-note*))
           :view-size (make-point 40 14)
           :view-font '("Monaco" 9 :SRCOR :PLAIN)
           :dialog-item-text  " play"))))

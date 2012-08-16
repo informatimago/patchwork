@@ -807,14 +807,14 @@
                                       (objc-method-info-signature-info ,first-method)))
                                     receiver ,selector args))))
                   :name `(:objc-dispatch ,name)))
-                (let* ((protocol-pairs (mapcar #'(lambda (pm)
+                (let* ((protocol-pairs (mapcar (lambda (pm)
                                                    (cons (lookup-objc-protocol
                                                           (ccl::objc-method-info-class-name pm))
                                                          (objc-method-info-signature-info
                                                           pm)))
                                                (objc-message-info-protocol-methods message-info)))
-                       (method-pairs (mapcar #'(lambda (group)
-                                                 (cons (mapcar #'(lambda (m)
+                       (method-pairs (mapcar (lambda (group)
+                                                 (cons (mapcar (lambda (m)
                                                                    (get-objc-method-info-class m))
                                                                group)
                                                        (objc-method-info-signature-info (car group))))
@@ -845,7 +845,7 @@
                     :name `(:objc-dispatch ,name)))))))
         (closer-mop:set-funcallable-instance-function
          gf
-         #'(lambda (&rest args)
+         (lambda (&rest args)
              (error "Unknown ObjC message ~a called with arguments ~s"
                     (symbol-name name) args))))))
 
@@ -900,7 +900,7 @@
 ;;; Should be called after using new interfaces that may define
 ;;; new methods on existing messages.
 (defun update-objc-method-info ()
-  (maphash #'(lambda (message-name info)
+  (maphash (lambda (message-name info)
                (ccl::lookup-objc-message-info message-name info)
                (postprocess-objc-message-info info))
            *objc-message-info*))
@@ -1199,7 +1199,7 @@
                                 ,(build-internal-call-from-method-info
                                   (caar methods) args vargs receiver msg s super)))))
                (clauses `(,(if (cdar methods)
-                               `(or ,@(mapcar #'(lambda (m)
+                               `(or ,@(mapcar (lambda (m)
                                                   `(typep ,receiver
                                                           ',(method-class-name m)))
                                               (unique-objc-classes-in-method-info-list

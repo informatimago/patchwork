@@ -94,11 +94,11 @@
          asdf:*central-registry* :test (function equalp))
 
 
-
-(ql:quickload :com.informatimago.objcl :verbose t :explain t)
-(ql:quickload :mclgui                  :verbose t :explain t)
+(ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)
+(ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
+(ql:quickload :mclgui                                     :verbose t :explain t)
 (mclgui:initialize)
-(ql:quickload :patchwork               :verbose t :explain t)
+(ql:quickload :patchwork                                  :verbose t :explain t)
 
 
 ;;;; THE END ;;;;

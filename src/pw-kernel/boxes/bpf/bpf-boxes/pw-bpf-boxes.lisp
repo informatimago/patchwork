@@ -68,22 +68,22 @@
 ;; 1 = timelist 2 = valuelist 3 = bpf
 (defvar *collector-popUp-menu*
   (new-menu " "
-            (new-leafmenu "Save" #'(lambda() (save *target-action-object*)))))
+            (new-leafmenu "Save" (lambda () (save *target-action-object*)))))
 
 (defvar *points-menu* ())
 
 (defvar *bpf-popUp-menu* ())
 
 (defun make-bpf-pops () 
-  (setf *points-menu* (new-leafmenu "flip-mode" #'(lambda () (set-the-points-view *target-action-object*))))
+  (setf *points-menu* (new-leafmenu "flip-mode" (lambda () (set-the-points-view *target-action-object*))))
   (setf *bpf-popUp-menu*
         (new-menu " "  *points-menu*
               (new-leafmenu "-" ())
-              (new-leafmenu "bpf object" #'(lambda() (set-output *target-action-object* :bpf)))
-              (new-leafmenu "X points" #'(lambda() (set-output *target-action-object* :x-points)))
-              (new-leafmenu "Y points" #'(lambda() (set-output *target-action-object* :y-points)))
+              (new-leafmenu "bpf object" (lambda () (set-output *target-action-object* :bpf)))
+              (new-leafmenu "X points" (lambda () (set-output *target-action-object* :x-points)))
+              (new-leafmenu "Y points" (lambda () (set-output *target-action-object* :y-points)))
               (new-leafmenu "-" ())
-              (new-leafmenu "Save" #'(lambda() (save *target-action-object*))))))
+              (new-leafmenu "Save" (lambda () (save *target-action-object*))))))
 
 (defclass  C-patch-function (C-patch-application C-pw-resize-x) 
   ((popUpBox :initform nil :accessor popUpBox)
@@ -119,7 +119,7 @@
     self))
 
 (defmethod get-lock-button-fun ((self C-patch-function))
-  #'(lambda (item)
+  (lambda (item)
       (if (value (view-container item))
         (progn 
           (set-dialog-item-text item "o")
@@ -294,7 +294,7 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
     (let ((points (list! x-val))
           result)
       (setq result 
-            (mapcar #'(lambda (x) (bpf-out bpf-ob x (give-x-points bpf-ob)))
+            (mapcar (lambda (x) (bpf-out bpf-ob x (give-x-points bpf-ob)))
                     points))
       (if (consp x-val)  result (car result)))))|#
 
@@ -309,13 +309,13 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
 (defmethod get-transfer-output ((self null) points) (declare (ignore points)) nil)
 
 (defmethod get-transfer-output ((self C-break-point-function) points)
-  (let ((result (mapcar #'(lambda (x) (bpf-out self x (give-x-points self)))
+  (let ((result (mapcar (lambda (x) (bpf-out self x (give-x-points self)))
                     (list! points))))
     (if (consp points)  result (car result))))
 
 (defmethod get-transfer-output ((self cons) points)
   (if (subtypep (type-of (first self)) 'C-break-point-function)
-    (let ((y-vals (mapcar #'(lambda (bpf) (get-transfer-output bpf points)) self)))
+    (let ((y-vals (mapcar (lambda (bpf) (get-transfer-output bpf points)) self)))
       (if (rest y-vals) y-vals (first y-vals)))
     (progn (format t "input is not a bpf or lists of bpfs ~%") (ui:ed-beep))))
 
@@ -340,7 +340,7 @@ and nbdec  is the number of decimals desired in the output.
                                               xend3)) fact4) nbdec5))
 
 (defmethod get-bpf-sample-output ((self cons) echan1 xinit2 xend3 fact4 nbdec5)
-  (mapcar #'(lambda (bpf) (get-bpf-sample-output bpf echan1 xinit2 xend3 fact4 nbdec5))
+  (mapcar (lambda (bpf) (get-bpf-sample-output bpf echan1 xinit2 xend3 fact4 nbdec5))
           self))
 
 (defmethod get-bpf-sample-output ((self number) echan1 xinit2 xend3 fact4 nbdec5)

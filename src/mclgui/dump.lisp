@@ -75,11 +75,11 @@
 
 (defmacro collect-slots (object &rest slots)
   (if (symbolp object)
-      `((lambda (,object)
+      `((cl:lambda (,object)
           (declare (ignorable ,object))
           ,(extract-slots object slots)) ,object)
       (destructuring-bind (ovar oval) object
-        `((lambda (,ovar)
+        `((cl:lambda (,ovar)
             (declare (ignorable ,ovar))
             ,(extract-slots object slots))  ,oval))))
 
@@ -215,8 +215,8 @@
      (let ((subview  [nssubviews objectAtIndex:i])
            (level (+ 4 level)))
        (format t "~%")
-       (format t "~V<~>frame =~S~%" level (get-nsrect [subview frame]))
-       (format t "~V<~>bounds=~S~%" level (get-nsrect [subview bounds]))
+       (format t "~V<~>frame      = ~S~%" level (get-nsrect [subview frame]))
+       (format t "~V<~>bounds     = ~S~%" level (get-nsrect [subview bounds]))
        (dump-nsview-subviews subview level)))))
 
 (defun dump-nswindow-subviews (nswindow)

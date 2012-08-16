@@ -104,7 +104,7 @@
 (defmethod initialize-instance :after  ((view view) &key view-subviews subviews &allow-other-keys)
   ;; We need to do that after the subclasses such as windows have initialized.
   (let ((subviews (or view-subviews subviews)))
-    (format-trace "initialize-instance" view subviews)
+    ;; (format-trace "initialize-instance" view subviews)
     (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
     (apply (function add-subviews) view (coerce subviews 'list)))
   view)
@@ -153,12 +153,10 @@ All views contained in a given window have the same wptr.
             (make-view-valid view)
             (compute-view-region view (view-clip-region-slot view) container))))))
 
-
-(defgeneric view-allocate-clip-region (view)
-  (:method ((view view))
-    (let ((rgn (view-clip-region view)))
-      (or rgn
-          (setf (view-clip-region-slot view) (new-rgn))))))
+(defmethod view-allocate-clip-region ((view view))
+  (let ((rgn (view-clip-region view)))
+    (or rgn
+        (setf (view-clip-region-slot view) (new-rgn)))))
 
 (defgeneric view-clip-region (view)
   (:method ((view view))
@@ -191,15 +189,16 @@ RETURN:    the view-font-codes of the font-view or of the application-font.
                                  (view-font-codes font-view))
     (let ((ff (or ff 65536)) ; application-font
           (ms (or ms 0)))
-        (format-trace "set-font" :ff ff :ms ms)
+        ;; (format-trace "set-font" :ff ff :ms ms)
         (finish-output *trace-output*)
       (multiple-value-bind (font mode) (font-from-codes ff ms)
-        (declare (ignore mode))          ; TODO: manage mode (:srcOr …)
-        (format-trace "set-font" font mode)
-        (finish-output *trace-output*)
+        ;; TODO: manage mode (:srcOr …)
+        ;; (format-trace "set-font" font mode)
+        ;; (finish-output *trace-output*)
         [font set]
-        (format-trace "[font set]" 'done)
-        (finish-output *trace-output*))
+        ;; (format-trace "[font set]" 'done)
+        ;; (finish-output *trace-output*)
+        )
       (list ff ms))))
 
 ;; [(font-from-codes 65536 0) set]
@@ -365,6 +364,8 @@ WINDOW:         A window.
               (install-view-in-window subview window))))
 
 
+
+
 (defgeneric remove-view-from-window (view)
   (:documentation "
 DO:             Remove view from its container.  It should never be
@@ -492,17 +493,6 @@ NEW-CONTAINER:  The new container of the view.
       (error "Container must always be ~S for windows." nil))
     new-container))
 
-
-(defmethod view-activate-event-handler ((view view))
-  (dovector (v (view-subviews view))
-    (view-activate-event-handler v))
-  (call-next-method))
-
-
-(defmethod view-deactivate-event-handler ((view view))
-  (dovector (v (view-subviews view))
-    (view-deactivate-event-handler v))
-  (call-next-method))
 
 
 (defgeneric add-subviews (view &rest subviews)
@@ -927,13 +917,11 @@ RETURN:         (make-point h v)
       (unless (eql pos (view-position view))
         (invalidate-view view t)         
         (setf (slot-value view 'view-position) pos)
-        (invalidate-view view t)
         (with-handle (viewh view)
           [viewh setFrameOrigin: (nspoint pos)]
           #-(and)
-          (com.informatimago.common-lisp.cesarum.utility:tracing
-           view viewh pos
-           (on-main-thread [viewh setFrameOrigin: (nspoint pos)]))))
+          (on-main-thread [viewh setFrameOrigin: (nspoint pos)]))
+        (invalidate-view view t))
       (refocus-view view)
       pos)))
 
@@ -958,11 +946,11 @@ V:              The height of the new size, or NIL if the complete
         (invalidate-view view t)
         (with-handle (viewh view)
           [viewh setFrameSize: (nssize siz)]
-          [viewh setBounds: (nsrect (make-point 0 0) siz)]
+          [viewh setBounds: (nsrect (view-origin view) siz)]
           #-(and)
           (progn
             (on-main-thread [viewh setFrameSize: (nssize siz)])
-            (on-main-thread [viewh setBounds: (nsrect (make-point 0 0) siz)]))))
+            (on-main-thread [viewh setBounds: (nsrect (view-origin view) siz)]))))
       (refocus-view view)
       siz)))
 
@@ -1114,6 +1102,7 @@ POINT:          A point, encoded as an integer.
 
 SOURCE-VIEW:    A view in whose coordinate system point is given.
 "
+  (declare (stepper disable))
   (labels ((convert-to-window (view pt)
              (if (or (typep view 'window)
                      (null (view-container view)))
@@ -1259,10 +1248,12 @@ VIEW:           A simple view or view.
 VISRGN, CLIPRGN Region records from the view’s wptr.
 ")
   (:method ((view simple-view) &optional visrgn cliprgn)
+    (declare (ignore visrgn cliprgn)) ; for now ; we could compute a clip rect.
     (with-focused-view (view-container view)
       (view-draw-contents view)))
 
   (:method ((view view) &optional visrgn cliprgn)
+    (declare (ignore visrgn cliprgn)) ; for now ; we could compute a clip rect.
     (with-focused-view view
       (view-draw-contents view)
       #-(and)
@@ -1369,8 +1360,9 @@ VIEW:           A simple view.
 
 
 
-(defmethod view-font-codes-info ((view simple-view))
-  (multiple-value-call (function font-codes-info) (view-font-codes view)))
+(defgeneric view-font-codes-info (view)
+  (:method ((view simple-view))
+    (multiple-value-call (function font-codes-info) (view-font-codes view))))
 
 (defgeneric set-initial-view-font (view font-spec)
   (:method ((view simple-view) font-spec)

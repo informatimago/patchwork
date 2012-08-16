@@ -76,7 +76,7 @@
                 (make-instance 'button-dialog-item 
                                :view-position (make-point 80 50)
                                :dialog-item-text "Cancel"
-                               :dialog-item-action #'(lambda (item) item (return-from-modal-dialog nil))))
+                               :dialog-item-action (lambda (item) item (return-from-modal-dialog nil))))
   (case mode
     ('range 
      (add-subviews *rtm-editor-dialog-window*
@@ -101,7 +101,7 @@
 
 (defun edit-rtm-editor-velocity-menu ()
    (open-rtm-win 'range "Velocity" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-velocity *active-rtm-window*  (value *rtm-win-1st-numbox*) (value *rtm-win-2nd-numbox*))
       (return-from-modal-dialog ()))))
 
@@ -125,7 +125,7 @@
 
 (defun edit-rtm-editor-transpose-menu ()
    (open-rtm-win 'simple "Transpose (in cents)" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-transpose *active-rtm-window*  (value *rtm-win-1st-numbox*))
             (return-from-modal-dialog ()))
        :min1 -3600 :max1 3600 :val1 100))
@@ -147,7 +147,7 @@
 
 (defun edit-rtm-editor-chans-menu ()
    (open-rtm-win 'simple "Midi channel" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-chans *active-rtm-window*  (value *rtm-win-1st-numbox*))
            (return-from-modal-dialog ()))
        :min1 1 :max1 16 :val1 1))
@@ -166,7 +166,7 @@
 #|
 (defun edit-rtm-editor-duration-menu ()
    (open-rtm-win 'simple "Duration (in %)" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-duration *active-rtm-window*  (value *rtm-win-1st-numbox*))
            (return-from-modal-dialog ()))
        :min1 1 :max1 1000 :val1 90))
@@ -175,7 +175,7 @@
 ;;changed by aaa 28-08-95 from pw-modif
 (defun edit-rtm-editor-duration-menu ()
   (open-rtm-win 'simple "Duration (in %)" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-duration *active-rtm-window*  (value *rtm-win-1st-numbox*))
            (return-from-modal-dialog ()))
        :min1 1 :max1 1000 :val1 100))
@@ -202,7 +202,7 @@
 
 (defun edit-rtm-editor-Metronome-menu ()
    (open-rtm-win 'range "Unit   Metronome" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-Metronome *active-rtm-window*  (patch-value  *rtm-win-1st-numbox* ())(value *rtm-win-2nd-numbox*))
             (return-from-modal-dialog ()))
        :min1 1 :max1 32 :val1 5 :min2 10 :max2 360 :val2 60))
@@ -250,7 +250,7 @@
 
 (defun edit-rtm-editor-transpose-global-menu ()
    (open-rtm-win 'simple "Transpose (in cents)" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-transpose-global *active-rtm-window*  (value *rtm-win-1st-numbox*))
             (return-from-modal-dialog ()))
        :min1 -3600 :max1 3600 :val1 100))
@@ -271,7 +271,7 @@
 
 (defun edit-rtm-editor-chans-global-menu ()
    (open-rtm-win 'simple "Midi channel" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-chans-global *active-rtm-window*  (value *rtm-win-1st-numbox*))
            (return-from-modal-dialog ()))
        :min1 1 :max1 16 :val1 1))
@@ -296,7 +296,7 @@
             (tell chords #'set-all-chans chan)))))
 
 (ui:add-menu-items  *RTM-global-menu*                        
-   (new-leafmenu "Increment channel" #'(lambda () (edit-rtm-editor-chans-global-2 *active-rtm-window*))))
+   (new-leafmenu "Increment channel" (lambda () (edit-rtm-editor-chans-global-2 *active-rtm-window*))))
 
 ;;========================================
 ;;global duration
@@ -304,7 +304,7 @@
 ;;changed by aaa 28-08-95 from pw-modif
 (defun edit-rtm-editor-duration-global-menu ()
    (open-rtm-win 'simple "Duration (in %)" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-duration-global *active-rtm-window*  (value *rtm-win-1st-numbox*))
            (return-from-modal-dialog ()))
        :min1 1 :max1 1000 :val1 100))
@@ -312,7 +312,7 @@
 #|
 (defun edit-rtm-editor-duration-global-menu ()
    (open-rtm-win 'simple "Duration (in %)" 
-       #'(lambda (item) (declare (ignore item))
+       (lambda (item) (declare (ignore item))
            (edit-rtm-editor-duration-global *active-rtm-window*  (value *rtm-win-1st-numbox*))
            (return-from-modal-dialog ()))
        :min1 1 :max1 1000 :val1 90))
@@ -338,7 +338,7 @@
 (defun edit-rtm-editor-Metronome-global-menu ()
   (without-interrupts
    (open-rtm-win 'range "Unit   Metronome"
-                 #'(lambda (item) (declare (ignore item))
+                 (lambda (item) (declare (ignore item))
                     (edit-rtm-editor-Metronome-global *active-rtm-window*  (patch-value *rtm-win-1st-numbox* ())
                                                       (value *rtm-win-2nd-numbox*))
                     (return-from-modal-dialog ()))
@@ -375,20 +375,20 @@
 (ui:add-menu-items  *RTM-menu*    
    (new-menu "Choose Staff"
       (new-menu "Selected staff"
-                           (new-leafmenu "G2-G" #'(lambda()     (edit-rtm-editor-staff-layout *active-rtm-window* 1)))  
-                           (new-leafmenu "G" #'(lambda()        (edit-rtm-editor-staff-layout *active-rtm-window* 2))) 
-                           (new-leafmenu "G F" #'(lambda()      (edit-rtm-editor-staff-layout *active-rtm-window* 3)))  
-                           (new-leafmenu "F" #'(lambda()        (edit-rtm-editor-staff-layout *active-rtm-window* 4)))  
-                           (new-leafmenu "G F F2" #'(lambda()   (edit-rtm-editor-staff-layout *active-rtm-window* 5)))  
-                           (new-leafmenu "G2 G F F2" #'(lambda()(edit-rtm-editor-staff-layout *active-rtm-window* 6)))  
-                           (new-leafmenu "Empty" #'(lambda()     (edit-rtm-editor-staff-layout *active-rtm-window* 7)))) 
+                           (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 1)))  
+                           (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 2))) 
+                           (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staff-layout *active-rtm-window* 3)))  
+                           (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 4)))  
+                           (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staff-layout *active-rtm-window* 5)))  
+                           (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staff-layout *active-rtm-window* 6)))  
+                           (new-leafmenu "Empty" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 7)))) 
       (new-menu "All staffs"
-                           (new-leafmenu "G2-G" #'(lambda()     (edit-rtm-editor-staffs-layout *active-rtm-window* 1)))  
-                           (new-leafmenu "G" #'(lambda()        (edit-rtm-editor-staffs-layout *active-rtm-window* 2))) 
-                           (new-leafmenu "G F" #'(lambda()      (edit-rtm-editor-staffs-layout *active-rtm-window* 3)))  
-                           (new-leafmenu "F" #'(lambda()        (edit-rtm-editor-staffs-layout *active-rtm-window* 4)))  
-                           (new-leafmenu "G F F2" #'(lambda()   (edit-rtm-editor-staffs-layout *active-rtm-window* 5)))  
-                           (new-leafmenu "G2 G F F2" #'(lambda()(edit-rtm-editor-staffs-layout *active-rtm-window* 6)))  
-                           (new-leafmenu "Empty" #'(lambda()     (edit-rtm-editor-staffs-layout *active-rtm-window* 7))))))
+                           (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staffs-layout *active-rtm-window* 1)))  
+                           (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 2))) 
+                           (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staffs-layout *active-rtm-window* 3)))  
+                           (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 4)))  
+                           (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staffs-layout *active-rtm-window* 5)))  
+                           (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staffs-layout *active-rtm-window* 6)))  
+                           (new-leafmenu "Empty" (lambda ()     (edit-rtm-editor-staffs-layout *active-rtm-window* 7))))))
                                                                                                        
 

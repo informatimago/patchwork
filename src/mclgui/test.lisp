@@ -513,10 +513,9 @@
 ||#
 
 (defun test/draw-string (&optional (string "Hello World!"))
-  (com.informatimago.common-lisp.cesarum.utility:tracing
-   (set-view-font (front-window) '("Monaco" 9 :srcCopy))
-   (with-font-focused-view (aref (view-subviews (front-window)) 0)
-     (draw-string 10 20 string))))
+  (set-view-font (front-window) '("Monaco" 9 :srcCopy))
+  (with-font-focused-view (aref (view-subviews (front-window)) 0)
+    (draw-string 10 20 string)))
 
 ;; (test/draw-string)
 
@@ -662,3 +661,16 @@
        mclgui::stream-tyo)
 
 ||#
+
+(defmethod view-draw-contents :after ((view simple-view))
+  (setf *color-available* t)
+  (with-focused-view view
+   (with-fore-color *blue-color*
+     (let* ((o (view-origin view))
+            (x (- (point-h o)))
+            (y (- (point-v o)))
+            (s (view-size view))
+            (w (point-h s))
+            (h (point-v s)))
+ 
+       (draw-rect x y w h)))))

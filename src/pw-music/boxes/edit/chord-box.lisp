@@ -69,7 +69,7 @@
 
 (defun form-note-objs (&rest list)
   (let (note instrument)
-  (mapcar #'(lambda (note-form) 
+  (mapcar (lambda (note-form) 
               (setq note (make-instance 'C-note :midic (first note-form)
                                         :dur (second note-form)
                                         :offset-time (third note-form)

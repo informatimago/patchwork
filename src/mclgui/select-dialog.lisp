@@ -82,7 +82,7 @@
              (let ((s-item (find-subview-of-type (view-container item)
                                                  'sequence-dialog-item)))
                (funcall action-function 
-                        (mapcar #'(lambda (c) (cell-contents s-item c))
+                        (mapcar (lambda (c) (cell-contents s-item c))
                                 (selected-cells s-item))))))
       (when (and dialog-class (not pos-p) modeless)
         (let ((w (front-window :class 'select-dialog)))  ; or dialog-class?
@@ -96,7 +96,7 @@
                 :dialog-item-action
                 (cond 
                   ((not modeless)
-                   #'(lambda (item)
+                   (lambda (item)
                        (return-from-modal-dialog (act-on-items item))))
                   (t
                    #'act-on-items))))

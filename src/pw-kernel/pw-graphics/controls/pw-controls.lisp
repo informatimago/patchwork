@@ -54,18 +54,17 @@
 (defvar *menu-action-cut-std* ())
 (defvar *menu-action-copy-std* ())
 (defvar *menu-action-paste-std* ())
-(defvar *menu-action-cut-txt*
-      #'(lambda () (cut *pw-controls-dialog-text-item*)))
-(defvar *menu-action-copy-txt* #'(lambda () (copy *pw-controls-dialog-text-item*)))
-(defvar *menu-action-paste-txt* #'(lambda () (paste *pw-controls-dialog-text-item*)))
+(defvar *menu-action-cut-txt*   (lambda () (cut *pw-controls-dialog-text-item*)))
+(defvar *menu-action-copy-txt*  (lambda () (copy *pw-controls-dialog-text-item*)))
+(defvar *menu-action-paste-txt* (lambda () (paste *pw-controls-dialog-text-item*)))
 
 (defun set-all-menu-actions ()
   (setf *menu-action-cut-std* 
-    (menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")))
+        (menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")))
   (setf *menu-action-copy-std* 
-    (menu-item-action-function (find-menu-item *pw-menu-edit* "Copy")))
+        (menu-item-action-function (find-menu-item *pw-menu-edit* "Copy")))
   (setf *menu-action-paste-std* 
-    (menu-item-action-function (find-menu-item *pw-menu-edit* "Paste"))))
+        (menu-item-action-function (find-menu-item *pw-menu-edit* "Paste"))))
 
 (defun make-pw-controls-dialog (&optional class)
   (set-all-menu-actions)
@@ -86,55 +85,55 @@
 (defvar *cancel-button* ())
 
 (defun make-pw-controls-dialog-old ()
-(MAKE-INSTANCE 'DIALOG :window-show nil
-               :WINDOW-TYPE :SINGLE-EDGE-BOX :VIEW-POSITION #@(-426 -60)
-               :VIEW-SIZE #@(91 20)
-               :CLOSE-BOX-P NIL
-               :VIEW-FONT '("Chicago" 12 :SRCOR :PLAIN)
-               :VIEW-SUBVIEWS
-               (LIST (setf *pw-controls-dialog-text-item-old*
-                     (MAKE-DIALOG-ITEM 'EDITABLE-TEXT-DIALOG-ITEM
-                                       #@(2 1)
-                                       #@(84 16)
-                                       "Untitled"
-                                       NIL
-                                      :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
-                                      :ALLOW-RETURNS NIL))
-                     (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
-                                       #@(6 47)
-                                       #@(62 16)
-                                       "OK"
-                                       #'(LAMBDA (ITEM) 
-                                          (declare (ignore ITEM))
-                                          (set-dialog-item-text-from-dialog
+  (MAKE-INSTANCE 'DIALOG :window-show nil
+                 :WINDOW-TYPE :SINGLE-EDGE-BOX :VIEW-POSITION #@(-426 -60)
+                 :VIEW-SIZE #@(91 20)
+                 :CLOSE-BOX-P NIL
+                 :VIEW-FONT '("Chicago" 12 :SRCOR :PLAIN)
+                 :VIEW-SUBVIEWS
+                 (LIST (setf *pw-controls-dialog-text-item-old*
+                             (MAKE-DIALOG-ITEM 'EDITABLE-TEXT-DIALOG-ITEM
+                                               #@(2 1)
+                                               #@(84 16)
+                                               "Untitled"
+                                               NIL
+                                               :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                               :ALLOW-RETURNS NIL))
+                       (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
+                                         #@(6 47)
+                                         #@(62 16)
+                                         "OK"
+                                         (LAMBDA (ITEM) 
+                                               (declare (ignore ITEM))
+                                             (set-dialog-item-text-from-dialog
                                               *pw-controls-current-pw-control* 
                                               (dialog-item-text *pw-controls-dialog-text-item-old*))
-                                          (window-hide *pw-controls-dialog*))
-                                       :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
-                                       :DEFAULT-BUTTON T)
-                     (setf *cancel-button*
-                           (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
-                                       #@(86 49)
-                                       #@(62 16)
-                                       "cancel"
-                                       NIL
-                                       :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
-                                       :DEFAULT-BUTTON NIL)))))
+                                             (window-hide *pw-controls-dialog*))
+                                         :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                         :DEFAULT-BUTTON T)
+                       (setf *cancel-button*
+                             (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
+                                               #@(86 49)
+                                               #@(62 16)
+                                               "cancel"
+                                               NIL
+                                               :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                               :DEFAULT-BUTTON NIL)))))
 
 (defun open-pw-controls-dialog-old (item &optional point size)
- (let ((*menubar-frozen* t)) ; to avoid flicker in the menubar
-  (unless *pw-controls-dialog* (setf *pw-controls-dialog* (make-pw-controls-dialog-old)))
-  (setf *pw-controls-current-pw-control* item)
-  (set-dialog-item-text *pw-controls-dialog-text-item-old* (dialog-item-text item))
-  (set-view-position *pw-controls-dialog* 
-     (add-points  
-      (local-to-global (view-container item) (view-position item)) 
-      (or point (make-point 1 0))))
-  (set-view-size *pw-controls-dialog* 
-                 (subtract-points (or size (view-size item)) (make-point 2 2)))
-  (set-view-size *pw-controls-dialog-text-item-old* 
-                 (subtract-points (view-size item) (make-point 2 2)))
-  (window-select *pw-controls-dialog*)))
+  (let ((*menubar-frozen* t)) ; to avoid flicker in the menubar
+    (unless *pw-controls-dialog* (setf *pw-controls-dialog* (make-pw-controls-dialog-old)))
+    (setf *pw-controls-current-pw-control* item)
+    (set-dialog-item-text *pw-controls-dialog-text-item-old* (dialog-item-text item))
+    (set-view-position *pw-controls-dialog* 
+                       (add-points  
+                        (local-to-global (view-container item) (view-position item)) 
+                        (or point (make-point 1 0))))
+    (set-view-size *pw-controls-dialog* 
+                   (subtract-points (or size (view-size item)) (make-point 2 2)))
+    (set-view-size *pw-controls-dialog-text-item-old* 
+                   (subtract-points (view-size item) (make-point 2 2)))
+    (window-select *pw-controls-dialog*)))
 
 (defun open-pw-controls-dialog (item &optional point size class)
   (if (not (eq (type-of (front-window)) 'c-pw-window))
@@ -156,20 +155,20 @@
         (change-menu-actions)  ))))
 
 (defun change-menu-actions ()
-       (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")
-                              *menu-action-cut-txt*)
-       (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Copy")
-                              *menu-action-copy-txt*)
-       (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Paste")
-                              *menu-action-paste-txt*))
+  (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")
+                                 *menu-action-cut-txt*)
+  (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Copy")
+                                 *menu-action-copy-txt*)
+  (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Paste")
+                                 *menu-action-paste-txt*))
 
 (defun restore-menu-actions ()
-       (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")
-                              *menu-action-cut-std*)
-       (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Copy")
-                              *menu-action-copy-std*)
-       (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Paste")
-                              *menu-action-paste-std*))
+  (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")
+                                 *menu-action-cut-std*)
+  (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Copy")
+                                 *menu-action-copy-std*)
+  (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Paste")
+                                 *menu-action-paste-std*))
 
 (defun kill-text-item ()
   (remove-subviews (view-container *current-small-inBox*)
@@ -209,21 +208,21 @@
   (set-view-font self '("Monaco" 9 :SRCOR :PLAIN)))
 
 (defmethod value ((self C-ttybox))
-   (dialog-item-text self))
+  (dialog-item-text self))
 
 (defmethod (setf value) (value (self C-ttybox))
   (set-dialog-item-text self
-        (if (not (stringp value))
-          (format () "~D" value)
-          (string-downcase value))))
+                        (if (not (stringp value))
+                          (format () "~D" value)
+                          (string-downcase value))))
 
 (defmethod decompile ((self C-ttybox))
   `(make-instance ',(class-name (class-of self))
-          :view-position ,(view-position self)
-          :view-size ,(view-size self)
-          :dialog-item-text ,(dialog-item-text self)
-          :doc-string ,(doc-string self)
-          :type-list ',(type-list self)))
+     :view-position ,(view-position self)
+     :view-size ,(view-size self)
+     :dialog-item-text ,(dialog-item-text self)
+     :doc-string ,(doc-string self)
+     :type-list ',(type-list self)))
 
 (defmethod x+w ((self C-ttybox)) (+ (x self)(w self)))
 ;;=========================
@@ -232,11 +231,11 @@
 (defmethod view-draw-contents ((self C-ttybox))
   ;;;(with-focused-view self
   ;;modified 920818 [Camilo]
- (with-font-focused-view self
-   (if (open-state self)
-       (call-next-method)
-       (draw-string 3 9 (doc-string self)))
-   (draw-rect 0 0 (w self)(h self))))
+  (with-font-focused-view self
+    (if (open-state self)
+      (call-next-method)
+      (draw-string 3 9 (doc-string self)))
+    (draw-rect 0 0 (w self)(h self))))
 
 
 (defmethod set-open-state ((self C-ttybox) fl)
@@ -256,8 +255,8 @@
   (set-dialog-item-text self text))
 
 (defmethod view-click-event-handler ((self C-ttybox) where)
- (if (and (open-state self) (double-click-p))
-   (view-double-click-event-handler self where)))
+  (if (and (open-state self) (double-click-p))
+    (view-double-click-event-handler self where)))
 
 ;;=========================
 ;;PW
@@ -266,12 +265,13 @@
   (declare (ignore obj))
   (read-from-string (dialog-item-text self)))
 
-(defmethod set-special-text ((self C-ttybox) value) (declare (ignore value)) )
+(defmethod set-special-text ((self C-ttybox) value)
+  (declare (ignore value)))
 
 ;;===========================================================================
 
 (defclass C-TTYBOX-EVAL (C-ttybox) ())
-  
+
 ;;=========================
 ;;PW
 
@@ -295,9 +295,9 @@
 
 (defmethod (setf value) (value (self C-ttybox-str))
   (set-dialog-item-text self
-        (if (not (stringp value))
-          (format () "~D" value)
-          value)))
+                        (if (not (stringp value))
+                          (format () "~D" value)
+                          value)))
 
 ;;===========================================================================
 (defclass C-ttybox-out (C-ttybox-str) ())
@@ -328,7 +328,7 @@
 
 (defmethod view-click-event-handler ((self C-ttybox-absout) where)
   (when (double-click-p)
-     (view-double-click-event-handler self where)))
+    (view-double-click-event-handler self where)))
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-absout) text)
   (set-dialog-item-text self text)
@@ -348,14 +348,14 @@
     (with-pen-state (:mode :srcxor) 
       (fill-rect*  1 1 (- (w self) 2)(- (h self) 2))))
   (when (dialog-item-action-function self)
-     (funcall (dialog-item-action-function  self) self)))
+    (funcall (dialog-item-action-function  self) self)))
 
 (defmethod view-draw-contents ((self C-button-latched))
- (with-focused-view self
-     (draw-string 3 9 (dialog-item-text self))
-     (unless (open-state self)
-        (with-pen-state (:mode :srcxor) 
-          (fill-rect*  1 1 (- (w self) 2)(- (h self) 2))))
+  (with-focused-view self
+    (draw-string 3 9 (dialog-item-text self))
+    (unless (open-state self)
+      (with-pen-state (:mode :srcxor) 
+        (fill-rect*  1 1 (- (w self) 2)(- (h self) 2))))
     (draw-rect 0 0 (w self)(h self))))
 
 (defmethod value ((self C-button-latched)) (not (open-state self)))
@@ -376,15 +376,15 @@
 
 (defmethod decompile ((self C-numbox))
   `(make-instance ',(class-name (class-of self))
-          :view-position ,(view-position self)
-          :view-size ,(view-size self)
-          :dialog-item-text ,(dialog-item-text self)
-          :VIEW-FONT ',(VIEW-FONT self)
-          :doc-string ,(doc-string self)
-          :type-list ',(type-list self)
-          :value   ,(value self)
-          :min-val  ,(min-val self)
-          :max-val ,(max-val self)))
+     :view-position ,(view-position self)
+     :view-size ,(view-size self)
+     :dialog-item-text ,(dialog-item-text self)
+     :VIEW-FONT ',(VIEW-FONT self)
+     :doc-string ,(doc-string self)
+     :type-list ',(type-list self)
+     :value   ,(value self)
+     :min-val  ,(min-val self)
+     :max-val ,(max-val self)))
 
 (defmethod initialize-instance :after ((view C-numbox) &rest initargs)
   (declare (ignore initargs))
@@ -404,8 +404,8 @@
 
 (defmethod item-action-while-drag ((self C-numbox)))
 (defmethod item-action-after-drag ((self C-numbox))
-   (when (dialog-item-action-function self)
-        (funcall (dialog-item-action-function  self) self)))
+  (when (dialog-item-action-function self)
+    (funcall (dialog-item-action-function  self) self)))
 
 (defmethod map-mouse-increment ((view C-numbox))
   (cond ((option-key-p) 100) 
@@ -414,33 +414,33 @@
         (t 1))) 
 
 (defmethod view-click-event-handler ((self C-numbox) where)
- (declare (ignore where))
- (when (open-state self)
-   (unless (call-next-method)
-    (with-focused-view self
-      (draw-rect 1 1 (- (w self) 2)(- (h self) 2)))
-    (let* ((win (view-window self))
-           (first-v (point-v (view-mouse-position win)))
-           (last-mp (view-mouse-position win))
-           (last-value (value self)))
+  (declare (ignore where))
+  (when (open-state self)
+    (unless (call-next-method)
+      (with-focused-view self
+        (draw-rect 1 1 (- (w self) 2)(- (h self) 2)))
+      (let* ((win (view-window self))
+             (first-v (point-v (view-mouse-position win)))
+             (last-mp (view-mouse-position win))
+             (last-value (value self)))
       ;;;(pfloop                                 ;!!
-      (loop
-        (event-dispatch)
-        (unless (mouse-down-p) (return))
-        (let ((mp (view-mouse-position win)))
-          (unless (eql mp last-mp)
-            (setq last-mp mp)
-            (set-numbox-item-text self  
-               (setf (value self)
-                  (max (min-val self) (min (max-val self)
-                    (+ last-value 
-                      (* (map-mouse-increment self) (- first-v (point-v last-mp))))))))
-            (view-draw-contents self)
-            (with-focused-view self
-               (draw-rect 1 1 (- (w self) 2)(- (h self) 2)))
-            (item-action-while-drag self))))))
-     (item-action-after-drag self)
-     (view-draw-contents self)))
+        (loop
+          (event-dispatch)
+          (unless (mouse-down-p) (return))
+          (let ((mp (view-mouse-position win)))
+            (unless (eql mp last-mp)
+              (setq last-mp mp)
+              (set-numbox-item-text self  
+                                    (setf (value self)
+                                          (max (min-val self) (min (max-val self)
+                                                                   (+ last-value 
+                                                                      (* (map-mouse-increment self) (- first-v (point-v last-mp))))))))
+              (view-draw-contents self)
+              (with-focused-view self
+                (draw-rect 1 1 (- (w self) 2)(- (h self) 2)))
+              (item-action-while-drag self))))))
+    (item-action-after-drag self)
+    (view-draw-contents self)))
 
 ;;=========================
 ;;PW
@@ -456,8 +456,8 @@
 (defclass C-numbox-continuous (C-numbox) ())
 
 (defmethod item-action-while-drag ((self C-numbox-continuous))
-   (when (dialog-item-action-function self)
-        (funcall (dialog-item-action-function  self) self)))
+  (when (dialog-item-action-function self)
+    (funcall (dialog-item-action-function  self) self)))
 
 (defmethod item-action-after-drag ((self C-numbox-continuous)))
 
@@ -470,21 +470,21 @@
 
 (defmethod decompile ((self C-menubox))
   `(make-instance ',(class-name (class-of self))
-          :view-position ,(view-position self)
-          :view-size ,(view-size self)
-          :dialog-item-text ,(dialog-item-text self)
-          :VIEW-FONT ',(VIEW-FONT self)
-          :doc-string ,(doc-string self)
-          :type-list ',(type-list self)
-          :value   ,(value self)
-          :min-val  ,(min-val self)
-          :max-val ,(max-val self)
-          :menu-box-list ',(menu-box-list self)))
+     :view-position ,(view-position self)
+     :view-size ,(view-size self)
+     :dialog-item-text ,(dialog-item-text self)
+     :VIEW-FONT ',(VIEW-FONT self)
+     :doc-string ,(doc-string self)
+     :type-list ',(type-list self)
+     :value   ,(value self)
+     :min-val  ,(min-val self)
+     :max-val ,(max-val self)
+     :menu-box-list ',(menu-box-list self)))
 
 (defmethod set-menu-box-list  ((self C-menubox) list) (setf (menu-box-list self) list))
 
 (defmethod menubox-value  ((self C-menubox))
-   (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self))) 
+  (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self))) 
 
 (defmethod set-numbox-item-text  ((self C-menubox) value)
   (if (stringp value)
@@ -504,7 +504,7 @@
 (defmethod patch-value ((self C-menubox) obj)
   (declare (ignore obj))
   (menubox-value self))
-  
+
 
 ;;===========================================================================
 ;;                      C-menubox-val
@@ -514,7 +514,6 @@
 (defclass  C-menubox-val (C-menubox) ())
 
 (defmethod menubox-value ((self C-menubox-val)) 
-  (declare (ignore obj))
   (car (call-next-method))) 
 
 ;;=========================
@@ -533,33 +532,33 @@
 ;;for INTERFACE-TOOLS
 ;;=========================
 (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
-              (make-instance 'C-menubox
-                     :value 0
+(make-instance 'C-menubox
+:value 0
 ;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)
-                     :menu-box-list '("  ac" " czx" "  bx" "   z")))
+:menu-box-list '("  ac" " czx" "  bx" "   z")))
 
 (defmethod INTERFACE-TOOLS::add-editor-items :after ((menubox C-menubox) editor)
-  (let ((position (add-points INTERFACE-TOOLS::*editor-items-start-pos* #@(0 66))))
-    (add-subviews
-     editor
-     (make-dialog-item 'button-dialog-item
-                       position #@(130 16) "Set Menubox Strings"
-                       #'(lambda (item)
-                           (declare (ignore item))
-                           (set-menu-box-list
-                            menubox
-                            (INTERFACE-TOOLS::get-new-table-data 
-                             (menu-box-list menubox) "strings")))))))
+(let ((position (add-points INTERFACE-TOOLS::*editor-items-start-pos* #@(0 66))))
+(add-subviews
+editor
+(make-dialog-item 'button-dialog-item
+position #@(130 16) "Set Menubox Strings"
+(lambda (item)
+(declare (ignore item))
+(set-menu-box-list
+menubox
+(INTERFACE-TOOLS::get-new-table-data 
+(menu-box-list menubox) "strings")))))))
 
 (defmethod INTERFACE-TOOLS::copy-instance ((item C-menubox))
-  (let* ((new-item (call-next-method)))
-    (setf (value new-item) (value item))
-    (setf (menu-box-list new-item) (menu-box-list item))
-    new-item))
+(let* ((new-item (call-next-method)))
+(setf (value new-item) (value item))
+(setf (menu-box-list new-item) (menu-box-list item))
+new-item))
 
 (defmethod INTERFACE-TOOLS::object-source-code ((item C-menubox))
-  (nconc (call-next-method)
-         `(:menu-box-list ',(menu-box-list item))))
+(nconc (call-next-method)
+`(:menu-box-list ',(menu-box-list item))))
 
 ;;====================================================================================================
 |#
@@ -568,20 +567,20 @@
 ;;for INTERFACE-TOOLS
 ;;=========================
 (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
-              (make-instance 'C-numbox
-                     :view-position #@(5 22)
-                     :value 0))
+(make-instance 'C-numbox
+:view-position #@(5 22)
+:value 0))
 ;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)))
 
 (defmethod INTERFACE-TOOLS::copy-instance ((item C-numbox))
-  (let* ((new-item (call-next-method))
-         (value (value item)))
-    (set-numbox-item-text new-item value)
-    new-item))
+(let* ((new-item (call-next-method))
+(value (value item)))
+(set-numbox-item-text new-item value)
+new-item))
 
 (defmethod INTERFACE-TOOLS::object-source-code ((item C-numbox))
-  (nconc (call-next-method)
-         `(:value ,(value item))))
+(nconc (call-next-method)
+`(:value ,(value item))))
 
 ;;=========================
 |#

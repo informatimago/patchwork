@@ -75,15 +75,6 @@
 
 (in-package :ae)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (export '(create-appleevent choose-appleevent-target choose-process-dialog
-            create-self-target create-named-process-target create-psn-target 
-            do-processes find-named-process find-process-with-signature
-            create-alias-list send-appleevent appleevent-filter-proc
-            get-transaction-id get-return-id get-event-class get-error-number
-            create-odoc create-pdoc create-oapp create-quit create-eval create-dosc
-            send-eval send-dosc send-eval-to-hypercard send-dosc-to-hypercard)))
-
 
 ;; create-appleevent
 ;; Create an apple event
@@ -274,7 +265,7 @@
       (setq inforec-var (cadr psn-var)
             inforec-tail (list inforec-var)
             psn-var (car psn-var)))
-    `(let ((,thunk #'(lambda (,psn-var ,@inforec-tail)
+    `(let ((,thunk (lambda (,psn-var ,@inforec-tail)
                        (declare (type macptr ,psn-var ,@inforec-tail))
                        ,@body)))
        (declare (dynamic-extent ,thunk))

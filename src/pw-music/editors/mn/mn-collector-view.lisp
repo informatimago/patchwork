@@ -69,53 +69,53 @@
         (new-menu 
          " "
          (new-menu "Play" 
-                   (new-leafmenu "All" #'(lambda() (play-all-staffs *target-action-object*)))
-                   ;(new-leafmenu "Visible" #'(lambda()(play-the-chords *target-action-object* t)))
-                   ;(new-leafmenu "selected" #'(lambda()(play-the-chords *target-action-object* ())))
-                   (new-leafmenu "Stop Playing" #'(lambda() (stop-all-staffs *target-action-object*))))
+                   (new-leafmenu "All" (lambda () (play-all-staffs *target-action-object*)))
+                   ;(new-leafmenu "Visible" (lambda ()(play-the-chords *target-action-object* t)))
+                   ;(new-leafmenu "selected" (lambda ()(play-the-chords *target-action-object* ())))
+                   (new-leafmenu "Stop Playing" (lambda () (stop-all-staffs *target-action-object*))))
          (new-menu "Approximation"
                    (prog1 (setf a-leaf-menu
                                 (new-leafmenu "SemiTone" 
-                                    #'(lambda() (use-all-approx-scale  *target-action-object* *c-major-scale*))))
+                                    (lambda () (use-all-approx-scale  *target-action-object* *c-major-scale*))))
                      (set-command-key a-leaf-menu #\2))
                    (prog1 (setf a-leaf-menu
                                 (new-leafmenu "Quarter tone" 
-                                   #'(lambda() (use-all-approx-scale  *target-action-object* *1/4-tone-chromatic-scale*))))
+                                   (lambda () (use-all-approx-scale  *target-action-object* *1/4-tone-chromatic-scale*))))
                      (set-command-key a-leaf-menu #\4))
                    (prog1 (setf a-leaf-menu
                                 (new-leafmenu "Eigth tone" 
-                                    #'(lambda() (use-all-approx-scale  *target-action-object* *1/8-tone-chromatic-scale*))))
+                                    (lambda () (use-all-approx-scale  *target-action-object* *1/8-tone-chromatic-scale*))))
                      (set-command-key a-leaf-menu #\8)))
          (new-menu "Scale"
                    (new-leafmenu "C-major" 
-                                 #'(lambda() (use-all-scale  *target-action-object* *c-major-scale*)))
+                                 (lambda () (use-all-scale  *target-action-object* *c-major-scale*)))
                    (new-leafmenu "Chromatic" 
-                                 #'(lambda() (use-all-scale  *target-action-object* *chromatic-scale*))))
+                                 (lambda () (use-all-scale  *target-action-object* *chromatic-scale*))))
          (new-menu "Choose Staff"   ;;;;;;;;"Lay out"
-                   ;;(new-leafmenu "Add Staff" #'(lambda() (add-new-staff-to-MN-editor *target-action-object*)))
+                   ;;(new-leafmenu "Add Staff" (lambda () (add-new-staff-to-MN-editor *target-action-object*)))
                    ;;(new-menu "Choose Staff"
-                   (new-leafmenu "G2-G" #'(lambda() 
+                   (new-leafmenu "G2-G" (lambda () 
                                             (use-staff  *target-action-object* 1 *g2-g-staffs*)))
-                   (new-leafmenu "G" #'(lambda() 
+                   (new-leafmenu "G" (lambda () 
                                          (use-staff  *target-action-object* 2 *g-plain-staffs*)))
-                   (new-leafmenu "G F" #'(lambda() 
+                   (new-leafmenu "G F" (lambda () 
                                            (use-staff  *target-action-object* 3 *g-f-staffs*)))
-                   (new-leafmenu "F" #'(lambda() 
+                   (new-leafmenu "F" (lambda () 
                                          (use-staff  *target-action-object* 4 *f-plain-staffs*)))
-                   (new-leafmenu "G F F2" #'(lambda() 
+                   (new-leafmenu "G F F2" (lambda () 
                                               (use-staff  *target-action-object* 5 *g-f-f2-staffs*)))
-                   (new-leafmenu "G2 G F F2" #'(lambda() 
+                   (new-leafmenu "G2 G F F2" (lambda () 
                                                  (use-staff  *target-action-object* 6 *g2-g-f-f2-staffs*)))
-                   (new-leafmenu "Empty" #'(lambda()
+                   (new-leafmenu "Empty" (lambda ()
                                                      (use-staff  *target-action-object* 7 *empty-staffs*))))
          (new-menu "Select" 
-                   (new-leafmenu "visible" #'(lambda() (Do-selections *target-action-object* nil)))
-                   (new-leafmenu "All" #'(lambda() (Do-selections *target-action-object* t))))
+                   (new-leafmenu "visible" (lambda () (Do-selections *target-action-object* nil)))
+                   (new-leafmenu "All" (lambda () (Do-selections *target-action-object* t))))
          (new-leafmenu "-" ())
          (new-menu "Transforms"
-                   (new-leafmenu "Chord Notes" #'(lambda()(Cresc-selection *target-action-object*)))
-                   (new-leafmenu "Retro" #'(lambda()(Retro-selection *target-action-object*)))
-                   (new-leafmenu "Chord Time" #'(lambda()(Accell-selection *target-action-object*)))))))
+                   (new-leafmenu "Chord Notes" (lambda ()(Cresc-selection *target-action-object*)))
+                   (new-leafmenu "Retro" (lambda ()(Retro-selection *target-action-object*)))
+                   (new-leafmenu "Chord Time" (lambda ()(Accell-selection *target-action-object*)))))))
 
 (make-chord-collector-pops)
 
@@ -171,7 +171,7 @@
                           :dialog-item-text "tr"
                           :view-font '("monaco"  9  :srcor)
                           :dialog-item-action
-                          #'(lambda (item)
+                          (lambda (item)
                               (declare (ignore item))
                               (transpose-selection self)))
            (make-instance 'C-numbox  
@@ -316,7 +316,7 @@
                        :view-position (make-point 80 150)
                        :view-size (make-point 40 23)
                        :dialog-item-action
-                       #'(lambda(item) (declare (ignore item)) (do-chosen-action self))))
+                       (lambda (item) (declare (ignore item)) (do-chosen-action self))))
   (setf (slot-value self 'Cancel-button) 
         (make-instance 'button-dialog-item
                        :default-button ()
@@ -324,7 +324,7 @@
                        :view-position (make-point 160 150)
                        :view-size (make-point 60 25)
                        :dialog-item-action
-                       #'(lambda(item) (declare (ignore item)) (return-from-modal-dialog nil))))  )
+                       (lambda (item) (declare (ignore item)) (return-from-modal-dialog nil))))  )
 
 (defmethod use-staff ((self C-MN-view-mod) num staff)
     (dolist (panel (editor-objects self))
@@ -556,7 +556,7 @@
                (unselect-all-chords (car all-panels) 0 0)
                (let ((size (view-size (car all-panels)))
                      (max-y
-                      (apply 'max  (mapcar #'(lambda (panel) (+ (point-v (view-size panel))
+                      (apply 'max  (mapcar (lambda (panel) (+ (point-v (view-size panel))
                                                                 (point-v (view-position panel))))
                                            all-panels)))
                      (last-panel-home (origin (car (last all-panels))))
@@ -611,23 +611,21 @@
       (start (apdfuncall 10 2 15
                          'play-chosen-chords self the-notes (cdr (car the-notes)))))))
 
-(setf *MN-mod-play-advance* 20)    ; time advance for chord scheduling
+(defparameter *MN-mod-play-advance* 20)    ; time advance for chord scheduling
 
 (defmethod play-chosen-chords ((self C-chord-line) the-notes t-offset)
-  (declare (special *MN-play-flag*))
-    (when the-notes
-      (let ((start-time)
-            (approx (compute-approx)))
-        (setf *MN-play-flag* t)
-        (setq start-time (cdr (car the-notes)))
-        (apdfuncall 10 (priority) (-  start-time t-offset)
-                    'keep-playing-notes self the-notes start-time approx))))
+  (when the-notes
+    (let ((start-time)
+          (approx (compute-approx)))
+      (setf *MN-play-flag* t)
+      (setq start-time (cdr (car the-notes)))
+      (apdfuncall 10 (priority) (-  start-time t-offset)
+                  'keep-playing-notes self the-notes start-time approx))))
 
 (defun micro-channel (midic)
   (+ 1 (/ (mod midic 100) 25)))
 
 (defmethod keep-playing-notes ((self C-chord-line) notes start-time &optional approx)
-  (declare (special *MN-play-flag*))
   (when *MN-play-flag*
     (cond ((eq *playing-option* :pb)
            (play-note (car (pop notes)) approx)

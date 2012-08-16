@@ -258,24 +258,24 @@ takes its default value."
   (declare (ignore midic dur vel chan m-ins)))
 ;;==================================
 
-(setf *note-obj-pw-type*
+(defparameter *note-obj-pw-type*
   (make-instance 'C-pw-type
   :control-form
    `(make-instance 'C-ttybox  :view-size (make-point 36 14)
                     :type-list '(note-obj))))
 
-(setf *fix-list-tty-pw-type*
+(defparameter *fix-list-tty-pw-type*
   (make-instance 'C-pw-type
   :control-form
    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "()" 
       :type-list '(fixnum list))))
 
-(setf *note-obj-field-pw-type*
+(defparameter *note-obj-field-pw-type*
   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-val
-                                                         :view-size (make-point 36 14)
-    :menu-box-list '(("midic" . midic) ("dur". dur) 
-                     ("vel". vel) ("chan". chan)
-                     ("instrument". instrument)) 
-    :type-list '(no-connection))))
+                                             :view-size (make-point 36 14)
+                                             :menu-box-list '(("midic" . midic) ("dur". dur) 
+                                                              ("vel". vel) ("chan". chan)
+                                                              ("instrument". instrument)) 
+                                             :type-list '(no-connection))))
 
 ;;==================================

@@ -43,6 +43,19 @@
 
 
 
+(defmethod view-activate-event-handler ((view view))
+  (dovector (v (view-subviews view))
+    (view-activate-event-handler v))
+  (call-next-method))
+
+(defmethod view-deactivate-event-handler ((view view))
+  (dovector (v (view-subviews view))
+    (view-deactivate-event-handler v))
+  (call-next-method))
+
+
+
+
 (defmethod view-click-event-handler ((view simple-view) where)
   (declare (ignore where))
   view)
@@ -68,11 +81,13 @@
 (defmacro %get-current-key-handler (window)
   `(view-get ,window '%current-key-handler))
 
+(defmethod current-key-handler ((w null))
+  nil)
+
 (defmethod current-key-handler ((w window))
   (%get-current-key-handler w))
 
-(defmethod current-key-handler ((w null))
-  nil)
+
 
 
 (defmacro %get-key-handler-list (window)

@@ -191,7 +191,7 @@
 
 ;;(defmethod insert-point-by-h ((self C-break-point-function) new-point)
 ;;  (set-break-point-function self 
-;;     (sort (cons new-point (break-point-list self))  #'< :key #'(lambda (a) (point-h a)))))
+;;     (sort (cons new-point (break-point-list self))  #'< :key (lambda (a) (point-h a)))))
 
 (defmethod insert-point-by-h ((self C-break-point-function) new-bp)
    (let ((bps (break-point-list self))

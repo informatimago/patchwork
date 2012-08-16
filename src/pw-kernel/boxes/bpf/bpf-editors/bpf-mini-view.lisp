@@ -138,10 +138,10 @@
    (when x-values 
     (setq x-min (apply #'min (mapcar #'car x-values)))
     (setq x-max ;(car (last x-values)))
-          (apply #'max (mapcar #'(lambda (vs) (car (last vs))) x-values)))
-    (setq y-min (apply #'min (mapcar #'(lambda (vs) (apply #'min vs)) y-values)))
+          (apply #'max (mapcar (lambda (vs) (car (last vs))) x-values)))
+    (setq y-min (apply #'min (mapcar (lambda (vs) (apply #'min vs)) y-values)))
     (setq y-max ;(apply #'max y-values))
-       (apply #'max (mapcar #'(lambda (vs) (apply #'max vs)) y-values)))
+       (apply #'max (mapcar (lambda (vs) (apply #'max vs)) y-values)))
     (unless (=  x-max x-min)
       (setf (h-view-scaler view) (/ (+ (- x-max x-min)(* (- x-max x-min) .01)) (w view) ))) 
     (unless (=  y-max y-min)

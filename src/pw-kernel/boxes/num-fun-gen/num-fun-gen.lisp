@@ -186,7 +186,7 @@ Si sym = nil, la fct n'est pas affichée dans le listener"
               ((>= bmin bmax) (and res (apply 'max res)))
             (setq power
              (false-position-search  
-              #'(lambda (b) #i(y/y * (x1 ** b - x0 ** b) - (x2 ** b - x1 ** b)))
+              (lambda (b) #i(y/y * (x1 ** b - x0 ** b) - (x2 ** b - x1 ** b)))
               bmin bmax 0.001))
              (if power (push power res))))
    (unless b 

@@ -163,9 +163,10 @@ Called by -[MclguiWindow zoom:] which is called from WINDOW-ZOOM-EVENT-HANDLER."
 
 ;;; --- window moving ----
 
-(defmethod window-move-event-handler ((window window) new-position)
-  (let ((*window-moving* t))
-    (set-view-position window new-position)))
+(defgeneric window-move-event-handler (window new-position)
+  (:method ((window window) new-position)
+    (let ((*window-moving* t))
+      (set-view-position window new-position))))
 
 
 ;;; --- window update ----

@@ -789,7 +789,8 @@ RETURN:         NIL.
                       (menu-deinstall item)))
                   (setf (slot-value menu 'item-list) (delete item (slot-value menu 'item-list)))
                   (release item))
-                (cerror "Continue" 'menu-item-not-owned-error :menu menu :item item))))))))
+                ;; (cerror "Continue" 'menu-item-not-owned-error :menu menu :item item)
+                )))))))
 
 
 (defgeneric find-menu-item (menu title)
@@ -850,18 +851,20 @@ This is the menu-item-update-function for the items in the Edit menu.
           (menu-disable menu)))))
 
 
-(defmethod menu-update-for-modal ((menu menu) &optional what)
-  (let ((updater (menu-update-function menu)))
-    (if updater
+(defgeneric menu-update-for-modal (menu &optional what)
+  (:method ((menu menu) &optional what)
+    (let ((updater (menu-update-function menu)))
+      (if updater
         (funcall updater menu)
         (case what
           (:disable (menu-disable menu))
-          (:enable  (menu-enable  menu))))))
+          (:enable  (menu-enable  menu)))))))
 
 
- (defmethod menu-select ((menu menu) num)
-   ;; Use ELT because errs out if list too short...
-  (menu-item-action (elt (slot-value menu 'item-list) (1- num))))
+(defgeneric menu-select (menu num)
+  (:method ((menu menu) num)
+    ;; Use ELT because errs out if list too short...
+    (menu-item-action (elt (slot-value menu 'item-list) (1- num)))))
 
 
 
@@ -890,6 +893,9 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 (defgeneric window-menu-item (w)
   (:documentation "RETURN: A window-menu menu-item for the window W."))
+
+
+(defvar *bring-windows-front-item*  nil)
 
 
 (defun update-windows-menu (menu)
@@ -932,7 +938,7 @@ This is the menu-item-update-function for the items in the Edit menu.
                   (let ((copy nil))
                     (dolist (x new-items)
                       (when x (push x copy)))
-                    (setf new-items (sort copy #'string-lessp :key #'ccl::menu-title))))
+                    (setf new-items (sort copy #'string-lessp :key (function menu-title)))))
                 (dolist (item new-items)
                   (when item ; windoid's & da-window's have no menu-item's                     
                     (add-menu-items menu item)
@@ -986,18 +992,19 @@ This is the menu-item-update-function for the items in the Edit menu.
                       (setf (handle item) nsitem))))))
 
 
-(defmethod handle-of-menu-item-of ((menu menu))
-  "
+(defgeneric handle-of-menu-item-of (menu)
+  (:documentation "
 RETURN: The handle of the menu-item that has (handle menu) as submenu.
-"
-  (when (handle menu)
-    (let ((supermenu [(handle menu) supermenu]))
-      (if (nullp supermenu)
+")
+  (:method ((menu menu))
+    (when (handle menu)
+      (let ((supermenu [(handle menu) supermenu]))
+        (if (nullp supermenu)
           nil
           (let ((index [supermenu indexOfItemWithSubmenu:(handle menu)]))
             (if (minusp index)
-                nil
-                [supermenu itemAtIndex:index]))))))
+              nil
+              [supermenu itemAtIndex:index])))))))
 
 
 (defun ns-add-item (nsmenu nsitem)
@@ -1169,7 +1176,6 @@ RETURN:         A new instance of MENU representing the NSMenu NSMENU.
       :do [window orderFront:window])))
 
 
-(defvar *bring-windows-front-item*  nil)
 
 
 (defun fetch-current-menubar ()

@@ -127,7 +127,7 @@
        (add-to-selection-buttons panel-obj selection-butt)
        (connect-control selection-butt function rtm-obj)))
 
-(setf *selection-buttons-pool* (make-instance 'C-selection-buttons-pool))
+(defparameter *selection-buttons-pool* (make-instance 'C-selection-buttons-pool))
 ;;(length (buttons-pool *selection-buttons-pool*))
 ;;(length (free-beat-selection-buttons *selection-buttons-pool*))
 ;;(give-beat-selection-button  *selection-buttons-pool* () 0 0 0 0)

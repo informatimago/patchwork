@@ -69,7 +69,7 @@
   
   (defun collect-normal-expander (n-value fun forms)
     `(progn
-       ,@(mapcar #'(lambda (form) `(setf ,n-value (,fun ,form ,n-value))) forms)
+       ,@(mapcar (lambda (form) `(setf ,n-value (,fun ,form ,n-value))) forms)
        ,n-value))
 
   (defun form-symbol (first &rest others)
@@ -134,7 +134,7 @@
 (defun collect-list-expander (n-value n-tail forms)
   (let ((n-res (gensym)))
     `(progn
-       ,@(mapcar #'(lambda (form)
+       ,@(mapcar (lambda (form)
                      `(let ((,n-res (cons ,form nil)))
                         (cond (,n-tail
                                (setf (cdr ,n-tail) ,n-res)

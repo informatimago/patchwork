@@ -215,8 +215,8 @@
                        (break-point-functions (editor-view-object (application-object self))))))
     (case (out-type self)
     (:bpf (if (second bpfs) bpfs (first bpfs)))
-    (:x-points (mapcar #'(lambda (bpf) (slot-value bpf 'X-points)) bpfs))
-    (:y-points (mapcar #'(lambda (bpf) (slot-value bpf 'Y-points)) bpfs)))))
+    (:x-points (mapcar (lambda (bpf) (slot-value bpf 'X-points)) bpfs))
+    (:y-points (mapcar (lambda (bpf) (slot-value bpf 'Y-points)) bpfs)))))
 
 (defmethod construct-bpfs-objects ((self number) &optional ts-exp)
   (let* ((ts (convert-to-lists ts-exp))
@@ -229,7 +229,7 @@
     (let ((vs-exp (convert-to-lists self))
           (ts-exp (convert-to-lists ts-exp)))
       (setq ts-exp (equalize-lists vs-exp ts-exp))
-      (mapcar #'(lambda (vs-list ts-list) (make-break-point-function ts-list vs-list))
+      (mapcar (lambda (vs-list ts-list) (make-break-point-function ts-list vs-list))
               vs-exp ts-exp))))
 
 (defmethod construct-bpfs-objects ((self C-break-point-function) &optional ts-exp)

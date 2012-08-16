@@ -49,6 +49,99 @@ are allowed in the editable-text dialog item. Otherwise, it returns NIL.
 "))
 
 
+
+(defgeneric key-handler-list (view)
+  (:documentation "
+RETURN:         The list of key handlers associated with view.
+VIEW:           A simple view or dialog item.
+"))
+
+
+(defgeneric current-key-handler (window)
+  (:documentation "
+RETURN:        The current key handler of window.
+"))
+
+
+(defgeneric set-current-key-handler (window item &optional select-all)
+  (:documentation "
+DO:            Set the current key handler of window to item.  If item
+               is not already the current key handler and SELECT-ALL
+               is true, SET-CURRENT-KEY-HANDLER selects all of the
+               WINDOW.
+
+WINDOW:        A window.
+
+ITEM:          A key handler.  If item is not a key handler, the
+               function signals an error.
+
+SELECT-ALL:    This parameter determines whether the entire text of
+               the key handler is highlighted when it is first
+               selected.  The default is T; that is, all the text is
+               highlighted and can be manipulated at once.
+"))
+
+
+(defgeneric add-key-handler (view &optional window)
+  (:documentation "
+The generic function add-key-handler adds a key handler to view. It is
+called by install-view-in-window when the view installed is a
+subclass of key-handler-mixin. If window has no current key handler,
+view becomes the current key handler.
+
+VIEW:           A simple view or dialog item.
+
+WINDOW:         A window to which to add the key handler. The default
+                value is (VIEW-WINDOW VIEW).
+"))
+
+
+(defgeneric remove-key-handler (view &optional window)
+  (:documentation "
+The generic function remove-key-handler removes a key handler from
+a window. It is called by the method of remove-view-from-window for
+key-handler-mixin.
+
+VIEW:           A simple view or dialog item.
+
+WINDOW:         A window to which to add the key handler. The default
+                value is (VIEW-WINDOW VIEW).
+"))
+
+
+
+(defgeneric change-key-handler (view)
+  (:documentation "
+The generic function change-key-handler changes the key handler of
+view to the next key handler on key-handler-list of view.
+
+VIEW:           A simple view or dialog item.
+"))
+
+
+
+
+
+(defgeneric key-handler-idle (view &optional dialog)
+  (:documentation "
+The KEY-HANDLER-IDLE generic function is called periodically via the
+default WINDOW-NULL-EVENT-HANDLER function to allow a key handler to
+blink a cursor or perform other periodic activities.  The method for
+FRED-DIALOG-ITEM blinks the insertion point and matches
+parentheses.  The method for SIMPLE-VIEW does nothing.
+
+VIEW:           A simple view.
+
+DIALOG:         An argument allowing a dialog to be specified. In
+                system-supplied methods, this argument is ignored.
+
+")
+  (:method ((view simple-view) &optional dialog)
+    (declare (ignore dialog))
+    view))
+
+
+
 (defclass key-handler-mixin ()
   ((allow-returns :initarg :allow-returns :initform nil :accessor allow-returns-p)
    (allow-tabs    :initarg :allow-tabs    :initform nil :accessor allow-tabs-p))
@@ -185,97 +278,6 @@ the editable-text dialog item.
   (remove-key-handler item))
 
 
-
-
-(defgeneric key-handler-list (view)
-  (:documentation "
-RETURN:         The list of key handlers associated with view.
-VIEW:           A simple view or dialog item.
-"))
-
-
-(defgeneric current-key-handler (window)
-  (:documentation "
-RETURN:        The current key handler of window.
-"))
-
-
-(defgeneric set-current-key-handler (window item &optional select-all)
-  (:documentation "
-DO:            Set the current key handler of window to item.  If item
-               is not already the current key handler and SELECT-ALL
-               is true, SET-CURRENT-KEY-HANDLER selects all of the
-               WINDOW.
-
-WINDOW:        A window.
-
-ITEM:          A key handler.  If item is not a key handler, the
-               function signals an error.
-
-SELECT-ALL:    This parameter determines whether the entire text of
-               the key handler is highlighted when it is first
-               selected.  The default is T; that is, all the text is
-               highlighted and can be manipulated at once.
-"))
-
-
-(defgeneric add-key-handler (view &optional window)
-  (:documentation "
-The generic function add-key-handler adds a key handler to view. It is
-called by install-view-in-window when the view installed is a
-subclass of key-handler-mixin. If window has no current key handler,
-view becomes the current key handler.
-
-VIEW:           A simple view or dialog item.
-
-WINDOW:         A window to which to add the key handler. The default
-                value is (VIEW-WINDOW VIEW).
-"))
-
-
-(defgeneric remove-key-handler (view &optional window)
-  (:documentation "
-The generic function remove-key-handler removes a key handler from
-a window. It is called by the method of remove-view-from-window for
-key-handler-mixin.
-
-VIEW:           A simple view or dialog item.
-
-WINDOW:         A window to which to add the key handler. The default
-                value is (VIEW-WINDOW VIEW).
-"))
-
-
-
-(defgeneric change-key-handler (view)
-  (:documentation "
-The generic function change-key-handler changes the key handler of
-view to the next key handler on key-handler-list of view.
-
-VIEW:           A simple view or dialog item.
-"))
-
-
-
-
-
-(defgeneric key-handler-idle (view &optional dialog)
-  (:documentation "
-The KEY-HANDLER-IDLE generic function is called periodically via the
-default WINDOW-NULL-EVENT-HANDLER function to allow a key handler to
-blink a cursor or perform other periodic activities.  The method for
-FRED-DIALOG-ITEM blinks the insertion point and matches
-parentheses.  The method for SIMPLE-VIEW does nothing.
-
-VIEW:           A simple view.
-
-DIALOG:         An argument allowing a dialog to be specified. In
-                system-supplied methods, this argument is ignored.
-
-")
-  (:method ((view simple-view) &optional dialog)
-    (declare (ignore dialog))
-    view))
 
 
 

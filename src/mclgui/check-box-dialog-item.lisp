@@ -70,32 +70,34 @@ checkboxes.
 
 
 
-(defmethod check-box-check ((item check-box-dialog-item))
-  "
+(defgeneric check-box-check (item)
+  (:documentation "
 The check-box-check generic function places an X in the checkbox. The
 function merely places an X in the box; it does not run the action of the
 dialog item.
-"
-  (setf (check-box-checked-p item) t)
-  (when (installed-item-p item)
-    (with-focused-view (view-container item)
-      (niy check-box-check item)
-      ;; (#_SetControlValue (dialog-item-handle item) 1)
-      )))
+")
+  (:method ((item check-box-dialog-item))
+    (setf (check-box-checked-p item) t)
+    (when (installed-item-p item)
+      (with-focused-view (view-container item)
+        (niy check-box-check item)
+        ;; (#_SetControlValue (dialog-item-handle item) 1)
+        ))))
 
 
-(defmethod check-box-uncheck ((item check-box-dialog-item))
-  "
+(defgeneric check-box-uncheck (item)
+  (:documentation "
 The check-box-uncheck generic function removes the X from the
 checkbox. The function merely removes the X from the box; it does not run
 the action of the dialog item. The function returns nil.
-"
-  (setf (check-box-checked-p item) nil)
-  (when (installed-item-p item)
-    (with-focused-view (view-container item)
-      (niy check-box-uncheck item)
-      ;; (#_SetControlValue (dialog-item-handle item) 0)
-      )))
+")
+  (:method ((item check-box-dialog-item))
+    (setf (check-box-checked-p item) nil)
+    (when (installed-item-p item)
+      (with-focused-view (view-container item)
+        (niy check-box-uncheck item)
+        ;; (#_SetControlValue (dialog-item-handle item) 0)
+        ))))
 
 
 (defmethod dialog-item-action ((item check-box-dialog-item))

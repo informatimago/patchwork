@@ -78,7 +78,7 @@
   ;;;(append (call-next-method) (list (make-point (w self) (- (h self) 7)))))
 
 #|(defmethod get-lock-button-fun ((self C-pw-circ))
-  #'(lambda (item)
+  (lambda (item)
     (if (value (view-container item))
       (progn (set-dialog-item-text item "o")
              (setf (data self) nil))
@@ -194,7 +194,7 @@ This box can be extended by option-clicking bottom-right
 (defmethod correct-extension-box ((self C-pw-test) new-box values)
   (let ((ctrls (cdr (pw-controls new-box)))
         (values  (cdr (append (butlast values) (list* 0 0 (last values))))))
-    (mapc #'(lambda (ctrl val) 
+    (mapc (lambda (ctrl val) 
               (setf (value ctrl) val)
               (set-dialog-item-text ctrl (format () "~D" val))) ctrls values)
     (when (not (eq (car (last (input-objects self))) (car (last (pw-controls self)))))

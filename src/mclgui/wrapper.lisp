@@ -36,11 +36,15 @@
 (objcl:enable-objcl-reader-macros)
 
 
+(defgeneric handle (object)
+  (:documentation "The NSObject instance wrapped over.")
+  (:method ((none null)) nil))
+
+
 (defclass wrapper ()
   ((handle :initform nil
            :initarg :handle
-           :reader handle
-           :documentation "The NSObject instance wrapped over."))
+           :reader handle))
   (:documentation "This mixin adds a wrapped-over NSObject instance handle to a wrapper object."))
 
 
@@ -56,9 +60,18 @@
 
 
 
-(defmethod (setf handle) (new-handle (wrapper wrapper))
-  (let ((old-handle (handle wrapper)))
-    (if new-handle
+(defgeneric (setf handle) (new-handle wrapper)
+  (:documentation "
+DO:             Sets the handle of the wrapper.
+                If NEW-HANDLE is the same as the old handle, then nothing is done.
+                If NEW-HANDLE is nil, the release the old handler if any.
+                If NEW-HANDLE is not nil, then it's retained.
+
+RETURN:         NEW-HANDLE.
+")
+  (:method (new-handle (wrapper wrapper))
+    (let ((old-handle (handle wrapper)))
+      (if new-handle
         (unless (eq old-handle new-handle)
           (when old-handle
             [old-handle release])
@@ -67,7 +80,7 @@
         (when old-handle
           [old-handle release]
           (setf (slot-value wrapper 'handle) nil))))
-  new-handle)
+    new-handle))
 
 
 (defmacro with-handle ((handle-var wrapper) &body body)
@@ -204,8 +217,8 @@ DO:             Execute BODY, unless a wrapping is occuring, in which
         (wrap-nsmenu nsobject))
        ([nsobject isKindOfClass:(oclo:@class "NSMenuItem")]
         (wrap-nsmenuitem nsobject))
-       ;; ([nsobject isKindOfClass:(oclo:@class "NSWindow")]
-       ;;  (wrap-nswindow nsobject))
+       ([nsobject isKindOfClass:(oclo:@class "NSWindow")]
+        (wrap-nswindow nsobject))
        ([nsobject isKindOfClass:(oclo:@class "NSDictionary")]
         (wrap-nsdictionary nsobject))
        ([nsobject isKindOfClass:(oclo:@class "NSNotification")]

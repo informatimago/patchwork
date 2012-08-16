@@ -88,13 +88,13 @@
 ;;A popUpMenu for selecting the type of chord-box output (patch-value)
 (defvar *Chord-box-popUpMenu*
   (new-menu " "
-            (new-leafmenu "Midics" #'(lambda() (set-output *target-action-object* :midic)))
-            (new-leafmenu "Durations" #'(lambda() (set-output *target-action-object* :duration)))
-            (new-leafmenu "Velocity" #'(lambda() (set-output *target-action-object* :dynamic)))
-            (new-leafmenu "Offsets" #'(lambda() (set-output *target-action-object* :offset)))
-            (new-leafmenu "Reorder" #'(lambda() (set-output *target-action-object* :order)))
-            (new-leafmenu "Chord Object" #'(lambda() (set-output *target-action-object* :object)))
-            (new-leafmenu "Save Chord" #'(lambda() (save *target-action-object* )))))
+            (new-leafmenu "Midics" (lambda () (set-output *target-action-object* :midic)))
+            (new-leafmenu "Durations" (lambda () (set-output *target-action-object* :duration)))
+            (new-leafmenu "Velocity" (lambda () (set-output *target-action-object* :dynamic)))
+            (new-leafmenu "Offsets" (lambda () (set-output *target-action-object* :offset)))
+            (new-leafmenu "Reorder" (lambda () (set-output *target-action-object* :order)))
+            (new-leafmenu "Chord Object" (lambda () (set-output *target-action-object* :object)))
+            (new-leafmenu "Save Chord" (lambda () (save *target-action-object* )))))
 
 (defmethod initialize-instance :after ((self C-patch-chord-box-M ) &key controls)
   (declare (ignore controls) (special *Chord-box-popUpMenu*))
@@ -119,7 +119,7 @@
   (set-pw-win+pw-obj (mus-not-editor self) *active-patch-window* self))
 
 (defmethod get-lock-button-fun ((self C-patch-chord-box-M))
-  #'(lambda (item)
+  (lambda (item)
       (if (value (view-container item))
         (progn 
           (set-dialog-item-text item "o")
@@ -222,7 +222,7 @@
            (setf (chords  (chord-line my-in))
                    (list (make-chord-object val 0 (type-of (car old-chords)))))
            (if (and old-chords (notes (car old-chords)))
-             (mapc #'(lambda (new-note old-note)
+             (mapc (lambda (new-note old-note)
                        (setf (dur new-note) (dur old-note))
                        (setf (vel new-note) (vel old-note))
                        (setf (offset-time new-note) (offset-time old-note))

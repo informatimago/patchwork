@@ -34,6 +34,8 @@
 
 (in-package "MCLGUI")
 
+(declaim (declaration stepper))
+
 (deftype point () '(unsigned-byte 32))
 
 (defun make-point (h &optional v)
@@ -46,9 +48,10 @@ weight 15-0.
 
 RETURN:         If V is given then the encoded point #@(H V), else H.
 "
+  (declare (stepper disable))
   (if v
-      (dpb (ldb (byte 16 0) v) (byte 16 16) (ldb (byte 16 0) h))
-      h))
+    (dpb (ldb (byte 16 0) (round v)) (byte 16 16) (ldb (byte 16 0) (round h)))
+    h))
 
 
 (defun point-string (point)
@@ -57,6 +60,7 @@ RETURN:         A string representation of POINT.
 
 EXAMPLE:        (point-string (make-point 10 20)) --> \"#@(10 20)\"
 "
+  (declare (stepper disable))
   (format nil "#@(~A ~A)" (point-h point) (point-v point)))
 
 
@@ -64,20 +68,22 @@ EXAMPLE:        (point-string (make-point 10 20)) --> \"#@(10 20)\"
   "
 RETURN:         The horizontal coordinate of POINT.
 "
+  (declare (stepper disable))
   (let ((u (ldb (byte 16  0) point)))
     (if (< 32767 u)
-        (- u 65536)
-        u)))
+      (- u 65536)
+      u)))
 
 
 (defun point-v (point)
   "
 RETURN:         The vertical coordinate of POINT.
 "
+  (declare (stepper disable))
   (let ((u (ldb (byte 16 16) point)))
     (if (< 32767 u)
-        (- u 65536)
-        u)))
+      (- u 65536)
+      u)))
 
 
 (defun point<= (point &rest other-points)
@@ -95,27 +101,30 @@ POINT:          A point, represented by an integer.
 
 OTHER-POINTS:   Zero or more other points represented by integers.
 "
+  (declare (stepper disable))
   (if (null other-points)
-      t
-      (let ((h (point-h point))
-            (v (point-v point)))
-        (dolist (p other-points t)
-          (unless (and (<= h (setq h (point-h p)))
-                       (<= v (setq v (point-v p))))
-            (return nil))))))
+    t
+    (let ((h (point-h point))
+          (v (point-v point)))
+      (dolist (p other-points t)
+        (unless (and (<= h (setq h (point-h p)))
+                     (<= v (setq v (point-v p))))
+          (return nil))))))
 
 
 (defun add-points (a b)
   "
 RETURN:         The point that is the vectorial sum of points A and B.
 "
+  (declare (stepper disable))
   (make-point (+ (point-h a) (point-h b))
               (+ (point-v a) (point-v b))))
 
 (defun subtract-points (a b)
-    "
+  "
 RETURN:         The point that is the vectorial difference of points A from B.
 "
+  (declare (stepper disable))
   (make-point (- (point-h a) (point-h b))
               (- (point-v a) (point-v b))))
 
@@ -124,6 +133,7 @@ RETURN:         The point that is the vectorial difference of points A from B.
   "
 RETURN:         The point P as a list of coordinates (H V).
 "
+  (declare (stepper disable))
   (list (point-h p) (point-v p)))
 
 
@@ -136,10 +146,11 @@ RETURN:         The point P as a list of coordinates (H V).
 (defun sharp-at-dispatch-reader-macro (stream subchar arg)
   "#@(x y) reads a Point."
   (declare (ignore subchar arg))
+  (declare (stepper disable))
   (let ((coord  (read stream)))
     (if *read-suppress*
-        (values)
-        (values (apply (function make-point) coord)))))
+      (values)
+      (values (apply (function make-point) coord)))))
 
 
 (defmacro enable-sharp-at-reader-macro ()

@@ -61,13 +61,13 @@
     (let ((valid-slots (class-slot-names (car notes))) methods)
       (if (consp the-slots)
         (mapcar 
-         #'(lambda (note) 
-             (mapcar #'(lambda (slot)
+         (lambda (note) 
+             (mapcar (lambda (slot)
                          (if (setq methods (member slot valid-slots :test #'string=))
                            (slot-value note (car methods))
                            (error "invalid slot ~A " slot)))
                      the-slots))  notes)
-        (mapcar  #'(lambda (note) 
+        (mapcar  (lambda (note) 
                      (if (setq methods (member the-slots valid-slots :test #'string=))
                        (slot-value note (car methods))
                        (error *no-notes-error* note the-slots)))  notes)))
@@ -88,7 +88,7 @@ slots of each chord is paired in a list with the chord's attack time. "
   (get-chosen-note-slots (notes self) the-slots))
 
 (defmethod get-note-dimensions ((self C-chord-line) the-slots &optional include?)
-  (mapcar #'(lambda (chord)
+  (mapcar (lambda (chord)
               (if include?
                 (list (t-time chord)
                       (get-chosen-note-slots (notes chord) the-slots))
@@ -119,7 +119,7 @@ them the given <value(s)>."
                 (set-chosen-note-slots (notes object) slots values)
                 (pw::update-chord object))
                ((subtypep (type-of object) 'C-chord-line)
-                (mapc #'(lambda (chord)
+                (mapc (lambda (chord)
                             (set-chosen-note-slots (notes chord) slots 
                                                    (or (pop values) default-val)))
                         (chords object))
@@ -136,8 +136,8 @@ them the given <value(s)>."
            (def-val (car (last values))))
       (if (consp the-slots)
         (mapc 
-         #'(lambda (note) 
-             (mapc #'(lambda (slot)
+         (lambda (note) 
+             (mapc (lambda (slot)
                        (if (setq methods (member slot valid-slots :test #'string=))
                          (progn 
                            (setf  (slot-value note (car methods))
@@ -145,7 +145,7 @@ them the given <value(s)>."
                            (update-note note))
                          (error "invalid slot ~A " slot)))
                    the-slots))  notes)
-        (mapc #'(lambda (note) 
+        (mapc (lambda (note) 
                   (if (setq methods (member the-slots valid-slots :test #'string=))
                     (progn 
                       (setf (slot-value note (car methods)) (or (pop values) def-val))

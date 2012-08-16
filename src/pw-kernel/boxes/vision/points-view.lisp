@@ -77,7 +77,7 @@
 (defmethod set-points-list-to-rect ((self C-points-rect) points sort-mode)
   (when (string= sort-mode "sort")
     (setq points 
-      (sort (mapcar #'list (first points)(second points)) #'< :key #'(lambda (a)(car a))))
+      (sort (mapcar #'list (first points)(second points)) #'< :key (lambda (a)(car a))))
     (setq points (list (mapcar #'first points)(mapcar #'second points))))
   (scale-x&y-points self points (w self)(h self))) 
 

@@ -337,11 +337,12 @@
 
 (defun make-MN-editor-chordMN-rtm (staff)
   (make-music-notation-editor 'C-chord-boxMN-window-rtm
-                               'C-chord-mus-not-view 'C-MN-panel-ChordBox
-                               (make-point 230 200) staff))
+                              'C-chord-mus-not-view
+                              'C-MN-panel-ChordBox
+                              (make-point 230 200) staff))
 
-(setf *the-chord-rtm-editor*
-      (make-MN-editor-chordMN-rtm *g2-g-f-f2-staffs*))
+(defparameter *the-chord-rtm-editor*
+  (make-MN-editor-chordMN-rtm *g2-g-f-f2-staffs*))
 
 (defmethod save-window-state ((self C-beat) win)
   (declare (ignore win self)))
@@ -856,7 +857,9 @@ metronome units
   *beat-leaf-objs*)
 
 ;;=======================================
-(defmethod stop-measure-line ((self C-measure-line)) (setf *MN-play-flag* ()) (setf (stop-flag self) t))
+(defmethod stop-measure-line ((self C-measure-line))
+  (setf *MN-play-flag* ())
+  (setf (stop-flag self) t))
 
 (defmethod play-measure-line-continue ((self C-measure-line) measures t-scfactor)
   (unless (stop-flag self)
@@ -979,7 +982,7 @@ metronome units
   (let* ((off-fl 
            (third (ask-all 
               (rtm-radio-ctrls (editor-collection-object *active-rtm-window*)) 'check-box-checked-p)))
-         (notes (sort (copy-list (notes self)) '< :key #'(lambda (note) (offset-time note))))
+         (notes (sort (copy-list (notes self)) '< :key (lambda (note) (offset-time note))))
          (offsets (ask-all notes #'offset-time))
           diff-lst diff-lst+)
       (if (not (rest offsets))
@@ -1001,7 +1004,7 @@ metronome units
           (or (not *active-rtm-window*)
                (third (ask-all 
                        (rtm-radio-ctrls (editor-collection-object *active-rtm-window*)) 'check-box-checked-p))))
-         (notes (sort (copy-list (notes self)) '< :key #'(lambda (note) (offset-time note))))
+         (notes (sort (copy-list (notes self)) '< :key (lambda (note) (offset-time note))))
          (offsets (ask-all notes #'offset-time))
           diff-lst diff-lst+)
       (if (not (rest offsets))

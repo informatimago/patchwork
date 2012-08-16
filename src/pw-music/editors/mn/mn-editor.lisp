@@ -271,7 +271,7 @@
             :dialog-item-text "ins"
             :view-font '("monaco"  9  :srcor)
             :dialog-item-action
-            #'(lambda (item)
+            (lambda (item)
                 (rplacd (assoc :ins (ctrl-settings self))
                         (check-box-checked-p item))
                 (update-view-controler self)))
@@ -289,7 +289,7 @@
             :dialog-item-text txt
             :view-font '("monaco"  9  :srcor) 
             :dialog-item-action
-            #'(lambda (item)
+            (lambda (item)
                 (set-value-ctrl self item type)
                 (update-view-controler self))))
 
@@ -300,9 +300,10 @@
     (progn (reset-view-ctrls self)
            (rplacd (assoc kind (ctrl-settings self)) t))))
 
-(setf *MN-view-ctrls-space* (make-point 9 36))
+
+(defparameter *MN-view-ctrls-space* (make-point 9 36))
+
 (defmethod update-view-controler ((self C-mus-not-view))
-  (declare (special *MN-view-ctrls-space*))
   (with-focused-view self
        (with-pen-state (:mode :srccopy :pattern *white-pattern*)
            (fill-rect* 0 0 (- (w self) (point-h *MN-view-ctrls-space*))
@@ -318,13 +319,13 @@
   (cdr (assoc ctrl (ctrl-settings self))))
 
 (defmethod set-view-position ((self C-mus-not-view) h &optional v)
-  h v
-  (call-next-method) )
+  (declare (ignorable h v))
+  (call-next-method))
 
 (defmethod set-view-size ((self C-mus-not-view) h &optional v)
-  h v
+  (declare (ignorable h v))
   (set-extCtrl-view-size self h v)
-  (call-next-method) )
+  (call-next-method))
 
 ;;This method should really send a "view-size-changed" to the external controls, which
 ;;should be sub-classes of dialog-items... [Camilo]
@@ -435,7 +436,6 @@
 
 ;;aaa from pw-modifs le 10-9-95
 (defmethod stop-all-staffs ((self C-mus-not-view))
-  (declare (special *MN-play-flag*))
   (setf *MN-play-flag* nil)
   (tell (ask-all (editor-objects self) 'chord-line) 'stop-play))
 
@@ -622,7 +622,7 @@
         (y (point-v (view-scroll-position view))))
     (with-focused-view view
       (with-pen-state (:mode :srccopy :pattern *white-pattern*)
-        (fill-rect  view *white-pattern* x y (+ x w) (+ y h) )))))
+        (fill-rect  x y (+ x w) (+ y h))))))
 
 (defmethod scroll-bar-changed ((view C-music-notation-panel) scroll-bar)
   (let ((h-pos (point-h (view-scroll-position view))))

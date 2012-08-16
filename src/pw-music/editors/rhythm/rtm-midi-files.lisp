@@ -50,7 +50,7 @@
               midi-list)
       (pop measures))
      (make-variable-length-midi-delta-times
-       (sort (append (nreverse midi-list) midi-data) '< :key #'(lambda (a) (car a))))))
+       (sort (append (nreverse midi-list) midi-data) '< :key (lambda (a) (car a))))))
 
 ;;===========================================================
 

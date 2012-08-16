@@ -75,7 +75,7 @@
           :while (< start len)
           :do (progn
                 (draw-string (point-h pos) (point-v pos) (nsubseq string start end))
-                (when (< end len)
+                (when (< end (1- len))
                   (setf pos (make-point 0 (+ (point-v pos) line-height)))))
           :finally  (setf pos (make-point (+ (string-width (nsubseq string
                                                                     previous-start

@@ -36,13 +36,6 @@
 (in-package "MCLGUI")
 
 
-(defun application-is-active ()
-  [[NSApplication sharedApplication] isActive])
-
-(define-symbol-macro *foreground*
-    (application-is-active))
-
-
 (defclass application (wrapper)
   ())
 
@@ -602,8 +595,8 @@ REFCON:         An optional reference identifier, which can be any MCL
         (cons function refcon)))
 
 
-(defmethod no-queued-reply-handler ((application application) theAppleEvent reply handlerRefcon)
-  "
+(defgeneric no-queued-reply-handler (application theAppleEvent reply handlerRefcon)
+  (:documentation "
 
 The default method of the generic function NO-QUEUED-REPLY-HANDLER
 signals the appleevent-error condition with :oserr
@@ -625,16 +618,17 @@ HANDLERREFCON:  The handler reference constant, which is any Lisp object.
                 specifying some Lisp object that serves to distinguish (for
                 instance) two different installations of the same handler.
                 The reference constant is often ignored.
-"
-  (declare (ignore reply handlerRefcon))
-  (let ((return-id (ae-get-attribute-longinteger theAppleEvent '\#$keyReturnIDAttr)))
-    (error (make-condition 'appleevent-error :oserr '\#$errAEEventNotHandled
-                           :error-string (format nil "No queued reply handler for id: ~d"
-                                                 return-id)))))
+")
+  (:method ((application application) theAppleEvent reply handlerRefcon)
+    (declare (ignore reply handlerRefcon))
+    (let ((return-id (ae-get-attribute-longinteger theAppleEvent '\#$keyReturnIDAttr)))
+      (error (make-condition 'appleevent-error :oserr '\#$errAEEventNotHandled
+                             :error-string (format nil "No queued reply handler for id: ~d"
+                                                   return-id))))))
 
 
-(defmethod queued-reply-handler ((application application) theAppleEvent reply handlerRefcon)
-  "
+(defgeneric queued-reply-handler (application theAppleEvent reply handlerRefcon)
+  (:documentation "
 The generic function QUEUED-REPLY-HANDLER calls the installed reply
 handler for the return ID of appleevent.  If there is no applicable reply
 handler, it calls NO-QUEUED-REPLY-HANDLER.
@@ -655,16 +649,17 @@ HANDLERREFCON:  The handler reference constant, which is any Lisp object.
                 specifying some Lisp object that serves to distinguish (for
                 instance) two different installations of the same handler.
                 The reference constant is often ignored.
-"
-  (let* ((return-id (ae-get-attribute-longinteger theAppleEvent '\#$keyReturnIDAttr))
-         (handler   (gethash return-id %queued-reply-handlers%)))
-    (if handler
-      (progn
-        (let ((fun    (car handler))
-              (refcon (cdr handler)))
-          (remhash return-id %queued-reply-handlers%)
-          (funcall fun application theAppleEvent reply refcon)))
-      (no-queued-reply-handler application theAppleEvent reply handlerRefcon))))
+")
+  (:method ((application application) theAppleEvent reply handlerRefcon)
+    (let* ((return-id (ae-get-attribute-longinteger theAppleEvent '\#$keyReturnIDAttr))
+           (handler   (gethash return-id %queued-reply-handlers%)))
+      (if handler
+        (progn
+          (let ((fun    (car handler))
+                (refcon (cdr handler)))
+            (remhash return-id %queued-reply-handlers%)
+            (funcall fun application theAppleEvent reply refcon)))
+        (no-queued-reply-handler application theAppleEvent reply handlerRefcon)))))
 
 
 

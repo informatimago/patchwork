@@ -34,10 +34,21 @@
 
 (in-package "MCLGUI")
 
-(defstruct (rect
-             (:constructor %make-rect))
-  (topLeft     (make-point 0 0) :type point)
-  (bottomRight (make-point 0 0) :type point))
+(eval-when (:compile-toplevel :load-toplevel :execute) ; to be able to use #S in the same file.
+
+  (defstruct (rect
+               (:constructor %make-rect))
+    (topLeft     (make-point 0 0) :type point)
+    (bottomRight (make-point 0 0) :type point))
+
+  (defmethod make-load-form ((object rect) &optional environment)
+    (declare (ignore environment))
+    ;; => creation-form[, initialization-form]
+    `(%make-rect :topleft ,(rect-topleft object)
+                 :bottomright ,(rect-bottomright object)))
+
+  );;eval-when
+
 
 (defun make-rect (left &optional top right bottom)
   "
@@ -46,16 +57,12 @@ The function MAKE-RECT can be called with either:
 - two points, topLeft and bottomRight;
 - four coordinates: left, top, right, bottom.
 "
-  (cond
+   (cond
     ((and (null top) (null right) (null bottom))
      (copy-rect left))
     ((and (null right) (null bottom))
      (%make-rect :topleft left :bottomright top))
     (t
-     (check-type left   fixnum)
-     (check-type top    fixnum)
-     (check-type right  fixnum)
-     (check-type bottom fixnum)
      (%make-rect :topleft (make-point left top) :bottomright (make-point right bottom)))))
 
 (defun rect-to-list (rect)
@@ -77,15 +84,37 @@ RETURN:         A list of two lists containing the coordinates of the
 (defun rect-top    (rect) (point-v (rect-topleft     rect)))
 (defun rect-right  (rect) (point-h (rect-bottomright rect)))
 (defun rect-bottom (rect) (point-v (rect-bottomright rect)))
-(defun (setf rect-left)   (value rect)
-  (setf  (rect-topleft     rect) (make-point value  (point-v (rect-topleft     rect)))))
-(defun (setf rect-top)    (value rect)
-  (setf  (rect-topleft     rect) (make-point (point-h (rect-topleft     rect))  value)))
-(defun (setf rect-right)   (value rect)
-  (setf  (rect-bottomright rect) (make-point value  (point-v (rect-bottomright rect)))))
-(defun (setf rect-bottom)    (value rect)
-  (setf  (rect-bottomright rect) (make-point (point-h (rect-bottomright rect))  value)))
 
+(defun rect-width  (rect) (- (point-h (rect-bottomright rect))
+                             (point-h (rect-topleft rect))))
+(defun rect-height (rect) (- (point-v (rect-bottomright rect))
+                             (point-v (rect-topleft rect))))
+
+(defun (setf rect-left)   (value rect)
+  (setf  (rect-topleft     rect) (make-point value  (point-v (rect-topleft     rect))))
+  value)
+
+(defun (setf rect-top)    (value rect)
+  (setf  (rect-topleft     rect) (make-point (point-h (rect-topleft     rect))  value))
+  value)
+
+(defun (setf rect-right)   (value rect)
+  (setf  (rect-bottomright rect) (make-point value  (point-v (rect-bottomright rect))))
+  value)
+
+(defun (setf rect-bottom)    (value rect)
+  (setf  (rect-bottomright rect) (make-point (point-h (rect-bottomright rect))  value))
+  value)
+
+(defun (setf rect-width)  (new-width rect)
+  "Moves the botright point to accomodate the new width"
+  (setf (rect-right rect) (+ (rect-left rect) new-width))
+  new-width)
+
+(defun (setf rect-height)  (new-height rect)
+  "Moves the botright point to accomodate the new height"
+  (setf (rect-bottom rect) (+ (rect-top rect) new-height))
+  new-height)
 
 (defun equal-rect (rect1 rect2)
   "

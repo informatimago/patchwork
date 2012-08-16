@@ -148,13 +148,13 @@
                (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls (editor-collection-object self)))))
                (start 
                 (apdfuncall  100 (priority) 15 
-                             #'(lambda ()
+                             (lambda ()
                                  (tell measures #'play-measure (get-play-speed (editor-collection-object self))))))))))
     (#\P (when (eq 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
            (start
             (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls (editor-collection-object self)))))
             (apdfuncall 100 (priority) 15 
-                        #'(lambda ()
+                        (lambda ()
                             (play-measure (rtm-selection-1 (editor-collection-object self)) (get-play-speed (editor-collection-object self))))))))
     (#\a (when (rtm-selection-1 (editor-collection-object self))
            (if (eq 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
@@ -213,5 +213,5 @@
   (when (pw-object self)
     (draw-appl-label (pw-object self) #\A))
   (when (eq *active-RTM-window* self)  ; no RTM window selected
-     (menu-item-enable *apps-RTM-menu-item*)
-     (enable-Lisp-apps-menu-item?)))
+    (menu-item-enable *apps-RTM-menu-item*)
+    (enable-Lisp-apps-menu-item?)))

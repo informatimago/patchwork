@@ -69,10 +69,13 @@ the opposite of view-origin.)
 
 
 (defmethod print-object ((view simple-view) stream)
-  (print-parseable-object (view stream :type t :identity t)
-                          (:view-position        (point-to-list (view-position view)))
-                          (:view-size            (point-to-list (view-size view)))
-                          (:view-scroll-position (point-to-list (view-scroll-position view)))))
+  (print-parseable-object
+   (view stream :type t :identity t)
+   (:view-position        (point-to-list (view-position view)))
+   (:position/window      (point-to-list (convert-coordinates (view-position view)
+                                                              view (view-window view))))
+   (:view-size            (point-to-list (view-size view)))
+   (:view-scroll-position (point-to-list (view-scroll-position view)))))
 
 
 (defgeneric view-subviews (view)

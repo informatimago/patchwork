@@ -68,20 +68,21 @@
   (update-default-button d))
 
 
-(defmethod update-default-button ((d string-dialog))
-  (let ((debutton (default-button d)))
-    (when debutton
-      (let ((text-items (subviews d 'editable-text-dialog-item)))
-        (when text-items
-          (let ((empties (slot-value d 'allow-empty-strings)))
-            (if (or (eq empties t)
-                    (dolist (item text-items t) ; enables if no text-items but there should be some
-                      (unless (and (consp empties)
-                                   (member (view-nick-name item) empties))
-                        (when (eq 0 (dialog-item-text-length item))
-                          (return nil)))))
-              (dialog-item-enable debutton)
-              (dialog-item-disable debutton))))))))
+(defgeneric update-default-button (d)
+  (:method ((d string-dialog))
+    (let ((debutton (default-button d)))
+      (when debutton
+        (let ((text-items (subviews d 'editable-text-dialog-item)))
+          (when text-items
+            (let ((empties (slot-value d 'allow-empty-strings)))
+              (if (or (eq empties t)
+                      (dolist (item text-items t) ; enables if no text-items but there should be some
+                        (unless (and (consp empties)
+                                     (member (view-nick-name item) empties))
+                          (when (eq 0 (dialog-item-text-length item))
+                            (return nil)))))
+                (dialog-item-enable debutton)
+                (dialog-item-disable debutton)))))))))
 
 
 
@@ -138,7 +139,7 @@
                                         #@(62 20)
                                         ok-text
                                         (if (not modeless)
-                                          #'(lambda (item)
+                                          (lambda (item)
                                                 (return-from-modal-dialog (act-on-text item)))
                                           #'act-on-text))                     
                       (make-dialog-item 'button-dialog-item
@@ -147,7 +148,7 @@
                                         #@(62 20)
                                         cancel-text
                                         (or cancel-function
-                                            #'(lambda (item)
+                                            (lambda (item)
                                                   (if (not modeless) 
                                                     (return-from-modal-dialog :cancel)
                                                     (window-close (view-window item)))))

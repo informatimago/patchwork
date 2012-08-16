@@ -6,7 +6,7 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;     ASDF system definition for the Patchwork Application.
 ;;;;    
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -31,15 +31,13 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*-
 
 (asdf:defsystem :patchwork
-    :name "patchwork-package"
-    :description "IRCAM Computer Assisted Composition"
-    :author ""
+    :name "Patch Work Application"
+    :description "Patch Work: IRCAM Computer Assisted Composition"
+    :author "IRCAM"
     :version "1.0.0"
-    :license "?"
+    :license "GPL3"
     :properties ((#:author-email                   . "pjb@informatimago.com")
                  (#:date                           . "Spring 2012")
                  ((#:albert #:output-dir)          . "../documentation/patchwork/")
@@ -48,7 +46,8 @@
                  ((#:albert #:docbook #:bgcolor)   . "white")
                  ((#:albert #:docbook #:textcolor) . "black"))
     :depends-on ("alexandria"
-                 "mclgui")
+                 "mclgui"
+                 "com.informatimago.common-lisp.lisp.stepper")
     :components ((:file "patchwork-package" 
                         :depends-on ("pw-kernel/environment/lelisp-macros"))
 
@@ -182,13 +181,8 @@
                                      "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/drivers+resources/midi"))
 
-
-                 (:file "pw-lib/epw-1.0b/import"
-                        :depends-on ("patchwork-package"))
-                 
                  (:file "pw-lib/epw-1.0b/epw-menus" 
-                        :depends-on ("pw-lib/epw-1.0b/import"
-                                     "pw-kernel/environment/epw-package"  
+                        :depends-on ("pw-kernel/environment/epw-package"  
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-lib/epw-1.0b/harmonicity"
@@ -198,32 +192,26 @@
                                      "pw-lib/epw-1.0b/freq-harmony"))
 
                  (:file "pw-lib/epw-1.0b/chord-filter" 
-                        :depends-on ("pw-lib/epw-1.0b/import"
-                                     "pw-kernel/environment/epw-package"  
+                        :depends-on ("pw-kernel/environment/epw-package"  
                                      "pw-kernel/types/pw-type-scheme"))
                  
                  (:file "pw-lib/epw-1.0b/combinatorial" 
-                        :depends-on ("pw-lib/epw-1.0b/import"
-                                     "pw-kernel/environment/epw-package"  
+                        :depends-on ("pw-kernel/environment/epw-package"  
                                      "pw-kernel/types/pw-type-scheme"))
                  
-                 
                  (:file "pw-lib/epw-1.0b/crime-fm" 
-                        :depends-on ("pw-lib/epw-1.0b/import"
-                                     "pw-kernel/environment/epw-package"  
+                        :depends-on ("pw-kernel/environment/epw-package"  
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/environment/epw-package"))
                  
                  (:file "pw-lib/epw-1.0b/freq-harmony" 
-                        :depends-on ("pw-lib/epw-1.0b/import"
-                                     "pw-kernel/environment/epw-package"  
+                        :depends-on ("pw-kernel/environment/epw-package"  
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-music/editors/mn/mn-note-chord-chordline"))
                  
                  (:file "pw-lib/epw-1.0b/harmonicity" 
-                        :depends-on ("pw-lib/epw-1.0b/import"
-                                     "pw-kernel/environment/epw-package"  
+                        :depends-on ("pw-kernel/environment/epw-package"  
                                      "pw-kernel/types/pw-type-scheme"))
 
 
@@ -433,7 +421,8 @@
                  (:file "pw-kernel/pw-graphics/controls/pw-controls" 
                         :depends-on ("patchwork-package"
                                      "pw-macosx/reader-macros"
-                                     "pw-kernel/pw-graphics/controls/pw-graphics"))
+                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
                  (:file "pw-kernel/pw-graphics/controls/pw-graphics" 
                         :depends-on ("patchwork-package"
@@ -448,8 +437,10 @@
                  (:file "pw-kernel/pw-graphics/window+menu/pw-help-window" 
                         :depends-on ("patchwork-package"))
                  
-                 (:file "pw-kernel/pw-graphics/window+menu/pw-menu" 
-                        :depends-on ("patchwork-package"))
+                 (:file "pw-kernel/pw-graphics/window+menu/pw-menu"
+                        :depends-on ("patchwork-package" ))
+
+
                  
                  (:file "pw-kernel/pw-graphics/window+menu/pw-window" 
                         :depends-on ("patchwork-package"
@@ -467,12 +458,13 @@
                  
                  (:file "pw-kernel/abstraction+config/abstraction" 
                         :depends-on ("patchwork-package"
-                                     "pw-kernel/types/pw-type-scheme"))
+                                     "pw-kernel/types/pw-type-scheme"
+                                     "pw-kernel/pw-graphics/window+menu/pw-window"))
                  
                  (:file "pw-kernel/abstraction+config/abstraction-m" 
                         :depends-on ("patchwork-package"
                                      "pw-kernel/types/pw-type-scheme"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
+                                     "pw-kernel/pw-graphics/window+menu/pw-window"))
                  
                  (:file "pw-kernel/abstraction+config/config-setup" 
                         :depends-on ("patchwork-package"))
@@ -541,7 +533,7 @@
                  
                  (:file "pw-music/boxes/edit/ch-line-build" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     ;; "pw-macosx/reader-macros"
                                      "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/types/pw-types"
@@ -558,7 +550,7 @@
                  
                  (:file "pw-music/boxes/edit/midi-instrument-editors" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     ;; "pw-macosx/reader-macros"
                                      "pw-kernel/drivers+resources/scheduler" 
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view"))
@@ -700,22 +692,26 @@
                  
                  (:file "pw-music/editors/mn/mn-chord-ed" 
                         :depends-on ("patchwork-package"
+                                     "pw-music/menu/mn-menu"
                                      "pw-music/editors/mn/mn-editor"
+                                     "pw-music/editors/mn/mn-note-chord-chordline"
                                      "pw-kernel/drivers+resources/scheduler"
+                                     "pw-kernel/pw-graphics/controls/popupmenu"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
                  (:file "pw-music/editors/mn/mn-collector-panel" 
                         :depends-on ("patchwork-package"
-                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-music/menu/mn-menu"
                                      "pw-music/editors/mn/mn-window"
                                      "pw-music/editors/mn/mn-editor"
                                      "pw-music/editors/mn/mn-chord-ed"
-                                     "pw-music/editors/mn/mn-note-chord-chordline"))
+                                     "pw-music/editors/mn/mn-note-chord-chordline"
+                                     "pw-kernel/pw-graphics/controls/pw-graphics"))
                  
                  (:file "pw-music/editors/mn/mn-collector-view" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     ;; "pw-macosx/reader-macros"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
@@ -725,13 +721,15 @@
                  
                  (:file "pw-music/editors/mn/mn-editor" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     ;; "pw-macosx/reader-macros"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/environment/epw-package"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
+                                     "pw-music/menu/mn-menu"
                                      "pw-music/editors/mn/mn-window"
-                                     "pw-music/editors/mn/mn-note-chord-chordline"))
+                                     ;;"pw-music/editors/mn/mn-note-chord-chordline"
+                                     ))
                  
                  (:file "pw-music/editors/mn/mn-help-window" 
                         :depends-on ("patchwork-package"))
@@ -740,7 +738,8 @@
                         :depends-on ("patchwork-package"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
-                                     "pw-kernel/environment/epw-package"))
+                                     "pw-kernel/environment/epw-package"
+                                     "pw-music/editors/mn/mn-editor"))
 
                  (:file "pw-music/editors/mn/mn-window" 
                         :depends-on ("patchwork-package"
@@ -775,7 +774,7 @@
                  
                  (:file "pw-kernel/types/pw-types" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     ;; "pw-macosx/reader-macros"
                                      "pw-kernel/pw-graphics/controls/pw-controls"))
                  
                  (:file "pw-kernel/types/object-types" 

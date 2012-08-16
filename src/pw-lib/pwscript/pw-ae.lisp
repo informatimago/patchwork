@@ -341,7 +341,7 @@
     (setDescRecPtr descRecPtr self)
     (if object
       (maphash 
-       #'(lambda (keyword item)
+       (lambda (keyword item)
            (setKeyItem self keyword item))
        object)))
   (setDescRecPtr descRecPtr self))

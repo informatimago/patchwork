@@ -160,6 +160,7 @@ Error Messages
 
 ::
 
+   (step-notrace ui::object-identity ui::call-print-parseable-object)
 
 .. comment  
                     -----------------------------

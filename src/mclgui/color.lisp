@@ -222,7 +222,6 @@ REDISPLAY-P:    If the value of this is true (the default), this
                                  green: (color-green color)
                                  blue: (color-blue color)
                                  alpha: (color-alpha color)]))
-             (print (type-of color))
              [color set]
              [color setFill]
              [color setStroke])

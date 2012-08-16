@@ -110,8 +110,9 @@ ITEM:           A sequence dialog item.
     (slot-value item 'table-sequence)))
 
 
-(defmethod (setf table-sequence) (value (item sequence-dialog-item))
-  (set-table-sequence item value))
+(defgeneric (setf table-sequence) (value item)
+  (:method (value (item sequence-dialog-item))
+    (set-table-sequence item value)))
 
 
 (defgeneric set-table-sequence (item new-seq)
@@ -139,7 +140,7 @@ NEW-SEQUENCE:   The sequence to be associated with the sequence dialog
              new-dims)
         (let* (                    ;(handle (dialog-item-handle item))
                                         ;(active-p (and handle (href handle :ListRec.lactive)))
-               (f #'(lambda (item h v)
+               (f (lambda (item h v)
                       (let ((index (cell-to-index item h v)))
                         (when (and index (>= index length))
                           (cell-deselect item h v))))))
@@ -161,33 +162,17 @@ NEW-SEQUENCE:   The sequence to be associated with the sequence dialog
         new-seq))))
 
 
-(defgeneric cell-to-index (item h &optional v)
-  (:documentation "
-
-The CELL-TO-INDEX generic function returns an index into the sequence
-associated with the dialog item, corresponding to the cell whose indices in
-the table are H and V.  If there is no such cell, it returns NIL.
-This index is suitable for passing to the Common Lisp function elt.
-
-ITEM:           A sequence dialog item.
-
-H:              Horizontal index.
-
-V:              Vertical index.  If the value of V is NIL, H is
-                assumed to represent a point.
-
-")
-  (:method ((item sequence-dialog-item) h &optional v)
-      (normalize-h&v h v)
-      (let* ((table-dimensions (table-dimensions item))
-             (table-sequence (table-sequence item))
-             (sequence-order (slot-value item 'sequence-order))
-             (index (if (eq sequence-order :horizontal)
-                        (+ (* (point-h table-dimensions) v) h)
-                        (+ (* (point-v table-dimensions) h) v))))
-        (if (< index (length table-sequence))
-            index
-            nil))))
+(defmethod cell-to-index ((item sequence-dialog-item) h &optional v)
+  (normalize-h&v h v)
+  (let* ((table-dimensions (table-dimensions item))
+         (table-sequence (table-sequence item))
+         (sequence-order (slot-value item 'sequence-order))
+         (index (if (eq sequence-order :horizontal)
+                  (+ (* (point-h table-dimensions) v) h)
+                  (+ (* (point-v table-dimensions) h) v))))
+    (if (< index (length table-sequence))
+      index
+      nil)))
 
 
 (defgeneric index-to-cell (item index)

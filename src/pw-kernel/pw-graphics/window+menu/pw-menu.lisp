@@ -215,10 +215,12 @@
 
 ;;==================================================
 
+(defgeneric abstract-box (object))
+
 (defun cleanup-PW-wins ()
   (setf *pw-window-list* (remove nil (remove nil *pw-window-list* :key #'wptr)
                                  :key #'abstract-box :test-not #'eq ))
-  (tell  *pw-window-list* 'kill-patch-window))
+  (tell *pw-window-list* 'kill-patch-window))
 
 
 
@@ -240,27 +242,22 @@ DO:       Execute the BODY with a handler for CONDITION and
        (finish-output))))
 
 (defun lisp-menu-action ()
-  (niy lisp-menu-action)
-  #-(and)
-  (let ((listener (find-if (lambda (w)
-                             (subtypep (type-of w) 'listener))
+  (let ((listener (find-if (lambda (w) (subtypep (type-of w) 'hemlock-listener-frame))
                            (windows))))
     (when listener
       (window-select listener)))
-  (enable-all-apps-menu-items)
-  (menu-item-disable *apps-lisp-menu-item*))
+  (menu-item-disable *apps-lisp-menu-item*)
+  (enable-Lisp-apps-menu-item?))
 
 
 (defun pw-menu-action ()
-  (com.informatimago.common-lisp.cesarum.utility:tracing
-   (format *trace-output* "~&~S --> ~S~%" '*active-patch-window* *active-patch-window*)
-   (if *active-patch-window* 
-       (if (window-visiblep *active-patch-window*) 
-           (window-select *active-patch-window*)
-           (search-for-next-pw-window)) 
-       (make-new-pw-window t))
-   (enable-all-apps-menu-items)
-   (menu-item-disable *apps-PW-menu-item*)))
+  (if *active-patch-window* 
+    (if (window-visiblep *active-patch-window*) 
+      (window-select *active-patch-window*)
+      (search-for-next-pw-window)) 
+    (make-new-pw-window t))
+  (enable-all-apps-menu-items)
+  (menu-item-disable *apps-PW-menu-item*))
 
 
 (defun initialize-menus ()

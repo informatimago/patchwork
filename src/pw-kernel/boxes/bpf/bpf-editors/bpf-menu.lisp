@@ -55,20 +55,20 @@
 
 (ui:add-menu-items *BPF-menu-file*
   (new-leafmenu "Save BPF lib..."
-     #'(lambda () (save-BPF-lib *pw-BPF-library*))))
+     (lambda () (save-BPF-lib *pw-BPF-library*))))
 
 (ui:add-menu-items *BPF-menu-file*
   (new-leafmenu "Load BPF lib..."
-     #'(lambda () (load-BPF-lib))))
+     (lambda () (load-BPF-lib))))
 
 ;;;============================
 ;;Hardcopy printing
 
 (defvar *BPF-print-setUp*
-  (new-leafmenu "Page Setup…" #'(lambda () (ui::win-print-setUp *active-BPF-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-BPF-window*))))
 
 (defvar *print-BPF-menu* 
-  (new-leafmenu "Print…" #'(lambda () (ui::window-hardcopy *active-BPF-window*))))
+  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy *active-BPF-window*))))
 
 (ui:add-menu-items *BPF-menu-file* *BPF-print-setUp* *print-BPF-menu*)
 
@@ -81,19 +81,19 @@
 (let ((menu-now))
   (ui:add-menu-items  *BPF-menu-edit* 
      (setq menu-now (new-leafmenu "Cut" 
-       #'(lambda () (cut-bpf (editor-view-object *active-BPF-window*))))))
+       (lambda () (cut-bpf (editor-view-object *active-BPF-window*))))))
    (set-command-key menu-now #\X)
    (ui:add-menu-items  *BPF-menu-edit* 
       (setq menu-now (new-leafmenu "Copy" 
-       #'(lambda () (copy-bpf (editor-view-object *active-BPF-window*))))))
+       (lambda () (copy-bpf (editor-view-object *active-BPF-window*))))))
    (set-command-key menu-now #\C)
    (ui:add-menu-items  *BPF-menu-edit* 
       (setq menu-now (new-leafmenu "Paste" 
-       #'(lambda () (paste-bpf (editor-view-object *active-BPF-window*))))))
+       (lambda () (paste-bpf (editor-view-object *active-BPF-window*))))))
    (set-command-key menu-now #\V)
    (ui:add-menu-items  *BPF-menu-edit* 
       (setq menu-now (new-leafmenu "Select All" 
-     #'(lambda () (select-all-bpf (editor-view-object *active-BPF-window*) )))))
+     (lambda () (select-all-bpf (editor-view-object *active-BPF-window*) )))))
    (set-command-key menu-now #\A))
 
 ;;============================================
@@ -103,21 +103,21 @@
 
 (ui:add-menu-items *BPF-menu*
   (new-leafmenu "Add BPF to lib" 
-      #'(lambda () (add-BPF-to-lib *active-BPF-window* *pw-BPF-library*))))
+      (lambda () (add-BPF-to-lib *active-BPF-window* *pw-BPF-library*))))
 
 (let ((menu-now))
   (ui:add-menu-items *BPF-menu*
     (setq menu-now (new-leafmenu "Next BPF from lib" 
-     #'(lambda () (next-from-BPF-lib *active-BPF-window* *pw-BPF-library*)))))
+     (lambda () (next-from-BPF-lib *active-BPF-window* *pw-BPF-library*)))))
    (set-command-key menu-now #\N)
    (ui:add-menu-items *BPF-menu*
    (setq menu-now (new-leafmenu "Prev BPF from lib" 
-     #'(lambda () (next-from-BPF-lib *active-BPF-window* *pw-BPF-library* -1)))))
+     (lambda () (next-from-BPF-lib *active-BPF-window* *pw-BPF-library* -1)))))
    (set-command-key menu-now #\P))
 
 (ui:add-menu-items *BPF-menu*
    (new-leafmenu "Reset BPF lib" 
-       #'(lambda () (reset-BPF-lib *pw-BPF-library*))))
+       (lambda () (reset-BPF-lib *pw-BPF-library*))))
 
 ;;============================================
 ;; menubar for BPF
@@ -135,17 +135,15 @@
 ;;============================================
 ;; application 
 
-(defvar *apps-BPF-menu-item* ())
-
-
-(setf *apps-BPF-menu-item* 
-   (add-apps-item-to-apps-menu  "BPF"
-     #'(lambda () 
-        (if *active-BPF-window* 
-          (if (wptr *active-BPF-window*)
-            (progn 
-              (window-select *active-BPF-window*)
-              (enable-all-apps-menu-items)
-              (menu-item-disable *apps-BPF-menu-item*))
-            (ui:ed-beep))
-          (ui:ed-beep)))))
+(defparameter *apps-BPF-menu-item* 
+  (add-apps-item-to-apps-menu  "BPF"
+                               (lambda () 
+                                   (if *active-BPF-window* 
+                                     (if (wptr *active-BPF-window*)
+                                       (progn 
+                                         (window-select *active-BPF-window*)
+                                         (enable-all-apps-menu-items)
+                                         (menu-item-disable *apps-BPF-menu-item*))
+                                       (ui:ed-beep))
+                                     (ui:ed-beep)))))
+;;;; THE END ;;;;

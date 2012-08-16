@@ -52,7 +52,7 @@ not be acceptable as entry for some other boxes."
   (less-deep-mapcar 'sort-mod1 chord))
 
 (defun sort-mod1 (ch)
-  (sort (mapcar #'(lambda (m) (let ((pc (mod m 1200))) (list pc (- m pc)))) (list! ch))
+  (sort (mapcar (lambda (m) (let ((pc (mod m 1200))) (list pc (- m pc)))) (list! ch))
    #'< :key #'car))
 
 ;; ---- max-abs-idt ----
@@ -187,7 +187,7 @@ i.e distorts <regch> as little as possible to take the intervallic structure of 
          (regch-sort-mod (sort-mod regch))
          (regch-mod (mapcar #'car regch-sort-mod))
          (regch-transp (mapcar #'second regch-sort-mod))
-         (intch-mod (sort (mapcar #'(lambda (m) (mod m 1200)) intch) #'<))
+         (intch-mod (sort (mapcar (lambda (m) (mod m 1200)) intch) #'<))
          (dist-min most-positive-fixnum)
          best-renvers best-transpos)
     (unless (= (length regch) length)
@@ -202,7 +202,7 @@ i.e distorts <regch> as little as possible to take the intervallic structure of 
       (setf (car intch-mod) (+ 1200 (car intch-mod)))
       (setq intch-mod (permut-circn intch-mod)))
     (values dist-min
-            (mapcar #'(lambda (intmidic regtransp)
+            (mapcar (lambda (intmidic regtransp)
                         (+ intmidic best-transpos regtransp -1200))
                     intch-mod regch-transp))))
 
@@ -214,7 +214,7 @@ i.e distorts <regch> as little as possible to take the intervallic structure of 
 comparing the distorsions of <regch>."
   (let ((best-dist-min most-positive-fixnum) best-ch (regch (list! regch)))
     (mapc
-     #'(lambda (intch)
+     (lambda (intch)
          (multiple-value-bind (dist-min ch) (closest-renv regch intch int-dist)
            (when (< dist-min best-dist-min)
              (setq best-dist-min dist-min best-ch ch))))

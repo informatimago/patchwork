@@ -44,13 +44,19 @@
 
 
 (defun initialize/screen ()
-  (niy initialize/screen))
+  (multiple-value-bind (pos siz) (main-screen-frame)
+    (declare (ignore pos))
+    (setf *screen-width*       (point-h siz)
+          *screen-height*      (point-v siz)))
+  (values))
+
 
 (defvar *initialized* nil)
 
 (defun initialize ()
   "Initialize the MCL GUI."
   (unless *initialized*
+    (initialize/screen)
     (initialize/region)
     (initialize/color)
     (initialize/pattern)
@@ -58,7 +64,6 @@
     (initialize/cursor)
     (initialize/scrap)
     (initialize/font)
-    (initialize/screen)
     (initialize/menu)
     (initialize/view)
     (initialize/window)

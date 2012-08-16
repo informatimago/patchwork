@@ -167,12 +167,12 @@ the fundamentals."
 
 (defun doublenth (fund nth type)
   (if (= type 1) (flat-once (simplenth fund nth type))
-      (mapcar #'(lambda (x) (flat (simplenth fund x type))) nth)))
+      (mapcar (lambda (x) (flat (simplenth fund x type))) nth)))
 
 (defun seqfund-nth (fund nth type listnth)
-  (cond ((not listnth) (mapcar #'(lambda (x) (simplenth x nth 2)) fund)) 
-        ((= type 1) (flat-once (mapcar #'(lambda (x) (doublenth x nth  2)) fund)))
-        ((= type 2)  (mapcar #'(lambda (x) (flat (simplenth x nth type))) fund) )))
+  (cond ((not listnth) (mapcar (lambda (x) (simplenth x nth 2)) fund)) 
+        ((= type 1) (flat-once (mapcar (lambda (x) (doublenth x nth  2)) fund)))
+        ((= type 2)  (mapcar (lambda (x) (flat (simplenth x nth type))) fund) )))
        
 
 ;; anciens noms, pour compatibilité
@@ -247,7 +247,7 @@ included ('inclu') or excluded ('exclu') from the output list."
 (defun lfshift (fchord dfreq type output)
   (let ((res (deep-mapcar/1 #'g+ dfreq  fchord )))
     (cond ((and (= output 2) (= type 1))
-           (mapcar #'(lambda (x) (x-append x fchord)) res))
+           (mapcar (lambda (x) (x-append x fchord)) res))
           ((and (= output 2) (= type 2))
            (x-append fchord (flat-once res)))
           (t (if (= type 2) (flat-once res) res)))))
@@ -255,12 +255,12 @@ included ('inclu') or excluded ('exclu') from the output list."
 
 (defun doubleshift (fchord dfreq type output)
   (cond ((= type 2)
-           (mapcar #'(lambda (x) (lfshift x dfreq type output)) fchord))
+           (mapcar (lambda (x) (lfshift x dfreq type output)) fchord))
         ((and (= output 1) (= type 1))
-           (flat-once (mapcar #'(lambda (x) (lfshift fchord x type output)) dfreq)))
+           (flat-once (mapcar (lambda (x) (lfshift fchord x type output)) dfreq)))
         ((and (= output 2) (= type 1))
            (flat-once 
-            (mapcar #'(lambda (x) (lcshift fchord x type output)) dfreq)))))
+            (mapcar (lambda (x) (lcshift fchord x type output)) dfreq)))))
    
 
 
@@ -469,7 +469,7 @@ calculations and output are all in hertz."
 (let* (ll (x (one-elem fcarrier)) (fcarrier (list! fcarrier)) (fmod (list! fmod)))
     (while fcarrier
       (let ((a (pop fcarrier)))
-        (push (unique (flat (mapcar #'(lambda (x) (fmcalc a x index)) fmod))) ll) ))
+        (push (unique (flat (mapcar (lambda (x) (fmcalc a x index)) fmod))) ll) ))
     (if  x (flat (nreverse ll)) (nreverse ll))))
  
 (defunp fm/midic ((mcarrier midics?) (mmod midics?) (index fix>0)) list
@@ -493,7 +493,7 @@ calculations and output are all in hertz."
           (index (if (atom index) (arithm-ser 1 1 index) index)))
   (while fcarrier
       (let ((a (pop fcarrier)))
-        (push (unique (flat (mapcar #'(lambda (x) (fmnth a x index output)) fmod))) ll) ))
+        (push (unique (flat (mapcar (lambda (x) (fmnth a x index output)) fmod))) ll) ))
     (if  x (flat (nreverse ll)) (nreverse ll))))
  
 (defun fm/f/ratio (fcarrier ratio  index output )
@@ -501,7 +501,7 @@ calculations and output are all in hertz."
           (index (if (atom index) (arithm-ser 1 1 index) index)))
   (while fcarrier
       (let ((a (pop fcarrier)))
-        (push (unique (flat (mapcar #'(lambda (x) (fmnth a x index output)) 
+        (push (unique (flat (mapcar (lambda (x) (fmnth a x index output)) 
                                     (g* a ratio) ))) ll) ))
     (if  x (flat (nreverse ll)) (nreverse ll))))
 
@@ -595,7 +595,7 @@ lists."
 
 (defun ringlist (fonda fondb hqa hqb )
   (let ((lfonda (g* fonda hqa)) (lfondb (list!(g* fondb hqb))))
-    (flat-once (mapcar #'(lambda (x) (ring-mod lfonda x 2 1 1)) lfondb))))
+    (flat-once (mapcar (lambda (x) (ring-mod lfonda x 2 1 1)) lfondb))))
 
 
 
@@ -714,7 +714,7 @@ transpositions combined."
       (while ch2 (newl int2 (- (nextl ch2) base-note-2)))
       (setq int2 (nreverse int2))
       (setq res (mapcar 
-        #'(lambda (midic) (mapcar #'(lambda (iv) (+ iv midic)) int2))
+        (lambda (midic) (mapcar (lambda (iv) (+ iv midic)) int2))
         ch1 ))
       (if (= type 2) (flat res) res )))
 
@@ -734,7 +734,7 @@ transpositions combined."
      (while ch2 (newl int2 (- (nextl ch2) base-note-2)))
       (setq int2  (nreverse int2))
        (mapcar 
-        #'(lambda (midic) (mapcar #'(lambda (iv) (- iv midic)) chord))
+        (lambda (midic) (mapcar (lambda (iv) (- iv midic)) chord))
         int2 )))
 
 ;; n0  n1  n2  n3  n4  n5
@@ -764,9 +764,9 @@ notes to be transposed by octaves to fit within the specified range."
       (setq int2  (nreverse int2))
       (setq chords
             (mapcar 
-             #'(lambda (midic) (mapcar #'(lambda (iv) (- iv midic)) chord))
+             (lambda (midic) (mapcar (lambda (iv) (- iv midic)) chord))
              int2 ))
-      (setq chords (mapcar #'(lambda (list) (transpoct list min max)) chords))
+      (setq chords (mapcar (lambda (list) (transpoct list min max)) chords))
       (if (= output 2) (cdr chords) chords)))
 
 (defunp down-transp ((chord list (:value "(6000 6300)")) &optional (min (midic (:value 0)))
@@ -827,7 +827,7 @@ while making with <pivot> an interval smaller than one octave.
 
 (defunp transpoct1 ((midics midics?) (min midic) (max midic)) midic
   ""
-  (let ((result (mapcar #'(lambda (midic)
+  (let ((result (mapcar (lambda (midic)
                             (while (< midic min) (incf midic 1200))
                             (while (> midic max) (decf midic 1200))
                             midic) (list! midics))))
@@ -983,7 +983,7 @@ the function approx-m prior to the entries."
 (defmethod get-list-of-midics ((midics pw::C-chord)) (list (ask-all (pw::notes midics) 'pw::midic)))
 
 (defmethod get-list-of-midics ((midics pw::C-chord-line))
-  (mapcar #'(lambda (chord) (ask-all (pw::notes chord) 'pw::midic))
+  (mapcar (lambda (chord) (ask-all (pw::notes chord) 'pw::midic))
           (pw::chords midics)))
 
 (defmethod get-list-of-midics ((midics number)) (list (list midics)))
@@ -1121,8 +1121,8 @@ and octaviation."
       (repeat (nextl order) (newl new-notes (nextl mel)))
       (setq new-ch (copy-list new-notes))
       (mapc
-       #'(lambda (n)
-           (unless (some #'(lambda (nn) (zerop (mod (- nn n) 1200))) new-notes)
+       (lambda (n)
+           (unless (some (lambda (nn) (zerop (mod (- nn n) 1200))) new-notes)
              (newl new-ch n)))
        (car chords))
       (newl chords (nreverse new-ch)))
@@ -1143,7 +1143,7 @@ and filled with permutations of <notes> and intervals among <intervals>."
     (if (endp ints)
       (list (prog1 serie (format t "~A~%" (mc->n (reverse serie)))))
       (mapcan
-       #'(lambda (int)
+       (lambda (int)
            (when (setq note-oct (exist-note? (setq note (+ int (car serie))) notes))
              (all-series (cons note serie) (remove note-oct notes)
                          (delete int (permutn-random (copy-list ints))))))
@@ -1209,11 +1209,11 @@ chord.
 
 The argument <note> may receive a list; in which case the output is a 
 corresponding list of notes found and/or nils."
-  (less-deep-mapcar #'(lambda (x) (car-mapcar 'exist-note1 note x)) chord ))
+  (less-deep-mapcar (lambda (x) (car-mapcar 'exist-note1 note x)) chord ))
 
 
 (defun exist-note1 ( note chord)
-  (some #'(lambda (n) (when (zerop (mod (- note n) 1200)) n)) (list! chord)))
+  (some (lambda (n) (when (zerop (mod (- note n) 1200)) n)) (list! chord)))
 
 
 
@@ -1446,7 +1446,7 @@ ext.: <nb> = nombre de ces éléments"
 will be sent to the midi channel specified, <chans>. If <chans> is a list 
 the tuning will be sent to all listed channels."
   (cond ((not (consp tunings))
-         (mapc #'(lambda (canal) (TXtun1 tunings canal)) (list! chans)))
+         (mapc (lambda (canal) (TXtun1 tunings canal)) (list! chans)))
         ((not (consp chans))
-         (mapc #'(lambda (tun) (TXtun1 tun chans)) (list! tunings)))
+         (mapc (lambda (tun) (TXtun1 tun chans)) (list! tunings)))
         (t (mapc #'TXtun1 tunings chans))))

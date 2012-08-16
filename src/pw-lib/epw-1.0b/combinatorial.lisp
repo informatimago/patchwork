@@ -200,7 +200,7 @@ value 'nil' is returned. "
            (setf *abort-search* nil)
            (all-ints amb 0 n nil 0 fixed)
            *found-chords*)))))
-  (if (= format 1) (mapcar #'(lambda (x) (remove 0 x)) res) res)))
+  (if (= format 1) (mapcar (lambda (x) (remove 0 x)) res) res)))
 
 (defunp int-rec () list "current hits" *found-chords*)
 
@@ -209,4 +209,4 @@ value 'nil' is returned. "
 (constraint '(0 2 6 7 10) '((1 3)))
 |#
 
-(mapcar  #'(lambda (x) (remove 0 x)) '((0 1 2) (2 0 5 8)))
+(mapcar  (lambda (x) (remove 0 x)) '((0 1 2) (2 0 5 8)))

@@ -55,7 +55,7 @@
                          (setq sub-menu (make-instance 'menu-item :menu-item-title mtitle))))
     (push (eval`(function (lambda () ,body))) *PW-box-instance-list*)
     (set-menu-item-action-function sub-menu
-                                   #'(lambda () (add-patch-box *active-patch-window* (eval body))))
+                                   (lambda () (add-patch-box *active-patch-window* (eval body))))
     sub-menu))
 
 ;;(PW-addmenu-fun *PWoper-menu* 'config 'C-patch-configurer)
@@ -64,11 +64,6 @@
 ;;   submenuitems for *pw-Data-menu*
 
 (PW-addmenu *pw-data-menu* '(numbox const evconst))
-
-(eval-when (eval compile load)
-  (import '(C-patch-buffer:C-patch-buffer C-patch-accum:C-patch-accum
-            C-patch-file-buffer:C-patch-file-buffer C-patch-file-buffer::Ascii-win
-            C-patch-file-buffer::C-patch-ascii-buffer)))
 
 (PW-addmenu-fun *pw-data-menu* 'C-patch-buffer:Buffer 'C-patch-buffer)
 
@@ -157,7 +152,7 @@ l-scale% x->dx dx->x random2 LLalea  LL-oper matrix-oper))|#
 
 (ui:add-menu-items  *pw-control-menu* 
                     (new-leafmenu "pwmap" 
-                                  #'(lambda () 
+                                  (lambda () 
                                       (let ((enum (make-PW-standard-box 'C-enum-collect-source 'enum))
                                             (loop (make-PW-standard-box 'C-map-first 'pwmap)))
                                         (init-patch-pos *active-patch-window* loop)
@@ -173,7 +168,7 @@ l-scale% x->dx dx->x random2 LLalea  LL-oper matrix-oper))|#
 
 (ui:add-menu-items  *pw-control-menu* 
                     (new-leafmenu "pwreduce" 
-                                  #'(lambda () 
+                                  (lambda () 
                                       (let ((enum1 (make-PW-standard-box 'C-enum-collect-source 'enum))
                                             (enum2 (make-PW-standard-box 'C-enum-collect-source 'enum))
                                             (reduce (make-PW-standard-box 'C-reducer 'pwreduce)))
@@ -305,10 +300,10 @@ range-filter band-filter))|#
 ;;;============================
 ;;Hardcopy printing
 (defvar *PW-print-setUp*
-  (new-leafmenu "Page Setup…" #'(lambda () (ui::win-print-setUp *active-patch-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-patch-window*))))
 
 (defvar *print-PW-menu* 
-  (new-leafmenu "Print…" #'(lambda () (ui::window-hardcopy  *active-patch-window*))))
+  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy  *active-patch-window*))))
 
 (ui:add-menu-items *pw-menu-file* *PW-print-setUp* *print-PW-menu*)
 ;;;===================

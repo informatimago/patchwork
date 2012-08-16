@@ -86,11 +86,11 @@
      (setf (x-origo-ctrl self) 
         (make-instance 'C-numbox-continuous-no-double-click 
            :view-size (make-point 40 15) :dialog-item-text "  0" :min-val -9999 
-           :dialog-item-action #'(lambda (item) (set-bpf-x-origo (editor-view-object self) item))))
+           :dialog-item-action (lambda (item) (set-bpf-x-origo (editor-view-object self) item))))
      (setf (y-origo-ctrl self) 
         (make-instance 'C-numbox-continuous-no-double-click 
            :view-size (make-point 40 15) :dialog-item-text "  0" :min-val -9999
-           :dialog-item-action #'(lambda (item) (set-bpf-y-origo (editor-view-object self) item))))
+           :dialog-item-action (lambda (item) (set-bpf-y-origo (editor-view-object self) item))))
      (setf (x-disp-ctrl self) 
         (make-instance 'C-ttybox :view-size (make-point 40 15) :dialog-item-text "  0"))
      (setf (y-disp-ctrl self) 
@@ -99,12 +99,12 @@
         (make-instance 'C-numbox-continuous-no-double-click 
            :view-size (make-point 40 15) :dialog-item-text "  0" 
            :value 100 :min-val 35
-           :dialog-item-action #'(lambda (item) (set-bpf-x-zoom (editor-view-object self) item))))
+           :dialog-item-action (lambda (item) (set-bpf-x-zoom (editor-view-object self) item))))
      (setf (y-zoom-ctrl self) 
         (make-instance 'C-numbox-continuous-no-double-click 
             :view-size (make-point 40 15) :dialog-item-text "  0" 
             :value 100 :min-val 35
-           :dialog-item-action #'(lambda (item) (set-bpf-y-zoom (editor-view-object self) item)))) )
+           :dialog-item-action (lambda (item) (set-bpf-y-zoom (editor-view-object self) item)))) )
   (push (add-bpf-editor-radio-cluster self 0 0 "drag") (bpf-radio-ctrls self))
   (push (add-bpf-editor-radio-cluster self 0 0 "sel") (bpf-radio-ctrls self))
   (push (add-bpf-editor-radio-cluster self 0 0 "zoom") (bpf-radio-ctrls self))
@@ -123,7 +123,7 @@
             :dialog-item-text txt
             :view-font '("monaco"  9  :srcor) 
             :dialog-item-action
-            #'(lambda (item)
+            (lambda (item)
                 (set-bpf-edit-mode self item (dialog-item-text item)))))
 
 (defmethod set-bpf-edit-mode ((self C-BPF-window) item text)

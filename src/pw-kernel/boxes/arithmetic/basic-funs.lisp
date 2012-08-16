@@ -56,7 +56,7 @@
 a one-element list"
   (cond  ((atom list?) (apply fun list? args))
          ((= (length list?) 1) (apply fun (car list?) args))
-         (t (mapcar #'(lambda (x) (apply fun x  args ))  list? ))))
+         (t (mapcar (lambda (x) (apply fun x  args ))  list? ))))
 
 #|
 (defun deep-mapcar (fun fun1 list? &rest args)
@@ -74,54 +74,54 @@ whether each of <list1?> <list2?> is a list or not."
     ((consp list1?)
      (if (consp list2?)
        ;(error "cannot double-mapcar 2 lists: ~S and ~S~%." list1? list2?)
-       (mapcar #'(lambda (x1 x2) (apply fun1 x1 x2 args))
+       (mapcar (lambda (x1 x2) (apply fun1 x1 x2 args))
                list1? list2?)
-       (mapcar #'(lambda (x) (apply fun1 x list2? args))
+       (mapcar (lambda (x) (apply fun1 x list2? args))
                list1?)))
     ((consp list2?)
-     (mapcar #'(lambda (x) (apply fun1 list1? x args))
+     (mapcar (lambda (x) (apply fun1 list1? x args))
              list2?))
     (t (apply fun1 list1? list2? args))))
 
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 number) (arg2 number))
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 number) (arg2 number))
   (funcall fun arg1 arg2))
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 cons) (arg2 number))
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 number))
   (cons (arith-tree-mapcar fun (car arg1) arg2)
         (arith-tree-mapcar fun  (cdr arg1) arg2)))
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 null) arg2)
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 null) arg2)
   (declare (ignore arg1 arg2)) nil)
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 number) (arg2 cons))
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 number) (arg2 cons))
   (cons (arith-tree-mapcar fun arg1 (car arg2))
         (arith-tree-mapcar fun  arg1 (cdr arg2))))
 
-(defmethod arith-tree-mapcar ((fun function) arg1 (arg2 null))
+(defmethod arith-tree-mapcar ((fun cl:function) arg1 (arg2 null))
    (declare (ignore arg1 arg2)) nil)
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 cons) (arg2 cons))
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 cons))
   (cons (arith-tree-mapcar fun (car arg1) (car arg2))
         (arith-tree-mapcar fun  (cdr arg1) (cdr arg2))))
 |#
 ;;optimized (tail recursion) [Camilo 931004]
-(defmethod arith-tree-mapcar ((fun function) (arg1 number) (arg2 number) &optional accumulator)
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 number) (arg2 number) &optional accumulator)
   (if accumulator (reverse (cons (funcall fun arg1 arg2) accumulator)) (funcall fun arg1 arg2)))
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 cons) (arg2 number) &optional accumulator)
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 number) &optional accumulator)
   (arith-tree-mapcar fun (cdr arg1) arg2 (cons (arith-tree-mapcar fun (car arg1) arg2) accumulator)))
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 null) arg2 &optional accumulator)
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 null) arg2 &optional accumulator)
   (declare (ignore arg1 arg2)) (reverse accumulator))
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 number) (arg2 cons) &optional accumulator)
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 number) (arg2 cons) &optional accumulator)
   (arith-tree-mapcar fun arg1 (cdr arg2) (cons (arith-tree-mapcar fun arg1 (car arg2)) accumulator)))
 
-(defmethod arith-tree-mapcar ((fun function) arg1 (arg2 null) &optional accumulator)
+(defmethod arith-tree-mapcar ((fun cl:function) arg1 (arg2 null) &optional accumulator)
    (declare (ignore arg1 arg2 )) (reverse accumulator))
 
-(defmethod arith-tree-mapcar ((fun function) (arg1 cons) (arg2 cons) &optional accumulator)
+(defmethod arith-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 cons) &optional accumulator)
   (arith-tree-mapcar fun (cdr arg1) (cdr arg2)
                      (cons (arith-tree-mapcar fun (car arg1) (car arg2)) accumulator)))
 
@@ -197,7 +197,7 @@ whether each of <list1?> <list2?> is a list or not."
 extendible. (See the letter E on the module.) The input decimals sets the choice 
 of number of decimal places to round to. I2? specifies division of this rounded 
 number by a second before  rounding;."
-  (arith-tree-mapcar #'(lambda (x y) (approx-decimals x y decimals)) l1? l2?))
+  (arith-tree-mapcar (lambda (x y) (approx-decimals x y decimals)) l1? l2?))
 
 (defunp g-div ((l1? numbers?) (l2? numbers? (:value 1))) numbers?
    "Integer division of two numbers or trees, Euclidean division. "
@@ -313,7 +313,7 @@ and
 will return  ? PW->(8 8 12 17 26 32 34 37 40)
 "
   (let ((x start))
-    (cons x (mapcar #'(lambda (dx) (incf x dx)) dxs))))
+    (cons x (mapcar (lambda (dx) (incf x dx)) dxs))))
 
 (defunp LLdecimals ((list numbers? (:value 1.6)) (nbdec fix)) numbers?
   "Arrondit liste de profondeur quelconque avec <nbdec> décimales"
@@ -362,28 +362,28 @@ will return     ?
 
 #|(defunp matrix-oper ((l1? numbers?) (l2? numbers?) (fun symbol (:value "+"))) numbers?
 "applies fun to elements of l1? and l2? considered as matrices"
-(mapcar #'(lambda (elem) (double-mapcar fun elem l2?)) (list! l1?)))|#
+(mapcar (lambda (elem) (double-mapcar fun elem l2?)) (list! l1?)))|#
 
-(defmethod tree-product ((fun function) (tree1 number) (tree2 number))
+(defmethod tree-product ((fun cl:function) (tree1 number) (tree2 number))
   (funcall fun tree1 tree2))
 
-(defmethod tree-product ((fun function) (tree1 null) tree2) (declare (ignore tree1 tree2)) nil)
+(defmethod tree-product ((fun cl:function) (tree1 null) tree2) (declare (ignore tree1 tree2)) nil)
 
-(defmethod tree-product ((fun function) tree1 (tree2 null)) (declare (ignore tree1 tree2)) nil)
+(defmethod tree-product ((fun cl:function) tree1 (tree2 null)) (declare (ignore tree1 tree2)) nil)
 
-(defmethod tree-product ((fun function) (tree1 cons) (tree2 number))
-  (mapcar #'(lambda (x) (tree-product fun x tree2)) tree1))
+(defmethod tree-product ((fun cl:function) (tree1 cons) (tree2 number))
+  (mapcar (lambda (x) (tree-product fun x tree2)) tree1))
 
-(defmethod tree-product ((fun function) (tree1 number) (tree2 cons))
-  (mapcar #'(lambda (x) (tree-product fun tree1 x)) tree2))
+(defmethod tree-product ((fun cl:function) (tree1 number) (tree2 cons))
+  (mapcar (lambda (x) (tree-product fun tree1 x)) tree2))
 
-(defmethod tree-product ((fun function) (tree1 cons) (tree2 cons))
-  (mapcar #'(lambda (x) (mapcar #'(lambda (y) (tree-product fun x y)) tree2)) tree1))
+(defmethod tree-product ((fun cl:function) (tree1 cons) (tree2 cons))
+  (mapcar (lambda (x) (mapcar (lambda (y) (tree-product fun x y)) tree2)) tree1))
 
 ;;to be eliminated
 (defunp matrix-oper ((l1? numbers?) (l2? numbers?) (fun symbol (:value "+"))) numbers?
 "applies fun to elements of l1? and l2? considered as matrices"
- (mapcar #'(lambda (x) (mapcar #'(lambda (y) (funcall fun x y)) (list! l2?))) (list! l1?)))
+ (mapcar (lambda (x) (mapcar (lambda (y) (funcall fun x y)) (list! l2?))) (list! l1?)))
 
 (defunp cartesian ((l1? numbers?) (l2? numbers?) (fun symbol (:value "+"))) numbers?
 "Applies the function fun to elements 
@@ -402,11 +402,11 @@ will return ? PW->((10)) ,
  ((4 5) (4 6) (4 7) (4 8)))
 
 "
- (mapcar #'(lambda (x) (mapcar #'(lambda (y) (funcall fun x y)) (list! l2?))) (list! l1?)))
+ (mapcar (lambda (x) (mapcar (lambda (y) (funcall fun x y)) (list! l2?))) (list! l1?)))
 
 (defunp pw::pgcd ((list list) (approx fix/float (:value 1))) float "fix/float gcd"
   (labels ((min-gcd? (x y) (<= (- y x) approx));;(<= (- 1 (/ x y)) approx))
-           (enough-approx? (diff) (every #'(lambda(x) (min-gcd? (apply 'min diff) x)) diff))
+           (enough-approx? (diff) (every (lambda (x) (min-gcd? (apply 'min diff) x)) diff))
            (loop-gcd (list)
              (let* ((min (apply 'min list))
                     (diff (g- (substitute (+ min min) min list :test #'min-gcd?) min)))

@@ -109,7 +109,6 @@ dialog items. It is built on SIMPLE-VIEW.
 
 
 (defmacro reference-method (generic-function (&rest classes))
-  (niy reference-method generic-function classes)
   `(niy reference-method ',generic-function ',classes))
 
 
@@ -301,13 +300,13 @@ CLIPRGN:        Region records from the view’s wptr.  They are ignored.
 (defmethod set-view-position ((item dialog-item) h &optional v)
   (let ((new-position (make-point h v)))
     (unless (eql new-position (view-position item))
-      (with-focused-dialog-item (item)
-        (without-interrupts
-            (let ((window (view-window item)))
-              (when window
-                (invalidate-view item t))
-              (call-next-method)
-              (invalidate-view item t)))))
+      (let ((window (view-window item)))
+        (if window
+          (with-focused-dialog-item (item)
+            (invalidate-view item t)
+            (call-next-method)
+            (invalidate-view item t))
+          (call-next-method))))
     new-position))
 
 
@@ -393,60 +392,62 @@ DO:             Enable or disable the dialog ITEM depending on ENABLED-P.
 
 
 
-(defmethod view-outer-size ((view simple-view))
-  (let ((old-pos  (view-position view))
-        (old-size (view-size view)))
-    (unless old-pos  (setf (slot-value view 'view-position) 0))
-    (unless old-size (setf (slot-value view 'view-size) (view-default-size view)))
-    (multiple-value-bind (tl br) (view-corners view)        
-      (setf (slot-value view 'view-position) old-pos)
-      (subtract-points br tl))))
+(defgeneric view-outer-size (view)
+  (:method ((view simple-view))
+    (let ((old-pos  (view-position view))
+          (old-size (view-size view)))
+      (unless old-pos  (setf (slot-value view 'view-position) 0))
+      (unless old-size (setf (slot-value view 'view-size) (view-default-size view)))
+      (multiple-value-bind (tl br) (view-corners view)        
+        (setf (slot-value view 'view-position) old-pos)
+        (subtract-points br tl)))))
 
 
-(defmethod view-find-vacant-position ((view view) subview)
-  (let* ((size       (view-outer-size subview))
-         (inner-size (view-size subview))
-         (height     (point-v size))
-         (width      (point-h size))
-         (w-size     (view-size view))
-         (w-height   (point-v w-size))
-         (w-width    (point-h w-size))
-         (rect-rgn   (new-rgn))
-         (vacant-rgn (new-rgn))
-         (v-list     (list 4))
-         (h-list     (list 4))
-         (h-delta    (ash (- (point-h size) (point-h inner-size)) -1))
-         (v-delta    (ash (- (point-v size) (point-v inner-size)) -1)))
-    (unwind-protect
-         (progn
-           (let ((s-rect (make-rect 0 0 (point-h w-size) (point-v w-size))))
-             (set-rect-region vacant-rgn s-rect)
-             (dovector (item (view-subviews view))
-                       (let ((position (view-position item))
-                             (size     (view-outer-size item)))
-                         (unless (or (eq item subview) (not position))                
-                           (let ((lower-right (add-points position size)))
-                             (setf (rect-topleft s-rect) position
-                                   (rect-bottomright s-rect) lower-right))
-                           (inset-rect s-rect -4 -4)
-                           (set-rect-region rect-rgn s-rect)
-                           (difference-region vacant-rgn rect-rgn vacant-rgn)
-                           (pushnew (+ 6 (rect-right  s-rect)) h-list)
-                           (pushnew (+ 6 (rect-bottom s-rect)) v-list))))
-             (setf v-list (sort v-list (function <))
-                   h-list (sort h-list (function <)))
-             (dolist (v v-list)
-               (dolist (h h-list)
-                 (set-rect-region rect-rgn h v (+ h width) (+ v height))
-                 (union-region vacant-rgn rect-rgn rect-rgn)
-                 (when (and (equal-region-p rect-rgn vacant-rgn)
-                            (< (+ v height) w-height)
-                            (< (+ h width)  w-width))
-                   (return-from view-find-vacant-position (make-point (+ h h-delta)(+ v v-delta)))))))
-           (return-from view-find-vacant-position (make-point 0 0)))
-      (dispose-region vacant-rgn)
-      (dispose-region rect-rgn))
-    (return-from view-find-vacant-position (make-point 0 0))))
+(defgeneric view-find-vacant-position (view subview)
+  (:method ((view view) subview)
+    (let* ((size       (view-outer-size subview))
+           (inner-size (view-size subview))
+           (height     (point-v size))
+           (width      (point-h size))
+           (w-size     (view-size view))
+           (w-height   (point-v w-size))
+           (w-width    (point-h w-size))
+           (rect-rgn   (new-rgn))
+           (vacant-rgn (new-rgn))
+           (v-list     (list 4))
+           (h-list     (list 4))
+           (h-delta    (ash (- (point-h size) (point-h inner-size)) -1))
+           (v-delta    (ash (- (point-v size) (point-v inner-size)) -1)))
+      (unwind-protect
+          (progn
+            (let ((s-rect (make-rect 0 0 (point-h w-size) (point-v w-size))))
+              (set-rect-region vacant-rgn s-rect)
+              (dovector (item (view-subviews view))
+                (let ((position (view-position item))
+                      (size     (view-outer-size item)))
+                  (unless (or (eq item subview) (not position))                
+                    (let ((lower-right (add-points position size)))
+                      (setf (rect-topleft s-rect) position
+                            (rect-bottomright s-rect) lower-right))
+                    (inset-rect s-rect -4 -4)
+                    (set-rect-region rect-rgn s-rect)
+                    (difference-region vacant-rgn rect-rgn vacant-rgn)
+                    (pushnew (+ 6 (rect-right  s-rect)) h-list)
+                    (pushnew (+ 6 (rect-bottom s-rect)) v-list))))
+              (setf v-list (sort v-list (function <))
+                    h-list (sort h-list (function <)))
+              (dolist (v v-list)
+                (dolist (h h-list)
+                  (set-rect-region rect-rgn h v (+ h width) (+ v height))
+                  (union-region vacant-rgn rect-rgn rect-rgn)
+                  (when (and (equal-region-p rect-rgn vacant-rgn)
+                             (< (+ v height) w-height)
+                             (< (+ h width)  w-width))
+                    (return-from view-find-vacant-position (make-point (+ h h-delta)(+ v v-delta)))))))
+            (return-from view-find-vacant-position (make-point 0 0)))
+        (dispose-region vacant-rgn)
+        (dispose-region rect-rgn))
+      (return-from view-find-vacant-position (make-point 0 0)))))
 
 
 
@@ -483,13 +484,14 @@ dialog-item-width-correction.)
                     (* nlines (font-codes-line-height ff ms)))))))
 
 
-(defmethod set-default-size-and-position ((view simple-view) &optional container)
-  (when (view-size view)
-    (setf (slot-value view 'view-size) (view-default-size view)))
-  (when (view-position view)
-    (let ((container (or container (view-container view)))) 
-      (when container
-        (setf (slot-value view 'view-position) (view-find-vacant-position container view))))))
+(defgeneric set-default-size-and-position (view &optional container)
+  (:method ((view simple-view) &optional container)
+    (when (view-size view)
+      (setf (slot-value view 'view-size) (view-default-size view)))
+    (when (view-position view)
+      (let ((container (or container (view-container view)))) 
+        (when container
+          (setf (slot-value view 'view-position) (view-find-vacant-position container view)))))))
 
 
 

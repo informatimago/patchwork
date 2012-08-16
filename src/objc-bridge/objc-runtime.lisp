@@ -103,7 +103,7 @@
 
 
 (defun clear-objc-protocols ()
-  (maphash #'(lambda (name proto)
+  (maphash (lambda (name proto)
                (declare (ignore name))
                (setf (objc-protocol-address proto) nil))
            *objc-protocols*))
@@ -127,7 +127,7 @@
 
 (defun compute-objc-direct-slots-from-info (info class)
   (let* ((ns-package (find-package "NS")))
-    (mapcar #'(lambda (field)
+    (mapcar (lambda (field)
                 (let* ((name (compute-lisp-name (unescape-foreign-name
                                                  (ccl::foreign-record-field-name
                                                   field))
@@ -304,7 +304,7 @@
 
 
 (defun do-all-objc-classes (f)
-  (maphash #'(lambda (ptr id) (declare (ignore ptr)) (funcall f (id->objc-class id)))
+  (maphash (lambda (ptr id) (declare (ignore ptr)) (funcall f (id->objc-class id)))
            (objc-class-map)))
 
 
@@ -706,7 +706,7 @@
           (if (null decl)
               (or (%get-private-objc-class class)
                   (%register-private-objc-class class name))
-              (com.informatimago.common-lisp.cesarum.utility:tracing
+              (progn
                 (format t "### class ~A ~S has decl ~A~%" class name decl) (finish-output)
                 (setf id (register-objc-class class))
                 (setf class (id->objc-class id))
@@ -865,7 +865,7 @@ argument lisp string."
                                        :nsstringptr (%make-constant-nsstring string)))))
 
 #+ccl (ccl::def-ccl-pointers objc-strings ()
-        (maphash #'(lambda (string cached)
+        (maphash (lambda (string cached)
                      (setf (objc-constant-string-nsstringptr cached)
                            (%make-constant-nsstring string)))
                  *objc-constant-strings*))
@@ -921,7 +921,7 @@ argument lisp string."
   classptr)
 
 (defun invalidate-objc-class-descriptors ()
-  (maphash #'(lambda (name descriptor)
+  (maphash (lambda (name descriptor)
                (declare (ignore name))
                (setf (objc-class-descriptor-classptr descriptor) nil))
            *objc-class-descriptors*))
@@ -2006,7 +2006,7 @@ argument lisp string."
                     (push (list (encode-objc-type arg) offset size) result))))))))
     (declare (fixnum gprs-used fprs-used))
     (let* ((max-parm-end
-            (- (apply #'max (mapcar #'(lambda (i) (+ (cadr i) (caddr i)))
+            (- (apply #'max (mapcar (lambda (i) (+ (cadr i) (caddr i)))
                                     arg-info))
                objc-forwarding-stack-offset)))
       (format nil "~a~d~:{~a~d~}"
@@ -2308,7 +2308,7 @@ argument lisp string."
           (setf (objc-message-info-ambiguous-methods message-info)
                 (mapcar #'cdr
                         (sort signature-alist
-                              #'(lambda (x y)
+                              (lambda (x y)
                                   (< (length (cdr x))
                                      (length (cdr y)))))))
           (setf (objc-message-info-flags message-info) nil)
@@ -2408,7 +2408,7 @@ that (known) message signatures be updated in that case."
 (defun register-objc-init-messages ()
   (ccl::do-interface-dirs (d)
     (dolist (init (ccl::cdb-enumerate-keys (ccl::db-objc-methods d)
-                                      #'(lambda (string)
+                                      (lambda (string)
                                           (string= string "init" :end1 (min (length string) 4)))))
       (process-init-message (get-objc-message-info init)))))
 
@@ -2453,7 +2453,7 @@ that (known) message signatures be updated in that case."
 (defun register-objc-set-messages ()
   (ccl::do-interface-dirs (d)
     (dolist (init (ccl::cdb-enumerate-keys (ccl::db-objc-methods d)
-                                      #'(lambda (string)
+                                      (lambda (string)
                                           (string= string "set"
                                                    :end1 (min (length string) 3)))))
       (objc-set->setf init))))
@@ -2685,7 +2685,7 @@ ultimately malloc-based.
      imp)))
 
 #+ccl (ccl::def-ccl-pointers add-objc-methods ()
-        (maphash #'(lambda (impname m)
+        (maphash (lambda (impname m)
                      (declare (ignore impname))
                      (%add-lisp-objc-method m))
                  *lisp-objc-methods*))

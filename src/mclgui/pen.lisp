@@ -383,13 +383,14 @@ not normally called directly but instead by stream output functions.
 ;;    -[NSColor setStroke] sets the current color in the NSGraphicContext.
 
 
-(defmethod pen-shadow ((pen pen-state) &key position size mode pattern)
-  (make-instance 'pen-state
-    :visible (pen-shown-p pen)
-    :position (or position (pen-position pen))
-    :size (or size (pen-size pen))
-    :mode (or (pen-mode-arg mode) (pen-mode pen))
-    :pattern (or pattern (pen-state-pattern pen))))
+(defgeneric pen-shadow (pen &key position size mode pattern)
+  (:method ((pen pen-state) &key position size mode pattern)
+    (make-instance 'pen-state
+      :visible (pen-shown-p pen)
+      :position (or position (pen-position pen))
+      :size (or size (pen-size pen))
+      :mode (or (pen-mode-arg mode) (pen-mode pen))
+      :pattern (or pattern (pen-state-pattern pen)))))
 
 
 (defun call-with-pen-state (thunk pen)

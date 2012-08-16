@@ -43,13 +43,6 @@
 
 (in-package :pw)
 
-(provide 'application-box)
-
-;;====================================================================================================
-;;====================================================================================================
-
-;;(import '(PW-editors:C-application-window PW-editors:set-pw-win+pw-obj))
-;;====================================================================================================
 
 (defclass C-radio-button (static-text-dialog-item) ())
 
@@ -88,7 +81,7 @@
                        :dialog-item-action (get-lock-button-fun self))))
 
 (defmethod get-lock-button-fun ((self C-patch-application))
-  #'(lambda (item)
+  (lambda (item)
       (if (value (view-container item))
         (progn 
           (set-dialog-item-text item "o")

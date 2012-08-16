@@ -59,6 +59,7 @@
 
 
 
+(defgeneric field-size (pane))
 
 (defclass scroller-mixin ()
   ((v-scroller            :accessor v-scroller)
@@ -114,25 +115,27 @@
 ;; Returns two points, the limits for the horizontal & vertical scroll bars
 ;; This is the coordinate system passed to set-view-scroll-position
 
-(defmethod scroll-bar-limits ((view scroller-mixin))
-  (let ((field-size (field-size view))
-        (size (view-size view))
-        (h-scroller (h-scroller view))
-        (v-scroller (v-scroller view)))
-    (if field-size
-      (values (make-point 0 (max (if h-scroller (scroll-bar-setting h-scroller) 0)
-                                 (- (point-h field-size) (point-h size))))
-              (make-point 0 (max (if v-scroller (scroll-bar-setting v-scroller) 0)
-                                 (- (point-v field-size) (point-v size)))))
-      (let ((size (view-size view)))
-        (normal-scroll-bar-limits view (add-points size size))))))
+(defgeneric scroll-bar-limits (view)
+  (:method ((view scroller-mixin))
+    (let ((field-size (field-size view))
+          (size (view-size view))
+          (h-scroller (h-scroller view))
+          (v-scroller (v-scroller view)))
+      (if field-size
+        (values (make-point 0 (max (if h-scroller (scroll-bar-setting h-scroller) 0)
+                                   (- (point-h field-size) (point-h size))))
+                (make-point 0 (max (if v-scroller (scroll-bar-setting v-scroller) 0)
+                                   (- (point-v field-size) (point-v size)))))
+        (let ((size (view-size view)))
+          (normal-scroll-bar-limits view (add-points size size)))))))
 
 
-(defmethod normal-scroll-bar-limits ((view scroller-mixin) max-h &optional max-v)
-  (let ((size (view-size view))
-        (max (make-point max-h max-v)))
-    (values (make-point 0 (max 0 (- (point-h max) (point-h size))))
-            (make-point 0 (max 0 (- (point-v max) (point-v size)))))))
+(defgeneric normal-scroll-bar-limits (view max-h &optional max-v)
+  (:method ((view scroller-mixin) max-h &optional max-v)
+    (let ((size (view-size view))
+          (max (make-point max-h max-v)))
+      (values (make-point 0 (max 0 (- (point-h max) (point-h size))))
+              (make-point 0 (max 0 (- (point-v max) (point-v size))))))))
 
 
 ;; And here's how a view communicates it's page size
@@ -176,84 +179,88 @@
      (update-scroll-bars self :length t :position t))))
 
 
-(defmethod update-scroll-bars ((self scroller-mixin) &key length position)
-  (let* ((pos (view-position self))
-         (size (view-size self))
-         (h-scroller (h-scroller self))
-         (v-scroller (v-scroller self))
-         (outline (scroller-outline self)))
-    (when (and pos size)                ; auto-sizing may not have happenned yet 
-      (without-interrupts
-       (reposition-scroll-bars self h-scroller v-scroller :length length :position position)
-       (when length
-         (update-scroll-bar-limits self h-scroller v-scroller))
-       (when outline
-         (setq pos (subtract-points pos #@(1 1))
-               size (add-points size (scroll-bar-correction self)))
-         (set-view-position outline pos)
-         (set-view-size outline size))))))
+(defgeneric update-scroll-bars (self &key length position)
+  (:method ((self scroller-mixin) &key length position)
+    (let* ((pos (view-position self))
+           (size (view-size self))
+           (h-scroller (h-scroller self))
+           (v-scroller (v-scroller self))
+           (outline (scroller-outline self)))
+      (when (and pos size)   ; auto-sizing may not have happenned yet 
+        (without-interrupts
+            (reposition-scroll-bars self h-scroller v-scroller :length length :position position)
+          (when length
+            (update-scroll-bar-limits self h-scroller v-scroller))
+          (when outline
+            (setq pos (subtract-points pos #@(1 1))
+                  size (add-points size (scroll-bar-correction self)))
+            (set-view-position outline pos)
+            (set-view-size outline size)))))))
 
 
-(defmethod update-scroll-bar-limits ((self scroller-mixin) &optional
-                                     (h-scroller (h-scroller self))
-                                     (v-scroller (v-scroller self)))
-  (multiple-value-bind (h-limits v-limits) (scroll-bar-limits self)
-    (let ((page-size (scroll-bar-page-size self))
-          (scroll-size (scroll-bar-scroll-size self)))
-      (when  h-scroller
-        (set-scroll-bar-min h-scroller (point-h h-limits))
-        (set-scroll-bar-max h-scroller (point-v h-limits))
-        (setf (scroll-bar-page-size h-scroller) (point-h page-size))
-        (setf (scroll-bar-scroll-size h-scroller) (point-h scroll-size)))
-      (when v-scroller
-        (set-scroll-bar-min v-scroller (point-h v-limits))
-        (set-scroll-bar-max v-scroller (point-v v-limits))
-        (setf (scroll-bar-page-size v-scroller) (point-v page-size))
-        (setf (scroll-bar-scroll-size v-scroller) (point-v scroll-size))))))
+(defgeneric update-scroll-bar-limits (self &optional h-scroller v-scroller)
+  (:method ((self scroller-mixin) &optional
+            (h-scroller (h-scroller self))
+            (v-scroller (v-scroller self)))
+    (multiple-value-bind (h-limits v-limits) (scroll-bar-limits self)
+      (let ((page-size (scroll-bar-page-size self))
+            (scroll-size (scroll-bar-scroll-size self)))
+        (when  h-scroller
+          (set-scroll-bar-min h-scroller (point-h h-limits))
+          (set-scroll-bar-max h-scroller (point-v h-limits))
+          (setf (scroll-bar-page-size h-scroller) (point-h page-size))
+          (setf (scroll-bar-scroll-size h-scroller) (point-h scroll-size)))
+        (when v-scroller
+          (set-scroll-bar-min v-scroller (point-h v-limits))
+          (set-scroll-bar-max v-scroller (point-v v-limits))
+          (setf (scroll-bar-page-size v-scroller) (point-v page-size))
+          (setf (scroll-bar-scroll-size v-scroller) (point-v scroll-size)))))))
 
 
 ;; Call this whenever the thumb position changes.
-(defmethod update-thumbs ((self scroller-mixin))
-  (let ((pos (view-scroll-position self))
-        (h-scroller (h-scroller self))
-        (v-scroller (v-scroller self))
-        (update-limits? nil))
-    (when (and h-scroller
-               (not (eql (scroll-bar-setting h-scroller) (point-h pos))))
-      (when (eql (scroll-bar-min h-scroller)
-                 (set-scroll-bar-setting h-scroller (point-h pos)))
-        (setq update-limits? t)))
-    (when (and v-scroller
-               (not (eql (scroll-bar-setting v-scroller) (point-v pos))))
-      (when (eql (scroll-bar-min v-scroller)
-                 (set-scroll-bar-setting v-scroller (point-v pos)))
-        (setq update-limits? t)))
-    (when update-limits? (update-scroll-bar-limits self))))
+(defgeneric update-thumbs (self)
+  (:method ((self scroller-mixin))
+    (let ((pos (view-scroll-position self))
+          (h-scroller (h-scroller self))
+          (v-scroller (v-scroller self))
+          (update-limits? nil))
+      (when (and h-scroller
+                 (not (eql (scroll-bar-setting h-scroller) (point-h pos))))
+        (when (eql (scroll-bar-min h-scroller)
+                   (set-scroll-bar-setting h-scroller (point-h pos)))
+          (setq update-limits? t)))
+      (when (and v-scroller
+                 (not (eql (scroll-bar-setting v-scroller) (point-v pos))))
+        (when (eql (scroll-bar-min v-scroller)
+                   (set-scroll-bar-setting v-scroller (point-v pos)))
+          (setq update-limits? t)))
+      (when update-limits? (update-scroll-bar-limits self)))))
 
 
 ; Seperate from update-scroll-bars so that users can specialize it.
-(defmethod reposition-scroll-bars ((self scroller-mixin) h-scroller v-scroller &key length position)
-  (let* ((pos (view-position self))
-         (size (view-size self))
-         (width (point-h size))
-         (height (point-v size))
-         (grow-icon-p (grow-icon-p self)))
-    (when (and pos size)                ; auto-sizing may not have happenned yet 
-      (without-interrupts
-       (when h-scroller
-         (when position
-           (set-view-position h-scroller (add-points pos (make-point -1 height))))
-         (when length
-           (set-scroll-bar-length h-scroller
-            ;; ## WIDTH ADJUSTED IF A GROW ICON:
-             (+ 2 width (if (and grow-icon-p (not v-scroller)) -14 0)))))
-       (when v-scroller
-         (when position
-           (set-view-position v-scroller (add-points pos (make-point width -1))))
-         (when length
-           (set-scroll-bar-length v-scroller
-                                  ;; height ADJUSTED IF A GROW ICON:
-              (+ 2 height (if (and grow-icon-p (not h-scroller)) -14 0)))))))))
+(defgeneric reposition-scroll-bars (self h-scroller v-scroller &key length position)
+  (:method ((self scroller-mixin) h-scroller v-scroller &key length position)
+    (let* ((pos (view-position self))
+           (size (view-size self))
+           (width (point-h size))
+           (height (point-v size))
+           (grow-icon-p (grow-icon-p self)))
+      (when (and pos size)   ; auto-sizing may not have happenned yet 
+        (without-interrupts
+            (when h-scroller
+              (when position
+                (set-view-position h-scroller (add-points pos (make-point -1 height))))
+              (when length
+                (set-scroll-bar-length h-scroller
+                                       ;; ## WIDTH ADJUSTED IF A GROW ICON:
+                                       (+ 2 width (if (and grow-icon-p (not v-scroller)) -14 0)))))
+          (when v-scroller
+            (when position
+              (set-view-position v-scroller (add-points pos (make-point width -1))))
+            (when length
+              (set-scroll-bar-length v-scroller
+                                     ;; height ADJUSTED IF A GROW ICON:
+                                     (+ 2 height (if (and grow-icon-p (not h-scroller)) -14 0))))))))))
 
  
 (defmethod scroll-bar-changed ((view scroller-mixin) scroll-bar)
@@ -284,6 +291,7 @@
 ;; view. The scroller should have scroll-bar-mixin mixed in.
 ;;
 
+
 (defclass scroller-pane (view)
   ((scroller              :accessor scroller)
    (scroller-outline      :accessor scroller-outline
@@ -291,18 +299,22 @@
    (draw-scroller-outline :accessor draw-scroller-outline
                           :initarg :draw-scroller-outline)))
 
+(defgeneric v-scroller (pane)
+  (:method ((pane scroller-pane))
+    (v-scroller (scroller pane))))
 
 
-(defmethod v-scroller ((pane scroller-pane))
-  (v-scroller (scroller pane)))
-
-
-(defmethod h-scroller ((pane scroller-pane))
-  (h-scroller (scroller pane)))
+(defgeneric h-scroller (pane)
+  (:method ((pane scroller-pane))
+    (h-scroller (scroller pane))))
 
 
 (defmethod field-size ((pane scroller-pane))
   (field-size (scroller pane)))
+
+
+
+
 
 
 (defmethod initialize-instance ((self scroller-pane) &rest initargs &key
@@ -342,22 +354,23 @@
   self)
 
     
-(defmethod scroller-size-and-position ((self scroller-pane) h-scrollp v-scrollp)
-  (let ((scroller-size (view-size self))
-        (scroller-position #@(0 0)))
-    (when scroller-size
-      (when h-scrollp
-        (setq scroller-size (subtract-points scroller-size #@(15 0))))
-      (when v-scrollp
-        (setq scroller-size (subtract-points scroller-size #@(0 15)))))
-    (when (draw-scroller-outline self)
-      (setq scroller-position #@(1 1)
-            scroller-size (and scroller-size
-                               (subtract-points scroller-size #@(2 2)))))
-    (values scroller-size scroller-position)))
+(defgeneric scroller-size-and-position (self h-scrollp v-scrollp)
+  (:method ((self scroller-pane) h-scrollp v-scrollp)
+    (let ((scroller-size (view-size self))
+          (scroller-position #@(0 0)))
+      (when scroller-size
+        (when h-scrollp
+          (setq scroller-size (subtract-points scroller-size #@(15 0))))
+        (when v-scrollp
+          (setq scroller-size (subtract-points scroller-size #@(0 15)))))
+      (when (draw-scroller-outline self)
+        (setq scroller-position #@(1 1)
+              scroller-size (and scroller-size
+                                 (subtract-points scroller-size #@(2 2)))))
+      (values scroller-size scroller-position))))
 
 
-(defmethod scroll-bar-limits ((self scroller-pane))
+(defmethod  scroll-bar-limits ((self scroller-pane))
   (scroll-bar-limits (scroller self)))
 
 

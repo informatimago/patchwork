@@ -451,7 +451,7 @@
 ;;................................................................................: fields
 (defmacro fields (e &optional v)
   (if v
-    `(let ((e ,e)) (mapc #'(lambda (f) (midiaddfield e f)) ,v))
+    `(let ((e ,e)) (mapc (lambda (f) (midiaddfield e f)) ,v))
     `(let (l (e ,e))  (dotimes (i (midicountfields e)) (push (midigetfield e i) l)) (nreverse l)) ))
 
 
@@ -1109,11 +1109,11 @@
 ;;---------------------------------------------------------------------------------
 
 ;;................................................................................: add-startup-action
-(defmethod add-startup-action ((foo function))
+(defmethod add-startup-action ((foo cl:function))
   (pushnew foo *lisp-startup-functions*))
 
 ;;................................................................................: add-quit-action
-(defmethod add-quit-action ((foo function))
+(defmethod add-quit-action ((foo cl:function))
   (pushnew foo *lisp-cleanup-functions*))
 
 

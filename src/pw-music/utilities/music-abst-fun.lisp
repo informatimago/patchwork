@@ -93,7 +93,7 @@
   (declare (ignore obj))
   (let ((fun
          `(let ((*closure-data* ,(decompile (chord-seq self))))
-           #'(lambda () *closure-data*))))
+           (lambda () *closure-data*))))
     `(list 'funcall ,fun)))
 
 (defmethod compile-me ((self C-patch-PolifMN) obj)

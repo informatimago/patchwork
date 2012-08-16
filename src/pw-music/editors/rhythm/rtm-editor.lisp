@@ -143,7 +143,8 @@
 (defmethod set-first-beat-num ((self C-beat-editor-panel) value) (setf (first-beat-num self) value)) 
 (defmethod set-beat-zoom ((self C-beat-editor-panel) value) (setf (beat-zoom self) value)) 
 
-(setf *rtm-editor-velocity-list* '(100 100))
+(defparameter *rtm-editor-velocity-list* '(100 100))
+
 (defmethod view-click-event-handler :after ((self C-beat-editor-panel) where)
   (declare (ignore where))
   (if (option-key-p)
@@ -280,7 +281,7 @@
         (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
         (start 
           (apdfuncall 100 (priority) 15
-                      #'(lambda ()
+                      (lambda ()
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self))))))       
       (play-sequence (make-instance 'C-chord-line 
@@ -299,7 +300,7 @@
         (setf scheduler::*print-on-late?* t)
         (start 
           (apdfuncall 100 (priority) 15
-                      #'(lambda ()
+                      (lambda ()
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self))))))       
       (let ((c-line (make-instance 'C-chord-line 
@@ -309,7 +310,7 @@
           (progn (setf scheduler::*print-on-late?* t)
                  (start 
                    (apdfuncall 100 (priority) 15
-                      #'(lambda ()
+                      (lambda ()
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self)))))   ))))))
 
@@ -322,7 +323,7 @@
         (setf scheduler::*print-on-late?* t)
         (start 
           (apdfuncall 100 (priority) 15
-                      #'(lambda ()
+                      (lambda ()
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self))))))       
       (let ((c-line (make-instance 'C-chord-line 
@@ -332,7 +333,7 @@
           (progn (setf scheduler::*print-on-late?* t)
                  (start 
                    (apdfuncall 100 (priority) 15
-                      #'(lambda ()
+                      (lambda ()
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self)))))   ))))))
           ;;(start (apdfuncall 100 (priority) 15 #'play-chords c-line)))))))
@@ -362,25 +363,25 @@
                                      :view-position (make-point 2 ctrl-y) :view-size (make-point 36 14) 
                                      :min-val 1  :value 1 
                                      :dialog-item-action 
-                                     #'(lambda (item) (scroll-beat self item))))
+                                     (lambda (item) (scroll-beat self item))))
                 (setf (first-staff-num-ctrl self)
                   (make-instance 'C-numbox 
                                      :view-position (make-point 40 ctrl-y) :view-size (make-point 36 14) 
                                      :min-val 1  :value (1+ (first-staff-num self)) 
                                      :dialog-item-action 
-                                     #'(lambda (item) (scroll-to-staff-number self item))))
+                                     (lambda (item) (scroll-to-staff-number self item))))
                 (setf (visible-staffs-count-ctrl self)
                    (make-instance 'C-numbox 
                                      :view-position (make-point 78 ctrl-y) :view-size (make-point 36 14) 
                                      :min-val 1  :value (visible-staffs-count self)
                                      :dialog-item-action 
-                                     #'(lambda (item) (update-staff-count-number self item))))
+                                     (lambda (item) (update-staff-count-number self item))))
                 (setf (beat-zoom-ctrl self)
                       (make-instance 'C-numbox 
                                      :view-position (make-point 116 ctrl-y) :view-size (make-point 36 14) 
                                      :min-val 10 :min-val 1000  :value (beat-zoom-ctrl-value self)
                                      :dialog-item-action 
-                                     #'(lambda (item) (zoom-beat self item))))
+                                     (lambda (item) (zoom-beat self item))))
                 (setf (play-speed-ctrl self)
                       (make-instance 'C-numbox 
                                      :view-position (make-point 167 ctrl-y) :view-size (make-point 36 14) 
@@ -390,20 +391,20 @@
                                :view-position (make-point 215 ctrl-y) :view-size (make-point 50 14) 
                                :view-font '("monaco" 9)
                                :dialog-item-action 
-                               #'(lambda (item) item
+                               (lambda (item) item
                                   (play-rtm-with-options self)))
                 (make-instance 'button-dialog-item 
                                :dialog-item-text " SPlay "
                                :view-position (make-point 275 ctrl-y) :view-size (make-point 50 14) 
                                :view-font '("monaco" 9)
                                :dialog-item-action 
-                               #'(lambda (item) item (play-rtms+scroll self)))
+                               (lambda (item) item (play-rtms+scroll self)))
                 (make-instance 'button-dialog-item 
                                :dialog-item-text " Stop "
                                :view-position (make-point 335 ctrl-y) :view-size (make-point 50 14) 
                                :view-font '("monaco" 9)
                                :dialog-item-action 
-                               #'(lambda (item) item 
+                               (lambda (item) item 
                                   (tell (ask-all (beat-editors self) 'measure-line) 'stop-measure-line)))
                (setf (beat-edit-ctrl self)
                       (make-instance 'check-box-dialog-item 
@@ -411,7 +412,7 @@
                                      :view-position (make-point 410 ctrl-y) :view-size (make-point 50 14) 
                                      :view-font '("monaco" 9 :srcor)
                                      :dialog-item-action 
-                                     #'(lambda (item) (set-edit-mode self item))))
+                                     (lambda (item) (set-edit-mode self item))))
                (setf (chord-edit-ctrl self)
                       (make-instance 'check-box-dialog-item 
                                      :dialog-item-text "chord"
@@ -427,7 +428,7 @@
             :view-container self
             :dialog-item-text txt
             :view-font '("monaco" 9 :srcor)
-            :dialog-item-action #'(lambda (item) item (erase+view-draw-contents (view-window self))))) 
+            :dialog-item-action (lambda (item) item (erase+view-draw-contents (view-window self))))) 
 
 ;;================
 

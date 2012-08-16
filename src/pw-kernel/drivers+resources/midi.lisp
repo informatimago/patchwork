@@ -57,10 +57,11 @@
 (defvar *midi-share?* nil)  ;Is MidiShare present
 (defvar *pw-refnum* nil)    ;Identifier for PatchWork
 (defvar *player* NIL)           ;For play
-  
+
 
 
 (defun midi-new-filter (&key chan port type)
+  (declare (ignore chan port type))
   (ui:uiwarn "~S is not implemented" 'midi-new-filter)
   ;; (let ((f (ui::make-record :tfilter)))
   ;;   (cond ((eq chan t) (dotimes (i 16) (midishare::acceptchan f i t)))
@@ -77,6 +78,7 @@
 
 
 (defmethod midi-free-filter ((f t #|ui::macptr|#))
+  (declare (ignorable f))
   (ui:uiwarn "~S is not implemented" 'midi-free-filter)
   ;; (unless (ui::%null-ptr-p f)
   ;;   (ui::dispose-record f))
@@ -84,6 +86,7 @@
 
 
 (defmethod midi-modify-filter ((f t #|ui::macptr|#) &key accept chan port type)
+  (declare (ignorable f) (ignore accept chan port type))
   (ui:uiwarn "~S is not implemented" 'midi-free-filter)
   ;; (unless (ui::%null-ptr-p f)
   ;;   (cond ((eq chan t) (dotimes (i 16) (midishare::acceptchan f i accept)))
@@ -137,13 +140,16 @@
 
 ;;;;MidiWrite
 (defun midi-write-time (event time)
+  (declare (ignore event time))
   (ui:uiwarn "~S is not implemented" 'midi-write-time)
   ;; (when *pw-refnum*
   ;;   (midishare::MidiSendAt *pw-refnum* event time))p
   )
 
 
+#-(and)
 (defun midi-write (event)
+  (declare (ignore event))
   (ui:uiwarn "~S is not implemented" 'midi-write)
   ;; (midi-write-time event (midishare::MidiGetTime))
   )
@@ -159,7 +165,7 @@
   ;;    ev))
   )
 
-  
+
 ;;;;Midi-clear - Flush the MidiShare's events.
 (defun midi-clear ()
   (ui:uiwarn "~S is not implemented" 'midi-clear)
@@ -170,10 +176,10 @@
 ;;;;clock-time - return the current time of. The time is expressed in ticks.
 (defun clock-time () 
   (ui:uiwarn "~S is not implemented" 'clock-time)
-   ;; (round (/ (midishare::MidiGetTime) 10))
+  ;; (round (/ (midishare::MidiGetTime) 10))
   1)
 
-  
+
 ;;;;utilities, hacks
 
 
@@ -181,16 +187,16 @@
   (ui:uiwarn "~S is not implemented" 'midi-notes-off)
   ;;(dotimes (chan 16)
   ;;  (midi-write (make-midievent #xb chan #x7b 0)))
-)
+  )
 
 (defun midi-reset ()
   (ui:uiwarn "~S is not implemented" 'midi-reset)
   ;;(midishare::MidiFlushEvs *pw-refnum*)
   ;;(midi-notes-off)
-)
+  )
 
 (push #'midi-close ui:*lisp-cleanup-functions*)
 (ui::def-load-pointers startup-midi () (midi-open))
 
-;;(proclaim '(optimize (speed 1) (safety 1) (space 1)))
+;;;; THE END ;;;;
 

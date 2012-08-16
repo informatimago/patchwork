@@ -79,11 +79,11 @@
 (defvar *Table-disp-popUpMenu*
   (new-menu 
    " "
-   (new-leafmenu "Open" #'(lambda() (open-patch-win *target-action-object* )))
-   (new-leafmenu "Column Center" #'(lambda() (table-layout *target-action-object* 'cc)))
-   ;(new-leafmenu "Row Center" #'(lambda() (table-layout *target-action-object* 'rc)))
-   (new-leafmenu "Right justify" #'(lambda() (table-layout *target-action-object* 'r)))
-   ;(new-leafmenu "Left justify" #'(lambda() (table-layout *target-action-object* 'l)))
+   (new-leafmenu "Open" (lambda () (open-patch-win *target-action-object* )))
+   (new-leafmenu "Column Center" (lambda () (table-layout *target-action-object* 'cc)))
+   ;(new-leafmenu "Row Center" (lambda () (table-layout *target-action-object* 'rc)))
+   (new-leafmenu "Right justify" (lambda () (table-layout *target-action-object* 'r)))
+   ;(new-leafmenu "Left justify" (lambda () (table-layout *target-action-object* 'l)))
 ))
 
 
@@ -122,7 +122,7 @@
 (defmethod table-layout ((self C-table-displayer) option)
   (let* ((data (patch-value (car (input-objects self)) self))
          (maxlength (apply 'max 
-                           (mapcar #'(lambda(row) (length (list! row))) data)))
+                           (mapcar (lambda (row) (length (list! row))) data)))
          )
     
     (cond ((eq option 'cc)
@@ -137,7 +137,7 @@
                   :initial-element #\Space))
     (dolist (row data)
       (setq init-pos (- maxlength (length (list! row)) increm))
-      (mapc #'(lambda (elem) 
+      (mapc (lambda (elem) 
                 (setf (aref (table self) (incf init-pos increm) index) elem))
             (list! row))
       (incf index))))

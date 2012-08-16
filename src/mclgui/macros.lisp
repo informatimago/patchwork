@@ -36,13 +36,13 @@
 (objcl:enable-objcl-reader-macros)
 
 (defmacro niy (item &rest vars)
-  `(format *trace-output* "~&~40A (~S~:{(~S ~S)~^ ~})~%"
+  `(format *trace-output* "~&(~40A (~S~:{(~S ~S)~^ ~}))~%"
            "not implemented yet:"
            ',item (mapcar (lambda (var) (list var (type-of var)))
                           (list ,@vars))))
 
 (defmacro uiwarn (control-string &rest args)
-  `(format *trace-output* "~&~?~%" ',control-string' (list ,@args)))
+  `(format *trace-output* "~&(~?)~%" ',control-string' (list ,@args)))
 
 
 
@@ -120,12 +120,14 @@ POSITION:       0 means insert in front of the list.
 
 
 
+(declaim (declaration stepper))
 
 (defun object-identity (object)
   "
 RETURN:         A string containing the object identity as printed by
                 PRINT-UNREADABLE-OBJECT.
 "
+  (declare (stepper disable))
   (let ((*print-readably* nil))
     (let ((ident
            (with-output-to-string (stream)
@@ -137,6 +139,7 @@ RETURN:         A string containing the object identity as printed by
   "
 SEE:            PRINT-PARSEABLE-OBJECT
 "
+  (declare (stepper disable))
   (if *print-readably*
       (error 'print-not-readable :object object)
       (progn
@@ -199,13 +202,13 @@ RETURN:         The object that bas been printed (so that you can use
   (if (symbolp object)
       `(call-print-parseable-object ,object ,stream ,type ,identity
                                     (lambda (,object)
-                                      (declare (ignorable ,object))
+                                      (declare (ignorable ,object) (stepper disable))
                                       ,(extract-slots object slots)))
       (destructuring-bind (ovar oval) object
         `(let ((,ovar ,oval))
            (call-print-parseable-object ,ovar ,stream ,type ,identity
                                         (lambda (,ovar)
-                                          (declare (ignorable ,ovar))
+                                          (declare (ignorable ,ovar) (stepper disable))
                                           ,(extract-slots object slots)))))))
 
 
@@ -243,7 +246,9 @@ RETURN: A form sending
                      (symbolp (second message)))
                 (oclo:lisp-to-objc-message (list (second message))))
                (t
-                (check-type message (or keyword (cons symbol null))))))
+                (check-type message (or keyword
+                                        (cons symbol null) ; ???
+                                        (cons symbol (cons symbol null)))))))
            (objarg (argument)
              (if (null argument)
                  '*null*
@@ -257,19 +262,21 @@ RETURN: A form sending
               (eq 'objc:send (first form)))
          (destructuring-bind (send recipient message &optional argument) form
            (declare (ignore send))
-           (format-trace "performSelectorOnMainThread" recipient message argument wait)
-           `[,recipient performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
-                        withObject: ,(objarg argument)
-                        waitUntilDone: ,wait]))
+           ;; TODO: eval once arguments!
+           `(progn (format-trace "performSelectorOnMainThread" ',recipient ,message ,argument ,wait)
+                   [,recipient performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
+                                withObject: ,(objarg argument)
+                                waitUntilDone: ,wait])))
         ((and (listp form)
               (<= 2 (length form) 3)
               (eq 'objc:objc-message-send-super (first form)))
          (destructuring-bind (send message &optional argument) form
            (declare (ignore send))
-           (format-trace "performSelectorOnMainThread" 'super message argument wait)
-           `[super performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
-                   withObject: ,(objarg argument)
-                   waitUntilDone: ,wait]))
+           ;; TODO: eval once arguments!
+           `(progn (format-trace "performSelectorOnMainThread" 'super ,message ,argument ,wait)
+                   [super performSelectorOnMainThread: (oclo:selector ,(objcmsg message))
+                           withObject: ,(objarg argument)
+                           waitUntilDone: ,wait])))
         (t
          (error 'simple-program-error
                 :format-control "The ~S form in ~S must be an Objective-C message send with a single argument."

@@ -717,6 +717,7 @@ The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to 0 deg
            (descriptor-cache-descriptor *descriptor-cache*)
            (multiple-value-bind (name size mode face color) (font-values ff ms)
              (multiple-value-bind (traits others) (style-to-font-traits face)
+               (declare (ignore others)) ; for now…
                ;; (print (list name size mode traits others color))
                (let* ((attributes
                        (list
@@ -742,7 +743,8 @@ The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to 0 deg
 
 (defun font-from-codes (ff ms)
   (multiple-value-bind (descriptor mode size) (font-descriptor-from-codes ff ms)
-    (values [NSFont fontWithDescriptor:descriptor size:(cgfloat size)] mode)))
+    (values [NSFont fontWithDescriptor:descriptor size:(if size (cgfloat size) (cgfloat 0.0))]
+            mode)))
 
 
 

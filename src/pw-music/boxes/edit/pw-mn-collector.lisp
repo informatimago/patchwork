@@ -82,14 +82,14 @@
   
 (defmethod get-chordline-form ((self C-chord-line))
   (mapcar 
-   #'(lambda (chord) 
+   (lambda (chord) 
        `(list ,(t-time chord) ,@(mapcar #'get-useful-note-slots (notes chord))))
    (chords self)))
 
 (defmethod form-to-chord-line ((self C-chord-line) chords-form)
   (if chords-form
     (setf (chords self)
-          (mapcar #'(lambda (form) 
+          (mapcar (lambda (form) 
                     (make-instance 'C-chord
                                    :t-time (car form)
                                    :notes (apply #'form-note-objs (cdr form))))
@@ -217,7 +217,6 @@
 
 ;;changed by aaa 28-08-95 from pw-modif
 (defmethod stop-play ((self C-patch-midi))
-  (declare (special *MN-play-flag*))
   (setf *MN-play-flag* nil)
   (when (play-flag self)
     (setf (play-flag self) ())
@@ -241,9 +240,9 @@
   (car (editor-objects (car (subviews (application-object self))))))
 
 ;;====================
-(setf *collector-popUp-menu*
+(defparameter *collector-popUp-menu*
   (new-menu " "
-            (new-leafmenu "Save" #'(lambda() (save *target-action-object*)))))
+            (new-leafmenu "Save" (lambda () (save *target-action-object*)))))
 
 (defclass C-patch-midi-Mod (C-patch-midi) 
   ((clock-obj :initform *global-clock* :allocation :class :accessor clock-obj)
@@ -302,12 +301,12 @@
     (list (view-size win) (MN-zoom-scaler mus-view)
           (length (editor-objects mus-view)))))
 
-(setf *midicent-obj-pw-type*
-      (make-instance 'C-pw-type
-  :control-form
-   `(make-instance 'C-numbox  :view-size (make-point 36 14)
-                   :value 6000 :min-val 0 :max-val 12700 
-       :type-list '(fixnum list chord))))
+(defparameter *midicent-obj-pw-type*
+  (make-instance 'C-pw-type
+    :control-form
+    `(make-instance 'C-numbox  :view-size (make-point 36 14)
+                    :value 6000 :min-val 0 :max-val 12700 
+                    :type-list '(fixnum list chord))))
 
 (defmethod polifonic? ((self C-patch-midi-mod)) nil)
 
@@ -344,7 +343,7 @@
           (list nil `(list ,(active-mode self)
                           ,(if *decompile-chords-mode* 
                             `(list
-                              ,@(mapcar #'(lambda (ch-line) `(list ,@(get-chordline-form ch-line)))
+                              ,@(mapcar (lambda (ch-line) `(list ,@(get-chordline-form ch-line)))
                                         (chord-line-list self))))))))
 
 (defmethod decompile ((self C-patch-polifMN-mod))
@@ -352,7 +351,7 @@
           (list nil `(list ,(active-mode self)
                           ,(if *decompile-chords-mode* 
                             `(list
-                               ,@(mapcar #'(lambda (ch-line) 
+                               ,@(mapcar (lambda (ch-line) 
                                              `(list ,@(get-chordline-form ch-line)))
                                          (chord-line-list self))))
                           ,(if (wptr (application-object self))
@@ -366,7 +365,7 @@
 
 #|(defun make-pw-Poly-chord-line-box (box mode ch-line-forms state)
   (setf (active-mode box) mode)
-  (mapc #'(lambda (ch-line chords-form editor)
+  (mapc (lambda (ch-line chords-form editor)
             (form-to-chord-line ch-line chords-form)
             (setf (chord-line editor) ch-line))
         (chord-line-list box) ch-line-forms 
@@ -383,7 +382,7 @@
         (push (make-instance 'C-chord-line) (chord-line-list box)))
       (window-close (application-object box))
       (rebuild-collector-win box))       
-    (mapc #'(lambda (ch-line chords-form editor)
+    (mapc (lambda (ch-line chords-form editor)
               (form-to-chord-line ch-line chords-form)
               (setf (chord-line editor) ch-line))
           (chord-line-list box) ch-line-forms 
@@ -523,9 +522,8 @@
 
 ;;add by aaa 28-08-95 from pw-modif
 (defmethod stop-play ((self C-patch-polifMN-mod))
-  (declare (special *MN-play-flag*))
   (setf *MN-play-flag* nil)
- (stop-all-staffs (car (subviews (application-object self)))))
+  (stop-all-staffs (car (subviews (application-object self)))))
 
 
 ;;==================

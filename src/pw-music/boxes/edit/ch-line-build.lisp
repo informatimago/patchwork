@@ -111,8 +111,8 @@
              (def-chans (get-last-singleton chans))
              (def-offs (get-last-singleton offs))
              all-chords a-chord chord )
-        (when (and (every #'(lambda (chord) (subtypep (type-of chord) 'C-chord)) chords)
-                   (some  #'(lambda (chord) (not (zerop (pw::t-time chord)))) chords))
+        (when (and (every (lambda (chord) (subtypep (type-of chord) 'C-chord)) chords)
+                   (some  (lambda (chord) (not (zerop (pw::t-time chord)))) chords))
           (setq time-list
                 (epw::x->dx (pw::get-slot chords 'pw::t-time))))
         (setf (chords (chord-seq self))
@@ -280,9 +280,10 @@ right of the module The ‘o’ indicates that the module is open."
 ;;(pw::pw-addmenu-fun pw::*pw-menu-patch* 'chordseq 'C-patch-chord-line)
 
 ;;;this is only kept for compatibility and may be erased at any moment...
-(setf pw::*chord-line-object-type*
+(defparameter pw::*chord-line-object-type*
   (make-instance 'C-pw-type
-  :control-form
-   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "()" 
-      :type-list '(pw::chord list))))
+    :control-form
+    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "()" 
+                    :type-list '(pw::chord list))))
+
 ;;(pw::pw-addmenu-fun (pw::the-user-menu) 'chordseq 'C-patch-chord-line::C-patch-chord-line)

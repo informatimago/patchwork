@@ -72,9 +72,9 @@
  number and <chans>  is the MIDI channel. Both of these can be
  lists. In this case a list of MIDI program change  messages is sent out."
   (cond ((not (consp pgms))
-         (mapc #'(lambda (canal) (pgmout1 pgms canal)) (list! chans)))
+         (mapc (lambda (canal) (pgmout1 pgms canal)) (list! chans)))
         ((not (consp chans))
-         (mapc #'(lambda (son) (pgmout1 son chans)) (list! pgms)))
+         (mapc (lambda (son) (pgmout1 son chans)) (list! pgms)))
         (t (mapc #'pgmout1 pgms chans))))
 
 (defun bendout1 (son canal)
@@ -87,9 +87,9 @@
 channel(s) <chans>.  <values> and <chans> can be single numbers or lists. 
 The range of pitch bend is between -8192 and 8190."
   (cond ((not (consp values))
-         (mapc #'(lambda (canal) (bendout1 values canal)) (list! chans)))
+         (mapc (lambda (canal) (bendout1 values canal)) (list! chans)))
         ((not (consp chans))
-         (mapc #'(lambda (son) (bendout1 son chans)) (list! values)))
+         (mapc (lambda (son) (bendout1 son chans)) (list! values)))
         (t (mapc #'pgmout1 values chans))))
 
 (defun volum1 (vol canal)
@@ -104,9 +104,9 @@ between
 
     "
   (cond ((not (consp vol))
-         (mapc #'(lambda (canal) (volum1 vol canal)) (list! chans)))
+         (mapc (lambda (canal) (volum1 vol canal)) (list! chans)))
         ((not (consp chans))
-         (mapc #'(lambda (vol) (volum1 vol chans)) (list! vol)))
+         (mapc (lambda (vol) (volum1 vol chans)) (list! vol)))
         (t (mapc #'volum1 vol chans))))
 
 
@@ -124,15 +124,15 @@ for chord notes. The third (optional) argument gives the approximation (default:
   
   (let* ((chords (chords ch-l))
          (notes (ask-all chords 'notes))
-         (midics (mapcar #'(lambda(note) (ask-all note 'midic)) notes))
+         (midics (mapcar (lambda (note) (ask-all note 'midic)) notes))
          (atimes (ask-all chords 't-time))
-         (vels (mapcar #'(lambda(note) (ask-all note 'vel)) notes))
-         (durs (mapcar #'(lambda(note) (ask-all note 'dur)) notes))
-         (offs (mapcar #'(lambda(note) (ask-all note 'offset-time)) notes))
-         (chans (mapcar #'(lambda(note) (l+ (ask-all note 'chan) -1)) notes)))
+         (vels (mapcar (lambda (note) (ask-all note 'vel)) notes))
+         (durs (mapcar (lambda (note) (ask-all note 'dur)) notes))
+         (offs (mapcar (lambda (note) (ask-all note 'offset-time)) notes))
+         (chans (mapcar (lambda (note) (l+ (ask-all note 'chan) -1)) notes)))
     (C-pw-send-midi-note:snd-midinote  (epw::approx-m midics approx) vels
                                        (if (= chan 0)
-                                         (mapcar #'(lambda (lis1 lis2) (l+ lis1 lis2)) (epw::microtone midics approx) chans)
+                                         (mapcar (lambda (lis1 lis2) (l+ lis1 lis2)) (epw::microtone midics approx) chans)
                                          (ll-oper (epw::microtone midics approx) (1- chan) '+))
                                        durs offs atimes)))
 
@@ -401,7 +401,7 @@ given parameters to MIDI"
 
 (defvar *Midi-box-popUpMenu*
   (new-menu " "
-         (new-leafmenu "Deactivate" #'(lambda() (set-output *target-action-object* :off)))))
+         (new-leafmenu "Deactivate" (lambda () (set-output *target-action-object* :off)))))
 
 (defmethod initialize-instance :after ((self C-pw-midi-in) &key controls)
   (declare (ignore controls) (special *Midi-box-popUpMenu*))

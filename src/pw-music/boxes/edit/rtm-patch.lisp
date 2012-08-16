@@ -551,7 +551,7 @@ Click 'h' with the <poly-rtm> editor opened for more information."
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls editor))))
     (start 
       (apdfuncall 100 (priority) 15
-                  #'(lambda ()
+                  (lambda ()
                       (tell (ask-all editors 'measure-line) 'play-measure-line (get-play-speed editor)))))))
 
 #|
@@ -561,7 +561,7 @@ Click 'h' with the <poly-rtm> editor opened for more information."
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls editor))))
     (start 
       (apdfuncall 100 (priority) 15
-                  #'(lambda ()
+                  (lambda ()
                       (tell (ask-all editors 'measure-line) 'play-measure-line (get-play-speed editor)))))))
 |#
 ;;====================================================================================================

@@ -35,18 +35,16 @@
 (in-package "MCLGUI")
 
 
-(defmethod dialog-item-text-length ((item dialog-item))
-  (length (dialog-item-text item)))
-
-
-(defmethod dialog-item-text-length ((item static-text-dialog-item))
-  (niy dialog-item-text-length item)
-  #-(and)
-  (let ((h (dialog-item-handle item)))
-    (if h
-      (#_GetHandleSize h)
-      (length (slot-value item 'dialog-item-text)))))
-
+(defgeneric dialog-item-text-length (item)
+  (:method ((item dialog-item))
+    (length (dialog-item-text item)))
+  (:method ((item static-text-dialog-item))
+    (niy dialog-item-text-length item)
+    #-(and)
+    (let ((h (dialog-item-handle item)))
+      (if h
+        (#_GetHandleSize h)
+        (length (slot-value item 'dialog-item-text))))))
 
 
 (defun message-dialog (message &key (ok-text "OK")

@@ -134,7 +134,7 @@
 
 (defmethod draw-with-offset-view ((self C-MN-panel-Mod) the-chords
                                   zoom-scale MN-offset MN-C5)
-  (mapc #'(lambda (chord) (draw-chord-with-offs self chord zoom-scale MN-offset MN-C5))
+  (mapc (lambda (chord) (draw-chord-with-offs self chord zoom-scale MN-offset MN-C5))
         the-chords))
 
 (defmethod draw-chord-with-offs  ((self C-MN-panel-Mod) 
@@ -508,7 +508,8 @@
       ((eq char #\P) 
          (if (selected-chords self)
            (play-selected-chords (chord-line self) 
-                                 (selected-chords self))
+                                 (selected-chords self)
+                                 0) ; TODO: ?
            (play-visible-chords (chord-line self) (visible-chords self)
                                 (truncate
                                  (scaled-mouse-h self 

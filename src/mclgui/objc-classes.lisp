@@ -108,6 +108,7 @@
 (defun size-to-nssize (size)   (make-nssize :width (cgfloat (point-h size)) :height (cgfloat (point-v size))))
 (defun nssize-to-size (nssize) (make-point (coord (nssize-width nssize)) (coord (nssize-height nssize))))
 
+
 (defun nsrect-origin (nsrect) (make-nspoint :x     (nsrect-x nsrect)     :y      (nsrect-y nsrect)))
 (defun nsrect-size   (nsrect) (make-nssize  :width (nsrect-width nsrect) :height (nsrect-height nsrect)))
 
@@ -118,16 +119,20 @@
   (setf (nsrect-width  nsrect) (nssize-width  nssize)
         (nsrect-height nsrect) (nssize-height nssize)))
 
-(defun rect-to-nsrect (position size)
-  (make-nsrect :x (cgfloat (point-h position))
-               :y (cgfloat (point-v position))
-               :width  (cgfloat (point-h size))
-               :height (cgfloat (point-v size))))
+;; Note: we consider the NSRects in flipped coordinate systems.
+
+(defun rect-to-nsrect (rect)
+  (make-nsrect :x (cgfloat (rect-left rect))
+               :y (cgfloat (rect-top rect))
+               :width  (cgfloat (rect-width rect))
+               :height (cgfloat (rect-height rect))))
 
 (defun nsrect-to-rect (nsrect)
-  "RETURN: A list of POINTs: position and size."
-  (list (make-point (coord (nsrect-x nsrect))      (coord (nsrect-y nsrect)))
-        (make-point (coord (nsrect-width nsrect))  (coord (nsrect-height nsrect)))))
+  "RETURN: A RECT."
+  (make-rect (coord (nsrect-x nsrect))
+             (coord (nsrect-y nsrect))
+             (coord (+ (nsrect-x nsrect) (nsrect-width nsrect)))
+             (coord (+ (nsrect-y nsrect) (nsrect-height nsrect)))))
 
 
 
@@ -396,15 +401,17 @@ RETURN:         DST.
   `(handler-case
        (progn ,@body)
      (error (err)
-       (format *trace-output* "~%ERROR while ~S:~%~A~2%"
-               ',(if (= 1 (length body)) body `(progn ,@body))
-               err)
-       (finish-output *trace-output*)
-       nil)))
+            (declare (stepper disable))
+            (format *trace-output* "~%ERROR while ~S:~%~A~2%"
+                    ',(if (= 1 (length body)) body `(progn ,@body))
+                    err)
+            (finish-output *trace-output*)
+            nil)))
 
 
 (defun format-trace (method &rest arguments)
-  (format *trace-output* "~&~40A ~{~S~^ ~}~%" method arguments)
+  (declare (stepper disable))
+  (format *trace-output* "~&(~40A ~{~S~^ ~})~%" method arguments)
   (force-output *trace-output*))
 
 
@@ -430,16 +437,6 @@ RETURN:         DST.
 ;; vv = sy - wy - sv
 
 
-(defun nswindow-to-window-position (frame-coordinates size-point)
-  "
-RETURN: The view-position POINT.
-"
-  (let ((screen-pos (main-screen-frame)))
-    (destructuring-bind (x y &rest size) frame-coordinates
-      (declare (ignore size))
-      (make-point (- (round x) (point-h screen-pos))
-                  (- (point-v screen-pos) (round y) (point-v size-point))))))
-
 
 (defun window-to-nswindow-origin (position size)
   "
@@ -451,16 +448,6 @@ RETURN: A NSPoint containing the origin of the nswindow.
                          (point-v position) (point-v size)))))
 
 
-(defun window-to-nswindow-frame (position size)
-  "
-RETURN: A NSRect containing the frame of the window.
-"
-  (multiple-value-bind (screen-pos screen-siz) (main-screen-frame)
-    (ns:make-ns-rect (+ (point-h screen-pos) (point-h position))
-                     (- (+ (point-v screen-pos) (point-v screen-siz))
-                        (point-v position) (point-v size))
-                     (point-h size)
-                     (point-v size))))
 
 
 
@@ -471,6 +458,29 @@ RETURN:         Position and size of the main screen.
   (multiple-value-bind (x y w h) (frame [[NSScreen mainScreen] frame])
     (values (make-point (round x) (round y))
             (make-point (round w) (round h)))))
+
+(defun nswindow-to-window-rect (frame)
+  "
+FRAME:  A NSRECT (in screen coordinates).
+RETURN: a RECT (in flipped \"screen coordinates\").
+"
+  (multiple-value-bind (sx sy sw sh) (frame [[NSScreen mainScreen] frame])
+    (declare ( ignore sw))
+    (make-rect (- (nsrect-x frame)                           sx) ; left
+               (- (+ sy sh)   (+ (nsrect-y frame) (nsrect-height frame))) ; top
+               (- (+ (nsrect-x frame) (nsrect-width frame))  sx) ; right
+               (- (+ sy sh)   (nsrect-y frame))))) ; bottom
+
+(defun window-to-nswindow-frame (position size)
+  "
+RETURN: A NSRect containing the frame of the window.
+"
+  (multiple-value-bind (sx sy sw sh) (frame [[NSScreen mainScreen] frame])
+    (declare ( ignore sw))
+    (ns:make-ns-rect (+ sx (point-h position))
+                     (- (+ sy sh) (+ (point-v position) (point-v size)))
+                     (point-h size)
+                     (point-v size))))
 
 
 ;;;------------------------------------------------------------
@@ -498,8 +508,7 @@ RETURN:         Position and size of the main screen.
 ;;         (format-trace "-[MclguiWindowDelegate windowDidMove:]" window)
 ;;         (with-handle (handle  window)
 ;;           (window-move-event-handler window
-;;                                      (nswindow-to-window-position (multiple-value-list (frame [handle frame]))
-;;                                                                   (view-size window))))))]
+;;                                      (rect-topleft (nswindow-to-window-rect (get-nsrect [handle frame])))))))]
 ;; 
 ;; 
 ;; @[MclguiWindowDelegate
@@ -549,9 +558,7 @@ RETURN:         Position and size of the main screen.
       (let* ((window (nswindow-window self)))
         (format-trace "-[MclguiWindow windowDidMove:]" window)
         (with-handle (handle  window)
-          (window-move-event-handler window
-                                     (nswindow-to-window-position (multiple-value-list (frame [handle frame]))
-                                                                  (view-size window))))))]
+          (window-move-event-handler window (rect-topleft (nswindow-to-window-rect (get-nsrect [handle frame])))))))]
 
 
 @[MclguiWindow
@@ -590,9 +597,9 @@ RETURN:         Position and size of the main screen.
   method:(close)
   resultType:(:void)
   body:
-  (let ((window  (nswindow-window self)))
-    (format-trace "-[MclguiWindow close]" window)
-    (report-errors
+  (report-errors
+      (let ((window  (nswindow-window self)))
+        (format-trace "-[MclguiWindow close]" window)
         (catch :cancel (window-close window))))]
 
 

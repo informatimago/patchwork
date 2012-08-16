@@ -44,10 +44,6 @@
 ;;
 ;; A general buffer box
 ;;
-(defpackage "C-PATCH-BUFFER"
-  (:use "COMMON-LISP" "UI" "PATCH-WORK")
-  (:export "C-PATCH-BUFFER" "THE-BUFFER" "BUFFER" "C-RADIO-BUTTON"
-           "GET-LOCK-BUTTON-FUN" "VALUE"))
 
 (in-package "C-PATCH-BUFFER")
 
@@ -85,7 +81,7 @@
                        :dialog-item-action (get-lock-button-fun self))))
 
 (defmethod get-lock-button-fun ((self C-patch-buffer))
-  #'(lambda (item)
+  (lambda (item)
     (if (value (view-container item))
       (set-dialog-item-text item "o")
       (set-dialog-item-text item "x"))
@@ -117,9 +113,7 @@ close the module immediately after evaluation to avoid recalculating the input."
 (unintern 'pw-function)
 |#
 
-(defpackage "C-PATCH-ACCUM"
-  (:use "COMMON-LISP" "UI" "PATCH-WORK"  "C-PATCH-BUFFER")
-  (:export "C-PATCH-ACCUM" "THE-BUFFER" "ACCUM" "*ACCUM-BUFFER-LIMIT*"))
+
 
 (in-package "C-PATCH-ACCUM")
 

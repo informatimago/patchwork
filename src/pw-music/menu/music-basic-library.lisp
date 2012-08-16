@@ -48,8 +48,8 @@
 (ui:add-menu-items *PWoper-menu* (new-leafmenu  "-" ()))
 
 (ui:add-menu-items *PWoper-menu* 
-                (new-leafmenu "MIDI Reset" #'(lambda() (pw-reset-for-midi)))
-                (new-leafmenu "MIDI all-notes-off" #'(lambda() (all-off))))
+                (new-leafmenu "MIDI Reset" (lambda () (pw-reset-for-midi)))
+                (new-leafmenu "MIDI all-notes-off" (lambda () (all-off))))
 
 
 (PW-addmenu-fun *pw-MN-Edit-menu* 'chord 'C-patch-chord-box-M)
@@ -131,7 +131,7 @@
 
 #|(ui:add-menu-items *pw-Midi-menu* 
   (new-leafmenu "raw-in" 
-     #'(lambda () 
+     (lambda () 
        (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
                                            'C-pw-midi-in:m-data))
              (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-midi-in
@@ -142,7 +142,7 @@
        (setf (open-state (car (pw-controls loop)) ) nil)
        (tell (controls *active-patch-window*) 'draw-connections))))
     (new-leafmenu "note-in" 
-     #'(lambda () 
+     (lambda () 
        (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
                                            'C-pw-midi-in:m-data))
              (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-note-in
@@ -153,7 +153,7 @@
        (setf (open-state (car (pw-controls loop)) ) nil)
        (tell (controls *active-patch-window*) 'draw-connections))))
   (new-leafmenu "note-in" 
-     #'(lambda () 
+     (lambda () 
        (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
                                            'C-pw-midi-in:m-data))
              (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-note-on-in
@@ -164,7 +164,7 @@
        (setf (open-state (car (pw-controls loop)) ) nil)
        (tell (controls *active-patch-window*) 'draw-connections))))
   (new-leafmenu "chord-in" 
-     #'(lambda () 
+     (lambda () 
        (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
                                            'C-pw-midi-in:m-data))
              (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-chord-in
@@ -198,10 +198,10 @@
 ;;Hardcopy printing
 
 (defvar *MN-print-setUp*
-  (new-leafmenu "Page Setup…" #'(lambda () (ui::win-print-setUp *active-mn-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-mn-window*))))
 
 (defvar *print-MN-menu* 
-  (new-leafmenu "Print…" #'(lambda () (ui::window-hardcopy *active-mn-window*))))
+  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy *active-mn-window*))))
 
 (ui:add-menu-items *MN-menu-file* *MN-print-setUp* *print-MN-menu*)
 

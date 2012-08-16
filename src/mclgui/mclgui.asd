@@ -66,10 +66,10 @@
 
                  (:file "objc-classes"
                         :depends-on ("package"
-                                      "macros" "wrapper" "variables" "point"))
+                                      "macros" "wrapper" "variables" "point" "rect"))
                  (:file "graphics"
                         :depends-on ("package"
-                                     "macros" "variables" "point"))
+                                     "macros" "variables" "point" "color" "font"))
                  
                  ;; Chapter 2:
 
@@ -79,7 +79,8 @@
                  (:file "font"
                         :depends-on ("package" 
                                      "macros" "variables" "system"
-                                     "point" "objc-classes" "color"))
+                                     "point" "objc-classes" "color"
+                                     "wrapper"))
                  
                  (:file "pattern"
                         :depends-on ("package" 
@@ -91,8 +92,7 @@
                  (:file "menu"
                         :depends-on ("package" 
                                      "macros" "variables" "color"
-                                     "point" "font" "wrapper" "notification"
-                                     "event"))
+                                     "point" "font" "wrapper" "notification"))
 
                  (:file "window-menu-item"
                         :depends-on ("package" 
@@ -121,7 +121,8 @@
                                      "macros" "variables" "color"
                                      "point" "region" "font"
                                      "view-classes" "objc-classes"
-                                     "wrapper" "view" "notification"))
+                                     "wrapper" "view" "notification"
+                                     "menu"))
 
                  (:file "fred-window"
                         :depends-on ("package" 
@@ -224,7 +225,7 @@
                         :depends-on ("package" 
                                      "macros" "variables" "point"
                                      "system"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" "event" "view-event"
                                      "dialog-item" "key-handler-mixin"))
 
                  (:file "y-or-n-dialog"
@@ -279,7 +280,7 @@
                  ;; Chapter 6: Color
 
                  (:file "color"
-                        :depends-on ("package"))
+                        :depends-on ("package" "wrapper"))
 
                  ;; Chapter 8: File System Interface
 
@@ -352,6 +353,7 @@
                  (:file "mclgui"
                         :depends-on ("package"
                                      "macros" "variables"
+                                     "objc-classes"
                                      "point" "font" "pen" "pattern" "cursor" "view-stream"
                                      "menu" "view" "window" "dialog" "fred-window"
                                      "dialog-item" "control-dialog-item"

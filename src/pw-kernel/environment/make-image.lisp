@@ -81,7 +81,7 @@
                          (t
                           (menu-item-action (nth (1- item-num) (menu-items menubar-popup)))
                           (eval-enqueue         ; see comment below
-                           #'(lambda ()
+                           (lambda ()
                                (save-application
                                 file
                                 :application-class (find-class *app-class-name*)
@@ -131,7 +131,7 @@
         (sizes (list (* 8500 1024)
                      (* 6500  1024))))
     (eval-enqueue        
-     #'(lambda ()
+     (lambda ()
          (save-application
           file
           :application-class (find-class 'ui::lisp-development-system)

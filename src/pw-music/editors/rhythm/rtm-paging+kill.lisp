@@ -109,7 +109,7 @@
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
     (start 
       (apdfuncall 100 (priority) 15
-                  #'(lambda () 
+                  (lambda () 
                       (play-measure-line+scroll (measure-line (car editors)) (view-window self) (get-play-speed self) 0 (calc-next-rtm-page (view-window self)))
                       (tell (ask-all (cdr editors) 'measure-line) 'play-measure-line (get-play-speed self)))))))
 #|
@@ -119,7 +119,7 @@
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
     (start 
       (apdfuncall 100 (priority) 15
-                  #'(lambda () 
+                  (lambda () 
                       (play-measure-line+scroll (measure-line (car editors)) (view-window self) (get-play-speed self) 0 (calc-next-rtm-page (view-window self)))
                       (tell (ask-all (cdr editors) 'measure-line) 'play-measure-line (get-play-speed self)))))))
 |#
@@ -141,7 +141,7 @@
 
 
 #|
-;;(ui:add-menu-items *RTM-menu* (new-leafmenu "Play-rtms+scroll" #'(lambda () (play-rtms+scroll (editor-collection-object *active-rtm-window*))))) 
+;;(ui:add-menu-items *RTM-menu* (new-leafmenu "Play-rtms+scroll" (lambda () (play-rtms+scroll (editor-collection-object *active-rtm-window*))))) 
 ;;; only polif
 (defun calc-next-rtm-page (self)  
   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))

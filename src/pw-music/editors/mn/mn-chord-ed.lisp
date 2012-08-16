@@ -649,7 +649,7 @@
                            ))
           ((eq char #\M) (when active-note 
                            (setf *global-music-notation-panel* self)
-                           (add-MN-to-note active-note 0 0)))
+                           (add-MN-to-note active-note (view-window self) 0 0)))
           ((and (eq char #\e) (or active-note (selected-notes self)))
            (open-param-ctrl (view-container self)))
           ((eq char #\S) (reset-order self))
@@ -737,7 +737,7 @@
                       (to (point-h (view-mouse-position self)))
                       (all-higher 
                        (remove to notes :test #'>= 
-                               :key #'(lambda (note) 
+                               :key (lambda (note) 
                                         (calc-chord-pixel-x chord 0 (arp-view-x note) (t-time chord))))))
                  (if all-higher
                    (setq to (- (order (car all-higher)) 2)))
@@ -798,49 +798,49 @@
          " "
          (new-menu "Chord view" 
                    (new-leafmenu "arpeggio" 
-                                 #'(lambda() (change-arp-view *target-action-object* 'arp)))
+                                 (lambda () (change-arp-view *target-action-object* 'arp)))
                    (new-leafmenu "chord" 
-                                 #'(lambda() (change-arp-view *target-action-object* 'chord)))
+                                 (lambda () (change-arp-view *target-action-object* 'chord)))
                    (new-leafmenu "time offset"
-                                 #'(lambda() (change-arp-view *target-action-object* 'time))))
+                                 (lambda () (change-arp-view *target-action-object* 'time))))
          (new-menu "Approximation"
                    (prog1 (setf a-leaf-menu
                                 (new-leafmenu "SemiTone" 
-                                    #'(lambda() (use-all-approx-scale  
+                                              (lambda () (use-all-approx-scale  
                                                  *target-action-object* *c-major-scale*))))
                      (set-command-key a-leaf-menu #\2))
                    (prog1 (setf a-leaf-menu
                                 (new-leafmenu "Quarter tone" 
-                                   #'(lambda() (use-all-approx-scale  
+                                   (lambda () (use-all-approx-scale  
                                                 *target-action-object* *1/4-tone-chromatic-scale*))))
                      (set-command-key a-leaf-menu #\4))
                    (prog1 (setf a-leaf-menu
                                 (new-leafmenu "Eigth tone" 
-                                    #'(lambda() (use-all-approx-scale  
+                                    (lambda () (use-all-approx-scale  
                                                  *target-action-object* *1/8-tone-chromatic-scale*))))
                      (set-command-key a-leaf-menu #\8)))
          (new-menu "Scale"
                    (new-leafmenu "C-major" 
-                                 #'(lambda() (use-all-scale  
+                                 (lambda () (use-all-scale  
                                               *target-action-object* *c-major-scale*)))
                    (new-leafmenu "Chromatic" 
-                                 #'(lambda() (use-all-scale  
+                                 (lambda () (use-all-scale  
                                               *target-action-object* *chromatic-scale*))))
          (new-menu "Staff"
                    (new-leafmenu "G2-G"
-                                 #'(lambda() (use-staff  *target-action-object* 1 *g2-g-staffs*)))
+                                 (lambda () (use-staff  *target-action-object* 1 *g2-g-staffs*)))
                    (new-leafmenu "G"
-                                 #'(lambda() (use-staff  *target-action-object* 2 *g-plain-staffs*)))
+                                 (lambda () (use-staff  *target-action-object* 2 *g-plain-staffs*)))
                    (new-leafmenu "G F" 
-                                 #'(lambda() (use-staff  *target-action-object* 3 *g-f-staffs*)))
+                                 (lambda () (use-staff  *target-action-object* 3 *g-f-staffs*)))
                    (new-leafmenu "F" 
-                                 #'(lambda() (use-staff  *target-action-object* 4 *f-plain-staffs*)))
+                                 (lambda () (use-staff  *target-action-object* 4 *f-plain-staffs*)))
                    (new-leafmenu "G F F2" 
-                                 #'(lambda() (use-staff  *target-action-object* 5 *g-f-f2-staffs*)))
+                                 (lambda () (use-staff  *target-action-object* 5 *g-f-f2-staffs*)))
                    (new-leafmenu "G2 G F F2" 
-                                 #'(lambda() (use-staff  *target-action-object* 6 *g2-g-f-f2-staffs*)))
+                                 (lambda () (use-staff  *target-action-object* 6 *g2-g-f-f2-staffs*)))
                    (new-leafmenu "Empty" 
-                                 #'(lambda() (use-staff  *target-action-object* 7 *empty-staffs*)))))))
+                                 (lambda () (use-staff  *target-action-object* 7 *empty-staffs*)))))))
 
 (make-chord-ed-pops)
 
@@ -988,7 +988,6 @@
 |#
 
 (defmethod play-arpeggiated ((self C-chord-mus-not-view))
-  (declare (special *MN-play-flag*))
   (let* ((chord (car (chords (chord-line (car (editor-objects self))))))
          (pitch-notes (copy-list (notes chord)))
          (notes (sort pitch-notes #'< :key #'order)))
@@ -1003,7 +1002,6 @@
                 'keep-playing-arps self notes))))))
 
 (defmethod keep-playing-arps ((self C-chord-mus-not-view) notes)
-  (declare (special *MN-play-flag*))
   (when *MN-play-flag*
       (play-note (pop notes))
       (if notes
@@ -1011,7 +1009,6 @@
                      self notes))))
 
 (defmethod keep-playing-arps-mc ((self C-chord-mus-not-view) notes)
-  (declare (special *MN-play-flag*))
   (when *MN-play-flag*
     (let ((approx-m (approx-for-playing (midic (car notes)))))
       (write-midi-note (dur (car notes)) (micro-channel approx-m)

@@ -61,11 +61,7 @@
 
 ;; =============================================================================-======
 
-;; =============================================================================-======
-
-(proclaim '(optimize (speed 3) (safety 0) (space 1)))
-
-(setf *eventhook* nil)
+(defparameter *eventhook* nil)
 
 ;; User Constants
 
@@ -144,12 +140,11 @@ It cannot be changed, except in the source code.")
   `(task-logtime *current-task*))
 
 (in-package "SCHEDULER")
-(let (#+ccl(ccl:*warn-if-redefine* nil))
-  (defun midi:midi-write (event)
-    "New version"
-    (midi-write-time event
-       (if (null *current-task*) (midishare::MidiGetTime)
-           (* 10 (- (logtime) *schedulertime--clocktime*))))))
+(defun midi:midi-write (event)
+  "New version"
+  (midi-write-time event
+                   (if (null *current-task*) (midishare::MidiGetTime)
+                       (* 10 (- (logtime) *schedulertime--clocktime*)))))
 
 (defvar *error-when-extra-start?* t
   "Calling \"start\" from within a scheduler task signals an error when this variable
@@ -194,7 +189,7 @@ priority.  It must not be called more than once from the same task."
      ;; HACK! the delay is stored in (task-exectime task) (see execute-task)
      (setf (task-link task) :re-dfuncall (task-exectime task) ,delay)
      ,@(mapcan
-        #'(lambda (arg) (list `(rplaca arg-list ,arg) '(pop arg-list)))
+        (lambda (arg) (list `(rplaca arg-list ,arg) '(pop arg-list)))
         arguments)
      task))
 
@@ -344,7 +339,7 @@ is stopped in the :STEP mode)."
             (task-advance task)
             (task-priority task)
             `(,(task-function task)
-              ,@(mapcar #'(lambda (arg) `',arg) (task-arguments task))))
+              ,@(mapcar (lambda (arg) `',arg) (task-arguments task))))
     (when next-task (pretty-print-task next-task stream))))
 
 ;; At current exec-time 219954 (clock=310151) [:step mode]
@@ -734,7 +729,7 @@ time with the :STEP mode.")
 
 (proclaim '(optimize (speed 1) (safety 1) (space 1)))
 
-;;(push #'(lambda () (setq *eventhook* nil)) ui:*save-exit-functions*)
+;;(push (lambda () (setq *eventhook* nil)) ui:*save-exit-functions*)
 
 ;;(new-restore-lisp-function 'init-scheduler :if-exists :old)
 ;;(ui::def-load-pointers startup-the-scheduler () (ui::without-interrupts (init-scheduler)))

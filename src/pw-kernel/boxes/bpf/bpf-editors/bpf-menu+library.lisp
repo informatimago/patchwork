@@ -114,9 +114,7 @@
 
 ;;============================================================================================
 
-;;(defvar *pw-BPF-library* ())
-
-(setf *pw-BPF-library* (make-instance 'C-pw-BPF-library :lib-name '*pw-BPF-library*))
+(defparameter *pw-BPF-library* (make-instance 'C-pw-BPF-library :lib-name '*pw-BPF-library*))
 
 ;;(bpf-lib-objects *pw-BPF-library*)
 

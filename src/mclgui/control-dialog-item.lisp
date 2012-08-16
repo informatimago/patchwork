@@ -43,41 +43,42 @@
   (declare (ignore where))
   *arrow-cursor*)
 
-(defmethod installed-item-p ((item control-dialog-item))
-  (let ((dialog (view-container item)))
-    (and dialog
-         ;; (wptr dialog)
-         ;; (dialog-item-handle item)
-         )))
+(defgeneric installed-item-p (item)
+  (:method ((item control-dialog-item))
+    (let ((dialog (view-container item)))
+      (and dialog
+           ;; (wptr dialog)
+           ;; (dialog-item-handle item)
+           ))))
 
-(defmethod install-view-in-window :after ((button control-dialog-item) w)
-  (declare (ignore w))
+(defmethod  install-view-in-window :after ((button control-dialog-item) w)
   (when (and (not (typep button 'scroll-bar-dialog-item)))
     (let ((text (dialog-item-text button)))
       (when text
         (niy install-view-in-window :after button w)
-        #+ignore ;; done earlier
-        (when (not (7bit-ascii-p text))  ;; fix it
+        #+ignore                       ;; done earlier
+        (when (not (7bit-ascii-p text)) ;; fix it
           (set-dialog-item-text button text))))))
 
 
-(defmethod fix-osx-dialog-item-font ((button control-dialog-item))
-  (niy fix-osx-dialog-item-font button)
-  #-(and)
-  (when (dialog-item-handle button)
-    (multiple-value-bind (ff ms) (view-font-codes button)  ;; dont bother if eql sys-font?
-      (rlet ((fsrec :controlfontstylerec))
-            (setf (pref fsrec :controlfontstylerec.flags) (logior #$kControlUseFontMask #$kControlUseFaceMask
-                                                                  #$kControlUseSizeMask #$kControlUseModeMask)
-                  (pref fsrec :controlfontstylerec.font) (ash ff -16)
-                  (pref fsrec :controlfontstylerec.size) (logand ms #xffff)
-                  (pref fsrec :controlfontstylerec.style) (ash (logand ff #xffff) -8)
-                  (pref fsrec :controlfontstylerec.mode) (ash ms -16))
-            (#_SetControlFontStyle (dialog-item-handle button) fsrec)))))
+(defgeneric fix-osx-dialog-item-font (button)
+  (:method ((button control-dialog-item))
+    (niy fix-osx-dialog-item-font button)
+    #-(and)
+    (when (dialog-item-handle button)
+      (multiple-value-bind (ff ms) (view-font-codes button) ;; dont bother if eql sys-font?
+        (rlet ((fsrec :controlfontstylerec))
+              (setf (pref fsrec :controlfontstylerec.flags) (logior #$kControlUseFontMask #$kControlUseFaceMask
+                                                                    #$kControlUseSizeMask #$kControlUseModeMask)
+                    (pref fsrec :controlfontstylerec.font) (ash ff -16)
+                    (pref fsrec :controlfontstylerec.size) (logand ms #xffff)
+                    (pref fsrec :controlfontstylerec.style) (ash (logand ff #xffff) -8)
+                    (pref fsrec :controlfontstylerec.mode) (ash ms -16))
+              (#_SetControlFontStyle (dialog-item-handle button) fsrec))))))
 
 
 (defmethod set-view-font-codes :after ((button control-dialog-item) ff ms &optional m1 m2)
-  (declare (ignore ff ms m1 m2))
+  ;; (declare (ignore ff ms m1 m2))
   (niy set-view-font-codes :after button ff ms m1 m2)
   #-(and)
   (when (and (not (typep button 'scroll-bar-dialog-item))
@@ -137,6 +138,11 @@
           (#_deactivatecontrol (dialog-item-handle dialog-item)))))))
 
 
+(defgeneric validate-control-dialog-item (item)
+  (:method ((item control-dialog-item))
+    (validate-corners item #@(0 0) (view-size item))))
+
+
 (defmethod set-view-position ((item control-dialog-item) h &optional v)
   (let ((new-pos (make-point h v)))
     (unless (eql new-pos (view-position item))
@@ -152,10 +158,6 @@
               (validate-control-dialog-item item)
               (invalidate-view item))))))
     new-pos))
-
-
-(defmethod validate-control-dialog-item ((item control-dialog-item))
-  (validate-corners item #@(0 0) (view-size item)))
 
 
 (defmethod set-view-size ((item control-dialog-item) h &optional v)

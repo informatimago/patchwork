@@ -58,7 +58,7 @@
 
 (defun make-type-set (list)
   (make-instance 'C-PW-type-set 
-                 :type-list (mapcar #'(lambda (type) (cons (type-name type) type)) list)))
+                 :type-list (mapcar (lambda (type) (cons (type-name type) type)) list)))
 
 (defmethod get-type ((self C-PW-type-set) type-name)
   (cdr (assoc type-name (type-list self) :test #'string=)))
@@ -92,7 +92,7 @@
   "replaces old-spec values by new-specs values in all equal keys. Adds the spec if
    new key"
   (let ((specs (copy-list old-specs)) (n-sp new-specs) res)
-    (mapc #'(lambda (key-val) (update-spec key-val specs))
+    (mapc (lambda (key-val) (update-spec key-val specs))
           (progn (while n-sp (push (cons (pop n-sp) (pop n-sp)) res))
                  (nreverse res)))
     specs))
@@ -110,7 +110,8 @@
 
 (defun collect-keywords (arglist)
   (let ((collection (cons (list '&required) *valid-defune-keywords*))
-        (current-key '&required) element)
+        (current-key '&required)
+        element)
     (dolist (arg arglist)
       (setq element (cdr (assoc current-key collection)))
       (if (not (consp arg))
@@ -120,12 +121,12 @@
         (setq collection 
               (substitute (cons current-key (append element (list arg)))
                           (cons current-key element)
-                          collection :test #'(lambda (x y) (string= (car x) (car y)))))))
+                          collection :test (lambda (x y) (string= (car x) (car y)))))))
     collection))
   
 (defun valid-keyword-p (arg)
   (and (symbolp arg)
-       (member arg *valid-defune-keywords* :test #'(lambda (x y) (string= x (car y))))))
+       (member arg *valid-defune-keywords* :test (lambda (x y) (string= x (car y))))))
 
 (defun get-arg-specs (arg-name args-types &optional position)
   (let (specs var-spec)
@@ -151,7 +152,6 @@
 (defclass C-menubox-val-mod (C-menubox) ())
 
 (defmethod menubox-value ((self C-menubox-val-mod)) 
-  (declare (ignore obj))
   (car (call-next-method))) 
 
 (defmethod patch-value ((self C-menubox-val-mod) obj) 
@@ -381,7 +381,7 @@
 (defun get-lambda-list (collected-a-list)
 "returns a standard lambda list from the a-list of type-specs"
    (let* ((keys (cons  '&required *valid-defp-keywords*))
-          (lambda-list (mapcan #'(lambda (key) (get-arg-names key collected-a-list)) keys)))
+          (lambda-list (mapcan (lambda (key) (get-arg-names key collected-a-list)) keys)))
      (if (eq (car lambda-list) '&required)
        (cdr lambda-list)
        lambda-list)))
@@ -407,13 +407,13 @@
   
 (defmethod set-PW-symbolic-type-data ((me symbol) intypes outtype)
   "the symbol stores information about its function"
-  (mapc #'(lambda (type) (check-input-types type  me)) intypes)
+  (mapc (lambda (type) (check-input-types type  me)) intypes)
   (check-io-type outtype :output me)
   (setf (get me '*type-intypes*) intypes)
   (setf (get me '*type-outtype*) (find-out-type outtype))
-  ;(import me)
-  ;(export me)
-  me )
+  ;;(import me)
+  ;;(export me)
+  me)
 
 (defun copy-PW-symbolic-type-data (pw-function new-name)
   "copies type-data from pw-function to new-name"
@@ -432,7 +432,7 @@
 (defun set-function-arg-names (fun name-list)
   (let (result)
     (setf (get fun '*type-intypes*)
-          (mapcar #'(lambda (args) 
+          (mapcar (lambda (args) 
                       (setq result nil)
                       (cons (car args) 
                             (and name-list 
@@ -442,7 +442,7 @@
                   (get-intypes fun)))))
 
 (defun check-input-types (type-form fun)
-  (mapc #'(lambda (form) (check-io-type (if (not (consp (cadr form)))
+  (mapc (lambda (form) (check-io-type (if (not (consp (cadr form)))
                                           (cadr form) (caadr form)) :input fun))
         (cdr type-form)))
   
@@ -529,8 +529,7 @@
 
 (defun make-PW-standard-box (class-name pw-function 
                              &optional (position (make-point 15 15)) value-list size)
-  (let ((input-boxes-types (make-defunp-function-arg-list pw-function 
-                                                          (if value-list (length value-list) 0)))
+  (let ((input-boxes-types (make-defunp-function-arg-list pw-function (length value-list)))
         (y-now 5)
         (index 0)
         (input-boxes '())
@@ -543,42 +542,44 @@
     ;;;;;(if size (adjust-new-size input-boxes size))
     (dolist (box input-boxes)
       (if (zerop index)
-        (set-view-position box (make-point 5 y-now))
+        (progn (set-view-position box (make-point 5 y-now))
+               (ui::format-trace "make-pw-standard-box" (point-to-list (make-point 5 y-now)) box))
         (progn (set-view-position box (make-point (+ 7 (w box)) y-now))
+               (ui::format-trace "make-pw-standard-box" (point-to-list (make-point (+ 7 (w box)) y-now)) box)
                (incf y-now (+ 2 (h box)))))
       (setq index (mod (incf index) 2)))
     (if (not (zerop index)) (incf y-now (+ 2 (h (car (last input-boxes))))))
-    (setq module
-          (make-instance class-name :view-position position 
-                         :view-size  (make-point 
-                                      (+ 5 
-                                         (if input-boxes
-                                           (apply #'max (ask-all input-boxes 'x+w)) 42))
-                                      (+ 13 y-now))
-                         :pw-function pw-function
-                         :type-list (get-out-type-list pw-function)
-                         :VIEW-SUBVIEWS input-boxes))
+    (setq module (make-instance class-name
+                   :view-position position 
+                   :view-size  (make-point 
+                                (+ 5  (if input-boxes
+                                        (apply #'max (ask-all input-boxes 'x+w))
+                                        42))
+                                (+ 13 y-now))
+                   :pw-function pw-function
+                   :type-list (get-out-type-list pw-function)
+                   :VIEW-SUBVIEWS input-boxes))
     (if size (resize-patch-box module size 0))
     module))
 
 (defun box (class-name pw-function pw-function-string
-                       &optional (position (make-point 15 15)) value-list size sp)
- "same as make-pw-standard-box with a shorter name and specific method calling, for
+            &optional (position (make-point 15 15)) value-list size sp)
+  "same as make-pw-standard-box with a shorter name and specific method calling, for
  even more compact PW boxes decompilation "
-(let ((box (make-PW-standard-box class-name pw-function position value-list size)))
-  (setf (pw-function-string box) pw-function-string)
-  (complete-box box sp)
-  box))
+  (let ((box (make-PW-standard-box class-name pw-function position value-list size)))
+    (setf (pw-function-string box) pw-function-string)
+    (complete-box box sp)
+    box))
 
 (defun sbox (class-name pw-function pw-function-string active?
-                       &optional (position (make-point 15 15)) value-list size sp)
- "same as box with activation flag "
-(let ((box (box class-name pw-function pw-function-string position value-list size sp)))
-  (setf (active-mode box) active?)
-  box))
+             &optional (position (make-point 15 15)) value-list size sp)
+  "same as box with activation flag "
+  (let ((box (box class-name pw-function pw-function-string position value-list size sp)))
+    (setf (active-mode box) active?)
+    box))
 
 (defun set-new-values (boxes values)
-  (mapc #'(lambda (box val) 
+  (mapc (lambda (box val) 
             (unless (eq val :default)
               (setf (value box) val)
               (set-dialog-item-text box 
@@ -593,9 +594,9 @@
   (if (= (length boxes) 1)   ;not clear what to do in other cases....
     (let* ((box (car boxes))
            (w-scale (/ (point-h size) (+ (w box) 10)))
-          (h-scale (/ (point-v size) (+ (h box) 18))))
-      (set-view-size box
-            (make-point (truncate (* w-scale (w box))) (truncate (* h-scale (h box))))))))
+           (h-scale (/ (point-v size) (+ (h box) 18))))
+      (set-view-size box (make-point (truncate (* w-scale (w box)))
+                                     (truncate (* h-scale (h box))))))))
 
 (defun make-functional-pw-boxes (function win) 
   (if (not (fboundp function))
@@ -618,7 +619,7 @@
 (merge-specs (get-type set 'lago) '(min-val 887))
 (get-pw-type-specs 'fix>0s?)
 (defunp my-fun3 ((x symbol) (y (fix (:value 1))) &optional (z fix)) list "my-fun"
-  (mapcar #'(lambda (item) (+ (if z z 0) (* item y))) x))
+  (mapcar (lambda (item) (+ (if z z 0) (* item y))) x))
 (get 'my-fun3 '*type-intypes*)
 (Get-Pw-Type-Specs 'fix>0)
 (set-function-arg-names 'my-fun3 '(w b d))

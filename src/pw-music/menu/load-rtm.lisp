@@ -60,7 +60,7 @@ now defined in Music-Package.lisp GA 20/06/94
 (defun update-all-rhythm-files ()
   (mapc  #'|CLPF-UTIL|:compile-file? *all-rhythm-files*))
 
-(mapc #'(lambda (file) (load-once file)) *all-rhythm-files*)
+(mapc (lambda (file) (load-once file)) *all-rhythm-files*)
 
 |#
 

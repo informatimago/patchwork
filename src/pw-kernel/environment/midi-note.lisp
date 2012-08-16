@@ -43,15 +43,6 @@
  
 (in-package :pw)
 
-(provide 'midi-note)
-;;=======================
-
-
-;;(export '(write-midi-note write-midicent-note update-cents-vector write-midicent-note
-;;         write-pitch-bend-value write-controller-value write-program-change-value 
-;;         write-program-change-value midi-only-attacks-pitches quantize-chords
-;;         read-from-midi))
-
 ;;=========================
 
 ;;(require "LELISP-MACROS")

@@ -98,6 +98,7 @@
              (enabled-p          (dialog-item-enabled-p item))
              (compress-p         (compress-text item))
              (old-state          nil))
+         (declare (ignorable position size text-justification truncation enabled-p compress-p old-state))
          (niy view-draw-contents item)
          ;; (rlet ((rect :rect :topleft position :botright (add-points position size) ))
          ;;   (let* ((theme-back (theme-background-p item))

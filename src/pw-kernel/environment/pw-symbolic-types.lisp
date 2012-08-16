@@ -78,12 +78,12 @@ whether each of <list1?> <list2?> is a list or not."
     ((consp list1?)
      (if (consp list2?)
        ;(error "cannot double-mapcar 2 lists: ~S and ~S~%." list1? list2?)
-       (mapcar #'(lambda (x1 x2) (apply fun1 x1 x2 args))
+       (mapcar (lambda (x1 x2) (apply fun1 x1 x2 args))
                list1? list2?)
-       (mapcar #'(lambda (x) (apply fun1 x list2? args))
+       (mapcar (lambda (x) (apply fun1 x list2? args))
                list1?)))
     ((consp list2?)
-     (mapcar #'(lambda (x) (apply fun1 list1? x args))
+     (mapcar (lambda (x) (apply fun1 list1? x args))
              list2?))
     (t (apply fun1 list1? list2? args))))
 
@@ -94,7 +94,7 @@ All the arguments <fun> <fun1> <list?> <args> must not side-effect.
 <list?> must not contain any dotted pair."
   `(ifnot (listp ,list?)
      (,fun1 ,list? ,@args)
-     (mapcar ,(ifnot args `#',fun `#'(lambda (arg1) (,fun arg1 ,@args)))
+     (mapcar ,(ifnot args `#',fun `(lambda (arg1) (,fun arg1 ,@args)))
        ,list?)))
 
 (defun do-+ (freqs)

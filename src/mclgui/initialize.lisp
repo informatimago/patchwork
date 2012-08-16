@@ -339,7 +339,7 @@
   (add-new-item menu "New" 'fred :command-key #\N :help-spec 1101)
   (add-new-item menu "Open…" 'edit-select-file :command-key #\O :help-spec 1102)
   #+ignore
-  (add-new-item *file-menu* "Open Unix…" #'(lambda nil 
+  (add-new-item *file-menu* "Open Unix…" (lambda ()
                                              (let ((*do-unix-hack* t))
                                                (edit-select-file))))
   (add-menu-items menu (make-instance 'menu :menu-title "Open Recent"
@@ -357,15 +357,15 @@
                 :class 'window-menu-item :command-key #\S 
                 :update-function #'save-menu-item-update
                 :help-spec '(1105 1 2))
-  (add-new-item menu "Save As…" #'(lambda (w)
+  (add-new-item menu "Save As…" (lambda (w)
                                            (window-do-operation w 'window-save-as))
                 :class 'window-menu-item
                 :command-key '(:shift #\S)
-                :update-function #'(lambda (item)(edit-menu-item-update item 'window-save-as)) 
+                :update-function (lambda (item)(edit-menu-item-update item 'window-save-as)) 
                 :help-spec '(1106 1 2))  
   
-  (add-new-item menu "Save Copy As…" #'(lambda (w) (window-do-operation w 'window-save-copy-as))
-                :update-function #'(lambda (item)(edit-menu-item-update item 'window-save-copy-as))
+  (add-new-item menu "Save Copy As…" (lambda (w) (window-do-operation w 'window-save-copy-as))
+                :update-function (lambda (item)(edit-menu-item-update item 'window-save-copy-as))
                 :class 'window-menu-item                
                 :help-spec '(1107 1 2))
   (add-new-item menu "Revert…" 'window-revert
@@ -376,7 +376,7 @@
   (lds
    (progn
      (add-new-item menu "Load File…"                
-                   #'(lambda (&aux (file (choose-file-dialog
+                   (lambda (&aux (file (choose-file-dialog
                                           :mac-file-type '("TEXT"
                                                            #-ppc-target "FASL"
                                                            #+ppc-target "PFSL")
@@ -385,7 +385,7 @@
                    :command-key #\Y
                    :help-spec 1303)     
      (add-new-item *file-menu* "Compile File…"
-                   #'(lambda () 
+                   (lambda () 
                        (let* ((file (choose-file-dialog :mac-file-type "TEXT"
                                                         :button-string "Compile"))
                               (output-file (choose-new-file-dialog
@@ -545,7 +545,7 @@
       text)))
 
 (defun front-window-that-isnt (evil-window)
-  (let ((mapper #'(lambda (w)
+  (let ((mapper (lambda (w)
                     (unless (eq w evil-window)
                       (return-from front-window-that-isnt w)))))
     (declare (dynamic-extent mapper))
@@ -574,15 +574,15 @@
 
   (add-new-item menu "Undo" #'undo
                 :class 'window-menu-item :command-key #\Z
-                :update-function #'(lambda (item)
+                :update-function (lambda (item)
                                      (edit-menu-item-update item 'undo))
-                :help-spec #'(lambda (item)
+                :help-spec (lambda (item)
                                (if (eql 0 (search "Redo" (menu-item-title item)
                                                   :test 'char-equal))
                                  '(1201 3 4) '(1201 1 2))))
   (add-new-item menu "Undo more" #'undo-more
                 :class 'window-menu-item :command-key '(:shift #\Z)
-                :update-function #'(lambda (item)
+                :update-function (lambda (item)
                                      (edit-menu-item-update item 'undo-more))
                 :help-spec '(1202 1 2))
   (add-new-item menu "-" nil :disabled t)
@@ -590,28 +590,28 @@
   (add-new-item menu "Cut" #'cut
                 :class 'window-menu-item :command-key #\X :help-spec '(1203 1 2)
                 :update-function 
-                #'(lambda (item) (edit-menu-item-update item 'cut)))
+                (lambda (item) (edit-menu-item-update item 'cut)))
   (add-new-item menu "Copy" #'copy
                 :class 'window-menu-item :command-key #\C :help-spec '(1204 1 2)
                 :update-function 
-                #'(lambda (item) (edit-menu-item-update item 'copy)))
+                (lambda (item) (edit-menu-item-update item 'copy)))
   (add-new-item menu "Paste" #'paste
                 :class 'window-menu-item :command-key #\V :help-spec '(1205 1 2)
                 :update-function
-                #'(lambda (item) (edit-menu-item-update item 'paste)))
+                (lambda (item) (edit-menu-item-update item 'paste)))
   (add-new-item menu "Clear" #'clear
                 :class 'window-menu-item :help-spec '(1206 1 2)
                 :update-function 
-                #'(lambda (item) (edit-menu-item-update item 'clear)))
+                (lambda (item) (edit-menu-item-update item 'clear)))
   (add-new-item menu "Select All" #'select-all
-                :update-function #'(lambda (item) (edit-menu-item-update item 'select-all))
+                :update-function (lambda (item) (edit-menu-item-update item 'select-all))
                 :class 'window-menu-item
                 :command-key #\A :help-spec '(1207 1 2))
   (add-new-item menu "-" nil :disabled t)
-  (add-new-item menu search-item-name #'(lambda ()
+  (add-new-item menu search-item-name (lambda ()
                                           (when (require 'dialogs)
                                             (search-window-dialog)))
-                :update-function #'(lambda (item)
+                :update-function (lambda (item)
                                      (edit-menu-item-update item 'search))
                 :command-key #\F :help-spec 1208)
   (add-new-item menu search-again-item-name #'do-search-again
@@ -622,7 +622,7 @@
  (setf (slot-value (find-menu-item *edit-menu* search-item-name) 'menu-item-action)
        #'search-window-dialog
        (menu-item-update-function (find-menu-item *edit-menu* search-again-item-name))
-       #'(lambda (item)
+       (lambda (item)
            (if (search-again-p)
              (menu-item-enable  item)
              (menu-item-disable item)))))
@@ -744,7 +744,7 @@
                                             :update-function 'update-windows-menu
                                             :help-spec '(values 1500 (1501 1 2 1 3))))
 
-;(push #'(lambda () (update-windows-menu *windows-menu*)) *save-exit-functions*)
+;(push (lambda () (update-windows-menu *windows-menu*)) *save-exit-functions*)
 
 (defparameter *default-menubar*
   (lds (list *apple-menu* *file-menu* *edit-menu*

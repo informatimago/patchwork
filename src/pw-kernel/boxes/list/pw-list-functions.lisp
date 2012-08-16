@@ -83,13 +83,13 @@ For example,  if  <list> is  (a b c d) and <l-nth> is (2 (0) 1)) the box returns
   "minimum value(s) of a list or list of numbers"
   (if (not (consp (first list)))
     (apply 'min list)
-    (mapcar #'(lambda (x) (apply 'min x)) list)))
+    (mapcar (lambda (x) (apply 'min x)) list)))
 
 (defunp l-max ((list list)) fix
   "maximum value(s) of a list or list of numbers"
   (if (not (consp (first list)))
     (apply 'max list)
-    (mapcar #'(lambda (x) (apply 'max x)) list)))
+    (mapcar (lambda (x) (apply 'max x)) list)))
 
 (defun the-min (x) (apply 'min x))
 (defun the-max (x) (apply 'max x))
@@ -178,7 +178,7 @@ positions <posn> par les éléments correspondant de la liste <val>.
 Si la <posn> demandée n'existe pas l'opération de substitution n'est pas
 effectuée."
   (let ((posn (pw::list! posn)) (val (pw::list! val)))
-    (mapcar #'(lambda (p v) (when  (and (or (zerop p) (plusp p)) (< p
+    (mapcar (lambda (p v) (when  (and (or (zerop p) (plusp p)) (< p
                                                                     (length lis1))) (setf (nth p lis1) v) ))  posn  val)
     lis1))
 
@@ -208,7 +208,7 @@ extended."
 
 (defunp unique ((lst list)) list
   "returns a copy of <list>, dropping duplicate values (deepest level)"
-  (less-deep-mapcar #'(lambda (x) (unique-1 x #'eq)) lst))
+  (less-deep-mapcar (lambda (x) (unique-1 x #'eq)) lst))
 
 #|
 (defunp rem-dups ((lst list)
@@ -221,7 +221,7 @@ Returns a copy of <lst>."
   (if test test #'eq)
   (cond
    ((not (consp lst)) lst)
-   ((listp (car lst)) (mapcar #'(lambda (x) (rem-dups x test)) lst))
+   ((listp (car lst)) (mapcar (lambda (x) (rem-dups x test)) lst))
    (t (unique-1 lst test))))
 
 (defunp rem-dups ((lst list)
@@ -237,7 +237,7 @@ occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3
    ((not (consp lst)) lst)
    ((every 'listp lst)
     (if (eq depth 2)
-      (mapcar #'(lambda (x) (rem-dups x test)) lst)
+      (mapcar (lambda (x) (rem-dups x test)) lst)
       (unique-1 lst test)))
    (t (unique-1 lst test))))
 |#
@@ -257,7 +257,7 @@ occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3
    ((not (consp lst)) lst)
    ((every 'listp lst)
     (if (eq depth 2)
-      (mapcar #'(lambda (x) (rem-dups x test)) lst)
+      (mapcar (lambda (x) (rem-dups x test)) lst)
       (unique-1 lst test)))
    (t (unique-1 lst test))))
 
@@ -297,7 +297,7 @@ will return
 (defunp l-order ((list list)  (funct list (:value "<"))) list
 "gives the order of the elements of <list> according to 
 function <funct> ( < by default)"
-  (mapcar #'(lambda (x) (position x list)) (epw::sort-list list funct)))
+  (mapcar (lambda (x) (position x list)) (epw::sort-list list funct)))
 
 ;;changed by aaa 28-08-95 from pw-modif
 (defunp posn-order ((list list)  (funct list (:value "<"))) list
@@ -305,7 +305,7 @@ function <funct> ( < by default)"
     ordonnée à partir de <funct>. Il est possible de changer <funct>
     et obtenir les rangs à partir d'autres ordres de rangement."
   (let* ((thelist (epw::sort-list list funct))  rep)
-    (mapc #'(lambda (x)
+    (mapc (lambda (x)
               (let* ((repons (position x thelist)) (i 0))
                 (while (position repons rep)
                       (incf i)
@@ -318,7 +318,7 @@ function <funct> ( < by default)"
 "Ce module retourne une liste de rangs de la liste <list>
     ordonnée à partir de <funct>. Il est possible de changer <funct>
     et obtenir les rangs à partir d'autres ordres de rangement."
-  (mapcar #'(lambda (x) (position x list)) (pw::sort-list list funct)))
+  (mapcar (lambda (x) (position x list)) (pw::sort-list list funct)))
 |#
 
 (defun noRep-union (lists oper test key)
@@ -621,7 +621,7 @@ remaining divisions are returned as nil."
 
 (defunp ll-suppress ((lliste list) (elem numbers? )) list
 " retire les éléments de numéro <elem> de chaque sous-liste de la liste"
-  (mapcar #'(lambda (x) (l-delete x elem)) lliste))
+  (mapcar (lambda (x) (l-delete x elem)) lliste))
 
 (defunp l-delete ((list list) (elem numbers? )) list
 "deletes the elemth (can be a list) element from list. If <elem> is a list of
@@ -659,12 +659,12 @@ numbers, these have to be ordered "
 (defunp g-scaling/sum ((list list) (sum midics? (:value 1))) list
 "scales <list> (may be tree) so that its sum becomes <sum>. Trees must be 
 well-formed. The children of a node must be either all leaves or all nonleaves. "
- (less-tree-mapcar #'(lambda (x y) (l* x (/ y (apply #'+ x)))) list sum t))
+ (less-tree-mapcar (lambda (x y) (l* x (/ y (apply #'+ x)))) list sum t))
 
 (defunp g-scaling/max ((list list) (max midics? (:value 1))) list
 "scales <list>  (may be tree) so that its max becomes <max>. Trees must be 
 well-formed: The children of a node must be either all leaves or all nonleaves. "
- (less-tree-mapcar #'(lambda (x y) (l* x (/ y (list-max x)))) list max t))
+ (less-tree-mapcar (lambda (x y) (l* x (/ y (list-max x)))) list max t))
 
 (defunp permut-circ ((list list) &optional (nth (fix (:value 1)))) list
   "Returns a circular permutation of a copy of <list> starting from its <nth> 
@@ -726,7 +726,7 @@ if <matrix> is ((1 2) (3 4) (5 6) (7 8) (9 10)) <mat-trans> returns ((1 3 5 7 9)
   (let ((maxl (1- (loop for elt in matrix maximize (length elt))))
         result)
     (for (i 0 1 maxl)
-      (push (remove nil (mapcar #'(lambda (list) (nth i list)) matrix)) result))
+      (push (remove nil (mapcar (lambda (list) (nth i list)) matrix)) result))
     (nreverse result)))
 
 

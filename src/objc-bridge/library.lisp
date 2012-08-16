@@ -116,7 +116,7 @@
     #-ccl (niy load-cocoa-framework)
     #+ccl
     (call-in-initial-process
-     #'(lambda ()
+     (lambda ()
          ;; We need to load and "initialize" the CoreFoundation library
          ;; in the thread that's going to process events.  Looking up a
          ;; symbol in the library should cause it to be initialized

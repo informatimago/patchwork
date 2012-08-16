@@ -427,7 +427,7 @@
     (when (and (typep event 'chord) pitch)
       (setf (note-list event)
             (mapcar
-             #'(lambda (pitch)
+             (lambda (pitch)
                  (make-instance 'note 
                                 :pitch (if (numberp pitch)
                                          (midics-to-enigma pitch)
@@ -438,7 +438,7 @@
     (when tie
       (if (typep event 'note)
         (setf (begin-tie event) tie)
-        (mapc #'(lambda (note tie-val) (setf (begin-tie note) tie-val))
+        (mapc (lambda (note tie-val) (setf (begin-tie note) tie-val))
               (note-list event)
               tie)))
     (setf (current-event (parent-score self)) event)
@@ -451,7 +451,7 @@
         (setf (first-in-tuplet event) t))
       (incf (event-count (event-tuplet event))))
     (when (typep event 'chord)
-      (mapc #'(lambda (note)
+      (mapc (lambda (note)
                 (setf (first-in-tuplet note) (first-in-tuplet event)))
             (note-list event)))
     t))
@@ -476,13 +476,13 @@
             (event-count  self)
             (1+ (event-count  self)))
     (mapl
-     #'(lambda (levent)
+     (lambda (levent)
          (setf next (if (cdr levent) (rank (cadr levent)) 0)  
                cprev 0 cnext 0)
          (if (not (typep (car levent) 'chord))
            (translate-event-to-enigma (car levent) prev next cprev cnext)
            (mapl 
-            #'(lambda (lnote) 
+            (lambda (lnote) 
                 (setf cnext (if (cdr lnote) (rank (cadr lnote)) 0))  
                 (translate-event-to-enigma (car lnote) prev next cprev cnext )
                 (setf prev 0 next 0 cprev (rank (car lnote))) )
@@ -660,7 +660,7 @@
        (t
         (cond
          ((consp type)
-          (unless (some #'(lambda (single-type) (check-pop-token tok-list single-type nil))
+          (unless (some (lambda (single-type) (check-pop-token tok-list single-type nil))
                         type)
             (setf errcount t)))
          (t

@@ -43,13 +43,6 @@
 
 (in-package :pw)
 
-(provide 'application-window)
-
-;;====================================================================================================
-;;(export '(C-application-window set-pw-win+pw-obj))
-;;(import '(patch-work:draw-appl-label-win))
-;;====================================================================================================
-
 (defclass  C-application-window (window)  
   ((pw-win :initform nil :accessor pw-win)
    (pw-object :initform nil :accessor pw-object)))

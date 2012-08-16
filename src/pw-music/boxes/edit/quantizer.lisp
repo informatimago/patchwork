@@ -46,8 +46,7 @@
 
 (in-package "QUANTIZING")
 
-(defvar *maximum-pulses* ())
-(setf *maximum-pulses* 32)
+(defparameter *maximum-pulses* 32)
 (defvar *max-division* 8)
 (defvar *min-pulses* 5)
 
@@ -72,7 +71,7 @@
   (let (quants quantized-times)
     (dolist (needed-pulses (needed-pulses max-pulses attack-times tmin tmax) (nreverse quants))
       (setq quantized-times 
-            (mapcar #'(lambda (time) (adjust-time-to-grid time needed-pulses tmin tmax)) attack-times))
+            (mapcar (lambda (time) (adjust-time-to-grid time needed-pulses tmin tmax)) attack-times))
       (push 
        (make-quanta needed-pulses (deletions quantized-times) (distance attack-times quantized-times)
                     (proportion-distance attack-times quantized-times tmin tmax) quantized-times)
@@ -90,7 +89,7 @@
 ;;euclidean distance
 (defun distance (list qlist)
   (let ((accum 0.0) (length 0))
-    (mapc #'(lambda (x y) (incf accum (sqr (- x y))) (incf length)) list qlist)
+    (mapc (lambda (x y) (incf accum (sqr (- x y))) (incf length)) list qlist)
     (/ (sqrt accum) (max 1.0 (float length))) ))
 
 (defun x->propx (l)
@@ -112,8 +111,8 @@
           (t (count-different-proportions (rest prop1) (rest prop2) count)))))
 
 (defun count-slope-signs (prop1 prop2)
-  (abs (apply '+ (pw::g- (mapcar #'(lambda (x) (if (>= x 1) 1 -1)) prop1)
-                         (mapcar #'(lambda (x) (if (>= x 1) 1 -1)) prop2)))))
+  (abs (apply '+ (pw::g- (mapcar (lambda (x) (if (>= x 1) 1 -1)) prop1)
+                         (mapcar (lambda (x) (if (>= x 1) 1 -1)) prop2)))))
 
 ;;;This is computer generated code from Joshua's error measure patch [931026]
 
@@ -121,22 +120,22 @@
   (apply '+
     (epw::g-power 
      (let (A)
-       (mapcar #'(lambda (B) (setf A B) (epw::g/ (apply '+ A) (length A)))
+       (mapcar (lambda (B) (setf A B) (epw::g/ (apply '+ A) (length A)))
          (let (C D)
-           (mapcar #'(lambda (E F)
+           (mapcar (lambda (E F)
                        (setf C E D F)
                        (let (G)
-                         (mapcar #'(lambda (H) (setf G H) (epw::g-power (apply '/ (epw:sort-list G '>)) '3))
+                         (mapcar (lambda (H) (setf G H) (epw::g-power (apply '/ (epw:sort-list G '>)) '3))
                                  (epw:mat-trans (list C D)))))
                    (let (J)
-                     (mapcar #'(lambda (K) (setf J K) (cond ((= (length J) 1) J) (t (epw::g-scaling/sum J '100))))
+                     (mapcar (lambda (K) (setf J K) (cond ((= (length J) 1) J) (t (epw::g-scaling/sum J '100))))
                              (mapcar 'list
                                      (epw:x-append (patch-work:const var1)
                                                    (epw::create-list (epw::g-abs (epw::g- (max (length (patch-work:const var1))
                                                                                                (length (patch-work:const var2)))
                                                                                           (length (patch-work:const var1)))) 1)))))
                    (let (M)
-                     (mapcar #'(lambda (N)
+                     (mapcar (lambda (N)
                                  (setf M N)
                                  (cond ((= (length M) 1) M)
                                        (t (epw::g-scaling/sum M '100))))
@@ -181,7 +180,7 @@
                          #'quant-test2)))
       ;;(format t " ~% option proportions: ~S option number of divs: ~S ~%" option1 option2)
       ;;(print 
-       (mapcar #'(lambda (item1 item2) (if (< (* (get-distance item1) (* 1.2 (- 1 *distance-weight*)))
+       (mapcar (lambda (item1 item2) (if (< (* (get-distance item1) (* 1.2 (- 1 *distance-weight*)))
                                              (* (get-distance item2) *distance-weight*) )
                                         item1 item2)) option1 option2)))   ;;)
 
@@ -250,7 +249,7 @@
   (round (* nb-pulse (- qtime tmin)) (- tmax tmin)))
 
 (defun get-all-pulse-nums (note tmax tmin)
-  (mapcar #'(lambda (qtime) (pulse-number qtime (caar note) tmax tmin)) (cdr note)))
+  (mapcar (lambda (qtime) (pulse-number qtime (caar note) tmax tmin)) (cdr note)))
 
 (defun get-scaled-atimes (atimes dur-max)
   (dx->x (car atimes) (l-scaler/sum (x->dx atimes) dur-max)))
@@ -334,7 +333,7 @@ becomes prev-slur in the next call)."
      ((null partition)
       (if (and list (not atimes))
         (progn 
-               (mapcar #'(lambda (time) (keep-unquantized-statistics to time)) (butlast list 2))
+               (mapcar (lambda (time) (keep-unquantized-statistics to time)) (butlast list 2))
                (setq prev-slur nil)
                (unless (or (= last-list to) (= last-list tmin) (not (rest list)))
                  (set-error to last-list))
@@ -342,9 +341,8 @@ becomes prev-slur in the next call)."
         (values (test-quantize-constraints (list tmin to) tmin beat-dur prev-slur) t prev-slur)))
      (t (setf (rest atimes) partition) (values atimes slur? prev-slur)))))
 
-(defvar *minimum-quant-dur* ())
 
-(setf *minimum-quant-dur* (/ 100 16))
+(defparameter *minimum-quant-dur* (/ 100 16))
 
 (defun within-quantizing-limits (value beat-dur)
   (declare (ignore beat-dur))
@@ -357,7 +355,7 @@ becomes prev-slur in the next call)."
 (defun deleted-of (quant-structure) (second (first quant-structure)))
     
 (defun compound-beats (beat-list)
-  (mapcar #'(lambda (beat) (if (null (cdr beat)) (car beat) (list 1 beat))) beat-list))
+  (mapcar (lambda (beat) (if (null (cdr beat)) (car beat) (list 1 beat))) beat-list))
 
 (defun form-atimes-list (times from to)
   (and times
@@ -372,8 +370,8 @@ becomes prev-slur in the next call)."
          (beats (and durs (remove 0
                                   (if slur? 
                                     (cons (float (round (pop durs) min-dur))
-                                          (mapcar #'(lambda (dur) (round dur min-dur)) durs))
-                                    (mapcar #'(lambda (dur) (round dur min-dur)) durs)) :test #'=))))
+                                          (mapcar (lambda (dur) (round dur min-dur)) durs))
+                                    (mapcar (lambda (dur) (round dur min-dur)) durs)) :test #'=))))
      beats))
 
 (defun search-rythm (a-section tmin prev-slur)
@@ -563,7 +561,7 @@ box."
             (setq old-silence new-silence)
             (when beats-with-silences
               (push (pw::make-measure  current-unit
-                                      (mapcar #'(lambda (beat) (pw::make-beat 1 (list beat)))
+                                      (mapcar (lambda (beat) (pw::make-beat 1 (list beat)))
                                               beats-with-silences)
                                       current-tempo) result)
               (setq durs (nthcdr modifs durs))))
@@ -584,7 +582,7 @@ box."
 ;;;;;;;;;;;;;;;;;===============================================
 (defun set-grace-notes-pos (grace-notes durs)
   (let ((atimes (pw::g-round (pw::dx->x 0 durs) 1)) (count -1))
-    (mapcar #'(lambda (pair) (cons (- (position (pw::g-round (first pair) 1) atimes :test #'=) (incf count))
+    (mapcar (lambda (pair) (cons (- (position (pw::g-round (first pair) 1) atimes :test #'=) (incf count))
                                    (cdr pair)))
             (sort grace-notes '< :key #'first))))
 ;;;;;;;;;;;;;;;================================================
@@ -683,7 +681,7 @@ A list of forbidden unit divisions can optionally be given."
 ;;;Tempo variations. Linear, for the moment...
 
 (defun linear-tempo-ch (vf v0 tf t0)
-  #'(lambda (d) (cuad-solve (* 0.5 (/ (- vf v0) (- tf t0))) v0 (- d))))
+  (lambda (d) (cuad-solve (* 0.5 (/ (- vf v0) (- tf t0))) v0 (- d))))
 
 (defun cuad-solve (a b c)
     (/ (+ (- b) (sqrt (- (sqr b) (* 4.0 a c)))) (* 2.0 a)))

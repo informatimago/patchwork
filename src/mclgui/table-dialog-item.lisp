@@ -278,6 +278,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
     (let* ((cell-pos    (cell-position item h v))
            (cell-width  (table-column-width item h))
            (cell-height (table-row-height item v)))
+      (declare (ignore cell-width cell-height))
       (when cell-pos
         (with-focused-view (view-container item)
           (niy redraw-cell item h v)
@@ -434,22 +435,20 @@ FUN:            A (function item h v)
 (defmacro do-column-widths ((item column-width &optional (column (gensym)))
                             (&optional start end from-end)
                             &body body)
-  (let ((thunk (gensym)))
-    `(block nil
-       (map-column-widths (lambda (,column-width ,column)
+  `(block nil
+     (map-column-widths (lambda (,column-width ,column)
                             (declare (ignorable ,column))
-                            ,@body)
-                          ,item ,start ,end ,from-end))))
+                          ,@body)
+                        ,item ,start ,end ,from-end)))
 
 
 (defmacro do-row-heights ((item row-height &optional (row (gensym)))
                           (&optional start end from-end)
                           &body body)
-  (let ((thunk (gensym)))
-    `(block nil
-       (map-row-heights (lambda (,row-height ,row)
+  `(block nil
+     (map-row-heights (lambda (,row-height ,row)
                           (declare (ignorable ,row))
-                          ,@body) ,item ,start ,end ,from-end))))
+                        ,@body) ,item ,start ,end ,from-end)))
 
 
 
@@ -512,9 +511,9 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                     ((< new-br-v old-br-v)
                      (invalidate-corners parent (make-point pos-h new-br-v) old-bottom-right t)))))))
       (setf (table-rows    item) v
-            (table-columns item) h))
-    (fixup-scroll-bars item)
-    pt))
+            (table-columns item) h)
+      (fixup-scroll-bars item)
+      pt)))
 
 
 
@@ -709,6 +708,7 @@ FONT-SPEC:      A font spec.
                           (table-outline-region item)))
              (pos      (view-position item))
              (botright (add-points pos (table-inner-size item))))
+        (declare (ignore botright rgn))
         (niy invert-cell-selection item h v selected-p)
         #-(and)
         (with-temp-rgns (temp-rgn)
@@ -725,6 +725,7 @@ FONT-SPEC:      A font spec.
   (with-focused-dialog-item (item)
     (let* ((item-pos  (view-position item))
            (item-size (table-inner-size item)))
+      (declare (ignore item-pos item-size))
       (niy invalidate-cell h v)
       #-(and)
       (rlet ((item-rect :rect :topleft item-pos :botright (add-points item-pos item-size))) 
@@ -993,6 +994,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                 (pos-v            (point-v pos))
                 (inner-size-h     (point-h inner-size))
                 (inner-size-v     (point-v inner-size)))
+            (declare (ignore inner-size-h inner-size-v pos-v pos-h outline-region selection-region))
             (niy scroll-to-cell item h v)
             #-(and)
             (when selection-region
@@ -1098,55 +1100,57 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                 res)))))
 
 
-(defmethod point-to-cell ((item table-dialog-item) h &optional v)
-  (when (installed-item-p item)
-    (normalize-h&v h v)
-    (let* ((cell-size   (cell-size item))
-           (cell-size-h (point-h cell-size))
-           (cell-size-v (point-v cell-size))
-           (sep-width   (point-h (separator-size item)))
-           (sep-height  (point-v (separator-size item)))
-           (top-row     (table-top-row item))
-           (left-column (table-left-column item))
-           (pos         (view-position item))
-           (pos-h       (point-h pos))
-           (pos-v       (point-v pos))
-           (inner-size  (table-inner-size item))
-           (inner-h     (point-h inner-size))
-           (inner-v     (point-v inner-size)))
-      (when (and (<= pos-h h (+ pos-h inner-h))
-                 (<= pos-v v (+ pos-v inner-v)))
-        (decf h pos-h)
-        (decf v pos-v)
-        (let ((cell-h (if (column-widths-hash item)
+(defgeneric point-to-cell (item h &optional v)
+  (:method ((item table-dialog-item) h &optional v)
+    (when (installed-item-p item)
+      (normalize-h&v h v)
+      (let* ((cell-size   (cell-size item))
+             (cell-size-h (point-h cell-size))
+             (cell-size-v (point-v cell-size))
+             (sep-width   (point-h (separator-size item)))
+             (sep-height  (point-v (separator-size item)))
+             (top-row     (table-top-row item))
+             (left-column (table-left-column item))
+             (pos         (view-position item))
+             (pos-h       (point-h pos))
+             (pos-v       (point-v pos))
+             (inner-size  (table-inner-size item))
+             (inner-h     (point-h inner-size))
+             (inner-v     (point-v inner-size)))
+        (when (and (<= pos-h h (+ pos-h inner-h))
+                   (<= pos-v v (+ pos-v inner-v)))
+          (decf h pos-h)
+          (decf v pos-v)
+          (let ((cell-h (if (column-widths-hash item)
                           (let ((width 0))
                             (do-column-widths (item column-width column) (left-column)
                                               (when (> (incf width column-width) h)
                                                 (return column))))
                           (+ left-column
                              (if (eql cell-size-h 0)
-                                 0
-                                 (floor h (+ cell-size-h sep-width))))))
-              (cell-v (if (row-heights-hash item)
+                               0
+                               (floor h (+ cell-size-h sep-width))))))
+                (cell-v (if (row-heights-hash item)
                           (let ((height 0))
                             (do-row-heights (item row-height row) (top-row)
                                             (when (> (incf height row-height) v)
                                               (return row))))
                           (+ top-row
                              (if (eql cell-size-v 0)
-                                 0
-                                 (floor v (+ cell-size-v sep-height)))))))
-          (when (and (< cell-h (table-columns item))
-                     (< cell-v (table-rows item)))
-            (make-point cell-h cell-v)))))))
+                               0
+                               (floor v (+ cell-size-v sep-height)))))))
+            (when (and (< cell-h (table-columns item))
+                       (< cell-v (table-rows item)))
+              (make-point cell-h cell-v))))))))
 
 
 
 
 
 
-(defmethod cell-contents-string ((item table-dialog-item) cell)
-  (%cell-contents-string-new item cell nil))
+(defgeneric cell-contents-string (item cell)
+  (:method ((item table-dialog-item) cell)
+    (%cell-contents-string-new item cell nil)))
 
 
 (defvar *default-cell-contents-string-combined-method* nil)
@@ -1197,38 +1201,34 @@ V:              Vertical index. If the value of v is NIL, h is assumed
   #+ccl (ccl::%find-1st-arg-combined-method (ccl::%gf-dispatch-table gf) arg))
 
 
-(defun initialize/table-dialog-item ()
-  (setf
 
-   *default-cell-contents-string-combined-method*
-   (find-1st-arg-combined-method (function cell-contents-string)
-                                 (class-prototype (find-class 'table-dialog-item)))
-   
-   *default-draw-table-cell-combined-method*
-   (find-1st-arg-combined-method (function draw-table-cell)
-                                 (class-prototype (find-class 'table-dialog-item)))))
+(defgeneric cell-contents-string-new (item h &optional v)
+  (:method ((item table-dialog-item) h &optional v)
+    (%cell-contents-string-new item h v))
+  (:method :around ((item table-dialog-item) h &optional v)
+           ;; These two methods make users of the old cell-contents-string
+           ;; and draw-table-cell continue to work.
+           (let ((cm (find-1st-arg-combined-method #'cell-contents-string item)))
+             (if (eq cm *default-cell-contents-string-combined-method*)
+               (call-next-method)
+               (funcall cm item (make-point h v))))))
 
 
-
-(defmethod cell-contents-string-new :around ((item table-dialog-item) h &optional v)
-  ;; These two methods make users of the old cell-contents-string
-  ;; and draw-table-cell continue to work.
-  (let ((cm (find-1st-arg-combined-method #'cell-contents-string item)))
-    (if (eq cm *default-cell-contents-string-combined-method*)
-        (call-next-method)
-        (funcall cm item (make-point h v)))))
-
-(defmethod draw-table-cell ((item table-dialog-item) cell rect selectedp)
-  (%draw-table-cell-new item (point-h cell) (point-v cell) rect selectedp))
+(defgeneric draw-table-cell (item cell rect selectedp)
+  (:method ((item table-dialog-item) cell rect selectedp)
+    (%draw-table-cell-new item (point-h cell) (point-v cell) rect selectedp)))
 
 
 
 ;; why not call this draw-table-cell-h-v 
-(defmethod draw-table-cell-new :around ((item table-dialog-item) h v rect selectedp)
-  (let ((cm (find-1st-arg-combined-method #'draw-table-cell item)))
-    (if (eq cm *default-draw-table-cell-combined-method*)
-        (call-next-method)
-        (funcall cm item (make-point h v) rect selectedp))))
+(defgeneric draw-table-cell-new (item h v rect selectedp)
+  (:method :around ((item table-dialog-item) h v rect selectedp)
+           (let ((cm (find-1st-arg-combined-method #'draw-table-cell item)))
+             (if (eq cm *default-draw-table-cell-combined-method*)
+               (call-next-method)
+               (funcall cm item (make-point h v) rect selectedp))))
+  (:method ((item table-dialog-item) h v rect selectedp)
+    (%draw-table-cell-new item h v rect selectedp)))
 
 
 
@@ -1293,63 +1293,65 @@ V:              Vertical index. If the value of v is NIL, h is assumed
       (make-point (+ (min width max-width) (if table-vscrollp 15 0))
                   (+ (min height max-height) (if table-hscrollp 15 0))))))
 
-(defmethod maybe-need-scroll-bars ((table table-dialog-item) &optional installing)
-  (let ((size (view-size table)))
-    (when size
-      (let ((h (point-h size))
-            (v (point-v size))
-            (container (view-container table))
-            (computed-cell-size nil)
-            (vscrollp (table-vscrollp table))
-            (hscrollp (table-hscrollp table))
-            (changed nil))
-        (declare (fixnum h v))
-        (when (or (eq vscrollp :undetermined)
-                  (eq hscrollp :undetermined))
-          (flet ((compute-cell-size ()
-                   (let ((columns (table-columns table)))
-                     (setf (cell-size-slot table)
-                           (default-cell-size
-                               table
-                               (truncate h
-                                         (if (zerop columns)
+
+(defgeneric maybe-need-scroll-bars (table &optional installing)
+  (:method ((table table-dialog-item) &optional installing)
+    (let ((size (view-size table)))
+      (when size
+        (let ((h (point-h size))
+              (v (point-v size))
+              (container (view-container table))
+              (computed-cell-size nil)
+              (vscrollp (table-vscrollp table))
+              (hscrollp (table-hscrollp table))
+              (changed nil))
+          (declare (fixnum h v))
+          (when (or (eq vscrollp :undetermined)
+                    (eq hscrollp :undetermined))
+            (flet ((compute-cell-size ()
+                     (let ((columns (table-columns table)))
+                       (setf (cell-size-slot table)
+                             (default-cell-size
+                                 table
+                                 (truncate h
+                                           (if (zerop columns)
                                              1
                                              columns))))
-                     (setf computed-cell-size t))))
-            (declare (dynamic-extent #'compute-cell-size))
-            (unless (cell-size table) (compute-cell-size))
-            (let (undetermined-vscrollp)
-              (flet ((do-vscrollp (&optional (vsp vscrollp))
-                       (when (eq vsp :undetermined)
-                         (setf undetermined-vscrollp t)
-                         (let ((rows (table-rows table))
-                               (height 0))
-                           (setf vscrollp
-                                 (and (> rows 1)
-                                      (progn (do-row-heights (table row-height) () (incf height row-height))
-                                             (> height v))))
-                           ))
-                       (when vscrollp
-                         (decf h 15)
-                         (when computed-cell-size (compute-cell-size))))
-                     (do-hscrollp ()
-                       (when (eq hscrollp :undetermined)
-                         (let ((cols (table-columns table))
-                               (width 0))
-                           (setf hscrollp
-                                 (and (> cols 1)
-                                      (progn (do-column-widths (table column-width) () (incf width column-width))
-                                             (> width h))))
-                           ))
-                       (when hscrollp
-                         (decf v 15))))
-                (do-vscrollp)
-                (do-hscrollp)
-                (when (and undetermined-vscrollp (not vscrollp) hscrollp)
-                  (do-vscrollp :undetermined))))))
-        (let ((vbar (table-vscroll-bar table))
-              (hbar (table-hscroll-bar table)))
-          (if vscrollp
+                       (setf computed-cell-size t))))
+              (declare (dynamic-extent #'compute-cell-size))
+              (unless (cell-size table) (compute-cell-size))
+              (let (undetermined-vscrollp)
+                (flet ((do-vscrollp (&optional (vsp vscrollp))
+                         (when (eq vsp :undetermined)
+                           (setf undetermined-vscrollp t)
+                           (let ((rows (table-rows table))
+                                 (height 0))
+                             (setf vscrollp
+                                   (and (> rows 1)
+                                        (progn (do-row-heights (table row-height) () (incf height row-height))
+                                               (> height v))))
+                             ))
+                         (when vscrollp
+                           (decf h 15)
+                           (when computed-cell-size (compute-cell-size))))
+                       (do-hscrollp ()
+                         (when (eq hscrollp :undetermined)
+                           (let ((cols (table-columns table))
+                                 (width 0))
+                             (setf hscrollp
+                                   (and (> cols 1)
+                                        (progn (do-column-widths (table column-width) () (incf width column-width))
+                                               (> width h))))
+                             ))
+                         (when hscrollp
+                           (decf v 15))))
+                  (do-vscrollp)
+                  (do-hscrollp)
+                  (when (and undetermined-vscrollp (not vscrollp) hscrollp)
+                    (do-vscrollp :undetermined))))))
+          (let ((vbar (table-vscroll-bar table))
+                (hbar (table-hscroll-bar table)))
+            (if vscrollp
               (when (not vbar)
                 (let ((bar (make-scroll-bar-for-table table :vertical)))
                   (setf changed t)
@@ -1358,36 +1360,37 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                 (set-view-container vbar nil)
                 (setf changed t)
                 (setf (table-vscroll-bar table) nil)))
-          (if hscrollp
+            (if hscrollp
               (when (not hbar)
                 (let ((bar (make-scroll-bar-for-table table :horizontal)))
                   (setf changed t)
                   (setf (table-hscroll-bar table) bar)))
-              (when hbar  ; maybe its not cool to remove existing bars??
+              (when hbar ; maybe its not cool to remove existing bars??
                 (set-view-container hbar nil) 
                 (setf changed t)
                 (setf (table-hscroll-bar table) nil))))
-        ;; fixup-scroll-bars only does something if table installed and visible-dimensions makes sense.
-        ;; - get size and pos right before set container
-        (when (and changed (not installing))
-          (fixup-scroll-bars table)
-          (when vscrollp
-            (when container (set-view-container (table-vscroll-bar table) container)))
-          (when hscrollp
-            (when container (set-view-container (table-hscroll-bar table) container)))
-          (maybe-fix-cell-size table))          
+          ;; fixup-scroll-bars only does something if table installed and visible-dimensions makes sense.
+          ;; - get size and pos right before set container
+          (when (and changed (not installing))
+            (fixup-scroll-bars table)
+            (when vscrollp
+              (when container (set-view-container (table-vscroll-bar table) container)))
+            (when hscrollp
+              (when container (set-view-container (table-hscroll-bar table) container)))
+            (maybe-fix-cell-size table))          
                                         ;(when changed (maybe-fix-cell-size table))
-        changed
-        ))))
+          changed
+          )))))
 
-(defmethod set-view-level :after ((item table-dialog-item) level)
-  (let ((hscroll (table-hscroll-bar item))
-        (vscroll (table-vscroll-bar item))
-        (level+1 (1+ level))
-        (container (view-container item)))
-    (when (and container (< level+1 (length (view-subviews container))))
-      (when hscroll (set-view-level hscroll level+1))
-      (when vscroll (set-view-level vscroll level+1)))))
+(defgeneric set-view-level (item level)
+  (:method :after ((item table-dialog-item) level)
+           (let ((hscroll (table-hscroll-bar item))
+                 (vscroll (table-vscroll-bar item))
+                 (level+1 (1+ level))
+                 (container (view-container item)))
+             (when (and container (< level+1 (length (view-subviews container))))
+               (when hscroll (set-view-level hscroll level+1))
+               (when vscroll (set-view-level vscroll level+1))))))
 
 (defmethod set-view-container :after ((item table-dialog-item) container)
   (let ((hscroll (table-hscroll-bar item))
@@ -1395,44 +1398,49 @@ V:              Vertical index. If the value of v is NIL, h is assumed
     (when hscroll (set-view-container hscroll container))
     (when vscroll (set-view-container vscroll container))))
 
-(defmethod (setf separator-size) :around (new-size (item table-dialog-item))
-  (let ((old-size (separator-size item)))
-    (prog1 (call-next-method)
-      (unless (= new-size old-size)
-        (setf (visible-dimensions-slot item) nil)     ; clear cache
-        (when (installed-item-p item)
-          (compute-selection-regions item)
-          (invalidate-view item t)
-          (fixup-scroll-bars item))))))
+(defgeneric (setf separator-size) (new-size item)
+  (:method :around (new-size (item table-dialog-item))
+           (let ((old-size (separator-size item)))
+             (prog1 (call-next-method)
+               (unless (= new-size old-size)
+                 (setf (visible-dimensions-slot item) nil) ; clear cache
+                 (when (installed-item-p item)
+                   (compute-selection-regions item)
+                   (invalidate-view item t)
+                   (fixup-scroll-bars item)))))))
 
-(defmethod (setf separator-visible-p) :around (value (item table-dialog-item))
-  (let ((old-visible-p (separator-visible-p item)))
-    (prog1
-        (call-next-method)
-      (unless (eq (not (null value)) (not (null old-visible-p)))
-        (invalidate-view item t)
-        (fixup-scroll-bars item)))))
+(defgeneric (setf separator-visible-p) (value item)
+  (:method :around (value (item table-dialog-item))
+           (let ((old-visible-p (separator-visible-p item)))
+             (prog1
+                 (call-next-method)
+               (unless (eq (not (null value)) (not (null old-visible-p)))
+                 (invalidate-view item t)
+                 (fixup-scroll-bars item))))))
 
-(defmethod (setf separator-color) :around (new-color (item table-dialog-item))
-  (let ((old-color (separator-color item)))
-    (prog1
-        (call-next-method)
-      (unless (equal new-color old-color)
-        (invalidate-view item t)))))
+(defgeneric (setf separator-color) (new-color item)
+  (:method :around (new-color (item table-dialog-item))
+           (let ((old-color (separator-color item)))
+             (prog1
+                 (call-next-method)
+               (unless (equal new-color old-color)
+                 (invalidate-view item t))))))
 
-(defmethod separator-pattern ((item table-dialog-item))
-  (let ((pattern (separator-pattern-slot item)))
-    (cond ((macptrp pattern) pattern)
-          ((symbolp pattern) (and (boundp pattern) (symbol-value pattern)))
-          ((functionp pattern) (funcall pattern))
-          (t nil))))
+(defgeneric separator-pattern (item)
+  (:method ((item table-dialog-item))
+    (let ((pattern (separator-pattern-slot item)))
+      (cond ((macptrp pattern) pattern)
+            ((symbolp pattern) (and (boundp pattern) (symbol-value pattern)))
+            ((functionp pattern) (funcall pattern))
+            (t nil)))))
 
-(defmethod (setf separator-pattern) :around (new-pattern (item table-dialog-item))
-  (let ((old-pattern (separator-pattern item)))
-    (prog1
-        (call-next-method)
-      (unless (equal new-pattern old-pattern)
-        (invalidate-view item t)))))
+(defgeneric (setf separator-pattern) (new-pattern item)
+  (:method :around (new-pattern (item table-dialog-item))
+           (let ((old-pattern (separator-pattern item)))
+             (prog1
+                 (call-next-method)
+               (unless (equal new-pattern old-pattern)
+                 (invalidate-view item t))))))
 
 (defun string-width-for-focused-control (string ff ms)
   (niy string-width-for-focused-control string ff ms)
@@ -1444,36 +1452,40 @@ V:              Vertical index. If the value of v is NIL, h is assumed
   100)
 
 
-(defmethod default-cell-size ((item table-dialog-item) &optional width)
-  (let ((dialog (view-container item)))
-    (with-focused-dialog-item (item dialog)
-      (multiple-value-bind (ff ms) (view-font-codes item)
-        (let ((table-max-width (table-max-width item)))
-          (let ((rows (table-rows item))
-                (columns (table-columns item))
-                (dwidth width)
-                height string)
-            (niy default-cell-size item width)
-            #-(and)
-            (rlet ((fp :fontinfo))
-                  (#_GetFontinfo fp)
-                  (setf height
-                        (+ (rref fp fontinfo.ascent)
-                           (rref fp fontinfo.descent)
-                           (rref fp fontinfo.leading))))
-            (unless dwidth
-              (setf dwidth 1)
-              (dotimes (h columns)
-                (dotimes (v rows)
-                  (setf string (cell-contents-string-new item h v))
-                  (setf dwidth (max dwidth (string-width-for-focused-control string ff ms)))))
-              (setf dwidth (min (+ dwidth 6) table-max-width)))
-            (make-point (max 5 dwidth) (max 5 height))))))))
+(defgeneric default-cell-size (item &optional width)
+  (:method ((item table-dialog-item) &optional width)
+    (let ((dialog (view-container item)))
+      (with-focused-dialog-item (item dialog)
+        (multiple-value-bind (ff ms) (view-font-codes item)
+          (let ((table-max-width (table-max-width item)))
+            (let ((rows (table-rows item))
+                  (columns (table-columns item))
+                  (dwidth width)
+                  height string)
+              (niy default-cell-size item width)
+              #-(and)
+              (rlet ((fp :fontinfo))
+                    (#_GetFontinfo fp)
+                    (setf height
+                          (+ (rref fp fontinfo.ascent)
+                             (rref fp fontinfo.descent)
+                             (rref fp fontinfo.leading))))
+              (unless dwidth
+                (setf dwidth 1)
+                (dotimes (h columns)
+                  (dotimes (v rows)
+                    (setf string (cell-contents-string-new item h v))
+                    (setf dwidth (max dwidth (string-width-for-focused-control string ff ms)))))
+                (setf dwidth (min (+ dwidth 6) table-max-width)))
+              (make-point (max 5 dwidth) (max 5 height)))))))))
 
 
-(defmethod cell-contents-string-new ((item table-dialog-item) h &optional v)
-  (%cell-contents-string-new item h v))
 
+
+
+(defparameter %draw-cell-string-stream
+  ;; (make-truncating-string-stream 255)
+  (make-string-output-stream))
 
 (defun %cell-contents-string-new (item h v)
   (normalize-h&v h v)
@@ -1592,32 +1604,35 @@ V:              Vertical index. If the value of v is NIL, h is assumed
       )))
 
 ;; CLIM adds a method for this
-(defmethod make-scroll-bar-for-table ((table table-dialog-item) direction)
-  (make-instance 'table-scroll-bar
+(defgeneric make-scroll-bar-for-table (table direction)
+  (:method ((table table-dialog-item) direction)
+    (make-instance 'table-scroll-bar
       :scrollee table
-      :view-position #@(-3000 -3000)  ; mAYBE no longer needed
+      :view-position #@(-3000 -3000)    ; mAYBE no longer needed
       :track-thumb-p (scroll-bar-track-thumb-p table)
-      :direction direction))
+      :direction direction)))
 
 
 
                                         ; These are only safe to use when the table is not in its window.
-(defmethod (setf table-hscrollp) (value (item table-dialog-item))
-  (unless value
-    (let ((scroll-bar (table-hscroll-bar item)))
-      (when scroll-bar
-        (setf (table-hscroll-bar item) nil)
-        (set-view-container scroll-bar nil))))
-  (setf (table-hscrollp-slot item) (not (null value))))
+(defgeneric (setf table-hscrollp) (value item)
+  (:method (value (item table-dialog-item))
+    (unless value
+      (let ((scroll-bar (table-hscroll-bar item)))
+        (when scroll-bar
+          (setf (table-hscroll-bar item) nil)
+          (set-view-container scroll-bar nil))))
+    (setf (table-hscrollp-slot item) (not (null value)))))
 
 
-(defmethod (setf table-vscrollp) (value (item table-dialog-item))
-  (unless value
-    (let ((scroll-bar (table-vscroll-bar item)))
-      (when scroll-bar
-        (setf (table-vscroll-bar item) nil)
-        (set-view-container scroll-bar nil))))
-  (setf (table-vscrollp-slot item) (not (null value))))
+(defgeneric (setf table-vscrollp) (value item)
+  (:method (value (item table-dialog-item))
+    (unless value
+      (let ((scroll-bar (table-vscroll-bar item)))
+        (when scroll-bar
+          (setf (table-vscroll-bar item) nil)
+          (set-view-container scroll-bar nil))))
+    (setf (table-vscrollp-slot item) (not (null value)))))
 
 
 (defun fixup-scroll-bar-levels (item)
@@ -1746,41 +1761,43 @@ V:              Vertical index. If the value of v is NIL, h is assumed
       (#_DisposeRgn rgn))))
 
 
-(defmethod add-to-selection-region ((item table-dialog-item) selected-p h &optional v
-                                    dont-compute-outline-region)
-  (let ((selection-region (table-selection-region item))
-        (visible-dimensions (visible-dimensions item)))
-    (when visible-dimensions
-      (prog1
-          (when (and selection-region h)
-            (normalize-h&v h v)
-            (let* ((top-row (1- (table-top-row item)))
-                   (left-column (1- (table-left-column item)))
-                   ;;(visible-dimensions (visible-dimensions item))
-                   (bottom-row (+ top-row (point-v visible-dimensions) 2))
-                   (right-column (+ left-column (point-h visible-dimensions) 2)))
-              (when (and (<= top-row v bottom-row)
-                         (<= left-column h right-column))
-                (multiple-value-bind (ignore cell-size top-left) (cell-position item h v)
-                  (declare (ignore ignore))
-                  (when top-left
-                    (let ((bottom-right (add-points top-left cell-size)))
-                      (niy add-to-selection-region item selected-p h v dont-compute-outline-region)
-                      #-(and)
-                      (with-temp-rgns (rgn)
-                        (#_SetRectRgn rgn
-                                      (point-h top-left)(point-v top-left)
-                                      (point-h bottom-right)(point-v bottom-right))
-                        (if selected-p
+(defgeneric add-to-selection-region (item selected-p h &optional v dont-compute-outline-region)
+  (:method ((item table-dialog-item) selected-p h &optional v
+            dont-compute-outline-region)
+    (let ((selection-region (table-selection-region item))
+          (visible-dimensions (visible-dimensions item)))
+      (when visible-dimensions
+        (prog1
+            (when (and selection-region h)
+              (normalize-h&v h v)
+              (let* ((top-row (1- (table-top-row item)))
+                     (left-column (1- (table-left-column item)))
+                     ;;(visible-dimensions (visible-dimensions item))
+                     (bottom-row (+ top-row (point-v visible-dimensions) 2))
+                     (right-column (+ left-column (point-h visible-dimensions) 2)))
+                (when (and (<= top-row v bottom-row)
+                           (<= left-column h right-column))
+                  (multiple-value-bind (ignore cell-size top-left) (cell-position item h v)
+                    (declare (ignore ignore))
+                    (when top-left
+                      (let ((bottom-right (add-points top-left cell-size)))
+                        (declare (ignore bottom-right))
+                        (niy add-to-selection-region item selected-p h v dont-compute-outline-region)
+                        #-(and)
+                        (with-temp-rgns (rgn)
+                          (#_SetRectRgn rgn
+                                        (point-h top-left)(point-v top-left)
+                                        (point-h bottom-right)(point-v bottom-right))
+                          (if selected-p
                             (#_UnionRgn rgn selection-region selection-region)
                             (#_DiffRgn selection-region rgn selection-region))
-                        t)))))))         ; did something
-        #-(and)
-        (unless dont-compute-outline-region
-          (let ((outline-region (table-outline-region item)))
-            (#_CopyRgn selection-region outline-region)
-            (#_InsetRgn outline-region 1 1)
-            (#_XorRgn selection-region outline-region outline-region)))))))
+                          t)))))))      ; did something
+          #-(and)
+          (unless dont-compute-outline-region
+            (let ((outline-region (table-outline-region item)))
+              (#_CopyRgn selection-region outline-region)
+              (#_InsetRgn outline-region 1 1)
+              (#_XorRgn selection-region outline-region outline-region))))))))
 
 
 (defun table-inner-size (table &optional size)
@@ -1820,13 +1837,14 @@ V:              Vertical index. If the value of v is NIL, h is assumed
         (when (wptr item)
           (compute-selection-regions item))))))
 
-(defmethod maybe-fix-cell-size ((item table-dialog-item))
-  (when (<= (point-h (table-dimensions item)) 1) ; or (sequence-order wrap-length)
-    (when (and (view-size item)(cell-size item))
-      (let ((inner-size (table-inner-size item)))
-        (set-cell-size item
-                       (make-point (max 1 (point-h inner-size))
-                                   (max 1 (point-v (cell-size item)))))))))
+(defgeneric maybe-fix-cell-size (item)
+  (:method ((item table-dialog-item))
+    (when (<= (point-h (table-dimensions item)) 1) ; or (sequence-order wrap-length)
+      (when (and (view-size item)(cell-size item))
+        (let ((inner-size (table-inner-size item)))
+          (set-cell-size item
+                         (make-point (max 1 (point-h inner-size))
+                                     (max 1 (point-v (cell-size item))))))))))
 
 (defmethod view-corners ((item table-dialog-item))
   (multiple-value-call #'inset-corners #@(-1 -1) (call-next-method)))
@@ -1835,59 +1853,63 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 (defvar *updating* nil)
 
 
-(defmethod table-row-height ((item table-dialog-item) row)
-  (check-type row integer)
-  (let ((row-heights-hash (row-heights-hash item)))
-    (or (and row-heights-hash (gethash row row-heights-hash))
-        (let ((cell-size (cell-size item)))
-          (and cell-size (point-v cell-size))))))
+(defgeneric table-row-height (item row)
+  (:method ((item table-dialog-item) row)
+    (check-type row integer)
+    (let ((row-heights-hash (row-heights-hash item)))
+      (or (and row-heights-hash (gethash row row-heights-hash))
+          (let ((cell-size (cell-size item)))
+            (and cell-size (point-v cell-size)))))))
 
-(defmethod table-column-width ((item table-dialog-item) column)
-  (check-type column integer)
-  (let ((column-widths-hash (column-widths-hash item)))
-    (or (and column-widths-hash (gethash column column-widths-hash))
-        (let ((cell-size (cell-size item)))
-          (and cell-size (point-h cell-size))))))
+(defgeneric table-column-width (item column)
+  (:method ((item table-dialog-item) column)
+    (check-type column integer)
+    (let ((column-widths-hash (column-widths-hash item)))
+      (or (and column-widths-hash (gethash column column-widths-hash))
+          (let ((cell-size (cell-size item)))
+            (and cell-size (point-h cell-size)))))))
 
-(defmethod (setf table-row-height) (value (item table-dialog-item) row)
-  (check-type row integer)
-  (check-type value (or null fixnum))
-  (let ((hash (or (row-heights-hash item)
-                  (and value (setf (row-heights-hash item) (make-hash-table :test 'eql))))))
-    (if value
+(defgeneric (setf table-row-height) (value item row)
+  (:method (value (item table-dialog-item) row)
+    (check-type row integer)
+    (check-type value (or null fixnum))
+    (let ((hash (or (row-heights-hash item)
+                    (and value (setf (row-heights-hash item) (make-hash-table :test 'eql))))))
+      (if value
         (setf (gethash row hash) value)
         (when hash
           (remhash row hash)
           (when (eql 0 (hash-table-count hash))
             (setf (row-heights-hash item) nil)))))
-  (setf (visible-dimensions-slot item) nil)     ; clear cache
-  (when (installed-item-p item)
-    (compute-selection-regions item)
-    (invalidate-view item t))           ; optimize this to scroll appropriately and invalidate minimally
-  (when (table-vscroll-bar item)
+    (setf (visible-dimensions-slot item) nil) ; clear cache
+    (when (installed-item-p item)
+      (compute-selection-regions item)
+      (invalidate-view item t)) ; optimize this to scroll appropriately and invalidate minimally
+    (when (table-vscroll-bar item)
                                         ;(scroll-bar-changed item t)
-    (fixup-scroll-bars item))
-  value)
+      (fixup-scroll-bars item))
+    value))
 
-(defmethod (setf table-column-width) (value (item table-dialog-item) column)
-  (check-type column integer)
-  (check-type value (or null fixnum))
-  (let ((hash (or (column-widths-hash item)
-                  (and value (setf (column-widths-hash item) (make-hash-table :test 'eql))))))
-    (if value
+(defgeneric (setf table-column-width) (value item column)
+  (:method (value (item table-dialog-item) column)
+    (check-type column integer)
+    (check-type value (or null fixnum))
+    (let ((hash (or (column-widths-hash item)
+                    (and value (setf (column-widths-hash item) (make-hash-table :test 'eql))))))
+      (if value
         (setf (gethash column hash) value)
         (when hash
           (remhash column hash)
           (when (eql 0 (hash-table-count hash))
             (setf (column-widths-hash item) nil)))))
-  (setf (visible-dimensions-slot item) nil)     ; clear cache
-  (when (installed-item-p item)
-    (compute-selection-regions item)
-    (invalidate-view item t))           ; optimize this to scroll appropriately and invalidate minimally
-  (when (table-hscroll-bar item)
+    (setf (visible-dimensions-slot item) nil) ; clear cache
+    (when (installed-item-p item)
+      (compute-selection-regions item)
+      (invalidate-view item t)) ; optimize this to scroll appropriately and invalidate minimally
+    (when (table-hscroll-bar item)
                                         ;(scroll-bar-changed item t)
-    (fixup-scroll-bars item))
-  value)
+      (fixup-scroll-bars item))
+    value))
 
 (defmethod view-draw-contents ((item table-dialog-item))
   (without-interrupts
@@ -1900,6 +1922,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                  (back-color            (part-color item :body))
                  (pos                   (view-position item))
                  (inner-size            (table-inner-size item)))
+            (declare (ignore inner-size pos back-color color-list color-p))
             (niy view-draw-contents item)
             #-(and)
             (rlet ((rect :rect :topleft pos :botright (add-points pos inner-size)))
@@ -2027,8 +2050,9 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 
 
-(defmethod draw-table-cell-new ((item table-dialog-item) h v rect selectedp)
-  (%draw-table-cell-new item h v rect selectedp))
+
+
+(defvar *table-fore-color* nil)
 
 ;;; draw gray if not enabled and color-p
 (defun %draw-table-cell-new (item h v rect selectedp)
@@ -2038,11 +2062,11 @@ V:              Vertical index. If the value of v is NIL, h is assumed
     (with-focused-view container
       (let ((cell-fonts (table-cell-fonts item)))
         (multiple-value-bind (ff ms) (view-font-codes item)
-          (let* ((top (pref rect rect.top))
+          (let* ((top (rect-top rect))
                  (key (cons h v))
                  (back-color-p (eq (cell-colors item) :background))
                  (cell-color (part-color-h-v item h v)))
-            (declare (ignore-if-unused top))
+            (declare (ignore top))
             (declare (dynamic-extent key))
             (without-interrupts
                 (let* ((font (and cell-fonts
@@ -2056,6 +2080,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                                            *table-fore-color*)))
                        (pos (view-position item))
                        (botright (add-points pos (table-inner-size item))))
+                  (declare (ignore botright fore-color back-color))
                   (setq ff (or (car font) ff)
                         ms (or (cdr font) ms))
                   (niy %draw-table-cell-new item h v rect selectedp)
@@ -2078,30 +2103,31 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 
 
-(defmethod first-selected-cell ((item table-dialog-item))
-  (or (first-selected-cell-slot item)
-      (let ((hash (table-selection-hash item)))
-        (when (and hash (plusp (hash-table-count hash)))
-          (let ((min-h most-positive-fixnum)
-                (min-v most-positive-fixnum))
-            ;; find min row in min column
-            (maphash (lambda (key val)
-                       (declare (ignore val))
-                       (let ((ph (car key))
-                             (pv (cdr key)))
-                         (if (eql ph min-h)
+(defgeneric first-selected-cell (item)
+  (:method ((item table-dialog-item))
+    (or (first-selected-cell-slot item)
+        (let ((hash (table-selection-hash item)))
+          (when (and hash (plusp (hash-table-count hash)))
+            (let ((min-h most-positive-fixnum)
+                  (min-v most-positive-fixnum))
+              ;; find min row in min column
+              (maphash (lambda (key val)
+                           (declare (ignore val))
+                         (let ((ph (car key))
+                               (pv (cdr key)))
+                           (if (eql ph min-h)
                              (setq min-v (min min-v pv))
                              (if (< ph min-h)
-                                 (progn                               
-                                   (setq min-h ph min-v pv))))))
-                     hash)                                         
-            (setf (first-selected-cell-slot item)(make-point min-h min-v)))))))
+                               (progn                               
+                                 (setq min-h ph min-v pv))))))
+                       hash)                                         
+              (setf (first-selected-cell-slot item)(make-point min-h min-v))))))))
 
 
 
 
 
-(defvar *table-fore-color* nil)
+
 
 
 (defmethod view-activate-event-handler ((item table-dialog-item))
@@ -2150,7 +2176,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                   (with-temp-rgns (cell-rgn)  ; << do colored cells 1 by 1
                     (let ((hash (table-selection-hash item)))
                       (when hash
-                        (let ((f #'(lambda (key value)
+                        (let ((f (lambda (key value)
                                      (declare (ignore value))
                                      (let ((h (car key))(v (cdr key)))
                                        (multiple-value-bind (pos size)
@@ -2234,6 +2260,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                                                  (not command-key-p))))
                                        (let* ((hash (table-selection-hash item))
                                               (colored-cells-p (colored-cells-p item)))
+                                         (declare (ignore hash colored-cells-p))
                                          (niy view-click-event-handler item where)
                                          #-(and)
                                          (with-temp-rgns (rgn)
@@ -2245,7 +2272,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                                                          (cell-select item h v)
                                                          (when hash
                                                            (when colored-cells-p
-                                                             (let ((f #'(lambda (k val)
+                                                             (let ((f (lambda (k val)
                                                                           (declare (ignore val))
                                                                           (unless (and (eql (car k) h)
                                                                                        (eql (cdr k) v))
@@ -2317,68 +2344,74 @@ V:              Vertical index. If the value of v is NIL, h is assumed
         (#_GetMouse pt)
         (%get-point pt)))
 
-(defmethod deselect-cells-between ((item table-dialog-item) first-h first-v h v)
-  (when (< h first-h)
-    (rotatef h first-h))
-  (when (< v first-v)
-    (rotatef v first-v))
-  (loop
-    :for i :from first-h :to h
-    :do (loop
-          :for j :from first-v :to v
-          :do (cell-deselect item i j))))
+(defgeneric deselect-cells-between (item first-h first-v h v)
+  (:method ((item table-dialog-item) first-h first-v h v)
+    (when (< h first-h)
+      (rotatef h first-h))
+    (when (< v first-v)
+      (rotatef v first-v))
+    (loop
+      :for i :from first-h :to h
+      :do (loop
+            :for j :from first-v :to v
+            :do (cell-deselect item i j)))))
 
 
-(defmethod select-cells-between ((item table-dialog-item) first-h first-v h v)
-  (when (< h first-h)
-    (rotatef h first-h))
-  (when (< v first-v)
-    (rotatef v first-v))
-  (loop
-    :for i :from first-h :to h
-    :do (loop
-          :for j :from first-v :to v
-          :do (cell-select item i j))))
+(defgeneric select-cells-between (item first-h first-v h v)
+  (:method ((item table-dialog-item) first-h first-v h v)
+    (when (< h first-h)
+      (rotatef h first-h))
+    (when (< v first-v)
+      (rotatef v first-v))
+    (loop
+      :for i :from first-h :to h
+      :do (loop
+            :for j :from first-v :to v
+            :do (cell-select item i j)))))
 
 
-(defmethod deselect-cells-above ((item table-dialog-item) h v)
-  (let ((hash (table-selection-hash item)))
-    (when hash
-      (maphash (lambda (k val)
-                 (declare (ignore val))
-                 (when (or (> (car k) h)
-                           (> (cdr k) v))
-                   (cell-deselect item k)))
-               hash))))
+(defgeneric deselect-cells-above (item h v)
+  (:method ((item table-dialog-item) h v)
+    (let ((hash (table-selection-hash item)))
+      (when hash
+        (maphash (lambda (k val)
+                     (declare (ignore val))
+                   (when (or (> (car k) h)
+                             (> (cdr k) v))
+                     (cell-deselect item k)))
+                 hash)))))
 
 
-(defmethod max-selected-h&v ((item table-dialog-item))
-  (let* ((hash (table-selection-hash item))
-         (max-h -1)
-         (max-v -1))    
-    (when hash        
-      (maphash (lambda (k val)
-                 (declare (ignore val))
-                 (setq max-h (max max-h (car k)))
-                 (setq max-v (max max-v (cdr k))))
-               hash))
-    (values max-h max-v)))
+(defgeneric max-selected-h&v (item)
+  (:method ((item table-dialog-item))
+    (let* ((hash (table-selection-hash item))
+           (max-h -1)
+           (max-v -1))    
+      (when hash        
+        (maphash (lambda (k val)
+                     (declare (ignore val))
+                   (setq max-h (max max-h (car k)))
+                   (setq max-v (max max-v (cdr k))))
+                 hash))
+      (values max-h max-v))))
 
 
-(defmethod deselect-cells ((item table-dialog-item))
-  (let ((hash (table-selection-hash item)))
-    (when hash
-      (maphash (lambda (k v)
-                 (declare (ignore v))
-                 (cell-deselect item k))
-               hash))))
+(defgeneric deselect-cells (item)
+  (:method ((item table-dialog-item))
+    (let ((hash (table-selection-hash item)))
+      (when hash
+        (maphash (lambda (k v)
+                     (declare (ignore v))
+                   (cell-deselect item k))
+                 hash)))))
 
 
 
-(defmethod colored-cells-p ((item table-dialog-item))
-  (and (eq (cell-colors item) :background)
-       (let ((hash (table-cell-color-hash item)))
-         (and hash (plusp (hash-table-count hash))))))
+(defgeneric colored-cells-p (item)
+  (:method ((item table-dialog-item))
+    (and (eq (cell-colors item) :background)
+         (let ((hash (table-cell-color-hash item)))
+           (and hash (plusp (hash-table-count hash)))))))
 
 
 (defvar *last-auto-scroll-time* 0)
@@ -2426,39 +2459,40 @@ V:              Vertical index. If the value of v is NIL, h is assumed
     (window-update-event-handler (view-window item)))
   (values left-column top-row))
 
-(defmethod find-clicked-cell ((item table-dialog-item) where)
-  (setq where (convert-coordinates where (view-container item) item))  
-  (let* ((top-row (table-top-row item))
-         (left-column (table-left-column item))
-         (cell-size (cell-size item))
-         (sep-width (point-h (separator-size item)))
-         (sep-height (point-v (separator-size item)))
-         (where-h (point-h where))
-         (where-v (point-v where))
-         (column (if (column-widths-hash item)
+(defgeneric find-clicked-cell (item where)
+  (:method ((item table-dialog-item) where)
+    (setq where (convert-coordinates where (view-container item) item))  
+    (let* ((top-row (table-top-row item))
+           (left-column (table-left-column item))
+           (cell-size (cell-size item))
+           (sep-width (point-h (separator-size item)))
+           (sep-height (point-v (separator-size item)))
+           (where-h (point-h where))
+           (where-v (point-v where))
+           (column (if (column-widths-hash item)
                      (let ((width 0))
                        (do-column-widths (item column-width column) (left-column)
                                          (when (> (incf width column-width) where-h)
                                            (return column))))
                      (+ left-column 
                         (if (zerop (point-h cell-size))
-                            0
-                            (floor where-h (+ (point-h cell-size) sep-width))))))
-         (row (if (row-heights-hash item)
+                          0
+                          (floor where-h (+ (point-h cell-size) sep-width))))))
+           (row (if (row-heights-hash item)
                   (let ((height 0))
                     (do-row-heights (item row-height row) (top-row)
                                     (when (> ( incf height row-height) where-v)
                                       (return row))))
                   (+ top-row 
                      (if (zerop (point-v cell-size))
-                         0
-                         (floor where-v (+ (point-v cell-size) sep-height)))))))
-    (let* ((table-cols (table-columns item))
-           (table-rows (table-rows item)))
-      (values (max 0 (min (1- table-cols) column))
-              (max 0 (min (1- table-rows) row))
-              (and (<= 0 column (1- table-cols))
-                   (<= 0 row (1- table-rows)))))))
+                       0
+                       (floor where-v (+ (point-v cell-size) sep-height)))))))
+      (let* ((table-cols (table-columns item))
+             (table-rows (table-rows item)))
+        (values (max 0 (min (1- table-cols) column))
+                (max 0 (min (1- table-rows) row))
+                (and (<= 0 column (1- table-cols))
+                     (<= 0 row (1- table-rows))))))))
 
 
 
@@ -2546,6 +2580,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
     (let ((selection-rgn (if (view-active-p item)
                              (table-selection-region item)
                              (table-outline-region item))))
+      (declare (ignore selection-rgn))
       (niy toggle-selection-region item)
       #-(and)
       (with-hilite-mode
@@ -2585,14 +2620,43 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 
 
-(defmethod cell-to-index ((item table-dialog-item) h &optional v)
-  (when (null v)
-    (setq v (point-v h) h (point-h h)))
-  (let* ((dims (table-dimensions item))
-         (h-dim (point-h dims))
-         (v-dim (point-v dims)))
-    (if (and (< v v-dim)(< h h-dim))
-        (+ h (* v h-dim)))))
+(defgeneric cell-to-index (item h &optional v)
+  (:documentation  "
+
+The CELL-TO-INDEX generic function returns an index into the sequence
+associated with the dialog item, corresponding to the cell whose indices in
+the table are H and V.  If there is no such cell, it returns NIL.
+This index is suitable for passing to the Common Lisp function elt.
+
+ITEM:           A sequence dialog item.
+
+H:              Horizontal index.
+
+V:              Vertical index.  If the value of V is NIL, H is
+                assumed to represent a point.
+
+")
+  (:method ((item table-dialog-item) h &optional v)
+    (when (null v)
+      (setq v (point-v h) h (point-h h)))
+    (let* ((dims (table-dimensions item))
+           (h-dim (point-h dims))
+           (v-dim (point-v dims)))
+      (if (and (< v v-dim)(< h h-dim))
+        (+ h (* v h-dim))))))
+
+
+(defun initialize/table-dialog-item ()
+  (setf *default-cell-contents-string-combined-method*
+        (find-1st-arg-combined-method (function cell-contents-string)
+                                      (class-prototype (find-class 'table-dialog-item)))
+        
+        *default-draw-table-cell-combined-method*
+        (find-1st-arg-combined-method (function draw-table-cell)
+                                      (class-prototype (find-class 'table-dialog-item)))
+
+        *table-fore-color* *black-color*)
+  (values))
 
 
 ;;;; THE END ;;;;

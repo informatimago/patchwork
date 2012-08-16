@@ -130,7 +130,7 @@
     (if rtm-fl 
       (nreverse midi-list)
       (make-variable-length-midi-delta-times
-        (sort (nreverse midi-list) '< :key #'(lambda (a) (car a)))))))
+        (sort (nreverse midi-list) '< :key (lambda (a) (car a)))))))
 |#
 
 (defun  make-midi-file-list  (chords &optional rtm-fl)
@@ -156,7 +156,7 @@
     (if rtm-fl 
       (nreverse midi-list)
       (make-variable-length-midi-delta-times
-        (sort (nreverse midi-list) '< :key #'(lambda (a) (car a)))))))
+        (sort (nreverse midi-list) '< :key (lambda (a) (car a)))))))
 
 
 (defun make-midi-file-0 (chords)

@@ -168,9 +168,9 @@
     (setq l1 (delete nil l1)
           l2 (delete nil l2))
     (format out "~%~%;; Expressions of 1st list")
-    (mapc #'(lambda (e) (print e out)) l1)
+    (mapc (lambda (e) (print e out)) l1)
     (format out "~%~%;; Expressions of 2nd list")
-    (mapc #'(lambda (e) (print e out)) l2)
+    (mapc (lambda (e) (print e out)) l2)
     out))
 
 ;; =============================================================================-======
@@ -204,6 +204,7 @@
 (defun create-level (dop iop l-op.tr associative? &aux me ops)
   "Create a level object from the specification of the default and inverse operators
 and the associativity."
+  (declare (ignorable ops))
   (unless (listp dop) (setq dop (list dop)))
   (unless (listp iop) (setq iop (list iop)))
   (setq me
@@ -216,7 +217,7 @@ and the associativity."
   (setf (level-tr-default me) (level-translate me (car (level-dop me)))
         (level-tr-inverse me) (level-translate me (car (level-iop me))))
   ;; (mapc
-  ;;  #'(lambda (op)
+  ;;  (lambda (op)
   ;;      (check-type op symbol)
   ;;      (unless (eq (symbol-package op) (load-time-value (find-package "KEYWORD")))
   ;;        (import op "COMMON-LISP")
@@ -303,19 +304,19 @@ Help on available operations can be obtained with (prefix-help)."
    ((not (level-associative? level))
     (let ((result (nextl exprs)))
       (mapc
-       #'(lambda (op expr)
+       (lambda (op expr)
            (setq result (list (level-translate level op) result expr)))
        ops exprs)
       result))
    ;; associative and only inverse (- /)
-   ((every #'(lambda (op) (level-inverse? level op)) ops)
+   ((every (lambda (op) (level-inverse? level op)) ops)
     `(,(level-tr-inverse level) ,@exprs))
    ;; associative operator (+ - * /): skip default operators (+ *)
    ;; could use commutativity too...
    (t `(,(level-tr-default level)
         ,(nextl exprs)
         ,@(mapcar
-           #'(lambda (op expr)
+           (lambda (op expr)
                (if (level-default? level op) expr
                    (list (level-translate level op) expr)))
            ops exprs)))))

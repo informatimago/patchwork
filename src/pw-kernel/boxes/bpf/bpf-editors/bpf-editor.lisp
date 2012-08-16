@@ -222,7 +222,7 @@
           (setf (sel-start self) (1- new-sel-begin))
           (update-bpf-view self))))))
 
-(defmethod get-points-range ((self C-bpf-view) x-val (fun function))
+(defmethod get-points-range ((self C-bpf-view) x-val (fun cl:function))
   (let ((all-points (break-point-list (break-point-function self)))
         res)
     (dolist (point all-points (nreverse res))

@@ -143,9 +143,9 @@ default button in the view-window of ITEM.  Otherwise it returns NIL.
         (or (not (eq (view-window item)(view-container item)))
             #+ignore
             (multiple-value-bind (ff ms)(view-font-codes item)
-              (declare (ignore-if-unused ms))
+              (declare (ignorable ms))
               (multiple-value-bind (sys-ff sys-ms)(sys-font-codes)
-                (declare (ignore-if-unused sys-ms))
+                (declare (ignorable sys-ms))
                 (or (not (eql ff sys-ff))
                     #+ignore
                     (not (eql ms sys-ms)))))))
@@ -256,14 +256,16 @@ dialog-item-action method for button.
         (maybe-draw-default-button-outline item)))))
 
 
-(defmethod draw-default-button-outline ((item button-dialog-item))
-  (when (installed-item-p item)
-    (with-focused-dialog-item (item)
-      (let ((grayp (not (dialog-item-enabled-p item))))
-        (with-slots (color-list) item
-          (with-fore-color (or (getf color-list :frame nil)  *light-blue-color*) ;; how do we tell if user changed to "graphite"?
-            (without-interrupts
-                (niy draw-default-button-outline item)
+(defgeneric draw-default-button-outline (item)
+  (:method ((item button-dialog-item))
+    (when (installed-item-p item)
+      (with-focused-dialog-item (item)
+        (let ((grayp (not (dialog-item-enabled-p item))))
+          (declare (ignore grayp))
+          (with-slots (color-list) item
+            (with-fore-color (or (getf color-list :frame nil)  *light-blue-color*) ;; how do we tell if user changed to "graphite"?
+              (without-interrupts
+                  (niy draw-default-button-outline item)
                 ;; (with-item-rect (rect item)
                 ;;   (#_insetRect rect -4 -4)
                 ;;   (rlet ((ps :penstate))
@@ -273,7 +275,7 @@ dialog-item-action method for button.
                 ;;           (#_PenPat *gray-pattern*))
                 ;;         (#_FrameRoundRect rect 16 16)
                 ;;         (#_SetPenState ps)))
-              )))))))
+                ))))))))
 
 
 (defun maybe-draw-default-button-outline (button)

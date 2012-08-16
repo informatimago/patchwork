@@ -76,7 +76,7 @@
                  :view-size size :window-show () :close-box-p close-button
                  )))
     (apply #'add-subviews win controls)
-    (mapc #'(lambda (connection-list) 
+    (mapc (lambda (connection-list) 
               (connect-nth-control (nth (first connection-list) controls)
                                    (second connection-list)
                                    (nth (third connection-list) controls)))
@@ -276,7 +276,7 @@
       (ui:add-menu-items  *pw-windows-menu* 
                           (setf (wins-menu-item window-now)
                                 (new-leafmenu  (window-title window-now) 
-                                               #'(lambda ()(window-select window-now))))))
+                                               (lambda ()(window-select window-now))))))
     (when (eq (front-window)  window-now)
       (update-wins-menu-items window-now)))) 
 
@@ -307,8 +307,8 @@
     (ui:set-menubar *patch-work-menu-root*)
     (enable-all-apps-menu-items))
   (menu-item-disable *apps-PW-menu-item*)
-  (update-PW-file-menu-items
-   (top-level-patch-win? self) (save-changes-to-file-flag self))
+  (update-PW-file-menu-items (top-level-patch-win? self)
+                             (save-changes-to-file-flag self))
   (update-wins-menu-items self)
   (when (not (equal *active-patch-window* self))
     (record--ae :|PWst| :|sele| `((,:|----| ,(mkSO :|cpat| nil :|name| (win-title self))))))
@@ -344,11 +344,11 @@
   (if (and  (top-level-patch-win? self) ;;
             (save-changes-to-file-flag self)
             (not *pw-nosave-mode*))
-      (if (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self)))
-          (PW-WINDOW-SAVE-MN self)))
+    (if (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self)))
+      (PW-WINDOW-SAVE-MN self)))
   (view-deactivate-event-handler self)
   (if (wins-menu-item self)
-      (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
+    (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
   (setq *pw-window-list* (remove self *pw-window-list* :test 'eq)) 
   (tell (controls self) 'remove-yourself-control)
   (call-next-method)
@@ -371,7 +371,7 @@
 
 ;;this method will dissapear at any moment....
 (defmethod window-decompile-connections ((self C-pw-window))
-  (mapcar #'(lambda (code) `(list ,(second (second code)) ,(third code) ,(second (fourth code))))
+  (mapcar (lambda (code) `(list ,(second (second code)) ,(third code) ,(second (fourth code))))
           (decompile-all-connections self)))
 
 ;;=================
@@ -549,7 +549,7 @@
 (defmethod allign-patches-to-x-y  ((self C-pw-window))
   (tell (controls self) 'draw-connections t) 
   (let ((ctrls (active-patches self))(x-now)(previous-ctrl))
-    (setq ctrls (sort ctrls '< :key #'(lambda (obj) (y obj))))
+    (setq ctrls (sort ctrls '< :key (lambda (obj) (y obj))))
     (setq x-now (x (car ctrls)))
     (setq previous-ctrl (pop ctrls))
     (while ctrls 
@@ -560,7 +560,7 @@
 (defmethod allign-patches-to-y  ((self C-pw-window))
   (tell (controls self) 'draw-connections t) 
   (let ((ctrls (active-patches self))(y-now)(previous-ctrl))
-    (setq ctrls (sort ctrls '< :key #'(lambda (obj) (x obj))))
+    (setq ctrls (sort ctrls '< :key (lambda (obj) (x obj))))
     (setq y-now (y (car ctrls)))
     (setq previous-ctrl (pop ctrls))
     (while ctrls 

@@ -334,7 +334,6 @@ NEW-SCROLLEE: The new scrollee of item.
 
 
 (defmethod install-view-in-window :after ((item scroll-bar-dialog-item) view)
-  (declare (ignore view))
   (let* ((window (view-window item))
          (my-size (view-size item))
          (my-position (view-position item))
@@ -342,7 +341,9 @@ NEW-SCROLLEE: The new scrollee of item.
          (min (scroll-bar-min item))
          (max (scroll-bar-max item))
          (mac-setting (mac-scroll-bar-setting setting min max)))
+    (declare (ignorable window my-size my-position mac-setting))
     (multiple-value-bind (mac-min mac-max) (mac-scroll-bar-min-max min max)
+      (declare (ignorable  mac-min mac-max))
       (niy install-view-in-window item view)
       #-(and)
       (when window
@@ -550,6 +551,7 @@ NEW-SCROLLEE: The new scrollee of item.
          (real-time-tracking (scroll-bar-track-thumb-p item))
          width length old-mouse left right mouse setting)
                                         ; disable periodic tasks that draw
+    (declare (ignorable mouse right old-mouse max min old-setting))
     (progn
       (setf last-mouse
             ;; global-to-local
@@ -590,17 +592,18 @@ NEW-SCROLLEE: The new scrollee of item.
         (track-scroll-bar item setting :in-thumb)))))
 
                                         
-(defmethod track-scroll-bar ((item scroll-bar-dialog-item) value part)
-  ;; Returns the new value for the scroll bar
-  (set-scroll-bar-setting 
-   item
-   (case part
-     (:in-up-button   (- value (scroll-bar-scroll-size item)))
-     (:in-down-button (+ value (scroll-bar-scroll-size item)))
-     (:in-page-up     (- value (scroll-bar-page-size item)))
-     (:in-page-down   (+ value (scroll-bar-page-size item)))
-     (t               value)))
-  (dialog-item-action item))
+(defgeneric track-scroll-bar (item value part)
+  (:method ((item scroll-bar-dialog-item) value part)
+    ;; Returns the new value for the scroll bar
+    (set-scroll-bar-setting 
+     item
+     (case part
+       (:in-up-button   (- value (scroll-bar-scroll-size item)))
+       (:in-down-button (+ value (scroll-bar-scroll-size item)))
+       (:in-page-up     (- value (scroll-bar-page-size item)))
+       (:in-page-down   (+ value (scroll-bar-page-size item)))
+       (t               value)))
+    (dialog-item-action item)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -690,8 +693,9 @@ SCROLL-BAR:     A scroll bar.
 ;; The accessor is defined by the DEFCLASS
 ;;
 
-(defmethod (setf scroll-bar-setting) (new-value (item scroll-bar-dialog-item))
-  (set-scroll-bar-setting item new-value))
+(defgeneric (setf scroll-bar-setting) (new-value item)
+  (:method (new-value (item scroll-bar-dialog-item))
+    (set-scroll-bar-setting item new-value)))
 
 
 (defun %set-scroll-bar-setting (item new-value only-if-new-value)
@@ -732,8 +736,9 @@ NEW-SETTING:    The new setting of item.
 ;;here's the setter
 ;;
 
-(defmethod (setf scroll-bar-min) (new-value (item scroll-bar-dialog-item))
-  (set-scroll-bar-min item new-value))
+(defgeneric (setf scroll-bar-min) (new-value item)
+  (:method (new-value (item scroll-bar-dialog-item))
+    (set-scroll-bar-min item new-value)))
 
 
 (defgeneric set-scroll-bar-min (item new-value)
@@ -759,8 +764,10 @@ NEW-VALUE:     The new minimum setting of item.
 ;;scroll-bar-max is a :reader for the class
 ;;here's the setter
 ;;
-(defmethod (setf scroll-bar-max) (new-value (item scroll-bar-dialog-item))
-  (set-scroll-bar-max item new-value))
+
+(defgeneric (setf scroll-bar-max) (new-value item)
+  (:method (new-value (item scroll-bar-dialog-item))
+    (set-scroll-bar-max item new-value)))
 
 
 (defgeneric set-scroll-bar-max (item new-value)
@@ -905,8 +912,9 @@ The scroll-bar-width generic function returns the width of item.
 ;;set-scroll-bar-width, not by calling set-view-size directly
 ;;
 
-(defmethod (setf scroll-bar-width) (new-length (item scroll-bar-dialog-item))
-  (set-scroll-bar-width item new-length))
+(defgeneric (setf scroll-bar-width) (new-length item)
+  (:method (new-length (item scroll-bar-dialog-item))
+    (set-scroll-bar-width item new-length)))
 
 
 (defgeneric set-scroll-bar-width (item new-width)
@@ -988,20 +996,22 @@ NEW-VALUE:      The new width of item.
     (call-next-method item h v)))
 
 
-(defmethod corrected-view-position ((item scroll-bar-dialog-item))
-  (let ((splitter (pane-splitter item)))
-    (if (and splitter (member (pane-splitter-position item) '(:top :left)))
+(defgeneric corrected-view-position (item)
+  (:method ((item scroll-bar-dialog-item))
+    (let ((splitter (pane-splitter item)))
+      (if (and splitter (member (pane-splitter-position item) '(:top :left)))
         (view-position splitter)
-        (view-position item))))
+        (view-position item)))))
 
                                         ; Change the relative position of a scroll bar's pane splitter.
                                         ;  :top <-> :bottom
                                         ; :left <-> :right
-(defmethod set-pane-splitter-position ((item scroll-bar-dialog-item) pos)
-  (let ((position (corrected-view-position item)))
-    (setf (slot-value item 'pane-splitter-position) pos)
-    (set-view-position item position))
-  pos)
+(defgeneric set-pane-splitter-position (item pos)
+  (:method ((item scroll-bar-dialog-item) pos)
+    (let ((position (corrected-view-position item)))
+      (setf (slot-value item 'pane-splitter-position) pos)
+      (set-view-position item position))
+    pos))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -1049,8 +1059,9 @@ NEW-VALUE:      The new width of item.
       (fill-rect (rect-left rect) (rect-top rect) (rect-right rect) (rect-bottom rect)))))
 
 
-(defmethod pane-splitter-limiting-container ((scrollee simple-view))
-  (view-window scrollee))
+(defgeneric pane-splitter-limiting-container (scrollee)
+  (:method ((scrollee simple-view))
+    (view-window scrollee)))
 
 
 (defmethod view-click-event-handler ((item pane-splitter) where)
@@ -1115,43 +1126,48 @@ NEW-VALUE:      The new width of item.
                                         ; mouse-position is the position of the mouse in the coordinate system of
                                         ; the scrollee.
                                         ; The default method draws the outline right where the mouse is.
-(defmethod pane-splitter-outline-position (scrollee scroll-bar mouse-position)
-  (declare (ignore scrollee scroll-bar))
-  mouse-position)
+(defgeneric pane-splitter-outline-position (scrollee scroll-bar mouse-position)
+  (:method (scrollee scroll-bar mouse-position)
+    (declare (ignore scrollee scroll-bar))
+    mouse-position))
 
 
-(defmethod draw-pane-splitter-outline (scrollee scroll-bar pos min max direction)
-  (declare (ignore scrollee scroll-bar))
-  (niy draw-pane-splitter-outline scrollee scroll-bar pos min max direction)
-  #-(and)
-  (if (eq direction :horizontal)
+(defgeneric draw-pane-splitter-outline (scrollee scroll-bar pos min max direction)
+  (:method (scrollee scroll-bar pos min max direction)
+    ;; (declare (ignore scrollee scroll-bar))
+    (niy draw-pane-splitter-outline scrollee scroll-bar pos min max direction)
+    #-(and)
+    (if (eq direction :horizontal)
       (progn (#_MoveTo min pos)
              (#_LineTo max pos))
       (progn (#_MoveTo pos min)
-             (#_LineTo pos max))))
+             (#_LineTo pos max)))))
 
                                         ; Some users may want to specialize on this
-(defmethod pane-splitter-corners ((scrollee simple-view) scroll-bar)
-  (declare (ignore scroll-bar))
-  (let* ((window (view-window scrollee))
-         (container (view-container scrollee)))
-    (multiple-value-bind (tl br) (view-corners scrollee)
-      (when (and container (not (eq container window)))
-        (setf tl (convert-coordinates tl container window)
-              br (convert-coordinates br container window)))
-      (values tl br))))
+(defgeneric pane-splitter-corners (scrollee scroll-bar)
+  (:method ((scrollee simple-view) scroll-bar)
+    (declare (ignore scroll-bar))
+    (let* ((window (view-window scrollee))
+           (container (view-container scrollee)))
+      (multiple-value-bind (tl br) (view-corners scrollee)
+        (when (and container (not (eq container window)))
+          (setf tl (convert-coordinates tl container window)
+                br (convert-coordinates br container window)))
+        (values tl br)))))
 
                                         ; This is the method that all users will specialize on if they
                                         ; want a pane-splitter to do anything but draw a line.
-(defmethod split-pane ((scrollee simple-view) scroll-bar pos direction inside-limits)
-  (declare (ignore scroll-bar pos direction inside-limits)))
+(defgeneric split-pane (scrollee scroll-bar pos direction inside-limits)
+  (:method ((scrollee simple-view) scroll-bar pos direction inside-limits)
+    (declare (ignore scroll-bar pos direction inside-limits))))
 
                                         ; Users need to specialize this if they want double clicks to do anything
                                         ; It should return true to denote that it handled the double click.
                                         ; Otherwise, the double click will be treated just like a single click.
-(defmethod pane-splitter-handle-double-click ((scrollee simple-view) pane-splitter where)
-  (declare (ignore pane-splitter where))
-  nil)
+(defgeneric pane-splitter-handle-double-click (scrollee pane-splitter where)
+  (:method ((scrollee simple-view) pane-splitter where)
+    (declare (ignore pane-splitter where))
+    nil))
 
 ;;;;;;;;;;;;;;;
 ;; support for mouse wheel maybe?
@@ -1172,18 +1188,20 @@ NEW-VALUE:      The new width of item.
                                         ; If you don't have this preference, the defaults may feel too slow. Try setting both to 4 and go from there.
                                         ; Set *wheel-scroll-factor* to 0 to globally disable mouse wheel scrolling.
 
-(defmethod adjust-horizontal-wheel-speed ((w t) delta)
-  "Specialize if needed for different types of windows."
-  (if (numberp *horizontal-wheel-scroll-factor*)
+(defgeneric adjust-horizontal-wheel-speed (w delta)
+  (:documentation "Specialize if needed for different types of windows.")
+  (:method ((w t) delta)
+    (if (numberp *horizontal-wheel-scroll-factor*)
       (round (* delta *horizontal-wheel-scroll-factor*))
-      delta))
+      delta)))
 
-(defmethod scroll-wheel-handler ((w t) delta direction wherep)
+(defgeneric scroll-wheel-handler (w delta direction wherep)
+  (:method ((w t) delta direction wherep)
                                         ; belt and suspenders
-  (declare (ignore delta direction wherep))
+    (declare (ignore delta direction wherep))
                                         ;(format t "Attempting to wheel scroll ~S" w)
-  0 ; #$noerr
-  )
+    0                                   ; #$noerr
+    ))
 
 
 (defmethod scroll-wheel-handler ((w simple-view) delta direction wherep)
@@ -1201,7 +1219,7 @@ NEW-VALUE:      The new width of item.
 (defmethod scroll-wheel-handler ((w window) delta direction wherep)
   "Default handler for Fred windows and most everything else. Now makes
    both horizontal (shift-wheel) and vertical scrolling in Fred windows instantaneous."
-  (declare (ignore-if-unused wherep))
+  (declare (ignorable wherep))
   (niy scroll-wheel-handler w delta direction wherep)
   #-(and)
   (let ((res #$eventNotHandledErr))

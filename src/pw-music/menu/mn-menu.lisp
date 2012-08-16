@@ -58,12 +58,11 @@
                 ;*pw-Music-Extern-menu*
                 *pw-Midi-menu* *pw-Multidim-Music-menu*)
 
-(setf *patch-work-menu-root*
-  (list
-     *pw-menu-apps*
-     *pw-menu-file* *pw-menu-edit* 
-     *PWoper-menu* *pw-kernel-menu* *pw-menu-Music* *pw-menu-patch* 
-     *pw-windows-menu*))
+(defparameter *patch-work-menu-root*
+  (list *pw-menu-apps*
+        *pw-menu-file* *pw-menu-edit* 
+        *PWoper-menu* *pw-kernel-menu* *pw-menu-Music* *pw-menu-patch* 
+        *pw-windows-menu*))
 
 (ui:set-menubar *default-CCL-menubar*)
 
@@ -74,7 +73,7 @@
 (defvar *MN-menu-file* (new-menu "File"))
 
 (ui:add-menu-items  *MN-menu-file* (new-leafmenu "Save as midifile..."  
-    #'(lambda () (PW-midi-file-SAVE))))
+    (lambda () (PW-midi-file-SAVE))))
 
 ;;============================================
 ;; MN
@@ -85,32 +84,32 @@
 (ui:add-menu-items *MN-menu*
     (new-menu "Approximation"
         (prog1 (setf a-leaf-menu
-                     (new-leafmenu "SemiTone" #'(lambda() (use-all-approx-scale  *c-major-scale*))))
+                     (new-leafmenu "SemiTone" (lambda () (use-all-approx-scale  *c-major-scale*))))
           (set-command-key a-leaf-menu #\2))
         (prog1 (setf a-leaf-menu
                      (new-leafmenu "Quarter tone" 
-                                   #'(lambda() (use-all-approx-scale  *1/4-tone-chromatic-scale*))))
+                                   (lambda () (use-all-approx-scale  *1/4-tone-chromatic-scale*))))
           (set-command-key a-leaf-menu #\4))
         (prog1 (setf a-leaf-menu
                      (new-leafmenu "Eigth tone" 
-                                   #'(lambda() (use-all-approx-scale  *1/8-tone-chromatic-scale*))))
+                                   (lambda () (use-all-approx-scale  *1/8-tone-chromatic-scale*))))
           (set-command-key a-leaf-menu #\8)))
     (new-menu "Scale"
               (new-leafmenu "C-major" 
-                            #'(lambda() (use-all-scale  *c-major-scale*)))
+                            (lambda () (use-all-scale  *c-major-scale*)))
               (new-leafmenu "Chromatic" 
-                            #'(lambda() (use-all-scale  *chromatic-scale*)))
+                            (lambda () (use-all-scale  *chromatic-scale*)))
               (new-leafmenu "Quarter Tone"
-                            #'(lambda() (use-all-scale *1/4-tone-chromatic-scale*)))
+                            (lambda () (use-all-scale *1/4-tone-chromatic-scale*)))
               (new-leafmenu "Eighth Tone"
-                        #'(lambda() (use-all-scale  *1/8-tone-chromatic-scale*)))))
+                        (lambda () (use-all-scale  *1/8-tone-chromatic-scale*)))))
 |#
 
 (defvar *play-Pbend-menu* 
-  (new-leafmenu "Pitch Bend" #'(lambda () (set-playing-option :pb))))
+  (new-leafmenu "Pitch Bend" (lambda () (set-playing-option :pb))))
 
 (defvar *play-Multichan-menu* 
-  (new-leafmenu "Multi Channel" #'(lambda () (set-playing-option :mc))))
+  (new-leafmenu "Multi Channel" (lambda () (set-playing-option :mc))))
 
 #|(ui:add-menu-items *MN-menu*
                 (new-menu "Play Option" *play-Pbend-menu* *play-Multichan-menu*))|#
@@ -120,7 +119,7 @@
 (defvar *MN-menu-edit* (new-menu "Edit"))
 
 ;;added 910415
-(defvar *undo-MN-menu* (new-leafmenu "Undo" #'(lambda () (redo-MN-edit))))
+(defvar *undo-MN-menu* (new-leafmenu "Undo" (lambda () (redo-MN-edit))))
 (ui:add-menu-items *MN-menu-edit* *undo-MN-menu*)
 (set-command-key *undo-MN-menu* #\Z)
 (menu-item-disable *undo-MN-menu*)
@@ -128,15 +127,15 @@
 
  (ui:add-menu-items  *MN-menu-edit* 
      (setq menu-now (new-leafmenu "Cut" 
-       #'(lambda () (cut *active-MN-window*)))))
+       (lambda () (cut *active-MN-window*)))))
    (set-command-key menu-now #\X)
    (ui:add-menu-items  *MN-menu-edit*
       (setq menu-now (new-leafmenu "Copy" 
-       #'(lambda () (copy *active-MN-window*)))))
+       (lambda () (copy *active-MN-window*)))))
    (set-command-key menu-now #\C)
    (ui:add-menu-items  *MN-menu-edit*
       (setq menu-now (new-leafmenu "Paste" 
-       #'(lambda () (paste *active-MN-window*)))))
+       (lambda () (paste *active-MN-window*)))))
    (set-command-key menu-now #\V)
 
 (defvar *MN-menu-root*
@@ -152,12 +151,9 @@
 ;;============================================
 ;; application 
 
-(defvar *apps-MN-menu-item* ())
-
-
-(setf *apps-MN-menu-item* 
+(defparameter  *apps-MN-menu-item* 
    (add-apps-item-to-apps-menu  "MN"
-     #'(lambda () 
+     (lambda () 
         (if *active-MN-window* 
           (if (wptr *active-MN-window*)
             (progn 
@@ -166,3 +162,5 @@
               (menu-item-disable *apps-MN-menu-item*))
             (ui:ed-beep))
           (ui:ed-beep)))))
+
+;;;; THE END ;;;;

@@ -6,7 +6,7 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    Defines the EPW menus.
 ;;;;    
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -77,85 +77,94 @@
     (rplacd menus (cddr menus)))
   (rplacd menus (cons menu (cdr menus))))|#
 
-(ui:add-menu-items (pw::the-user-menu)  *epw-menu*)
-
-
-(ui:add-menu-items *epw-Intervals-menu*
-                    *epw-Gen-menu*
-                    *epw-Itreatment-menu*
-                    *epw-Ianalysis-menu*)
-
-(ui:add-menu-items  *epw-FreqHarm-menu*
-                     *epw-Harm-series-menu*
-                     *epw-modulations-menu*
-                     *epw-Htreatment-menu*
-                     *epw-Hanalysis-menu*)
-
 (defvar *epw-midi-menu* (new-menu "Midi"))
 
-(pw::pw-addmenu  *epw-midi-menu* '(epw::txtune))
-                                  
-(ui:add-menu-items
- *epw-menu*
- *epw-Intervals-menu*
- *epw-FreqHarm-menu*
- *epw-Utilities-menu*
- *epw-midi-menu*)
+(defvar *epw-menus-initialized* nil)
 
-;; =============================================================================-======
+(defun initialize/epw-menus ()
+  (unless *epw-menus-initialized*
+    (ui:add-menu-items (pw::the-user-menu)  *epw-menu*)
 
-;; defining the menu leaves
 
-;; intervals ---------
+    (ui:add-menu-items *epw-Intervals-menu*
+                       *epw-Gen-menu*
+                       *epw-Itreatment-menu*
+                       *epw-Ianalysis-menu*)
 
-(PW-addmenu
- *epw-Gen-menu*
- '(inter->chord chord->inter all-series combinatorial-interv::find-intervals))
+    (ui:add-menu-items  *epw-FreqHarm-menu*
+                        *epw-Harm-series-menu*
+                        *epw-modulations-menu*
+                        *epw-Htreatment-menu*
+                        *epw-Hanalysis-menu*)
 
-(PW-addmenu
- *epw-Itreatment-menu*
- '(remove-int transpoct mul-chord all-inversions
-   auto-transp best-transp best-inv))
 
-(PW-addmenu
- *epw-Ianalysis-menu*
- '(exist-note? midi-center sort-mod))
+    (pw::pw-addmenu  *epw-midi-menu* '(epw::txtune))
+    
+    (ui:add-menu-items
+     *epw-menu*
+     *epw-Intervals-menu*
+     *epw-FreqHarm-menu*
+     *epw-Utilities-menu*
+     *epw-midi-menu*)
 
-;; freq harm  ------------
+    ;; =============================================================================-======
 
-(PW-addmenu
- *epw-Harm-series-menu*
- '(harm-series nth-harm ))
+    ;; defining the menu leaves
 
-(pw::pw-addmenu-fun *epw-modulations-menu* 'fm-spec 'C-fm-box)
+    ;; intervals ---------
 
-(PW-addmenu
- *epw-modulations-menu*
- '(freq-mod fm-ratio ring-mod ring-harm))
+    (PW-addmenu
+     *epw-Gen-menu*
+     '(inter->chord chord->inter all-series combinatorial-interv::find-intervals))
 
-(PW-addmenu
- *epw-Htreatment-menu*
- '(fshift fshift-proc fdistor fdistor-proc))
+    (PW-addmenu
+     *epw-Itreatment-menu*
+     '(remove-int transpoct mul-chord all-inversions
+       auto-transp best-transp best-inv))
 
-(PW-addmenu
- *epw-Hanalysis-menu*
- '(harm-dist closest-harm  best-freq))
+    (PW-addmenu
+     *epw-Ianalysis-menu*
+     '(exist-note? midi-center sort-mod))
 
-(ui:add-menu-items *epw-Hanalysis-menu* (pw::new-leafmenu "-" ()))
+    ;; freq harm  ------------
 
-(PW-addmenu  *epw-Hanalysis-menu*
-    '(virt-fund))
+    (PW-addmenu
+     *epw-Harm-series-menu*
+     '(harm-series nth-harm ))
 
-;; utilities  ---------
+    (pw::pw-addmenu-fun *epw-modulations-menu* 'fm-spec 'C-fm-box)
 
-(PW-addmenu
- *epw-Utilities-menu*
- '(l-distor/2 l-distor/3 l*line l*curb/2 l*curb/3 densifier min->sec sec->min))
+    (PW-addmenu
+     *epw-modulations-menu*
+     '(freq-mod fm-ratio ring-mod ring-harm))
 
-(ui:add-menu-items *epw-Utilities-menu* (pw::new-leafmenu "-" ()))
+    (PW-addmenu
+     *epw-Htreatment-menu*
+     '(fshift fshift-proc fdistor fdistor-proc))
 
-(PW-addmenu
- *epw-Utilities-menu*
- '(special-char text-format insert-special))
+    (PW-addmenu
+     *epw-Hanalysis-menu*
+     '(harm-dist closest-harm  best-freq))
+
+    (ui:add-menu-items *epw-Hanalysis-menu* (pw::new-leafmenu "-" ()))
+
+    (PW-addmenu  *epw-Hanalysis-menu*
+                 '(virt-fund))
+
+    ;; utilities  ---------
+
+    (PW-addmenu
+     *epw-Utilities-menu*
+     '(l-distor/2 l-distor/3 l*line l*curb/2 l*curb/3 densifier min->sec sec->min))
+
+    (ui:add-menu-items *epw-Utilities-menu* (pw::new-leafmenu "-" ()))
+
+    (PW-addmenu
+     *epw-Utilities-menu*
+     '(special-char text-format insert-special))
+
+    (setf *epw-menus-initialized* t)))
+
+(initialize/epw-menus)
 
 ;; =============================================================================-======

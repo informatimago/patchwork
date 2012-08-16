@@ -43,17 +43,18 @@
 (defgeneric dont-throb (button))
 
 
-(defmethod button-props-to-window ((item default-button-mixin) window)
-  (niy button-props-to-window item window)
-  ;; (cond ((view-get item 'default-button-p)
-  ;;        (setf (%get-default-button window) item)
-  ;;        (when (dialog-item-handle item) ;; might be a 3d-button
-  ;;          (if (dont-throb item)
-  ;;              nil
-  ;;              (#_setwindowdefaultbutton (wptr window) (dialog-item-handle item)))))
-  ;;       ((view-get item 'cancel-button-p)
-  ;;        (setf (%get-cancel-button window) item)))
-  )
+(defgeneric button-props-to-window (item window)
+  (:method ((item default-button-mixin) window)
+    (niy button-props-to-window item window)
+    ;; (cond ((view-get item 'default-button-p)
+    ;;        (setf (%get-default-button window) item)
+    ;;        (when (dialog-item-handle item) ;; might be a 3d-button
+    ;;          (if (dont-throb item)
+    ;;              nil
+    ;;              (#_setwindowdefaultbutton (wptr window) (dialog-item-handle item)))))
+    ;;       ((view-get item 'cancel-button-p)
+    ;;        (setf (%get-cancel-button window) item)))
+    ))
 
 
 (defmethod initialize-instance :after ((item default-button-mixin) &key default-button cancel-button view-container)  

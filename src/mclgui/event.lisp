@@ -379,7 +379,7 @@ VIEW:           A simple view.
                        (get-nsrect [winh convertRectFromScreen:(ns:make-ns-rect (nspoint-x pt) (nspoint-y pt) 1 1)])
                        ;; deprecated, but 10.6+ doesn't work on ccl-1.8.
                        (get-nspoint [winh convertScreenToBase:[NSEvent mouseLocation]]))))
-        (print winpt)
+        ;; (print winpt)
         (with-view-handle (viewh view)
           (nspoint-to-point (get-nspoint [viewh convertPoint:(unwrap winpt)
                                                 fromView:*null*]))))
@@ -600,6 +600,13 @@ IDLE:           An argument representing whether the main Lisp process
       (when (and *eventhook*  (funcall *eventhook*))
         (return-from event-dispatch))
       (process-event *current-event*))))
+
+
+(defun application-is-active ()
+  [[NSApplication sharedApplication] isActive])
+
+(define-symbol-macro *foreground*
+    (application-is-active))
 
 
 (defun get-next-event (event &optional (idle *idle*) sleep-ticks)

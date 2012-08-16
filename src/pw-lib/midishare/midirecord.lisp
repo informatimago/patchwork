@@ -57,9 +57,9 @@
         (make-popUpbox  "A" self
                         (new-menu " "
                                   (new-leafmenu "Chord" 
-                                                #'(lambda() (setf (out-type self) :chord)))
+                                                (lambda () (setf (out-type self) :chord)))
                                   (new-leafmenu "Chord-line" 
-                                                #'(lambda() (setf (out-type self) :c-l))))
+                                                (lambda () (setf (out-type self) :c-l))))
                        :view-position (make-point (- (w self) 10)
                                                   (- (h self) 14))
                        :view-container self
@@ -374,7 +374,7 @@ Input may be any PatchWork object that could be played through play-object
 (defun midiseq2chord (list)
   (make-instance 'c-chord
                 :t-time 0
-                :notes (mapcar #'(lambda (note)
+                :notes (mapcar (lambda (note)
                                    (make-instrument-note (first note) (second note) (fourth note) (third note) nil)) list)))
 
 

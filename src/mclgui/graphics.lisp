@@ -41,7 +41,15 @@
   (draw-string x y (string cn)))
 
 (defun draw-string (x y str)
-  (format-trace "draw-string" x y str *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "draw-string" x y str *current-view* (when *current-view* (view-window *current-view*)))
+  (with-fore-color *yellow-color*
+    (let* ((o (view-origin *current-view*))
+           (x (point-h o))
+           (y (point-v o))
+           (s (view-size *current-view*))
+           (w (point-h s))
+           (h (point-v s)))
+      (draw-rect x y w h)))
   (destructuring-bind (ff ms) *current-font-codes*
     (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
       (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
@@ -53,8 +61,9 @@
   str)
 
 
+
 (defun draw-point (x y)
-  (format-trace "draw-point" x y *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "draw-point" x y *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
@@ -63,7 +72,7 @@
 
 
 (defun draw-line (x1 y1 x2 y2)
-  (format-trace "draw-line" x1 y1 x2 y2 *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "draw-line" x1 y1 x2 y2 *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
@@ -71,46 +80,47 @@
                (size (pen-size pen))
                (path [NSBezierPath bezierPath]))
           [path setLineCapStyle:#$NSSquareLineCapStyle]
-          (if (and (= #@(1 1) size)
-                   (eq *black-pattern* (pen-state-pattern pen)))
+          ;; stroke draws between the pixels, so we'll fill the line always.
+          ;; (if (and (= #@(1 1) size)
+          ;;          (eq *black-pattern* (pen-state-pattern pen)))
+          ;;     (progn
+          ;;       [path moveToPoint:(ns:make-ns-point x1 y1)]
+          ;;       [path lineToPoint:(ns:make-ns-point x2 y2)]
+          ;;       [path stroke])
+          (let ((sx (point-h size))
+                (sy (point-v size)))
+            (unless (< x1 x2)
+              (rotatef x1 x2)
+              (rotatef y1 y2))
+            (if (< y1 y2)
+              (progn
+                [path moveToPoint:(ns:make-ns-point x1 y1)]
+                [path lineToPoint:(ns:make-ns-point (+ x1 sx) y1)]
+                [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
+                [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
+                [path lineToPoint:(ns:make-ns-point x2 (+ y2 sy))]
+                [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))])
               (progn
                 [path moveToPoint:(ns:make-ns-point x1 y1)]
                 [path lineToPoint:(ns:make-ns-point x2 y2)]
-                [path stroke])
-              (let ((sx (point-h size))
-                    (sy (point-v size)))
-                (unless (< x1 x2)
-                  (rotatef x1 x2)
-                  (rotatef y1 y2))
-                (if (< y1 y2)
-                    (progn
-                      [path moveToPoint:(ns:make-ns-point x1 y1)]
-                      [path lineToPoint:(ns:make-ns-point (+ x1 sx) y1)]
-                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
-                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
-                      [path lineToPoint:(ns:make-ns-point x2 (+ y2 sy))]
-                      [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))])
-                    (progn
-                      [path moveToPoint:(ns:make-ns-point x1 y1)]
-                      [path lineToPoint:(ns:make-ns-point x2 y2)]
-                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
-                      [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
-                      [path lineToPoint:(ns:make-ns-point (+ x1 sx) (+ y1 sy))]
-                      [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))]))
-                [path closePath]
-                [path fill])))))))
+                [path lineToPoint:(ns:make-ns-point (+ x2 sx) y2)]
+                [path lineToPoint:(ns:make-ns-point (+ x2 sx) (+ y2 sy))]
+                [path lineToPoint:(ns:make-ns-point (+ x1 sx) (+ y1 sy))]
+                [path lineToPoint:(ns:make-ns-point x1 (+ y1 sy))]))
+            [path closePath]
+            [path fill]))))))
 
 
 
 (defun draw-rect (x y w h)
-  (format-trace "draw-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "draw-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
         (let* ((pen  (view-pen window))
                (size (pen-size pen)))
           
-          (if (and (= #@(1 1) size)
+          (if (and nil (= #@(1 1) size)
                    (eq *black-pattern* (pen-state-pattern pen)))
             (#_NSFrameRect (ns:make-ns-rect x y w h))
             (let ((path [NSBezierPath bezierPath])
@@ -156,7 +166,7 @@
 
 
 (defun fill-rect (x y w h)
-  (format-trace "fill-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "fill-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
@@ -165,7 +175,7 @@
                                       (mode-to-compositing-operation (pen-mode pen))))))))
 
 (defun erase-rect (x y w h)
-  (format-trace "erase-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "erase-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (let ((color (unwrap (or (and *current-view*
                                 (view-window *current-view*)
                                 (slot-value (view-window *current-view*) 'back-color))
@@ -188,7 +198,7 @@
 
 
 (defun draw-ellipse (x y w h)
-  (format-trace "draw-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "draw-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
@@ -211,7 +221,7 @@
 
 
 (defun fill-ellipse (x y w h)
-  (format-trace "fill-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+  ;; (format-trace "fill-ellipse-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window

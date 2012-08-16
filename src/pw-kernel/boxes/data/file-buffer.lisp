@@ -45,39 +45,36 @@
 ;; A module with a Fred-Window 
 ;;;
 
-(defpackage "C-PATCH-FILE-BUFFER"
-  (:use "COMMON-LISP" "LELISP-MACROS" "UI" "PATCH-WORK")
-  (:export "C-PATCH-FILE-BUFFER"))
 
 (in-package "C-PATCH-FILE-BUFFER")
 
 (defvar *file-box-popUpMenu* 
   (new-menu " "
             (new-leafmenu "New" 
-                          #'(lambda() (get-new *target-action-object*)))
+                          (lambda () (get-new *target-action-object*)))
             (new-leafmenu "Open" 
-                          #'(lambda() (get-file *target-action-object*)))
+                          (lambda () (get-file *target-action-object*)))
             (new-leafmenu "Open File" 
-                          #'(lambda() (get-different-file *target-action-object*)))
+                          (lambda () (get-different-file *target-action-object*)))
             (new-leafmenu "Save Win" 
-                          #'(lambda() (Save-win *target-action-object*)))
+                          (lambda () (Save-win *target-action-object*)))
             (new-leafmenu "-" ())))
 
 (defvar *ascii-option*
   (new-leafmenu "Ascii" 
-              #'(lambda () (set-ascii-win *target-action-object*))))
+              (lambda () (set-ascii-win *target-action-object*))))
 
 (defvar *lisp-option*
   (new-leafmenu "Lisp" 
-              #'(lambda () (set-lisp-win *target-action-object*))))
+              (lambda () (set-lisp-win *target-action-object*))))
 
 (defvar *add-mode-option*
   (new-leafmenu "Add" 
-              #'(lambda () (set-add-mode *target-action-object*))))
+              (lambda () (set-add-mode *target-action-object*))))
 
 (defvar *replace-mode-option*
   (new-leafmenu "Replace" 
-              #'(lambda () (set-replace-mode *target-action-object*))))
+              (lambda () (set-replace-mode *target-action-object*))))
 
 (defvar *add-option* t)
 

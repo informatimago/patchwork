@@ -138,7 +138,7 @@
             (get-selector-for (objc-selector-name selector) error-p))))
 
 (defun clear-objc-selectors ()
-  (maphash #'(lambda (name sel)
+  (maphash (lambda (name sel)
                (declare (ignore name))
                (setf (objc-selector-%sel sel) nil))
            *objc-selectors*))
@@ -250,7 +250,7 @@
 
 (defun map-objc-classes (&optional (lookup-in-database-p t))
   (iterate-over-objc-classes
-   #'(lambda (class)
+   (lambda (class)
        (note-class-protocols class)
        (install-foreign-objc-class class lookup-in-database-p))))
 

@@ -846,14 +846,13 @@ tutorial file only if the names differ"
                          :view-position (make-point 50 38)
                          :view-size     (make-point 500 300)
                          :window-show   t)))
-    (com.informatimago.common-lisp.cesarum.utility:tracing
-     (ui:add-menu-items *pw-windows-menu* 
-                        (setf (wins-menu-item win)
-                              (new-leafmenu win-string (lambda () (window-select win)))))
-     (push win *pw-window-list*) 
-     (update-wins-menu-items win)
-     (record--ae :|core| :|crel| `((,:|kocl| ,:|cpat| )))
-     win)))
+    (ui:add-menu-items *pw-windows-menu* 
+                       (setf (wins-menu-item win)
+                             (new-leafmenu win-string (lambda () (window-select win)))))
+    (push win *pw-window-list*) 
+    (update-wins-menu-items win)
+    (record--ae :|core| :|crel| `((,:|kocl| ,:|cpat| )))
+    win))
 
 
 ;;;; THE END ;;;;

@@ -566,7 +566,7 @@
     (unless (dolist (note (cdr (notes self)) t)
               (if (< (midic note) min) (return nil) (setq min (midic note))))
       (setf (notes self)
-            (sort (notes self) #'< :key #'(lambda(note)(midic note)))))
+            (sort (notes self) #'< :key (lambda (note)(midic note)))))
     (notes self)))
             
 (defmethod update-chord ((self C-chord))
@@ -608,6 +608,8 @@
 
 (defmethod stop-play ((self C-chord-line))
   (setf (play-flag self) ()))
+
+(defvar *MN-play-flag* nil)
 
 (defmethod play-chords ((self C-chord-line) &optional begin-time)
   (setf *MN-play-flag* t)

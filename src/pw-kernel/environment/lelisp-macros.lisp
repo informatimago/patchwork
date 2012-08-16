@@ -55,10 +55,6 @@
    "TELL" "ASK" "ASK-ALL" "WITH"))
 (in-package "LELISP-MACROS")
 
-;; (do-external-symbols (s "LELISP-MACROS")
-;;   (import s "COMMON-LISP")
-;;   (export s "COMMON-LISP"))
-
 
 ;; =============================================================================-======
 ;; This file "LELISP-MACROS.Lisp" exports lisp macros.
@@ -148,7 +144,7 @@
   (let ((args-var (gensym "ARGS-")) (fun-var (gensym "FUN-")))
     (if args
       `(let ((,args-var (list ,@args)) (,fun-var ,fun))
-         (mapc #'(lambda (x) (apply ,fun-var x ,args-var)) ,outlet))
+         (mapc (lambda (x) (apply ,fun-var x ,args-var)) ,outlet))
       `(mapc ,fun ,outlet))))
 
 (defmacro ask (outlet fun &rest args)
@@ -164,7 +160,7 @@
   (let ((args-var (gensym "ARGS-")) (fun-var (gensym "FUN-")))
     (if args
       `(let ((,args-var (list ,@args)) (,fun-var ,fun))
-         (mapcar #'(lambda (x) (apply ,fun-var x ,args-var)) ,outlet))
+         (mapcar (lambda (x) (apply ,fun-var x ,args-var)) ,outlet))
       `(mapcar ,fun ,outlet))))
 
 ;; =============================================================================-======
@@ -175,14 +171,14 @@
 would not be restricted to variables)."
   (let ((places (mapcar #'first l-place-value))
         (values (mapcar #'second l-place-value))
-        (vars (mapcar #'(lambda (pv) (declare (ignore pv)) (gensym "WITH-"))
+        (vars (mapcar (lambda (pv) (declare (ignore pv)) (gensym "WITH-"))
                       l-place-value)))
     `(let ,(mapcar #'list vars places)
        (unwind-protect
          (progn
-           ,@(mapcar #'(lambda (place value) `(setf ,place ,value)) places values)
+           ,@(mapcar (lambda (place value) `(setf ,place ,value)) places values)
            ,@body)
-         ,@(mapcar #'(lambda (place var) `(setf ,place ,var)) places vars)))))
+         ,@(mapcar (lambda (place var) `(setf ,place ,var)) places vars)))))
 
 ;;(let ((l '(a . b))) (with (((car l) 1) ((cdr l) 2)) (print l)))
 

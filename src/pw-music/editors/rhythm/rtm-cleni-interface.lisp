@@ -78,7 +78,7 @@
       (write-cleni-measure (nth i measures) (1+ i)))
     (cleni:describe-score *rtm-cleni-score*  :temperament *cleni-temperament-mode*
                           :staff staff)
-    (mapc #'(lambda (specs)
+    (mapc (lambda (specs)
               ;(format t "~D " (incf *counter*))
               (apply #'cleni:describe-score *rtm-cleni-score* specs))
           (nreverse *cleni-notehead-list*))))
@@ -334,5 +334,5 @@
      (cleni:translate-score *rtm-cleni-score* new-name)))
 
 ;;(save-cleni-rtm-score)
-(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as ENIGMA..." #'(lambda () (save-cleni-rtm-score))))  
-(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as 1/4-ENIGMA..." #'(lambda () (let ((*cleni-temperament-mode* 4))(save-cleni-rtm-score)))))  
+(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as ENIGMA..." (lambda () (save-cleni-rtm-score))))  
+(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as 1/4-ENIGMA..." (lambda () (let ((*cleni-temperament-mode* 4))(save-cleni-rtm-score)))))  

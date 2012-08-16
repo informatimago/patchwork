@@ -43,7 +43,7 @@
 
 (in-package :pw)
 
-(provide 'abstraction)
+;; (provide 'abstraction)
 
 ;;====================================================================================================
 ;;====================================================================================================
@@ -211,7 +211,7 @@ name)
               (eq (pw-function (car patches)) 'absin)
               (push (car patches) in-boxes))
            (pop patches))
-    (sort in-boxes '< :key #'(lambda (a) (patch-value (second (pw-controls a)) ())))))
+    (sort in-boxes '< :key (lambda (a) (patch-value (second (pw-controls a)) ())))))
 
 (defun make-pair-list-pw-types (type1 lst)
   (let ((res))

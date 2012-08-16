@@ -35,7 +35,7 @@
 
 
 (defpackage "MCLGUI"
-  (:use "COMMON-LISP"
+  (:use "CL-STEPPER"
         "TRIVIAL-GRAY-STREAMS"
         "CLOSER-MOP")
   (:nicknames "UI")
@@ -223,10 +223,12 @@
    "VIEW-ERROR"
    "VIEW-ERROR-VIEW"
 
-   ;; Extension: FRED-Window
-   ;; Actually, we implement them with NSText objects.
+   ;; Extension:
+   ;; FRED-Window will be replaced by hemlock-frame and hemlock-listener-frame.
    "FRED-WINDOW"
-
+   "HEMLOCK-LISTENER-FRAME"
+   "HEMLOCK-FRAME"
+   "UNKNOWN-WINDOW"
    
    ;; ----------------------------------------
    ;; Chapter 5: Dialog Items and Dialogs
@@ -256,6 +258,8 @@
 
    "EDITABLE-TEXT-DIALOG-ITEM"
    
+   "BOX-DIALOG-ITEM"
+
    "CHECK-BOX-DIALOG-ITEM" "CHECK-BOX-CHECKED-P" "CHECK-BOX-CHECK"
    "CHECK-BOX-UNCHECK"
 
@@ -464,6 +468,14 @@
    ;; ----------------------------------------
 
    "ED-BEEP"
+   "ED-KILL-SELECTION"
+   "BUFFER-INSERT-FILE"
+   "BUFFER-WRITE-FILE"
+   "BUFFER-SIZE"
+   "BUFFER-CURRENT-SEXP"
+   "BUFFER-CHAR"
+   "SET-FRED-DISPLAY-START-MARK"
+   "FRED-UPDATE"
 
    "FIXNUMP"
    

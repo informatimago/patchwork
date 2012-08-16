@@ -257,7 +257,7 @@ editor opened for more information."
       (setq pivot-chord (nth (+ (length set-of-graces) (caar set-of-graces)) chords))
       (dolist (pair set-of-graces)
         (setq piece-chord (nth (first pair) chords)) 
-        (mapc #'(lambda (note)
+        (mapc (lambda (note)
                   (setf (offset-time note) (- (floor (cdr pair))))
                   (setf (dur note) (floor (cdr pair)))
                   (add-new-note pivot-chord note))
@@ -279,7 +279,7 @@ editor opened for more information."
             new-chords chords))
     (dolist (pair grace-notes)
       (setq piece-chord (nthcdr (first pair) chords))
-      (mapc #'(lambda (note)
+      (mapc (lambda (note)
                 (setf (offset-time note) (- (floor (cdr pair))))
                 (setf (dur note) (floor (cdr pair)))
                 (add-new-note (second piece-chord) note))  (notes (first piece-chord)))
@@ -333,11 +333,11 @@ editor opened for more information."
 (pw-addmenu-fun *rtm-boxes-menu* 'rtm 'C-patch-score-voice)
 
 (defun rtm-tree (measure-lines)
-  (mapcar #'(lambda (m-line) 
+  (mapcar (lambda (m-line) 
               (flat-once
                (mapcar 
-                #'(lambda (beats-in-meas) 
-                    (mapcar #'(lambda (beat) 
+                (lambda (beats-in-meas) 
+                    (mapcar (lambda (beat) 
                                 (let ((form (decompile beat)))
                                   (list (second form) (eval (third form)))))                                   
                             beats-in-meas))
@@ -346,11 +346,11 @@ editor opened for more information."
 
 (defun get-all-slots (objs slot)
   (if (consp objs)
-    (mapcar #'(lambda (obj) (slot-value obj slot)) objs)
+    (mapcar (lambda (obj) (slot-value obj slot)) objs)
     (slot-value objs slot)))
 
 (defun rtm-dels (measure-lines)
-  (mapcar #'(lambda (m-line)
+  (mapcar (lambda (m-line)
               (pw::calc-t-time-measure-line m-line 1.0)
               (x->dx (ask-all
                       (ask-all (collect-all-chord-beat-leafs m-line) #'beat-chord)
@@ -359,9 +359,9 @@ editor opened for more information."
 
 ;;changed by aaa le 26-09-95
 (defun rtm-durs (measure-lines)
-  (mapcar #'(lambda (m-line)
+  (mapcar (lambda (m-line)
               (calc-t-time-measure-line m-line 1.0)
-              (mapcar #'(lambda (notes) (dur (car notes)))
+              (mapcar (lambda (notes) (dur (car notes)))
                       (ask-all
                        (ask-all (collect-all-chord-beat-leafs m-line) #'beat-chord)
                        #'notes)))
@@ -369,9 +369,9 @@ editor opened for more information."
 
 #|
 (defun rtm-durs (measure-lines)
-  (mapcar #'(lambda (m-line)
+  (mapcar (lambda (m-line)
               (calc-t-time-measure-line m-line 0.99)
-              (mapcar #'(lambda (notes) (dur (car notes)))
+              (mapcar (lambda (notes) (dur (car notes)))
                       (ask-all
                        (ask-all (collect-all-chord-beat-leafs m-line) #'beat-chord)
                        #'notes)))
@@ -379,8 +379,8 @@ editor opened for more information."
 |#
 
 (defun rtm-signs (measure-lines)
-  (mapcar #'(lambda (m-line) 
-              (mapcar #'(lambda (measure)
+  (mapcar (lambda (m-line) 
+              (mapcar (lambda (measure)
                           (list (apply '+ (ask-all (beat-objects measure) 
                                                    #'unit-length))
                                 (read-from-string (low measure))))
@@ -389,13 +389,13 @@ editor opened for more information."
 
 (defun rtm-tempo (measure-lines)
   (mapcar 
-   #'(lambda (m-line) 
-       (mapcar #'(lambda (measure) (metronome measure))
+   (lambda (m-line) 
+       (mapcar (lambda (measure) (metronome measure))
                (measures m-line)))
    measure-lines))
 
 (defun rtm-chords (measure-lines)
-  (mapcar #'(lambda (m-line) 
+  (mapcar (lambda (m-line) 
               (pw::calc-t-time-measure-line m-line 1.0)
               (get-rchords m-line))
           measure-lines))
@@ -431,7 +431,7 @@ be:
 
 (defmethod C-get-note-slots::get-note-dimensions ((self pw::C-measure-line) the-slots &optional include?)
   (if include?
-    (mapcar #'(lambda (chord t-time) (list t-time chord))
+    (mapcar (lambda (chord t-time) (list t-time chord))
             (C-get-note-slots::get-note-dimensions (first (pw::rtm-chords (list self))) the-slots)
             (pw::dx->x 0 (first (pw::rtm-dels (list self)))))
     (C-get-note-slots::get-note-dimensions (first (pw::rtm-chords (list self))) the-slots)))

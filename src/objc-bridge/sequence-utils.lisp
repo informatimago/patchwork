@@ -20,7 +20,7 @@
 
 (defun split-if (test seq &optional (dir :before))
   (remove-if
-   #'(lambda (x) (equal x (subseq seq 0 0)))
+   (lambda (x) (equal x (subseq seq 0 0)))
    (loop for start fixnum = 0 
          then (if (eq dir :before) stop (the fixnum (1+ (the fixnum stop))))
          while (< start (length seq))
@@ -35,7 +35,7 @@
          while stop)))
   
 (defun split-if-char (char seq &optional dir)
-  (split-if #'(lambda (ch) (eq ch char)) seq dir))
+  (split-if (lambda (ch) (eq ch char)) seq dir))
 
 (defmethod split-lines ((text string))
   (delete-if (lambda (x) (string= x ""))

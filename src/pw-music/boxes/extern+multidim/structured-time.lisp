@@ -117,7 +117,7 @@
            (ask-all (ask-all (apply #'append (ask-all chords 'notes)) 'instrument) 'pw-win)
           :test 'eq)
         'super-note)) 
-     (setq super-notes (setq super-notes-temp (sort super-notes '> :key #'(lambda (a) (diatone a)))))
+     (setq super-notes (setq super-notes-temp (sort super-notes '> :key (lambda (a) (diatone a)))))
      (while super-notes
         (setq pw-win-now (pw-win (instrument (car super-notes))))       
         (when (setq midi-box-now (car (find-all-midi-out-boxes pw-win-now)))
@@ -155,7 +155,7 @@
      (open-patch-win patch-box))))
 
 (defun set-all-chords (ch-list from-ch-list)
-  (mapc #'(lambda (ch-to ch-from) (setf (chords ch-to) (chords ch-from))) ch-list from-ch-list))
+  (mapc (lambda (ch-to ch-from) (setf (chords ch-to) (chords ch-from))) ch-list from-ch-list))
 
 (defun make-pw-npolif-editor-list (count)
   (let ((arg-list))

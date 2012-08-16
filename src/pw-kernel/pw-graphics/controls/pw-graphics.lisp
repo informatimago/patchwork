@@ -130,7 +130,7 @@
     self))
 
 (defmethod erase-draw-contents ((self simple-view))  
-  (ui::with-view-frame (x y w h) self (erase-rect )))
+  (ui::with-view-frame (x y w h) self (erase-rect x y w h)))
 
 (defmethod erase-view-inside-rect ((self simple-view))
   (with-pen-state (:pattern *white-pattern* :mode :patcopy)
@@ -151,6 +151,7 @@
          (bottomright (add-points topleft (view-size self))))
     (draw-rect  (point-h topleft)     (point-v topleft)
                 (point-h bottomright) (point-v bottomright))))
+
 
 (defun inside-rectangle? (x1 y1 x y w h)
   (and (<= x x1 (+ x w)) (<= y y1 (+ y h))))
@@ -183,8 +184,7 @@
                                     #@(2 24)
                                     #@(114 95)
                                     "Untitled"
-                                    #'(LAMBDA
-                                          (ITEM)
+                                    (lambda (item)
                                         (window-hide *pw-pop-menu-window*)
                                         (call-pw-pop-up-function 
                                          (cell-contents item 
@@ -198,7 +198,7 @@
                                     #@(4 4)
                                     #@(46 17)
                                     "Cancel"
-                                    #'(LAMBDA (item) item (window-hide *pw-pop-menu-window*))
+                                    (lambda (item) item (window-hide *pw-pop-menu-window*))
                                     :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
                                     :DEFAULT-BUTTON NIL))))) 
 

@@ -49,7 +49,7 @@
 
 (defun PW-addmenu (menu funs)
   "append to the menu <menu> the PW module generators from the list <funs>"
-  (mapc #'(lambda (fun) (PW-addmenu-fun menu fun)) funs) )
+  (mapc (lambda (fun) (PW-addmenu-fun menu fun)) funs) )
 
 (defun PW-addmenu-fun (menu fun &optional box-class)
   "append to the menu <menu> the PW module generator <fun>"
@@ -70,7 +70,7 @@
                             (make-instance 'ui:menu-item 
                               :menu-item-title (string-downcase fun)
                                            :menu-item-action
-                                           #'(lambda () 
+                                           (lambda () 
                                                (make-lisp-pw-boxes
                                                 fun *active-patch-window*))))
         ))))
@@ -91,7 +91,7 @@
                    (setq sub-menu (make-instance 'menu-item :menu-item-title mtitle))))
         (push (eval `(function(lambda () ,body))) *PW-box-instance-list*)
         (set-menu-item-action-function sub-menu
-                   #'(lambda () (add-patch-box *active-patch-window* (eval body))))
+                   (lambda () (add-patch-box *active-patch-window* (eval body))))
         sub-menu))))
 
 
@@ -169,5 +169,8 @@
           (list ,@(ask-all (pw-controls self) 'value)) ,(view-size self))
     (call-next-method)))
 
-(defmethod complete-box ((self C-patch) args) (declare (ignore args)))
+(defmethod complete-box ((self C-patch) args)
+  (declare (ignore args)))
+
+;;;; THE END ;;;;
 

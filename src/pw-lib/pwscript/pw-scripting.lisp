@@ -170,7 +170,7 @@
   (let* ((beat-chord (beat-chord self)) rep)
     (if (null beat-chord)
       (let* ((rtm-list (rtm-list self)))
-        (mapcar #'(lambda (mes)
+        (mapcar (lambda (mes)
                 (setf rep (concatenate 'list rep (get-chords-from-beat mes) ))) rtm-list)
         rep)
       (concatenate 'list rep  (list beat-chord)))))
@@ -510,7 +510,7 @@
     (t (format nil "~D" repons))))
 
 (defun elimine-ptr (lis)
-  (mapcar #'(lambda (repons)
+  (mapcar (lambda (repons)
               (cond
                ((or (numberp repons) (rationalp repons) (stringp repons)) repons)
                ((equal (class-name (class-of repons)) 'patch-work::c-chord-line)

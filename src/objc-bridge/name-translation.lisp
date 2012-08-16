@@ -136,7 +136,7 @@
   (let ((pl (prefix-list l)))
     (loop
       :for w :in *special-objc-words*
-      :for p = (position-if #'(lambda (s) (string= s w)) pl)
+      :for p = (position-if (lambda (s) (string= s w)) pl)
       :when p :do (return-from check-prefix (values (nth p pl) (1+ p))))
     (values (first l) 1)))
 
@@ -152,7 +152,7 @@
 (defun symbol-concatenate (slist &optional (sep "") (package *package*))
   (values 
    (intern 
-    (reduce #'(lambda (s1 s2) (string-cat s1 sep s2))
+    (reduce (lambda (s1 s2) (string-cat s1 sep s2))
             (mapcar #'string-upcase slist))
     package)))
 
@@ -174,7 +174,7 @@
 (defun compute-lisp-name (str &optional (package *package*))
   (symbol-concatenate
    (collapse-prefix 
-    (split-if #'(lambda (ch) (or (upper-case-p ch) (digit-char-p ch))) str))
+    (split-if (lambda (ch) (or (upper-case-p ch) (digit-char-p ch))) str))
    "-"
    package))
 
@@ -196,7 +196,7 @@
 ;;;          (:next-event-matching-mask :until-date :in-mode :dequeue)
 
 (defun compute-objc-to-lisp-message (str)
-  (mapcar #'(lambda (s) (compute-lisp-name s (find-package "KEYWORD")))
+  (mapcar (lambda (s) (compute-lisp-name s (find-package "KEYWORD")))
           (split-if-char #\: str :elide)))
 
 
@@ -222,9 +222,9 @@
                                   (substrings (subseq str i pos))
                                   (setq i (1+ pos)))))))
            (split 
-            (mapcar #'(lambda (s)
+            (mapcar (lambda (s)
                         (collapse-prefix
-                         (split-if #'(lambda (ch)
+                         (split-if (lambda (ch)
                                        (or (upper-case-p ch) (digit-char-p ch)))
                                    s)))
                     
@@ -279,7 +279,7 @@
              (not (eq (symbol-package (first klist)) (find-package :keyword))))
         (objcify (first klist))
         (apply #'string-cat
-               (mapcar #'(lambda (sym) (string-cat (objcify sym) ":")) klist)))))
+               (mapcar (lambda (sym) (string-cat (objcify sym) ":")) klist)))))
 
 
 ;;; Convert an ObjC initializer to a list of corresponding initargs,
@@ -290,7 +290,7 @@
   (cond 
     ((= (length init) 0) nil)
     ((and (> (length init) 3) (string= init "init" :start1 0 :end1 4))
-     (mapcar #'(lambda (s) (compute-lisp-name s (find-package "KEYWORD")))
+     (mapcar (lambda (s) (compute-lisp-name s (find-package "KEYWORD")))
              (split-if-char #\: (subseq init 4 (length init)) :elide)))
     (t (error "~S is not a valid initializer" init))))
 

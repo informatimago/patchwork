@@ -144,38 +144,33 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
 
 
 
-(defvar *ascii-note-C-scale*)
-(defvar *ascii-note-do-scale*)
-(defvar *ascii-note-alterations*)
-(defvar *ascii-note-scales* nil
-  "The scales used by the functions mc->n and n->mc." )
+(defparameter *ascii-note-C-scale*
+  (mapc (lambda (x) (setf (car x) (string-upcase (string (car x)))))
+        '((C) (C . :q) (C . :s) (D . :-q)
+          (D) (D . :q) (E . :f) (E . :-q)
+          (E) (E . :q)
+          (F) (F . :q) (F . :s) (G . :-q)
+          (G) (G . :q) (G . :s) (A . :-q)
+          (A) (A . :q) (B . :f) (B . :-q)
+          (B) (B . :q)  )))
 
-(setf *ascii-note-C-scale*
-  (mapc #'(lambda (x) (setf (car x) (string-upcase (string (car x)))))
-    '((C) (C . :q) (C . :s) (D . :-q)
-      (D) (D . :q) (E . :f) (E . :-q)
-      (E) (E . :q)
-      (F) (F . :q) (F . :s) (G . :-q)
-      (G) (G . :q) (G . :s) (A . :-q)
-      (A) (A . :q) (B . :f) (B . :-q)
-      (B) (B . :q)  )))
+(defparameter *ascii-note-do-scale*
+  (mapc (lambda (x) (setf (car x) (string-downcase (string (car x)))))
+        '((do) (do . :q) (do . :s) (re . :-q)
+          (re) (re . :q) (mi . :f) (mi . :-q)
+          (mi) (mi . :q)
+          (fa) (fa . :q) (fa . :s) (sol . :-q)
+          (sol)(sol . :q)(sol . :s)(la . :-q)
+          (la) (la . :q) (si . :f) (si . :-q)
+          (si) (si . :q)  )))
 
-(setf *ascii-note-do-scale*
-  (mapc #'(lambda (x) (setf (car x) (string-downcase (string (car x)))))
-    '((do) (do . :q) (do . :s) (re . :-q)
-      (re) (re . :q) (mi . :f) (mi . :-q)
-      (mi) (mi . :q)
-      (fa) (fa . :q) (fa . :s) (sol . :-q)
-      (sol)(sol . :q)(sol . :s)(la . :-q)
-      (la) (la . :q) (si . :f) (si . :-q)
-      (si) (si . :q)  )))
+(defparameter *ascii-note-alterations*
+  '((:s "#" +100) (:f "b" -100)
+    (:q "+" +50) (:qs "#+" +150) (:-q "_" -50) (:f-q "b-" -150)
+    (:s "d" +100)))
 
-(setf *ascii-note-alterations*
-   '((:s "#" +100) (:f "b" -100)
-     (:q "+" +50) (:qs "#+" +150) (:-q "_" -50) (:f-q "b-" -150)
-     (:s "d" +100)))
-
-(setf *ascii-note-scales* (list *ascii-note-C-scale* *ascii-note-do-scale*))
+(defparameter *ascii-note-scales* (list *ascii-note-C-scale* *ascii-note-do-scale*)
+  "The scales used by the functions mc->n and n->mc.")
 
 (defun mc->n1 (midic &optional (ascii-note-scale (car *ascii-note-scales*)))
   "Converts <midic> to a string representing a symbolic ascii note."
@@ -193,7 +188,7 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
 (defun n->mc1 (str &optional (*ascii-note-scale* (car *ascii-note-scales*)))
   "Converts a string representing a symbolic ascii note to a midic."
   (setq str (string str))
-  (let ((note (some #'(lambda (note)
+  (let ((note (some (lambda (note)
                         (when (and (null (cdr note))
                                    (eql 0 (search (car note) str :test #'string-equal)))
                           note)) *ascii-note-scale*))
@@ -205,7 +200,7 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
     ;; at this point: "C" -> 0 ; "D" -> 100 ; "E" -> 200 ; etc.
     (setq index (length (car note)))
     ;; alteration
-    (when (setq alt (some #'(lambda (alt)
+    (when (setq alt (some (lambda (alt)
                               (when (eql index (search (cadr alt) str :start2 index
                                                        :test #'string-equal))
                                 alt)) *ascii-note-alterations*))
@@ -219,10 +214,9 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
       (incf midic (parse-integer str :start index)))
     midic))
 
-(defvar *ascii-intervals*)
 
-(setf *ascii-intervals*
- '("1" "2m" "2M" "3m" "3M" "4" "4A" "5" "6m" "6M" "7m" "7M"))
+(defparameter *ascii-intervals*
+  '("1" "2m" "2M" "3m" "3M" "4" "4A" "5" "6m" "6M" "7m" "7M"))
 
 (defun int->symb1 (int)
   "Converts a midic interval to a symbolic interval."
