@@ -572,10 +572,12 @@
         (unless (eql last-mp fix-pos)
           (push-to-top view)
           (set-view-position view (subtract-points prev-mp delta))
+          #-(and) ;; TODO
           (record--ae :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
-                                        (,:|insh| ,(cl-user::getDescRecPtr (cl-user::asAEDesc 
-                                                                            (list (point-h (subtract-points prev-mp delta)) 
-                                                                                  (point-v (subtract-points prev-mp delta))))))))
+                                        (,:|insh| ,(cl-user::getDescRecPtr
+                                                    (cl-user::asAEDesc 
+                                                     (list (point-h (subtract-points prev-mp delta)) 
+                                                           (point-v (subtract-points prev-mp delta))))))))
           (if group-move?
             (let ((dif-h (- (point-h prev-mp) (point-h fix-pos)))
                   (dif-v (- (point-v prev-mp) (point-v fix-pos)))

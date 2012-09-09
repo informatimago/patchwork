@@ -582,7 +582,4 @@ appears is not active.
     (call-next-method)))
 
 
-
-
-
 ;;;; THE END ;;;;

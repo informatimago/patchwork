@@ -45,79 +45,86 @@
 
 ;; (initialize/window)
 
-(defmethod initialize-instance ((window window) &key (view-font (view-default-font window)) &allow-other-keys)
-  (declare (ignorable view-font)) ; used by call-next-method.
-  (call-next-method)
-  (if (handle window)
-    (with-handle (winh window)
-      (let* ((frame (get-nsrect [winh frame]))
-             (bound (get-nsrect [[winh contentView] bounds]))
-             (posiz (nswindow-to-window-rect frame))
-             (ori   (subtract-points #@(0 0) (rect-topleft (nsrect-to-rect bound)))))
-        (setf (slot-value window 'window-title)  (objcl:lisp-string [winh title])
-              (slot-value window 'view-position)        (rect-topleft posiz)
-              (slot-value window 'view-size)            (rect-size posiz) 
-              (slot-value window 'view-scroll-position) ori)))
-    (progn
-     (setf (slot-value window 'view-position) (center-window (view-size window) (view-position window)))
-     (setf (view-valid window) (list nil))
-     (view-allocate-clip-region window)
-     (when (and (slot-value window 'erase-anonymous-invalidations)
-                (not (slot-value window 'theme-background)))
-       ;; only needed for non-theme color background
-       (setf (window-invalid-region window) (new-rgn)))
-     (add-to-list *window-list* window)
-     (let ((winh [[MclguiWindow alloc]
-                  initWithContentRect:(window-to-nswindow-frame (view-position window)
-                                                                (view-size window))
-                  styleMask:(ecase (window-type window)
-                              ((:document)
-                               (logior #$NSTitledWindowMask
-                                       #$NSMiniaturizableWindowMask
-                                       (if (window-close-box-p window)
-                                         #$NSClosableWindowMask
-                                         0)))
-                              ((:document-with-zoom
-                                :document-with-grow)
-                               (logior #$NSTitledWindowMask
-                                       #$NSMiniaturizableWindowMask
-                                       (if (window-close-box-p window)
-                                         #$NSClosableWindowMask
-                                         0)
-                                       #$NSResizableWindowMask))
-                              ((:double-edge-box
-                                :single-edge-box
-                                :shadow-edge-box)
-                               #$NSBorderlessWindowMask)
-                              ((:tool)
-                               (logior #$NSTitledWindowMask
-                                       (if (window-close-box-p window)
-                                         #$NSClosableWindowMask
-                                         0))))
-                  backing:#$NSBackingStoreBuffered
-                  defer:NO]))
-       (setf (slot-value winh 'window) window)
-       (setf (handle window) winh) ; must be done before setDelegate.
-       (let ((cviewh [[MclguiView alloc]
-                      initWithFrame:(window-to-nswindow-frame (make-point 0 0)
-                                                              (view-size window))]))
-         (setf (slot-value cviewh 'view) window)
-         [cviewh setAutoresizingMask:(logior #$NSViewWidthSizable #$NSViewHeightSizable)]
-         [winh setContentView:cviewh] window)
-       [winh setReleasedWhenClosed:YES]
-       [winh setHasShadow:yes]
-       [winh invalidateShadow]
-       [winh setAcceptsMouseMovedEvents:YES]
-       ;; [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)]
-       [winh setDelegate:winh]
-       (set-window-title window (window-title window))
-       [winh display])
-     ;; (format-trace "created window" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
-     (window-size-parts window)
-     (when (window-visiblep window)
-       (setf (slot-value window 'visiblep) nil)
-       (window-show window))))
-  window)
+(defmethod update-handle ((window window))
+  (setf (slot-value window 'view-position) (center-window (view-size window) (view-position window)))
+  (setf (view-valid window) (list nil))
+  (view-allocate-clip-region window)
+  (when (and (slot-value window 'erase-anonymous-invalidations)
+             (not (slot-value window 'theme-background)))
+    ;; only needed for non-theme color background
+    (setf (window-invalid-region window) (new-rgn)))
+  (add-to-list *window-list* window)
+  (let ((winh [[MclguiWindow alloc]
+               initWithContentRect:(window-to-nswindow-frame (view-position window)
+                                                             (view-size window))
+               styleMask:(ecase (window-type window)
+                           ((:document)
+                            (logior #$NSTitledWindowMask
+                                    #$NSMiniaturizableWindowMask
+                                    (if (window-close-box-p window)
+                                      #$NSClosableWindowMask
+                                      0)))
+                           ((:document-with-zoom
+                             :document-with-grow)
+                            (logior #$NSTitledWindowMask
+                                    #$NSMiniaturizableWindowMask
+                                    (if (window-close-box-p window)
+                                      #$NSClosableWindowMask
+                                      0)
+                                    #$NSResizableWindowMask))
+                           ((:double-edge-box
+                             :single-edge-box
+                             :shadow-edge-box)
+                            #$NSBorderlessWindowMask)
+                           ((:tool)
+                            (logior #$NSTitledWindowMask
+                                    (if (window-close-box-p window)
+                                      #$NSClosableWindowMask
+                                      0))))
+               backing:#$NSBackingStoreBuffered
+               defer:NO]))
+    (setf (slot-value winh 'window) window)
+    (setf (handle window) winh) ; must be done before setDelegate.
+    (let ((cviewh [[MclguiView alloc]
+                   initWithFrame:(window-to-nswindow-frame (make-point 0 0)
+                                                           (view-size window))]))
+      (setf (slot-value cviewh 'view) window)
+      [cviewh setAutoresizingMask:(logior #$NSViewWidthSizable #$NSViewHeightSizable)]
+      [winh setContentView:cviewh] window)
+    [winh setReleasedWhenClosed:YES]
+    [winh setHasShadow:yes]
+    [winh invalidateShadow]
+    [winh setAcceptsMouseMovedEvents:YES]
+    ;; [winh setDelegate:(make-instance 'mclgui-window-delegate :window window)]
+    [winh setDelegate:winh]
+    [winh setTitle:(objcl:objcl-string (window-title window))]
+    ;; (format-trace "created window" (window-title window) (point-to-list (view-position window)) (point-to-list (view-size window)) (window-to-nswindow-frame (view-position window) (view-size window)))
+    winh))
+
+
+(defmethod initialize-instance ((window window)
+                                &key (view-font (view-default-font window))
+                                &allow-other-keys)
+  ;; to set the view-font.
+  (declare (ignorable view-font))
+  (call-next-method))
+
+
+(defmethod initialize-instance :after ((window window) &key &allow-other-keys)
+  (with-handle (winh window)
+    (let* ((frame (get-nsrect [winh frame]))
+           (bound (get-nsrect [[winh contentView] bounds]))
+           (posiz (nswindow-to-window-rect frame))
+           (ori   (subtract-points #@(0 0) (rect-topleft (nsrect-to-rect bound)))))
+      (setf (slot-value window 'window-title)         (objcl:lisp-string [winh title])
+            (slot-value window 'view-position)        (rect-topleft posiz)
+            (slot-value window 'view-size)            (rect-size posiz) 
+            (slot-value window 'view-scroll-position) ori)))
+  (window-size-parts window)
+  (when (window-visiblep window)
+    (setf (slot-value window 'visiblep) nil)
+    (window-show window)
+    [(handle window) display]))
 
 
 
@@ -262,7 +269,8 @@ CLASS:          A class used to filter the result. The frontmost
                  (if (string-equal (window-title w) title)
                      (return-from find-window w)))
                :class class
-               :include-windoids t)
+               :include-windoids t
+               :include-invisibles t)
   nil)
 
 
@@ -401,9 +409,14 @@ V:              The vertical coordinate of the new position, or NIL if
         (mswindow (handle window)))
     (setf (slot-value window 'view-size) siz)
     (when (and (not *window-growing*) mswindow)
-      (on-main-thread [mswindow setFrame:(window-to-nswindow-frame pos siz)])
-      (on-main-thread [mswindow invalidateShadow]))
-    (call-next-method)
+      (if [mswindow isVisible]
+          (progn
+            (format-trace "Before mswindow setFrame:")
+            (on-main-thread [mswindow setFrame:(window-to-nswindow-frame pos siz)])
+            (format-trace "Before mswindow invalidateShadow")
+            (on-main-thread [mswindow invalidateShadow])
+            (format-trace "After"))
+           [mswindow setFrame:(window-to-nswindow-frame pos siz) display:NO]))
     (refocus-view window)
     siz))
 

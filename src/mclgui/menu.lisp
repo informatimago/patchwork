@@ -41,7 +41,7 @@
 ;;; Menubar
 ;;;---------------------------------------------------------------------
 
-(defclass menubar (colored wrapper)
+(defclass menubar (colored)
   ((menus :initform '()
           :initarg :menus
           :accessor menubar-menus)))
@@ -262,7 +262,9 @@ other styles.")
 
 
 
+
 (defmethod print-object ((self menu-element) stream)
+  (declare (stepper disable))
   (print-parseable-object (self stream :type t :identity t)
                           title enabledp checkedp)
   ;; (print-unreadable-object (self stream :type t)
@@ -281,6 +283,7 @@ other styles.")
 
 
 (defmethod print-object ((self menu) stream)
+  (declare (stepper disable))
   (print-parseable-object (self stream :type t :identity t)
                           title (:items (slot-value self 'item-list)))
   ;; (print-unreadable-object (self stream :type t)
@@ -972,24 +975,28 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 
 
+(defmethod update-handle ((item menu-element))
+  (if (and (stringp (menu-item-title item))
+           (string= (menu-item-title item) "-"))
+    (setf (handle item) [NSMenuItem separatorItem])
+    (multiple-value-bind (ke km) (decode-command-key (command-key item))
+      (let ((nsitem (or (handle item)
+                        [[NSMenuItem alloc]
+                         initWithTitle:(objcl:objcl-string (menu-item-title item))
+                         action:(oclo:@selector "menuItemSelected:")
+                         keyEquivalent:ke])))
+        [nsitem setKeyEquivalentModifierMask:km]
+        (when (nullp [nsitem target]) ; otherwise we keep the old target.
+          [nsitem setTarget:(make-instance 'menu-item-target :menu-item item)])
+        (ns-set-enabled nsitem (menu-enabled-p item))
+        [nsitem setState: (if (menu-item-check-mark item) 1 0)]
+        (setf (handle item) nsitem)))))
+
+
 (defmethod unwrap ((item menu-item))
   (unwrapping item
-              ;; (format t "~&unwrap menu ~S~%" (objcl:objcl-string (menu-title item))) (finish-output)
-              (if (and (stringp (menu-item-title item))
-                       (string= (menu-item-title item) "-"))
-                  (setf (handle item) [NSMenuItem separatorItem])
-                  (multiple-value-bind (ke km) (decode-command-key (command-key item))
-                    (let ((nsitem (or (handle item)
-                                      [[NSMenuItem alloc]
-                                       initWithTitle:(objcl:objcl-string (menu-item-title item))
-                                       action:(oclo:@selector "menuItemSelected:")
-                                       keyEquivalent:ke])))
-                      [nsitem setKeyEquivalentModifierMask:km]
-                      (when (nullp [nsitem target]) ; otherwise we keep the old target.
-                        [nsitem setTarget:(make-instance 'menu-item-target :menu-item item)])
-                      (ns-set-enabled nsitem (menu-enabled-p item))
-                      [nsitem setState: (if (menu-item-check-mark item) 1 0)]
-                      (setf (handle item) nsitem))))))
+    ;; (format t "~&unwrap menu ~S~%" (objcl:objcl-string (menu-title item))) (finish-output)
+    (or (handle item) (update-handle item))))
 
 
 (defgeneric handle-of-menu-item-of (menu)
@@ -1048,22 +1055,26 @@ DO:             Add to the NSMenu of MENU a NSItem with the NSMenu of
           [nsmenu setSubmenu:(unwrap submenu) forItem:nsitem]))))
 
 
+(defmethod update-handle ((menu menu))
+  (let ((nsmenu (or (handle menu)
+                    [[NSMenu alloc] initWithTitle:(objcl:objcl-string (menu-title menu))])))
+    ;; (format t "~&unwrap menu ~S~%" (menu-title menu)) (finish-output)
+    (when (slot-value menu 'menu-font)
+      [nsmenu setFont:(unwrap (slot-value menu 'menu-font))])
+    (dolist (item (slot-value menu 'item-list))
+      ;; (format t "~&item ~S~%"  (menu-title item)) (finish-output)
+      (if (typep item 'menu)
+        (ns-attach-submenu nsmenu item)
+        (let ((item-handle (handle item)))
+          (if item-handle
+            (ns-add-item nsmenu item-handle)
+            (ns-add-item nsmenu (unwrap item))))))
+    (setf (handle menu) nsmenu)))
+
+
 (defmethod unwrap ((menu menu))
   (unwrapping menu
-              (let ((nsmenu (or (handle menu)
-                                [[NSMenu alloc] initWithTitle:(objcl:objcl-string (menu-title menu))])))
-                ;; (format t "~&unwrap menu ~S~%" (menu-title menu)) (finish-output)
-                (when (slot-value menu 'menu-font)
-                  [nsmenu setFont:(unwrap (slot-value menu 'menu-font))])
-                (dolist (item (slot-value menu 'item-list))
-                  ;; (format t "~&item ~S~%"  (menu-title item)) (finish-output)
-                  (if (typep item 'menu)
-                      (ns-attach-submenu nsmenu item)
-                      (let ((item-handle (handle item)))
-                        (if item-handle
-                            (ns-add-item nsmenu item-handle)
-                            (ns-add-item nsmenu (unwrap item))))))
-                (setf (handle menu) nsmenu))))
+    (or (handle menu) (update-handle menu))))
 
 
 ;; (defmethod release ((item menu-item))
@@ -1201,7 +1212,7 @@ RETURN:         The list of MENUs collected.
 
 
 (defun initialize/menu ()
-  (setf *menubar-bottom* (ceiling [[[NSApplication sharedApplication]mainMenu]menuBarHeight]))
+  (setf *menubar-bottom* (ceiling [[[NSApplication sharedApplication] mainMenu] menuBarHeight]))
   (setf *default-menubar* (fetch-current-menubar)
         ;; Notice this menubar instance is immediately replaced by the following SET-MENUBAR call.
         *menubar*      (make-instance 'menubar :menus (copy-list *default-menubar*)))

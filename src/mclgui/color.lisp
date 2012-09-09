@@ -218,10 +218,11 @@ REDISPLAY-P:    If the value of this is true (the default), this
          (progn
            [NSGraphicsContext saveGraphicsState]
            (let ((color (unwrap color)
-                        #-(and) [NSColor colorWithCalibratedRed: (color-red color)
-                                 green: (color-green color)
-                                 blue: (color-blue color)
-                                 alpha: (color-alpha color)]))
+                   ;; [NSColor colorWithCalibratedRed: (color-red color)
+                   ;;          green: (color-green color)
+                   ;;          blue: (color-blue color)
+                   ;;          alpha: (color-alpha color)]
+                   ))
              [color set]
              [color setFill]
              [color setStroke])
@@ -237,10 +238,11 @@ REDISPLAY-P:    If the value of this is true (the default), this
           (null (view-window *current-view*)))
     (funcall function)
     (let ((*background-color* (unwrap color)
-                              #-(and) [NSColor colorWithCalibratedRed: (color-red color)
-                                               green: (color-green color)
-                                               blue: (color-blue color)
-                                               alpha: (color-alpha color)])
+            ;; [NSColor colorWithCalibratedRed: (color-red color)
+            ;;          green: (color-green color)
+            ;;          blue: (color-blue color)
+            ;;          alpha: (color-alpha color)]
+            )
           (old-color (slot-value (view-window *current-view*) 'back-color)))
       (unwind-protect
           (progn

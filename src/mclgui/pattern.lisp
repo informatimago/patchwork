@@ -154,11 +154,8 @@ PIXEL-HEIGHT:   Height of the bitmap (array-dimension bitmap 0).
       [image addRepresentation:[imagerep autorelease]]
       (setf (handle pattern) [NSColor colorWithPatternImage:[image autorelease]]))))
 
-(defmethod initialize-instance :after ((pattern pattern) &key &allow-other-keys)
-  (unless (handle pattern)
-    (update-handle pattern)))
-
 (defmethod print-object ((pattern pattern) stream)
+  (declare (stepper disable))
   (print-parseable-object (pattern stream :type t :identity t)
                           (:data
                            (with-output-to-string (out)

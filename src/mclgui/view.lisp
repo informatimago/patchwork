@@ -76,36 +76,44 @@
 
 
 
+(defmethod update-handle ((view simple-view))
+  (let ((pos (or (slot-value view 'view-position) #@(0   0)))
+        (siz (or (slot-value view 'view-size)     #@(10 10))))
+   (setf (handle view) [[MclguiView alloc]
+                        initWithFrame:(ns:make-ns-rect (point-h pos) (point-v pos)
+                                                       (point-h siz) (point-v siz))]
+         (slot-value (handle view) 'view) view))
+  (handle view))
 
 
+(defmethod unwrap ((view simple-view))
+  (unwrapping view
+    (or (handle view) (update-handle view))))
 
-(defmethod initialize-instance :after ((view simple-view) &key view-font &allow-other-keys)
-  ;; We need to do that after the subclasses such as windows have initialized.
-  (when (and view-font (not (typep view 'window)))
-    (set-initial-view-font view view-font))
-  (setf (slot-value view 'view-size)     (or (slot-value view 'view-size)     (view-default-size     view))
-        (slot-value view 'view-position) (or (slot-value view 'view-position) (view-default-position view)))
-  (unless (typep view 'window)
-    (setf (handle view) [[MclguiView alloc]
-                         initWithFrame:(ns:make-ns-rect (point-h (slot-value view 'view-position))
-                                                        (point-v (slot-value view 'view-position))
-                                                        (point-h (slot-value view 'view-size))
-                                                        (point-v (slot-value view 'view-size)))]
-          (slot-value (handle view) 'view) view))
-  (set-view-container view (slot-value view 'view-container))
-  view)
 
-(defmethod initialize-instance ((view view) &key &allow-other-keys)
-  ;; We need to do that after the subclasses such as windows have initialized.
+(defmethod initialize-instance ((view view) &key view-font &allow-other-keys)
+  (declare (stepper trace))
+  (unless (and (slot-boundp view 'view-position)
+               (slot-value view 'view-position))
+    (setf (slot-value view 'view-position) (view-default-position view)))
+  (unless (and (slot-boundp view 'view-size)
+               (slot-value view 'view-size))
+    (setf (slot-value view 'view-size) (view-default-size view)))
+  (when (slot-boundp  view 'view-container)
+    (set-view-container view (slot-value view 'view-container)))
   (call-next-method)
+  (when view-font
+    (set-initial-view-font view view-font))
   (setf (slot-value view 'view-subviews) #())
   view)
+
 
 (defmethod initialize-instance :after  ((view view) &key view-subviews subviews &allow-other-keys)
   ;; We need to do that after the subclasses such as windows have initialized.
   (let ((subviews (or view-subviews subviews)))
     ;; (format-trace "initialize-instance" view subviews)
-    (setf (slot-value view 'view-subviews) (make-array (length subviews) :adjustable t :fill-pointer 0))
+    (setf (slot-value view 'view-subviews)
+          (make-array (length subviews) :adjustable t :fill-pointer 0))
     (apply (function add-subviews) view (coerce subviews 'list)))
   view)
 
@@ -248,17 +256,19 @@ DO:             Evaluates the BODY in a lexical environment where
                           (*current-font-codes* (copy-list *current-font-codes*)))
                       (if (setf unlock [handle lockFocusIfCanDraw])
                           (progn
-                            (format-trace "did lockFocusIfCanDraw" view)
+                            ;; (format-trace "did lockFocusIfCanDraw" view)
                             (focus-view *current-view* *current-font-view*)
                             (apply (function set-current-font-codes) (set-font *current-font-view*))
                             (call-with-pen-state (lambda () (funcall function view))
                                                  (view-pen view))
                             [[NSGraphicsContext currentContext] flushGraphics])
-                          (format-trace "could not lockFocusIfCanDraw" view)))
+                          ;; (format-trace "could not lockFocusIfCanDraw" view)
+                          ))
                  (when unlock
                    (set-font *current-font-view*)
                    [handle unlockFocus]
-                   (format-trace "did unlockFocusIfCanDraw" view))
+                   ;;(format-trace "did unlockFocusIfCanDraw" view)
+                   )
                  (focus-view *current-view* *current-font-view*))))))))
 
 

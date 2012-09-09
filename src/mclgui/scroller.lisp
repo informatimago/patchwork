@@ -101,7 +101,7 @@
          (outline (if draw-scroller-outline
                     (make-instance 'box-dialog-item))))
     (setf (scroll-bar-correction self) (make-point (if v-scroll 17 2)
-                                             (if h-scroll 17 2)))
+                                                   (if h-scroll 17 2)))
     (setf (v-scroller self) v-scroll)
     (setf (h-scroller self) h-scroll)
     (setf (scroller-outline self) outline)

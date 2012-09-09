@@ -128,7 +128,8 @@ RETURN:         A string containing the object identity as printed by
                 PRINT-UNREADABLE-OBJECT.
 "
   (declare (stepper disable))
-  (let ((*print-readably* nil))
+  (let ((*step-mode* :run)
+        (*print-readably* nil))
     (let ((ident
            (with-output-to-string (stream)
              (print-unreadable-object (object stream :type nil :identity t)))))
@@ -140,16 +141,17 @@ RETURN:         A string containing the object identity as printed by
 SEE:            PRINT-PARSEABLE-OBJECT
 "
   (declare (stepper disable))
-  (if *print-readably*
-      (error 'print-not-readable :object object)
-      (progn
-        (format stream "~S"
-                (append (when type
-                          (list (class-name (class-of object))))
-                        (funcall thunk object)
-                        (when identity
-                          (list (object-identity object))))) 
-        object)))
+  (let ((*step-mode* :run))
+    (if *print-readably*
+        (error 'print-not-readable :object object)
+        (progn
+          (format stream "~S"
+                  (append (when type
+                            (list (class-name (class-of object))))
+                          (funcall thunk object)
+                          (when identity
+                            (list (object-identity object))))) 
+          object))))
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -199,17 +201,18 @@ RETURN:         The object that bas been printed (so that you can use
                 it in tail position in PRINT-OBJECT conformingly).
 
 "
-  (if (symbolp object)
-      `(call-print-parseable-object ,object ,stream ,type ,identity
-                                    (lambda (,object)
-                                      (declare (ignorable ,object) (stepper disable))
-                                      ,(extract-slots object slots)))
-      (destructuring-bind (ovar oval) object
-        `(let ((,ovar ,oval))
-           (call-print-parseable-object ,ovar ,stream ,type ,identity
-                                        (lambda (,ovar)
-                                          (declare (ignorable ,ovar) (stepper disable))
-                                          ,(extract-slots object slots)))))))
+  `(locally (declare (stepper disable))
+     ,(if (symbolp object)
+         `(call-print-parseable-object ,object ,stream ,type ,identity
+                                       (lambda (,object)
+                                         (declare (ignorable ,object) (stepper disable))
+                                         ,(extract-slots object slots)))
+         (destructuring-bind (ovar oval) object
+           `(let ((,ovar ,oval))
+              (call-print-parseable-object ,ovar ,stream ,type ,identity
+                                           (lambda (,ovar)
+                                             (declare (ignorable ,ovar) (stepper disable))
+                                             ,(extract-slots object slots))))))))
 
 
 

@@ -472,7 +472,7 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
                   :reason :duplicate-size  :option item))
          (setf size item
                size-mask -1))
-        ((stringp item)
+        ((or (stringp item) (and (symbolp item) (not (keywordp item))))
          (when font
            (error 'invalid-font-spec-error :font-spec font-spec 
                   :reason :duplicate-name  :option item))
@@ -522,6 +522,7 @@ OLD-MS:         The old mode-size code. A mode-size code is a 32-bit
           (color (or color (ldb (byte 8 0) (point-h old-ff))))
           (mode  (or mode  (point-v old-ms)))
           (size  (or size  (point-h old-ms))))
+      ;; (print (list :font font :face face :color color :mode mode :size size))
       (values (make-point (dpb face (byte 8 8) color) font)
               (make-point size mode)
               (make-point (dpb face-mask (byte 8 8) color-mask) font-mask)
@@ -575,7 +576,7 @@ significant.
 "
   (let ((font (nsfont-from-codes ff ms)))
     (values [font ascender]
-            [font descender]
+            (- [font descender])
             (nsrect-width (get-nsrect [font boundingRectForFont]))
             [font leading])))
 
@@ -590,7 +591,7 @@ MS:             Mode/Size code.
 "
   (multiple-value-bind (a d w l) (font-codes-info ff ms)
     (declare (ignore w))
-    (values (round (+ a d l)))))
+    (values (ceiling (+ a d l)))))
 
 
 (defun font-info (&optional font-spec)
@@ -790,6 +791,119 @@ MS:             Mode/Size code.
     (move *current-view* width 0)
     (values string width)))
 
+
+
+;; don't errchk - may get -8808 
+
+
+;; (defconstant #$kATSULineBreakInWord -8808)
+;; ;; This is not an error code but is returned by ATSUBreakLine to
+
+;;     indicate that the returned offset is within a word since there was
+;;     only less than one word that could fit the requested width.
+
+(defun atsu-line-break-given-layout (layout start width)
+  ;;  *    oLineBreak:
+  ;;  *      On return, the value specifies the soft line break as
+  ;;  *      determined by ATSUBreakLine. If the value returned is the same
+  ;;  *      value as specified in iLineStart , you have made an input
+  ;;  *      parameter error. In this case, check to make sure that the line
+  ;;  *      width specified in iLineWidth is big enough for ATSUBreakLine
+  ;;  *      to perform line breaking. ATSUBreakLine does not return an
+  ;;  *      error in this case.
+  (niy atsu-line-break-given-layout layout start width)
+  #-(and)
+  (rlet ((outoff :ptr))
+        (#_atsubreakline layout start (#_long2fix width) t outoff)
+        (let ((res (%get-unsigned-long outoff)))
+          (if (eql res start)(error "phooey"))
+          res)))
+
+(defun string-start-end (string &optional start end)
+  (let* ((string (string string))
+         (len    (length string))
+         (start  (or start 0))
+         (end    (or end len)))
+    (flet ((are (a i) (error "Array index ~S out of bounds for ~S." i a)))    
+      (unless (<= 0 end len)   (are string end))
+      (unless (<= 0 start len) (are string start))
+      (unless (<= start end)
+        (error "Start ~S exceeds end ~S for a string operation." start end))
+      (multiple-value-bind (str off) (array-displacement string)
+        (values (or str string) (+ off start) (+ off end))))))
+
+
+(defun draw-string-in-rect (string rect &key
+                                   truncation justification compress-p
+                                   (start 0) (end (length string))
+                                   ff ms color)
+  (when (not (and ff ms))
+    (multiple-value-setq (ff ms) (grafport-font-codes-with-color)))
+  (when color
+    (setf ff (logior (logand ff (lognot #xff)) (color->ff-index color))))
+  (niy draw-string-in-rect string rect truncation justification compress-p start end ff ms color)
+  (font-code-draw-string string ff ms start end color)
+  ;; (multiple-value-bind (line-ascent descent width leading) (font-codes-info ff ms)
+  ;;   (declare (ignore line-ascent descent width leading))
+  ;;   (niy draw-string-in-rect string rect truncation justification compress-p start end ff ms color)
+  ;;   #-(and)
+  ;;   (with-clip-rect-intersect rect ;; can we assume callers have done this? - nah let callers assume done here
+  ;;     (let* ((numchars (- end start))
+  ;;            (hpos (pref rect :rect.left))
+  ;;            (vpos (pref rect :rect.top))
+  ;;            (max-width (- (pref rect :rect.right) hpos)))
+  ;;       (unless (eq numchars 0)
+  ;;         (%stack-block ((ubuff (%i+ numchars numchars)))
+  ;;           (copy-string-to-ptr string start numchars ubuff)
+  ;;           (with-atsu-layout (layout ubuff numchars ff ms)
+  ;;             (when (and truncation (not (eq truncation :none)))
+  ;;               (set-layout-line-truncation-given-layout layout truncation (null compress-p))) ;; aha need no-squash-p                
+  ;;             (set-layout-line-width-given-layout layout max-width)
+  ;;             (when justification  ;; doesnt work - fixed now
+  ;;               (set-layout-line-justification-given-layout layout justification))
+  ;;             (cond
+  ;;              ((and truncation (not (eq truncation :none)))
+  ;;               (errchk (#_atsudrawtext layout 0 numchars
+  ;;                        (#_long2fix hpos)
+  ;;                        (#_long2fix (%i+ vpos line-ascent)))))
+  ;;              (t
+  ;;               (let* ((line-height (%i+ line-ascent descent leading))
+  ;;                      (rect-height (- (pref rect :rect.bottom) vpos))
+  ;;                      (now-height 0)
+  ;;                      (my-start 0))                      
+  ;;                 (loop
+  ;;                   (let ((next (atsu-line-break-given-layout layout my-start max-width)))
+  ;;                     ;(cerror "g" "h ~a ~a ~A ~a" my-start numchars next (- next my-start))
+  ;;                     (errchk (#_atsudrawtext layout my-start (- next my-start)
+  ;;                              (#_long2fix hpos)
+  ;;                              (#_long2fix (%i+ vpos line-ascent))))
+  ;;                     (setf my-start next)
+  ;;                     (when (%i>= my-start numchars)(return))
+  ;;                     (setf now-height (%i+ now-height line-height))
+  ;;                     (when (%i>= now-height rect-height)(return))
+  ;;                     (setf vpos (%i+ vpos line-height))))))))))))
+  ;;   nil)
+  )
+
+
+
+
+(defun color->ff-index (color)
+  #-(and)
+  (if (and color (not (eq color *black-color*)))
+      (fred-palette-closest-entry color)
+      0)
+  (niy color->ff-index color)
+  0)
+
+(defun grafport-font-codes-with-color ()
+  #-(and)
+  (multiple-value-bind (ff ms)(grafport-font-codes)
+    (let* ((foo (grafport-fore-color))) ;; 0 is black is 0    
+      (if (not (eq foo 0))
+          (setf ff (logior (logand ff (lognot #xff)) (fred-palette-closest-entry foo))))
+      (values ff ms)))
+  (current-font-codes))
 
 (defmacro grafport-write-string (string start end &optional ff ms color)
   (let ((vstart (gensym))

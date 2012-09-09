@@ -41,13 +41,13 @@
 ;;;;
 ;;;;=========================================================
 
-(in-package :pw)
+(in-package :ui)
 
 ;;======================================
 ;; from library:scrollers.lisp to allow smaller scrollbars
 (defvar *default-scroll-size* 8) ; normally 16
 
-(defmethod initialize-instance ((self ui::scroller-mixin) &rest initargs &key
+(defmethod initialize-instance ((self scroller-mixin) &rest initargs &key
                                 view-container (v-scrollp t) (h-scrollp t)
                                 (draw-scroller-outline t) (bottom-boarder 1)
                                 track-thumb-p
@@ -69,8 +69,9 @@
                                     :track-thumb-p track-thumb-p)))
          (outline (if draw-scroller-outline
                     (make-instance 'box-dialog-item))))
-    (setf (scroll-bar-correction self) (make-point (if v-scroll (1+ *default-scroll-size*) 2)
-                                             (if h-scroll (+ bottom-boarder *default-scroll-size*) 2)))
+    (setf (scroll-bar-correction self)
+          (make-point (if v-scroll (1+ *default-scroll-size*) 2)
+                      (if h-scroll (+ bottom-boarder *default-scroll-size*) 2)))
     (setf (v-scroller self) v-scroll)
     (setf (h-scroller self) h-scroll)
     (setf (scroller-outline self) outline)
@@ -79,3 +80,4 @@
     (when view-container
       (set-view-container self view-container))))
 
+;;;; THE END ;;;;

@@ -44,10 +44,11 @@
    (name     :initarg :name     :initform "Cursor"         :type string :accessor cursor-name))
   (:documentation "A Quickdraw cursor"))
 
+
 (defmethod print-object ((cursor cursor) stream)
-  (print-unreadable-object (cursor stream :identity t :type t)
-    (format stream "~S" (cursor-name cursor)))
-  cursor)
+  (declare (stepper disable))
+  (print-parseable-object (cursor stream :type t :identity t)
+                          name))
 
 
 (defun cursor-premultiplied-data (cursor)
@@ -101,12 +102,10 @@ RETURN:         A newly allocated bit16 containing the data of the
                                hotSpot:(ns:make-ns-point (point-h (cursor-hot-spot cursor))
                                                          (point-v (cursor-hot-spot cursor)))])))))
 
+(defmethod unwrap ((self cursor))
+  (unwrapping self
+    (or (handle self) (updte-handle self))))
 
-
-
-(defmethod initialize-instance :after ((cursor cursor) &key &allow-other-keys)
-  (unless (handle cursor)
-    (update-handle cursor)))
 
 ;; Not needed for now.  In anycase, NS cursors can be any size, and in
 ;; color, so in general we cannot convert them back to a Macintosh
@@ -152,7 +151,7 @@ NOTE:           If set-cursor is called from anywhere except within a
     ;; (format-trace "set-cursor" cursor)
     (setf *current-cursor* cursor)
     (unless (handle cursor)
-      (setf (handle cursor) (update-handle cursor)))
+      (update-handle cursor))
     (with-handle (nscursor cursor)
       [nscursor set])))
 

@@ -60,9 +60,9 @@ Chargement du programme
 
 2- Voir 'generate-application.lisp' ou 'loader.lisp'.  Editer
    ~/LOGHOSTS/PATCHWORK pour indiqure où sont installés les sources de
-   Patchwork ; par exemple:
+   Patchwork ; par exemple: ::
 
-      ;;-*- mode:lisp; coding:utf-8; -*-
+      ;; -*- mode:lisp; coding:utf-8; -*-
 
       #.(list
          (list "PATCHWORK:**;*.*.*"

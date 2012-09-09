@@ -149,6 +149,10 @@ NEW-SCROLLEE: The new scrollee of item.
 
 
 
+(defmethod update-handle ((view scroll-bar-dialog-item))
+  (call-next-method) ; for now
+  (handle view))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;initialize-instance
@@ -169,14 +173,15 @@ NEW-SCROLLEE: The new scrollee of item.
 ;;
 
 (defmethod initialize-instance ((item scroll-bar-dialog-item) &rest initargs
-                                &key (min 0) 
+                                &key
+                                (min 0) 
                                 (max (if t 10000 100))  ;; was + $scroll-bar-max $scroll-bar-max
                                 (setting 0)
-                                width
-                                (direction :vertical) length scrollee
+                                (direction :vertical) width length
+                                view-container view-position view-size
+                                scrollee
                                 pane-splitter-cursor pane-splitter-class
-                                pane-splitter (pane-splitter-length 7) view-size
-                                view-position view-container)
+                                pane-splitter (pane-splitter-length 7))
   (declare (dynamic-extent initargs))
   (setf max (max min max)
         setting (min (max setting min) max))
@@ -252,12 +257,11 @@ NEW-SCROLLEE: The new scrollee of item.
          :length length
          :view-container nil
          :view-position view-position
-         :view-size
-         (case direction
-           (:vertical (make-point width length))
-           (:horizontal (make-point length width))
-           (t (error "illegal :direction ~a (must be :vertical or :horizontal)."
-                     direction)))
+         :view-size (case direction
+                      (:vertical   (make-point width length))
+                      (:horizontal (make-point length width))
+                      (t (error "illegal :direction ~a (must be :vertical or :horizontal)."
+                                direction)))
          initargs)
   (when (and pane-splitter view-container (not view-position))
     (set-default-size-and-position item view-container))

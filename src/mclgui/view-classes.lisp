@@ -69,6 +69,7 @@ the opposite of view-origin.)
 
 
 (defmethod print-object ((view simple-view) stream)
+  (declare (stepper disable))
   (print-parseable-object
    (view stream :type t :identity t)
    (:view-position        (point-to-list (view-position view)))
@@ -249,6 +250,7 @@ DO:             Remove the property KEY from the VIEW.
 
 
 (defmethod print-object ((window window) stream)
+  (declare (stepper disable))
   (print-parseable-object (window stream :type t :identity t)
                           (:title (ignore-errors (window-title window)))
                           (:view-position (point-to-list (view-position window)))

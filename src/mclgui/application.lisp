@@ -43,6 +43,15 @@
   ())
 
 
+(defmethod update-handle ((self application))
+  (setf (handle self) [NSApplication sharedApplication]))
+
+
+(defmethod unwrap ((self application))
+  (unwrapping self
+    (or (handle self) (update-handle self))))
+
+
 (defgeneric application-error (application condition error-pointer)
   (:documentation "
 The generic function APPLICATION-ERROR is called whenever a condition
@@ -666,7 +675,7 @@ HANDLERREFCON:  The handler reference constant, which is any Lisp object.
 
 
 (defun initialize/application ()
-  (setf *application* (make-instance 'application :handle [NSApplication sharedApplication]))
+  (setf *application* (make-instance 'application))
   (install-appleevent-handler :|aevt| :|ansr| #'queued-reply-handler)
   (install-appleevent-handler :|aevt| :|oapp| #'open-application-handler)
   (install-appleevent-handler :|aevt| :|quit| #'quit-application-handler)

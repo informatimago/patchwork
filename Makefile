@@ -87,7 +87,8 @@ help::
 	@printf "$(HELP_FORMAT)" "clean" "Erases the fasl files."
 	@printf "$(HELP_FORMAT)" "cleanall" "+ Erases the backup files files."
 clean::
-	rm -rf $$(find ~/.cache/common-lisp -type d -name patchwork -print)
+	true rm -rf $$(find ~/.cache/common-lisp -type d -name patchwork -print)
+	rm -rf ~/.cache/common-lisp/*
 cleanall::clean
 	find . -name \*~ -exec rm {} \;
 

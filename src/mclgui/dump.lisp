@@ -143,6 +143,14 @@
 
 
 
+(defgeneric map1-subviews (fun view)
+  (:method (fun (view simple-view))
+    (funcall fun view))
+  (:method (fun (view view))
+    (cons (funcall fun view)
+          (map 'list
+               (lambda (subview) (map1-subviews fun subview))
+               (view-subviews view)))))
 
 
 

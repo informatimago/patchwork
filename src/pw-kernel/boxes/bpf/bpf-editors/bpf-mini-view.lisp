@@ -200,8 +200,7 @@
 
 ;;==================================================================================================================
 
-(defclass C-mini-bpf-view (;; ui:view
-                           C-ttybox)
+(defclass C-mini-bpf-view (C-ttybox)
   ((break-point-function :initform nil :initarg :break-point-function 
      :accessor break-point-function)
    (h-view-scaler :initform 1.0 :initarg :h-view-scaler :accessor h-view-scaler)

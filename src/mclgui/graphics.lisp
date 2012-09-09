@@ -42,22 +42,27 @@
 
 (defun draw-string (x y str)
   ;; (format-trace "draw-string" x y str *current-view* (when *current-view* (view-window *current-view*)))
-  (with-fore-color *yellow-color*
-    (let* ((o (view-origin *current-view*))
-           (x (point-h o))
-           (y (point-v o))
-           (s (view-size *current-view*))
-           (w (point-h s))
-           (h (point-v s)))
-      (draw-rect x y w h)))
+  ;; (with-fore-color *yellow-color*
+  ;;   (let* ((o (view-origin *current-view*))
+  ;;          (x (point-h o))
+  ;;          (y (point-v o))
+  ;;          (s (view-size *current-view*))
+  ;;          (w (point-h s))
+  ;;          (h (point-v s)))
+  ;;     (draw-rect x y w h)))
   (destructuring-bind (ff ms) *current-font-codes*
     (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
       (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
       ;; (print descriptor)
       ;; [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))]
-      [(objcl:objcl-string str)
-       drawAtPoint: (ns:make-ns-point x y)
-       withAttributes:  [descriptor fontAttributes]]))
+      ;; (format-trace "draw-string" x y str [descriptor fontAttributes])
+      (multiple-value-bind (a d w l) (font-codes-info ff ms)
+        (declare (ignore w l))
+        ;; (format-trace "draw-string" a d w l)
+        ;; the origin of the bounding box.  topleft in flipped coordinates.
+        [(objcl:objcl-string str)
+         drawAtPoint: (ns:make-ns-point x (- y a d))
+         withAttributes:  [descriptor fontAttributes]])))
   str)
 
 

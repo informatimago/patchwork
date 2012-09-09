@@ -131,6 +131,7 @@ default menu item.  Otherwise the value itself is displayed as if by
 
 
 (defmethod print-object ((thing pop-up-menu) stream)
+  (declare (stepper disable))
   (print-parseable-object (thing stream :type t :identity t)
                           (:title (let ((title (menu-title  thing)))
                                     (if (and title (not (equal title "")))

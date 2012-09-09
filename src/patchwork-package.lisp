@@ -133,7 +133,7 @@
 ;;   (:export "MIDI-OPEN" "MIDI-WRITE" "MIDI-CLOSE")
 ;;   (:intern "*PLAYER*" "*PW-REFNUM*" "MIDI-RESET"))
 
-
+#-(and)
 (cl:defpackage "FFI"
   (:export "kAENoReply" "AEGetKeyDesc" "kCurrentProcess" "EraseRgn"
            "AEDeleteParam" "DisposHandle" "AEGetParamDesc"

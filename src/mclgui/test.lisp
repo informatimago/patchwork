@@ -370,6 +370,7 @@
 
 
 (defmethod print-object ((view test-view) stream)
+  (declare (stepper disable))
   (print-parseable-object (view stream :type t :identity t)
                           id
                           (:view-position        (point-to-list (view-position view)))

@@ -645,21 +645,23 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
                 same as when Macintosh Common Lisp is running in the
                 foreground.
 "
-  
   (let ((nsevent [[NSApplication sharedApplication]
                   nextEventMatchingMask: (mac-event-mask-to-ns-event-mask every-event)
                   untilDate: [NSDate dateWithTimeIntervalSinceNow: (cgfloat (* 60
                                                                                (or sleep-ticks
                                                                                    (if *foreground* 
-                                                                                       (if idle
-                                                                                           *idle-sleep-ticks*
-                                                                                           *foreground-sleep-ticks*)
-                                                                                       *background-sleep-ticks*))))]
+                                                                                     (if idle
+                                                                                       *idle-sleep-ticks*
+                                                                                       *foreground-sleep-ticks*)
+                                                                                     *background-sleep-ticks*))))]
                   inMode:#$NSDefaultRunLoopMode
                   dequeue:YES]))
-    (when nsevent
-      (assign-event event (wrap-nsevent nsevent))
-      event)))
+    (assign-event event
+                  (if (and nsevent (not (nullp nsevent)))
+                    (wrap-nsevent nsevent)
+                    (get-null-event)))
+    (format-trace "get-next-event" (event-what event) (event-where event))
+    event))
 
 
 

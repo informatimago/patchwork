@@ -41,23 +41,88 @@
   (:method ((none null)) nil))
 
 
+(defgeneric update-handle (wrapper)
+  (:documentation "
+Some subclasses need to compute a new NS instance when the lisp
+instance state changes.  This method compute and sets, the new (handle
+wrapper), or updates an old (handle wrapper) object from the wrapper.
+
+UNWRAP of a subclass could be implemented as:
+
+    (defmethod unwrap ((self some-class))
+       (unwrapping self
+          (or (handle self) (update-handle self))))
+
+"))
+
+
+
 (defclass wrapper ()
   ((handle :initform nil
            :initarg :handle
            :reader handle))
-  (:documentation "This mixin adds a wrapped-over NSObject instance handle to a wrapper object."))
+  (:documentation "
+This mixin adds a wrapped-over NSObject instance handle to a wrapper object.
 
+Subclasses should implement a method for UPDATE-HANDLE to initialize
+the Objective-C object.
+"))
 
-(defmethod initialize-instance :after ((self wrapper) &key &allow-other-keys)
-  #+ccl (ccl:terminate-when-unreachable self)
-  (when (handle self)
-    [(handle self) retain])
-  self)
 
 
 #+ccl (defmethod ccl:terminate ((self wrapper))
         (setf (handle self) nil))
 
+
+(defmethod initialize-instance :after ((self wrapper) &key &allow-other-keys)
+  #+ccl (ccl:terminate-when-unreachable self)
+  (if (handle self)
+    [(handle self) retain]
+    (update-handle self))
+  self)
+
+
+(defgeneric unwrap (wrapper)
+  (:documentation "
+DO:             Create and initialize the underlying object and bind
+                it to the HANDLE of the WRAPPER, unless it's already
+                there.
+
+POST:           (not (null (handle wrapper)))
+
+RETURN:         (handle wrapper)
+
+NOTE:           There are functions such as WRAP-NSMENU to build
+                subclass-of-WRAPPER instances from
+                subclass-of-NSObject instances, hence the name of
+                UNWRAP.
+
+NOTE:           Subclasses should define a method, calling
+                (unwrapping object …).
+
+SEE ALSO:       UNWRAPPING, WRAPPING.
+")
+  (:method ((wrapper wrapper))
+    (unwrapping wrapper
+      (or (handle wrapper)
+          (progn (cerror "Continue" "Unwrapping an empty wrapper ~S." wrapper)
+                 *null*)))))
+
+
+(defgeneric release (wrapper)
+  (:documentation "
+
+DO:             Release the NSObject retained by this WRAPPER and all
+                its components.
+
+POST:           (null (handle wrapper))
+
+RETURN:         WRAPPER
+
+")
+  (:method ((wrapper wrapper))
+    (setf (handle wrapper) nil)
+    wrapper))
 
 
 (defgeneric (setf handle) (new-handle wrapper)
@@ -97,62 +162,7 @@ RETURN:         The result of BODY if the WRAPPER has a handle, NIL
 
 
 
-(defgeneric update-handle (wrapper)
-  (:documentation "
-Some subclasses need to compute a new NS instance when the lisp
-instance state changes.  This method compute and sets the new (handle
-wrapper).
 
-UNWRAP of a subclass could be implemented as:
-
-    (defmethod unwrap ((self some-class))
-       (unwrapping self
-          (or (handle self) (update-handle self))))
-
-"))
-
-
-(defgeneric unwrap (wrapper)
-  (:documentation "
-DO:             Create and initialize the underlying object and bind
-                it to the HANDLE of the WRAPPER, unless it's already
-                there.
-
-POST:           (not (null (handle wrapper)))
-
-RETURN:         (handle wrapper)
-
-NOTE:           There are functions such as WRAP-NSMENU to build
-                subclass-of-WRAPPER instances from
-                subclass-of-NSObject instances, hence the name of
-                UNWRAP.
-
-NOTE:           Subclasses should define a method, calling
-                (unwrapping object …).
-
-SEE ALSO:       UNWRAPPING, WRAPPING.
-")
-  (:method ((wrapper wrapper))
-    (unwrapping wrapper
-     (or (handle wrapper)
-         (progn (cerror "Continue" "Unwrapping an empty wrapper ~S." wrapper)
-                *null*)))))
-
-
-(defgeneric release (wrapper)
-  (:documentation "
-
-DO:             Release the NSObject retained by this WRAPPER and all
-                its components.
-
-POST:           (null (handle wrapper))
-
-RETURN:         WRAPPER
-
-")
-  (:method ((wrapper wrapper))
-    (setf (handle wrapper) nil)
-    wrapper))
 
 
 

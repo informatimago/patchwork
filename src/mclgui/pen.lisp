@@ -341,6 +341,7 @@ not normally called directly but instead by stream output functions.
 
 
 (defmethod print-object ((pen pen-state) stream)
+  (declare (stepper disable))
   (print-parseable-object (pen stream :type t :identity t)
                           visiblep
                           (:position (point-to-list (pen-position pen)))

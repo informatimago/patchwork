@@ -322,7 +322,7 @@ hasn’t been handled and the normal event handlers are invoked.
 ")
 
 
-(defvar *idle* t
+(defvar *idle* nil
   "
 The *IDLE* variable signals the event system that the main Lisp
 process is idle. This changes the sleep time that event dispatch gives

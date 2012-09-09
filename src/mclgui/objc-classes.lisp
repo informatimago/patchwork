@@ -55,8 +55,8 @@
   (or (and a (not b)) (and (not a) b)))
 
 (defun cgfloat    (value) (coerce value 'ns:cgfloat))
-(defun fontsize   (value) (round  value))
-(defun coord      (value) (round  value))
+(defun fontsize   (value) (values (round  value)))
+(defun coord      (value) (values (round  value)))
 (declaim (inline cgfloat fontsize coord))
 
 
@@ -86,7 +86,8 @@
   (height 0.0d0 :type double-float))
 
 
-(defun make-nsrect (&key (x 0.0d0 xp) (y 0.0d0 yp) (width 0.0d0 widthp) (height 0.0d0 heightp) origin size)
+(defun make-nsrect (&key (x 0.0d0 xp) (y 0.0d0 yp) (width 0.0d0 widthp) (height 0.0d0 heightp)
+                      origin size)
   (assert (xor (or xp yp) origin))
   (assert (xor (or widthp heightp) size))
   (if origin
@@ -102,15 +103,21 @@
                         :width (cgfloat width)     :height (cgfloat height)))))
 
 
-(defun point-to-nspoint (point)   (make-nspoint :x (cgfloat (point-h point)) :y (cgfloat (point-v point))))
-(defun nspoint-to-point (nspoint) (make-point (coord (nspoint-x nspoint)) (coord (nspoint-y nspoint))))
+(defun point-to-nspoint (point)
+  (make-nspoint :x (cgfloat (point-h point)) :y (cgfloat (point-v point))))
+(defun nspoint-to-point (nspoint)
+  (make-point (coord (nspoint-x nspoint)) (coord (nspoint-y nspoint))))
 
-(defun size-to-nssize (size)   (make-nssize :width (cgfloat (point-h size)) :height (cgfloat (point-v size))))
-(defun nssize-to-size (nssize) (make-point (coord (nssize-width nssize)) (coord (nssize-height nssize))))
+(defun size-to-nssize (size)
+  (make-nssize :width (cgfloat (point-h size)) :height (cgfloat (point-v size))))
+(defun nssize-to-size (nssize)
+  (make-point (coord (nssize-width nssize)) (coord (nssize-height nssize))))
 
 
-(defun nsrect-origin (nsrect) (make-nspoint :x     (nsrect-x nsrect)     :y      (nsrect-y nsrect)))
-(defun nsrect-size   (nsrect) (make-nssize  :width (nsrect-width nsrect) :height (nsrect-height nsrect)))
+(defun nsrect-origin (nsrect)
+  (make-nspoint :x     (nsrect-x nsrect)     :y      (nsrect-y nsrect)))
+(defun nsrect-size   (nsrect)
+  (make-nssize  :width (nsrect-width nsrect) :height (nsrect-height nsrect)))
 
 (defun (setf nsrect-origin) (nspoint nsrect)
   (setf (nsrect-x nsrect) (nspoint-x nspoint)
@@ -394,6 +401,28 @@ RETURN:         DST.
                                                              fromView:*null*])))))
       :modifiers (nsmodifier-to-macmodifier [nsevent modifierFlags])))))
 
+
+(defun timestamp ()
+  "RETURN: The time in second since startup."
+  #+ccl (/ (#_mach_absolute_time) 1.0d9)
+  #-ccl (error "~S not implemented" 'timestamp))
+
+
+(defun get-null-event ()
+  "RETURN: A new null event."
+  (make-event :what null-event
+              :when (truncate (timestamp) (/ +tick-per-second+))
+              :where (nspoint-to-point
+                      (let ((win (front-window)))
+                        (if win
+                          (let ((winh (handle win)))
+                            (if winh
+                              (get-nspoint [winh mouseLocationOutsideOfEventStream])
+                              (get-nspoint [NSEvent mouseLocation])))
+                          (get-nspoint [NSEvent mouseLocation]))))
+              :modifiers  (nsmodifier-to-macmodifier [NSEvent modifierFlags])))
+
+
 ;;;------------------------------------------------------------
 
 
@@ -483,6 +512,7 @@ RETURN: A NSRect containing the frame of the window.
                      (point-v size))))
 
 
+
 ;;;------------------------------------------------------------
 ;;; Types.
 
@@ -523,6 +553,26 @@ RETURN: A NSRect containing the frame of the window.
 
 
 
+;;;------------------------------------------------------------
+;;; NSWindow
+
+@[NSWindow
+  method:(setFrame:(:<NSR>ect)rect)
+  resultType:(:void)
+  body:
+  (format-trace "-[NSWindow setFrame:]")
+  [self setFrame:rect display:YES]]
+
+
+
+@[NSWindow
+  method:(orderBelow:(:id)otherWindow)
+  resultType:(:void)
+  body:
+  (format-trace "-[NSWindow orderBelow:]")
+  [self orderWindow:#$NSWindowBelow relativeTo:[otherWindow windowNumber]]]
+
+
 
 ;;;------------------------------------------------------------
 ;;; MclguiWindow
@@ -531,22 +581,6 @@ RETURN: A NSRect containing the frame of the window.
            slots:((window :initform nil
                           :initarg :view
                           :reader nswindow-window))]
-
-@[MclguiWindow
-  method:(setFrame:(:<NSR>ect)rect)
-  resultType:(:void)
-  body:
-  (format-trace "-[MclguiWindow setFrame:]")
-  [self setFrame:rect display:YES]]
-
-
-@[MclguiWindow
-  method:(orderBelow:(:id)otherWindow)
-  resultType:(:void)
-  body:
-  (format-trace "-[MclguiWindow orderBelow:]")
-  [self orderWindow:#$NSWindowBelow relativeTo:[otherWindow windowNumber]]]
-
 
 
 @[MclguiWindow
@@ -680,6 +714,22 @@ RETURN: A NSRect containing the frame of the window.
       (view-key-event-handler window key)))]
 
 
+;;;------------------------------------------------------------
+;;; MclguiTextField
+
+@[NSTextField subClass:MclguiTextField
+              slots:((item :initform nil
+                           :initarg :item
+                           :reader nscontroller-dialog-item
+                           :documentation "An instance of DIALOG-ITEM or subclasses."))]
+
+@[MclguiTextField
+  method:(mclguiAction:(:id)sender)
+  resultType:(:void)
+  body:
+  (declare (ignore sender))
+  (when (nscontroller-dialog-item self)
+    (dialog-item-action (nscontroller-dialog-item self)))]
 
 ;;;------------------------------------------------------------
 ;;; MclguiView
@@ -693,7 +743,6 @@ RETURN: A NSRect containing the frame of the window.
   method:(isFlipped)
   resultType:(:<bool>)
   body:YES]
-
 
 (defvar *view-draw-contents-from-drawRect* nil)
 
@@ -734,7 +783,7 @@ RETURN: A NSRect containing the frame of the window.
   method: (mouseMoved:(:id)theEvent)
   resultType: (:void)
   body:
-  (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) theEvent)
+  ;; (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) theEvent)
   (when (nsview-view self)
     (let ((*current-event* (wrap-nsevent theEvent)))
       (window-null-event-handler (view-window (nsview-view self)))))]
@@ -762,9 +811,33 @@ RETURN: A NSRect containing the frame of the window.
   method:(evaluate)
   resultType:(:void)
   body:
-  (format-trace "evaluate")
   (format-trace "evaluate"  (evaluator-thunk self))
   (funcall (evaluator-thunk self))]
+
+
+;;;------------------------------------------------------------
+;;; Objective-C
+
+(defun class-get-subclasses (class)
+  (if (symbolp class)
+    (class-get-subclasses (find-class class))
+    (let ((num-classes (#_objc_getClassList *null* 0)))
+      (cffi:with-foreign-object (classes :pointer num-classes)
+        (#_objc_getClassList classes num-classes)
+        (loop
+          :for i :below num-classes 
+          :for subclass = (cffi:mem-aref classes :pointer i)
+          :when (loop
+                  :for superclass = (#_class_getSuperclass subclass)
+                  :then (#_class_getSuperclass superclass)
+                  :while (and (not (nullp superclass))
+                              (eq superclass class))
+                  :finally (return (if (nullp superclass)
+                                     nil
+                                     superclass)))
+          :collect subclass)))))
+
+;; (class-get-subclasses 'ns:ns-object)
 
 
 ;;;; THE END ;;;;
