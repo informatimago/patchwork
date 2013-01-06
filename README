@@ -53,13 +53,13 @@ Chargement du programme
         cd ~/quicklisp/local-projects
         git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
 
-     Normalement ils sont obtenu automatiquement via quicklisp, mais
-     il y a des modifications nécessaires pour Patchwork dans le
-     repository git, qui ne seront prises en compte par quicklisp qu'à
-     la prochaine itération mensuelle.  
+     Normalement ils sont obtenus automatiquement via quicklisp, mais
+     il y a des modifications nécessaires pour Patchwork dans le dépôt
+     git, qui ne seront prises en compte par quicklisp qu'à la
+     prochaine itération mensuelle.  
 
 2- Voir 'generate-application.lisp' ou 'loader.lisp'.  Editer
-   ~/LOGHOSTS/PATCHWORK pour indiqure où sont installés les sources de
+   ~/LOGHOSTS/PATCHWORK pour indiquer où sont installés les sources de
    Patchwork ; par exemple: ::
 
       ;; -*- mode:lisp; coding:utf-8; -*-
