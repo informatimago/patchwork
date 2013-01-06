@@ -62,8 +62,8 @@
 
 (defstruct (nspoint
              (:constructor %make-nspoint))
-  (x      0.0d0 :type double-float)
-  (y      0.0d0 :type double-float))
+  (x      0.0d0 :type ns:cgfloat)
+  (y      0.0d0 :type ns:cgfloat))
 
 (defun make-nspoint (&key (x 0.0d0) (y 0.0d0))
   (%make-nspoint :x (cgfloat x) :y (cgfloat y)))
@@ -71,8 +71,8 @@
 
 (defstruct (nssize
              (:constructor %make-nssize))
-  (width  0.0d0 :type double-float)
-  (height 0.0d0 :type double-float))
+  (width  0.0d0 :type ns:cgfloat)
+  (height 0.0d0 :type ns:cgfloat))
 
 (defun make-nssize (&key (width 0.0d0) (height 0.0d0))
   (%make-nssize :width (cgfloat width) :height (cgfloat height)))
@@ -80,27 +80,35 @@
 
 (defstruct (nsrect
              (:constructor %make-nsrect))
-  (x      0.0d0 :type double-float)
-  (y      0.0d0 :type double-float)
-  (width  0.0d0 :type double-float)
-  (height 0.0d0 :type double-float))
+  (x      0.0d0 :type ns:cgfloat)
+  (y      0.0d0 :type ns:cgfloat)
+  (width  0.0d0 :type ns:cgfloat)
+  (height 0.0d0 :type ns:cgfloat))
 
 
 (defun make-nsrect (&key (x 0.0d0 xp) (y 0.0d0 yp) (width 0.0d0 widthp) (height 0.0d0 heightp)
-                      origin size)
+                        origin size)
   (assert (xor (or xp yp) origin))
   (assert (xor (or widthp heightp) size))
-  (if origin
-      (if size
-          (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
-                        :width (nssize-width size) :height (nssize-height size))
-          (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
-                        :width (cgfloat width)     :height (cgfloat height)))
-      (if size
-          (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
-                        :width (nssize-width size) :height (nssize-height size))
-          (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
-                        :width (cgfloat width)     :height (cgfloat height)))))
+  (let ((origin (typecase origin
+                  (null    nil)
+                  (integer (make-nspoint :x (point-h origin) :y (point-v origin)))
+                  (t       origin)))
+        (size (typecase size
+                  (null    nil)
+                  (integer (make-nssize :width (point-h size) :height (point-v size)))
+                  (t       size))))
+   (if origin
+       (if size
+           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
+                         :width (nssize-width size) :height (nssize-height size))
+           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
+                         :width (cgfloat width)     :height (cgfloat height)))
+       (if size
+           (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
+                         :width (nssize-width size) :height (nssize-height size))
+           (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
+                         :width (cgfloat width)     :height (cgfloat height))))))
 
 
 (defun point-to-nspoint (point)
