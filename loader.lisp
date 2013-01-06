@@ -93,6 +93,7 @@
          #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
          asdf:*central-registry* :test (function equalp))
 
+#+(and ccl (not cl-user::no-cocoa)) (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
 
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)
 (ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
