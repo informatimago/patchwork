@@ -348,6 +348,9 @@
                                      "rect"))
 
 
+                 #+has-appleevent
+                 (:file "apple-event"
+                        :depends-on ("package"))
                  ;; MCLGUI:
 
                  (:file "mclgui"
@@ -366,7 +369,8 @@
                                      "select-dialog"
                                      "scroller"
                                      "event" "view-event" "window-event"
-                                     "cursor" "scrap" "eval" "application"))))
+                                     "cursor" "scrap" "eval" "application"
+                                     #+has-appleevent "apple-event"))))
 
 
 ;;;; THE END ;;;;
