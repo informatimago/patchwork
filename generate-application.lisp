@@ -65,6 +65,7 @@
                                          :directory '(:relative "LOGHOSTS")
                                          :name :wild
                                          :type :unspecific
+                                         ;; :type "HOST"
                                          :version :wild)
                           (user-homedir-pathname)
                           nil))
@@ -111,6 +112,11 @@
 ;; (pushnew 'cl-user::no-cocoa *features*)
 #+(and ccl (not cl-user::no-cocoa)) (require :cocoa)
 #+(and ccl (not cl-user::no-cocoa)) (defparameter *cocoa-readtable* (copy-readtable *readtable*))
+#+(and ccl (not cl-user::no-cocoa)) (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
+
+
+;; DEBUG ;;
+(ql:quickload :com.informatimago.common-lisp.lisp.stepper)
 
 (ql:quickload :mclgui)
 (ui:initialize)
