@@ -254,10 +254,10 @@ EXAMPLE:        (style-to-font-traits '(:italic :bold :underline :outline :exten
                                   :test (function string-equal)))))
 
 (defun system-font-name ()
-  (car (font-family (objcl:lisp-string [[NSFont systemFontOfSize:12.0d0] fontName]))))
+  (car (font-family (objcl:lisp-string [[NSFont systemFontOfSize:(cgfloat 12.0d0)] fontName]))))
 
 (defun application-font-name ()
-  (car (font-family (objcl:lisp-string [[NSFont userFontOfSize:12.0d0] fontName]))))
+  (car (font-family (objcl:lisp-string [[NSFont userFontOfSize:(cgfloat 12.0d0)] fontName]))))
 
 
 (defvar *mac-font-names*
@@ -723,7 +723,7 @@ The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to 0 deg
                (let* ((attributes
                        (list
                         NSFontNameAttribute            name
-                        NSFontSizeAttribute            (coerce size 'double-float)
+                        NSFontSizeAttribute            (coerce size 'ns:cgfloat)
                         NSForegroundColorAttributeName (if (zerop color)
                                                          (make-color 65535 0 0)
                                                          (error "Color for font not implemented yet."))
