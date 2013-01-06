@@ -148,7 +148,7 @@
 
 (defmethod view-draw-contents ((item static-text-dialog-item))
   (with-handle (texth item)
-    [texth drawRect: (make-nsrect :origin (view-origin item) :size (view-size item))])
+    [texth drawRect: (unwrap (make-nsrect :origin (view-origin item) :size (view-size item)))])
   ;; We shouldn't have to do anything really
   #-(and)
   (when (installed-item-p item)
