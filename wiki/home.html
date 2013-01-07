@@ -1,0 +1,113 @@
+<h1>PatchWork on MacOSX</h1>
+
+<p>[project-status|avancement du projet]
+
+<p>[references]
+
+<h2>Comment rapporter une bogue - Bug Tracking: How to add a Ticket</h2>
+
+<p>N'importe qui peut ajouter un rapport de bogue, mais tous doivent s'identifier.
+<p>Vous pouvez <a href="/patchwork/register?g=">créer un compte</a>,
+ou <a href="/patchwork/login">vous connecter</a> avec un compte existant.
+
+<p>Anybody can add a bug report, but everybody must log in.
+<p>You may <a href="/patchwork/register?g=">create an account</a>,
+or <a href="/patchwork/login">log in</a> with an existing account.
+
+
+
+<h2>Comment clôner le dépôt - How to clone the repository</h2>
+
+<p>Le projet utilise le logiciel de gestion des sources 
+<a href="http://git-scm.com/"><b>git</b></a>.
+
+
+
+<p>À l'origine, le projet utilisait le logiciel de gestion des sources
+<a href="http://www.fossil-scm.org/"><b>fossil</b></a>.  Fossil est encore utilisé, pour le suivi des bogues, et pour ce wiki, mais les sources sont gérées par git, avec un dépôt central sur gitorious:
+
+<quote><a href="https://gitorious.org/patchwork">https://gitorious.org/patchwork</a></quote>
+
+
+<pre>
+
+&#91;pjb@kuiper :0 tmp]$ git clone git@gitorious.org:patchwork/patchwork.git
+Cloning into 'patchwork'...
+remote: Counting objects: 1720, done
+remote: Finding sources: 100% (1720/1720)
+remote: Compressing objects: 100% (288/288)
+remote: Compressing objects: 100% (287/287)
+Receiving objects: 100% (1720/1720), 5.93 MiB | 2.29 MiB/s, done.
+Resolving deltas: 100% (1412/1412), done.
+&#91;pjb@kuiper :0 tmp]$ cd patchwork
+&#91;pjb@kuiper :0 patchwork]$ ls -la
+total 432
+drwxr-xr-x  5 pjb  pjb    4096 Jan  7 01:27 ./
+drwxrwxrwt 23 root root 315392 Jan  7 01:27 ../
+drwxr-xr-x  7 pjb  pjb    4096 Jan  7 01:27 .git/
+-rw-r--r--  1 pjb  pjb    5056 Jan  7 01:27 Makefile
+-rw-r--r--  1 pjb  pjb   37806 Jan  7 01:27 Patchwork_license.rtf
+-rw-r--r--  1 pjb  pjb   35236 Jan  7 01:27 Patchwork_license.txt
+-rw-r--r--  1 pjb  pjb    2610 Jan  7 01:27 README
+drwxr-xr-x  2 pjb  pjb    4096 Jan  7 01:27 fossil/
+-rw-r--r--  1 pjb  pjb    6316 Jan  7 01:27 generate-application.lisp
+-rw-r--r--  1 pjb  pjb    4124 Jan  7 01:27 loader.lisp
+drwxr-xr-x  9 pjb  pjb    4096 Jan  7 01:27 src/
+&#91;pjb@kuiper :0 patchwork]$ make
+make all                            # Default target = help
+make help                           # Prints this help.
+make clean                          # Erases the fasl files.
+make cleanall                       # + Erases the backup files files.
+make variables                      # Prints the variables.
+make application                    # Generates the application.
+make generate-new-ccl               # Generates a new ccl.
+&#91;pjb@kuiper :0 patchwork]$ 
+</pre>
+
+<br><br><br>
+<p>Anciennes instruction pour le dépôt fossil (mais il ne sera pas mis à jour)</p>
+<small>
+<pre>
+
+# Pour un clône anonyme:
+
+&#91;pjb at kuiper :0 patchwork]$ <b>fossil clone http://fossil.informatimago.com:8002/patchwork patchwork.fossil</b>
+
+# Pour un clône avec login (permettant de push-er des commit-s sur le serveur):
+
+&#91;pjb at kuiper :0 patchwork]$ <b>fossil clone http://${USER}:${PASSWORD}@fossil.informatimago.com:8002/patchwork patchwork.fossil</b>
+
+# ${USER} et ${PASSWORD} étant le login créé sur ce site dépôt fossil.
+
+.               Bytes      Cards  Artifacts     Deltas
+Sent:              53          1          0          0
+Received:      818616       1034        143        375
+Sent:              58          2          0          0
+Received:        7721          7          0          0
+Total network traffic: 517 bytes sent, 821177 bytes received
+Rebuilding repository meta-data...
+  100.0% complete...
+project-id: ...
+server-id:  ...
+admin-user: ...
+&#91;pjb at kuiper :0 patchwork]$ <b>mkdir patchwork</b>
+&#91;pjb at kuiper :0 patchwork]$ <b>cd patchwork</b>
+&#91;pjb at kuiper :0 patchwork]$ <b>fossil open ../patchwork.fossil</b>
+Patchwork_license.rtf
+...
+src/pw-music/utilities/mn-hardcopy.lisp
+src/pw-music/utilities/music-abst-fun.lisp
+project-name: PatchWork/MacOSX
+repository:   /home/pjb/works/patchwork/patchwork/../patchwork.fossil
+local-root:   /home/pjb/works/patchwork/patchwork/
+project-code: 8da4fbae771061b0d45af1a298df4c4439092371
+checkout:     19efd2e28b33dd1acd93f603bd0c95edb1b42b27 2012-05-07 14:11:19 UTC
+parent:       cba26aa1935252fbf017d2bf4e7d96d5ca447a66 2012-05-07 14:11:09 UTC
+tags:         trunk
+comment:      Changed license to GPL3; added header comments. (user: pjb)
+&#91;pjb at kuiper :0 patchwork]$ ls
+./   Patchwork_license.rtf  _FOSSIL_		       src/
+../  Patchwork_license.txt  generate-application.lisp
+&#91;pjb at kuiper :0 patchwork]$ 
+</pre>
+</small>
