@@ -40,14 +40,14 @@
 (defun check-s ()
   (declare (special *record-enable*))
   (setf *record-enable* nil)
+  (niy *record-enable*)
   ;; (if (ui::gestalt :|ascr|) 
   ;;   (setf *record-enable* t)
   ;;   (setf *record-enable* nil))
   )
 
-#||PJB
-(ui::def-load-pointers check-script () (ui::without-interrupts (check-s)))
-||#
+(on-load-and-now check-script
+  (check-s))
 
 ;;RECORDABLES
 (defun pw::send-appleevent (the-appleevent the-reply &key

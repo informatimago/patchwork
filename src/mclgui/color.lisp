@@ -136,40 +136,6 @@ RGB colors into Macintosh color-table entries, see Inside Macintosh.
                        alpha: (cgfloat (%color-alpha self))]))
 
 
-(defun user-pick-color (&key (color *black-color*) (prompt "Pick a color") position)
-  "
-The USER-PICK-COLOR function displays the standard Macintosh Color
-Picker at POSITION, set to color COLOR, with prompt PROMPT.  It
-returns the selected color if the user clicks OK or throws to the tag
-:cancel if the user clicks Cancel.
-
-
-COLOR:          The default color to bring up in the dialog box. The
-                default is *BLACK-COLOR*.
-
-PROMPT:         The prompt to display in the dialog box. The default
-                is \"Pick a color\".
-
-POSITION:       The position of the Color Picker on screen. The
-                default is calculated by Macintosh Common Lisp.
-
-"
-  (declare (ignore prompt position))
-  (let ((panel [NSColorPanel sharedColorPanel]))
-    [panel setShowsAlpha:YES]
-    [panel setMode:#$NSWheelModeColorPanel]
-    [panel setColor:[NSColor colorWithCalibratedRed: (color-red color)
-                             green: (color-green color)
-                             blue: (color-blue color)
-                             alpha: (color-alpha color)]]
-    [panel makeKeyAndOrderFront:panel]
-    (when (= [[NSApplication sharedApplication]runModalForWindow:panel]
-             #$NSRunAbortedResponse)
-      (throw-cancel))
-    (wrap-nscolor [panel color])))
-
-
-
 
 (defgeneric set-fore-color (window color)
   (:documentation "

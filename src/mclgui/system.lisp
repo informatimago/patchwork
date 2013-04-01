@@ -35,6 +35,176 @@
 (in-package "MCLGUI")
 
 
+
+
+
+;;;
+;;; The hairy subject of saving and reloading images, with the
+;;; restoration of resources and pointers.  
+;;;
+
+
+;; We define on-* macros that let us define functions that are called
+;; at specific times, and in the following order:
+;;
+;; quit
+;;     on-quit
+;; 
+;; save-application
+;;     on-quit
+;;     on-save
+;; 
+;; launch
+;;     on-restore
+;;     on-load-and-now
+;;     on-startup
+
+
+
+
+
+#+ccl
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (import '(ccl:*lisp-cleanup-functions*
+            ccl:*save-exit-functions*
+            ccl:*restore-lisp-functions*
+            ccl:def-load-pointers
+            ccl:*lisp-startup-functions*)))
+
+
+#-ccl
+(defvar *lisp-cleanup-functions* '()
+  "
+The *LISP-CLEANUP-FUNCTIONS* variable contains a list of functions of
+no arguments on which funcall is run just before Macintosh Common Lisp
+exits (via QUIT or SAVE-APPLICATION).  These functions are called just
+after the windows are closed.
+
+When saving an application, the functions in *LISP-CLEANUP-FUNCTIONS*
+are run, then the functions in *SAVE-EXIT-FUNCTIONS* are run.
+")
+
+
+#-ccl
+(defvar *save-exit-functions* '()
+  "
+The *SAVE-EXIT-FUNCTIONS* variable contains a list of functions to be
+called when an image is saved.  These functions should perform any
+preparation necessary for the image saving.  The functions are called
+in the order in which they appear in the list.
+
+When saving an application, the functions in *LISP-CLEANUP-FUNCTIONS*
+are run, then the functions in *SAVE-EXIT-FUNCTIONS* are run.
+")
+
+
+#-ccl
+(defvar *restore-lisp-functions* '())
+
+
+#-ccl
+(defvar *lisp-user-pointer-functions* '())
+
+
+#-ccl
+(defvar *lisp-startup-functions* '()
+  "
+The *LISP-STARTUP-FUNCTIONS* variable contains a list of functions of
+no arguments on which funcall is run after Macintosh Common Lisp
+starts, just before it enters the top-level function (usually the
+Listener’s read loop).  The functions contained in
+*LISP-STARTUP-FUNCTIONS* are run after the functions specified by
+DEF-LOAD-POINTERS and before the init file is loaded.  The functions
+are called in reverse order from the order in which they appear in the
+list. 
+")
+
+
+
+#| in ccl:
+
+;; Add function to lisp system pointer functions, and run it if it's
+;; not already there.
+
+(defmacro def-ccl-pointers (name arglist &body body &aux (old (gensym)))
+  `(flet ((,name ,arglist ,@body))
+     (let ((,old (member ',name *lisp-system-pointer-functions* :key #'function-name)))
+       (if ,old
+         (rplaca ,old #',name)
+         (progn
+           (push #',name *lisp-system-pointer-functions*)
+           (,name))))))
+
+(defmacro def-load-pointers (name arglist &body body &aux (old (gensym)))
+  `(flet ((,name ,arglist ,@body))
+     (let ((,old (member ',name *lisp-user-pointer-functions* :key #'function-name)))
+       (if ,old
+         (rplaca ,old #',name)
+         (progn
+           (push #',name *lisp-user-pointer-functions*)
+           (,name))))))
+
+|#
+
+
+(defmacro define-on-operators (base-name list-var &optional and-now)
+  (let ((fname (intern (format nil "ON-~A*" (symbol-name base-name))))
+        (mname (intern (format nil "ON-~A"  (symbol-name base-name)))))
+    `(progn
+       (defun ,fname (function-name thunk and-now)
+         (when thunk
+           (setf (symbol-function function-name) thunk))
+         (pushnew function-name ,list-var)
+         (when and-now (funcall function-name)))
+       (defmacro ,mname (function-name &body body)
+         (multiple-value-bind (docstring declarations body) (parse-body :lambda body)
+           `(,',fname ',function-name
+                    ,(when body `(lambda ()
+                                   ,@docstring
+                                   ,@declarations
+                                   (block ,function-name ,@body)))
+                    ,,and-now)))
+       ',mname)))
+
+
+(define-on-operators quit         *lisp-cleanup-functions*)
+(define-on-operators save         *save-exit-functions*)
+(define-on-operators restore      *restore-lisp-functions*)
+#-ccl
+(define-on-operators load-and-now *lisp-user-pointer-functions*  :and-now)
+#+ccl
+(defmacro on-load-and-now (function-name &body body)
+  `(progn
+     (setf (symbol-function ',function-name) (lambda () (block ,function-name ,@body)))
+     (def-load-pointers ,function-name () ,@body)))
+(define-on-operators startup      *lisp-startup-functions*)
+
+
+
+;;;
+;;;---------------------------------------------------------------------
+;;;
+
+(defmacro without-interrupts (&body body)
+  "
+The WITHOUT-INTERRUPTS special form executes form with all event
+processing disabled, including abort.
+
+You should use WITHOUT-INTERRUPTS sparingly because anything executed
+dynamically within it cannot be aborted or easily debugged.  However,
+you must often use WITHOUT-INTERRUPTS in code that causes a window to
+be redisplayed.  If you need to invalidate a number of regions in a
+window, do it inside a without-interrupts form to prevent multiple
+redisplays.
+"
+  ;; Note: the mcl implementation doesn't seem to do anything more:
+  `(progn ,@body))
+
+
+;;;
+;;;---------------------------------------------------------------------
+;;;
+
 (defun fixnump (object)
   (typep object 'fixnum))
 

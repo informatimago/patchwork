@@ -733,9 +733,7 @@ The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to 0 deg
                         ;; NSShadowAttributeName          (if (member :shadow    others) *default-shadow* nil)
                         ;; NSStrokeWidthAttributeName     (if (member :outline   others) 3.0f0 0.0f0)
                         )))
-                 (list (make-instance 'wrapper
-                         :handle [NSFontDescriptor
-                                  fontDescriptorWithFontAttributes:(unwrap-plist attributes)])
+                 (list (awrap [NSFontDescriptor fontDescriptorWithFontAttributes:(unwrap-plist attributes)])
                        mode
                        size))))))
   (values-list (list* (handle (first (descriptor-cache-descriptor *descriptor-cache*)))
@@ -1003,7 +1001,8 @@ DO:             Change the view font codes of view.  The font/face
 
 
 
-
+(defclass font (wrapper)
+  ((specification :initarg :specification :accessor font-specification)))
 
 (defun wrap-nsfont (nsfont)
   (make-instance 'wrapper :handle nsfont))

@@ -175,10 +175,6 @@
       (concatenate 'list rep  (list beat-chord)))))
 ;;***********HANDLERS***************
 
-
-(defclass application ()
-  ())
-
 ;;OPEN
 
 (defmethod even-open ((a application) theAppleEvent reply handlerRefcon)

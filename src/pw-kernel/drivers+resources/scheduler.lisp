@@ -42,7 +42,7 @@
 
 
 (defpackage "SCHEDULER"
-  (:use "COMMON-LISP")
+  (:use "COMMON-LISP" "MCLGUI")
   (:import-from "UI" "WITHOUT-INTERRUPTS" "*EVENTHOOK*" "EVENT-DISPATCH")
   (:import-from "MIDI" "CLOCK-TIME" "MIDI-WRITE" "MIDI-WRITE-TIME")
   (:export "START" "*ERROR-WHEN-EXTRA-START?*" "DFUNCALL" "APDFUNCALL"
@@ -729,17 +729,14 @@ time with the :STEP mode.")
 
 (proclaim '(optimize (speed 1) (safety 1) (space 1)))
 
-;;(push (lambda () (setq *eventhook* nil)) ui:*save-exit-functions*)
+(on-quit quit/scheduler (setq *eventhook* nil))
+(on-load-and-now init/scheduler (init-scheduler))
+(init-scheduler)
 
-;;(new-restore-lisp-function 'init-scheduler :if-exists :old)
-;;(ui::def-load-pointers startup-the-scheduler () (ui::without-interrupts (init-scheduler)))
-
-;;(init-scheduler)
-
-#|
+#||
 (defun bar (n) (repeat n (print 'bar)))
 (start
  (setq s2 (dfuncall 100 'bar 100))
  (with-more-priority
    (setq s1 (dfuncall 60 'princ 'foo))))
-|#
+||#

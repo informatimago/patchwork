@@ -57,8 +57,8 @@
 
 
 (defvar *r-view-temp-region* nil)
-;; (def-load-pointers r-view-temp-region ()
-;;   (ui::without-interrupts (setq *r-view-temp-region* (#_NewRgn))))
+(on-load-and-now init/r-view-temp-region
+  (setq *r-view-temp-region* (new-region)))
 
 ;;======================================
 

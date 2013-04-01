@@ -647,13 +647,14 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
 "
   (let ((nsevent [[NSApplication sharedApplication]
                   nextEventMatchingMask: (mac-event-mask-to-ns-event-mask every-event)
-                  untilDate: [NSDate dateWithTimeIntervalSinceNow: (cgfloat (* 60
-                                                                               (or sleep-ticks
-                                                                                   (if *foreground* 
-                                                                                     (if idle
-                                                                                       *idle-sleep-ticks*
-                                                                                       *foreground-sleep-ticks*)
-                                                                                     *background-sleep-ticks*))))]
+                  untilDate: [NSDate dateWithTimeIntervalSinceNow:
+                                     (cgfloat (* 60
+                                                 (or sleep-ticks
+                                                     (if *foreground* 
+                                                         (if idle
+                                                             *idle-sleep-ticks*
+                                                             *foreground-sleep-ticks*)
+                                                         *background-sleep-ticks*))))]
                   inMode:#$NSDefaultRunLoopMode
                   dequeue:YES]))
     (assign-event event
@@ -716,22 +717,6 @@ different from the default behavior for many types of events.
 
 WINDOW:         A window.
 "))
-
-
-(defmacro without-interrupts (&body body)
-  "
-The WITHOUT-INTERRUPTS special form executes form with all event
-processing disabled, including abort.
-
-You should use WITHOUT-INTERRUPTS sparingly because anything executed
-dynamically within it cannot be aborted or easily debugged.  However,
-you must often use WITHOUT-INTERRUPTS in code that causes a window to
-be redisplayed.  If you need to invalidate a number of regions in a
-window, do it inside a without-interrupts form to prevent multiple
-redisplays.
-"
-  ;; Note: the mcl implementation doesn't seem to do anything more:
-  `(progn ,@body))
 
 
 

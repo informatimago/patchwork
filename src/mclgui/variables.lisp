@@ -405,6 +405,14 @@ The *watch-cursor* variable specifies the watch-face shape shown
 during time-consuming operations, when event processing is disabled.
 ")
 
+;; pane-splitter cursors:
+(defvar *top-ps-cursor*        nil)
+(defvar *bottom-ps-cursor*     nil)
+(defvar *left-ps-cursor*       nil)
+(defvar *right-ps-cursor*      nil)
+(defvar *vertical-ps-cursor*   nil)
+(defvar *horizontal-ps-cursor* nil)
+
 
 (defvar *cursorhook* nil
   "
@@ -451,44 +459,7 @@ entries for them to this list.
 
 (defvar *application* nil)
 
-(defvar *lisp-startup-functions* '()
-  "
-The *LISP-STARTUP-FUNCTIONS* variable contains a list of functions of
-no arguments on which funcall is run after Macintosh Common Lisp
-starts, just before it enters the top-level function (usually the
-Listener’s read loop).  The functions contained in
-*LISP-STARTUP-FUNCTIONS* are run after the functions specified by
-DEF-LOAD-POINTERS and before the init file is loaded.  The functions
-are called in reverse order from the order in which they appear in the
-list. 
-")
-
-
-(defvar *lisp-cleanup-functions* '()
-  "
-The *LISP-CLEANUP-FUNCTIONS* variable contains a list of functions of
-no arguments on which funcall is run just before Macintosh Common Lisp
-exits (via QUIT or SAVE-APPLICATION).  These functions are called just
-after the windows are closed.
-
-When saving an application, the functions in *LISP-CLEANUP-FUNCTIONS*
-are run, then the functions in *SAVE-EXIT-FUNCTIONS* are run.
-")
-
-(defvar *save-exit-functions* '()
-  "
-The *SAVE-EXIT-FUNCTIONS* variable contains a list of functions to be
-called when an image is saved.  These functions should perform any
-preparation necessary for the image saving.  The functions are called
-in the order in which they appear in the list.
-
-When saving an application, the functions in *LISP-CLEANUP-FUNCTIONS*
-are run, then the functions in *SAVE-EXIT-FUNCTIONS* are run.
-")
-
-
 (defvar *hide-windoids-on-suspend* t)
-
 
 
 ;;;; THE END ;;;;

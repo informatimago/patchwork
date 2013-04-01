@@ -1104,31 +1104,10 @@
 ;;---------------------------------------------------------------------------------
 
 
-;;---------------------------------------------------------------------------------
-;; 			    To Add Startup and Quit Actions
-;;---------------------------------------------------------------------------------
-
-;;................................................................................: add-startup-action
-(defmethod add-startup-action ((foo cl:function))
-  (pushnew foo *lisp-startup-functions*))
-
-;;................................................................................: add-quit-action
-(defmethod add-quit-action ((foo cl:function))
-  (pushnew foo *lisp-cleanup-functions*))
-
-
-;;---------------------------------------------------------------------------------
-;; 	 		MidiShare Startup and Quit Actions
-;;---------------------------------------------------------------------------------
-
-;;................................................................................: install-midishare-interface
 (defun install-midishare-interface ()
-  (ui::def-load-pointers start-midi-share () (setf *midishare* (%get-ptr (%int-to-ptr #xB8))))
   (unless (midishare) 
     (print "MidiShare not installed. PatchWork cannot play or record Midi.")))
-;;;(error "MidiShare not installed")))
 
-;;................................................................................: remove-midishare-interface
 (defun remove-midishare-interface ()
   (setq *midiShare* nil))
 
@@ -1137,7 +1116,9 @@
 ;;---------------------------------------------------------------------------------
 
 (eval-when (:load-toplevel :execute)
-  (add-startup-action #'install-midishare-interface)
-  (add-quit-action #'remove-midishare-interface)
+  (on-load-and-now start-midi-share
+     (setf *midishare* (%get-ptr (%int-to-ptr #xB8))))
+  (on-startup install-midishare-interface)
+  (on-quit    remove-midishare-interface)
   (install-midishare-interface))
 ||#

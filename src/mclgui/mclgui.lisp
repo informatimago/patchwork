@@ -35,13 +35,6 @@
 (in-package "MCLGUI")
 
 
-(defmacro def-load-pointers (name lambda-list &body body)
-  ;; NOTE: we won't implement this, the sources will have to change.
-  (niy def-load-pointer name lambda-list body)
-  `(niy def-load-pointer ',name ',lambda-list ',body))
-
-
-
 
 (defun initialize/screen ()
   (multiple-value-bind (pos siz) (main-screen-frame)

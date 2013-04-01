@@ -160,19 +160,19 @@
                :prompt "Save new image as:"
                :button-string  "Save"
                :directory (merge-pathnames "Desktop/" (user-homedir-pathname))
+               ;; PJB-TODO:  check logical pathnames in patchwork.
                #-(and)"CL:images;Pw.image"))
         (sizes (list (* 8500 1024)
                      (* 6500  1024))))
     (when file
       (clear-patchwork)
-      #+ccl (setf ccl:*lisp-cleanup-functions* (list (car ccl:*lisp-cleanup-functions*)))
       (eval-enqueue        
        (lambda ()
          #+ccl (ccl::build-application
                 :name (file-namestring file)
                 :directory (make-pathname :name nil :type nil :version nil :defaults file)
                 :copy-ide-resources t
-                ;; :init-file "HOME:patchwork-init.lisp"
+                ;; :init-file #P"HOME:patchwork-init.lisp"
                 ;; '(pathname "~/application-init.lisp")
                 ;;  (lambda ()
                 ;;              (make-pathname :name  "patchwork-init" :type "lisp"
@@ -348,21 +348,21 @@ DO:       Execute the BODY with a handler for CONDITION and
   (add-menu-items *PWoper-menu*
                   (new-leafmenu "Lisp function…"
                                 (lambda () 
-                                  (let ((string
-                                         (get-string-from-user  "Lisp function"
-                                                                :size (make-point 200 85)
-                                                                :position :centered
-                                                                :initial-string "list")))
-                                    (when string
-                                      (setf *si-record* nil)
-                                      (let* ((patch (make-lisp-pw-boxes (read-from-string string) 
-                                                                        *active-patch-window*)))
-                                        (setf *si-record* t)
-                                        (when patch
-                                          (record-patch "funlisp"
-                                                        (list (point-h (view-position patch))
-                                                              (point-h (view-position patch)))
-                                                        string)))))))
+                                    (let ((string
+                                           (get-string-from-user  "Lisp function"
+                                                                  :size (make-point 200 85)
+                                                                  :position :centered
+                                                                  :initial-string "list")))
+                                      (when string
+                                        (setf *si-record* nil)
+                                        (let* ((patch (make-lisp-pw-boxes (read-from-string string) 
+                                                                          *active-patch-window*)))
+                                          (setf *si-record* t)
+                                          (when patch
+                                            (record-patch "funlisp"
+                                                          (list (point-h (view-position patch))
+                                                                (point-h (view-position patch)))
+                                                          string)))))))
                   (new-leafmenu "-" nil)
                   ;; (new-leafmenu "Abort" (lambda () (toplevel))))
                   )
@@ -419,8 +419,7 @@ DO:       Execute the BODY with a handler for CONDITION and
   (set-command-key   *apps-lisp-menu-item* #\L)
   (set-command-key   *apps-PW-menu-item*   #\1)
   ;;------------------------------
-  #+ccl (pushnew (function cleanup-PW-wins) ccl:*lisp-cleanup-functions*)
-  #-ccl (niy *lisp-cleanup-functions*))
+  (on-quit cleanup-PW-wins))
 
 
 (initialize-menus)

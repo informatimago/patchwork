@@ -58,7 +58,7 @@
                         :depends-on ("package"))
                  
                  (:file "wrapper"
-                        :depends-on ("package"))
+                        :depends-on ("package" "system"))
 
                  (:file "notification"
                         :depends-on ("package"
@@ -108,7 +108,7 @@
                  (:file "view"
                         :depends-on ("package" 
                                      "macros" "variables" "color"
-                                     "point" "region" "font" "pen"
+                                     "point" "region" "font" "pen" 
                                      "wrapper" "view-classes" "objc-classes"))
 
                  (:file "view-stream"
@@ -136,7 +136,7 @@
                  (:file "dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" ; "event"
                                      "region"))
 
                  (:file "default-button-mixin"
@@ -147,13 +147,13 @@
                  (:file "control-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" ; "event"
                                      "dialog-item"))
                  
                  (:file "button-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" ; "event"
                                      "dialog-item" "control-dialog-item"
                                      "default-button-mixin"))
 
@@ -167,7 +167,7 @@
                  (:file "radio-button-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" ; "event"
                                      "dialog-item" "control-dialog-item"
                                      "button-dialog-item"))
                  
@@ -185,8 +185,7 @@
 
                  (:file "key-handler-mixin"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system"
+                                     "macros" "variables" "point" "system"
                                      "view-classes" "view" "window"))
                  
                  (:file "editable-text-dialog-item"
@@ -198,7 +197,7 @@
                  (:file "table-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system" "region"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" ; "event"
                                      "dialog-item" "view-event" "key-handler-mixin"
                                      "scroll-bar-dialog-item"))
 
@@ -212,26 +211,24 @@
                  (:file "scroll-bar-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" ; "event"
                                      "dialog-item" "view-event"))
 
                  (:file "pop-up-menu-dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"
+                                     "view-classes" "view" "window" ; "event"
                                      "dialog-item" "view-event"))
 
                  (:file "dialog"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system"
-                                     "view-classes" "view" "window" "event" "view-event"
+                                     "macros" "variables" "point" "system"
+                                     "view-classes" "view" "window"  "view-event" "event"
                                      "dialog-item" "key-handler-mixin"))
 
                  (:file "y-or-n-dialog"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system"
+                                     "macros" "variables" "point" "system"
                                      "view-classes" "view" "window" "event"
                                      "dialog-item" "key-handler-mixin"
                                      "button-dialog-item" 
@@ -240,8 +237,7 @@
 
                  (:file "select-dialog"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system"
+                                     "macros" "variables" "point" "system"
                                      "view-classes" "view" "window" "event"
                                      "dialog-item" "key-handler-mixin"
                                      "button-dialog-item" 
@@ -250,8 +246,7 @@
 
                  (:file "message-dialog"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system"
+                                     "macros" "variables" "point" "system"
                                      "view-classes" "view" "window" "event"
                                      "dialog-item" "key-handler-mixin"
                                      "button-dialog-item" 
@@ -260,8 +255,7 @@
 
                  (:file "get-string-dialog"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system"
+                                     "macros" "variables" "point" "system"
                                      "view-classes" "view" "window" "event"
                                      "dialog-item" "key-handler-mixin"
                                      "button-dialog-item" 
@@ -270,9 +264,9 @@
 
                  (:file "scroller"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system" "graphics"
-                                     "view-classes" "view" "window" "event"
+                                     "macros" "variables" "point" "system"
+                                     "graphics"
+                                     "view-classes" "view" "window" ; "event"
                                      "dialog-item" "key-handler-mixin"
                                      "scroll-bar-dialog-item"
                                      "dialog"))
@@ -281,6 +275,9 @@
 
                  (:file "color"
                         :depends-on ("package" "wrapper"))
+
+                 (:file "color-dialog"
+                        :depends-on ("package" "wrapper" "color" "dialog"))
 
                  ;; Chapter 8: File System Interface
 
@@ -301,14 +298,12 @@
                  
                  (:file "view-event"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system" "view-classes" "view"
+                                     "macros" "variables" "point" "system" "view-classes" "view"
                                      "event" "key-handler-mixin"))
 
                  (:file "window-event"
                         :depends-on ("package" 
-                                     "macros" "variables" "point"
-                                     "system" "view-classes" "window"
+                                     "macros" "variables" "point" "system" "view-classes" "window"
                                      "view-event" "event" "application"))
 
                  

@@ -744,7 +744,8 @@
                                             :update-function 'update-windows-menu
                                             :help-spec '(values 1500 (1501 1 2 1 3))))
 
-;(push (lambda () (update-windows-menu *windows-menu*)) *save-exit-functions*)
+(on-save on-save/update-windows-menu
+  (update-windows-menu *windows-menu*))
 
 (defparameter *default-menubar*
   (lds (list *apple-menu* *file-menu* *edit-menu*

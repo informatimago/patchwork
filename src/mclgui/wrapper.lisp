@@ -36,6 +36,7 @@
 (objcl:enable-objcl-reader-macros)
 
 
+
 (defgeneric handle (object)
   (:documentation "The NSObject instance wrapped over.")
   (:method ((none null)) nil))
@@ -68,6 +69,65 @@ Subclasses should implement a method for UPDATE-HANDLE to initialize
 the Objective-C object.
 "))
 
+(defmacro with-handle ((handle-var wrapper) &body body)
+  "
+DO:             Binds HANDLE-VAR to (handle WRAPPER) and then executes
+                BODY only when the handle of the WRAPPER is not NULL.
+
+RETURN:         The result of BODY if the WRAPPER has a handle, NIL
+                otherwise.
+"
+  `(let ((,handle-var (handle ,wrapper)))
+     (when ,handle-var
+       ,@body)))
+
+
+
+(defvar *wrapping* nil)
+
+(defmacro wrapping (&body body)
+  "
+DO:             Wrapping functions should use this macro so that calls
+                to UNWRAP are detected and inhibited.
+
+NOTE:           WRAPPING updates the instance from a NS object.
+"
+  `(let ((*wrapping* t))
+     ,@body))
+
+
+(defmacro unwrapping (object &body body)
+  "
+DO:             Execute BODY, unless a wrapping is occuring, in which
+                case it just check that OBJECT already has a handle.
+
+NOTE:           UNWRAPPING returns the handle or compute a new NS
+                object from the instance (and sets the handle with it).
+"
+  (let ((vobject (gensym "object")))
+    `(let ((,vobject ,object))
+       (if *wrapping*
+           (let ((handle (handle ,vobject)))
+             (unless handle
+               (cerror "Continue" "Called (UNWRAP ~S) while wrapping." ,vobject))
+             handle)
+           (progn
+             ,@body)))))
+
+
+
+(defparameter *wrapper-instances* (make-weak-list '()))
+
+(on-save clear-handles
+  (mapcar (lambda (wrapper)
+              (format *trace-output* "~&clearing a ~A~%" (class-name (class-of wrapper)))
+              (setf (handle wrapper) nil))
+          (weak-list-list *wrapper-instances*)))
+
+(on-restore reset-handles
+  (dolist (wrapper (weak-list-list *wrapper-instances*))
+    (format *trace-output* "~&unwrapping a ~A~%" (class-name (class-of wrapper)))
+    (unwrap wrapper)))
 
 
 #+ccl (defmethod ccl:terminate ((self wrapper))
@@ -76,6 +136,7 @@ the Objective-C object.
 
 (defmethod initialize-instance :after ((self wrapper) &key &allow-other-keys)
   #+ccl (ccl:terminate-when-unreachable self)
+  (push self (weak-list-list *wrapper-instances*))
   (if (handle self)
     [(handle self) retain]
     (update-handle self))
@@ -99,6 +160,7 @@ NOTE:           There are functions such as WRAP-NSMENU to build
 
 NOTE:           Subclasses should define a method, calling
                 (unwrapping object …).
+
 
 SEE ALSO:       UNWRAPPING, WRAPPING.
 ")
@@ -148,52 +210,73 @@ RETURN:         NEW-HANDLE.
     new-handle))
 
 
-(defmacro with-handle ((handle-var wrapper) &body body)
-  "
-DO:             Binds HANDLE-VAR to (handle WRAPPER) and then executes
-                BODY only when the handle of the WRAPPER is not NULL.
-
-RETURN:         The result of BODY if the WRAPPER has a handle, NIL
-                otherwise.
-"
-  `(let ((,handle-var (handle ,wrapper)))
-     (when ,handle-var
-       ,@body)))
 
 
 
+(defclass anonymous-wrapper (wrapper)
+  ((thunk :initarg :thunk :reader anonymous-wrapper-thunk)))
+
+(defmethod update-handle ((wrapper anonymous-wrapper))
+  (setf (handle wrapper) (funcall (anonymous-wrapper-thunk wrapper))))
+
+(defmacro awrap (&body body)
+  (let ((thunk (gensym)))
+    `(let ((,thunk (lambda () ,@body)))
+       (make-instance 'anonymous-wrapper :handle (funcall ,thunk) :thunk ,thunk))))
 
 
 
+#|
 
-(defvar *wrapping* nil)
-
-(defmacro wrapping (&body body)
-  "
-Wrapping functions should use this macro so that calls to UNWRAP are
-detected and inhibited.
-"
-  `(let ((*wrapping* t))
-     ,@body))
-
-
-(defmacro unwrapping (object &body body)
-  "
-DO:             Execute BODY, unless a wrapping is occuring, in which
-                case it just check that OBJECT already has a handle.
-"
-  (let ((vobject (gensym "object")))
-    `(let ((,vobject ,object))
-       (if *wrapping*
-           (let ((handle (handle ,vobject)))
-             (unless handle
-               (cerror "Continue" "Called (UNWRAP ~S) while wrapping." ,vobject))
-             handle)
-           (progn
-             ,@body)))))
+ui> (nsfont-from-codes 0 0)
+#<ns-font "LucidaGrande 12.00 pt. P [] (0x5c2e50) fobj=0x11a8a40, spc=3.80" (#x5C2E50)>
+:srccopy
+0
+(:plain)
+ui> (defparameter *font-data* [NSArchiver archivedDataWithRootObject:(nsfont-from-codes 0 0)])
+*font-data*
+ui> *font-data*)
+; Evaluation aborted on #<ccl::simple-reader-error #x302004C5B86D>.
+ui> *font-data*
+#<ns-mutable-data <040b7374 7265616d 74797065 6481e803 84014084 8484064e 53466f6e 741e8484 084e534f 626a6563 74008584 01692484 055b3336 635d0600 00001a00 0000fffe 4c007500 63006900 64006100 47007200 61006e00 64006500 00008401 660c8401 63009801 98009800 86> (#x119B3A0)>
+ui> [NSUnarchiver unarchiveObjectWithData:*font-data*]
+#<ns-font "LucidaGrande 12.00 pt. P [] (0x5c2e50) fobj=0x11a8a40, spc=3.80" (#x5C2E50)>
+|#
 
 
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+ (defconstant +C-ID+            #\@)
+ (defconstant +C-CLASS+         #\#)
+ (defconstant +C-SEL+           #\:)
+ (defconstant +C-CHR+           #\c)
+ (defconstant +C-UCHR+          #\C)
+ (defconstant +C-SHT+           #\s)
+ (defconstant +C-USHT+          #\S)
+ (defconstant +C-INT+           #\i)
+ (defconstant +C-UINT+          #\I)
+ (defconstant +C-LNG+           #\l)
+ (defconstant +C-ULNG+          #\L)
+ (defconstant +C-LNG-LNG+       #\q)
+ (defconstant +C-ULNG-LNG+      #\Q)
+ (defconstant +C-FLT+           #\f)
+ (defconstant +C-DBL+           #\d)
+ (defconstant +C-BFLD+          #\b)
+ (defconstant +C-BOOL+          #\B)
+ (defconstant +C-VOID+          #\v)
+ (defconstant +C-UNDEF+         #\?)
+ (defconstant +C-PTR+           #\^)
+ (defconstant +C-CHARPTR+       #\*)
+ (defconstant +C-ATOM+          #\%)
+ (defconstant +C-ARY-B+         #\[)
+ (defconstant +C-ARY-E+         #\])
+ (defconstant +C-UNION-B+       #\()
+ (defconstant +C-UNION-E+       #\))
+ (defconstant +C-STRUCT-B+      #\{)
+ (defconstant +C-STRUCT-E+      #\})
+ (defconstant +C-VECTOR+        #\!)
+ (defconstant +C-CONST+         #\r))
+                              
 
 (defun wrap (nsobject)
   ;; Note: circular ns structures not implemented yet.
@@ -209,11 +292,11 @@ DO:             Execute BODY, unless a wrapping is occuring, in which
                             #-ccl (error "Decoding [nsobject objCType] is not implemented in ~S" (lisp-implementation-type))
                             0))))
        (cond
-         ((find objctype #.(vector #$_C_FLT #$_C_DBL))
+         ((find objctype #.(vector +C-FLT+ +C-DBL+))
           [nsobject doubleValue])
-         ((find objctype #.(vector #$_C_UCHR #$_C_USHT #$_C_UINT #$_C_ULNG #$_C_ULNG_LNG))
+         ((find objctype #.(vector +C-UCHR+ +C-USHT+ +C-UINT+ +C-ULNG+ +C-ULNG-LNG+))
           [nsobject unsignedLongLongValue])
-         ((find objctype #.(vector #$_C_CHR #$_C_SHT #$_C_INT #$_C_LNG #$_C_LNG_LNG #$_C_BOOL))
+         ((find objctype #.(vector +C-CHR+ +C-SHT+ +C-INT+ +C-LNG+ +C-LNG-LNG+ +C-BOOL+))
           [nsobject unsignedLongLongValue])
          (t
           nsobject))))

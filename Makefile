@@ -39,8 +39,8 @@
 
 ## Configurable:
 
-#CCL_EXE=/data/languages/ccl/bin/ccl
-CCL_EXE=ccl
+CCL_EXE=/data/languages/ccl/bin/ccl
+#CCL_EXE=ccl
 CCL=$(CCL_EXE) --no-init --batch
 CCL_EVAL=--eval
 

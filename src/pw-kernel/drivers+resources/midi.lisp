@@ -45,7 +45,7 @@
 ;;                MIDI.Lisp
 ;; =============================================================================-======
 (defpackage "MIDI"
-  (:use "COMMON-LISP")
+  (:use "COMMON-LISP" "MCLGUI")
   (:export "MIDI-OPEN" "MIDI-CLOSE" "MIDI-WRITE" "MIDI-WRITE-TIME"
            "MIDI-WRITE-NOW" "MIDI-READ" "CLOCK-TIME" "MIDI-CLEAR"))
 (in-package "MIDI")
@@ -101,11 +101,8 @@
   )
 
 (defvar *filter* nil)
-
-;;(ui::def-load-pointers init-filter () 
-;;  (setf *filter* 
-;;        (midi-new-filter :chan t :port t 
-;;                         :type t)))
+(on-load-and-now init/filter
+ (setf *filter* (midi-new-filter :chan t :port t :type t)))
 
 
 
@@ -195,8 +192,8 @@
   ;;(midi-notes-off)
   )
 
-(push #'midi-close ui:*lisp-cleanup-functions*)
-(ui::def-load-pointers startup-midi () (midi-open))
+(on-quit midi-close)
+(on-load-and-now init/midi (midi-open))
 
 ;;;; THE END ;;;;
 

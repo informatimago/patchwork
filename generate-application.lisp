@@ -36,12 +36,20 @@
 
 (in-package "COMMON-LISP-USER")
 
+(setf *load-verbose* t)
+
 #+ccl (setf ccl:*default-external-format*           :unix
             ccl:*default-file-character-encoding*   :utf-8
             ccl:*default-line-termination*          :unix
             ccl:*default-socket-character-encoding* :utf-8)
 
+(defun say (fmt &rest args)
+  (format *trace-output* "~%;;; ~?~%" fmt args)
+  (finish-output *trace-output*))
+
+(say "Loading quicklisp.")
 (load #P"~/quicklisp/setup.lisp")
+(setf quicklisp-client:*quickload-verbose* t)
 
 
 ;;;------------------------------------------------------------
@@ -110,13 +118,17 @@
          asdf:*central-registry* :test (function equalp))
 
 ;; (pushnew 'cl-user::no-cocoa *features*)
+#+(and ccl (not cl-user::no-cocoa)) (say "Loading :cocoa (takes some time to start…)")
 #+(and ccl (not cl-user::no-cocoa)) (require :cocoa)
 #+(and ccl (not cl-user::no-cocoa)) (defparameter *cocoa-readtable* (copy-readtable *readtable*))
+#+(and ccl (not cl-user::no-cocoa)) (say "Loading MacOSX Libraries")
 #+(and ccl (not cl-user::no-cocoa)) (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
 
 
 ;; DEBUG ;;
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper)
+;; (print *features*)
+(ql:quickload :com.informatimago.clext) ; closer-weak
 
 (ql:quickload :mclgui)
 (ui:initialize)
@@ -136,6 +148,15 @@
   (make-pathname :name  "patchwork-init" :type "lisp"
                  :defaults (user-homedir-pathname)))
 
+
+
+#+ccl (dolist (lib ccl::*shared-libraries*)
+        (say "Shared library: ~A" lib))
+(say "Generating ~A" "~/Desktop/Patchwork.app")
+
+#|
+
+
 #+(and ccl (not cl-user::no-cocoa))
 (ccl::build-application
  :name "PatchWork"
@@ -147,6 +168,9 @@
  ;;              (make-pathname :name  "patchwork-init" :type "lisp"
  ;;                             :defaults (user-homedir-pathname)))
  )
+
+#+(and ccl  cl-user::no-cocoa)
+(progn (princ "ccl:save-application will exit.") (terpri) (finish-output))
 
 #+(and ccl  cl-user::no-cocoa)
 (ccl::save-application
@@ -167,4 +191,5 @@
 (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
                             :console :always)
 
+|#
 ;;;; the END ;;;;

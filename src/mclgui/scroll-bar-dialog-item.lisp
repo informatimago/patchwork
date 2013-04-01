@@ -134,15 +134,6 @@ NEW-SCROLLEE: The new scrollee of item.
   (setf (slot-value item 'scrollee) new-scrollee))
 
 
-;; These are initialized for real by a def-ccl-pointers in l1-edfrec
-(defparameter *top-ps-cursor*        *arrow-cursor*)
-(defparameter *bottom-ps-cursor*     *arrow-cursor*)
-(defparameter *left-ps-cursor*       *arrow-cursor*)
-(defparameter *right-ps-cursor*      *arrow-cursor*)
-(defparameter *vertical-ps-cursor*   *arrow-cursor*)
-(defparameter *horizontal-ps-cursor* *arrow-cursor*)
-
-
 (defmethod view-cursor ((p pane-splitter) where)
   (declare (ignore where))
   (pane-splitter-cursor p))

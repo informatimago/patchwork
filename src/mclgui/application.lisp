@@ -231,8 +231,8 @@ FORM:           A symbol, function or lisp form.
     (let ((evaluator [[MclguiEvaluator alloc] init]))
       (setf (evaluator-thunk evaluator)
             (typecase form
-              ((or symbol function) form)
-              (otherwise            (lambda () (eval form)))))
+              ((or symbol cl:function) form)
+              (otherwise               (lambda () (eval form)))))
       (on-main-thread [evaluator evaluate])
       [evaluator autorelease]))
   (:method ((application lisp-development-system) form)

@@ -1177,8 +1177,8 @@ default menu item.  Otherwise the value itself is displayed as if by
 
 (defparameter *chicago-font* 0)  ;; avoid some consing below
 
-;; (def-ccl-pointers chicago-font1 ()
-;;   (setf *chicago-font* (ash (font-codes '("chicago")) -16)))
+(on-load-and-now load-chicago-font
+  (setf *chicago-font* (ash (font-codes '("chicago")) -16)))
 
 
 (defun set-pop-up-item-check-mark (item mark)  
