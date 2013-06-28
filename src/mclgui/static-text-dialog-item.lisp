@@ -112,6 +112,7 @@
 
 
 (defmethod set-view-font-codes ((item static-text-dialog-item) ff ms &optional ff-mask ms-mask)
+  (declare (ignore ff ms ff-mask ms-mask))
   (multiple-value-prog1 (call-next-method)
     (with-handle (texth item)
       (multiple-value-bind (ff ms) (view-font-codes item)

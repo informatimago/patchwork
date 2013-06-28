@@ -1,7 +1,7 @@
 ;;; -*- mode:lisp -*-
 ;;; This file is processed by batch-cl-indent
 
-(0 wrapping)
+(1 wrapping)
 (1 unwrapping)
 
 (1 ccl:rletz)

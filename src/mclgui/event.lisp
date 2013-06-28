@@ -659,7 +659,7 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
                   dequeue:YES]))
     (assign-event event
                   (if (and nsevent (not (nullp nsevent)))
-                    (wrap-nsevent nsevent)
+                    (wrap nsevent)
                     (get-null-event)))
     (format-trace "get-next-event" (event-what event) (event-where event))
     event))

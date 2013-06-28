@@ -35,9 +35,11 @@
 
 
 (defpackage "MCLGUI"
-  (:use "CL"; "CL-STEPPER"
-        "TRIVIAL-GRAY-STREAMS"
-        "CLOSER-MOP")
+  (:use
+   ;; "CL-STEPPER"
+   "COMMON-LISP"
+   "TRIVIAL-GRAY-STREAMS"
+   "CLOSER-MOP")
   (:use "COM.INFORMATIMAGO.COMMON-LISP.LISP-SEXP.SOURCE-FORM"
          "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK")
   (:nicknames "UI")

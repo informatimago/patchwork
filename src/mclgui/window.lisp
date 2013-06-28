@@ -175,12 +175,12 @@ INCLUDE-WINDOIDS
                 value of the CLASS argument is WINDOID.
 "
   (delete-if (lambda (window)
-               (not (and (if include-windoids
+                 (not (and (if include-windoids
                              (or (typep window class)
                                  (typep window 'windoid))
                              (typep window class))
-                         (or include-invisibles
-                             (window-visiblep window)))))
+                           (or include-invisibles
+                               (window-visiblep window)))))
              (copy-list *window-list*)))
 
 
@@ -245,7 +245,7 @@ INCLUDE-WINDOIDS
   (dolist (w (windows :class class
                       :include-invisibles include-invisibles
                       :include-windoids include-windoids)
-           nil)
+             nil)
     (funcall function w)))
 
 
@@ -266,7 +266,7 @@ CLASS:          A class used to filter the result. The frontmost
                 default is WINDOW.
 "
   (map-windows (lambda (w)
-                 (if (string-equal (window-title w) title)
+                   (if (string-equal (window-title w) title)
                      (return-from find-window w)))
                :class class
                :include-windoids t
@@ -306,34 +306,34 @@ close box or chooses Close from the File menu.
 
 (defun center-window (size position)
   (if (numberp position)
-      position
-      (let ((pos-h (truncate (- *screen-width*  (point-h size)) 2))
-            (pos-v (truncate (- *screen-height* (point-v size)) 2)))
-        (cond ((eq position :centered)
-               (make-point pos-h pos-v))
-              ((atom position)
-               (error 'simple-type-error
-                      :datum position
-                      :expected-type '(or (member :centered) cons)
-                      :format-control "The position should be either :CENTERED or a list (CONSTRAINT [AMOUNT]) instead of ~S"
-                      :format-arguments (list position)))
-              (t (let ((constraint (pop position))
-                       (amount (or (pop position) 0)))
-                   (case constraint
-                     (:top
-                      (make-point pos-h amount))
-                     (:bottom
-                      (make-point pos-h (- *screen-height* amount (point-v size))))
-                     (:left
-                      (make-point amount pos-v))
-                     (:right
-                      (make-point (- *screen-width* amount (point-h size)) pos-v))
-                     (otherwise
-                      (error 'simple-type-error
-                             :datum constraint
-                             :expected-type '(member :top :bottom :left :right)
-                             :format-control "The constraint should be one of ~{~S~^, ~} instead of ~S"
-                             :format-arguments (list '(:top :bottom :left :right) constraint))))))))))
+    position
+    (let ((pos-h (truncate (- *screen-width*  (point-h size)) 2))
+          (pos-v (truncate (- *screen-height* (point-v size)) 2)))
+      (cond ((eq position :centered)
+             (make-point pos-h pos-v))
+            ((atom position)
+             (error 'simple-type-error
+                    :datum position
+                    :expected-type '(or (member :centered) cons)
+                    :format-control "The position should be either :CENTERED or a list (CONSTRAINT [AMOUNT]) instead of ~S"
+                    :format-arguments (list position)))
+            (t (let ((constraint (pop position))
+                     (amount (or (pop position) 0)))
+                 (case constraint
+                   (:top
+                    (make-point pos-h amount))
+                   (:bottom
+                    (make-point pos-h (- *screen-height* amount (point-v size))))
+                   (:left
+                    (make-point amount pos-v))
+                   (:right
+                    (make-point (- *screen-width* amount (point-h size)) pos-v))
+                   (otherwise
+                    (error 'simple-type-error
+                           :datum constraint
+                           :expected-type '(member :top :bottom :left :right)
+                           :format-control "The constraint should be one of ~{~S~^, ~} instead of ~S"
+                           :format-arguments (list '(:top :bottom :left :right) constraint))))))))))
 
 
 (defvar *window-moving* nil
@@ -385,19 +385,19 @@ V:              The vertical coordinate of the new position, or NIL if
                 the complete position is given by H.
 "
   (if (numberp h)
-      (let ((pos      (make-point h v))
-            (siz      (make-point h v))
-            (mswindow (handle window)))
-        (setf (slot-value window 'view-position) pos)
-        (when (and (not *window-moving*) mswindow)
-          ;; (format-trace "Before mswindow setFrameOrigin:")
-           (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin pos siz)])
-           ;; (format-trace "Before mswindow invalidateShadow")
-           (on-main-thread [mswindow invalidateShadow])
-           ;; (format-trace "After")
-          )
-        pos)
-      (set-view-position window (center-window (view-size window) h)))) 
+    (let ((pos      (make-point h v))
+          (siz      (make-point h v))
+          (mswindow (handle window)))
+      (setf (slot-value window 'view-position) pos)
+      (when (and (not *window-moving*) mswindow)
+        ;; (format-trace "Before mswindow setFrameOrigin:")
+        (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin pos siz)])
+        ;; (format-trace "Before mswindow invalidateShadow")
+        (on-main-thread [mswindow invalidateShadow])
+        ;; (format-trace "After")
+        )
+      pos)
+    (set-view-position window (center-window (view-size window) h)))) 
 
 
 (defvar *window-growing* nil
@@ -410,13 +410,13 @@ V:              The vertical coordinate of the new position, or NIL if
     (setf (slot-value window 'view-size) siz)
     (when (and (not *window-growing*) mswindow)
       (if [mswindow isVisible]
-          (progn
-            (format-trace "Before mswindow setFrame:")
-            (on-main-thread [mswindow setFrame:(window-to-nswindow-frame pos siz)])
-            (format-trace "Before mswindow invalidateShadow")
-            (on-main-thread [mswindow invalidateShadow])
-            (format-trace "After"))
-           [mswindow setFrame:(window-to-nswindow-frame pos siz) display:NO]))
+        (progn
+          (format-trace "Before mswindow setFrame:")
+          (on-main-thread [mswindow setFrame:(window-to-nswindow-frame pos siz)])
+          (format-trace "Before mswindow invalidateShadow")
+          (on-main-thread [mswindow invalidateShadow])
+          (format-trace "After"))
+        [mswindow setFrame:(window-to-nswindow-frame pos siz) display:NO]))
     (refocus-view window)
     siz))
 
@@ -619,18 +619,18 @@ INCLUDE-INVISIBLES:
     (let ((handle (handle window)))
       (when handle
         (if (plusp new-layer)
-            (let ((other-window
-                   (or (elt (windows :include-invisibles include-invisibles) new-layer)
-                       (first (last *window-list*)))))
-              (window-send-behind window other-window))
-            (window-bring-to-front window)
-            ;; (if (eql window (first *window-list*))
-            ;;     [handle makeKeyAndOrderFront:handle]
-            ;;     (let ((other (handle (first *window-list*))))
-            ;;       (when other
-            ;;         [handle orderWindow:#$NSWindowAbove
-            ;;                 relativeTo:[other windowNumber]])))
-            )))
+          (let ((other-window
+                 (or (elt (windows :include-invisibles include-invisibles) new-layer)
+                     (first (last *window-list*)))))
+            (window-send-behind window other-window))
+          (window-bring-to-front window)
+          ;; (if (eql window (first *window-list*))
+          ;;     [handle makeKeyAndOrderFront:handle]
+          ;;     (let ((other (handle (first *window-list*))))
+          ;;       (when other
+          ;;         [handle orderWindow:#$NSWindowAbove
+          ;;                 relativeTo:[other windowNumber]])))
+          )))
     ;; (without-interrupts
     ;;     (let* ((wptr (wptr w)))    
     ;;       (when wptr
@@ -706,8 +706,8 @@ Update *last-windoid* and *windoid-count*
         (cond ((windoid-p window)
                (when found-non-windoid?
                  (if last-windoid
-                     (window-send-behind window last-windoid)
-                     (window-bring-to-front window)))
+                   (window-send-behind window last-windoid)
+                   (window-bring-to-front window)))
                (setf last-windoid window)
                (unless (window-active-p window)
                  (view-activate-event-handler window))
@@ -719,8 +719,8 @@ Update *last-windoid* and *windoid-count*
     (when *selected-window*           ; maybe nobody is selected
       (setf *selected-window* selected)
       (if last-windoid
-          (window-send-behind selected last-windoid )
-          (window-bring-to-front selected))
+        (window-send-behind selected last-windoid )
+        (window-bring-to-front selected))
       (unless (window-active-p selected)
         (view-activate-event-handler selected)))))
 
@@ -735,29 +735,29 @@ DO:             Bring WINDOW to the front, activate it, and show
     ;; Sometimes (front-window) is nil
     (let ((window (front-window)))
       (if window
-          (window-select window)
-          (when *selected-window*
-            (view-deactivate-event-handler *selected-window*)
-            (setq *selected-window* nil)))))
+        (window-select window)
+        (when *selected-window*
+          (view-deactivate-event-handler *selected-window*)
+          (setq *selected-window* nil)))))
 
   (:method ((window window))
     (setf *last-mouse-click-window* window)
     (if (eq window *selected-window*)
-        (unless (window-active-p window)
-          (view-activate-event-handler window))
-        (progn
-         (when *selected-window*        
-           (view-deactivate-event-handler *selected-window*))
-         (window-bring-to-front window)
-         (setf *selected-window* nil)
-         (reselect-windows)
-         (window-bring-to-front window)
-         (setf *selected-window* window)
-         (view-activate-event-handler window)
-         (menu-update (edit-menu))))))
+      (unless (window-active-p window)
+        (view-activate-event-handler window))
+      (progn
+        (when *selected-window*        
+          (view-deactivate-event-handler *selected-window*))
+        (window-bring-to-front window)
+        (setf *selected-window* nil)
+        (reselect-windows)
+        (window-bring-to-front window)
+        (setf *selected-window* window)
+        (view-activate-event-handler window)
+        (menu-update (edit-menu))))))
 
 
- 
+
 (defgeneric window-zoom-position (window)
   (:documentation "
 RETURN:         The zoom position of WINDOW, that is, its position
@@ -790,8 +790,8 @@ V:              The vertical coordinate of the new position, or NIL if
 ")
   (:method ((window window) h &optional v)
     (if h
-        (setf (view-get window 'window-zoom-position) (make-point h v))
-        (view-remprop window 'window-zoom-position))))
+      (setf (view-get window 'window-zoom-position) (make-point h v))
+      (view-remprop window 'window-zoom-position))))
 
 
 (defgeneric window-default-zoom-position (window)
@@ -814,12 +814,12 @@ DO:             Determine the default zoom position of WINDOW, that
         ;; If origin of the window is still on the same screen...
         (if (and (<= sl current-h (1- sr))
                  (<= st current-v (1- sb)))
-            ;; ...then keep the same coordinates where they allow the window to remain
-            ;; wholly on the screen, and use the new ones where the old ones don't...
-            (make-point (if (< (+ current-h new-width left-border 1) sr) current-h moved-h)
-                        (if (< (+ current-v new-height 2) sb) current-v moved-v))
-            ;; otherwise go ahead and move the window.
-            (make-point moved-h moved-v))))))
+          ;; ...then keep the same coordinates where they allow the window to remain
+          ;; wholly on the screen, and use the new ones where the old ones don't...
+          (make-point (if (< (+ current-h new-width left-border 1) sr) current-h moved-h)
+                      (if (< (+ current-v new-height 2) sb) current-v moved-v))
+          ;; otherwise go ahead and move the window.
+          (make-point moved-h moved-v))))))
 
 
 
@@ -846,8 +846,8 @@ RETURN:         the new size, encoded as an integer.
 ")
   (:method ((window window) h &optional v)
     (if h
-        (setf (view-get window 'window-zoom-size) (make-point h v))
-        (view-remprop window 'window-zoom-size))))
+      (setf (view-get window 'window-zoom-size) (make-point h v))
+      (view-remprop window 'window-zoom-size))))
 
 
 (defgeneric window-default-zoom-size (window)
@@ -923,8 +923,8 @@ DESCRIPTION:    The WINDOW-NEEDS-SAVING-P generic function determines
                       (let ((spec (car (method-specializers method))))
                         (and (not (eq spec window-class))
                              (if (typep spec 'eql-specializer)
-                                 (eql (eql-specializer-object spec) w)
-                                 (member spec cpl)))))
+                               (eql (eql-specializer-object spec) w)
+                               (member spec cpl)))))
              (return t))))))
 
 
@@ -956,8 +956,8 @@ RETURN:         A BOOLEAN value indicating whether view can perform
       (t (let ((handler (current-key-handler view)))
            (when handler
              (if (method-exists-p 'window-can-do-operation handler)
-                 (window-can-do-operation handler op item)
-                 (method-exists-p op handler))))))))
+               (window-can-do-operation handler op item)
+               (method-exists-p op handler))))))))
 
 
 (defun window-do-operation (window op &optional (consider-window-method t))
@@ -1061,29 +1061,29 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 
 (defmethod get-fore-color ((window window))
-    (niy get-fore-color window)
-    ;; #-carbon-compat
-    ;; (with-port (wptr w)
-    ;;   (grafport-fore-color))
-    ;; #+carbon-compat
-    ;; (with-macptrs ((port (#_getwindowport (wptr w))))
-    ;;   (rlet ((color-rec :rgbcolor))
-    ;;     (#_getportforecolor port color-rec)
-    ;;     (rgb-to-color color-rec)))
-    )
+  (niy get-fore-color window)
+  ;; #-carbon-compat
+  ;; (with-port (wptr w)
+  ;;   (grafport-fore-color))
+  ;; #+carbon-compat
+  ;; (with-macptrs ((port (#_getwindowport (wptr w))))
+  ;;   (rlet ((color-rec :rgbcolor))
+  ;;     (#_getportforecolor port color-rec)
+  ;;     (rgb-to-color color-rec)))
+  )
 
 
 (defmethod get-back-color ((window window))
-    (niy get-back-color window)
-    ;; #-carbon-compat
-    ;; (with-port (wptr w)
-    ;;   (grafport-back-color))
-    ;; #+carbon-compat
-    ;; (with-macptrs ((port (#_getwindowport (wptr w))))
-    ;;   (rlet ((color-rec :rgbcolor))
-    ;;     (#_getportbackcolor port color-rec)
-    ;;     (rgb-to-color color-rec)))
-    )
+  (niy get-back-color window)
+  ;; #-carbon-compat
+  ;; (with-port (wptr w)
+  ;;   (grafport-back-color))
+  ;; #+carbon-compat
+  ;; (with-macptrs ((port (#_getwindowport (wptr w))))
+  ;;   (rlet ((color-rec :rgbcolor))
+  ;;     (#_getportbackcolor port color-rec)
+  ;;     (rgb-to-color color-rec)))
+  )
 
 
 
@@ -1098,26 +1098,23 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 
 
-(defun wrap-nswindow (nswindow)
-  (wrapping
-    (if (typep nswindow 'mclgui-window)
-      (or (nswindow-window nswindow)
-          (progn (cerror "Wrap ~S into an UNKNOWN-WINDOW instance."
-                         "The window ~S doesn't have a WINDOW instance."
-                         nswindow)
-                 (make-instance 'unknown-window :handle nswindow)))
-      (make-instance (typecase nswindow
-                       (gui::hemlock-listener-frame 'hemlock-listener-frame)
-                       (gui::hemlock-frame          'hemlock-frame)
-                       (t                           'unknown-window))
-        :handle nswindow))))
+(defmethod wrap ((nswindow ns:ns-window))
+  (wrapping nswindow
+    (make-instance 'unknown-window :handle nswindow)))
+
+(defmethod wrap ((nswindow gui::hemlock-listener-frame))
+  (wrapping nswindow
+    (make-instance 'hemlock-listener-frame :handle nswindow)))
+
+(defmethod wrap ((nswindow gui::hemlock-frame))
+  (wrapping nswindow
+    (make-instance 'hemlock-frame :handle nswindow)))
 
 
 (defun initialize/window ()
-  (setf *window-list*
-        (wrap [[NSApplication sharedApplication] windows]))
+  (setf *window-list* '()) ; wrapping windows modify *window-list*, so let's start from a blank state.
+  (setf *window-list* (nsarray-to-list [[NSApplication sharedApplication] windows]))
   (values))
-
 
 ;; (initialize/window)
 ;; 

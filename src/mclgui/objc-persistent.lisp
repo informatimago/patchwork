@@ -39,6 +39,8 @@
 (in-package "MCLGUI")
 (objcl:enable-objcl-reader-macros)
 
+
+
 (defmacro with-temporary-retained-nsobject ((variable retained-nsobject-expression) &body body)
   (let ((object (gensym)))
     `(let* ((,object ,retained-nsobject-expression)
@@ -59,6 +61,13 @@
   (format nil "#<~A #x~(~X~)>"
           (objcl:lisp-string [nsobject className])
           (cffi:pointer-address nsobject)))
+
+(defmethod print-object ((object ns:ns-object) stream)
+  (print-unreadable-object (object stream :type t :identity t)
+      (format stream "#<~A #x~(~X~)>"
+          (objcl:lisp-string [object className])
+          (cffi:pointer-address object)))
+  object)
 
 ;; ignore-errors only ignores CL errors;
 ;; we need a macro to ignore also NSExceptions.
@@ -91,92 +100,6 @@ to generate the current object do
 
 
 
-(defun find-nodes (tree table)
-  (cond
-    ((null tree) table)
-    ((gethash tree table) (incf (gethash tree table))   table)
-    ((atom tree)          (incf (gethash tree table 0)) table)
-    (t (incf (gethash tree table 0))
-       (find-nodes (cdr tree) (find-nodes (car tree) table)))))
-
-
-(defun print-identified-conses (tree  &optional (stream *standard-output*))
-    "
-DO:      Print the TREE with all cons cells identified with a #n= notation.
-TREE:    A sexp.
-STREAM:  The output stream (default: *STANDARD-OUTPUT*)
-NOTE:    Handles circles in the cons structure, but not thru the other
-         atoms (vectors, structures, objects).
-EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
-         prints:
-         ((a . b) . (#1=(c . d) . ((e . #1# ) . ())))
-"
-  (let ((table (find-nodes tree (make-hash-table :test (function eq))))
-        (index 0))
-    (maphash (lambda (k v)
-               (if (= 1 v)
-                   (remhash k table)
-                   (setf (gethash k table) (- (incf index))))) table)
-    (labels ((print-node (node)
-               (if (null node)
-                   (princ "()")
-                   (let ((index (gethash node table)))
-                     (if (and index (plusp index))
-                         (format stream "#~A# " index)
-                         (progn
-                           (when index
-                             (setf (gethash node table) (- index))
-                             (format stream "#~A=" (- index)))
-                           (if (atom node)
-                               (princ node stream)
-                               (progn
-                                 (princ "(" stream) 
-                                 (print-node (car node))
-                                 (princ " . " stream)
-                                 (print-node (cdr node))
-                                 (princ ")" stream)))))))))
-      (print-node tree)
-      tree)))
-
-;; (defvar *cicularly-archived-objects* nil)
-;; 
-;; (defun register   (object)
-;;   (let ((index (gethash object *cicularly-archived-objects*)))
-;;     (if index
-;;         t
-;;         (progn
-;;           (setf (gethash object *cicularly-archived-objects*)
-;;                 (1+ (hash-table-count *cicularly-archived-objects*)))
-;;           nil))))
-;; 
-;; (defun reference (object)
-;;   (let ((index (gethash object *cicularly-archived-objects*)))
-;;     (typecase index
-;;       (null    (register object) (reference object))
-;;       (integer (make-instance 'reference :index))
-;;       (t       index))))
-;; 
-;; 
-;; 
-;; (defgeneric archive-object-circularly (object archive)
-;;   (:method ((object atom))
-;;     (write-archive archive object))
-;;   (:method ((object array))
-;;     (let ((reference (register object)))
-;;       (if reference
-;;           (write-archive archive reference))
-;;         )
-;;     (let (())
-;;      (write-archive archive (list 'array
-;;                                   (array-dimensions object)
-;;                                   (array-element-type object)
-;;                                   )))
-;;     ()))
-;; 
-;; (defun archive-circularly (object)
-;;   (let ((*cicularly-archived-objects* (make-hash-table)))
-;;     (archive-object-circularly object)))
-
 
 ;;;---------------------------------------------------------------------
 ;;;
@@ -190,7 +113,8 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   resultType:(:id)
   body:
   (ignore-errors
-    (format *trace-output* "~A archiver:~A willEncodeObject:~A~%" (description self) (description archiver) (description object)))
+    (format *trace-output* "~A archiver:~A willEncodeObject:~A~%" (description self) (description archiver) (description object))
+    (finish-output *trace-output*))
   (push object (objects-being-encoded self))
   object]
 
@@ -199,14 +123,16 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A archiver:~A willReplaceObject:~A withObject:~A~%" (description self) (description archiver) (description object) (description replacement)))]
+    (format *trace-output* "~A archiver:~A willReplaceObject:~A withObject:~A~%" (description self) (description archiver) (description object) (description replacement))
+    (finish-output *trace-output*))]
 
 @[MclguiKeyedArchiverDelegate
   method:(encodeWithCoder:(:id)coder)
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A encodeWithCoder:~A~%" (description self) (description coder)))
+    (format *trace-output* "~A encodeWithCoder:~A~%" (description self) (description coder))
+    (finish-output *trace-output*))
   [(first (objects-being-encoded self)) encodeWithCoder:coder]]
 
 @[MclguiKeyedArchiverDelegate
@@ -214,7 +140,8 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A archiver:~A didEncodeObject:~A~%" (description self) (description archiver) (description object)))
+    (format *trace-output* "~A archiver:~A didEncodeObject:~A~%" (description self) (description archiver) (description object))
+    (finish-output *trace-output*))
   (pop (objects-being-encoded self))]
 
 @[MclguiKeyedArchiverDelegate
@@ -222,14 +149,16 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A archiverWillFinish:~A~%" (description self) (description archiver)))]
+    (format *trace-output* "~A archiverWillFinish:~A~%" (description self) (description archiver))
+    (finish-output *trace-output*))]
 
 @[MclguiKeyedArchiverDelegate
   method:(archiverDidFinish:(:id)archiver)
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A archiverDidFinish:~A~%" (description self) (description archiver)))]
+    (format *trace-output* "~A archiverDidFinish:~A~%" (description self) (description archiver))
+    (finish-output *trace-output*))]
 
 
 ;;;---------------------------------------------------------------------
@@ -244,7 +173,8 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A encodeConditionalObject:~A forKey:~A~%" (description self) (description object) (description key)))
+    (format *trace-output* "~A encodeConditionalObject:~A forKey:~A~%" (description self) (description object) (description key))
+    (finish-output *trace-output*))
   (push object (objects-being-encoded self))
   [super encodeConditionalObject:object forKey:key]]
 
@@ -253,9 +183,9 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   method:(encodeObject:(:id)object forKey:(:id)key)
   resultType:(:void)
   body:
-  (print (description object))
   (ignore-errors
-    (format *trace-output* "~A encodeObject:~A forKey:~A~%" (description self) (description object) (description key)))
+    (format *trace-output* "~A encodeObject:~A forKey:~A~%" (description self) (description object) (description key))
+    (finish-output *trace-output*))
   (push object (objects-being-encoded self))
   [super encodeObject:object forKey:key]]
 
@@ -277,7 +207,8 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
             (description self) (description unarchiver)
             (description name) (description classNames)
             ;; (objcl:lisp-string name) (wrap classNames)
-            ))
+            )
+    (finish-output *trace-output*))
   nil]
 
 @[MclguiKeyedUnarchiverDelegate
@@ -285,7 +216,8 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   resultType: (:id)
   body:
   (ignore-errors
-    (format *trace-output* "~A unarchiver:~A didDecodeObject:~A~%" (description self) (description unarchiver)  (description object)))
+    (format *trace-output* "~A unarchiver:~A didDecodeObject:~A~%" (description self) (description unarchiver)  (description object))
+    (finish-output *trace-output*))
   object]
 
 @[MclguiKeyedUnarchiverDelegate
@@ -293,21 +225,24 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
   resultType: (:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A unarchiver:~A willReplaceObject:~A withObject:~A~%" (description self) (description unarchiver) (description object) (description newObject)))]
+    (format *trace-output* "~A unarchiver:~A willReplaceObject:~A withObject:~A~%" (description self) (description unarchiver) (description object) (description newObject))
+    (finish-output *trace-output*))]
 
 @[MclguiKeyedUnarchiverDelegate
   method:(unarchiverWillFinish:(:id)unarchiver)
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A unarchiverWillFinish:~A~%" (description self) (description unarchiver)))]
+    (format *trace-output* "~A unarchiverWillFinish:~A~%" (description self) (description unarchiver))
+    (finish-output *trace-output*))]
 
 @[MclguiKeyedUnarchiverDelegate
   method:(unarchiverDidFinish:(:id)unarchiver)
   resultType:(:void)
   body:
   (ignore-errors
-    (format *trace-output* "~A unarchiverDidFinish:~A~%" (description self) (description unarchiver)))]
+    (format *trace-output* "~A unarchiverDidFinish:~A~%" (description self) (description unarchiver))
+    (finish-output *trace-output*))]
 
 ;;;---------------------------------------------------------------------
 ;;;
@@ -318,11 +253,12 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
 
 @[MclguiKeyedUnarchiver
   method:(decodeObjectForKey:(:id)key)
-  resultType:(:void)
+  resultType:(:id)
   body:
   (let ((object [super decodeObjectForKey:key]))
     (ignore-errors
-      (format *trace-output* "~A decodeObjectForKey:~A --> ~A~%" (description self) (description key) (description object)))
+      (format *trace-output* "~A decodeObjectForKey:~A --> ~A~%" (description self) (description key) (description object))
+    (finish-output *trace-output*))
     object)]
 
 
@@ -353,6 +289,8 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
                   #(1 2 3 4)))
   :success)
 
+(test/nsdata-vector)
+
 
 (defstruct archive
   wrappers
@@ -381,18 +319,24 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
          (length    (length wrappers))
          (nsobjects [NSMutableArray arrayWithCapacity:length])
          (data      [NSMutableData data]))
+    (break "initialized")
     (with-temporary-retained-nsobjects
         ((delegate  [MclguiKeyedArchiverDelegate new])
          (archiver  [[MclguiKeyedArchiver alloc] initForWritingWithMutableData:data]))
+      (break "will set delegate")
       [archiver setDelegate:[delegate autorelease]]
+      (break "archiver set up")
       (loop
         :for i :from 0
         :for wrapper :in wrappers
-        :do
-        [nsobjects addObject:(handle wrapper)]
-        (setf (handle wrapper) nil))
+        :do (progn
+              [nsobjects addObject:(handle wrapper)]
+              (setf (handle wrapper) nil)))
+      (break "nsobjects filled up, will encode it")
       [archiver encodeObject:nsobjects forKey:(objcl:objcl-string *root-key*)]
+      (break "archiver encoded, will finish it")
       [archiver finishEncoding]
+      (break "wrapping the archive")
       (make-archive :wrappers wrappers
                     :data (vector-from-nsdata data)
                     :root-key *root-key*
@@ -442,6 +386,7 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
                           (make-instance 'wrapper :handle nil)))
 
 
+#-(and)
 (defparameter *a* (archive-objects
                    (let ((d1 [NSMutableDictionary dictionary])
                          (d2 [NSMutableDictionary dictionary]))
@@ -454,6 +399,21 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
                      (setf (handle (elt *wi* 0)) d1
                            (handle (elt *wi* 1)) d2)
                      (make-weak-list *wi*))))
+
+(defparameter *test-object*
+  (let ((d1 [NSMutableDictionary dictionary])
+        (d2 [NSMutableDictionary dictionary]))
+    [d1 setObject:(objcl:objcl-string "Hello") forKey:(objcl:objcl-string "one")]
+    [d1 setObject:(objcl:objcl-string "World") forKey:(objcl:objcl-string "two")]
+    [d1 setObject:d2                           forKey:(objcl:objcl-string "d2")]
+    [d2 setObject:(objcl:objcl-string "un")    forKey:(objcl:objcl-string "one")]
+    [d2 setObject:(objcl:objcl-string "deux")  forKey:(objcl:objcl-string "two")]
+    [d2 setObject:d1                           forKey:(objcl:objcl-string "d1")]
+    ;; (wrap d1)
+    d1))
+
+#-(and) (defparameter *a* (archive-objects (make-weak-list (list *test-object*))))
+
 
 ;; (defparameter *wo* (unarchive-objects *a*))
 ;; [(handle (elt *wo* 0)) description]

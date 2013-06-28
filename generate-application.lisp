@@ -36,6 +36,8 @@
 
 (in-package "COMMON-LISP-USER")
 
+(defparameter *patchwork-version* "10.0-0.999")
+
 (setf *load-verbose* t)
 
 #+ccl (setf ccl:*default-external-format*           :unix
@@ -154,35 +156,103 @@
         (say "Shared library: ~A" lib))
 (say "Generating ~A" "~/Desktop/Patchwork.app")
 
-#|
+
+
+(objcl:enable-objcl-reader-macros)
+
+(defun dictionary (&rest keys-and-values)
+  (assert (evenp (length keys-and-values)))
+  (let ((table (make-hash-table :test (function equal))))
+    (loop
+      :for (key value) :on keys-and-values :by (function cddr)
+      :do (setf (gethash key table) value))
+    table))
+
+
+
+(defparameter *exported-type-utis* ; :|UTExportedTypeDeclarations|
+  (vector
+   (dictionary
+    :|UTTypeIdentifier| "com.informatimago.patckwork.macos.patchwork-file"
+    :|UTTypeDescription| "MacOS Patchwork file"
+    ;; :|UTTypeIconFile| "public.text.icns"
+    ;; :|UTTypeReferenceURL| ""
+    :|UTTypeConformsTo| #("org.lisp.lisp-source")
+    :|UTTypeTagSpecification| (dictionary
+                               :|com.apple.ostype| "PTCH" ;; ???
+                               :|public.filename-extension| #("pwpatch9")))
+   (dictionary
+    :|UTTypeIdentifier| "com.informatimago.patckwork.macosx.patchwork-file"
+    :|UTTypeDescription| "MacOSX Patchwork file"
+    ;; :|UTTypeIconFile| "public.text.icns"
+    ;; :|UTTypeReferenceURL| ""
+    ;; :|UTTypeVersion| "1.0"
+    :|UTTypeConformsTo| #("org.lisp.lisp-source")
+    :|UTTypeTagSpecification| (dictionary
+                               ;; :|public.mime-type| "text/lisp"
+                               :|public.filename-extension| #("pwpatch")))))
+
+
+(ui::unwrap *exported-type-utis*)
 
 
 #+(and ccl (not cl-user::no-cocoa))
 (ccl::build-application
- :name "PatchWork"
+ :name "Patchwork"
+ :type-string "APPL"
+ :creator-string "SOSP"
  :directory #P"~/Desktop/"
- :copy-ide-resources t
- ;; :init-file "HOME:patchwork-init.lisp"
- ;; '(pathname "~/application-init.lisp")
- ;;  (lambda ()
- ;;              (make-pathname :name  "patchwork-init" :type "lisp"
- ;;                             :defaults (user-homedir-pathname)))
- )
+ :copy-ide-resources t   ; whether to copy the IDE's resources
+ ;; :info-plist nil         ; optional user-defined info-plist
+ ;; :info-plist (ccl::make-info-dict
+ ;;              ;; (development-region $default-info-plist-development-region)
+ ;;              ;; (executable $default-info-plist-executable)
+ ;;              :getinfo-string (format nil "\"~A Copyright © 2013\"" *patchwork-version*)
+ ;;              ;; (help-book-folder $default-info-plist-help-book-folder)
+ ;;              ;; (help-book-name $default-info-plist-help-book-name)
+ ;;              ;; (icon-file $default-info-plist-icon-file)
+ ;;              :bundle-identifier "com.informatiamgo.patchwork"
+ ;;              ;; (dictionary-version $default-info-dictionary-version)
+ ;;              ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
+ ;;              ;; overriden by write-info-plist (bundle-package-type $default-info-plist-bundle-package-type)
+ ;;              ;; overriden by write-info-plist (bundle-signature $default-info-plist-bundle-signature)
+ ;;              :short-version-string  (format nil "\"~A\"" *patchwork-version*)
+ ;;              :version (format nil "\"~A\"" *patchwork-version*)
+ ;;              ;; (has-localized-display-name $default-info-plist-has-localized-display-name)
+ ;;              ;; (minimum-system-version $default-info-plist-minimum-system-version)
+ ;;              ;; (main-nib-file $default-info-plist-main-nib-file)
+ ;;              ;; (principal-class $default-info-plist-principal-class)
+ ;;              )
+ :nibfiles '()           ; a list of user-specified nibfiles
+                                        ; to be copied into the app bundle
+ :main-nib-name nil     ; the name of the nib that is to be loaded
+                                        ; as the app's main. this name gets written
+                                        ; into the Info.plist on the "NSMainNibFile" key
+ :application-class 'gui::cocoa-application
+ :private-frameworks '()
+ :toplevel-function nil
+ :altconsole t)
 
-#+(and ccl  cl-user::no-cocoa)
-(progn (princ "ccl:save-application will exit.") (terpri) (finish-output))
 
-#+(and ccl  cl-user::no-cocoa)
-(ccl::save-application
- #P"~/Desktop/PatchWork"
- :init-file "HOME:patchwork-init.lisp"
- ;; :native t
- :prepend-kernel t
- ;; '(pathname "~/patchwork-init.lisp")
- ;;  (lambda ()
- ;;              (make-pathname :name  "patchwork-init" :type "lisp"
- ;;                             :defaults (user-homedir-pathname)))
- )
+
+
+
+;;; ccl::build-application --> ccl::save-application --> ccl::%save-application-interal --> ccl::save-image
+;;
+;; #+(and ccl  cl-user::no-cocoa)
+;; (progn (princ "ccl:save-application will exit.") (terpri) (finish-output))
+;; 
+;; #+(and ccl  cl-user::no-cocoa)
+;; (ccl::save-application 
+;;  #P"~/Desktop/PatchWork"
+;;  :init-file "HOME:patchwork-init.lisp"
+;;  ;; :native t
+;;  :prepend-kernel t
+;;  ;; '(pathname "~/patchwork-init.lisp")
+;;  ;;  (lambda ()
+;;  ;;              (make-pathname :name  "patchwork-init" :type "lisp"
+;;  ;;                             :defaults (user-homedir-pathname)))
+;;  )
 
 
 
@@ -191,5 +261,4 @@
 (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
                             :console :always)
 
-|#
 ;;;; the END ;;;;

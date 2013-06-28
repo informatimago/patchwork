@@ -56,9 +56,12 @@
                                      "point"))
                  (:file "system"
                         :depends-on ("package"))
-                 
+
+                 (:file "circular"
+                        :depends-on ("package"))
+
                  (:file "wrapper"
-                        :depends-on ("package" "system"))
+                        :depends-on ("package" "system" "circular"))
 
                  (:file "notification"
                         :depends-on ("package"

@@ -126,6 +126,8 @@ help::
 	@printf "$(HELP_FORMAT)" "application" "Generates the application."
 application:clean
 	$(CCL_EXE) < generate-application.lisp
+regenerate-application:
+	$(CCL_EXE) < generate-application.lisp
 
 # There's a bug in ccl when generating an application from a loaded file…
 # $(LISP) \

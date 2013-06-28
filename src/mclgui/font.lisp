@@ -41,16 +41,14 @@
   "
 RETURN:         A list of font names (STRING)
 "
-  (nsarray-to-list [[NSFontManager sharedFontManager]
-                    availableFonts]))
+  (nsarray-to-list [[NSFontManager sharedFontManager] availableFonts]))
 
 
 (defun available-font-families ()
   "
 RETURN:         A list of font family names (STRING).
 "
-  (nsarray-to-list [[NSFontManager sharedFontManager]
-                    availableFontFamilies]))
+  (nsarray-to-list [[NSFontManager sharedFontManager] availableFontFamilies]))
 
 
 (defun available-members-of-font-family (family)
@@ -64,9 +62,9 @@ RETURN:         A list of FONT-DESCRIPTION lists for members of the font FAMILY:
                 2. The font’s weight (integer).
                 3. The font’s traits (integer).
 "
-  (nsarray-to-list [[NSFontManager sharedFontManager]
-                    availableMembersOfFontFamily:(objcl:objcl-string family)]))
-
+  (mapcar (lambda (element) (coerce element 'list))
+          (nsarray-to-list [[NSFontManager sharedFontManager]
+                            availableMembersOfFontFamily:(objcl:objcl-string family)])))
 
 
 (defstruct (font-description
@@ -1004,8 +1002,8 @@ DO:             Change the view font codes of view.  The font/face
 (defclass font (wrapper)
   ((specification :initarg :specification :accessor font-specification)))
 
-(defun wrap-nsfont (nsfont)
-  (make-instance 'wrapper :handle nsfont))
+(defmethod wrap ((nsfont ns:ns-font))
+  (make-instance 'font :handle nsfont))
 
 
 (defun initialize/font ()
@@ -1047,8 +1045,10 @@ DO:             Change the view font codes of view.  The font/face
           (,#$NSCompressedFontMask              . :compressed)
           (,#$NSFixedPitchFontMask              . :fixed-pitch)
           (,#$NSUnitalicFontMask                . :unitalic)))
-  (setf *font-list*     (sort (available-font-families) (function string<)))
-  (setf *font-families* (mapcar (lambda (family) (cons family (available-members-of-font-family family)))
+  (setf *font-list*     '()
+        *font-families* '()
+        *font-list*     (sort (available-font-families) (function string<))
+        *font-families* (mapcar (lambda (family) (cons family (available-members-of-font-family family)))
                                 *font-list*))
   (setf *current-font-codes* (list 0 0))
   (values))

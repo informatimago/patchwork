@@ -59,7 +59,13 @@ or else left as foreign types.")))
 ;; (defvar *wrap-objects* nil)
 
 
-(defun wrap-nsnotification (nsnotification)
+(defmethod structure ((nsnotification ns:ns-notification) element)
+  (funcall element :name [nsnotification name])
+  (funcall element :object [nsnotification object])
+  (unless (nullp [nsnotification userInfo])
+    (funcall element :user-info [nsnotification userInfo])))
+
+(defmethod wrap ((nsnotification ns:ns-notification))
   "
 RETURN:         A new NOTIFICATION instance filled with data from the
                 NSNOTIFICATION.
@@ -67,7 +73,7 @@ RETURN:         A new NOTIFICATION instance filled with data from the
   (make-instance 'notification
       :name (objcl:lisp-string [nsnotification name])
       :nsobject [nsnotification object]
-      :user-info (wrap-nsdictionary [nsnotification userInfo])))
+      :user-info (wrap [nsnotification userInfo])))
 
 
 

@@ -352,10 +352,9 @@ ITEM:           A table dialog item.
 
 
 
-(defgeneric installed-item-p (item)
-  (:method ((item table-dialog-item))
-    ;;(wptr item)
-    t))
+(defmethod installed-item-p ((item table-dialog-item))
+  ;;(wptr item)
+  t)
 
 
 (defgeneric map-selected-cells (item fun)

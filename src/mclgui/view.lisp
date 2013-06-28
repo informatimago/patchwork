@@ -200,6 +200,7 @@ RETURN:    the view-font-codes of the font-view or of the application-font.
         ;; (format-trace "set-font" :ff ff :ms ms)
         (finish-output *trace-output*)
       (multiple-value-bind (font mode) (font-from-codes ff ms)
+        (declare (ignore mode))
         ;; TODO: manage mode (:srcOr …)
         ;; (format-trace "set-font" font mode)
         ;; (finish-output *trace-output*)

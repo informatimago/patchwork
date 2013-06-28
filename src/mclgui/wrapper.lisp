@@ -36,6 +36,71 @@
 (objcl:enable-objcl-reader-macros)
 
 
+(defun map-nsarray (result-type mapper nsarray &rest other-sequences)
+  (let ((min-length (reduce (function min)
+                            (cons nsarray other-sequences)
+                            :key (lambda (sequence)
+                                     (etypecase sequence
+                                       (ns:ns-array [sequence count])
+                                       (vector (length sequence))
+                                       (cons   (length sequence))
+                                       (null   0)))))
+        (enumerators  (mapcar (lambda (sequence)
+                                  (etypecase sequence
+                                    (ns:ns-array   (lambda (index) [sequence objectAtIndex:index]))
+                                    (vector        (lambda (index) (aref sequence index)))
+                                    (cons          (lambda (index) (declare (ignore index)) (pop sequence)))
+                                    (null          (constantly nil))))
+                              (cons nsarray other-sequences)))
+        result setter postprocessing)
+    (cond
+      ((null result-type)
+       (setf result nil
+             setter (lambda (value index) (declare (ignore index)) value)
+             postprocessing (function identity)))
+      ((subtypep result-type 'ns:ns-array)
+       (setf result [NSMutableArray arrayWithCapacity:min-length]
+             setter (lambda (value index) (declare (ignore index)) [result addObject:value])
+             postprocessing (function identity)))
+      ((subtypep result-type 'string)
+       (setf result (make-string min-length)
+             setter (lambda (value index) (setf (aref result index) value))
+             postprocessing (function identity)))
+      ((subtypep result-type 'vector)
+       (setf result (make-array  min-length)
+             setter (lambda (value index) (setf (aref result index) value))
+             postprocessing (function identity)))
+      ((subtypep result-type 'list)
+       (setf result '()
+             setter (lambda (value index) (declare (ignore index)) (push value result))
+             postprocessing (function nreverse)))
+      (t
+       (error "Unexpected result-type ~S" result-type)))
+    (loop
+      :for i :below min-length
+      :do (funcall setter (apply mapper (mapcar (lambda (enumerator) (funcall enumerator i)) enumerators)) i))
+    (funcall postprocessing result)))
+
+(defmacro do-nsarray ((element-variable nsarray-expression &optional result-form) &body body)
+  (let ((varray (gensym))
+        (vindex (gensym)))
+    `(let* ((,varray ,nsarray-expression))
+       (dotimes (,vindex [,varray count] ,result-form)
+         (let ((,element-variable [,varray objectAtIndex:,vindex]))
+           ,@body)))))
+
+(defmacro do-nsdictionary ((key-variable value-variable nsdictionary-expression &optional result-form) &body body)
+  (let ((vdictionary (gensym))
+        (vkeys (gensym))
+        (vindex (gensym)))
+    `(let* ((,vdictionary ,nsdictionary-expression)
+            (,vkeys [,vdictionary allKeys]))
+       (dotimes (,vindex [,vkeys count] ,result-form)
+         (let* ((,key-variable   [,vkeys objectAtIndex:,vindex])
+                (,value-variable [,vdictionary objectForKey:,key-variable]))
+           ,@body)))))
+
+
 
 (defgeneric handle (object)
   (:documentation "The NSObject instance wrapped over.")
@@ -69,6 +134,11 @@ Subclasses should implement a method for UPDATE-HANDLE to initialize
 the Objective-C object.
 "))
 
+(defmethod print-object ((self wrapper) stream)
+  (print-unreadable-object (self stream :identity t :type t)
+    (prin1 (handle self) stream))
+  self)
+
 (defmacro with-handle ((handle-var wrapper) &body body)
   "
 DO:             Binds HANDLE-VAR to (handle WRAPPER) and then executes
@@ -83,17 +153,51 @@ RETURN:         The result of BODY if the WRAPPER has a handle, NIL
 
 
 
+;;;------------------------------------------------------------
+;;; wrapper
+;;;------------------------------------------------------------
+
+(defgeneric structure (object element-function)
+  (:documentation "The object should call element-function on each of it's element."))
+
+(defgeneric wrap (object)
+  (:documentation "
+Return a lisp object, usually an instance of a subclass of WRAPPER,
+that represents or wraps over the NS object.  Simple classes such as
+NSString or NSNumber can be 'wrapped' as lisp objects of types such as
+STRING or NUMBER
+"))
+
+
+
 (defvar *wrapping* nil)
 
-(defmacro wrapping (&body body)
+(defun wrap-walk (key object)
+  (declare (ignore key))
+  (when (circular-register object)
+    (structure object (function wrap-walk))))
+
+(defmacro wrapping (object &body body)
   "
 DO:             Wrapping functions should use this macro so that calls
                 to UNWRAP are detected and inhibited.
 
 NOTE:           WRAPPING updates the instance from a NS object.
 "
-  `(let ((*wrapping* t))
-     ,@body))
+  (let ((fbody (gensym)))
+    `(let ((*wrapping* t))
+       (flet ((,fbody ()
+                (wrap-walk :root ,object)
+                ,@body))
+         (declare (inline ,fbody))
+         (if *circular-references*
+           (,fbody)
+           (with-circular-references ()
+             (,fbody)))))))
+
+(defmethod wrap :around (object)
+  (wrapping object
+    (call-next-method)))
 
 
 (defmacro unwrapping (object &body body)
@@ -107,12 +211,12 @@ NOTE:           UNWRAPPING returns the handle or compute a new NS
   (let ((vobject (gensym "object")))
     `(let ((,vobject ,object))
        (if *wrapping*
-           (let ((handle (handle ,vobject)))
-             (unless handle
-               (cerror "Continue" "Called (UNWRAP ~S) while wrapping." ,vobject))
-             handle)
-           (progn
-             ,@body)))))
+         (let ((handle (handle ,vobject)))
+           (unless handle
+             (cerror "Continue" "Called (UNWRAP ~S) while wrapping." ,vobject))
+           handle)
+         (progn
+           ,@body)))))
 
 
 
@@ -121,7 +225,7 @@ NOTE:           UNWRAPPING returns the handle or compute a new NS
 (on-save clear-handles
   (mapcar (lambda (wrapper)
               (format *trace-output* "~&clearing a ~A~%" (class-name (class-of wrapper)))
-              (setf (handle wrapper) nil))
+            (setf (handle wrapper) nil))
           (weak-list-list *wrapper-instances*)))
 
 (on-restore reset-handles
@@ -153,10 +257,9 @@ POST:           (not (null (handle wrapper)))
 
 RETURN:         (handle wrapper)
 
-NOTE:           There are functions such as WRAP-NSMENU to build
-                subclass-of-WRAPPER instances from
-                subclass-of-NSObject instances, hence the name of
-                UNWRAP.
+NOTE:           The generic function WRAP builds subclass-of-WRAPPER
+                instances from subclass-of-NSObject instances, hence
+                the name of UNWRAP.
 
 NOTE:           Subclasses should define a method, calling
                 (unwrapping object …).
@@ -226,177 +329,287 @@ RETURN:         NEW-HANDLE.
 
 
 
-#|
+;;;------------------------------------------------------------
+;;; circular structures wrapping.
+;;;------------------------------------------------------------
 
-ui> (nsfont-from-codes 0 0)
-#<ns-font "LucidaGrande 12.00 pt. P [] (0x5c2e50) fobj=0x11a8a40, spc=3.80" (#x5C2E50)>
-:srccopy
-0
-(:plain)
-ui> (defparameter *font-data* [NSArchiver archivedDataWithRootObject:(nsfont-from-codes 0 0)])
-*font-data*
-ui> *font-data*)
-; Evaluation aborted on #<ccl::simple-reader-error #x302004C5B86D>.
-ui> *font-data*
-#<ns-mutable-data <040b7374 7265616d 74797065 6481e803 84014084 8484064e 53466f6e 741e8484 084e534f 626a6563 74008584 01692484 055b3336 635d0600 00001a00 0000fffe 4c007500 63006900 64006100 47007200 61006e00 64006500 00008401 660c8401 63009801 98009800 86> (#x119B3A0)>
-ui> [NSUnarchiver unarchiveObjectWithData:*font-data*]
-#<ns-font "LucidaGrande 12.00 pt. P [] (0x5c2e50) fobj=0x11a8a40, spc=3.80" (#x5C2E50)>
-|#
+@[NSObject subClass:MclguiReference
+           slots:((index  :initform nil
+                          :initarg :index
+                          :accessor reference-index))]
+
+(defmethod print-object ((self mclgui-reference) stream)
+  (print-unreadable-object (self stream :identity t :type t)
+    (format stream "#~D#" (reference-index self)))
+  self)
+
+@[NSObject subClass:MclguiReferenced
+           slots:((index  :initform nil
+                          :initarg :index
+                          :accessor referenced-index
+                          :accessor reference-index)
+                  (object :initform nil
+                          :initarg :object
+                          :accessor referenced-object))]
+
+(defmethod print-object ((self mclgui-referenced) stream)
+  (print-unreadable-object (self stream :identity t :type t)
+    (format stream "#~D=~S" (reference-index self) (referenced-object self)))
+  self)
+
+(defun make-reference (&key index)
+  (let ((reference [[MclguiReference alloc] init]))
+    (setf (reference-index reference) index)
+    [reference autorelease]))
+
+(defun make-referenced (&key index object)
+  (let ((referenced [[MclguiReferenced alloc] init]))
+    (setf (referenced-index referenced) index
+          (referenced-object referenced) object)
+    [referenced autorelease]))
+
+(defun substitute-object (object)
+  (let ((index (circular-reference object)))
+    (if index
+      (if (cdr index)
+        (make-reference :index (cdr index))
+        (let ((referenced (make-referenced :index (car index) :object object)))
+          (setf (cdr index) referenced)
+          referenced))
+      object)))
 
 
+
+
+;;------------------------------------------------------------
+;; wrapping NSObject and objects.
+;;------------------------------------------------------------
+
+(defmethod structure ((object t) element-function)
+  (declare (ignorable element-function))
+  (values))
+
+
+(defmethod wrap ((object t))
+  (cond
+    ((nullp object)
+     nil)
+    (t
+     object)))
+
+
+(defmethod wrap ((object ns:ns-object))
+  (make-instance 'wrapper :handle object))
+
+
+;;------------------------------------------------------------
+;; wrapping NSString
+;;------------------------------------------------------------
+
+(defmethod wrap ((object ns:ns-string))
+  ;; TODO: substitute-object for long strings.
+  (objcl:lisp-string object))
+
+
+;;------------------------------------------------------------
+;; wrapping NSNumber
+;;------------------------------------------------------------
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
- (defconstant +C-ID+            #\@)
- (defconstant +C-CLASS+         #\#)
- (defconstant +C-SEL+           #\:)
- (defconstant +C-CHR+           #\c)
- (defconstant +C-UCHR+          #\C)
- (defconstant +C-SHT+           #\s)
- (defconstant +C-USHT+          #\S)
- (defconstant +C-INT+           #\i)
- (defconstant +C-UINT+          #\I)
- (defconstant +C-LNG+           #\l)
- (defconstant +C-ULNG+          #\L)
- (defconstant +C-LNG-LNG+       #\q)
- (defconstant +C-ULNG-LNG+      #\Q)
- (defconstant +C-FLT+           #\f)
- (defconstant +C-DBL+           #\d)
- (defconstant +C-BFLD+          #\b)
- (defconstant +C-BOOL+          #\B)
- (defconstant +C-VOID+          #\v)
- (defconstant +C-UNDEF+         #\?)
- (defconstant +C-PTR+           #\^)
- (defconstant +C-CHARPTR+       #\*)
- (defconstant +C-ATOM+          #\%)
- (defconstant +C-ARY-B+         #\[)
- (defconstant +C-ARY-E+         #\])
- (defconstant +C-UNION-B+       #\()
- (defconstant +C-UNION-E+       #\))
- (defconstant +C-STRUCT-B+      #\{)
- (defconstant +C-STRUCT-E+      #\})
- (defconstant +C-VECTOR+        #\!)
- (defconstant +C-CONST+         #\r))
-                              
-
-(defun wrap (nsobject)
-  ;; Note: circular ns structures not implemented yet.
-  (cond
-    ;; Atoms:
-    ((nullp nsobject)
-     nil)
-    ([nsobject isKindOfClass:(oclo:@class "NSString")]
-     (objcl:lisp-string nsobject))
-    ([nsobject isKindOfClass:(oclo:@class "NSNumber")]
-     (let ((objctype (char-code
-                      (aref #+ccl (ccl:%get-cstring [nsobject objCType])
-                            #-ccl (error "Decoding [nsobject objCType] is not implemented in ~S" (lisp-implementation-type))
-                            0))))
-       (cond
-         ((find objctype #.(vector +C-FLT+ +C-DBL+))
-          [nsobject doubleValue])
-         ((find objctype #.(vector +C-UCHR+ +C-USHT+ +C-UINT+ +C-ULNG+ +C-ULNG-LNG+))
-          [nsobject unsignedLongLongValue])
-         ((find objctype #.(vector +C-CHR+ +C-SHT+ +C-INT+ +C-LNG+ +C-LNG-LNG+ +C-BOOL+))
-          [nsobject unsignedLongLongValue])
-         (t
-          nsobject))))
-    (t
-     ;; Compound objects:
-     ;; (let ((*wrap-objects* (or *wrap-objects* (make-hash-table))))
-     (cond
-       ([nsobject isKindOfClass:(oclo:@class "NSArray")]
-        (wrap-nsarray nsobject))
-       ([nsobject isKindOfClass:(oclo:@class "NSMenu")]
-        (wrap-nsmenu nsobject))
-       ([nsobject isKindOfClass:(oclo:@class "NSMenuItem")]
-        (wrap-nsmenuitem nsobject))
-       ([nsobject isKindOfClass:(oclo:@class "NSWindow")]
-        (wrap-nswindow nsobject))
-       ([nsobject isKindOfClass:(oclo:@class "NSDictionary")]
-        (wrap-nsdictionary nsobject))
-       ([nsobject isKindOfClass:(oclo:@class "NSNotification")]
-        (wrap-nsnotification nsobject))
-       (t
-        nsobject))
-     ;;)
-     )))
+  (defconstant +C-ID+            #\@)
+  (defconstant +C-CLASS+         #\#)
+  (defconstant +C-SEL+           #\:)
+  (defconstant +C-CHR+           #\c)
+  (defconstant +C-UCHR+          #\C)
+  (defconstant +C-SHT+           #\s)
+  (defconstant +C-USHT+          #\S)
+  (defconstant +C-INT+           #\i)
+  (defconstant +C-UINT+          #\I)
+  (defconstant +C-LNG+           #\l)
+  (defconstant +C-ULNG+          #\L)
+  (defconstant +C-LNG-LNG+       #\q)
+  (defconstant +C-ULNG-LNG+      #\Q)
+  (defconstant +C-FLT+           #\f)
+  (defconstant +C-DBL+           #\d)
+  (defconstant +C-BFLD+          #\b) ; bitfield.
+  (defconstant +C-BOOL+          #\B)
+  (defconstant +C-VOID+          #\v)
+  (defconstant +C-UNDEF+         #\?)
+  (defconstant +C-PTR+           #\^)
+  (defconstant +C-CHARPTR+       #\*)
+  (defconstant +C-ATOM+          #\%)
+  (defconstant +C-ARY-B+         #\[)
+  (defconstant +C-ARY-E+         #\])
+  (defconstant +C-UNION-B+       #\()
+  (defconstant +C-UNION-E+       #\))
+  (defconstant +C-STRUCT-B+      #\{)
+  (defconstant +C-STRUCT-E+      #\})
+  (defconstant +C-VECTOR+        #\!)
+  (defconstant +C-CONST+         #\r))
 
 
+(defmethod wrap ((object ns:ns-number))
+  (let ((objctype (char-code
+                   (aref #+ccl (ccl:%get-cstring [object objCType])
+                         #-ccl (error "Decoding [object objCType] is not implemented in ~S"
+                                      (lisp-implementation-type))
+                         0))))
+    (cond
+      ((find objctype #.(vector +C-FLT+ +C-DBL+))
+       [object doubleValue])
+      ((find objctype #.(vector +C-UCHR+ +C-USHT+ +C-UINT+ +C-ULNG+ +C-ULNG-LNG+))
+       [object unsignedLongLongValue])
+      ((find objctype #.(vector +C-CHR+ +C-SHT+ +C-INT+ +C-LNG+ +C-LNG-LNG+ +C-BOOL+))
+       [object longLongValue])
+      (t
+       (call-next-method)))))
 
-(defun wrap-nsdictionary (nsdictionary)
-   "
-RETURN:         A fresh P-list containing the NSDICTIONARY entries.
+;;------------------------------------------------------------
+;; wrapping NSArray
+;;------------------------------------------------------------
 
-DO:             Keys are converted to keywords; the values are
-                converted to lisp type if possible, or else left as
-                foreign types.
+(defmethod structure ((nsarray ns:ns-array) element)
+  (dotimes (i [nsarray count])
+    (funcall element i [nsarray objectAtIndex:i])))
 
-NOTE:           It's expected the dictionary is small, hence the P-list.
+(defmethod wrap ((object ns:ns-array))
+  (wrapping object
+    (let ((result (make-array [object count])))
+      (dotimes (i [object count] result)
+        (setf (aref result i) (wrap (substitute-object [object objectAtIndex:i])))))))
+
+
+;;------------------------------------------------------------
+;; wrapping NSDictionary
+;;------------------------------------------------------------
+
+(defmethod structure ((nsdictionary ns:ns-dictionary) element)
+  (do-nsdictionary (key value nsdictionary)
+    (funcall element :key key)
+    (funcall element :value value)))
+
+
+(defmethod wrap ((object ns:ns-dictionary))
+  "
+RETURN:         A fresh hash-table containing the NSDICTIONARY entries.
+
+DO:             Keys that are NSString are converted to keywords,
+                other keys are wrapped; the values are converted to
+                lisp type if possible, or else left as foreign types.
+
 "
-   (wrapping
-    (if (nullp nsdictionary)
-        nil
-        (loop
-          :with keyword = (find-package "KEYWORD")
-          :with enum =  [nsdictionary keyEnumerator]
-          :for key = [enum nextObject]
-          :until (nullp key)
-          :collect (intern (objcl:lisp-string key) keyword)
-          :collect (wrap [nsdictionary objectForKey:key])))))
+  (wrapping object
+    (let ((result (make-hash-table)) ; !!!!
+          ;; Since we map all the Objective-C key object to a lisp object,
+          ;; it doesn't matter what test function is used in the lisp hash-table.
+          ;; Hash-table test functions cannot be customized on lisp
+          ;; object to match isEqual: on the wrapped nsobjects.
+          (keyword (load-time-value (find-package "KEYWORD"))))
+      (do-nsdictionary (key value object result)
+        (let ((lisp-key   (if [key isKindOfClass:(oclo:@class "NSString")]
+                            (intern (objcl:lisp-string key) keyword)
+                            (wrap (substitute-object key))))
+              (lisp-value (wrap (substitute-object value))))
+          (setf (gethash lisp-key result) lisp-value))))))
 
 
-(defun wrap-nsarray (nsarray)
-  (wrapping
-   (let ((result '()))
-     (dotimes (i [nsarray count] (nreverse result))
-       (push (wrap [nsarray objectAtIndex:i]) result)))))
+;;------------------------------------------------------------
+;;------------------------------------------------------------
+
+;; (eql ccl:+null-ptr+ ccl:+null-ptr+) 
+;; (class-of )#<built-in-class ccl:macptr>
 
 
+(defun wrap-circularly (object)
+  (with-circular-references ()
+    (labels ((walk (key object)
+               (declare (ignore key))
+               (when (circular-register object)
+                 (structure object (function walk)))))
+      (walk :root object))
+    (wrap object)
+    ;; (com.informatimago.common-lisp.cesarum.utility:print-hashtable (car *circular-references*))
+    ))
+
+
+'(("NSArray"
+   (lambda (nsarray)
+       (when (circular-register nsarray)
+         (dotimes (i [nsarray count])
+           (walk [nsarray objectAtIndex:i]))))
+   (lambda (nsarray)
+       (let ((index (circular-reference nsarray)))
+         (if (and index (cdr index))
+           (wrap-reference (car index))
+           (progn
+             (if index
+               (wrap-referenced-object (car index) "NSArray"
+                                       (dotimes (i [nsarray count])
+                                         (wrap  [nsarray objectAtIndex:i])))
+               (wrap-unreferenced-object "NSArray"
+                                         (dotimes (i [nsarray count])
+                                           (wrap  [nsarray objectAtIndex:i]))))))))))
+
+
+
+
+
+
+;;------------------------------------------------------------
+;;------------------------------------------------------------
 
 (defmethod unwrap ((item symbol))
   (unwrapping item
-   (objcl:objcl-string (symbol-name item))))
+    (objcl:objcl-string (symbol-name item))))
 
 (defmethod unwrap ((item string))
   (unwrapping item
-   (objcl:objcl-string item)))
+    (objcl:objcl-string item)))
 
 (defmethod unwrap ((item real))
   (unwrapping item
-   [NSNumber numberWithDouble:(coerce item 'double-float)]))
+    [NSNumber numberWithDouble:(coerce item 'double-float)]))
 
 (defmethod unwrap ((item single-float))
   (unwrapping item
-   [NSNumber numberWithFloat:(coerce item 'single-float)]))
+    [NSNumber numberWithFloat:(coerce item 'single-float)]))
 
 (defmethod unwrap ((item integer))
   (unwrapping item
-   [NSNumber numberWithLongLong:item]))
+    [NSNumber numberWithLongLong:item]))
 
 (defmethod unwrap ((seq cons))
   (unwrapping seq
-   (loop
-     :with nsarray = [NSMutableArray arrayWithCapacity:(length seq)]
-     :for element :in seq
-     :do [nsarray addObject:(unwrap element)]
-     :finally (return nsarray))))
+    (loop
+      :with nsarray = [NSMutableArray arrayWithCapacity:(length seq)]
+      :for element :in seq
+      :do [nsarray addObject:(unwrap element)]
+      :finally (return nsarray))))
 
 (defmethod unwrap ((seq vector))
   (unwrapping seq
-   (loop
-     :with nsarray = [NSMutableArray arrayWithCapacity:(length seq)]
-     :for element :across seq
-     :do [nsarray addObject:(unwrap element)]
-     :finally (return nsarray))))
+    (loop
+      :with nsarray = [NSMutableArray arrayWithCapacity:(length seq)]
+      :for element :across seq
+      :do [nsarray addObject:(unwrap element)]
+      :finally (return nsarray))))
 
 (defmethod unwrap ((dict hash-table))
+  #-(and)
   (let ((objects '())
         (keys    '()))
     (maphash (lambda (k v) (push k keys) (push v objects)) dict)
     (unwrapping dict
-                [NSDictionary
-                 dictionaryWithObjects: (unwrap objects)
-                 forKeys: (unwrap keys)])))
+      [NSDictionary
+       dictionaryWithObjects: (unwrap objects)
+       forKeys: (unwrap keys)]))
+  (unwrapping dict
+    (let ((nsdict [NSMutableDictionary dictionaryWithCapacity:(hash-table-count dict)]))
+      (maphash (lambda (k v) [nsdict setObject:(unwrap v) forKey:(unwrap k)]) dict)
+      nsdict)))
+
+(defmethod unwrap ((self ns:ns-object))
+  self)
 
 (defun unwrap-plist (plist)
   (loop
@@ -404,21 +617,21 @@ NOTE:           It's expected the dictionary is small, hence the P-list.
     :collect k :into keys
     :collect v :into objects
     :finally (return (unwrapping plist
-                                 [NSDictionary
-                                  dictionaryWithObjects: (unwrap objects)
-                                  forKeys: (unwrap keys)]))))
-
-(defmethod unwrap ((self ns:ns-object))
-  self)
+                       [NSDictionary
+                        dictionaryWithObjects: (unwrap objects)
+                        forKeys: (unwrap keys)]))))
 
 
 (defun nsarray-to-list (nsarray)
-  (wrap-nsarray nsarray))
+  (wrapping nsarray
+   (let ((result '()))
+     (do-nsarray (element nsarray (nreverse result))
+       (push (wrap element) result)))))
 
 (defun list-to-nsarray (list)
   (if list
-      (unwrap list)
-      [NSMutableArray arrayWithCapacity:0]))
+    (unwrap list)
+    [NSMutableArray arrayWithCapacity:0]))
 
 
 ;;;; THE END ;;;;

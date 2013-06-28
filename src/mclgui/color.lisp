@@ -121,8 +121,8 @@ RGB colors into Macintosh color-table entries, see Inside Macintosh.
        (= (color-blue  color1) (color-blue  color2))))
 
 
-(defun wrap-nscolor (nscolor)
-  (wrapping
+(defmethod wrap ((nscolor ns:ns-color))
+  (wrapping nscolor
    (make-color [nscolor redComponent]
                [nscolor greenComponent]
                [nscolor blueComponent]

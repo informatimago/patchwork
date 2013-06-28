@@ -1132,51 +1132,62 @@ DO:             Add to the NSMenu of MENU a NSItem with the NSMenu of
 (defun %wrap-items (nsmenu)
   (let ((items '()))
     (dotimes (i [nsmenu numberOfItems] (nreverse items))
-      (push (wrap-nsmenuitem [nsmenu itemAtIndex:i]) items))))
+      (push (wrap [nsmenu itemAtIndex:i]) items))))
 
 
-(defun wrap-nsmenuitem (item)
+(defmethod structure ((nsmenuitem ns:ns-menu-item) element)
+  (funcall element :title [nsmenuitem title])
+  (let ((submenu [nsmenuitem submenu]))
+    (unless (nullp submenu)
+      (funcall element :submenu submenu))))
+
+
+(defmethod wrap ((item ns:ns-menu-item))
   "
 RETURN:         A new instance of MENUITEM representing the NSMenuItem ITEM.
 "
-  (unless (nullp item)
-   (wrapping
+  (wrapping item
     (let ((submenu [item submenu]))
       (apply (function make-instance) (if (nullp submenu)
-                                          'original-menu-item
-                                          'original-menu)
+                                        'original-menu-item
+                                        'original-menu)
              :handle (if (nullp submenu)
-                         item
-                         submenu)
+                       item
+                       submenu)
              :menu-item-title (objcl:lisp-string [item title])
              :enabledp [item isEnabled]
              :checkedp (if (zerop [item state])
-                           nil
-                           *check-mark*)
+                         nil
+                         *check-mark*)
              (if (nullp submenu)
-                 (list :command-key (let ((ke (objcl:lisp-string [item keyEquivalent])))
-                                      (if (zerop (length ke))
-                                          nil
-                                          (let ((km (decode-key-mask [item keyEquivalentModifierMask])))
-                                            (if km
-                                                (list km (aref ke 0))
-                                                (aref ke 0))))))
-                 (list :menu-items (%wrap-items submenu))))))))
+               (list :command-key (let ((ke (objcl:lisp-string [item keyEquivalent])))
+                                    (if (zerop (length ke))
+                                      nil
+                                      (let ((km (decode-key-mask [item keyEquivalentModifierMask])))
+                                        (if km
+                                          (list km (aref ke 0))
+                                          (aref ke 0))))))
+               (list :menu-items (%wrap-items submenu)))))))
 
 
-(defun wrap-nsmenu (nsmenu)
+(defmethod structure ((nsmenu ns:ns-menu) element)
+  (funcall element :title [nsmenu title])
+  (funcall element :font [nsmenu font])
+  (dotimes (i [nsmenu numberOfItems])
+    (funcall element i [nsmenu itemAtIndex:i])))
+
+(defmethod wrap ((nsmenu ns:ns-menu))
   "
 RETURN:         A new instance of MENU representing the NSMenu NSMENU.
 "
-  (unless (nullp nsmenu)
-   (wrapping
-    (make-instance 'original-menu
-        :handle nsmenu
-        :menu-title (objcl:lisp-string [nsmenu title])
-        :enabledp t
-        :checkedp nil
-        :menu-items (%wrap-items nsmenu)
-        :menu-font (wrap-nsfont [nsmenu font])))))
+  (wrapping nsmenu
+   (make-instance 'original-menu
+       :handle nsmenu
+       :menu-title (objcl:lisp-string [nsmenu title])
+       :enabledp t
+       :checkedp nil
+       :menu-items (%wrap-items nsmenu)
+       :menu-font (wrap [nsmenu font]))))
 
 
 
@@ -1200,7 +1211,7 @@ DO:             Inspect the application main menu, and build the
 
 RETURN:         The list of MENUs collected.
 "
-  (let ((menubar (menu-items (wrap-nsmenu [[NSApplication sharedApplication] mainMenu]))))
+  (let ((menubar (menu-items (wrap [[NSApplication sharedApplication] mainMenu]))))
     (dolist (menu menubar)
       (setf (slot-value menu 'owner) nil))
     (setf *apple-menu*   (change-class (first menubar) 'apple-menu)

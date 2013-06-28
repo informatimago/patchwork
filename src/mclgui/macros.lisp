@@ -46,9 +46,12 @@
 
 
 
-;; From Alexandria:
 (define-modify-macro appendf (&rest args) 
   append "Append onto list")
+
+(define-modify-macro nconcf (&rest args) 
+  nconc "Nconc onto list")
+
 (declaim (inline delete/swapped-arguments))
 (defun delete/swapped-arguments (sequence item &rest keyword-arguments)
   (apply #'delete item sequence keyword-arguments))

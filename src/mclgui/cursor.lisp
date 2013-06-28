@@ -111,7 +111,7 @@ RETURN:         A newly allocated bit16 containing the data of the
 ;; color, so in general we cannot convert them back to a Macintosh
 ;; cursor bitmap (16x16 black-and-white + mask).
 ;;
-;; (defun wrap-nscursor (nscursor)
+;; (defmethod wrap ((nscursor ns:ns-cursor))
 ;;   (let* ((representations [[nscursor image] representations])
 ;;          (bitmap-class [NSBitmapImageRep class])
 ;;          (rep (dotimes (i [representations count] [representations objectAtIndex:0])

@@ -155,18 +155,18 @@
 ;;; Conversions between ns:ns-point, ns:ns-size, ns:ns-rect and
 ;;; nspoint nssize and nsrect.
 
-(defun wrap-nspoint (nspoint)
-  (wrapping
+(defmethod wrap ((nspoint ns:ns-point))
+  (wrapping nspoint
    (make-nspoint :x     (ns:ns-point-x nspoint)
                  :y     (ns:ns-point-y nspoint))))
 
-(defun wrap-nssize (nssize)
-  (wrapping
+(defmethod wrap ((nssize ns:ns-size))
+  (wrapping nssize
    (make-nssize :width  (ns:ns-size-width nssize)
                 :height (ns:ns-size-height nssize))))
 
-(defun wrap-nsrect (nsrect)
-  (wrapping
+(defmethod wrap ((nsrect ns:ns-rect))
+  (wrapping nsrect
    (make-nsrect :x      (ns:ns-rect-x nsrect)
                 :y      (ns:ns-rect-y nsrect)
                 :width  (ns:ns-rect-width nsrect)
@@ -202,15 +202,15 @@
 
 (defmacro get-nspoint (call)
   (let ((vpoint (gensym)))
-    `(oclo:slet ((,vpoint ,call)) (wrap-nspoint ,vpoint))))
+    `(oclo:slet ((,vpoint ,call)) (wrap ,vpoint))))
 
 (defmacro get-nssize (call)
   (let ((vsize (gensym)))
-    `(oclo:slet ((,vsize ,call)) (wrap-nssize ,vsize))))
+    `(oclo:slet ((,vsize ,call)) (wrap ,vsize))))
 
 (defmacro get-nsrect (call)
   (let ((vframe (gensym)))
-    `(oclo:slet ((,vframe ,call)) (wrap-nsrect ,vframe))))
+    `(oclo:slet ((,vframe ,call)) (wrap ,vframe))))
 
 
 
@@ -349,8 +349,8 @@ RETURN:         DST.
 
 (defconstant +tick-per-second+ 60 "Number of ticks per second.")
 
-(defun wrap-nsevent (nsevent)
-  (wrapping
+(defmethod wrap ((nsevent ns:ns-event))
+  (wrapping nsevent
    (let ((what (case [nsevent type]
                  ((#.#$NSLeftMouseDown)         mouse-down)
                  ((#.#$NSLeftMouseUp)           mouse-up)
@@ -590,6 +590,13 @@ RETURN: A NSRect containing the frame of the window.
                           :initarg :view
                           :reader nswindow-window))]
 
+(defmethod wrap ((nswindow mclgui-window))
+  (wrapping nswindow
+   (or (nswindow-window nswindow)
+       (progn (cerror "Wrap ~S into an UNKNOWN-WINDOW instance."
+                      "The window ~S doesn't have a WINDOW instance."
+                      nswindow)
+              (make-instance 'unknown-window :handle nswindow)))))
 
 @[MclguiWindow
   method:(windowDidMove:(:id)nsnotification)
@@ -771,7 +778,7 @@ RETURN: A NSRect containing the frame of the window.
   body:
   (format-trace "-[MclguiView mouseDown:]" self (nsview-view self) theEvent)
   (when (nsview-view self)
-    (let ((*current-event* (wrap-nsevent theEvent)))
+    (let ((*current-event* (wrap theEvent)))
       (view-click-event-handler (nsview-view self)
                                 (nspoint-to-point
                                  (get-nspoint
@@ -784,7 +791,7 @@ RETURN: A NSRect containing the frame of the window.
   body:
   (format-trace "-[MclguiView mouseUp:]" self (nsview-view self) theEvent)
   (when (nsview-view self)
-    (let ((*current-event* (wrap-nsevent theEvent)))
+    (let ((*current-event* (wrap theEvent)))
       (window-mouse-up-event-handler (view-window (nsview-view self)))))]
 
 @[MclguiView
@@ -793,7 +800,7 @@ RETURN: A NSRect containing the frame of the window.
   body:
   ;; (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) theEvent)
   (when (nsview-view self)
-    (let ((*current-event* (wrap-nsevent theEvent)))
+    (let ((*current-event* (wrap theEvent)))
       (window-null-event-handler (view-window (nsview-view self)))))]
 
 @[MclguiView
@@ -802,7 +809,7 @@ RETURN: A NSRect containing the frame of the window.
   body:
   (format-trace "-[MclguiView mouseDragged]" self (nsview-view self) theEvent)
   (when (nsview-view self)
-    (let ((*current-event* (wrap-nsevent theEvent)))
+    (let ((*current-event* (wrap theEvent)))
       (window-null-event-handler (view-window (nsview-view self)))))]
 
 
