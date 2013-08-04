@@ -53,44 +53,39 @@
   (rtm-selection-1 (editor-collection-object *active-rtm-window*)))
 (defun update-all-beat-groupings ())
 
-(defvar *RTM-menu-edit* (new-menu "Edit"))
 
-(let ((menu-now))
-  (ui:add-menu-items  *RTM-menu-edit* 
-     (setq menu-now (new-leafmenu "Cut" 
-       (lambda () 
-           (when (get-current-rtm-selection)
-                (setf *rtm-struct-selection-scrap* (decompile (get-current-rtm-selection)))
-                (remove-beat-from-measure (get-current-rtm-selection))
-                (update-all-beat-groupings)
-                (erase+view-draw-contents *current-rtm-editor*))))))
-   (set-command-key menu-now #\X)
-   (ui:add-menu-items  *RTM-menu-edit* 
-      (setq menu-now (new-leafmenu "Copy" 
-        (lambda () 
-            (when (get-current-rtm-selection) 
-              (cond ((eq 'C-measure (class-name (class-of (get-current-rtm-selection))))
-                        (setf *measure-selection-scrap* (decompile (get-current-rtm-selection))))
-                    ((and (eq 'C-beat (class-name (class-of (get-current-rtm-selection))))
-                          (beat-chord (get-current-rtm-selection)))
-                        (setf *beat-chord-scrap* (decompile (beat-chord (get-current-rtm-selection)))))
-                    ((eq 'C-beat (class-name (class-of (get-current-rtm-selection))))
-                        (setf *rtm-struct-selection-scrap* (decompile (get-current-rtm-selection))))
-                    (t   
-                        (setf *measure-line-selection-scrap* (decompile (get-current-rtm-selection))))))))))
-   (set-command-key menu-now #\C)
-   (ui:add-menu-items  *RTM-menu-edit* 
-      (setq menu-now (new-leafmenu "Paste" 
-       (lambda ()    
-           (when (get-current-rtm-selection) 
-               (kill-chords (get-current-rtm-selection))
-               (paste-beat (get-current-rtm-selection))
-               (setf (rtm-selection-1 (editor-collection-object *active-rtm-window*)) ())  
-               (setf (rtm-selection-2 (editor-collection-object *active-rtm-window*)) ())  
-               (update-all-beat-groupings)
-               (erase+view-draw-contents 
-                  (current-rtm-editor (editor-collection-object *active-rtm-window*))))))))
-   (set-command-key menu-now #\V) )
+(defvar  *RTM-menu-edit*
+  (new-menu "Edit"
+
+            (item "Cut"  #\X
+                  (when (get-current-rtm-selection)
+                    (setf *rtm-struct-selection-scrap* (decompile (get-current-rtm-selection)))
+                    (remove-beat-from-measure (get-current-rtm-selection))
+                    (update-all-beat-groupings)
+                    (erase+view-draw-contents *current-rtm-editor*)))
+
+            (item  "Copy" #\C
+                   (when (get-current-rtm-selection) 
+                     (cond ((eq 'C-measure (class-name (class-of (get-current-rtm-selection))))
+                            (setf *measure-selection-scrap* (decompile (get-current-rtm-selection))))
+                           ((and (eq 'C-beat (class-name (class-of (get-current-rtm-selection))))
+                                 (beat-chord (get-current-rtm-selection)))
+                            (setf *beat-chord-scrap* (decompile (beat-chord (get-current-rtm-selection)))))
+                           ((eq 'C-beat (class-name (class-of (get-current-rtm-selection))))
+                            (setf *rtm-struct-selection-scrap* (decompile (get-current-rtm-selection))))
+                           (t   
+                            (setf *measure-line-selection-scrap* (decompile (get-current-rtm-selection)))))))
+
+            (item "Paste"  #\V
+                  (when (get-current-rtm-selection) 
+                    (kill-chords (get-current-rtm-selection))
+                    (paste-beat (get-current-rtm-selection))
+                    (setf (rtm-selection-1 (editor-collection-object *active-rtm-window*)) ())  
+                    (setf (rtm-selection-2 (editor-collection-object *active-rtm-window*)) ())  
+                    (update-all-beat-groupings)
+                    (erase+view-draw-contents 
+                     (current-rtm-editor (editor-collection-object *active-rtm-window*)))))))
+
 
 ;;(remove-menu-items  *RTM-menu-edit* (find-menu-item *RTM-menu-edit* "Paste")) 
 

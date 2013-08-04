@@ -125,18 +125,18 @@
 (menu-item-disable *undo-MN-menu*)
 (ui:add-menu-items *MN-menu-edit* (new-leafmenu "-" ()))
 
- (ui:add-menu-items  *MN-menu-edit* 
-     (setq menu-now (new-leafmenu "Cut" 
-       (lambda () (cut *active-MN-window*)))))
-   (set-command-key menu-now #\X)
-   (ui:add-menu-items  *MN-menu-edit*
-      (setq menu-now (new-leafmenu "Copy" 
-       (lambda () (copy *active-MN-window*)))))
-   (set-command-key menu-now #\C)
-   (ui:add-menu-items  *MN-menu-edit*
-      (setq menu-now (new-leafmenu "Paste" 
-       (lambda () (paste *active-MN-window*)))))
-   (set-command-key menu-now #\V)
+(ui:add-menu-items  *MN-menu-edit* 
+                    (setq menu-now (new-leafmenu "Cut" 
+                                                 (lambda () (cut *active-MN-window*)))))
+(set-command-key menu-now #\X)
+(ui:add-menu-items  *MN-menu-edit*
+                    (setq menu-now (new-leafmenu "Copy" 
+                                                 (lambda () (copy *active-MN-window*)))))
+(set-command-key menu-now #\C)
+(ui:add-menu-items  *MN-menu-edit*
+                    (setq menu-now (new-leafmenu "Paste" 
+                                                 (lambda () (paste *active-MN-window*)))))
+(set-command-key menu-now #\V)
 
 (defvar *MN-menu-root*
   (list

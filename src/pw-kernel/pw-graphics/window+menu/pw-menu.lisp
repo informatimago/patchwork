@@ -50,6 +50,15 @@
     (apply #'add-menu-items menu menus)
     menu))
 
+(defun new-item (title command-key thunk)
+  (let ((item (new-leafmenu title thunk)))
+    (when command-key
+      (set-command-key item command-key))
+    item))
+
+(defmacro item (title command-key &body body)
+  `(new-item ,title ,command-key (lambda () ,@body)))
+
 (defun menu-list (menu) (menu-items menu)) 
 
 (defun new-leafmenu (title action)
