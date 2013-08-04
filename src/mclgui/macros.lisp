@@ -124,6 +124,7 @@ POSITION:       0 means insert in front of the list.
 
 
 (declaim (declaration stepper))
+(defvar *step-mode* :run)
 
 (defun object-identity (object)
   "
