@@ -83,17 +83,18 @@
 
 ;;=====================================
 
-(setq *pw-points-rect-type*
-  (make-instance 'C-pw-type
-          :control-form
-           `(make-instance 'C-points-rect  :view-size (make-point 74 74) :type-list '(no-connection))))
+;; (setq *pw-points-rect-type*
+;;   (make-instance 'C-pw-type
+;;           :control-form
+;;            `(make-instance 'C-points-rect  :view-size (make-point 74 74) :type-list '(no-connection))))
+;; 
+;; 
+;; (setq *points-view-sort-pw-type*
+;;   (make-instance 'C-pw-type :control-form 
+;;    `(make-instance 'C-menubox  :view-size (make-point 36 14)
+;;     :menu-box-list '("sort" "nosort")
+;;     :type-list '(no-connection))))
 
-
-(setq *points-view-sort-pw-type*
-  (make-instance 'C-pw-type :control-form 
-   `(make-instance 'C-menubox  :view-size (make-point 36 14)
-    :menu-box-list '("sort" "nosort")
-    :type-list '(no-connection))))
 
 ;;===================================
 ;; save points ??

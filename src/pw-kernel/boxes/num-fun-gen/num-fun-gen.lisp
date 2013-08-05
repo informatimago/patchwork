@@ -63,10 +63,13 @@ function (f(x)= ...) is optional. If it is not included by the user, the program
 figures out which variables are involved."
   ;; fexpr == <expr> || (<fun> <args> = . <expr>)
   (multiple-value-bind (lambda name) (make-num-lambda fexpr)
-    ;(if |CLPF-UTIL|:*compile-num-lambda*
-      ;(compile name lambda)
-     ;; so that it works without the compiler
-      (eval `(function ,lambda))))
+    (cond
+      (*compile-num-lambda*
+       (compile name lambda))
+      (name
+       (eval `(defun ,name ,@(rest lambda))))
+      (t
+       (coerce lambda 'function)))))
 
 (defunp lagrange ((l-x-y list)) ()
   "Returns a Lagrange polynomial defined by the points of list <l-x-y>."

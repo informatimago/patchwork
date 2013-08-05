@@ -73,13 +73,12 @@
 ;;==================
 
 (defclass  C-patch-application-rtm-editor (C-patch-application C-process-begin+end)  
-  ((clock :initform 0 :accessor clock)
-   (clock-obj :initform *global-clock* :allocation :class :accessor clock-obj)
-   (chord-objects :initform nil :accessor chord-objects)
-;;   (previous-t-time :initform nil :accessor previous-t-time)
-   (play-flag :initform nil :accessor play-flag)
-  (measure-line :initform (make-instance 'C-measure-line) :initarg :measure-line :accessor measure-line)
-))
+  ((clock           :initform 0                               :accessor   clock)
+   (clock-obj       :initform *global-clock*                  :allocation :class          :accessor clock-obj)
+   (chord-objects   :initform nil                             :accessor   chord-objects)
+   ;; (previous-t-time :initform nil                             :accessor   previous-t-time)
+   (play-flag       :initform nil                             :accessor   play-flag)
+   (measure-line    :initform (make-instance 'C-measure-line) :initarg    :measure-line   :accessor measure-line)))
 ;;==================
 ;;???
 #|
@@ -176,8 +175,9 @@
    (draw-string  52 (- (h self) 4) (format nil "~5D" (clock (clock-obj self))))
    (set-view-font  (view-container  self) '(:srcor))))
 
-(defmethod clock-obj  ((self C-patch-application-rtm-editor)) self)
-(defmethod stop-clock  ((self C-patch-application-rtm-editor)) (stop-play self))
+;; TODO: delete: (defmethod clock-obj  ((self C-patch-application-rtm-editor)) self)
+(defmethod stop-clock  ((self C-patch-application-rtm-editor))
+  (stop-play self))
 
 (defmethod continue-record ((self C-patch-application-rtm-editor))
   (draw-clock self)

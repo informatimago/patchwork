@@ -611,12 +611,6 @@
 
 
 
-(defmethod pw::value ((self C-PATCH-BUFFER::C-patch-buffer))
-  (C-PATCH-BUFFER::value self))
-
-(defmethod pw::lock ((self C-PATCH-BUFFER::C-patch-buffer))
-  (C-PATCH-BUFFER::lock self))
-
 ;;ACTIVATE
 
 (defmethod even-actv ((a application) theAppleEvent reply handlerRefcon)
@@ -792,8 +786,6 @@
     )
 
 
-(defmethod stop-play ((self C-chord-line))
-  (setf (play-flag self) ()))
 
 (defmethod even-record ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon))

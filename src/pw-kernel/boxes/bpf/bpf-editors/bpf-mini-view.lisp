@@ -234,14 +234,16 @@
 ;;=====================================
 ;;draw
 
-(defmethod view-draw-contents ((self C-mini-bpf-view))
- (with-focused-view self
-   (draw-rect (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
-    (if (open-state self)
-     (when (break-point-function self)
-       (draw-bpf-function 
-            (break-point-function self) self nil (h-view-scaler self)(v-view-scaler self)))
-       (draw-string 3 9 (doc-string self)))))
+;; ;; Defined in multi-bpf.lisp:
+;;
+;; (defmethod view-draw-contents ((self C-mini-bpf-view))
+;;  (with-focused-view self
+;;    (draw-rect (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
+;;     (if (open-state self)
+;;      (when (break-point-function self)
+;;        (draw-bpf-function 
+;;             (break-point-function self) self nil (h-view-scaler self)(v-view-scaler self)))
+;;        (draw-string 3 9 (doc-string self)))))
 
 
 

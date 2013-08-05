@@ -249,10 +249,10 @@ by the values proportionaly placed between <minout> and <maxout>."
                  (newl res (nreverse temp)) )
              (nreverse res))))
 
-;;from Rhythms:Functions [magnus]
-
-(defun -power-function (begin end time curve)
-  (+ (* (- end begin) (expt time curve)) begin))
+;; ;;from Rhythms:Functions [magnus]
+;; 
+;; (defun -power-function (begin end time curve)
+;;   (+ (* (- end begin) (expt time curve)) begin))
 
 
 (defunp interpolation ((begin list) (end list) (samples fix>0 (:value 4))

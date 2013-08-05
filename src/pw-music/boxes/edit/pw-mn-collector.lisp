@@ -46,7 +46,11 @@
 (defclass  C-patch-application-midi (C-patch-application) ())
 
 (defmethod make-application-object ((self C-patch-application-midi))
-  (setf (application-object self) (make-music-notation-editor)))
+  (setf (application-object self) (make-music-notation-editor
+                                   'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
+                                   (make-point 350 200)
+                                   *g2-g-f-f2-staffs*
+                                   "Default C Patch Application Midi")))
 
 ;;====================================================================================================
 
@@ -338,26 +342,25 @@
 
 ;;(defmethod decompile ((self C-patch-PolifMN)) (call-next-method))
 
-(defmethod decompile ((self C-patch-polifMN-mod))
-  (append (call-next-method) 
-          (list nil `(list ,(active-mode self)
-                          ,(if *decompile-chords-mode* 
-                            `(list
-                              ,@(mapcar (lambda (ch-line) `(list ,@(get-chordline-form ch-line)))
-                                        (chord-line-list self))))))))
+;; (defmethod decompile ((self C-patch-polifMN-mod))
+;;   (append (call-next-method) 
+;;           (list nil `(list ,(active-mode self)
+;;                           ,(if *decompile-chords-mode* 
+;;                             `(list
+;;                               ,@(mapcar (lambda (ch-line) `(list ,@(get-chordline-form ch-line)))
+;;                                         (chord-line-list self))))))))
 
 (defmethod decompile ((self C-patch-polifMN-mod))
   (append (call-next-method) 
           (list nil `(list ,(active-mode self)
-                          ,(if *decompile-chords-mode* 
-                            `(list
-                               ,@(mapcar (lambda (ch-line) 
-                                             `(list ,@(get-chordline-form ch-line)))
-                                         (chord-line-list self))))
-                          ,(if (wptr (application-object self))
-                             `(list ,@(get-window-state self 
-                                                        (application-object self)))
-                             `(list ,@(window-state self)))))))
+                           ,(if *decompile-chords-mode* 
+                                `(list
+                                  ,@(mapcar (lambda (ch-line) 
+                                              `(list ,@(get-chordline-form ch-line)))
+                                            (chord-line-list self))))
+                           ,(if (wptr (application-object self))
+                                `(list ,@(get-window-state self (application-object self)))
+                                `(list ,@(window-state self)))))))
 
 (defmethod complete-box ((self C-patch-polifMN-mod) args)
   (make-pw-Poly-chord-line-box self (first args) (second args) (third args))

@@ -282,7 +282,8 @@
                  
                  (:file "pw-kernel/boxes/num-series/num-series" 
                         :depends-on ("patchwork-package"
-                                     "pw-kernel/types/pw-type-scheme"))
+                                     "pw-kernel/types/pw-type-scheme"
+                                     "pw-lib/epw-1.0b/freq-harmony"))
 
                  (:file "pw-kernel/boxes/num-fun-gen/num-fun-gen" 
                         :depends-on ("patchwork-package"

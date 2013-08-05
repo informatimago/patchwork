@@ -370,8 +370,8 @@ The resulting function is compiled when the value of *compile-num-lambda* is T (
   ;; fexpr == <expr> || (<fun> <args> = . <expr>)
   (multiple-value-bind (lambda name) (make-num-lambda fexpr)
     (if *compile-num-lambda*
-      (compile name lambda)
-      lambda)))
+        (compile name lambda)
+        (coerce '(lambda (x) (1+ x)) 'function))))
 
 (defun make-num-lambda (fexpr)
   "Creates a lisp function object from the \"functional\" expr <fexpr> which is

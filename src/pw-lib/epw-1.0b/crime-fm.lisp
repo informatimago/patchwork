@@ -44,7 +44,7 @@
 (defun add1 (x) (1+ x))
 
 (defun fmSpec (c m imod &optional order)
-    (let ((spec) s p q MI)
+    (let ((spec) s p #|q|# MI)
          (setq MI imod)
          (if (floatp imod) (setq imod (ceil imod)) (setq imod (fix imod)))
          (if (null order)
@@ -206,8 +206,8 @@
    (pw::default-char :initform "C" :accessor pw::default-char)))
 
 (defmethod do-menu-action ((self C-fm-box) str)
-  (call-next-method)
-  )
+  (declare (ignorable str))
+  (call-next-method))
 
 (defmethodp fm-spec C-fm-box ((carrier midics?) (modul midics? (:value 6600)) (index fix/float (:value 1))
                               (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) ch-ob

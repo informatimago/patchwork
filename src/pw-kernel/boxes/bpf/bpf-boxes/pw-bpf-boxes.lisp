@@ -423,11 +423,12 @@ request at input."
 (defmethod patch-value ((self C-patch-bpf-lib) obj)
   (patch-value (car (pw-controls self)) obj))
 
-;;not needed??!!  [911107]
-(setq *bpf-lib-pw-type*
-  (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf  
-    :view-size (make-point 40 40)
-    :menu-box-list ,*pw-BPF-library* :type-list '(no-connection))))
+;; ;;not needed??!!  [911107]
+;; (setq *bpf-lib-pw-type*
+;;   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf  
+;;     :view-size (make-point 40 40)
+;;     :menu-box-list ,*pw-BPF-library* :type-list '(no-connection))))
+
 
 (add-pw-input-type 'bpf-lib 'C-menubox-bpf
                    (list :view-size (make-point 40 40)

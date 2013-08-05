@@ -139,9 +139,9 @@
 ;;;---------------------------------------------------------------------
 
 (defvar *black-pattern*  nil)
-(defvar *dkgray-pattern* nil)
+(defvar *dark-gray-pattern* nil)
 (defvar *gray-pattern*   nil)
-(defvar *ltgray-pattern* nil)
+(defvar *light-gray-pattern* nil)
 (defvar *white-pattern*  nil)
 
 ;;;---------------------------------------------------------------------

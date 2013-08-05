@@ -423,7 +423,7 @@ values."
 
 (defunp freq-center ((freqs freq)) freq 
   "central freq between the lowest and highest notes of the chord <freqs>"
-  (freq-center2 (l-min (list! chord)) (l-max (list! chord))))
+  (freq-center2 (l-min (list! freqs)) (l-max (list! freqs))))
 ;;------------------------------------------------------------------
 
 (defunp best-freq ((chord midic)
@@ -775,31 +775,31 @@ notes to be transposed by octaves to fit within the specified range."
 keeping intervals.  Each note might be transposed by some octaves to fit
 in the (optional) register given."
 "Computes all chord's downward transpositions from the first note, keeping intervals" 
-  (let* ((chords ()) (base-note (car chord))
-         (ints (x->dx chord)) (revints (last ints)) (curints ints) pints
-         ch)
-    (if (zerop max) (setq max (apply #'max chord)))
-    (while curints
-      (setq ch (list base-note))
-      (setq pints curints)
-      (while pints
-        (newl ch (transpoct-prox (+ (car ch) (nextl pints)) min max (car ch))))
-      (setq ch (nreverse ch))
-      (nreverse ints)
-      (setq pints (cdr curints))
-      (while pints
-        (newl ch (transpoct-prox (- (car ch) (nextl pints)) min max (car ch))))
-      (newl chords ch)
-      (nreverse revints)
-      (nextl curints))
+(let* ((chords ()) (base-note (car chord))
+       (ints (x->dx chord)) (revints (last ints)) (curints ints) pints
+       ch)
+  (if (zerop max) (setq max (apply #'max chord)))
+  (while curints
     (setq ch (list base-note))
-    (nreverse ints)
-    (setq pints revints)
+    (setq pints curints)
+    (while pints
+      (newl ch (transpoct-prox (+ (car ch) (nextl pints)) min max (car ch))))
+    (setq ch (nreverse ch))
+    (setf ints (nreverse ints))
+    (setq pints (cdr curints))
     (while pints
       (newl ch (transpoct-prox (- (car ch) (nextl pints)) min max (car ch))))
     (newl chords ch)
-    (nreverse revints)
-    (nreverse chords)))
+    (setf revints (nreverse revints))
+    (nextl curints))
+  (setq ch (list base-note))
+  (setf ints (nreverse ints))
+  (setq pints revints)
+  (while pints
+    (newl ch (transpoct-prox (- (car ch) (nextl pints)) min max (car ch))))
+  (newl chords ch)
+  (setf revints (nreverse revints))
+  (nreverse chords)))
 
 ;;(defunt espace-chn ((chord chord) (min midic) (max midic)) chords)
 
@@ -1020,12 +1020,8 @@ the function approx-m prior to the entries."
 
 ;;iteration jusqu'a effet nul, sans protection contre bouclage
 (defun foo-iter (l-inter inf sup forbid replace)
-  (let ((tem))
-     (setq l-inter (sort l-inter #'<))
-     (until (equal (setq tem (copy-list l-inter))
-                 (setq l-inter (foo l-inter inf sup forbid replace)))
-        ;(freelist tem)
-        ))
+  (setq l-inter (sort l-inter #'<))
+  (until (equal l-inter (setq l-inter (foo l-inter inf sup forbid replace))))
   l-inter )
 
 ;;l-inter: liste ORDONNEE de midic "APPROXIME"

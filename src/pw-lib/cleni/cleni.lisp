@@ -602,7 +602,7 @@
 
 
 (defmethod translate-event-to-enigma ((self ScoreEvent) prev next cprev cnext)
-  (let ((pitch (pitch self)) (acc 0))
+  (let ((pitch (pitch self)))
     (format t "^eE(~D) ~D ~D ~D ~D ~D ~D "
             (rank self)
             prev next cprev cnext
@@ -755,11 +755,11 @@
                   'simple-string)))
         (target-file (full-pathname (merge-pathnames filename ".etf"))))    
     (format *error-output* "~%copying ~S to ~S~%"  template-file target-file)
-    (alexandria:copy-file template-file target-file :if-exists :overwrite)
+    (alexandria:copy-file template-file target-file :if-to-exists :overwrite)
     (format *error-output* "appending score desc. to ~S~%" target-file)
     (with-output-to-file (target-file :if-exists :append)
       (translate-to-enigma score))
-    (format *error-output* "done~%~%") ))
+    (format *error-output* "done~%~%")))
 
 ;;(full-pathname "CLENI:template~D.etf")
 ;;; ====================================================================

@@ -127,9 +127,9 @@ bottom right and dragging the mouse.
 ;;====================================================
 
 
-;;;not needed?????!!  911107
-(setq *pw-rectangle-tty-type*
-  (make-instance 'C-pw-type
-          :control-form
-           `(make-instance 'C-ttybox  :dialog-item-text ""
-                 :view-size (make-point 74 74) :type-list '(no-connection))))
+;; ;;;not needed?????!!  911107
+;; (setq *pw-rectangle-tty-type*
+;;   (make-instance 'C-pw-type
+;;           :control-form
+;;            `(make-instance 'C-ttybox  :dialog-item-text ""
+;;                  :view-size (make-point 74 74) :type-list '(no-connection))))
