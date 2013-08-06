@@ -280,45 +280,27 @@ DO:       Execute the BODY with a handler for CONDITION and
   ;;------------------------------
   (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"  'pw-menu-action))
   ;;------------------------------
-  (setf *pw-menu-file* (new-menu "File"))
-  (let ((menu-now))
-    (add-menu-items  *pw-menu-file* 
-                     (setf menu-now (new-leafmenu "New"        (lambda() (make-new-pw-window t)))))
-    (set-command-key menu-now #\N)
-    (add-menu-items  *pw-menu-file*
-                     (setf menu-now
-                           (new-leafmenu "Open patch..."       (lambda () (PW-LOAD-PATCH)))))
-    (set-command-key menu-now #\O)
-    (add-menu-items  *pw-menu-file* 
-                     (setf *pw-menu-file-close-item*
-                           (new-leafmenu "Close"               (lambda () (kill-patch-window *active-patch-window*)))))
-    (set-command-key *pw-menu-file-close-item* #\W)
-    (add-menu-items  *pw-menu-file* 
-                     (setf *pw-menu-file-only-Save-item*
-                           (new-leafmenu "Save"                (lambda () (PW-WINDOW-SAVE *active-patch-window*)))))
-    (set-command-key *pw-menu-file-only-Save-item* #\S)
-    (add-menu-items  *pw-menu-file* 
-                     (setf *pw-menu-file-only-SaveMN-item*
-                           (new-leafmenu "Save with MN"        (lambda () (PW-WINDOW-SAVE-MN *active-patch-window*)))))
-    (add-menu-items  *pw-menu-file* 
-                     (setf *pw-menu-file-Save-item*
-                           (new-leafmenu "Save as..."          (lambda () (PW-WINDOW-SAVE-as *active-patch-window*)))))
-    (add-menu-items  *pw-menu-file* 
-                     (setf *pw-menu-file-SaveMN-item*
-                           (new-leafmenu "Save with MN as..."  (lambda () (PW-WINDOW-SAVE-MN-as *active-patch-window*))))))
+  (setf *pw-menu-file-close-item*       (item "Close"        #\W        (kill-patch-window *active-patch-window*)))
+  (setf *pw-menu-file-only-Save-item*   (item "Save"         #\S        (PW-WINDOW-SAVE *active-patch-window*)))
+  (setf *pw-menu-file-only-SaveMN-item* (item "Save with MN"        nil (PW-WINDOW-SAVE-MN *active-patch-window*)))
+  (setf *pw-menu-file-Save-item*        (item "Save as..."          nil (PW-WINDOW-SAVE-as *active-patch-window*)))
+  (setf *pw-menu-file-SaveMN-item*      (item "Save with MN as..."  nil (PW-WINDOW-SAVE-MN-as *active-patch-window*)))
+  (setf *pw-menu-file* (new-menu "File"
+                                 (item "New"           #\N (make-new-pw-window t))
+                                 (item "Open patch..." #\O (PW-LOAD-PATCH))
+                                 *pw-menu-file-close-item*
+                                 *pw-menu-file-only-Save-item*
+                                 *pw-menu-file-only-SaveMN-item*
+                                 *pw-menu-file-Save-item*
+                                 *pw-menu-file-SaveMN-item*))
+  
   ;;------------------------------
-  (setf *pw-menu-edit* (new-menu "Edit"))
-  (let ((menu-now))
-    (add-menu-items  *pw-menu-edit* (setf menu-now (new-leafmenu "Cut"         (lambda () (cut *active-patch-window*)))))
-    (set-command-key menu-now #\X)
-    (add-menu-items  *pw-menu-edit* (setf menu-now (new-leafmenu "Copy"        (lambda () (copy *active-patch-window*)))))
-    (set-command-key menu-now #\C)
-    (add-menu-items  *pw-menu-edit* (setf menu-now (new-leafmenu "Paste"       (lambda () (paste *active-patch-window*)))))
-    (set-command-key menu-now #\V)
-    (add-menu-items  *pw-menu-edit* (setf menu-now (new-leafmenu "Duplicate"   (lambda () (duplicate *active-patch-window*)))))
-    (set-command-key menu-now #\D)
-    (add-menu-items  *pw-menu-edit* (setf menu-now (new-leafmenu "Select All"  (lambda () (activate-all *active-patch-window*) ))))
-    (set-command-key menu-now #\A))
+  (setf *pw-menu-edit* (new-menu "Edit"
+                                 (item "Cut"         #\X  (cut   *active-patch-window*))
+                                 (item "Copy"        #\C  (copy  *active-patch-window*))
+                                 (item "Paste"       #\V  (paste *active-patch-window*))
+                                 (item "Duplicate"   #\D  (duplicate *active-patch-window*))
+                                 (item "Select All"  #\A  (activate-all *active-patch-window*))))
   ;;------------------------------
   (setf *PWoper-menu*          (new-menu "PWoper"))
   (setf *pw-kernel-menu*       (new-menu "Kernel"))

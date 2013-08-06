@@ -116,27 +116,16 @@
 
 ;;============================================
 ;; menubar for MN
-(defvar *MN-menu-edit* (new-menu "Edit"))
 
-;;added 910415
-(defvar *undo-MN-menu* (new-leafmenu "Undo" (lambda () (redo-MN-edit))))
-(ui:add-menu-items *MN-menu-edit* *undo-MN-menu*)
-(set-command-key *undo-MN-menu* #\Z)
+(defvar *undo-MN-menu* (item "Undo" #\Z (redo-MN-edit)))
 (menu-item-disable *undo-MN-menu*)
-(ui:add-menu-items *MN-menu-edit* (new-leafmenu "-" ()))
-
-(ui:add-menu-items  *MN-menu-edit* 
-                    (setq menu-now (new-leafmenu "Cut" 
-                                                 (lambda () (cut *active-MN-window*)))))
-(set-command-key menu-now #\X)
-(ui:add-menu-items  *MN-menu-edit*
-                    (setq menu-now (new-leafmenu "Copy" 
-                                                 (lambda () (copy *active-MN-window*)))))
-(set-command-key menu-now #\C)
-(ui:add-menu-items  *MN-menu-edit*
-                    (setq menu-now (new-leafmenu "Paste" 
-                                                 (lambda () (paste *active-MN-window*)))))
-(set-command-key menu-now #\V)
+(defvar *MN-menu-edit* (new-menu "Edit"
+                                 *undo-MN-menu*
+                                 (item "-" nil)
+                                 (item "Cut"   #\X (cut   *active-MN-window*))
+                                 (item "Copy"  #\C (copy  *active-MN-window*))
+                                 (item "Paste" #\V (paste *active-MN-window*))
+                                 ))
 
 (defvar *MN-menu-root*
   (list
