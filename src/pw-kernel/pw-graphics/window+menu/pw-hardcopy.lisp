@@ -67,6 +67,10 @@
 ;;  (#~SerReset $boutRefNum 
 ;;              (+ $baud9600 $data8 $stop20 $noParity)))
 
+(defgeneric win-print-setup (view)
+  (:method ((view view))
+    (values)))
+
 (defmethod set-window-hardcopy-wptr ((self simple-view) wptr)
  (set-wptr self wptr))
 

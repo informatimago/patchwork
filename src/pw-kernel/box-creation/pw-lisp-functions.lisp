@@ -48,15 +48,6 @@
   "Returns an integer that is scaled as %scfc percentage of num."
   (round (* num %scfc) 100))
 
-(defunp random2 ((low fix/float) (high fix/float)) number
-  "Returns a random value between low high inclusive"
-  (if (zerop (- high low))
-    (+ high low (- low))
-    (let ((low-min (min low high)))
-      (if (or (floatp  low) (floatp high))
-        (+ (random (- (max low high) low-min)) low-min)
-        (+ (random (- (1+ (max low high)) low-min)) low-min)))))
-
 (defun mapcar-fun (fun a b)
   "applies fun to a and b
    a and b can be atoms or lists"
@@ -136,10 +127,5 @@ The length of the list is determined by count."
            (nreverse res))))))
 ;;(pw-addmenu *pw-menu-patch* '(scale-low-high))
 ;;===============================
-
-;; chord-box should accept a fix as well as a list of fixes
-(defun list! (thing)
-  "Returns a list containing <thing> or <thing> if it's already a list."
-  (if (listp thing) thing (list thing)))
 
 (provide 'PW-lisp-functions)

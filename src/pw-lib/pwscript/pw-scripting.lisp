@@ -731,15 +731,17 @@
 (in-package "C-PATCH-FILE-BUFFER")
 
 (defmethod pw::script-get-selected-file ((self C-patch-file-buffer) para)
-  (let ((name (full-pathname para)))
-    (ui:with-cursor *watch-cursor*
-      (setf (fred-win self) 
-            (make-instance 'fred-window :window-show nil))
-      (setf (file-name self) name)
-      (set-window-filename (fred-win self) name)
-      (buffer-insert-file (fred-buffer (fred-win self)) name)
-      (update-box-name self name)
-      (window-select (fred-win self)))))
+  (niy 'pw::script-get-selected-file self para)
+  ;; (let ((name (full-pathname para)))
+  ;;   (ui:with-cursor *watch-cursor*
+  ;;     (setf (fred-win self) 
+  ;;           (make-instance 'fred-window :window-show nil))
+  ;;     (setf (file-name self) name)
+  ;;     (set-window-filename (fred-win self) name)
+  ;;     (buffer-insert-file (fred-buffer (fred-win self)) name)
+  ;;     (update-box-name self name)
+  ;;     (window-select (fred-win self))))
+  )
 
 (in-package :pw)
 

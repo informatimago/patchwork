@@ -198,10 +198,10 @@
 ;;Hardcopy printing
 
 (defvar *MN-print-setUp*
-  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-mn-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (win-print-setUp *active-mn-window*))))
 
 (defvar *print-MN-menu* 
-  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy *active-mn-window*))))
+  (new-leafmenu "Print…" (lambda () (window-hardcopy *active-mn-window*))))
 
 (ui:add-menu-items *MN-menu-file* *MN-print-setUp* *print-MN-menu*)
 

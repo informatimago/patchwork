@@ -35,8 +35,6 @@
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
-(provide 'rtm-menu)
-
 ;;=========================================
 ;;=========================================
 ;; file
@@ -121,10 +119,10 @@
 ;; printing 
 
 (defvar *rtm-print-setUp*
-  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-rtm-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (win-print-setUp *active-rtm-window*))))
 
 (defvar *print-rtm-menu* 
-  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy *active-rtm-window*))))
+  (new-leafmenu "Print…" (lambda () (window-hardcopy *active-rtm-window*))))
 
 (ui:add-menu-items *rtm-menu-file* *rtm-print-setUp* *print-rtm-menu*)
 

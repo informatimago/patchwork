@@ -65,10 +65,10 @@
 ;;Hardcopy printing
 
 (defvar *BPF-print-setUp*
-  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-BPF-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (win-print-setUp *active-BPF-window*))))
 
 (defvar *print-BPF-menu* 
-  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy *active-BPF-window*))))
+  (new-leafmenu "Print…" (lambda () (window-hardcopy *active-BPF-window*))))
 
 (ui:add-menu-items *BPF-menu-file* *BPF-print-setUp* *print-BPF-menu*)
 

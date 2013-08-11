@@ -47,8 +47,9 @@
 ;;             |CLPF-UTIL|:prefix-help)))
 
 
+(fmakunbound 'make-num-fun)
 (defunp make-num-fun ((fexpr list (:value "(f(x)= x + 1)"))) nil
-  "Creates a lisp function object from the \"functional\" expr <fexpr> which is
+        "Creates a lisp function object from the \"functional\" expr <fexpr> which is
 basically an infixed expression (see prefix-expr and prefix-help).
 When <fexpr> begins with something like (f(x)= ...), the formal arguments are 
 taken from the given list, otherwise they are deduced from the body of <fexpr> 
@@ -61,15 +62,16 @@ between this notation and standard C notation is that spaces  must be put
 between operators. The variable name definition at the beginning of the 
 function (f(x)= ...) is optional. If it is not included by the user, the program 
 figures out which variables are involved."
-  ;; fexpr == <expr> || (<fun> <args> = . <expr>)
-  (multiple-value-bind (lambda name) (make-num-lambda fexpr)
-    (cond
-      (*compile-num-lambda*
-       (compile name lambda))
-      (name
-       (eval `(defun ,name ,@(rest lambda))))
-      (t
-       (coerce lambda 'function)))))
+        ;; fexpr == <expr> || (<fun> <args> = . <expr>)
+        (multiple-value-bind (lambda name) (make-num-lambda fexpr)
+          (cond
+            (*compile-num-lambda*
+             (compile name lambda))
+            (name
+             (eval `(defun ,name ,@(rest lambda))))
+            (t
+             (coerce lambda 'function)))))
+
 
 (defunp lagrange ((l-x-y list)) ()
   "Returns a Lagrange polynomial defined by the points of list <l-x-y>."

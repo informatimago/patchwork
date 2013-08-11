@@ -37,9 +37,10 @@
 
 ;; ==============================================
 
-(defvar *rtm-cleni-score* ())
-(defvar *cleni-notehead-list* ())
-(defvar *cleni-previous-chord-info-list* ())
+(defvar *rtm-cleni-score*                 '())
+(defvar *cleni-notehead-list*             '())
+(defvar *cleni-previous-chord-info-list*  '())
+(defvar *cleni-previous-obj-info-list*    '())
 
 ;; ==============================================
 (defun convert-rtm-unit-to-cleni (unit dots)

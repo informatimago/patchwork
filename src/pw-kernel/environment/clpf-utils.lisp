@@ -94,16 +94,15 @@
 ;; =============================================================================-======
 
 (defun file-compare… ()
-  (let*
-    ((file1 (ui:choose-file-dialog :button-string "Read 1st"))
-     (file2 (ui:choose-file-dialog :button-string "Read 2nd"))
-     (diffname (format () "~A/~A" (pathname-name file1) (pathname-name file2)))
-     (outfile
-      (ui:choose-new-file-dialog
-       :directory
-       (merge-pathnames (make-pathname  :name diffname :type "diff") file2)
-       :prompt "Save difference as:"
-       :button-string "Save diff" )))
+  (let* ((file1 (ui:choose-file-dialog :button-string "Read 1st"))
+         (file2 (ui:choose-file-dialog :button-string "Read 2nd"))
+         (diffname (format () "~A/~A" (pathname-name file1) (pathname-name file2)))
+         (outfile
+          (ui:choose-new-file-dialog
+           :directory
+           (merge-pathnames (make-pathname  :name diffname :type "diff") file2)
+           :prompt "Save difference as:"
+           :button-string "Save diff" )))
     (file-compare file1 file2 outfile)))
 
 (defun file-compare (file1 file2 outfile)
@@ -369,9 +368,13 @@ Local variables are automatically handled.
 The resulting function is compiled when the value of *compile-num-lambda* is T (default)."
   ;; fexpr == <expr> || (<fun> <args> = . <expr>)
   (multiple-value-bind (lambda name) (make-num-lambda fexpr)
-    (if *compile-num-lambda*
-        (compile name lambda)
-        (coerce '(lambda (x) (1+ x)) 'function))))
+    (cond
+      (*compile-num-lambda*
+       (compile name lambda))
+      (name
+       (eval `(defun ,name ,@(rest lambda))))
+      (t
+       (coerce lambda 'function)))))
 
 (defun make-num-lambda (fexpr)
   "Creates a lisp function object from the \"functional\" expr <fexpr> which is

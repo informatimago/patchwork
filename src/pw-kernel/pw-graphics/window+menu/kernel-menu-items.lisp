@@ -300,10 +300,10 @@ range-filter band-filter))|#
 ;;;============================
 ;;Hardcopy printing
 (defvar *PW-print-setUp*
-  (new-leafmenu "Page Setup…" (lambda () (ui::win-print-setUp *active-patch-window*))))
+  (new-leafmenu "Page Setup…" (lambda () (win-print-setUp *active-patch-window*))))
 
 (defvar *print-PW-menu* 
-  (new-leafmenu "Print…" (lambda () (ui::window-hardcopy  *active-patch-window*))))
+  (new-leafmenu "Print…" (lambda () (window-hardcopy  *active-patch-window*))))
 
 (ui:add-menu-items *pw-menu-file* *PW-print-setUp* *print-PW-menu*)
 ;;;===================

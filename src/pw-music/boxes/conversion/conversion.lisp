@@ -339,28 +339,30 @@ expressed in midi-cents, between f1 and f2."
   "Returns the interval in cents from <f-lo> to <f-hi>."
   (coef->cents (/ f-hi f-lo)))
 
-(defun sec->min1 (sec format)
-(let ((min (truncate sec 60)))
-  (if  (and (> format 0 )(= 0 min)) (list(lldecimals sec 2))
-      (list min 'min (lldecimals (mod sec 60) 4)))))
-
-(defune sec->min ((lsec numbers?) (format fix)) list
-"conversion secondes en minutes+secondes
-Format 0 : normal (ex: 1 min 15 ,  0 min 32)
-Format 1 : 0 min n'est pas noté (ex: 1 min 15 , 32)"
-  (deep-mapcar/1  'sec->min1 lsec format))
-
-(defune min->sec ((minutes numbers?)) numbers? ;;faire marcher pour atoms
-"conversion  minutes -> secondes
-orthographe : (3 x 25.3) ,  ou (3 25.3), ou (25.3), ou 25.3 
-x étant un caractère quelconque"
-  (less-deep-mapcar  'min->sec1 (list! minutes)))
-
-(defun min->sec1 (minutage) 
- (setq minutage (carlist! minutage))
-  (let ((sec (if (atom minutage) minutage (l-last minutage)))
-        (minutes (if (atom minutage) 0 (car minutage))))
-    (lldecimals (+  sec (* minutes 60)) 2)))
+;;; Duplicates with /home/pjb/works/patchwork/patchwork/src/pw-lib/epw-1.0b/freq-harmony.lisp ?
+;; (defun sec->min1 (sec &optional (nbdec 2) (format 1))
+;;   (let ((min (truncate sec 60)))
+;;     (if (and (> format 0 )(= 0 min))
+;;         (list (lldecimals sec nbdec))
+;;         (list min 'min (lldecimals (mod sec 60) nbdec)))))
+;; 
+;; (defune sec->min ((lsec numbers?) (format fix)) list
+;; "conversion secondes en minutes+secondes
+;; Format 0 : normal (ex: 1 min 15 ,  0 min 32)
+;; Format 1 : 0 min n'est pas noté (ex: 1 min 15 , 32)"
+;;   (deep-mapcar/1  'sec->min1 lsec 2 format))
+;; 
+;; (defune min->sec ((minutes numbers?)) numbers? ;;faire marcher pour atoms
+;; "conversion  minutes -> secondes
+;; orthographe : (3 x 25.3) ,  ou (3 25.3), ou (25.3), ou 25.3 
+;; x étant un caractère quelconque"
+;;   (less-deep-mapcar  'min->sec1 (list! minutes)))
+;; 
+;; (defun min->sec1 (minutage) 
+;;  (setq minutage (carlist! minutage))
+;;   (let ((sec (if (atom minutage) minutage (l-last minutage)))
+;;         (minutes (if (atom minutage) 0 (car minutage))))
+;;     (lldecimals (+  sec (* minutes 60)) 2)))
 
 (defun microton1  (midics approx) 
   (let ((result nil))

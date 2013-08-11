@@ -45,8 +45,11 @@ Chargement du programme
 
 1- Obtenir les sources.
 
-1.1- Obtenir les sources de Patchwork via fossil.
-     Voir: http://fossil.informatimago.com:8002/patchwork/home
+1.1- Obtenir les sources de Patchwork via git  ::
+
+        git clone git@gitorious.org:patchwork/patchwork.git
+
+   (ancien dépôt: _`http://fossil.informatimago.com:8002/patchwork/home`)
 
 1.2- Obtenir une version à jour de informatimago via git:
 
@@ -54,9 +57,9 @@ Chargement du programme
         git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
 
      Normalement ils sont obtenus automatiquement via quicklisp, mais
-     il y a des modifications nécessaires pour Patchwork dans le dépôt
-     git, qui ne seront prises en compte par quicklisp qu'à la
-     prochaine itération mensuelle.  
+     il y peut y avoir des modifications nécessaires pour Patchwork
+     dans le dépôt git, qui ne seront prises en compte par quicklisp
+     qu'à la prochaine itération mensuelle.  
 
 2- Voir 'generate-application.lisp' ou 'loader.lisp'.  Editer
    ~/LOGHOSTS/PATCHWORK pour indiquer où sont installés les sources de

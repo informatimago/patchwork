@@ -317,15 +317,29 @@ RETURN:         NEW-HANDLE.
 
 
 (defclass anonymous-wrapper (wrapper)
-  ((thunk :initarg :thunk :reader anonymous-wrapper-thunk)))
+  ((thunk         :initarg :thunk        :reader anonymous-wrapper-thunk)
+   (thunk-source  :initarg :thunk-source :reader anonymous-wrapper-thunk-source)))
+
+(defmethod print-object ((self anonymous-wrapper) stream)
+  (print-unreadable-object (self stream :identity t :type t)
+    (prin1 (list :handle (handle self)
+                 :thunk (anonymous-wrapper-thunk-source self)) stream))
+  self)
 
 (defmethod update-handle ((wrapper anonymous-wrapper))
   (setf (handle wrapper) (funcall (anonymous-wrapper-thunk wrapper))))
 
+(defmethod unwrap ((wrapper anonymous-wrapper))
+  (unwrapping wrapper
+    (funcall (anonymous-wrapper-thunk wrapper))))
+
 (defmacro awrap (&body body)
   (let ((thunk (gensym)))
     `(let ((,thunk (lambda () ,@body)))
-       (make-instance 'anonymous-wrapper :handle (funcall ,thunk) :thunk ,thunk))))
+       (make-instance 'anonymous-wrapper
+           :handle (funcall ,thunk)
+           :thunk ,thunk
+           :thunk-source (list* 'lambda '() ',body)))))
 
 
 
@@ -333,29 +347,34 @@ RETURN:         NEW-HANDLE.
 ;;; circular structures wrapping.
 ;;;------------------------------------------------------------
 
-@[NSObject subClass:MclguiReference
-           slots:((index  :initform nil
-                          :initarg :index
-                          :accessor reference-index))]
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  
+ @[NSObject subClass:MclguiReference
+            slots:((index  :initform nil
+                           :initarg :index
+                           :accessor reference-index))]
 
-(defmethod print-object ((self mclgui-reference) stream)
-  (print-unreadable-object (self stream :identity t :type t)
-    (format stream "#~D#" (reference-index self)))
-  self)
+ (defmethod print-object ((self mclgui-reference) stream)
+   (print-unreadable-object (self stream :identity t :type t)
+     (format stream "#~D#" (reference-index self)))
+   self)
 
-@[NSObject subClass:MclguiReferenced
-           slots:((index  :initform nil
-                          :initarg :index
-                          :accessor referenced-index
-                          :accessor reference-index)
-                  (object :initform nil
-                          :initarg :object
-                          :accessor referenced-object))]
+ @[NSObject subClass:MclguiReferenced
+            slots:((index  :initform nil
+                           :initarg :index
+                           :accessor referenced-index
+                           :accessor reference-index)
+                   (object :initform nil
+                           :initarg :object
+                           :accessor referenced-object))]
 
-(defmethod print-object ((self mclgui-referenced) stream)
+ (defmethod print-object ((self mclgui-referenced) stream)
   (print-unreadable-object (self stream :identity t :type t)
     (format stream "#~D=~S" (reference-index self) (referenced-object self)))
   self)
+
+ );;eval-when
+
 
 (defun make-reference (&key index)
   (let ((reference [[MclguiReference alloc] init]))

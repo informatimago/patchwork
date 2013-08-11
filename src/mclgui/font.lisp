@@ -718,22 +718,21 @@ The valid value range is from -1.0 to 1.0. The value of 0.0 corresponds to 0 deg
              (multiple-value-bind (traits others) (style-to-font-traits face)
                (declare (ignore others)) ; for now…
                ;; (print (list name size mode traits others color))
-               (let* ((attributes
-                       (list
-                        NSFontNameAttribute            name
-                        NSFontSizeAttribute            (coerce size 'ns:cgfloat)
-                        NSForegroundColorAttributeName (if (zerop color)
-                                                         (make-color 65535 0 0)
-                                                         (error "Color for font not implemented yet."))
-                        NSFontTraitsAttribute          (unwrap-plist
-                                                        (list NSFontSymbolicTrait  (font-traits-to-mask traits)))
-                        ;; NSUnderlineStyleAttributeName  (if (member :underline others) 1 0)
-                        ;; NSShadowAttributeName          (if (member :shadow    others) *default-shadow* nil)
-                        ;; NSStrokeWidthAttributeName     (if (member :outline   others) 3.0f0 0.0f0)
-                        )))
-                 (list (awrap [NSFontDescriptor fontDescriptorWithFontAttributes:(unwrap-plist attributes)])
-                       mode
-                       size))))))
+               (list (awrap [NSFontDescriptor fontDescriptorWithFontAttributes:
+                                              (unwrap-plist (list
+                                                             NSFontNameAttribute            name
+                                                             NSFontSizeAttribute            (coerce size 'ns:cgfloat)
+                                                             NSForegroundColorAttributeName (if (zerop color)
+                                                                                              (make-color 65535 0 0)
+                                                                                              (error "Color for font not implemented yet."))
+                                                             NSFontTraitsAttribute          (unwrap-plist
+                                                                                             (list NSFontSymbolicTrait  (font-traits-to-mask traits)))
+                                                             ;; NSUnderlineStyleAttributeName  (if (member :underline others) 1 0)
+                                                             ;; NSShadowAttributeName          (if (member :shadow    others) *default-shadow* nil)
+                                                             ;; NSStrokeWidthAttributeName     (if (member :outline   others) 3.0f0 0.0f0)
+                                                             ))])
+                     mode
+                     size)))))
   (values-list (list* (handle (first (descriptor-cache-descriptor *descriptor-cache*)))
                       (rest (descriptor-cache-descriptor *descriptor-cache*)))))
 

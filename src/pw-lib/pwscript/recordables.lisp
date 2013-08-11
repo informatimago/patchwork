@@ -286,12 +286,8 @@
     (tell (controls *active-patch-window*) 'draw-connections)
     (ui:niy 'delete-extra-inputs)
     ;; (record--ae :|PWst| :|pweb| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box-now)))))
-    box-now)
-  )
+    box-now))
 
-
-
-(defmethod delete-extra-inputs ((self C-pw-extend)) )
 
 (defmethod delete-extra-inputs ((self C-patch-application))
   (when (> (length (pw-controls self)) (original-args (pw-function self)))
@@ -493,15 +489,6 @@
 ;;NEW 
 
 
-(defun init-patch-pos (win patch)
-  (when *position-new-box*
-    (let* ((x (point-h *position-new-box*))
-           (y (point-v *position-new-box*))
-           (x1 (point-h (view-size win)))
-           (y1 (point-v (view-size win))))
-      (if (and (>= x 0) (>= y 0) (< x x1) (< y y1))
-          (set-view-position patch *position-new-box*)))))
-
 
 (defun record-patch (clase posi name)
   (ui:niy 'record-patch)
@@ -698,19 +685,21 @@
 
 
 (defmethod get-selected-file ((self C-patch-file-buffer))
-  (let ((name (if (and (file-name self) 
-                       (not (string= (file-namestring (file-name self)) "New")))
-                  (file-name self)
-                  (CHOOSE-FILE-DIALOG))))
-    (pw::record-menu "Open File"  (mac-namestring name) self)
-    (ui:with-cursor *watch-cursor*
-      (setf (fred-win self) 
-            (make-instance 'fred-window :window-show nil))
-      (setf (file-name self) name)
-      (set-window-filename (fred-win self) name)
-      (buffer-insert-file (fred-buffer (fred-win self)) name)
-      (update-box-name self name)
-      (window-select (fred-win self)))))
+  (niy 'get-selected-file)
+  ;; (let ((name (if (and (file-name self) 
+  ;;                      (not (string= (file-namestring (file-name self)) "New")))
+  ;;                 (file-name self)
+  ;;                 (CHOOSE-FILE-DIALOG))))
+  ;;   (pw::record-menu "Open File"  (namestring name) self)
+  ;;   (ui:with-cursor *watch-cursor*
+  ;;     (setf (fred-win self) 
+  ;;           (make-instance 'fred-window :window-show nil))
+  ;;     (setf (file-name self) name)
+  ;;     (set-window-filename (fred-win self) name)
+  ;;     (buffer-insert-file (fred-buffer (fred-win self)) name)
+  ;;     (update-box-name self name)
+  ;;     (window-select (fred-win self))))
+  )
 
 (in-package "C-PATCH-LIST-EDITOR")
 (defmethod open-patch-win ((self C-patch-list-editor))
@@ -743,8 +732,7 @@
           (WITH-OPEN-FILE (out new-name :direction :output :if-exists :supersede :if-does-not-exist :create)
             (prin1 '(in-package :pw) out)
             (let ((*package* :pw))
-              (prin1 `(add-patch-box *active-patch-window* ,(decompile self)) out))))
-        )))
+              (prin1 `(add-patch-box *active-patch-window* ,(decompile self)) out)))))))
 
 (defun record-menu  (title para self)
   (ui:niy 'record-menu)
@@ -817,26 +805,26 @@
 
 (defmethod view-position ((self null)) (make-point 0 0))
 (defmethod view-size     ((self null)) (make-point 1000 1000))
-(defun init-patch-pos (win patch)
-  (if (null *position-new-box*)
-      (progn
-        ;; (with-cursor *box-cursor*
-        ;;   (while (null (mouse-down-p)) t))
-        ;; (setf *position-new-box* (view-mouse-position win))
-        (ui:uiwarn "~S sets a random position" 'init-patch-pos
-         )
-        (if win
-            (setf *position-new-box* (add-points (view-position win)
-                                                 (make-point (random (point-h (view-size win)))
-                                                             (random (point-v (view-size win))))))))) 
-  (when *position-new-box*
-    (let* ((x (point-h *position-new-box*))
-           (y (point-v *position-new-box*))
-           (x1 (point-h (view-size win)))
-           (y1 (point-v (view-size win))))
-      (if (and (>= x 0) (>= y 0) (< x x1) (< y y1))
-          (set-view-position patch *position-new-box*)))))
 
+
+(defun init-patch-pos (win patch)
+  (unless *position-new-box*
+    (setf *position-new-box*
+          (if win
+              (add-points (view-position win)
+                          (make-point (random (point-h (view-size win)))
+                                      (random (point-v (view-size win)))))
+              (make-point 10 10))))
+  (let* ((x (point-h *position-new-box*))
+         (y (point-v *position-new-box*)))
+    (when win
+      (setf x (min x (point-h (view-size win)))
+            y (min y (point-v (view-size win)))))
+    (set-view-position patch (make-point x y))))
+
+
+
+;;;; THE END ;;;;
 
 
 

@@ -63,7 +63,10 @@
 
 (defmethod make-application-object ((self C-patch-PolifMN))
   (setf (application-object self)
-        (make-n-music-notation-editors (length (pw-controls self)))))
+        (make-n-music-notation-editors (length (pw-controls self))
+                                       self
+                                       'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
+                                       (make-point 350 200))))
 
 ;;_________
 

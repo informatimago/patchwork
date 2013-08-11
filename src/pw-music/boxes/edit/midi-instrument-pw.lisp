@@ -99,19 +99,19 @@ Label is used for browsing inside the MN-editor.
 ")
 ;;_________________
 
-(setq *bpf-lib-midi-ins-pw-type*
+(defparameter *bpf-lib-midi-ins-pw-type*
   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf  
     :view-size (make-point 36 14)
     :menu-box-list ,*pw-BPF-library* :type-list '(bpf))))
 
-(setq *midi-collection-label-pw-type*
+(defparameter *midi-collection-label-pw-type*
   (make-instance 'C-pw-type
           :control-form
            `(make-instance 'C-ttybox-str  
               :view-size (make-point 36 14) 
               :dialog-item-text "label" :type-list '(no-connection))))
 
-(setq *bpf-lib-midi-status-pw-type*
+(defparameter *bpf-lib-midi-status-pw-type*
   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-val  
     :view-size (make-point 36 14)
     :menu-box-list '(("paftr" . #xA0) ("contr". #xB0) ("prog" . #xC0) ("maftr" . #xD0) ("ptchb" . #xE0)) 
@@ -160,13 +160,13 @@ midi-instrument information.
 ")
 ;;_________________
 
-(setq *midi-ins-label-pw-type*
+(defparameter *midi-ins-label-pw-type*
   (make-instance 'C-pw-type
           :control-form
            `(make-instance 'C-ttybox-str  
                :view-size (make-point  36 14) 
                :dialog-item-text "flute" :type-list '(no-connection))))
-(setq *midi-ins-nargs-pw-type*
+(defparameter *midi-ins-nargs-pw-type*
   (make-instance 'C-pw-type
           :control-form
            `(make-instance 'C-ttybox  

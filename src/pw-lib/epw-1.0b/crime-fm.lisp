@@ -44,86 +44,86 @@
 (defun add1 (x) (1+ x))
 
 (defun fmSpec (c m imod &optional order)
-    (let ((spec) s p #|q|# MI)
-         (setq MI imod)
-         (if (floatp imod) (setq imod (ceil imod)) (setq imod (fix imod)))
-         (if (null order)
-             ;(setq order (car order))
-             (setq order (add1 imod)) )
-         (setq order (min order *maxorder*))
-         (setq spec `((, c . 0 )))
-         (for (i 1 1 order)
-              (newl spec (cons (- c (* i m)) (- i)))
-              (setq  spec (nconc spec (list (cons (+ c (* i m)) i))))
-              (when (and (null p) (< (caar spec) 0))
-                    (setq p spec)))
-         (setq s spec)
-         (while s
-                ;(when (and (null p) (>= (caar s) 0))
-                ;      (setq p q))
-                (cond 
-                      ( (< (cdar s) 0)
-                        (if (oddp (cdar s))
-                            (rplacd (car s) (- (bessel MI (abs (cdar s)))))
-                            (rplacd (car s) (bessel MI (abs (cdar s)))))
-                        (when (< (caar s) 0)
-                              (rplaca (car s) (- (caar s)))
-                              (rplacd (car s) (- (cdar s)))))
-                      ( t
-                        (rplacd (car s) (bessel MI (cdar s)))))
-                (setq q s)
-                (nextl s))
-         (setq spec
-               (if (not p)
-                    spec
-                    (fmMerge (cdr p) 
-                             (progn (rplacd p ()) (nreverse spec)))))
-         (mapc (lambda (comp)
-                       (rplacd comp (abs (cdr comp))))
-               spec)
-         (when (<= (caar spec) 0) (nextl spec))
-          (fmNormalize spec)
-         spec
-))
+  (let ((spec) s p q MI)
+    (declare (ignorable q))
+    (setq MI imod)
+    (if (floatp imod) (setq imod (ceil imod)) (setq imod (fix imod)))
+    (if (null order)
+                                        ;(setq order (car order))
+        (setq order (add1 imod)) )
+    (setq order (min order *maxorder*))
+    (setq spec `((, c . 0 )))
+    (for (i 1 1 order)
+         (newl spec (cons (- c (* i m)) (- i)))
+         (setq  spec (nconc spec (list (cons (+ c (* i m)) i))))
+         (when (and (null p) (< (caar spec) 0))
+           (setq p spec)))
+    (setq s spec)
+    (while s
+                                        ;(when (and (null p) (>= (caar s) 0))
+                                        ;      (setq p q))
+      (cond 
+        ( (< (cdar s) 0)
+         (if (oddp (cdar s))
+             (rplacd (car s) (- (bessel MI (abs (cdar s)))))
+             (rplacd (car s) (bessel MI (abs (cdar s)))))
+          (when (< (caar s) 0)
+            (rplaca (car s) (- (caar s)))
+            (rplacd (car s) (- (cdar s)))))
+        ( t
+         (rplacd (car s) (bessel MI (cdar s)))))
+      (setq q s)
+      (nextl s))
+    (setq spec
+          (if (not p)
+              spec
+              (fmMerge (cdr p) 
+                       (progn (rplacd p ()) (nreverse spec)))))
+    (mapc (lambda (comp)
+            (rplacd comp (abs (cdr comp))))
+          spec)
+    (when (<= (caar spec) 0) (nextl spec))
+    (fmNormalize spec)
+    spec))
 
 
 (defun fmNormalize (spec)
-    (let ((etot 0) ratio)
-         (mapc (lambda (x) (setf  etot (+ etot (cdr x))))
-               spec)
-         (setq ratio (/ 1000.0 etot))
-         (mapc (lambda (x)
-                  (rplacd x (fix (* (cdr x) ratio))))
-               spec)
-        spec))
+  (let ((etot 0) ratio)
+    (mapc (lambda (x) (setf  etot (+ etot (cdr x))))
+          spec)
+    (setq ratio (/ 1000.0 etot))
+    (mapc (lambda (x)
+            (rplacd x (fix (* (cdr x) ratio))))
+          spec)
+    spec))
 
 
- 
+
 (defun bessel (imod i)
-    (if (fixp imod)
-        (aref bessel i imod)
-        (let ((i1 (aref bessel i (fix imod))) (i2 (aref bessel i (ceil imod))))
-             (fix (+ i1 (* (- imod (fix imod)) (- i2 i1)))))))
+  (if (fixp imod)
+      (aref bessel i imod)
+      (let ((i1 (aref bessel i (fix imod))) (i2 (aref bessel i (ceil imod))))
+        (fix (+ i1 (* (- imod (fix imod)) (- i2 i1)))))))
 
 (defun fmMerge   (f1 f2)
-    (let ((r (list ())))
-         (fmMerge2 r f1 f2)
-         (cdr r)))
+  (let ((r (list ())))
+    (fmMerge2 r f1 f2)
+    (cdr r)))
 
 
 (defun fmMerge2 (r f1 f2)
-    (cond 
-          ((null f1) (rplacd r f2))
-          ((null f2) (rplacd r f1))
-          ((< (caar f1) (caar f2))
-           (rplacd r f1)
-           (fmMerge2 f1 (cdr f1) f2))
-          ((= (caar f1) (caar f2))
-           (rplaca f1 (cons (caar f1) (+ (cdar f1) (cdar f2))))
-           (rplacd r f1)
-           (fmMerge2 f1 (cdr f1) (cdr f2)))
-          (t (rplacd r f2)
-             (fmMerge2 f2 f1 (cdr f2)))))
+  (cond 
+    ((null f1) (rplacd r f2))
+    ((null f2) (rplacd r f1))
+    ((< (caar f1) (caar f2))
+     (rplacd r f1)
+     (fmMerge2 f1 (cdr f1) f2))
+    ((= (caar f1) (caar f2))
+     (rplaca f1 (cons (caar f1) (+ (cdar f1) (cdar f2))))
+     (rplacd r f1)
+     (fmMerge2 f1 (cdr f1) (cdr f2)))
+    (t (rplacd r f2)
+       (fmMerge2 f2 f1 (cdr f2)))))
 
 
 (defun fm (c m i)
@@ -181,24 +181,24 @@
 
 
 (epw::defunp fm/p ((car fix>0 (:value 5)) (mod fix>0 (:value 7)) (ind fix/float (:value 4))) list
-  "Computes a FM spectrum. Outputs a list of partials and a list of dyns"
-   (let ((spec (fmspec car mod ind)))
-    (cons (mapcar #'car spec)
-          (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec))))
+             "Computes a FM spectrum. Outputs a list of partials and a list of dyns"
+             (let ((spec (fmspec car mod ind)))
+               (cons (mapcar #'car spec)
+                     (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec))))
 
 
 (defunp fm-chord ((carrier midics?) (modul midics? (:value 6600)) (index fix/float (:value 1))
-                 &optional 
-                 (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) ch-ob
-        "Computes a FM spectrum. Outputs a chord object"
-  (when (= unit 1)
-    (setf carrier (mc->f carrier) modul (mc->f modul)))
-    (let* ((spec (fmspec carrier modul index)) (slength (length spec)))
-      (pw::mk-chord 
-       (f->mc (epw::band-filter (mapcar #'car spec) '((15.0 20000.0))))
-       (make-list slength :initial-element 50)
-       (make-list slength :initial-element 0)
-       (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec) )))
+                  &optional 
+                  (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) ch-ob
+                  "Computes a FM spectrum. Outputs a chord object"
+                  (when (= unit 1)
+                    (setf carrier (mc->f carrier) modul (mc->f modul)))
+                  (let* ((spec (fmspec carrier modul index)) (slength (length spec)))
+                    (pw::mk-chord 
+                     (f->mc (epw::band-filter (mapcar #'car spec) '((15.0 20000.0))))
+                     (make-list slength :initial-element 50)
+                     (make-list slength :initial-element 0)
+                     (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec) )))
 
 
 (defclass C-fm-box (pw::C-patch&popUp)
@@ -211,25 +211,25 @@
 
 (defmethodp fm-spec C-fm-box ((carrier midics?) (modul midics? (:value 6600)) (index fix/float (:value 1))
                               (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) ch-ob
-"Computes a FM spectrum. index is an int or float value between 1 and 25
+                              "Computes a FM spectrum. index is an int or float value between 1 and 25
 (float values are interpolated).<carrier> and <modul> can be midics or freqs (default midics)
 depending on the value of the <unit> argument. Outputs either a chord object (default) or
 midics, or freqs, or velocities depending on the popup menu"
-  (when (= unit 1)
-    (setf carrier (mc->f carrier) modul (mc->f modul)))
-  (let* ((spec (fmspec carrier modul index))
-         (vel (mapcar (lambda (x) (round (* (/ 127 3.0) (if (<= (cdr x) 0.0) 0 (log (cdr x) 10))))) spec))
-         (spec (epw::band-filter (mapcar #'car spec) '((15.0 20000.0))))
-         (slength (length spec)))
-    (cond ((string= (pw::current-str self) "M") (f->mc spec))
-          ((string= (pw::current-str self) "V") vel)
-          ((string= (pw::current-str self) "F") spec)
-          ((string= (pw::current-str self) "C")
-           (pw::mk-chord 
-            (f->mc spec)
-            (make-list slength :initial-element 50)
-            (make-list slength :initial-element 0)
-            vel)))))
+                              (when (= unit 1)
+                                (setf carrier (mc->f carrier) modul (mc->f modul)))
+                              (let* ((spec (fmspec carrier modul index))
+                                     (vel (mapcar (lambda (x) (round (* (/ 127 3.0) (if (<= (cdr x) 0.0) 0 (log (cdr x) 10))))) spec))
+                                     (spec (epw::band-filter (mapcar #'car spec) '((15.0 20000.0))))
+                                     (slength (length spec)))
+                                (cond ((string= (pw::current-str self) "M") (f->mc spec))
+                                      ((string= (pw::current-str self) "V") vel)
+                                      ((string= (pw::current-str self) "F") spec)
+                                      ((string= (pw::current-str self) "C")
+                                       (pw::mk-chord 
+                                        (f->mc spec)
+                                        (make-list slength :initial-element 50)
+                                        (make-list slength :initial-element 0)
+                                        vel)))))
 
 
 ;;(pw::pw-addmenu-fun (pw::the-user-menu) 'fm-spec 'C-fm-box)

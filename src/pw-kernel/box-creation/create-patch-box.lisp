@@ -152,14 +152,14 @@
 
 ;;====================================
 
-(defun make-lisp-function-arg-list (function)
-  (let ((arg-list (get-arglist function))
-        (res))
-   (when (car arg-list)
-     (while arg-list
-       (push  '*symbol-test-type* res)
-       (push  (string (pop arg-list)) res)))
-    (nreverse res)))
+;; (defun make-lisp-function-arg-list (function)
+;;   (let ((arg-list (get-arglist function))
+;;         (res))
+;;    (when (car arg-list)
+;;      (while arg-list
+;;        (push  '*symbol-test-type* res)
+;;        (push  (string (pop arg-list)) res)))
+;;     (nreverse res)))
 ;;=============================================
 
 (unless (fboundp 'get-lisp-function-arg-list)

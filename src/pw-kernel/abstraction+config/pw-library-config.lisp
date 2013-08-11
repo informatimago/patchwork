@@ -243,7 +243,7 @@ GA 17/5/94
   ;        (remove  (print (pathname-name lib)) module::*loaded-modules*  :test #'string-equal)))
   (setf *user-libs-config* ())
   (setf *user-abstracts-config* ())
-  (delete-file *config-init-file* :if-does-not-exist nil)
+  (ignore-errors (delete-file *config-init-file*))
   (with-open-file (file *config-init-file* :direction :output :if-exists :supersede
                           :if-does-not-exist :create)
       (prin1 `(nil nil (nil t t nil nil :mc) t) file))

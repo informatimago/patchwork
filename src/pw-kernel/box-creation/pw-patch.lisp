@@ -489,8 +489,8 @@
 ;;move
 
 (defmethod dmove-patch ((self C-patch) dx dy)
-  (record--ae :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
-                                      (,:|insh| ,(cl-user::getDescRecPtr (cl-user::asAEDesc (list (+ (x self) dx) (+ (y self) dy)))))))
+  ;; (record--ae :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
+  ;;                                     (,:|insh| ,(cl-user::getDescRecPtr (cl-user::asAEDesc (list (+ (x self) dx) (+ (y self) dy)))))))
   (set-view-position self (+ (x self) dx)(+ (y self) dy)))
 
 (defmethod set-view-scroll-position ((view C-patch) h &optional v scroll-visibly?)

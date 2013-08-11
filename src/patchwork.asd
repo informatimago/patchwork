@@ -618,11 +618,9 @@
                                      "pw-music/editors/rhythm/rtm-window"))
 
                  
-                 
                  (:file "pw-music/menu/rtm-menu" 
                         :depends-on ("patchwork-package"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
-
                  
                  (:file "pw-music/editors/rhythm/beat-measure-measure-line" 
                         :depends-on ("patchwork-package"
@@ -659,10 +657,6 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-help-window" 
                         :depends-on ("patchwork-package"))
-                 
-                 (:file "pw-music/editors/rhythm/rtm-menu" 
-                        :depends-on ("patchwork-package"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
                  (:file "pw-music/editors/rhythm/rtm-midi-files" 
                         :depends-on ("patchwork-package"))

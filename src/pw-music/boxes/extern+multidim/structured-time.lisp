@@ -329,9 +329,9 @@ Str-dur box is normally used in context of structured time.
 ;; !!  obj will be me after this call and the clock will accessed from this object !!   
 
 (defunp strout ((patch user-out)) nil
-"Strout (structured out) is used always in combination with a 'in' box.
+        "Strout (structured out) is used always in combination with a 'in' box.
 It is similar to to an 'out' box except that it adds to the clockvalue of
 the requesting box the begintime of the super-note of the requesting box. 
 Strout box is normally used in context of structured time.
 "
-(declare (ignore outsym)))
+        (values))
