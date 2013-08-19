@@ -36,7 +36,7 @@
 
 
 (defpackage "CLENI" 
-  (:use "COMMON-LISP")
+  (:use "COMMON-LISP" "MCLGUI")
   (:export  "NEW-SCORE" "DESCRIBE-SCORE" "TRANSLATE-SCORE"
             "*HALF-TONE*" "*QUARTER-TONE*" "*G-KEY*" "*C-3-KEY*"
             "*C-4-KEY*" "*F-KEY*"))
@@ -761,7 +761,7 @@
       (translate-to-enigma score))
     (format *error-output* "done~%~%")))
 
-;;(full-pathname "CLENI:template~D.etf")
+
 ;;; ====================================================================
 ;;;     Provide CLENI
 ;;; ====================================================================

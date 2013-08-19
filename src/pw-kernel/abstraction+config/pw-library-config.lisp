@@ -45,14 +45,21 @@
 
 (in-package :pw)
 
-(defvar *user-abstracts-config* ())
-(defvar *user-libs-config* ())
+(defvar *config-default-libr-path*  "PW-USER:library-autoload;")
+(defvar *config-default-abst-path*  "PW-USER:abstract-autoload;")
+(defvar *config-init-file*          "CL:PW-inits;config.init")
+
+(defparameter *user-library-folder-path*  (merge-pathnames "**;*.lib" *config-default-libr-path*))
+
+(defvar *user-abstracts-config* '())
+(defvar *user-libs-config*      '())
+
 
 (defun load-abstr-config ()
   (let* ((thestring (choose-directory-dialog :directory "cl:PW-user;")))
     (load&form-abstr-menu thestring)
-    (record--ae :|PWst| :|ploa| `((,:|----| ,(mkSO :|obab| nil :|name| (namestring (truename thestring))))))
-    ))
+    (record--ae :|PWst| :|ploa| `((,:|----| ,(mkSO :|obab| nil :|name| (namestring (truename thestring))))))))
+
 
 (defun load&form-abstr-menu (path &optional index)
   (if path
@@ -74,21 +81,21 @@
                  index)))))))))
 
 (defun form-abstract-subMenu (patch-file-name from-folder code &optional index)
-    (let ((sub-dir-list 
-           (nthcdr (- (length (parse-file-name from-folder)) (or index 2))
-                   (parse-file-name patch-file-name)))
-          (current-sub-menu *pw-menu-patch*)
-          (menu))
-      (dotimes (x (1- (length sub-dir-list)))
-        (unless 
+  (let ((sub-dir-list 
+         (nthcdr (- (length (parse-file-name from-folder)) (or index 2))
+                 (parse-file-name patch-file-name)))
+        (current-sub-menu *pw-menu-patch*)
+        (menu))
+    (dotimes (x (1- (length sub-dir-list)))
+      (unless 
           (setq menu (find-menu-item current-sub-menu (car sub-dir-list)))
-          (ui:add-menu-items current-sub-menu
-                     (setq menu (new-menu (car sub-dir-list)))))                            
-        (setq current-sub-menu menu)
-        (pop sub-dir-list))
-      (or (find-menu-item current-sub-menu (car sub-dir-list))
-          (ui:add-menu-items current-sub-menu (new-leafmenu (trim-extension (car sub-dir-list)) 
-                                                    (eval `(function (lambda () ,code))))))))
+        (ui:add-menu-items current-sub-menu
+                           (setq menu (new-menu (car sub-dir-list)))))                            
+      (setq current-sub-menu menu)
+      (pop sub-dir-list))
+    (or (find-menu-item current-sub-menu (car sub-dir-list))
+        (ui:add-menu-items current-sub-menu (new-leafmenu (trim-extension (car sub-dir-list)) 
+                                                          (eval `(function (lambda () ,code))))))))
 
 (defvar *compiled-abstr-extension* ".comp")
 
@@ -106,22 +113,18 @@
 (defun trim-extension (name)
   (let* ((point (position  #\. name :from-end t :test #'char=)))
     (if point (subseq name 0 point) name)))
-    
+
 
 ;;(load-abstr-config)
-(defvar *user-library-folder-path* "CL:PW-user;library-autoload;**;*.lib")
 
 (defun load-library-config ()
   (let* ((thestring (choose-file-dialog :directory "cl:User-library;" :button-string "load lib")))
     (load-one-user-library thestring)
-    (record--ae :|PWst| :|ploa| `((,:|----| ,(mkSO :|obli| nil :|name| (namestring (truename thestring))))))
-    ))
+    (record--ae :|PWst| :|ploa| `((,:|----| ,(mkSO :|obli| nil :|name| (namestring (truename thestring))))))))
 
 
-(defvar *config-init-file* "cl:PW-inits;config.init")
-(defvar *config-default-abst-path* "PW-User:abstract-autoload;")
 
-#|
+#||
 GA 17/5/94
 
 (defun load-one-user-library (path)
@@ -137,9 +140,9 @@ GA 17/5/94
     (with-open-file (file *config-init-file* :direction :output :if-exists :supersede
                           :if-does-not-exist :create)
       (prin1 `(,(append (first file-config-list) *user-libs-config*)
-               ,(append (second file-config-list) *user-abstracts-config*)
-               ,(get-global-options-marks)
-               ,(get-evaluation-option)) file))))
+                ,(append (second file-config-list) *user-abstracts-config*)
+                ,(get-global-options-marks)
+                ,(get-evaluation-option)) file))))
 
 (defun load-remembered-config ()
   (apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
@@ -164,10 +167,11 @@ GA 17/5/94
   (setf *user-abstracts-config* ())
   (delete-file *config-init-file* :if-does-not-exist nil)
   (with-open-file (file *config-init-file* :direction :output :if-exists :supersede
-                          :if-does-not-exist :create)
-      (prin1 `(nil nil (nil t t nil nil :mc) t) file))
+                        :if-does-not-exist :create)
+    (prin1 `(nil nil (nil t t nil nil :mc) t) file))
   (format t "configuration erased"))
-|#
+
+||#
 
 
 
@@ -180,7 +184,7 @@ GA 17/5/94
            (setf (logical-pathname-translations logical-dir-str)
                  `(("**;" ,(format nil "PW-USER:library-autoload;~A;**;" directory-path))))
            (unwind-protect
-             (load-again (format nil "~A:~A" logical-dir-str file-to-load))
+               (load-again (format nil "~A:~A" logical-dir-str file-to-load))
              (setf (logical-pathname-translations logical-dir-str) old-path))))
         (t (format t "can't find library in path: ~S" 
                    (full-pathname (format nil "~A:" logical-dir-str)))
@@ -204,7 +208,7 @@ GA 17/5/94
 ;;; do not erase user menu before loading image. cf chant.
 
 (defun load-remembered-config ()
-  ;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
+                                        ;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
   (let ((in-user-lib (directory *user-library-folder-path*))
         (file-config-list
          (with-open-file (file *config-init-file* :direction :input :if-does-not-exist nil)
@@ -237,16 +241,16 @@ GA 17/5/94
 
 
 (defun forget-all-config ()
-  ;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
-  ;(dolist (lib *user-libs-config*)
-  ;  (setf module::*loaded-modules*
-  ;        (remove  (print (pathname-name lib)) module::*loaded-modules*  :test #'string-equal)))
+                                        ;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
+                                        ;(dolist (lib *user-libs-config*)
+                                        ;  (setf module::*loaded-modules*
+                                        ;        (remove  (print (pathname-name lib)) module::*loaded-modules*  :test #'string-equal)))
   (setf *user-libs-config* ())
   (setf *user-abstracts-config* ())
   (ignore-errors (delete-file *config-init-file*))
   (with-open-file (file *config-init-file* :direction :output :if-exists :supersede
-                          :if-does-not-exist :create)
-      (prin1 `(nil nil (nil t t nil nil :mc) t) file))
+                        :if-does-not-exist :create)
+    (prin1 `(nil nil (nil t t nil nil :mc) t) file))
   (format t "configuration erased"))
 
 

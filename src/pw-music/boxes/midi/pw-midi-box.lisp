@@ -48,18 +48,18 @@
 (in-package :pw)
 
 (defunp midi-o ((bytes (list (:value "(144 60 100)" :type-list (list midic))))) list
-  "<midi-o> sends <bytes> out of the Macintosh serial modem port. For example, 
+        "<midi-o> sends <bytes> out of the Macintosh serial modem port. For example, 
     if we give the list (144 60 64) for bytes, our MIDI synthesizer (assuming it is 
     connected) play middle-C on channel 1 with a velocity of 64.  To turn off the 
     note, we would have to give bytes the argument (144 60 0)."
-(when bytes
-    (let ((event (midishare::MidiNewEv midishare::typeStream)))
-      (unless (%null-ptr-p event)	
-        (midishare::chan event 0)			
-        (midishare::port event 0)
-        (dolist (byte (list! bytes))
-          (midishare::midiaddfield event byte))
-        (midishare::MidiSendIm midi::*pw-refnum* event)))))
+        (when bytes
+          (let ((event (midishare::MidiNewEv midishare::typeStream)))
+            (unless (midishare:null-event-p event)	
+              (midishare::chan event 0)			
+              (midishare::port event 0)
+              (dolist (byte (list! bytes))
+                (midishare::midiaddfield event byte))
+              (midishare::MidiSendIm midi::*pw-refnum* event)))))
 
 (defunp pgmout1 ((son fix (:value 1 :min-val 1  :max-val 128))
                 (canal approx )) list
@@ -112,7 +112,7 @@ between
 
 (defpackage "C-PW-SEND-MIDI-NOTE"
   (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
-  (:import-from "SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL")
+  (:import-from "PATCH-WORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL")
   (:export "SND-MIDINOTE" "C-PW-SEND-MIDI-NOTE"))
 
 
@@ -382,7 +382,7 @@ given parameters to MIDI"
   
 (defpackage "C-PW-MIDI-IN"
   (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
-  (:import-from "SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
+  (:import-from "PATCH-WORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
   (:import-from "MIDI" "MIDI-READ")
   (:export "PW-MIDI-IN" "M-DATA" "C-PW-MIDI-IN" "DELAY" "STATUS" "MIDI-CHAN" "DATA1"
            "DATA2" "MIDI-OPCODE" "C-PW-MIDI-IN-TOP" "C-PW-DELAY-BOX" "C-PW-NOTE-IN"
@@ -432,7 +432,7 @@ given parameters to MIDI"
 
 (defmethod pw-schedule-midi-in ((self C-pw-midi-in) box patch delay)
   (let ((data (midi-read)))
-    (if (and (not (ui::%null-ptr-p data)) (pw-midi-filtered self data))
+    (if (and (not (midishare:null-event-p data)) (pw-midi-filtered self data))
       (progn
           (setf (value box) (format-midi self data))
           (patch-value patch self)
@@ -447,41 +447,41 @@ given parameters to MIDI"
  (defunp pw-midi-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
                     (patch (list (:type-list ())))
                     &optional (delay (fix>0 (:value 10)))) nil
-"<pw-midi-in> & <m-data> are used to gather incoming MIDI data from the Macintosh serial ports.
-  In order for the two to work, there must always be a loop with pw-midi-in at the bottom,
- <m-data> at the top, and some kind of <patch> dealing with the MIDI data in between.
-The optional input <delay> gives the delay time  evaluation (in 100ths of a second) of the input <patch>.
-In order to start the loop collecting MIDI data, the pw-midi-in module must be evaluated.
-When you are finished collecting MIDI data, select deactivate in the pw-midi-in menu.
-  WARNING!!!!!, if the module is not deactivated, patch evaluation will be very slow.
-Note that the incoming MIDI data will come out of the above patch in a compressed form.
-  To decompress the data, see the modules: midi-opcode, midi-channel, midi-data1, midi-data2, and midi-status."
+"
+<pw-midi-in> & <m-data> are used to gather incoming MIDI data from the
+Macintosh serial ports.  In order for the two to work, there must
+always be a loop with pw-midi-in at the bottom, <m-data> at the top,
+and some kind of <patch> dealing with the MIDI data in between.  The
+optional input <delay> gives the delay time  evaluation (in 100ths of
+a second) of the input <patch>.  In order to start the loop collecting
+MIDI data, the pw-midi-in module must be evaluated.  When you are
+finished collecting MIDI data, select deactivate in the pw-midi-in
+menu.  WARNING!!!!!, if the module is not deactivated, patch
+evaluation will be very slow.  Note that the incoming MIDI data will
+come out of the above patch in a compressed form.  To decompress the
+data, see the modules: midi-opcode, midi-channel, midi-data1,
+midi-data2, and midi-status.
+"
   (declare (ignore in-box patch delay)))
 
 (defunp raw-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
                     (patch (list (:type-list ())))
                     &optional (delay (fix>0 (:value 10)))) nil
-"The modules raw-in and  m-data together gather incoming MIDI data from the 
-Macintosh serial ports. In order for them to work, there must always be a loop 
-with 
-raw-in at the bottom,    m-data ;at the top, and some kind of patch dealing with 
-the 
-MIDI data in between. The optional input delay gives the delay time  evaluation 
-(in 
-100ths of a second) of the input patch. In order to start the loop collecting 
-  MIDI 
-;;data, the raw-in module must be evaluated. When you are finished collecting 
-MIDI 
-data, select 'Deactivate' in the raw-in menu. Warning , Very Important!!:: If the 
-module is not deactivated after use, patch evaluation will be very slow.  It is 
-very 
-dangerous because may cause Patchwork to report endlessly: 'late Task'. Note 
-that the 
-incoming MIDI data comes out of the patch in a compressed form.  To 
-decompress the 
-data, see the modules:   midi-opcode;,   midi-chan;,   midi-data1;,   midi-
-data2;, 
-and   midi-status;.
+                    "
+The modules raw-in and m-data together gather incoming MIDI data from
+the Macintosh serial ports.  In order for them to work, there must
+always be a loop with raw-in at the bottom, m-data ;at the top, and
+some kind of patch dealing with the MIDI data in between.  The
+optional input delay gives the delay time evaluation (in 100ths of a
+second) of the input patch.  In order to start the loop collecting
+MIDI data, the raw-in module must be evaluated.  When you are finished
+collecting MIDI data, select 'Deactivate' in the raw-in menu.
+Warning, Very Important!!:: If the module is not deactivated after
+use, patch evaluation will be very slow.  It is very dangerous because
+may cause Patchwork to report endlessly: 'late Task'.  Note that the
+incoming MIDI data comes out of the patch in a compressed form.  To
+decompress the data, see the modules: midi-opcode;, midi-chan;,
+midi-data1;, midi- data2;, and midi-status;.
 "
   (declare (ignore in-box patch delay)))
 
@@ -532,24 +532,20 @@ When you are finished collecting MIDI data, select deactivate in the pw-midi-in 
 (defunp note-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
                     (patch (list (:type-list ())))
                     &optional (delay (fix>0 (:value 10)))) nil
-"The note-in and m-data modules are invoked simultaneously. They gather 
-incoming 
-MIDI data from the Macintosh serial ports. note-in filters out all events other 
-than 
-note-on messages. In order for the two modules to work, there must always be 
-a loop 
-with note-in at the bottom,  m-data at the top, and some kind of patch dealing 
-with the 
-MIDI data in between. The optional input delay gives the delay time  evaluation 
-(in 
-100ths of a second) of the input patch. In order to start the loop that collects 
-MIDI data,  
-evaluate the note-in module. When you are finished collecting MIDI data, select 
-'Deactivate' in the note-in menu. Warning, Very Important!!: If the module is not 
-deactivated after use, patch evaluation will be very slow.  It is very dangerous 
-because 
-may cause Patchwork to report endlessly: 'late Task'.
-
+"
+The note-in and m-data modules are invoked simultaneously.  They gather
+incoming MIDI data from the Macintosh serial ports.  note-in filters
+out all events other than note-on messages.  In order for the two
+modules to work, there must always be a loop with note-in at the
+bottom, m-data at the top, and some kind of patch dealing with the
+MIDI data in between.  The optional input delay gives the delay time
+evaluation (in 100ths of a second) of the input patch.  In order to
+start the loop that collects MIDI data, evaluate the note-in
+module.  When you are finished collecting MIDI data, select
+'Deactivate' in the note-in menu.  Warning, Very Important!!: If the
+module is not deactivated after use, patch evaluation will be very
+slow.  It is very dangerous because may cause Patchwork to report
+endlessly: 'late Task'.
 "
   (declare (ignore in-box patch delay)))
 
@@ -627,11 +623,11 @@ endlessly: 'late Task'."
   (setf (state self) nil))
 
 (defun pw::pw-reset-for-midi()
-  ;(scheduler:set-scheduler-state :oot)
+  ;(patch-work.scheduler:set-scheduler-state :oot)
   (midi:midi-close)
-  (scheduler::init-scheduler)
+  (patch-work.scheduler::init-scheduler)
   (midi:midi-open)  
-  ;(scheduler:set-scheduler-state :rt)
+  ;(patch-work.scheduler:set-scheduler-state :rt)
   )
 
 

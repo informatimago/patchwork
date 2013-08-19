@@ -16,10 +16,7 @@
 ;;*                                           *
 ;;*********************************************
 
-
 (in-package :cl-user)
-;;(require :appleevent-toolkit)
-(load "PW:PW-lib;PWScript;appleevent-toolkit" :if-does-not-exist nil)
 
 (defconstant $kAECoreSuite             :|core|)
 

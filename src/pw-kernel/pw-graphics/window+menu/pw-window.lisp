@@ -393,8 +393,7 @@
       (apply #'add-subviews self patches)
       (set-changes-to-file-flag self)
       (tell patches 'set-pw-window-pointers self)
-      (tell patches 'draw-connections)
-      )))
+      (tell patches 'draw-connections))))
 
 (defmethod duplicate ((self C-pw-window))
   (when (active-patches self)
@@ -403,25 +402,21 @@
       (copy self)
       (tell patches 'deactivate-control)
       (record--ae :|core| :|clon| `((,:|----| ,:|csel| )))
-      (setf *si-record* nil)
-      (let* (#+ccl (ccl:*compile-definitions* nil) 
+      (let* ((*si-record* nil)
+             #+ccl (ccl:*compile-definitions* nil) 
              (new-patches (eval (patch-scrap self))))
         (tell new-patches 'dmove-patch 20 20)
         (apply #'add-subviews self  new-patches)
         (tell new-patches 'set-pw-window-pointers self)
-        (tell new-patches 'draw-connections)
-        (setf *si-record* t)
-        ))))
+        (tell new-patches 'draw-connections)))))
 
 (defmethod disconnect-all-cut-patches ((self C-pw-window) cut-patches)
-  (let* ((rest-patches 
-          (set-difference (controls self) (active-patches self) :test 'eq)))
+  (let* ((rest-patches  (set-difference (controls self) (active-patches self) :test 'eq)))
     (connect/unconn cut-patches rest-patches t)
     (dolist (alive-patch rest-patches)
       (dolist (dead-patch cut-patches)
         (disconnect-my-self alive-patch dead-patch))
-      (repaint-connections alive-patch cut-patches))
-    ))
+      (repaint-connections alive-patch cut-patches))))
 
 (defmethod cut ((self C-pw-window))
   (let ((active-patches (active-patches self)))
@@ -431,8 +426,7 @@
       (copy self)
       (dolist (patch active-patches)
         (remove-yourself-control patch)
-        (remove-subviews self patch)))
-    ))
+        (remove-subviews self patch)))))
 
 (defmethod cut-delete ((self C-pw-window))
   (let ((active-patches (active-patches self)))
@@ -442,8 +436,7 @@
       (record--ae :|core| :|delo| `((,:|----| ,:|csel| )))
       (dolist (patch active-patches)
         (remove-yourself-control patch)
-        (remove-subviews self patch)
-        ))))
+        (remove-subviews self patch)))))
 
 ;;========================
 ;; key handler

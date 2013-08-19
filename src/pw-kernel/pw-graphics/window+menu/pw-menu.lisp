@@ -169,8 +169,7 @@
                :prompt "Save new image as:"
                :button-string  "Save"
                :directory (merge-pathnames "Desktop/" (user-homedir-pathname))
-               ;; PJB-TODO:  check logical pathnames in patchwork.
-               #-(and)"CL:images;Pw.image"))
+               #-(and)"CL:images;Pw.image")) ;; PJB-TODO:  check logical pathnames in patchwork.
         (sizes (list (* 8500 1024)
                      (* 6500  1024))))
     (when file
@@ -345,10 +344,9 @@ DO:       Execute the BODY with a handler for CONDITION and
                                                                   :position :centered
                                                                   :initial-string "list")))
                                       (when string
-                                        (setf *si-record* nil)
-                                        (let* ((patch (make-lisp-pw-boxes (read-from-string string) 
-                                                                          *active-patch-window*)))
-                                          (setf *si-record* t)
+                                        (let ((patch (let ((*si-record* nil))
+                                                       (make-lisp-pw-boxes (read-from-string string) 
+                                                                           *active-patch-window*))))
                                           (when patch
                                             (record-patch "funlisp"
                                                           (list (point-h (view-position patch))
@@ -363,6 +361,12 @@ DO:       Execute the BODY with a handler for CONDITION and
         (let ((item (find-menu-item menu title)))
           (when item
             (add-menu-items *PWoper-menu* item))))))
+
+  (defvar *c-major-scale*)
+  (defvar *chromatic-scale*)
+  (defvar *1/4-tone-chromatic-scale*)
+  (defvar *1/8-tone-chromatic-scale*)
+  
   ;;------------------------------
   (setf *g-option-c-major*     (new-leafmenu "C-major"        (lambda () (set-globally-scale *c-major-scale*))))
   (setf *play-Pbend-menu*      (new-leafmenu "Pitch Bend"     (lambda () (set-playing-option :pb))))

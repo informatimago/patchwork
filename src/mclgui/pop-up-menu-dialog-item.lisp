@@ -1254,10 +1254,10 @@ default menu item.  Otherwise the value itself is displayed as if by
               (setf max (+ w 13 (font-codes-string-width (menu-item-title (car items)) ff ms)))
               (let* ((ss (font-codes-string-width " " ff ms))
                      (first (car items)))           
-                (%str-cat (menu-item-title first)
-                          (make-array (ceiling (- width max) ss)
-                                      :element-type 'base-character
-                                      :initial-element #\space)))))))))
+                (concatenate 'string (menu-item-title first)
+                             (make-array (ceiling (- width max) ss)
+                                         :element-type 'base-char
+                                         :initial-element #\space)))))))))
   (:method ((menu typein-menu-menu))
     (case (typein-menu-menu-position (view-container menu))
       (:right nil)

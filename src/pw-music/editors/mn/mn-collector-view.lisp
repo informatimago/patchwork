@@ -377,7 +377,7 @@
     (when all-the-chords
       (setq notes (order-the-notes (chord-line a-panel) all-the-chords x-origo))
       (setq beginT (abs (cdr (car notes))))
-      (setf scheduler::*print-on-late?* t)
+      (setf patch-work.scheduler::*print-on-late?* t)
       (start (apdfuncall  10 2 15  ;beginT 2 (+ beginT 10)
                           'play-chosen-chords (chord-line a-panel) notes (cdr (car notes)))))))
 
@@ -607,7 +607,7 @@
 (defmethod play-your-chords ((self C-chord-line))
   (let* ((the-notes (order-the-notes self (chords self) 0)))
     (when the-notes
-      (setf scheduler::*print-on-late?* t)
+      (setf patch-work.scheduler::*print-on-late?* t)
       (start (apdfuncall 10 2 15
                          'play-chosen-chords self the-notes (cdr (car the-notes)))))))
 

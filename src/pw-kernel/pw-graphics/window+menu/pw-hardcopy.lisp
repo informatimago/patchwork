@@ -71,12 +71,12 @@
   (:method ((view view))
     (values)))
 
-(defmethod set-window-hardcopy-wptr ((self simple-view) wptr)
- (set-wptr self wptr))
-
-(defmethod set-window-hardcopy-wptr ((self view) wptr)
- (set-wptr self wptr)
- (tell (subviews self) 'set-window-hardcopy-wptr wptr))
+;; (defmethod set-window-hardcopy-wptr ((self simple-view) wptr)
+;;  (set-wptr self wptr))
+;; 
+;; (defmethod set-window-hardcopy-wptr ((self view) wptr)
+;;  (set-wptr self wptr)
+;;  (tell (subviews self) 'set-window-hardcopy-wptr wptr))
 
 (defmethod win-print-setUp ((self window))
   (ui:uiwarn "~S ~S is not implemented yet" 'win-print-setUp '((self window)))

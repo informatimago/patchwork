@@ -34,8 +34,6 @@
 
 (in-package :pw)
 
-;; (load "PW:PW-lib;PWScript;PW-AE" :if-does-not-exist nil)
-
 
 (defvar *list-pw-script-objects* nil)
 (defvar *contador-pw-script-object* 0)

@@ -293,6 +293,8 @@ EVENTHOOK:       A hook.  The function modal-dialog binds *EVENTHOOK*
 
 
 (defun %return-from-modal-dialog (&rest values)
+  (niy %return-from-modal-dialog values)
+  #-(and)
   (when *modal-dialog-on-top* ; << maybe its gone or not set yet
     (let ((process (modal-dialog-process (car *modal-dialog-on-top*))))
       (when process

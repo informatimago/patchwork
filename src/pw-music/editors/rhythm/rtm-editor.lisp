@@ -297,7 +297,7 @@
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
     (if (eq *playing-option* :pb) 
       (progn
-        (setf scheduler::*print-on-late?* t)
+        (setf patch-work.scheduler::*print-on-late?* t)
         (start 
           (apdfuncall 100 (priority) 15
                       (lambda ()
@@ -307,7 +307,7 @@
                        :chords (remove nil (flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
           (play-your-chords c-line)
-          (progn (setf scheduler::*print-on-late?* t)
+          (progn (setf patch-work.scheduler::*print-on-late?* t)
                  (start 
                    (apdfuncall 100 (priority) 15
                       (lambda ()
@@ -320,7 +320,7 @@
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
     (if (eq *playing-option* :pb) 
       (progn
-        (setf scheduler::*print-on-late?* t)
+        (setf patch-work.scheduler::*print-on-late?* t)
         (start 
           (apdfuncall 100 (priority) 15
                       (lambda ()
@@ -330,7 +330,7 @@
                        :chords (remove nil (flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
           (play-your-chords c-line)
-          (progn (setf scheduler::*print-on-late?* t)
+          (progn (setf patch-work.scheduler::*print-on-late?* t)
                  (start 
                    (apdfuncall 100 (priority) 15
                       (lambda ()

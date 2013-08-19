@@ -153,47 +153,48 @@
 
 (defmethod make-abstraction-M ((self C-pw-window) 
                                &optional (abstract-class 'C-abstract-M))
-  (setf *si-record* nil)
-  (if (not (active-patches self))
-    (ui:message-dialog "No active patches!")
-    (let ((active-rect (find-active-rectangle self))
-          (new-win)(patches)(abstract-box)(in-boxes) 
-          (out-box (find-abstract-out-box self (active-patches self))))
-      (cond 
-       ((not out-box) 
-        (ui:message-dialog "One abstract-out-box should be selected !"))
-       ((> (length out-box) 1)
-        (ui:message-dialog "Only one abstract-out-box should be selected !"))
-       (t 
-        (cut self)
-        (setq patches (eval (patch-scrap self)))
-        (tell patches 'dmove-patch (- (car active-rect)) (- (second active-rect)))
-        (setq out-box (car (find-abstract-out-box self patches)))
-        (setq new-win 
-              (make-instance (type-of self) :close-box-p nil
-                             :window-title (dialog-item-text (car (pw-controls out-box)))
-                             :view-position 
-                             (make-point (+ (x self) (first active-rect))
-                                         (+ (y self) (second active-rect))) 
-                             :view-size 
-                             (make-point (third active-rect) (fourth active-rect)) ))
-        (apply #'add-subviews new-win patches)
-        (deactivate-control out-box)
-        ;;inboxes        
-        (setq in-boxes (find-abstract-in-boxes self patches))
-        (setq abstract-box 
-              (make-std-abstract-box self patches new-win in-boxes abstract-class ))
-        (unless abstract-box 
-          (window-close new-win)
-          (apply #'add-subviews self patches))
-        (when abstract-box
-          (add-subviews self abstract-box)
-          ;;connections
-          (make-abstract-box-connections self abstract-box out-box in-boxes new-win)
-          (tell (controls new-win) 'update-win-pointers new-win))
-        (setf *si-record* t)
-        (record--ae :|core| :|crel| `((,:|kocl| ,:|obab|)))
-        abstract-box)))))
+  (let ((*si-record* nil))
+    (if (not (active-patches self))
+        (ui:message-dialog "No active patches!")
+        (let ((active-rect (find-active-rectangle self))
+              (new-win)(patches)(abstract-box)(in-boxes) 
+              (out-box (find-abstract-out-box self (active-patches self))))
+          (cond 
+            ((not out-box) 
+             (ui:message-dialog "One abstract-out-box should be selected !"))
+            ((> (length out-box) 1)
+             (ui:message-dialog "Only one abstract-out-box should be selected !"))
+            (t 
+             (cut self)
+             (setq patches (eval (patch-scrap self)))
+             (tell patches 'dmove-patch (- (car active-rect)) (- (second active-rect)))
+             (setq out-box (car (find-abstract-out-box self patches)))
+             (setq new-win 
+                   (make-instance (type-of self) :close-box-p nil
+                                  :window-title (dialog-item-text (car (pw-controls out-box)))
+                                  :view-position 
+                                  (make-point (+ (x self) (first active-rect))
+                                              (+ (y self) (second active-rect))) 
+                                  :view-size 
+                                  (make-point (third active-rect) (fourth active-rect)) ))
+             (apply #'add-subviews new-win patches)
+             (deactivate-control out-box)
+             ;;inboxes        
+             (setq in-boxes (find-abstract-in-boxes self patches))
+             (setq abstract-box 
+                   (make-std-abstract-box self patches new-win in-boxes abstract-class ))
+             (unless abstract-box 
+               (window-close new-win)
+               (apply #'add-subviews self patches))
+             (when abstract-box
+               (add-subviews self abstract-box)
+               ;;connections
+               (make-abstract-box-connections self abstract-box out-box in-boxes new-win)
+               (tell (controls new-win) 'update-win-pointers new-win))
+             (let ((*si-record* t))
+               (record--ae :|core| :|crel| `((,:|kocl| ,:|obab|))))
+             abstract-box))))))
+
 
 (defmethod make-std-abstract-box ((self C-pw-window) patches new-win in-boxes  abstract-class)
    (let (in-put-docs)

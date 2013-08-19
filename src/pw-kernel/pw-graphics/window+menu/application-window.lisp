@@ -96,8 +96,13 @@
 ;; help window
 (defmethod open-application-help-window ((self C-application-window)))
 
+
 ;; patch-value -> giving a pointer to PW
-(defmethod patch-value ((self C-application-window) obj) (declare (ignore obj)) self)
+(defgeneric open-application-help-window (window)
+  (:method ((self C-application-window) obj)
+    (declare (ignore obj))
+    self))
+
 
 (defmethod window-close ((self C-application-window))
   (if (and (pw-object self) (wptr self)) (save-window-state (pw-object self) self))

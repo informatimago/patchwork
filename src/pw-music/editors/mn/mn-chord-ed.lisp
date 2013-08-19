@@ -967,7 +967,7 @@
          (play-arpeggiated self))
         ((get-ctrl-setting self :dur) 
          (let ((panels (editor-objects self)))
-             (progn (setf scheduler::*print-on-late?* t)
+             (progn (setf patch-work.scheduler::*print-on-late?* t)
                     (start
                       (apdfuncall 10  2 20 
                                   'play-chords (chord-line (car panels)) 0)))))
@@ -980,7 +980,7 @@
         ((setting-of self :arp)
          (play-arpeggiated self))
         (t (let ((panels (editor-objects self)))
-             (progn (setf scheduler::*print-on-late?* t)
+             (progn (setf patch-work.scheduler::*print-on-late?* t)
                     (start
                       (apdfuncall 10  2 20 
                                   'play-chords (chord-line (car panels)) 0)))))))
@@ -993,11 +993,11 @@
          (notes (sort pitch-notes #'< :key #'order)))
     (setf *MN-play-flag* t)
     (cond ((eq *playing-option* :mc)
-           (setf scheduler::*print-on-late?* t)
+           (setf patch-work.scheduler::*print-on-late?* t)
            (start (apdfuncall 10 (priority) 10
                               'keep-playing-arps-mc self notes)))
           ((eq *playing-option* :pb)
-           (setf scheduler::*print-on-late?* t)
+           (setf patch-work.scheduler::*print-on-late?* t)
            (start (apdfuncall 10 (priority) 10
                 'keep-playing-arps self notes))))))
 

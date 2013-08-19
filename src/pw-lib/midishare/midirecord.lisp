@@ -83,29 +83,28 @@
   (unless *pw-recording-midi*
     (when (and  midi::*pw-refnum* midi::*player* )
       (print "Recording...")
-      (setf *pw-recorder* (cl-user::open-player "PatchWorkRecorder"))
+      (setf *pw-recorder* (midi-player:open-player "PatchWorkRecorder"))
       (setf *pw-recording-midi* nil)
       (when (> *pw-recorder* 0)
         (setf *pw-recording-midi* t)
-        (cl-user::recordplayer *pw-recorder* 1)
-        (cl-user::startplayer *pw-recorder*)))))
+        (midi-player:recordplayer *pw-recorder* 1)
+        (midi-player:startplayer *pw-recorder*)))))
 
 
-;; (cl-user::closeplayer midi::*player*)
-;; (setf midi::*player* (cl-user::open-player "PatchWorkPlayer"))
+;; (midi-player:closeplayer midi::*player*)
+;; (setf midi::*player* (midi-player:open-player "PatchWorkPlayer"))
 
 (defmethod stop-play ((self c-patch-record))
   (when *pw-recording-midi*
     (print "Recording Off...")
-    (cl-user::stopplayer *pw-recorder*)
+    (midi-player:stopplayer *pw-recorder*)
     (let (recording-seq )
-      (setf recording-seq (cl-user::getAllTrackplayer *pw-recorder*))
+      (setf recording-seq (midi-player:getAllTrackplayer *pw-recorder*))
       (when recording-seq
         (setf *midi-tempo* 1000000)
         (setf (outseq self) (mievents2midilist recording-seq 1000))))
-    (cl-user::closeplayer *pw-recorder*))
-  (setf *pw-recording-midi* nil)
-  )
+    (midi-player:closeplayer *pw-recorder*))
+  (setf *pw-recording-midi* nil))
       
 
 
@@ -151,7 +150,7 @@ delta and output mode."
             (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
             (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
             (midishare::firstEv recording-seq tempo-evnt)
-            (cl-user::midi-file-save (mac-namestring name) recording-seq  myInfo)
+            (midi-player:midi-file-save (mac-namestring name) recording-seq  myInfo)
             (set-mac-file-type (mac-namestring name) :|Midi|)
             (midishare::midifreeseq recording-seq)))))))
 
@@ -185,7 +184,7 @@ delta and output mode."
   ;;           (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
   ;;           (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
   ;;           (midishare::firstEv recording-seq tempo-evnt)
-  ;;           (cl-user::midi-file-save (mac-namestring name) recording-seq  myInfo)
+  ;;           (midi-player:midi-file-save (mac-namestring name) recording-seq  myInfo)
   ;;           (set-mac-file-type (mac-namestring name) :|Midi|)
   ;;           (midishare::midifreeseq recording-seq))))))
   )
@@ -230,11 +229,11 @@ Input may be any PatchWork object that could be played through play-object
   ;;             (delta (patch-value (first (input-objects self)) (first (input-objects self))))
   ;;             rep)
   ;;         (rlet ((myInfo :MidiFileInfos))  
-  ;;           (cl-user::midi-file-load (mac-namestring name) recording-seq  myInfo)
+  ;;           (midi-player:midi-file-load (mac-namestring name) recording-seq  myInfo)
   ;;           (when recording-seq
-  ;;             (print (list  "clicks" (cl-user::mf-clicks myInfo) "tracks" (cl-user::mf-tracks myInfo) "MidiFormat" (cl-user::mf-format myInfo)))
+  ;;             (print (list  "clicks" (midi-player:mf-clicks myInfo) "tracks" (midi-player:mf-tracks myInfo) "MidiFormat" (midi-player:mf-format myInfo)))
   ;;             (let ((*midi-tempo* 1000000))
-  ;;               (setf rep (mievents2midilist recording-seq (cl-user::mf-clicks myInfo) )))
+  ;;               (setf rep (mievents2midilist recording-seq (midi-player:mf-clicks myInfo) )))
   ;;             (midiseq2cl rep delta)
   ;;             ))))))
   )
@@ -255,7 +254,7 @@ Input may be any PatchWork object that could be played through play-object
                 (tempo-change-log-time 0))
       (setf event (midishare::firstEv seq))
       (setf initdate (midishare::date event))
-      (while (not (%null-ptr-p event))
+      (while (not (midishare:null-event-p event))
         (setf date (- (midishare::date event) initdate))
         (case (midishare::type event)
           (144  (unless *pw-recording-midi* 
@@ -321,7 +320,7 @@ Input may be any PatchWork object that could be played through play-object
                 (tempo-change-log-time 0))
       (setf event (midishare::firstEv seq))
       (setf initdate (midishare::date event))
-      (while (not (%null-ptr-p event))
+      (while (not (midishare:null-event-p event))
         (setf date (- (midishare::date event) initdate))
         (case (midishare::type event)
           (144  (unless *pw-recording-midi* 

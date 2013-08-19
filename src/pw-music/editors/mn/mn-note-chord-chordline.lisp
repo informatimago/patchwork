@@ -69,7 +69,7 @@
     (if (and (= (approx-factor self) 25) (= index (1- vlength))) (incf up-octave))
     (list (svref  (diatone-vector self) index) (svref  (alteration-vector self) index) up-octave)))
 
-(defvar *chromatic-scale* (make-instance 'C-scale 
+(defparameter *chromatic-scale* (make-instance 'C-scale 
    :alteration-vector
 ;;          c   c#     d  d#   e     f   f#    g   g#   a   a#    h  
   (vector  () #\Y    () #\Y  ()    ()  #\Y   ()  #\Y   ()  #\Y  ())
@@ -77,7 +77,7 @@
   (vector  0   0      1  1     2     3   3     4   4    5     5   6)
   :approx-factor 100))
 
-(defvar *c-major-scale* (make-instance 'C-scale 
+(defparameter *c-major-scale* (make-instance 'C-scale 
    :alteration-vector
 ;;          c   c#     d  es    e     f   f#    g   as   a   b    h  
   (vector  () #\Y    () #\I   ()    ()  #\Y   ()  #\I   ()  #\I  ())
@@ -85,7 +85,7 @@
   (vector  0   0      1   2     2     3   3     4   5    5   6   6)
   :approx-factor 100))
 
-(defvar *1/4-tone-chromatic-scale* (make-instance 'C-scale 
+(defparameter *1/4-tone-chromatic-scale* (make-instance 'C-scale 
     :alteration-vector
 ;;          c  c+  c#  c++    d  d+  d#  d++   e  e+    f  f+   f#  f++      g  g+  g#  g++   
   (vector  () #\y #\Y #\L    () #\y #\Y  #\L  () #\y   () #\y  #\Y #\L     () #\y  #\Y #\L 
@@ -97,7 +97,7 @@
   :approx-factor 50))
 
 ;
-(defvar *1/8-tone-chromatic-scale* (make-instance 'C-scale 
+(defparameter *1/8-tone-chromatic-scale* (make-instance 'C-scale 
     :alteration-vector
 ;;          c   c^  c+  c+!  c#  c#^ c++  C++!    d   d!      d+  d+! d#  d#^ d++  eb+ e  e!  e+   e+!     
   (vector  () #\Z #\y  #\u  #\Y #\U #\L   #\z ()   #\Z    #\y #\u #\Y #\U #\L  #\z  () #\Z #\y  #\z 
@@ -110,10 +110,10 @@
            4 4 4 5  5  5   5   5  5 5 5 6  6   6 6 0)
   :approx-factor 25))
 
-(defvar *standard-music-notation-scale* *c-major-scale*)
+(defparameter *standard-music-notation-scale* *c-major-scale*)
 ;;(setq *standard-music-notation-scale* *1/4-tone-chromatic-scale*)
-(defvar *current-music-notation-scale* *c-major-scale*)         ;the scale selected by the user
-(defvar *current-approx-scale* *1/4-tone-chromatic-scale*)      ; the scale for user selected approximations
+(defparameter *current-music-notation-scale* *c-major-scale*)         ;the scale selected by the user
+(defparameter *current-approx-scale* *1/4-tone-chromatic-scale*)      ; the scale for user selected approximations
 ;;(setf *current-approx-scale* *c-major-scale*)
 ;;================================
 

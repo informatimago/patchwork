@@ -447,11 +447,11 @@
 (defmethod play-all-staffs ((self C-mus-not-view))
   (let ((panels (editor-objects self)))
     (if (monofonic-mn? self)
-      (progn (setf scheduler::*print-on-late?* t)
+      (progn (setf patch-work.scheduler::*print-on-late?* t)
              (start
                (apdfuncall 10  2 20 
                            'play-chords (chord-line (car panels)))))
-      (progn (setf scheduler::*print-on-late?* t)
+      (progn (setf patch-work.scheduler::*print-on-late?* t)
              (start (setf (advance) 30)
                     (dolist (panel panels)
                       (dfuncall 40

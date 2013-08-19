@@ -723,8 +723,11 @@
 ;;;(defmethod mouse-released-control-after ((self C-patch) ctrl win))
 (defmethod record ((self C-patch)))
 (defmethod clock ((self C-patch)) (clock (clock-obj self)))
-(defmethod update-win-pointers ((self C-patch) win-ptr) (declare (ignore win-ptr))) 
-(defmethod browse ((self C-patch))(print "no browse boxes")) 
+(defmethod update-win-pointers ((self C-patch) win-ptr) (declare (ignore win-ptr)))
+
+(defgeneric browse (patch)) 
+;; (defmethod browse ((self C-patch)) (print "no browse boxes"))
+
 (defmethod remove-yourself-control ((self C-patch)))
 (defmethod set-pw-window-pointers ((self C-patch) win)(declare (ignore win))) 
 (defmethod resize-patch? ((self C-patch)) nil) 

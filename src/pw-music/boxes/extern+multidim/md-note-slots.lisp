@@ -46,7 +46,7 @@
 ;;;===========================================
 
 (defpackage "C-GET-NOTE-SLOTS"
-  (:use "COMMON-LISP" "PATCH-WORK")
+  (:use "COMMON-LISP" "PATCH-WORK" "LELISP-MACROS")
   (:export "GET-NOTE-SLOTS" "SET-NOTE-SLOTS"))
 
 (in-package "C-GET-NOTE-SLOTS")

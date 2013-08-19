@@ -55,7 +55,7 @@
 ;;(use-package "MIDI")
 
 ;;(require "SCHEDULER")
-;;(use-package "SCHEDULER")
+;;(use-package "PATCH-WORK.SCHEDULER")
 
 ;;=================================================================================================
 ;;=================================================================================================
@@ -66,13 +66,13 @@
     (setq chan (1- chan))
     (setf dur (* 10 dur))
     (let ((event (midishare::MidiNewEv midishare::typeNote)))	
-      (unless (ui::%null-ptr-p event)	
+      (unless (midishare:null-event-p event)	
         (midishare::chan event chan)			
         (midishare::port event 0)			
         (midishare::field event 0 key)		
         (midishare::field event 1 vel)		
         (midishare::field event 2 dur)
-        (midi::midi-write  event)))))
+        (midi:midi-write  event)))))
 
 
 ;;========================================================================
@@ -100,20 +100,20 @@
       (setq chan (1- chan))
       (setf dur (* 10 dur))
       (let ((event (midishare::MidiNewEv midishare::typeNote)))	
-        (unless (ui::%null-ptr-p event)	
+        (unless (midishare:null-event-p event)	
           (midishare::chan event chan)			
           (midishare::port event 0)			
           (midishare::field event 0 key)		
           (midishare::field event 1 vel)		
           (midishare::field event 2 dur)
-          (midi::midi-write  event))))))
+          (midi:midi-write  event))))))
 
 ;;========================================================================
 
 (defun write-pitch-bend-value (chan value &optional (ls 0))
     (setq chan (1- chan))
     (let ((event (midishare::MidiNewEv midishare::typePitchWheel)))	
-     (unless (%null-ptr-p event)	
+     (unless (midishare:null-event-p event)	
        (midishare::chan event chan)			
        (midishare::port event 0)			
        (midishare::field event 0 ls)		
@@ -123,7 +123,7 @@
 (defun write-controller-value (chan controller value)
     (setq chan (1- chan))
     (let ((event (midishare::MidiNewEv midishare::typeCtrlChange)))	
-     (unless (%null-ptr-p event)	
+     (unless (midishare:null-event-p event)	
        (midishare::chan event chan)			
        (midishare::port event 0)			
        (midishare::field event 0 controller)		
@@ -135,7 +135,7 @@
 (defun write-program-change-value (chan program) 
     (setq chan (1- chan))
     (let ((event (midishare::MidiNewEv midishare::typeProgChange)))	
-     (unless (%null-ptr-p event)	
+     (unless (midishare:null-event-p event)	
        (midishare::chan event chan)			
        (midishare::port event 0)			
        (midishare::field event 0 program)		
@@ -145,7 +145,7 @@
 (defun write-pressure-value (chan key value)
   (setq chan (1- chan))
   (let ((event (midishare::MidiNewEv midishare::typeKeyPress)))	
-    (unless (%null-ptr-p event)	
+    (unless (midishare:null-event-p event)	
       (midishare::chan event chan)			
       (midishare::port event 0)			
       (midishare::field event 0 key)		
@@ -176,10 +176,10 @@
 
 (defun read-from-midi ()
   (let ((res)(temp)(start-time)  res2)
-    (when (car (setq temp (multiple-value-list (midi-read))))
+    (when (car (setq temp (multiple-value-list (midi:midi-read))))
       (setq start-time (cadr temp))
       (push (list (car temp) 0) res)
-      (while (car (setq temp (multiple-value-list (midi-read))))
+      (while (car (setq temp (multiple-value-list (midi:midi-read))))
         (push (list (car temp) (- (cadr temp) start-time)) res)))
     (while res
       (unless (eq (car (first res)) 254)

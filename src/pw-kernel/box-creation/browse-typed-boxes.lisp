@@ -51,7 +51,7 @@
 (setq *active-patch-window* ())
 ;;(make-new-pw-window)
 
-(defmethod browse ((self C-patch))(make-typed-box-list self)) 
+(defmethod browse ((self C-patch)) (make-typed-box-list self)) 
 
 ;;(defun cancel-pop ())
 

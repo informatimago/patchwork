@@ -41,22 +41,7 @@
 ;;;;**************************************************************************
 
 
-(defpackage "SCHEDULER"
-  (:use "COMMON-LISP" "MCLGUI")
-  (:import-from "UI" "WITHOUT-INTERRUPTS" "*EVENTHOOK*" "EVENT-DISPATCH")
-  (:import-from "MIDI" "CLOCK-TIME" "MIDI-WRITE" "MIDI-WRITE-TIME")
-  (:export "START" "*ERROR-WHEN-EXTRA-START?*" "DFUNCALL" "APDFUNCALL"
-           "RE-DFUNCALL" "ADVANCE" "PRIORITY" "WITH-MORE-PRIORITY"
-           "WITH-LESS-PRIORITY" "WITH" "*HIGHEST-PRIORITY*" "MIDI:MIDI-WRITE"
-           "EVENT-DISPATCH" "SCHEDULER-STATE" "SET-SCHEDULER-STATE"
-           "*SCHEDULER-INITIAL-STATE*" "WITH-SCHEDULER-OOT1" "SCHEDULER-STEP"
-           "PRINT-SCHEDULER-QUEUE" "ABORT-TASK" "RESET-SCHEDULER"
-           "*HIGHEST-LATENCY*" "*LATE-TASK*" "*PRINT-ON-LATE?*"
-           "*STEP-ON-LATE?*" "*RESET-ON-LATE?*" "*EVAL-ON-LATE?*"
-           "*ERROR-TASK*" "*CONDITION*" "*PRINT-ON-ERROR?*" "*STEP-ON-ERROR?*"
-           "*RESET-ON-ERROR?*"))
-
-(in-package "SCHEDULER")
+(in-package "PATCH-WORK.SCHEDULER")
 
 
 ;; =============================================================================-======
@@ -139,11 +124,16 @@ It cannot be changed, except in the source code.")
   "Returns the logical time of the current scheduler task."
   `(task-logtime *current-task*))
 
-(in-package "SCHEDULER")
+
+(in-package "PATCH-WORK.SCHEDULER")
+
+ ;; TODO:
+#-(and)
 (defun midi:midi-write (event)
   "New version"
   (midi-write-time event
-                   (if (null *current-task*) (midishare::MidiGetTime)
+                   (if (null *current-task*)
+                       (midishare::MidiGetTime)
                        (* 10 (- (logtime) *schedulertime--clocktime*)))))
 
 (defvar *error-when-extra-start?* t

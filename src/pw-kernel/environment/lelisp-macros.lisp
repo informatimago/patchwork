@@ -135,6 +135,7 @@
     `(pop ,lst) ))
 
 (defun vref (vect index)     (svref vect index))
+(defun (setf vref) (new-value vect index)  (setf (svref vect index) new-value))
 (defun vset (vect index val) (setf (svref vect index) val))
 (declaim (inline vref vset))
 
@@ -164,7 +165,7 @@
       `(mapcar ,fun ,outlet))))
 
 ;; =============================================================================-======
-;; The syntaxe is different from the Le_Lisp "with"
+;; The syntax is different from the Le_Lisp "with"
 
 (defmacro with (l-place-value &body body)
   "Changes locally the value of \"setf-able\" places (like a \"let\" where places

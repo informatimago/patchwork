@@ -208,7 +208,88 @@ CHOOSE-DIRECTORY-DIALOG dialog box to pathname.  It returns pathname.
 
 
 
+
+
+(defparameter *ascii-characters*
+  " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~")
+
+(defparameter *macroman-characters*
+   "ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄¤‹›ﬁﬂ‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ")
+
+(defun macroman-char (code)
+  (cond
+    ((< code   0) (error "Not a Mac Roman character code: ~d" code))
+    ((< code  32) (code-char code))
+    ((< code 127) (aref *ascii-characters* (- code 32)))
+    ((= code 127) #\Rubout)
+    ((< code 256) (aref *macroman-characters* (- code 128)))
+    (t            (error "Not a Mac Roman character code: ~d" code))))
+
+(defun macroman-code (ch)
+  (let ((code (char-code ch)))
+    (cond
+      ((< code 32) code)
+      ((eql #\Rubout ch) 127)
+      ((let ((pos (position ch *ascii-characters*)))
+         (when pos (+ pos 32))))
+      ((let ((pos (position ch *macroman-characters*)))
+         (when pos (+ pos 128))))
+      (t
+       (error "Not a Mac Roman character: '~C'" ch)))))
+
+
+(defun mactype-from-string (type-string)
+  (check-type type-string (string 4))
+  (loop
+    :for ch :across type-string
+    :for code = (macroman-code ch)
+    :for n = code :then (+ (* n 256) code)
+    :finally (return n)))
+
+(defun mactype-to-string (type-number)
+  (check-type type-number (integer 0 #xffffffff))
+  (loop
+    :with result = (make-string 4)
+    :for i :from 0
+    :for pos :from 24 :downto 0 :by 8
+    :do (setf (aref result i) (macroman-char (ldb (byte 8 pos) type-number)))
+    :finally (return result)))
+
+
+(defun mac-file-type (path)
+  (mactype-to-string [[[[NSFileManager defaultManager]
+                        attributesOfItemAtPath:(objcl:objcl-string (namestring (truename path)))
+                        error:oclo:*null*] objectForKey:#$NSFileHFSTypeCode] unsignedLongValue]))
+
+(defun mac-file-creator (path)
+  (mactype-to-string [[[[NSFileManager defaultManager]
+                        attributesOfItemAtPath:(objcl:objcl-string (namestring (truename path)))
+                        error:oclo:*null*] objectForKey:#$NSFileHFSCreatorCode] unsignedLongValue]))
+
+(defun set-mac-file-type (path type)
+  [[NSFileManager defaultManager]
+   setAttributes: [NSDictionary dictionaryWithObjects:[NSArray arrayWithObject:[NSNumber numberWithUnsignedLong:(mactype-from-string type)]]
+                                forKeys:[NSArray arrayWithObject:#$NSFileHFSTypeCode]]
+   ofItemAtPath:(objcl:objcl-string (namestring (truename path)))
+   error:oclo:*null*])
+
+(defun set-mac-file-creator (path creator)
+  [[NSFileManager defaultManager]
+   setAttributes: [NSDictionary dictionaryWithObjects:[NSArray arrayWithObject:[NSNumber numberWithUnsignedLong:(mactype-from-string  creator)]]
+                                forKeys:[NSArray arrayWithObject:#$NSFileHFSCreatorCode]]
+   ofItemAtPath:(objcl:objcl-string (namestring (truename path)))
+   error:oclo:*null*])
+
+
+(defun full-pathname (path)
+  (handler-case (truename path)
+    (error () (translate-logical-pathname path))))
+
+
 (defun initialize/file ()
   (setf *default-directory* (user-homedir-pathname)))
+
+
+
 
 ;;;; THE END ;;;;

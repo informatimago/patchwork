@@ -1021,7 +1021,7 @@ the function approx-m prior to the entries."
 ;;iteration jusqu'a effet nul, sans protection contre bouclage
 (defun foo-iter (l-inter inf sup forbid replace)
   (setq l-inter (sort l-inter #'<))
-  (until (equal l-inter (setq l-inter (foo l-inter inf sup forbid replace))))
+  (until (equal l-inter (setq l-inter (foo1 l-inter inf sup forbid replace))))
   l-inter )
 
 ;;l-inter: liste ORDONNEE de midic "APPROXIME"
@@ -1142,7 +1142,7 @@ and filled with permutations of <notes> and intervals among <intervals>."
        (lambda (int)
            (when (setq note-oct (exist-note? (setq note (+ int (car serie))) notes))
              (all-series (cons note serie) (remove note-oct notes)
-                         (delete int (permutn-random (copy-list ints))))))
+                         (delete int (npermut-random (copy-list ints))))))
        ints))))
 
 (defunt all-series ((serie chord) (notes chord (:value 6300)) (ints chord (:value 300))) chords)

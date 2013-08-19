@@ -54,15 +54,15 @@
   (when (and  midi::*pw-refnum* midi::*player* )
     (let ((playerIdle))
       (rlet ((myState :PlayerState))  
-        (cl-user::getStatePlayer midi::*player* myState) 
-        (when (= (cl-user::s-state myState) cl-user::kIdle) (setf playerIdle t)))
+        (midi-player:getStatePlayer midi::*player* myState) 
+        (when (= (midi-player:s-state myState) cl-user::kIdle) (setf playerIdle t)))
       (unless playerIdle (print "Wait end of previous play!"))
       (when playerIdle
         (let ((seq (midishare::midinewseq)))
           (setf *MidiShare-start-time* 0)
           (MidiPlay object 0 approx chanbase seq 1000)
-          (cl-user::setalltrackplayer midi::*player* seq 480)
-          (cl-user::startplayer midi::*player*)
+          (midi-player:setalltrackplayer midi::*player* seq 480)
+          (midi-player:startplayer midi::*player*)
           seq)))))
 ;;changed from paw-modifs 140397 aaa
 |#
@@ -72,15 +72,15 @@
   ;; (when (and  midi::*pw-refnum* midi::*player* )
   ;;   (let ((playerIdle))
   ;;     (rlet ((myState :PlayerState))  
-  ;;           (cl-user::getStatePlayer midi::*player* myState) 
-  ;;           (when (= (cl-user::s-state myState) cl-user::kIdle) (setf playerIdle t)))
+  ;;           (midi-player:getStatePlayer midi::*player* myState) 
+  ;;           (when (= (midi-player:s-state myState) cl-user::kIdle) (setf playerIdle t)))
   ;;     (unless playerIdle (print "Wait end of previous play!"))
   ;;     (when playerIdle
   ;;       (let ((seq (midishare::midinewseq)))
   ;;         (setf *MidiShare-start-time* 0)
   ;;         (MidiPlay object 0 approx chanbase seq 1000)
-  ;;         (cl-user::setalltrackplayer midi::*player* seq 500)
-  ;;         (cl-user::startplayer midi::*player*)
+  ;;         (midi-player:setalltrackplayer midi::*player* seq 500)
+  ;;         (midi-player:startplayer midi::*player*)
   ;;         seq))))
   )
 
@@ -88,7 +88,7 @@
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
   (let ((event (midishare:MidiNewEv midishare::typeNote)))	; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (%null-ptr-p event)	; if the allocation was succesfull
+    (unless (midishare:null-event-p event)	; if the allocation was succesfull
       (midishare::chan event    ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (approx-m  (midic note) approx))))))
@@ -105,7 +105,7 @@
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
   (let ((event (midishare:MidiNewEv midishare::typeNote)))	; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (%null-ptr-p event)	; if the allocation was succesfull
+    (unless (midishare:null-event-p event)	; if the allocation was succesfull
       (midishare::chan event    ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (approx-m  (midic note) approx))))))
@@ -241,19 +241,19 @@
 ;;===stop-play
 
 (defmethod stop-play ((self c-patch))
-  (when midi::*player* (cl-user::stopplayer midi::*player*)))
+  (when midi::*player* (midi-player:stopplayer midi::*player*)))
 
 (defmethod stop-play ((self c-patch-polifrtm))
-  (when midi::*player* (cl-user::stopplayer midi::*player*)))
+  (when midi::*player* (midi-player:stopplayer midi::*player*)))
 
 (defmethod stop-play ((self C-patch-score-voice)) 
-  (when midi::*player* (cl-user::stopplayer midi::*player*)))
+  (when midi::*player* (midi-player:stopplayer midi::*player*)))
 
 (defmethod stop-play ((self C-patch-midi)) 
-  (when midi::*player* (cl-user::stopplayer midi::*player*)))
+  (when midi::*player* (midi-player:stopplayer midi::*player*)))
 
 (defmethod stop-all-staffs ((self C-mus-not-view))
-  (when midi::*player* (cl-user::stopplayer midi::*player*)))
+  (when midi::*player* (midi-player:stopplayer midi::*player*)))
 
 (defmethod stop-measure-line ((self C-measure-line)) 
-  (when midi::*player* (cl-user::stopplayer midi::*player*)))
+  (when midi::*player* (midi-player:stopplayer midi::*player*)))

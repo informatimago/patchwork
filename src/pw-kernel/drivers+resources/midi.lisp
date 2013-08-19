@@ -144,12 +144,8 @@
   )
 
 
-#-(and)
 (defun midi-write (event)
-  (declare (ignore event))
-  (ui:uiwarn "~S is not implemented" 'midi-write)
-  ;; (midi-write-time event (midishare::MidiGetTime))
-  )
+  (midi-write-time event (midishare::MidiGetTime)))
 
 
 ;;;;Midi-read 
@@ -170,11 +166,14 @@
   )
 
 
+(defconstant tick (/ internal-time-units-per-second 60))
+
 ;;;;clock-time - return the current time of. The time is expressed in ticks.
 (defun clock-time () 
   (ui:uiwarn "~S is not implemented" 'clock-time)
   ;; (round (/ (midishare::MidiGetTime) 10))
-  1)
+
+  (/ (get-internal-run-time) tick))
 
 
 ;;;;utilities, hacks

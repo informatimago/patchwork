@@ -336,7 +336,8 @@
                         :depends-on ("package" "point"))
 
                  (:file "region"
-                        :depends-on ("package" "macros" "variables" "point"))
+                        :depends-on ("package" "macros" "variables" "point"
+                                               "view-classes"))
 
                  (:file "pen"
                         :depends-on ("package"
@@ -345,7 +346,11 @@
                                      "pattern"
                                      "rect"))
 
-
+                 (:file "quickdraw"
+                        :depends-on ("package" "macros" "variables" "point"
+                                               "objc-classes" "view-classes"
+                                               "pattern" "rect" "region" "pen"))
+                 
                  #+has-appleevent
                  (:file "apple-event"
                         :depends-on ("package"))

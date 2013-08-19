@@ -46,10 +46,12 @@
                  ((#:albert #:docbook #:bgcolor)   . "white")
                  ((#:albert #:docbook #:textcolor) . "black"))
     :depends-on ("alexandria"
+                 "closer-mop"
                  "mclgui"
                  "com.informatimago.common-lisp.lisp.stepper")
     :components ((:file "patchwork-package" 
-                        :depends-on ("pw-kernel/environment/lelisp-macros"))
+                        :depends-on ("pw-kernel/environment/lelisp-macros"
+                                     "pw-kernel/drivers+resources/midi"))
 
                  (:file "pw-macosx/reader-macros" 
                         :depends-on ("patchwork-package"
@@ -57,12 +59,19 @@
                  
                  
                  ;; (:file "pw-lib/pwscript/appleevent-toolkit" 
-                 ;; :depends-on ("patchwork-package"))
+                 ;;        :depends-on ("patchwork-package"))
+                 ;;
                  ;; (:file "pw-lib/pwscript/pw-ae" 
-                 ;; :depends-on ("patchwork-package"))
+                 ;;        :depends-on ("patchwork-package"
+                 ;;                     "pw-lib/pwscript/appleevent-toolkit"))
+
+                 (:file "pw-lib/pwscript/pw-scripting-gf"
+                        :depends-on ())
                  
                  (:file "pw-lib/pwscript/pw-scripting" 
                         :depends-on ("patchwork-package"
+                                     ;; "pw-lib/pwscript/pw-ae"
+                                     "pw-lib/pwscript/pw-scripting-gf" 
                                      "pw-kernel/boxes/data/file-buffer"
                                      "pw-kernel/boxes/data/list-editor"
                                      "pw-kernel/boxes/data/buffer-box"
@@ -84,8 +93,12 @@
                                      "pw-kernel/boxes/control/basic-library-boxes"
                                      "pw-music/boxes/edit/rtm-patch"
                                      "pw-music/boxes/edit/ch-line-build"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-window"
+                                     "pw-kernel/box-creation/application-box"
+                                     ;; "pw-kernel/box-creation/pw-patch"
                                      "pw-music/boxes/edit/pw-chord-box"
                                      "pw-music/boxes/edit/midi-instrument-editors"
+                                     "pw-music/boxes/edit/mn-editor-polif"
                                      "pw-music/boxes/edit/pw-mn-collector"
                                      "pw-music/editors/rhythm/rtm-window"
                                      "pw-music/editors/mn/mn-collector-view"
@@ -95,14 +108,18 @@
 
                  
                  (:file "pw-lib/midishare/midishare" 
-                        :depends-on ("patchwork-package"))
+                        :depends-on (#+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
 
                  
                  (:file "pw-lib/midishare/midiplay" 
                         :depends-on ("patchwork-package"
+                                     #+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      "pw-kernel/drivers+resources/midi"
                                      "pw-music/boxes/edit/rhythm-formation"
+                                     "pw-kernel/box-creation/pw-patch"
                                      "pw-music/boxes/edit/rtm-patch"
+                                     "pw-music/editors/rhythm/rtm-editor"
+                                     "pw-music/editors/rhythm/rtm-paging+kill"
                                      "pw-music/boxes/edit/pw-chord-box"
                                      "pw-music/boxes/edit/pw-mn-collector"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"
@@ -113,6 +130,7 @@
                  
                  (:file "pw-lib/midishare/midirecord" 
                         :depends-on ("patchwork-package"
+                                     #+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/drivers+resources/midi"
@@ -120,6 +138,11 @@
                                      "pw-music/boxes/edit/pw-mn-collector"
                                      "pw-music/editors/mn/mn-note-chord-chordline"))
 
+                 #+patchwork.loader::cocoa-midi-player
+                 (:file "pw-lib/midishare/cocoa-midi-player" 
+                        :depends-on ())
+                 
+                 #-(and)
                  (:file "pw-lib/midishare/playerppc" 
                         :depends-on ("patchwork-package"))
 
@@ -134,7 +157,8 @@
                  
                  (:file "pw-kernel/environment/clpf-utils" 
                         :depends-on ("patchwork-package"
-                                     "pw-kernel/environment/lelisp-macros"))
+                                     "pw-kernel/environment/lelisp-macros"
+                                     "pw-kernel/drivers+resources/midi"))
                  
                  (:file "pw-kernel/environment/mac-rsrc" 
                         :depends-on ("patchwork-package"
@@ -171,9 +195,8 @@
 
                  
                  (:file "pw-kernel/drivers+resources/midi" 
-                        :depends-on ("patchwork-package"
-                                     "pw-lib/midishare/midishare"
-                                     "pw-lib/midishare/playerppc"))
+                        :depends-on ("pw-lib/midishare/midishare"
+                                     #+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
                  
                  
                  (:file "pw-kernel/drivers+resources/scheduler" 
@@ -228,6 +251,7 @@
                  
                  (:file "pw-kernel/boxes/arithmetic/basic-funs" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/boxes/num-fun-gen/num-fun-gen"
                                      "pw-kernel/environment/clpf-utils"
                                      "pw-kernel/environment/epw-package"
                                      "pw-kernel/types/pw-type-scheme"))
@@ -245,7 +269,8 @@
                         :depends-on ("patchwork-package"
                                      "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/types/pw-type-scheme"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
+                                     "pw-kernel/pw-graphics/window+menu/pw-menu"
+                                     "pw-kernel/pw-graphics/controls/popupmenu"))
                  
                  (:file "pw-kernel/boxes/data/table-displayer" 
                         :depends-on ("patchwork-package"
@@ -270,6 +295,7 @@
                  
                  (:file "pw-kernel/boxes/list/pw-list-functions" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/environment/epw-package"
                                      "pw-kernel/types/pw-type-scheme"))
                  
@@ -282,11 +308,13 @@
                  
                  (:file "pw-kernel/boxes/num-series/num-series" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/boxes/num-fun-gen/num-fun-gen"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-lib/epw-1.0b/freq-harmony"))
 
                  (:file "pw-kernel/boxes/num-fun-gen/num-fun-gen" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/environment/clpf-utils"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-macosx/reader-macros"))
                  
@@ -329,10 +357,12 @@
                         :depends-on ("patchwork-package"))
                  
                  (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-help-window" 
-                        :depends-on ("patchwork-package"))
+                        :depends-on ("patchwork-package"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-menu"))
                  
                  (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-menu+library" 
                         :depends-on ("patchwork-package"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-menu" 
                                      "pw-kernel/boxes/bpf/bpf-editors/break-point-function"))
                  
                  (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view" 
@@ -348,10 +378,11 @@
                  (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-window" 
                         :depends-on ("patchwork-package"
                                      "pw-macosx/reader-macros"
-                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-menu"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view"
                                      "pw-kernel/pw-graphics/controls/mouse-window"
-                                     "pw-kernel/pw-graphics/window+menu/application-window"
-                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view"))
+                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-kernel/pw-graphics/window+menu/application-window"))
                  
                  (:file "pw-kernel/boxes/bpf/bpf-editors/break-point-function" 
                         :depends-on ("patchwork-package"
@@ -439,7 +470,9 @@
                         :depends-on ("patchwork-package"))
                  
                  (:file "pw-kernel/pw-graphics/window+menu/pw-menu"
-                        :depends-on ("patchwork-package" ))
+                        :depends-on ("patchwork-package"
+                                     "pw-kernel/environment/make-image"
+                                     "pw-lib/pwscript/pw-scripting-gf"))
 
 
                  
@@ -620,6 +653,7 @@
                  
                  (:file "pw-music/menu/rtm-menu" 
                         :depends-on ("patchwork-package"
+                                     "pw-music/editors/rhythm/global-vars"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
                  (:file "pw-music/editors/rhythm/beat-measure-measure-line" 
@@ -651,6 +685,7 @@
                  (:file "pw-music/editors/rhythm/rtm-editor" 
                         :depends-on ("patchwork-package"
                                      "pw-kernel/drivers+resources/scheduler"
+                                     "pw-music/editors/rhythm/global-vars"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"
                                      "pw-music/editors/mn/mn-note-chord-chordline"))
@@ -757,15 +792,8 @@
                         :depends-on ("patchwork-package"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
-                 ;; (:file "pw-music/menu/load-rtm" 
-                 ;;        :depends-on ("patchwork-package"
-                 ;;                     "pw-music/boxes/edit/rtm-patch"
-                 ;;                     "pw-kernel/pw-graphics/window+menu/pw-window"
-                 ;;                     "pw-music/editors/rhythm/beat-measure-measure-line"))
-                 
                  (:file "pw-music/editors/rhythm/global-vars" 
                         :depends-on ("patchwork-package"))
-                 
                  
                  (:file "pw-kernel/types/pw-types" 
                         :depends-on ("patchwork-package"

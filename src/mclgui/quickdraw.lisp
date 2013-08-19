@@ -102,11 +102,13 @@ body is evaluated with VAR bound to that rectangle."
    (cdr (assq thing *pen-modes-alist*))
    (error "Unknown pen mode: ~a" thing)))
 
-(defmethod origin ((view simple-view))
-  (view-scroll-position view))
+(defgeneric origin (view)
+  (:method ((view simple-view))
+    (view-scroll-position view)))
 
-(defmethod set-origin ((view simple-view) h &optional v)
-  (set-view-scroll-position view h v nil))
+(defgeneric set-origin (view h &optional v)
+  (:method set-origin ((view simple-view) h &optional v)
+           (set-view-scroll-position view h v nil)))
 
 
 (defmethod clip-region ((view simple-view) &optional (save-region))

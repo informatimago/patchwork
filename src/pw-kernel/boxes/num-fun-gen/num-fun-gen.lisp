@@ -47,7 +47,7 @@
 ;;             |CLPF-UTIL|:prefix-help)))
 
 
-(fmakunbound 'make-num-fun)
+
 (defunp make-num-fun ((fexpr list (:value "(f(x)= x + 1)"))) nil
         "Creates a lisp function object from the \"functional\" expr <fexpr> which is
 basically an infixed expression (see prefix-expr and prefix-help).
