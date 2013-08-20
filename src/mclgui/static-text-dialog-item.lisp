@@ -183,7 +183,7 @@
            (with-back-color back
              (multiple-value-bind (ff ms)(view-font-codes item)
                (when t ;; or when back?
-                 (erase-rect item
+                 (erase-rect* item
                              (point-h position) (point-v position)
                              (point-h size) (point-v size)))  
                (draw-string-in-rect (dialog-item-text item) rect 

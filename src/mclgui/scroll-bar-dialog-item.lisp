@@ -1051,7 +1051,7 @@ NEW-VALUE:      The new width of item.
          (br       (add-points tl (view-size item)))
          (rect     (make-rect :topLeft tl :bottomRight br)))
     (with-fore-color (if active-p *dark-gray-color* *gray-color*)
-      (fill-rect (rect-left rect) (rect-top rect) (rect-right rect) (rect-bottom rect)))))
+      (fill-rect* (rect-left rect) (rect-top rect) (rect-right rect) (rect-bottom rect)))))
 
 
 (defgeneric pane-splitter-limiting-container (scrollee)

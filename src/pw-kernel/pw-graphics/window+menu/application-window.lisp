@@ -94,14 +94,8 @@
     (draw-appl-label (pw-object self) #\A)))
 
 ;; help window
-(defmethod open-application-help-window ((self C-application-window)))
-
-
-;; patch-value -> giving a pointer to PW
-(defgeneric open-application-help-window (window)
-  (:method ((self C-application-window) obj)
-    (declare (ignore obj))
-    self))
+(defmethod open-application-help-window ((self C-application-window))
+  self)
 
 
 (defmethod window-close ((self C-application-window))

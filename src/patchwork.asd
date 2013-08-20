@@ -468,6 +468,9 @@
                  
                  (:file "pw-kernel/pw-graphics/window+menu/pw-help-window" 
                         :depends-on ("patchwork-package"))
+
+                 (:file "pw-kernel/environment/make-image"
+                        :depends-on ("patchwork-package"))
                  
                  (:file "pw-kernel/pw-graphics/window+menu/pw-menu"
                         :depends-on ("patchwork-package"

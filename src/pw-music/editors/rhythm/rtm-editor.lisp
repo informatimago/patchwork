@@ -473,7 +473,7 @@
 
 
 (defmethod draw-control-extra-stuff ((self C-beat-editor-collection))
-  (draw-rect 0 0 (- (w self) 0) (- (h self) 25)))
+  (draw-rect* 0 0 (- (w self) 0) (- (h self) 25)))
 
 (defmethod draw-beat-editor-objects ((self C-beat-editor-collection)) 
 ;;(beat-editors self))

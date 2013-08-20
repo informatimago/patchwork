@@ -49,7 +49,7 @@
   ;;          (s (view-size *current-view*))
   ;;          (w (point-h s))
   ;;          (h (point-v s)))
-  ;;     (draw-rect x y w h)))
+  ;;     (draw-rect* x y w h)))
   (destructuring-bind (ff ms) *current-font-codes*
     (multiple-value-bind (descriptor mode) (font-descriptor-from-codes ff ms)
       (declare (ignore mode)) ; TODO: manage mode (:srcOr …)
@@ -117,8 +117,8 @@
 
 
 
-(defun draw-rect (x y w h)
-  ;; (format-trace "draw-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+(defun draw-rect* (x y w h)
+  ;; (format-trace "draw-rect*" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
@@ -157,21 +157,21 @@
   :do (with-focused-view (front-window)
         (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
                                   :mode :srcCopy)
-          (draw-rect 10 20 100 200))
+          (draw-rect* 10 20 100 200))
         (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
                                   :mode mode)
-          (draw-rect 10 20 100 200)))
+          (draw-rect* 10 20 100 200)))
   (sleep 3))
 
 #-(and)
 (with-focused-view (front-window)
   (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10)
                             :mode :srcCopy)
-    (draw-rect 10 20 200 100)))
+    (draw-rect* 10 20 200 100)))
 
 
-(defun fill-rect (x y w h)
-  ;; (format-trace "fill-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+(defun fill-rect* (x y w h)
+  ;; (format-trace "fill-rect*" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
     (let ((window  (view-window *current-view*)))
       (when window
@@ -179,8 +179,8 @@
           (#_NSRectFillUsingOperation (ns:make-ns-rect x y w h)
                                       (mode-to-compositing-operation (pen-mode pen))))))))
 
-(defun erase-rect (x y w h)
-  ;; (format-trace "erase-rect" x y w h *current-view* (when *current-view* (view-window *current-view*)))
+(defun erase-rect* (x y w h)
+  ;; (format-trace "erase-rect*" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (let ((color (unwrap (or (and *current-view*
                                 (view-window *current-view*)
                                 (slot-value (view-window *current-view*) 'back-color))
@@ -195,7 +195,7 @@
 ;; (setf *color-available* t)
 ;; (with-focused-view (front-window)
 ;;   (with-back-color *orange-color*
-;;    (erase-rect 0 0 100 200)))
+;;    (erase-rect* 0 0 100 200)))
 ;; (with-focused-view (front-window)
 ;;   (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10))
 ;;     (with-fore-color *blue-color*

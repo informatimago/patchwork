@@ -260,7 +260,7 @@
   (let* ((object (application-object (view-container self)))
          (bpfs (and object (break-point-functions (editor-view-object object)))))
     (with-focused-view self
-      (draw-rect (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
+      (draw-rect* (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
       (if (open-state self)
         (when (break-point-function self)
           (draw-bpf-function 
@@ -279,7 +279,7 @@
   (let* ((object (application-object (view-container self)))
          (bpfs (and object (break-point-functions (editor-view-object object)))))
     (with-focused-view self
-      (draw-rect (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
+      (draw-rect* (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
       (if (open-state self)
         (progn
           (when bpfs

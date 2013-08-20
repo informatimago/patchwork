@@ -445,7 +445,7 @@
 (defmethod draw-dragging-rectangle ((self C-MN-panel-Mod) top bottom)
   (with-focused-view self
     (with-pen-state (:pattern *black-pattern* :mode :patXor)
-    (draw-rect (point-h top) (point-v top) 11 bottom))))
+    (draw-rect* (point-h top) (point-v top) 11 bottom))))
 
 (defmethod  update-rectangle-dragging ((self C-MN-panel-Mod) mouse-h mouse-v mouse-diff)
   (declare (ignore mouse-v mouse-diff))

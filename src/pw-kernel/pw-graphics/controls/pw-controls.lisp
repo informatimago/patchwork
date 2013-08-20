@@ -235,7 +235,7 @@
     (if (open-state self)
       (call-next-method)
       (draw-string 3 9 (doc-string self)))
-    (draw-rect 0 0 (w self) (h self))))
+    (draw-rect* 0 0 (w self) (h self))))
 
 
 (defmethod set-open-state ((self C-ttybox) fl)
@@ -356,7 +356,7 @@
     (unless (open-state self)
       (with-pen-state (:mode :srcxor) 
         (fill-rect*  1 1 (- (w self) 2)(- (h self) 2))))
-    (draw-rect 0 0 (w self)(h self))))
+    (draw-rect* 0 0 (w self)(h self))))
 
 (defmethod value ((self C-button-latched)) (not (open-state self)))
 (defmethod set-value ((self C-button-latched) value)  (setf (open-state self) (not value)))
@@ -418,7 +418,7 @@
   (when (open-state self)
     (unless (call-next-method)
       (with-focused-view self
-        (draw-rect 1 1 (- (w self) 2)(- (h self) 2)))
+        (draw-rect* 1 1 (- (w self) 2)(- (h self) 2)))
       (let* ((win (view-window self))
              (first-v (point-v (view-mouse-position win)))
              (last-mp (view-mouse-position win))
@@ -437,7 +437,7 @@
                                                                       (* (map-mouse-increment self) (- first-v (point-v last-mp))))))))
               (view-draw-contents self)
               (with-focused-view self
-                (draw-rect 1 1 (- (w self) 2)(- (h self) 2)))
+                (draw-rect* 1 1 (- (w self) 2)(- (h self) 2)))
               (item-action-while-drag self))))))
     (item-action-after-drag self)
     (view-draw-contents self)))

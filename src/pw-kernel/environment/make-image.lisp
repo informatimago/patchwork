@@ -31,9 +31,9 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
+
 (in-package :pw)
+
 #|
 (defun do-save-application (d applic-p)
   (let ((menubar-popup (view-named 'menubar-popup d))
@@ -113,9 +113,6 @@
 |#
 
 
-
-(in-package :pw)
-
 (defun clear-patchwork ()
   (niy clear-patchwork)
   #-(and) (midi::midi-close))
@@ -150,4 +147,5 @@
   (unless (and (ui:shift-key-p) (ui:command-key-p) (ui:control-key-p))
     (ui::without-interrupts (load "CL:pw-inits;drivers+resources;magic" :verbose nil :print nil)
                              (ui::check-protection))))
+
 

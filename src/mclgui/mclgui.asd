@@ -139,7 +139,7 @@
                  (:file "dialog-item"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" ; "event"
+                                     "view-classes" "view" "window" "event"
                                      "region"))
 
                  (:file "default-button-mixin"

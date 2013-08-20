@@ -51,11 +51,6 @@
 ;; with-font-codes  
 
 
-
-(defun fill-rect*  (x y w h) (fill-rect x y w h))
-(declaim (inline fill-rect*))
-
-
 (defvar *r-view-temp-region* nil)
 (on-load-and-now init/r-view-temp-region
   (setq *r-view-temp-region* (new-region)))
@@ -130,7 +125,7 @@
     self))
 
 (defmethod erase-draw-contents ((self simple-view))  
-  (ui::with-view-frame (x y w h) self (erase-rect x y w h)))
+  (ui::with-view-frame (x y w h) self (erase-rect* x y w h)))
 
 (defmethod erase-view-inside-rect ((self simple-view))
   (with-pen-state (:pattern *white-pattern* :mode :patcopy)
@@ -149,7 +144,7 @@
 (defmethod view-draw-out-line ((self simple-view))
   (let* ((topleft     (view-position  self))
          (bottomright (add-points topleft (view-size self))))
-    (draw-rect  (point-h topleft)     (point-v topleft)
+    (draw-rect* (point-h topleft)     (point-v topleft)
                 (point-h bottomright) (point-v bottomright))))
 
 

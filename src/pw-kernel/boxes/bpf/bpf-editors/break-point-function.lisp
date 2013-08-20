@@ -84,13 +84,13 @@
       (setq point-x-now (round (car x-points) h-view-scaler) 
             point-y-now (round (car y-points) v-view-scaler)) 
       (#_MoveTo :long (make-point point-x-now (- y point-y-now)))
-      (when draw-rects-fl (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 3 3)) 
+      (when draw-rects-fl (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3)) 
       (pop x-points)(pop y-points)
       (while x-points
          (setq point-x-now (round (car x-points) h-view-scaler) 
                point-y-now (round (car y-points) v-view-scaler)) 
          (#_LineTo :long (make-point (make-point point-x-now (- y point-y-now))))
-         (when draw-rects-fl (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 3 3)) 
+         (when draw-rects-fl (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3)) 
          (pop x-points)(pop y-points)))))|#
 
 (defvar *no-line-segments* ())
@@ -104,9 +104,9 @@
       (unless *no-line-segments* 
         (#_MoveTo :long (make-point point-x-now (- y point-y-now))))
       (if draw-rects-fl
-        (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 3 3)
+        (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3)
         (if *no-line-segments*
-          (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
+          (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
       (pop x-points)(pop y-points)
       (while x-points
          (setq point-x-now (round (car x-points) h-view-scaler) 
@@ -114,9 +114,9 @@
          (unless *no-line-segments*
            (#_LineTo :long (make-point (make-point point-x-now (- y point-y-now)))))
          (if draw-rects-fl
-           (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 3 3)
+           (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3)
            (if *no-line-segments*
-             (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
+             (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
          (pop x-points)(pop y-points)))))|#
 
 #|(defun draw-bpf-function-points (x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
@@ -127,9 +127,9 @@
       (unless *no-line-segments* 
         (#_MoveTo :long (make-point point-x-now (- y point-y-now))))
       (if draw-rects-fl
-        (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
+        (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
         (if *no-line-segments*
-          (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
+          (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
       (pop x-points)(pop y-points)
       (while x-points
          (setq point-x-now (round (car x-points) h-view-scaler) 
@@ -137,9 +137,9 @@
          (unless *no-line-segments*
            (#_LineTo :long (make-point (make-point point-x-now (- y point-y-now)))))
          (if draw-rects-fl
-           (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
+           (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
            (if *no-line-segments*
-             (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
+             (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
          (pop x-points)(pop y-points)))))|#
 
 (defun draw-bpf-function-points (x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
@@ -151,9 +151,9 @@
    ;;    (unless *no-line-segments* 
    ;;      (#_MoveTo :long (make-point point-x-now (- y point-y-now))))
    ;;    (if draw-rects-fl
-   ;;      (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
+   ;;      (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
    ;;      (if *no-line-segments*
-   ;;        (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
+   ;;        (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
    ;;    (pop x-points)(pop y-points)
    ;;    (while x-points
    ;;       (setq point-x-now (min #.(1- (expt 2 15)) (round (car x-points) h-view-scaler))
@@ -161,9 +161,9 @@
    ;;       (unless *no-line-segments*
    ;;         (#_LineTo :long (make-point (make-point point-x-now (- y point-y-now)))))
    ;;       (if draw-rects-fl
-   ;;         (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
+   ;;         (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
    ;;         (if *no-line-segments*
-   ;;           (draw-rect (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
+   ;;           (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
    ;;       (pop x-points)(pop y-points))))
    )
 

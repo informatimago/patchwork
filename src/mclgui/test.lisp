@@ -408,8 +408,8 @@
             (siz (view-size     view))
             (br  (add-points pos siz)))
        (format-trace "drawing test-view contents" (point-to-list pos) (point-to-list  siz) (point-to-list  br))
-       (erase-rect 0 0 (point-h siz) (point-v siz))
-       (draw-rect 3 3  (- (point-h siz) 6) (- (point-v siz) 6))
+       (erase-rect* 0 0 (point-h siz) (point-v siz))
+       (draw-rect*  3 3  (- (point-h siz) 6) (- (point-v siz) 6))
        ;; (line (+ (point-h pos) 10) (+ (point-v pos) 10) (- (point-h br)  10) (+ (point-v pos) 10))
        ;; (line (+ (point-h pos) 10) (+ (point-v pos) 10) (+ (point-h pos) 10) (- (point-v br)  10))
        ;; (line (+ (point-h pos) 10) (- (point-v br)  10) (- (point-h br)  10) (- (point-v br)  10))
@@ -509,7 +509,7 @@
 (window-close (front-window))
 (set-view-scroll-position (front-window) -10 -10)
 (with-focused-view (front-window)
-  (fill-rect 1 1 28 28))
+  (fill-rect* 1 1 28 28))
 
 ||#
 
@@ -558,8 +558,8 @@
     (let ((pos (view-position view))
           (siz (view-size     view))
           (bal (little-pos    view)))
-      (erase-rect (point-h pos) (point-v pos) (point-h siz) (point-v siz))
-      (draw-rect  (point-h pos) (point-v pos) (point-h siz) (point-v siz))
+      (erase-rect* (point-h pos) (point-v pos) (point-h siz) (point-v siz))
+      (draw-rect*  (point-h pos) (point-v pos) (point-h siz) (point-v siz))
       (fill-ellipse (- (point-h bal) 4) (- (point-v bal) 4) 8 8))))
 
 
@@ -584,15 +584,15 @@
 
 (with-focused-view (first (windows)) 
   (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10))
-    (draw-rect 20 200 200 300)))
+    (draw-rect* 20 200 200 300)))
 
 (with-focused-view (first (windows)) 
   (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10))
-    (fill-rect 20 200 200 300)))
+    (fill-rect* 20 200 200 300)))
 
 
 (with-focused-view (first (windows)) 
-  (erase-rect 220 200 300 300)
+  (erase-rect* 220 200 300 300)
   (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10))
     (fill-ellipse 220 200 200 100))
   (with-pen-state (:pattern *dark-gray-pattern* :size (make-point 20 10))
@@ -600,12 +600,12 @@
 
 (with-focused-view (first (windows)) 
   (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10))
-    (erase-rect 40 220 160 260)))
+    (erase-rect* 40 220 160 260)))
 
 (with-focused-view (first (windows)) 
   (with-back-color *black-pattern*
     (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10))
-      (erase-rect 40 220 160 260))))
+      (erase-rect* 40 220 160 260))))
 
 
 ;; (dump-nswindow-subviews (handle (first (windows))))
@@ -613,13 +613,13 @@
 (aref (view-subviews (front-window)) 8)
 
 (with-focused-view (front-window)
-  (draw-rect 32 48 127 102)
+  (draw-rect* 32 48 127 102)
   (draw-string 10 20 "Hello")
   (draw-string 10 30 "World")
   (draw-string 10 80 (format nil "How do ~%You Do?")))
 
 (with-focused-view (front-window)
-  (erase-rect 0 0 1000 1000))
+  (erase-rect* 0 0 1000 1000))
 (move-to (front-window) 0 10)
 (format (front-window)  "~%How do ~%You Do?~%")
 (format (front-window)  "How do ~%You Do?~%")
@@ -635,7 +635,7 @@
                      (font-line-height))))
 
 (with-focused-view (aref (view-subviews (front-window)) 8)
-  (draw-rect 10 10 107 82))
+  (draw-rect* 10 10 107 82))
 
 (test-view :view-position (293 239) :view-size (128 125) :view-scroll-position (0 0) "#x30200367203D")
 #((test-view :view-position (0 0) :view-size (100 100) :view-scroll-position (0 0) "#x30200365294D")
@@ -673,5 +673,4 @@
             (s (view-size view))
             (w (point-h s))
             (h (point-v s)))
- 
-       (draw-rect x y w h)))))
+       (draw-rect* x y w h)))))

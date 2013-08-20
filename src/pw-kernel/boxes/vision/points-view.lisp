@@ -68,7 +68,7 @@
 
 (defmethod view-draw-contents ((self C-points-rect))
   (with-focused-view  self
-    (draw-rect 0 0 (w self)(h self))
+    (draw-rect* 0 0 (w self)(h self))
     (let ((x-points (slot-value self 'scaled-x-points))
           (y-points (slot-value self 'scaled-y-points))
           (h (h self)))

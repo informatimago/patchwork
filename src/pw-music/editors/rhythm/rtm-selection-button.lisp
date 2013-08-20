@@ -85,7 +85,7 @@
 
 (defmethod draw-view-contents** ((self C-beat-selection-button) view)
   (with-pen-state  (:mode :srccopy :pattern *gray-pattern*)
-    (draw-rect (x self) (y self)(w self) (h self)))
+    (draw-rect* (x self) (y self)(w self) (h self)))
   (when (or (eq (cdr (selection-button-function self)) (rtm-selection-1 view))
             (eq (cdr (selection-button-function self)) (rtm-selection-2 view)))
     (with-pen-state (:mode :patXOR :pattern *black-pattern*)

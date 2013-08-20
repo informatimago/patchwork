@@ -50,7 +50,7 @@
 (defclass C-pw-outrect (BUTTON-DIALOG-ITEM) ())
 
 (defmethod view-draw-contents ((self C-pw-outrect))
-   (draw-rect (x self)(y self)(w self)(h self)))
+   (draw-rect* (x self) (y self) (w self) (h self)))
 
 (defmethod fill-patch-outrect ((self C-pw-outrect))
   (with-focused-view self 
@@ -302,7 +302,7 @@
     (draw-small-rects self)
     (draw-patch-view-outline self)
     (draw-function-name self 2 (- (h self) 5))
-    (draw-rect 0 0 (w self)(h self))))
+    (draw-rect* 0 0 (w self)(h self))))
 
 (defmethod print-connections ((self C-patch) &optional erase-mode)
    (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
@@ -353,7 +353,7 @@
 (defmethod draw-small-rects ((self C-patch))
   (for (i 0 1 (1- (length (pw-controls self))))
      (unless (member 'no-connection (type-list (nth i (pw-controls self))) :test 'eq)
-       (draw-rect (nth i (in-xs self)) (nth i (in-ys self)) 3 6))))
+       (draw-rect* (nth i (in-xs self)) (nth i (in-ys self)) 3 6))))
 
 ;; draw-connections is called only by the window not by a patch !
 
@@ -604,9 +604,9 @@
                               (subtract-points prev delta)))
             (diff-next (add-points (subtract-points (view-position self) current-pos)
                               (subtract-points next delta))))
-      (draw-rect (point-h diff-prev) (point-v diff-prev) (w self) (h self))
+      (draw-rect* (point-h diff-prev) (point-v diff-prev) (w self) (h self))
       (unless (= prev next)
-        (draw-rect (point-h diff-next) (point-v diff-next) (w self) (h self)))))))
+        (draw-rect* (point-h diff-next) (point-v diff-next) (w self) (h self)))))))
 
 (defmethod change-your-size ((view C-patch) win delta last-mp)
   (let ((the-rest (remove view (controls win) :test #'eq)))

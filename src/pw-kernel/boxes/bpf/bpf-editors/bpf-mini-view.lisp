@@ -238,7 +238,7 @@
 ;;
 ;; (defmethod view-draw-contents ((self C-mini-bpf-view))
 ;;  (with-focused-view self
-;;    (draw-rect (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
+;;    (draw-rect* (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
 ;;     (if (open-state self)
 ;;      (when (break-point-function self)
 ;;        (draw-bpf-function 

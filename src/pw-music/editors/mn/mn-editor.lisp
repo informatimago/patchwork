@@ -622,7 +622,7 @@
         (y (point-v (view-scroll-position view))))
     (with-focused-view view
       (with-pen-state (:mode :srccopy :pattern *white-pattern*)
-        (fill-rect  x y (+ x w) (+ y h))))))
+        (fill-rect*  x y (+ x w) (+ y h))))))
 
 (defmethod scroll-bar-changed ((view C-music-notation-panel) scroll-bar)
   (let ((h-pos (point-h (view-scroll-position view))))

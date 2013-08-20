@@ -55,7 +55,7 @@
 (defmethod view-draw-contents ((self box-dialog-item))
   (let ((pos (view-position self))
         (siz (view-size self)))
-    (draw-rect (point-h pos) (point-v pos) (point-h siz) (point-v siz))))
+    (draw-rect* (point-h pos) (point-v pos) (point-h siz) (point-v siz))))
 
 
 
@@ -385,7 +385,7 @@
 (defmethod view-draw-contents :before ((self scroller-pane))
   (when (draw-scroller-outline self)
     (let ((siz (view-size self)))
-      (draw-rect 0 0 (point-h siz) (point-v siz)))))
+      (draw-rect* 0 0 (point-h siz) (point-v siz)))))
 
 
 (defmethod set-view-size ((self scroller-pane) h &optional v)

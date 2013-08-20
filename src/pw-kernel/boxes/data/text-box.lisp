@@ -100,9 +100,9 @@
                               (subtract-points prev delta)))
             (diff-next (add-points (subtract-points position current-pos)
                               (subtract-points next delta))))
-      (pw::draw-rect (point-h diff-prev) (point-v diff-prev) (w control) (h control))
+      (pw::draw-rect* (point-h diff-prev) (point-v diff-prev) (w control) (h control))
       (unless (= prev next)
-        (pw::draw-rect (point-h diff-next) (point-v diff-next) (w control) (h control)))))))
+        (pw::draw-rect* (point-h diff-next) (point-v diff-next) (w control) (h control)))))))
 
 
 
