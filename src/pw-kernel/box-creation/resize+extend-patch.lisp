@@ -52,7 +52,7 @@
 (defmethod resize-patch? ((self C-pw-resize-x)) t) 
 
 (defmethod draw-patch-extra ((self C-pw-resize-x))
-  (draw-rect (- (w self) 5) (- (h self) 5) 5 5))
+  (draw-rect* (- (w self) 5) (- (h self) 5) 5 5))
 
 (defmethod resize-patch-box ((self C-pw-resize-x) mp delta)
   (let ((point-now (make-point (point-h (add-points mp delta)) (h self)))

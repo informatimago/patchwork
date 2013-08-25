@@ -108,12 +108,12 @@
 
                  
                  (:file "pw-lib/midishare/midishare" 
-                        :depends-on (#+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
+                        :depends-on (#+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
 
                  
                  (:file "pw-lib/midishare/midiplay" 
                         :depends-on ("patchwork-package"
-                                     #+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
+                                     #+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      "pw-kernel/drivers+resources/midi"
                                      "pw-music/boxes/edit/rhythm-formation"
                                      "pw-kernel/box-creation/pw-patch"
@@ -130,7 +130,7 @@
                  
                  (:file "pw-lib/midishare/midirecord" 
                         :depends-on ("patchwork-package"
-                                     #+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
+                                     #+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/drivers+resources/midi"
@@ -138,7 +138,7 @@
                                      "pw-music/boxes/edit/pw-mn-collector"
                                      "pw-music/editors/mn/mn-note-chord-chordline"))
 
-                 #+patchwork.loader::cocoa-midi-player
+                 #+cl-user::cocoa-midi-player
                  (:file "pw-lib/midishare/cocoa-midi-player" 
                         :depends-on ())
                  
@@ -196,7 +196,7 @@
                  
                  (:file "pw-kernel/drivers+resources/midi" 
                         :depends-on ("pw-lib/midishare/midishare"
-                                     #+patchwork.loader::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
+                                     #+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
                  
                  
                  (:file "pw-kernel/drivers+resources/scheduler" 

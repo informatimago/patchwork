@@ -40,7 +40,7 @@
 ;; (pushnew 'no-cocoa *features*)
 (pushnew 'cocoa-midi-player *features*)
 
-#-patchwork.loader::no-cocoa (require :cocoa)
+#-cl-user::no-cocoa (require :cocoa)
 
 
 #||
@@ -143,7 +143,7 @@
          #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
          asdf:*central-registry* :test (function equalp))
 
-#+(and ccl darwin (not patchwork.loader::no-cocoa))
+#+(and ccl darwin (not cl-user::no-cocoa))
 (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
 
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)

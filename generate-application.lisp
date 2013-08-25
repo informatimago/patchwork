@@ -85,6 +85,8 @@
 ;; --> #P"/Users/pjb/LOGHOSTS/PATCHWORK"
 
 (load-logical-pathname-translations "PATCHWORK")
+(load-logical-pathname-translations "PW-USER")
+(load-logical-pathname-translations "CLENI")
 
 ;; An example ~/LOGHOST/PATCHWORK.  I use #P"/home/pjb/" instead of
 ;; (user-homedir-pathname) because my sources are on a NFS mount, not on
@@ -120,12 +122,15 @@
          asdf:*central-registry* :test (function equalp))
 
 ;; (pushnew 'cl-user::no-cocoa *features*)
+(pushnew 'cocoa-midi-player *features*)
 #+(and ccl (not cl-user::no-cocoa)) (say "Loading :cocoa (takes some time to start…)")
 #+(and ccl (not cl-user::no-cocoa)) (require :cocoa)
 #+(and ccl (not cl-user::no-cocoa)) (defparameter *cocoa-readtable* (copy-readtable *readtable*))
 #+(and ccl (not cl-user::no-cocoa)) (say "Loading MacOSX Libraries")
 #+(and ccl (not cl-user::no-cocoa)) (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
 
+
+(ql:quickload :com.informatimago.common-lisp.cesarum)
 
 ;; DEBUG ;;
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper)
@@ -228,7 +233,7 @@
  :main-nib-name nil     ; the name of the nib that is to be loaded
                                         ; as the app's main. this name gets written
                                         ; into the Info.plist on the "NSMainNibFile" key
- :application-class 'gui::cocoa-application
+ :application-class #-ccl-1.9 'gui::cocoa-application #+ccl-1.9 'gui::lisp-application
  :private-frameworks '()
  :toplevel-function nil
  :altconsole t)

@@ -33,7 +33,7 @@
 ;;;;**************************************************************************
 
 (in-package "MCLGUI")
-
+(objcl:enable-objcl-reader-macros)
 
 
 
@@ -120,6 +120,9 @@ list.
 ")
 
 
+(defvar *application-did-finish-launching-functions* '()
+  "Functions called when NSApplication sends the applicationDidFinishLaunching: notification.")
+
 
 #| in ccl:
 
@@ -169,9 +172,14 @@ list.
 
 (define-on-operators quit         *lisp-cleanup-functions*)
 (define-on-operators save         *save-exit-functions*)
+
 (define-on-operators restore      *restore-lisp-functions*)
+(define-on-operators application-did-finish-launching  *application-did-finish-launching-functions*)
+
+
 #-ccl
 (define-on-operators load-and-now *lisp-user-pointer-functions*  :and-now)
+
 #+ccl
 (defmacro on-load-and-now (function-name &body body)
   `(progn
@@ -179,6 +187,40 @@ list.
      (def-load-pointers ,function-name () ,@body)))
 (define-on-operators startup      *lisp-startup-functions*)
 
+
+
+(defvar *initializer* nil)
+
+@[NSObject subClass:MclguiInitializer
+           slots:()]
+
+
+@[MclguiInitializer
+  method:(applicationDidFinishLaunching:(:id)notification)
+  resultType:(:void)
+  body:
+  (declare (ignore notification))
+  (with-simple-restart (abort "Abort (possibly crucial) startup functions.")
+    (flet ((call-with-restart (f)
+             (with-simple-restart 
+                 (continue "Skip (possibly crucial) startup function ~S."
+                           (if (symbolp f)
+                               f
+                               #+ccl(ccl::function-name f)
+                               #-ccl f))
+               (funcall f))))
+      (map nil (function call-with-restart) *application-did-finish-launching-functions*)))
+  [[NSNotificationCenter defaultCenter] removeObserver:self]
+  [self release]
+  (setf *initializer* nil)]
+
+(on-restore add-application-did-finish-launching-initializer
+  (setf *initializer* [MclguiInitializer new])
+  [[NSNotificationCenter defaultCenter]
+   addObserver:*initializer*
+   selector:(objc:@selector "applicationDidFinishLaunching:")
+   name:#$NSApplicationDidFinishLaunchingNotification
+   object:nil])
 
 
 ;;;

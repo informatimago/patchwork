@@ -228,7 +228,8 @@ NOTE:           UNWRAPPING returns the handle or compute a new NS
             (setf (handle wrapper) nil))
           (weak-list-list *wrapper-instances*)))
 
-(on-restore reset-handles
+#|on-restore|#
+ (on-application-did-finish-launching reset-handles
   (dolist (wrapper (weak-list-list *wrapper-instances*))
     (format *trace-output* "~&unwrapping a ~A~%" (class-name (class-of wrapper)))
     (unwrap wrapper)))
@@ -270,8 +271,9 @@ SEE ALSO:       UNWRAPPING, WRAPPING.
   (:method ((wrapper wrapper))
     (unwrapping wrapper
       (or (handle wrapper)
-          (progn (cerror "Continue" "Unwrapping an empty wrapper ~S." wrapper)
-                 *null*)))))
+          (progn ;;(cerror "Continue" "Unwrapping an empty wrapper ~S." wrapper)
+            (warn "Unwrapping an empty wrapper ~S." wrapper)
+            *null*)))))
 
 
 (defgeneric release (wrapper)
