@@ -81,9 +81,11 @@ Chargement du programme
 
 3- Lancer Clozure.app (AppStore), ou une autre version de ccl >= 1.7.
 
-4- (cd #P/repertoire/ou/sont/installes/les/sources/de/patchwork/")
+4- (cd #P"/repertoire/ou/sont/installes/les/sources/de/patchwork/")
 
-5- (load "loader.lisp")
+5- (shell "make -C /repertoire/ou/sont/installes/les/sources/de/patchwork/ clean")
+
+6- (load "loader.lisp")
 
 
 -- 
