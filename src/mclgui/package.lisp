@@ -41,13 +41,13 @@
    "TRIVIAL-GRAY-STREAMS"
    "CLOSER-MOP")
   (:use "COM.INFORMATIMAGO.COMMON-LISP.LISP-SEXP.SOURCE-FORM"
-         "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK")
+        "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK")
   (:nicknames "UI")
   (:shadowing-import-from "CLOSER-MOP"
                           "STANDARD-CLASS" "STANDARD-METHOD" "STANDARD-GENERIC-FUNCTION"
                           "DEFMETHOD" "DEFGENERIC")
-  (:import-from "OCLO"  "*NULL*" "NULLP")
-  (:import-from "OBJCL" "YES" "NO")
+  (:import-from "COM.INFORMATIMAGO.OCLO"  "*NULL*" "NULLP")
+  (:import-from "COM.INFORMATIMAGO.OBJCL" "YES" "NO")
   (:export
 
    ;; Extensions:
