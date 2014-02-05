@@ -277,7 +277,7 @@ DO:       Execute the BODY with a handler for CONDITION and
   ;;------------------------------
   (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
   ;;------------------------------
-  (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"  'pw-menu-action))
+  (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"    'pw-menu-action))
   ;;------------------------------
   (setf *pw-menu-file-close-item*       (item "Close"        #\W        (kill-patch-window *active-patch-window*)))
   (setf *pw-menu-file-only-Save-item*   (item "Save"         #\S        (PW-WINDOW-SAVE *active-patch-window*)))
@@ -413,7 +413,9 @@ DO:       Execute the BODY with a handler for CONDITION and
   (menu-item-disable *apps-lisp-menu-item*)
   (set-command-key   *apps-lisp-menu-item* #\L)
   (set-command-key   *apps-PW-menu-item*   #\1)
+  
   ;;------------------------------
+  (on-application-did-finish-launching pw-menu-action)
   (on-quit cleanup-PW-wins))
 
 

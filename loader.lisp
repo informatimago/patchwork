@@ -37,8 +37,8 @@
   (:use "COMMON-LISP"))
 (in-package "PATCHWORK.LOADER")
 
-;; (pushnew 'no-cocoa *features*)
-(pushnew 'cocoa-midi-player *features*)
+;; (pushnew 'cl-user::no-cocoa *features*)
+(pushnew 'cl-user::cocoa-midi-player *features*)
 
 #-cl-user::no-cocoa (require :cocoa)
 

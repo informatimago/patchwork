@@ -150,7 +150,7 @@ list.
 |#
 
 
-(defmacro define-on-operators (base-name list-var &optional and-now)
+(defmacro define-on-operators (base-name list-var &key and-now)
   (let ((fname (intern (format nil "ON-~A*" (symbol-name base-name))))
         (mname (intern (format nil "ON-~A"  (symbol-name base-name)))))
     `(progn
@@ -178,7 +178,7 @@ list.
 
 
 #-ccl
-(define-on-operators load-and-now *lisp-user-pointer-functions*  :and-now)
+(define-on-operators load-and-now *lisp-user-pointer-functions*  :and-now t)
 
 #+ccl
 (defmacro on-load-and-now (function-name &body body)

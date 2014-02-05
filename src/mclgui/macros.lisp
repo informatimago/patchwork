@@ -227,7 +227,6 @@ RETURN:         The object that bas been printed (so that you can use
 
 (defmacro on-main-thread (&whole whole form &key (wait t))
   "
-
 FORM:   Should be an Objective-C message send with zero or one argument.
         Examples: [view drawRect:rect]
                  [super drawRect:rect]
