@@ -1,0 +1,8 @@
+* Patchwork TO DO List
+
+** Bugs
+*** TODO clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
+*** TODO click-and-drag to move a box doesn't work.
+*** TODO numbox click-and-drag with opt/cmd is aphazadical.
+*** TODO no way to make multiple selections by click-and-dragging an rect arround boxes?
+** Features
