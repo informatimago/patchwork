@@ -146,7 +146,7 @@ Called by -[MclguiWindow zoom:] which is called from WINDOW-ZOOM-EVENT-HANDLER."
 (defmethod window-zoom-event-handler ((window window) message)
   (with-handle (winh window)
     (when (xor [winh isZoomed] (eq :inZoomIn message))
-      (on-main-thread [winh zoom:winh] :wait t)))
+      (on-main-thread [winh zoom:winh])))
   nil)
 
 

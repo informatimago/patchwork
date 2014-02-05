@@ -225,17 +225,17 @@ RETURN:         The object that bas been printed (so that you can use
 (define-condition simple-program-error (simple-error program-error)
   ())
 
-(defmacro on-main-thread (&whole whole form &key (wait nil))
+(defmacro on-main-thread (&whole whole form &key (wait t))
   "
 
-FORM:   Should be an Objective-C message send with zerop or one argument.
+FORM:   Should be an Objective-C message send with zero or one argument.
         Examples: [view drawRect:rect]
                  [super drawRect:rect]
                  (objc:send view :draw-rect rect)
                  (objc:objc-message-send-super :draw-rect rect)
 
 WAIT:   Whether we must wait for the message to return from the main
-        thread.
+        thread.  Default is T, to wait.
 
 RETURN: A form sending
         performSelectorOnMainThread:withObject:waitUntilDone: message

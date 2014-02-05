@@ -190,57 +190,14 @@ the entire table is visible.
           (set-cell-font item cell font-spec))))
 
 
-(defgeneric cell-contents (item h &optional v)
-  (:documentation "
-
-The cell-contents generic function returns the contents of the cell
-specified by H and V.  The method for TABLE-DIALOG-ITEM returns nil.
-The CELL-CONTENTS method should be specialized by subclasses of
-TABLE-DIALOG-ITEM.  It is called by DRAW-CELL-CONTENTS.
-
-ITEM:           A table dialog item.
-
-H:              Horizontal index.
-
-V:              Vertical index. If the value of v is NIL, h is assumed
-                to represent a point.
-
-")
-  (:method ((item table-dialog-item) h &optional v)
-    (declare (ignore h v))
-    nil))
+(defmethod cell-contents ((item table-dialog-item) h &optional v)
+  (declare (ignore h v))
+  nil)
 
 
-(defgeneric draw-cell-contents (item h &optional v rect)
-  (:documentation "
 
-The DRAW-CELL-CONTENTS generic function draws the contents of cell.
-It may be shadowed to provide a specialized display.  This function
-should not be called directly. It should be called only by
-REDRAW-CELL, which prepares the window for the drawing.
-
-The default method of DRAW-CELL-CONTENTS shows the printed
-representation of the cell contents (using the function stored in the
-function cell of :table-print-function, which defaults to princ). If
-the contents are too long to fit in the cell, an ellipsis is added at
-the end.
-
-The DRAW-CELL-CONTENTS function may be shadowed to provide specialized
-drawing (for example, to create a table of icons or patterns).  In
-many cases, however, you don’t need to redefine draw-cell-contents;
-you can often achieve the desired results with a function in
-:table-printfunction.
-
-ITEM:           A table dialog item.
-
-H:              Horizontal index.
-
-V:              Vertical index. If the value of v is NIL, h is assumed
-                to represent a point.
-
-")
-  (:method ((item table-dialog-item) h &optional v rect)
-    (draw-string-in-rect (cell-contents-string-new item h v) rect :truncation :end)))
+(defmethod draw-cell-contents ((item table-dialog-item) h &optional v rect)
+  (draw-string-in-rect (cell-contents-string-new item h v) rect :truncation :end))
 
 
 (defmacro normalize-h&v (h v)
@@ -249,44 +206,20 @@ V:              Vertical index. If the value of v is NIL, h is assumed
            ,h (point-h ,h))))
 
 
-(defgeneric redraw-cell (item h &optional v)
-  (:documentation "
-
-The redraw-cell generic function redraws the contents of cell.  When a
-single cell changes, calling this function explicitly is much more
-efficient than redrawing the entire table dialog item.  Redrawing the
-cell involves three operations:
-
-1. Setting the dialog’s clip rectangle so that drawing is restricted
-   to the cell.
-
-2. Moving the pen to a position 3 pixels above the bottom of the cell
-   and 3 pixels to the right of the left edge of the cell.
-
-3. Calling draw-cell-contents.
-
-ITEM:           A table dialog item.
-
-H:              Horizontal index.
-
-V:              Vertical index. If the value of v is NIL, h is assumed
-                to represent a point.
-
-")
-  (:method ((item table-dialog-item) h &optional v)
-    (normalize-h&v h v)
-    (let* ((cell-pos    (cell-position item h v))
-           (cell-width  (table-column-width item h))
-           (cell-height (table-row-height item v)))
-      (declare (ignore cell-width cell-height))
-      (when cell-pos
-        (with-focused-view (view-container item)
-          (niy redraw-cell item h v)
-          #-(and)
-          (rlet ((cell-rect :rect
-                            :topleft cell-pos
-                            :bottomright (add-points cell-pos (make-point cell-width cell-height))))
-                (%draw-table-cell-new item h v cell-rect (cell-selected-p item h v))))))))
+(defmethod redraw-cell ((item table-dialog-item) h &optional v)
+  (normalize-h&v h v)
+  (let* ((cell-pos    (cell-position item h v))
+         (cell-width  (table-column-width item h))
+         (cell-height (table-row-height item v)))
+    (declare (ignore cell-width cell-height))
+    (when cell-pos
+      (with-focused-view (view-container item)
+        (niy redraw-cell item h v)
+        #-(and)
+        (rlet ((cell-rect :rect
+                          :topleft cell-pos
+                          :bottomright (add-points cell-pos (make-point cell-width cell-height))))
+              (%draw-table-cell-new item h v cell-rect (cell-selected-p item h v)))))))
 
 
 
@@ -1382,15 +1315,15 @@ V:              Vertical index. If the value of v is NIL, h is assumed
           changed
           )))))
 
-(defgeneric set-view-level (item level)
-  (:method :after ((item table-dialog-item) level)
-           (let ((hscroll (table-hscroll-bar item))
-                 (vscroll (table-vscroll-bar item))
-                 (level+1 (1+ level))
-                 (container (view-container item)))
-             (when (and container (< level+1 (length (view-subviews container))))
-               (when hscroll (set-view-level hscroll level+1))
-               (when vscroll (set-view-level vscroll level+1))))))
+
+(defmethod set-view-level :after ((item table-dialog-item) level)
+         (let ((hscroll (table-hscroll-bar item))
+               (vscroll (table-vscroll-bar item))
+               (level+1 (1+ level))
+               (container (view-container item)))
+           (when (and container (< level+1 (length (view-subviews container))))
+             (when hscroll (set-view-level hscroll level+1))
+             (when vscroll (set-view-level vscroll level+1)))))
 
 (defmethod set-view-container :after ((item table-dialog-item) container)
   (let ((hscroll (table-hscroll-bar item))

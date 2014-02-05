@@ -390,14 +390,16 @@ V:              The vertical coordinate of the new position, or NIL if
           (mswindow (handle window)))
       (setf (slot-value window 'view-position) pos)
       (when (and (not *window-moving*) mswindow)
-        ;; (format-trace "Before mswindow setFrameOrigin:")
+        (pprint (macroexpand '(on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin pos siz)])) *trace-output*)
+        (format-trace "Before mswindow setFrameOrigin:")
         (on-main-thread [mswindow setFrameOrigin:(window-to-nswindow-origin pos siz)])
-        ;; (format-trace "Before mswindow invalidateShadow")
+        (format-trace "Before mswindow invalidateShadow")
         (on-main-thread [mswindow invalidateShadow])
-        ;; (format-trace "After")
-        )
+        (format-trace "After"))
       pos)
     (set-view-position window (center-window (view-size window) h)))) 
+
+
 
 
 (defvar *window-growing* nil

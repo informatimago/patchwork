@@ -336,7 +336,7 @@
                         :depends-on ("package" "point"))
 
                  (:file "region"
-                        :depends-on ("package" "macros" "variables" "point"
+                        :depends-on ("package" "macros" "variables" "point" "rect"
                                                "view-classes"))
 
                  (:file "pen"
@@ -353,7 +353,7 @@
                  
                  #+has-appleevent
                  (:file "apple-event"
-                        :depends-on ("package"))
+                        :depends-on ("package" "application"))
                  ;; MCLGUI:
 
                  (:file "mclgui"
