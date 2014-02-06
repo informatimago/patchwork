@@ -131,76 +131,77 @@
                                (html ("td")
                                      (format t "&nbsp;")))))))))
 
-
-(let* ((*default-pathname-defaults* #P"/home/pjb/works/patchwork/patchwork/src/mclgui/")
-       (stats (loop
-                :for (group . files) :in *groups*
-                :collect (loop
-                           :for file :in files
-                           :for contents = (with-open-file (stream file)
-                                             (loop
-                                               :for sexp = (read stream nil stream)
-                                               :until (eql sexp stream)
-                                               :collect sexp))
-                           :sum (count-if (lambda (sexp)
+(defun avancement ()
+  (let* ((*default-pathname-defaults* (com.informatimago.tools.pathname:TRANSLATE-LOGICAL-PATHNAME #P"PATCHWORK:SRC;MCLGUI;"))
+         (stats (loop
+                  :for (group . files) :in *groups*
+                  :collect (loop
+                             :for filename :in files
+                             :for file = (merge-pathnames filename *default-pathname-defaults*)
+                             :for contents = (with-open-file (stream file)
+                                               (loop
+                                                 :for sexp = (read stream nil stream)
+                                                 :until (eql sexp stream)
+                                                 :collect sexp))
+                             :sum (count-if (lambda (sexp)
                                               (and (listp sexp)
-                                               (symbolp (first sexp))
-                                               (= 3 (mismatch "DEF" (string (first sexp))))))
-                                          contents) :into definitions
-                           :sum (count-niy contents) :into niy
-                           :finally (return (list group definitions niy))))))
+                                                   (symbolp (first sexp))
+                                                   (= 3 (mismatch "DEF" (string (first sexp))))))
+                                            contents) :into definitions
+                             :sum (count-niy contents) :into niy
+                             :finally (return (list group definitions niy))))))
 
-  (terpri) (terpri)
-  (html "li"
-        (princ "Extraire des sources de MCL l'API MCLGUI.") (terpri)
-        (let ((max-fun (reduce (function max) stats :key (function second))))
-          (flet ((percent (implemented)
-                   (truncate (/ implemented max-fun) 1/100)))
-            (html ("table" "width=\"90%\"")
-                  (loop
-                    :for index :from 1
-                    :for (group definitions #|niy|#) :in stats
-                    ;; :for implemented = (max 0 (- definitions niy))
-                    :for status = "green" #-(and) (cond
-                                                    ((zerop implemented)         "red")
-                                                    ((= definitions implemented) "green")
-                                                    (t                           "yellow"))
-                    :do (percent-row ((percent definitions) (percent definitions) status)
-                          (format t "~2D. ~A: ~D définitions</li>"
-                                  index group definitions))))))
-        (princ "Cette étape est finie.") (terpri))
-  (princ "<br>") (terpri)
-  (html "li"
-        (princ "Implémenter l'API MCLGUI sur Mac OS X.") (terpri)
-        (let ((max-fun (reduce (function max) stats :key (function second))))
-          (flet ((percent (implemented)
-                   (truncate (/ implemented max-fun) 1/100)))
-            (html ("table" "width=\"90%\"")
-                  (loop
-                    :for index :from 1
-                    :for (group definitions niy) :in stats
-                    :for implemented = (max 0 (- definitions niy))
-                    :for status =  (cond
-                                     ((zerop implemented)         "red")
-                                     ((= definitions implemented) "green")
-                                     (t                           "yellow"))
-                    :do  (percent-row ((percent implemented)
-                                       (percent definitions)
-                                       status)
-                           (format t "~2D. ~A: ~D/~D fonctions implémentées</li>"
-                                   index group implemented definitions)))))))
-  (princ "<br>") (terpri) (terpri)
+    (terpri) (terpri)
+    (html "li"
+      (princ "Extraire des sources de MCL l'API MCLGUI.") (terpri)
+      (let ((max-fun (reduce (function max) stats :key (function second))))
+        (flet ((percent (implemented)
+                 (truncate (/ implemented max-fun) 1/100)))
+          (html ("table" "width=\"90%\"")
+            (loop
+              :for index :from 1
+              :for (group definitions #|niy|#) :in stats
+              ;; :for implemented = (max 0 (- definitions niy))
+              :for status = "green" #-(and) (cond
+                                              ((zerop implemented)         "red")
+                                              ((= definitions implemented) "green")
+                                              (t                           "yellow"))
+              :do (percent-row ((percent definitions) (percent definitions) status)
+                    (format t "~2D. ~A: ~D définitions</li>"
+                            index group definitions))))))
+      (princ "Cette étape est finie.") (terpri))
+    (princ "<br>") (terpri)
+    (html "li"
+      (princ "Implémenter l'API MCLGUI sur Mac OS X.") (terpri)
+      (let ((max-fun (reduce (function max) stats :key (function second))))
+        (flet ((percent (implemented)
+                 (truncate (/ implemented max-fun) 1/100)))
+          (html ("table" "width=\"90%\"")
+            (loop
+              :for index :from 1
+              :for (group definitions niy) :in stats
+              :for implemented = (max 0 (- definitions niy))
+              :for status =  (cond
+                               ((zerop implemented)         "red")
+                               ((= definitions implemented) "green")
+                               (t                           "yellow"))
+              :do  (percent-row ((percent implemented)
+                                 (percent definitions)
+                                 status)
+                     (format t "~2D. ~A: ~D/~D fonctions implémentées</li>"
+                             index group implemented definitions)))))))
+    (princ "<br>") (terpri) (terpri)
 
-  (loop
-    :for index :from 1
-    :for (group definitions niy) :in stats
-    :for implemented = (max 0 (- definitions niy))
-    :do (format t "~2D. ~20A: ~3D/~3D fonctions implémentées [~3D%]~%"
-                index group implemented definitions
-                (truncate (/ implemented definitions) 1/100))
-    :finally (terpri) (terpri))
-  
-  (values))
+    (loop
+      :for index :from 1
+      :for (group definitions niy) :in stats
+      :for implemented = (max 0 (- definitions niy))
+      :do (format t "~2D. ~20A: ~3D/~3D fonctions implémentées [~3D%]~%"
+                  index group implemented definitions
+                  (truncate (/ implemented definitions) 1/100))
+      :finally (terpri) (terpri))
+    
+    (values)))
 
 
 
