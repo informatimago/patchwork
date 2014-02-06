@@ -1,4 +1,20 @@
 * Patchwork TO DO List
+** Avancement
+
+10. Clipboard           :   2/  8 fonctions implémentées [ 25%]
+11. Apple Events        :   9/ 16 fonctions implémentées [ 56%]
+ 7. Dialog Items        : 355/441 fonctions implémentées [ 80%]
+ 6. Dialogs             :  43/ 52 fonctions implémentées [ 82%]
+12. Quickdraw           : 129/137 fonctions implémentées [ 94%]
+ 5. Windows             :  77/ 81 fonctions implémentées [ 95%]
+ 2. Fonts               :  75/ 78 fonctions implémentées [ 96%]
+ 4. Views               :  80/ 82 fonctions implémentées [ 97%]
+14. Divers              : 255/256 fonctions implémentées [ 99%]
+ 1. Points              :  12/ 12 fonctions implémentées [100%]
+ 3. Menus               :  98/ 98 fonctions implémentées [100%]
+ 8. Colors              :  30/ 30 fonctions implémentées [100%]
+ 9. Events              : 107/107 fonctions implémentées [100%]
+13. Files               :  18/ 18 fonctions implémentées [100%]
 
 ** Bugs
 *** TODO clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
@@ -6,3 +22,17 @@
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
 *** TODO no way to make multiple selections by click-and-dragging an rect arround boxes?
 ** Features
+*** TODO [#A] Apple Events
+**** ~/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
+
+*** TODO [#A] Delivery: debug de/serialization of wrapper/NSObjects save-image.
+
+*** TODO [#A] Windows
+*** TODO [#B] Dialog Items
+*** TODO [#B] Dialogs
+*** TODO Quickdraw
+*** TODO [#B] Views
+*** TODO [#C] Fonts
+*** TODO [#C] Clipboard
+
+*** TODO find-grep ';; *('
