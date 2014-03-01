@@ -11,12 +11,13 @@
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
+;;;;    2014-03-01 <PJB> Moved pw-macosx/reader-macros to pw-kernel/environment/reader-macros
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
 ;;;;    
-;;;;    Copyright IRCAM 1986 - 2012
+;;;;    Copyright IRCAM 1986 - 2014
 ;;;;    
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
@@ -53,7 +54,7 @@
                         :depends-on ("pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/drivers+resources/midi"))
 
-                 (:file "pw-macosx/reader-macros" 
+                 (:file "pw-kernel/environment/reader-macros" 
                         :depends-on ("patchwork-package"
                                      "pw-kernel/environment/clpf-utils"))
                  
@@ -82,7 +83,7 @@
 
                  (:file "pw-lib/pwscript/recordables" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-lib/pwscript/pw-scripting"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-kernel/abstraction+config/abstraction-m"
@@ -162,7 +163,7 @@
                  
                  (:file "pw-kernel/environment/mac-rsrc" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"))
+                                     "pw-kernel/environment/reader-macros"))
                  
                  (:file "pw-kernel/environment/midi-note" 
                         :depends-on ("patchwork-package"
@@ -245,7 +246,7 @@
                  
                  (:file "pw-kernel/types/pw-type-scheme" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/pw-graphics/controls/pw-controls"))
 
                  
@@ -288,7 +289,7 @@
                  
                  (:file "pw-kernel/boxes/data/text-box" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/types/pw-types"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"))
@@ -301,7 +302,7 @@
                  
                  (:file "pw-kernel/boxes/multidim/multidim" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/types/pw-types"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-music/boxes/edit/pw-mn-collector"))
@@ -316,7 +317,7 @@
                         :depends-on ("patchwork-package"
                                      "pw-kernel/environment/clpf-utils"
                                      "pw-kernel/types/pw-type-scheme"
-                                     "pw-macosx/reader-macros"))
+                                     "pw-kernel/environment/reader-macros"))
                  
                  
                  (:file "pw-kernel/boxes/vision/oscilloscope" 
@@ -341,7 +342,7 @@
                  
                  (:file "pw-kernel/boxes/bpf/bpf-boxes/pw-bpf-boxes" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/types/pw-types"
                                      "pw-kernel/environment/epw-package"  
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -367,7 +368,7 @@
                  
                  (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-editor"
                                      "pw-kernel/boxes/bpf/bpf-editors/break-point-function"))
                  
@@ -377,7 +378,7 @@
                  
                  (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-window" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-menu"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view"
                                      "pw-kernel/pw-graphics/controls/mouse-window"
@@ -432,7 +433,7 @@
                  
                  (:file "pw-kernel/box-creation/pw-patch" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/pw-graphics/window+menu/pw-window"
@@ -445,20 +446,20 @@
                  
                  (:file "pw-kernel/pw-graphics/controls/mouse-window" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"))
+                                     "pw-kernel/environment/reader-macros"))
                  
                  (:file "pw-kernel/pw-graphics/controls/popupmenu" 
                         :depends-on ("patchwork-package"))
                  
                  (:file "pw-kernel/pw-graphics/controls/pw-controls" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"
+                                     "pw-kernel/environment/reader-macros"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
                  (:file "pw-kernel/pw-graphics/controls/pw-graphics" 
                         :depends-on ("patchwork-package"
-                                     "pw-macosx/reader-macros"))
+                                     "pw-kernel/environment/reader-macros"))
                  
                  (:file "pw-kernel/pw-graphics/window+menu/application-window" 
                         :depends-on ("patchwork-package"))
@@ -570,7 +571,7 @@
                  
                  (:file "pw-music/boxes/edit/ch-line-build" 
                         :depends-on ("patchwork-package"
-                                     ;; "pw-macosx/reader-macros"
+                                     ;; "pw-kernel/environment/reader-macros"
                                      "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/types/pw-types"
@@ -587,7 +588,7 @@
                  
                  (:file "pw-music/boxes/edit/midi-instrument-editors" 
                         :depends-on ("patchwork-package"
-                                     ;; "pw-macosx/reader-macros"
+                                     ;; "pw-kernel/environment/reader-macros"
                                      "pw-kernel/drivers+resources/scheduler" 
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view"))
@@ -744,7 +745,7 @@
                  
                  (:file "pw-music/editors/mn/mn-collector-view" 
                         :depends-on ("patchwork-package"
-                                     ;; "pw-macosx/reader-macros"
+                                     ;; "pw-kernel/environment/reader-macros"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
@@ -754,7 +755,7 @@
                  
                  (:file "pw-music/editors/mn/mn-editor" 
                         :depends-on ("patchwork-package"
-                                     ;; "pw-macosx/reader-macros"
+                                     ;; "pw-kernel/environment/reader-macros"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/environment/epw-package"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
@@ -800,7 +801,7 @@
                  
                  (:file "pw-kernel/types/pw-types" 
                         :depends-on ("patchwork-package"
-                                     ;; "pw-macosx/reader-macros"
+                                     ;; "pw-kernel/environment/reader-macros"
                                      "pw-kernel/pw-graphics/controls/pw-controls"))
                  
                  (:file "pw-kernel/types/object-types" 
