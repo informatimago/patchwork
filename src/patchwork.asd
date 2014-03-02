@@ -59,6 +59,9 @@
                                      "pw-kernel/environment/clpf-utils"))
                  
                  
+                 (:file "pw-lib/pwscript/closae" 
+                  :depends-on ("patchwork-package"))
+
                  ;; (:file "pw-lib/pwscript/appleevent-toolkit" 
                  ;;        :depends-on ("patchwork-package"))
                  ;;
@@ -72,6 +75,7 @@
                  (:file "pw-lib/pwscript/pw-scripting" 
                         :depends-on ("patchwork-package"
                                      ;; "pw-lib/pwscript/pw-ae"
+                                     "pw-lib/pwscript/closae"
                                      "pw-lib/pwscript/pw-scripting-gf" 
                                      "pw-kernel/boxes/data/file-buffer"
                                      "pw-kernel/boxes/data/list-editor"
@@ -84,6 +88,7 @@
                  (:file "pw-lib/pwscript/recordables" 
                         :depends-on ("patchwork-package"
                                      "pw-kernel/environment/reader-macros"
+                                     "pw-lib/pwscript/closae"
                                      "pw-lib/pwscript/pw-scripting"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-kernel/abstraction+config/abstraction-m"

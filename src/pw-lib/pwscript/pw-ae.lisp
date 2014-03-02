@@ -452,7 +452,7 @@
     item))
 
 (defmethod setParamDesc ((self AppleEvent) keyword desc)
-  (#_AEPutParamDesc 
+  (#_AEPutParamDesc
    (getDescRecPtr self)
    keyword
    (getDescRecPtr desc)))

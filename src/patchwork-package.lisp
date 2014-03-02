@@ -150,6 +150,16 @@
           "PATCH-WORK"))
 
 
+(cl:defpackage "CLOS-APPLE-EVENT"
+  (:use "COMMON-LISP")
+  (:nicknames "CLOSAE")
+  (:export "APPLEEVENT" "GETPARAM" "PUTPARAM"
+           "AEDESC" "GETDESCRECPTR" "ASAEDESC"
+           "OBJECTSPECIFIER"
+           "GETCLASS" "GETCONTAINER" "GETFORM" "GETDATA"
+           "SETCLASS" "SETCONTAINER" "SETFORM" "SETDATA"
+           "WITH-AEDESCS" "CREATE-SELF-TARGET" "CREATE-APPLEEVENT"))
+ 
 ;; (cl:defpackage "PW-MIDI"
 ;;   (:nicknames "MIDI")
 ;;   (:use "CL")
@@ -191,5 +201,8 @@
            "pt2rect" "typeTargetID" "GetNextProcess" "AECoerceDesc"
            "typeWildCard" "PenMode"))
 
+
+(defpackage "USER-SUPPLIED-IN-OUTS"
+  (:use))
 
 ;;;; THE END ;;;;
