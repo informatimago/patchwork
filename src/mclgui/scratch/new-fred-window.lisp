@@ -539,7 +539,7 @@
 
 (defclass fred-window (fred-delegation-mixin window split-view)
   (;(window-cursor :allocation :class)
-   (modified-marker :allocation :class :initform #\240 :reader modified-marker)  ;; thats MacRoman for #\†
+   (modified-marker :allocation :class :initform #\† :reader modified-marker)  ;; thats MacRoman #\240
    (real-file-name :initform nil)
    ;(defs-dialog :initform nil)
    ;(status-line :initform nil :accessor view-status-line)

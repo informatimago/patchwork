@@ -154,7 +154,7 @@
         (controls thepatch)))
 
 (defun win-title (win)
- (delete #\† (window-title win)))
+ (remove #\† (window-title win)))
 
 
 (defun igual (str1 str2)
