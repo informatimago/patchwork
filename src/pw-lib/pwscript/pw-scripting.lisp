@@ -52,13 +52,12 @@
 ;;(closae:asAEDesc  100.0)
 
 (defun mkSO (a b c d)
-  (format *trace-output*  "Not Implemented Yet ~S" 'mkso)
   (make-instance 
-    'closae:objectspecifier
-    :class     a
-    :container b
-    :form      c
-    :data      d))
+   'closae:objectspecifier
+   :class     a
+   :container b
+   :form      c
+   :data      d))
 
 
 (defmethod salve-as ((self C-pw-window) as?)

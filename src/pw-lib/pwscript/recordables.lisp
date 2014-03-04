@@ -75,8 +75,8 @@
       (let ((*inside-aesend* t)
             (res #-(and) (#_AESend the-appleevent the-reply mode priority 
                                    timeout idleproc (or filterproc (%null-ptr)))
-                 #+(and) (aesend the-appleevent the-reply mode priority 
-                                 timeout idleproc filterproc)))
+                 #+(and) (closae:aesend the-appleevent the-reply mode priority 
+                                        timeout idleproc filterproc)))
         (if (eq res #$errAEWaitCanceled)        ; be silent about aborts
             #$noErr
             res)))

@@ -66,15 +66,11 @@
   (make-instance 'aedesc :object object :type type))
 
 
-(defclass objectspecifier (standard-object)
-  ((class     :reader getclass
-              :writer setclass)
-   (container :reader getcontainer
-              :writer setcontainer)
-   (form      :reader getform
-              :writer setform)
-   (data      :reader getdata
-              :writer setdata)))
+(defclass objectspecifier ()
+  ((class     :initarg :class     :reader getclass     :writer setclass)
+   (container :initarg :container :reader getcontainer :writer setcontainer)
+   (form      :initarg :form      :reader getform      :writer setform)
+   (data      :initarg :data      :reader getdata      :writer setdata)))
 
 
 (defmacro with-aedescs (vars &body body)
@@ -132,3 +128,10 @@ Returned value:  the-desc
     (putparam event #$keyTransactionIDAttr transaction-id))
   (setf (aedesc-object the-desc) event)
   the-desc)
+
+
+
+(defun aesend (the-appleevent the-reply mode priority timeout idleproc filterproc)
+  (error "Not implemented yet AESEND"))
+
+;;;; THE END ;;;;
