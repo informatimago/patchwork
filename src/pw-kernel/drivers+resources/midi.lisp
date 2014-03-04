@@ -120,9 +120,8 @@
   ;;     (midishare::MidiConnect *pw-refnum* 0 t)
   ;;     (midishare::MidiConnect 0 *pw-refnum*  t)
   ;;     (setq  *player* (cl-user::open-player "PatchWorkPlayer"))
-  ;;     )
-  ;; (print "MidiShare not present. PatchWork won't play Midi."))
-  (print "MidiShare not present. PatchWork won't play Midi."))
+  ;;     ))
+  (format *error-output* "~&MidiShare not present. PatchWork won't play Midi.~%"))
 
 
 ;;;;Close MidiShare and off the scheduler
