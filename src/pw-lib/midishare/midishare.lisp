@@ -97,21 +97,12 @@
            "VEL" "DUR" "XFIELDS" "TEXT"  "FIRSTEV" "LASTEV"
            "FILTERBIT"  "ACCEPTPORT" "ACCEPTTYPE" "ACCEPTCHAN"))
 (in-package :midishare)
-
-
-
+(import 'ui:niy)
 
 
 (defmacro defrecord (name &rest slots)
   `(defstruct ,name ,@(mapcar (function first) slots)))
 
-(defmacro niy (item &rest vars)
-  `(locally
-       (declare (ignorable ,@vars))
-       `(format *trace-output* "~&(~40A (~S~:{(~S ~S)~^ ~}))~%"
-             "not implemented yet:"
-             ',',item ',(mapcar (lambda (var) (list var (type-of var)))
-                                (list ,@vars)))))
 
 
 ;;---------------------------------------------------------------------------------

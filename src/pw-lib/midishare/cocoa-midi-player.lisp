@@ -51,9 +51,8 @@
            "SETTRACKPLAYER" "SETALLTRACKPLAYER" "SETPARAMPLAYER"
            "GETPARAMPLAYER" "MIDIFILESAVE" "MIDIFILELOAD"
            "MIDI-FILE-LOAD" "MIDI-FILE-SAVE"))
-
 (in-package "MIDI-PLAYER")
-
+(import 'ui:niy)
 
 
 #||
@@ -306,11 +305,6 @@ home:
 (defmacro defrecord (name &rest slots)
   `(defstruct ,name ,@(mapcar (function first) slots)))
 
-(defmacro niy (item &rest vars)
-  ``(format *trace-output* "~&(~40A (~S~:{(~S ~S)~^ ~}))~%"
-            "not implemented yet:"
-            ',',item ',(mapcar (lambda (var) (list var (type-of var)))
-                               (list ,@vars))))
 
 (defrecord Pos
   (bar  :short)  
