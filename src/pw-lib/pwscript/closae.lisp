@@ -41,10 +41,11 @@
 (defclass appleevent ()
   ((data :accessor appleevent-data)))
 
-(defmethod initialize-instance (self &key descrecptr &allow-other-keys)
+(defmethod initialize-instance ((self appleevent) &key descrecptr &allow-other-keys)
   (or descrecptr (call-next-method)))
 
 (defmethod getparam ((self appleevent) keyword &optional (type :|****|))
+  (declare (ignore type))
   (aedesc-object (assoc keyword (appleevent-data self))))
 
 (defmethod putparam ((self appleevent) keyword data)
@@ -123,15 +124,11 @@ transaction-id   an integer.  IBID.
 
 Returned value:  the-desc
 "
-
   (let ((event (make-instance 'appleevent)))
     (putparam event #$keyEventClassAttr class)
     (putparam event #$keyEventIDAttr id)
     (putparam event #$keyAddressAttr target)
     (putparam event #$keyReturnIDAttr return-id)
-    (putparam event #$TransactionIDAttr transaction-id))
+    (putparam event #$keyTransactionIDAttr transaction-id))
   (setf (aedesc-object the-desc) event)
   the-desc)
-
-
-
