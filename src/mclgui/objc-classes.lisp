@@ -412,8 +412,7 @@ RETURN:         DST.
 
 (defun timestamp ()
   "RETURN: The time in second since startup."
-  #+ccl (/ (#_mach_absolute_time) 1.0d9)
-  #-ccl (/ (get-internal-real-time) internal-time-units-per-second))
+  (/ (get-internal-real-time) internal-time-units-per-second))
 
 
 (defun get-null-event ()
