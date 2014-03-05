@@ -166,6 +166,7 @@ DO:             Remove the property KEY from the VIEW.
    (color-list                       :reader    window-color-list
                                      :initform  nil)
    (back-color                       :initform  nil)
+   (fore-color                       :initform  nil)
    (my-item                          :initform  nil)
    (window-do-first-click            :accessor  window-do-first-click
                                      :initarg   :window-do-first-click

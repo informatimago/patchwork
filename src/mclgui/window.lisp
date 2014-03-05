@@ -1041,50 +1041,26 @@ RETURN:         A BOOLEAN value indicating whether view can perform
 
 
 
+;; TODO: use get-fore-color when drawing in the window…
 (defmethod set-fore-color ((window window) color)
-  (when *color-available*
-    (niy get-fore-color window color)
-    ;; (with-rgb (rec color)
-    ;;   (with-port (wptr w)
-    ;;     (#_rgbforecolor rec)))
-    ))
+  (setf (slot-value window 'fore-color) color))
 
 
 (defmethod set-back-color ((window window) color &optional (redisplay-p t))
+  (setf (slot-value window 'back-color) color)
   (when *color-available*
-    (niy get-fore-color window color redisplay-p)
-    ;; (with-rgb (rec color)
-    ;;   (with-focused-view w
-    ;;     (#_rgbbackcolor rec)
-    ;;     (when redisplay-p
-    ;;       (invalidate-view w t))))
-    ))
+    (with-handle (winh window)
+      [winh setBackgroundColor:(unwrap color)])
+    (when redisplay-p
+      (invalidate-view w t))))
 
 
 (defmethod get-fore-color ((window window))
-  (niy get-fore-color window)
-  ;; #-carbon-compat
-  ;; (with-port (wptr w)
-  ;;   (grafport-fore-color))
-  ;; #+carbon-compat
-  ;; (with-macptrs ((port (#_getwindowport (wptr w))))
-  ;;   (rlet ((color-rec :rgbcolor))
-  ;;     (#_getportforecolor port color-rec)
-  ;;     (rgb-to-color color-rec)))
-  )
+  (slot-value window 'fore-color))
 
 
 (defmethod get-back-color ((window window))
-  (niy get-back-color window)
-  ;; #-carbon-compat
-  ;; (with-port (wptr w)
-  ;;   (grafport-back-color))
-  ;; #+carbon-compat
-  ;; (with-macptrs ((port (#_getwindowport (wptr w))))
-  ;;   (rlet ((color-rec :rgbcolor))
-  ;;     (#_getportbackcolor port color-rec)
-  ;;     (rgb-to-color color-rec)))
-  )
+  (slot-value window 'back-color))
 
 
 
