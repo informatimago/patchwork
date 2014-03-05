@@ -470,7 +470,7 @@
   (inval-r-view-sides view))
 
 (defmethod inval-r-view-sides ((view C-patch) &optional top&left?)
-  (ui:uiwarn "~S ~S is not implemented yet" 'inval-r-view-sides '((view C-patch) &optional top&left?))
+  (niy inval-r-view-sides view top&left?)
   ;; (when (wptr view)
   ;;   (let* ((pos (view-scroll-position view))
   ;;          (size (view-size view))

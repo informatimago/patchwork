@@ -59,7 +59,7 @@
 )
 
 (defmethod window-hardcopy ((self pw::C-MN-window) &optional show-fl)
-  (ui:uiwarn "~S ~S is not implemented yet" 'window-hardcopy '((self pw::C-MN-window) &optional show-fl))
+  (niy window-hardcopy self show-fl)
   ;; show-fl
   ;; (let* ((panels (pw::editor-objects (car (subviews self))))
   ;;        (last-time (max-time panels))

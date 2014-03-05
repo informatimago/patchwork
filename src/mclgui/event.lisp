@@ -599,6 +599,9 @@ IDLE:           An argument representing whether the main Lisp process
     (when (get-next-event *current-event* idle)
       (when (and *eventhook*  (funcall *eventhook*))
         (return-from event-dispatch))
+      (when (and (= app1-evt (event-what *current-event*))
+                 (process-ae-event *current-event*))
+        (return-from event-dispatch))
       (process-event *current-event*))))
 
 
@@ -607,6 +610,35 @@ IDLE:           An argument representing whether the main Lisp process
 
 (define-symbol-macro *foreground*
     (application-is-active))
+
+
+
+(defvar *out-of-band-event-queue* (cons nil nil))
+
+(defmacro with-mutex (object &body body)
+  `(progn ,@body))
+
+(defun post-event (event)
+  (print (list 'post-event event))
+  (let ((entry (list event)))
+    (with-mutex *out-of-band-event-queue*
+      (if (cdr *out-of-band-event-queue*)
+          (setf (cddr *out-of-band-event-queue*) entry
+                (cdr *out-of-band-event-queue*) entry)
+          (setf (car *out-of-band-event-queue*) entry
+                (cdr *out-of-band-event-queue*) entry))))
+  (values))
+
+(defun dequeue-event ()
+  (with-mutex *out-of-band-event-queue*  
+    (let ((entry (car *out-of-band-event-queue*)))
+      (when entry
+        (if (eq entry (cdr *out-of-band-event-queue*))
+            (setf (car *out-of-band-event-queue*) nil
+                  (cdr *out-of-band-event-queue*) nil)
+            (setf (car *out-of-band-event-queue*) (cdar *out-of-band-event-queue*)))
+        (car entry)))))
+
 
 
 (defun get-next-event (event &optional (idle *idle*) sleep-ticks)
@@ -645,6 +677,13 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
                 same as when Macintosh Common Lisp is running in the
                 foreground.
 "
+  (let ((queued-event (dequeue-event)))
+    (when queued-event
+      (format-trace "get-next-event"
+                    (event-what queued-event)
+                    (point-h (event-where queued-event))
+                    (point-v (event-where queued-event)))
+      (return-from get-next-event (assign-event event queued-event))))
   (let ((nsevent [[NSApplication sharedApplication]
                   nextEventMatchingMask: (mac-event-mask-to-ns-event-mask every-event)
                   untilDate: [NSDate dateWithTimeIntervalSinceNow:
@@ -661,8 +700,12 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
                   (if (and nsevent (not (nullp nsevent)))
                     (wrap nsevent)
                     (get-null-event)))
-    (format-trace "get-next-event" (event-what event) (event-where event))
-    event))
+    (unless (zerop (event-what event))
+      (format-trace "get-next-event"
+                    (event-what event)
+                    (point-h (event-where event))
+                    (point-v (event-where event))))
+    event)) 
 
 
 

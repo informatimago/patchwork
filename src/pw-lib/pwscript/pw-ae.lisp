@@ -241,7 +241,7 @@
   (setDescRecPtr descRecPtr self))
 
 (defmethod getSize ((self AEDescList))
-  (ui:uiwarn "~S ~S is not implemented yet" 'getSize '((self AEDescList)))
+  (niy getSize self)
   ;; (rlet ((result :Signed-Long))           
   ;;   (#_AECountItems
   ;;    (getDescRecPtr self)
@@ -273,7 +273,7 @@
    (getDescRecPtr desc)))
 
 (defmethod getNthDesc ((self AEDescList) index &optional (type :|****|))
-  (ui:uiwarn "~S ~S is not implemented yet" 'getNthDesc '((self AEDescList) index &optional (type :|****|)))
+  (niy getNthDesc self index type)
   ;; (let ((result (make-Record :AEDesc))
   ;;       (descClass nil))
   ;;   (rlet ((keyword :OSType))
@@ -292,7 +292,7 @@
   )
 
 (defmethod getAESizeOfNthDesc ((self AEDescList) index)
-  (ui:uiwarn "~S ~S is not implemented yet" 'getAESizeOfNthDesc '((self AEDescList) index))
+  (niy getAESizeOfNthDesc self index)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
   ;;   (#_AESizeOfNthItem 
@@ -379,7 +379,7 @@
     (make-Instance descClass :descRecPtr result)))
 
 (defmethod getAESizeOfKeyDesc ((self AERecord) keyword)
-  (ui:uiwarn "~S ~S is not implemented yet" 'getAESizeOfKeyDesc '((self AERecord) keyword))
+  (niy getAESizeOfKeyDesc self keyword)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
   ;;   (#_AESizeOfNthItem 
@@ -471,7 +471,7 @@
     (make-Instance descClass :descRecPtr result)))
 
 (defmethod getAESizeOfParam ((self AppleEvent) keyword)
-  (ui:uiwarn "~S ~S is not implemented yet" 'getAESizeOfParam '((self AppleEvent) keyword))
+  (niy getAESizeOfParam self keyword)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
   ;;   (#_AESizeOfParam 
@@ -513,7 +513,7 @@
     (make-Instance descClass :descRecPtr result)))
 
 (defmethod getAESizeOfAttribute ((self AppleEvent) keyword)
-  (ui:uiwarn "~S ~S is not implemented yet" 'getAESizeOfAttribute '((self AppleEvent) keyword))
+  (niy getAESizeOfAttribute self keyword)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
   ;;   (#_AESizeOfAttribute 

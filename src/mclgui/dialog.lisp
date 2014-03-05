@@ -103,7 +103,7 @@ recent outstanding catch-cancel.
 
 (defun process-event (event)
   (declare (ignore event))
-  (niy process-event)
+  ;; (niy process-event)
   #-(and)
   (let ((e-code (pref event :eventrecord.what)))
     (when (eq e-code $MButDwnEvt) 

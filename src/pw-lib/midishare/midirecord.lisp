@@ -168,7 +168,7 @@ delta and output mode."
 
 (defmethod patch-value ((self C-patch-save-midi) obj)
   (declare (ignore obj))
-  (ui:uiwarn "~S ~S is not implemented yet" 'patch-value '((self C-patch-save-midi) obj))
+  (niy patch-value self obj)
   ;; (when (and  midi::*pw-refnum* midi::*player* )
   ;;   (let ((name (CHOOSE-NEW-FILE-DIALOG)))
   ;;     (when name
@@ -221,7 +221,7 @@ Input may be any PatchWork object that could be played through play-object
 
 (defmethod patch-value ((self C-patch-load-midi) obj)
   (declare (ignore obj))
-  (ui:uiwarn "~S ~S is not implemented yet" 'patch-value '((self C-patch-load-midi) obj))
+  (niy patch-value self obj)
   ;; (when (and  midi::*pw-refnum* midi::*player* )
   ;;   (let ((name (CHOOSE-FILE-DIALOG)))
   ;;     (when name

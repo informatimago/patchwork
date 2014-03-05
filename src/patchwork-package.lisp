@@ -151,7 +151,7 @@
 
 
 (cl:defpackage "CLOS-APPLE-EVENT"
-  (:use "COMMON-LISP")
+  (:use "COMMON-LISP" "MCLGUI")
   (:nicknames "CLOSAE")
   (:export "APPLEEVENT" "GETPARAM" "PUTPARAM"
            "AEDESC" "GETDESCRECPTR" "ASAEDESC"

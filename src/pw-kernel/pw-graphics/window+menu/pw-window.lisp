@@ -93,7 +93,7 @@
   (when (eq  (call-next-method) self)  ; click inside window
     (if *current-small-inBox* (kill-text-item) )          ;;(see pw-controls)
     (unless (shift-key-p)(tell (controls self) #'deactivate-control))
-    (ui:uiwarn "~S ~S is not implemented yet" 'view-click-event-handler '((self C-pw-window) where))
+    (niy view-click-event-handler self where)
     ;; (rlet ((user-rect :rect)
     ;;        (scratch-rect :rect)
     ;;        (i-rect :rect))

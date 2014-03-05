@@ -143,7 +143,7 @@
          (pop x-points)(pop y-points)))))|#
 
 (defun draw-bpf-function-points (x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
-  (ui:uiwarn "~S is not implemented" 'draw-bpf-function-points)
+  (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
    ;; (let (point-x-now point-y-now)
    ;;  (when x-points
    ;;    (setq point-x-now (min #.(1- (expt 2 15)) (round (car x-points) h-view-scaler)) 

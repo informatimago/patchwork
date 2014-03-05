@@ -265,7 +265,7 @@
      (update-bpf-scroll-bar-settings self)))
 
 (defmethod draw-zoom-hair-line ((self C-bpf-view) where)
-  (ui:uiwarn "~S ~S is not implemented" 'draw-zoom-hair-line 'C-bpf-view)
+  (niy draw-zoom-hair-line self)
    ;; (rlet ((user-rect :rect))
    ;;    (#_pt2rect :long where
    ;;                :long (grow-gray-rect where 0 (wptr self) nil)

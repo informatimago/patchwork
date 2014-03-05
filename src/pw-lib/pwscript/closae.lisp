@@ -37,6 +37,8 @@
 ;;;;**************************************************************************
 
 (in-package "CLOSAE")
+(objcl:enable-objcl-reader-macros)
+
 
 (defclass appleevent ()
   ((data :accessor appleevent-data)))
@@ -125,13 +127,133 @@ Returned value:  the-desc
     (putparam event #$keyEventIDAttr id)
     (putparam event #$keyAddressAttr target)
     (putparam event #$keyReturnIDAttr return-id)
-    (putparam event #$keyTransactionIDAttr transaction-id))
-  (setf (aedesc-object the-desc) event)
-  the-desc)
+    (putparam event #$keyTransactionIDAttr transaction-id)
+    (setf (aedesc-object the-desc) event)
+    the-desc))
 
+
+
+(define-condition appleevent-error (error)
+  ((oserr                         :initarg :oserr        :reader oserr)
+   (error-string :initform nil    :initarg :error-string :reader error-string))
+  (:report
+   (lambda (c s)
+     (format s "(oserr ~d)~@[ - ~a~]" (oserr c) (error-string c))))
+  (:documentation "
+If an Apple event handler finds an error, it should signal this
+condition.  Any MCL errors that occur while handling the Apple event
+are automatically caught by Macintosh Common Lisp and handled
+appropriately.
+"))
+
+
+(defmacro ae-error (&body body)
+  (let ((verrno (gensym)))
+    `(let ((,verrno (progn ,@body)))
+       (if (zerop ,verrno)
+           ,verrno
+           (error 'appleevent-error :oserr ,verrno :error-string "Apple Event Error")))))
+
+
+
+(defstruct (ae-event
+            (:include event))
+  appleevent
+  reply
+  mode
+  priority
+  timeout
+  idleproc
+  filterproc)
 
 
 (defun aesend (the-appleevent the-reply mode priority timeout idleproc filterproc)
-  (error "Not implemented yet AESEND"))
+  (ui::post-event (make-ae-event
+                   :what ui::app1-evt
+                   :message 0
+                   :when (truncate (ui::timestamp) (/ ui::+tick-per-second+))
+                   :where (ui::nspoint-to-point (ui::get-nspoint [NSEvent mouseLocation]))
+                   :modifiers (ui::nsmodifier-to-macmodifier [NSEvent modifierFlags])
+                   ;; ---
+                   :appleevent the-appleevent
+                   :reply the-reply
+                   :mode mode
+                   :priority priority
+                   :timeout timeout
+                   :idleproc idleproc
+                   :filterproc filterproc))
+  0)
+
+
+
+
+(defvar *appleevent-handlers* (make-hash-table :test #'eq :size 41))
+
+
+(defgeneric symbolicate (thing)
+  (:method ((thing integer))
+    (intern (map 'string (function code-char)
+              (loop :for i :from 24 :downto 0 :by 8
+                    :collect (ldb (byte 8 i) thing)))
+            "KEYWORD"))
+  (:method ((thing string))
+    (intern thing "KEYWORD"))
+  (:method ((thing keyword))
+    thing)
+  (:method ((thing symbol))
+    (intern (symbol-name thing) "KEYWORD")))
+
+
+(defun install-appleevent-handler (class id function &optional (refcon nil))
+  "
+DO:             Install an Apple event handler.
+
+CLASS:          A four-letter keyword denoting the class of the event,
+                for example, :|aevt|.
+
+ID:             A four-letter keyword denoting the ID of the event,
+                for example, :|odoc|.
+
+REFCON:         An optional reference identifier, which can be any MCL
+                object; it identifies the specific installation of a
+                handler.
+"
+  (let* ((class (symbolicate class))
+         (id-table (gethash class *appleevent-handlers*)))
+    (unless id-table
+      (setq id-table (make-hash-table :test #'eq :size 1))
+      (setf (gethash class *appleevent-handlers*) id-table))
+    (setf (gethash (symbolicate id) id-table) (cons function refcon))))
+
+
+(defun get-appleevent-handler (class id)
+  (let* ((class (symbolicate class))
+         (id    (symbolicate id))
+         (entry (gethash class *appleevent-handlers*)))
+    (if entry
+        (let ((entry (gethash id entry)))
+          (if entry
+              (values (car entry) (cdr entry))
+              (get-appleevent-handler class :|****|)))
+        (get-appleevent-handler :|****| id))))
+
+
+(defun process-ae-event (event)
+  (typecase event
+    (ae-event
+     (let* ((ae    (ae-event-appleevent event))
+            (class (getparam ae #$keyEventClassAttr))
+            (id    (getparam ae #$keyEventIDAttr)))
+       (print (list 'apple-event :class (symbolicate class) :id (symbolicate  id)))
+       (multiple-value-bind (fun refcon) (get-appleevent-handler class id)
+         (when fun
+           (print fun)
+           (funcall fun *application* ae (ae-event-reply event) refcon)
+           (when (ae-event-reply event)
+             
+             )))
+       t))
+    (t nil)))
+
 
 ;;;; THE END ;;;;
