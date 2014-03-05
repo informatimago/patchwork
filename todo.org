@@ -22,11 +22,7 @@
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
 *** TODO no way to make multiple selections by click-and-dragging an rect arround boxes?
 ** Features
-*** TODO [#A] Apple Events
-**** ~/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
-
 *** TODO [#A] Delivery: debug de/serialization of wrapper/NSObjects save-image.
-
 *** TODO [#A] Windows
 *** TODO [#B] Dialog Items
 *** TODO [#B] Dialogs
@@ -34,5 +30,14 @@
 *** TODO [#B] Views
 *** TODO [#C] Fonts
 *** TODO [#C] Clipboard
+*** TODO [#C] Apple Events
+
+Apple Events are only used for external scriptability: aesend is only
+called from send-appleevent, which is only called from record--ae et
+al. in recordables.lisp
+
+Therefore this todo is not prioritary at all.
+
+**** ~/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
 
 *** TODO find-grep ';; *('

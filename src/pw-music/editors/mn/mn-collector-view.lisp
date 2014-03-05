@@ -431,7 +431,7 @@
                    (slot-value self 'OK-button))
     (setf (slot-value self 'selections) 
           (apply #'append (ask-all (editor-objects self) 'selected-chords)))
-    (setf *Cresc-action* ())
+    (setf *cresc-action* ())
     (modal-dialog dialog)))
 
 (defmethod do-chosen-action ((self C-MN-view-mod))
