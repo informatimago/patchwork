@@ -101,37 +101,43 @@ recent outstanding catch-cancel.
           p))))
 
 
+(defun process-multi-clicks (event)
+  )
+(defvar *eventhooks-in-progress* nil)
 (defun process-event (event)
-  (declare (ignore event))
-  ;; (niy process-event)
-  #-(and)
-  (let ((e-code (pref event :eventrecord.what)))
-    (when (eq e-code $MButDwnEvt) 
+  (let ((e-code (event-what event)))
+    (when (= e-code mouse-down) 
       (process-multi-clicks event) 
       ;; attempt to workaround OSX bug re leaking double-clicks - doesn't help.
-      (if (and #|(osx-p)|# (%i> *multi-click-count* 1)) (#_FlushEvents #$mUpMask 0)))
+      ;; (when (and #|(osx-p)|# (< 1 *multi-click-count*))
+      ;;     (#_FlushEvents #$mUpMask 0))
+      )
     (let* ((*current-event* event))
       (declare (special *current-event* *processing-events*))
       (block foo
-        (with-restart *event-abort-restart*
+        (progn ; with-restart *event-abort-restart*
           (let ((eventhook (or (and *modal-dialog-on-top*
-                                    (wptr (caar *modal-dialog-on-top*)) ;; blech
+                                    (caar *modal-dialog-on-top*)
                                     (modal-dialog-eventhook (car *modal-dialog-on-top*)))
-                             *eventhook*)))
+                               *eventhook*)))
             (unless (and eventhook
                          (flet ((process-eventhook (hook)
                                   (unless (member hook *eventhooks-in-progress*)
-                                    (let ((*eventhooks-in-progress*
-                                           (cons hook *eventhooks-in-progress*)))
+                                    (let ((*eventhooks-in-progress* (cons hook *eventhooks-in-progress*)))
                                       (declare (dynamic-extent *eventhooks-in-progress*))
                                       (funcall hook)))))
                            (declare (inline process-eventhook))
                            (if (listp eventhook)
-                             (dolist (item eventhook)
-                               (when (process-eventhook item) (return t)))
-                             (process-eventhook eventhook))))
-              (return-from foo (catch-cancel (do-event)))))))
+                               (dolist (item eventhook)
+                                 (when (process-eventhook item)
+                                   (return t)))
+                               (process-eventhook eventhook))))
+              (niy process-event)
+              ;; (return-from foo (catch-cancel (do-event)))
+              ))))
       e-code)))
+
+
 
 
 
