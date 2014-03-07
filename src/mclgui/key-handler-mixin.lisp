@@ -244,6 +244,7 @@ the editable-text dialog item.
       (when (eq item (current-key-handler my-dialog))
         (change-key-handler my-dialog))
       (when (eq item (current-key-handler my-dialog)) ;still current, so only one
+        (niy dialog-item-disable :before item)#-(and)
         (setf (%get-current-key-handler my-dialog) nil)))))
 
 
@@ -251,6 +252,7 @@ the editable-text dialog item.
   (let ((my-dialog (view-window item)))
     (when my-dialog
       (unless (current-key-handler my-dialog)
+        (niy dialog-item-enable :after item)#-(and)
         (when (and (member item (%get-key-handler-list my-dialog))
                    (key-handler-p item))
           (set-current-key-handler my-dialog item))))))

@@ -73,8 +73,9 @@
     (apply #'new-menu " "
            (dolist (item menu-a-list (nreverse res))
              (push (new-leafmenu (menu-name item)
-                                 (eval `(function 
-                                         (lambda () (set-output *target-action-object* ,(menu-char item))))))
+                                 (let ((menu-char (menu-char item)))
+                                   (lambda ()
+                                     (set-output *target-action-object* menu-char))))
                    res)))))
 
 (defun menu-name (item) (first item))

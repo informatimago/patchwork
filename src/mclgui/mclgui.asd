@@ -145,7 +145,7 @@
                  (:file "default-button-mixin"
                         :depends-on ("package" 
                                      "macros" "variables" "point" "system"
-                                     "view-classes" "view" "window" "event"))
+                                     "view-classes" "view" "window" "event" "dialog"))
 
                  (:file "control-dialog-item"
                         :depends-on ("package" 

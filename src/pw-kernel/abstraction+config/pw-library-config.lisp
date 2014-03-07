@@ -55,6 +55,29 @@
 (defvar *user-libs-config*      '())
 
 
+(defvar *names-of-loaded-files* (make-hash-table :test (function equal)))
+
+(defun is-loaded-p (name)
+  (gethash name *names-of-loaded-files*))
+
+(defun load-once (path &key verbose (if-does-not-exist :error))
+  (let ((name  (pathname-name path)))
+    (unless (is-loaded-p name)
+      (handler-case
+          (load path :verbose verbose :if-does-not-exist :error)
+        (:no-error ()
+          (setf (gethash name *names-of-loaded-files*) t))
+        (error (err)
+          (when if-does-not-exist
+            (error err)))))))
+
+(defun load-again (path &key verbose (if-does-not-exist :error))
+  (let ((name  (pathname-name path)))
+   (setf (gethash name *names-of-loaded-files*) nil))
+  (load-once path :verbose verbose :if-does-not-exist if-does-not-exist))
+
+
+
 (defun load-abstr-config ()
   (let* ((thestring (choose-directory-dialog :directory "cl:PW-user;")))
     (load&form-abstr-menu thestring)
@@ -176,19 +199,19 @@ GA 17/5/94
 
 
 (defun find&load-lib (logical-dir-str file-to-load directory-path)
-  (cond ((directory (format nil "~A:~A.*" logical-dir-str file-to-load))
-         (load-again (format nil "~A:~A" logical-dir-str file-to-load)))
-        ((directory
-          (format nil "PW-USER:library-autoload;~A;~A.*" directory-path file-to-load))
-         (let ((old-path (logical-pathname-translations logical-dir-str)))
-           (setf (logical-pathname-translations logical-dir-str)
-                 `(("**;" ,(format nil "PW-USER:library-autoload;~A;**;" directory-path))))
-           (unwind-protect
-               (load-again (format nil "~A:~A" logical-dir-str file-to-load))
-             (setf (logical-pathname-translations logical-dir-str) old-path))))
-        (t (format t "can't find library in path: ~S" 
-                   (full-pathname (format nil "~A:" logical-dir-str)))
-           (ui:ed-beep))))
+  (let ((path-to-load (merge-pathnames file-to-load logical-dir-str)))
+    (cond ((directory (make-pathname :type :wild :defaults path-to-load))
+           (load-again path-to-load))
+          ((directory (format nil "PW-USER:library-autoload;~A;~A.*" directory-path file-to-load))
+           (let ((old-path (logical-pathname-translations logical-dir-str)))
+             (setf (logical-pathname-translations logical-dir-str)
+                   `(("**;" ,(format nil "PW-USER:library-autoload;~A;**;" directory-path))))
+             (unwind-protect
+                  (load-again path-to-load)
+               (setf (logical-pathname-translations logical-dir-str) old-path))))
+          (t (format t "can't find library in path: ~S" 
+                     (full-pathname (format nil "~A:" logical-dir-str)))
+             (ui:ed-beep)))))
 
 (defun define-logical-path-dir (dir path)
   (setf (logical-pathname-translations dir)
@@ -208,7 +231,7 @@ GA 17/5/94
 ;;; do not erase user menu before loading image. cf chant.
 
 (defun load-remembered-config ()
-                                        ;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
+  ;;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
   (let ((in-user-lib (directory *user-library-folder-path*))
         (file-config-list
          (with-open-file (file *config-init-file* :direction :input :if-does-not-exist nil)
@@ -219,10 +242,11 @@ GA 17/5/94
       (load-one-user-library lib))
     (dolist (abstr-path (second file-config-list))
       (load&form-abstr-menu abstr-path))
-    (load&form-abstr-menu (mac-namestring *config-default-abst-path*) 1)
+    (load&form-abstr-menu (namestring *config-default-abst-path*) 1)
     (and (third file-config-list)
          (restore-global-options (third file-config-list) 
                                  (fourth file-config-list)))))
+
 (defun load-one-user-library (path)
   (if path
     (with-cursor *watch-cursor*

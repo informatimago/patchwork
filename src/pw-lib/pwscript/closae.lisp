@@ -168,6 +168,8 @@ appropriately.
 
 
 (defun aesend (the-appleevent the-reply mode priority timeout idleproc filterproc)
+  (niy aesend the-appleevent the-reply mode priority timeout idleproc filterproc)
+  #-(and)
   (ui::post-event (make-ae-event
                    :what ui::app1-evt
                    :message 0
@@ -255,5 +257,25 @@ REFCON:         An optional reference identifier, which can be any MCL
        t))
     (t nil)))
 
+
+
+(defun get-error-number (the-desc &optional (errorp t))
+  (declare (ignore errorp))
+  (getparam the-desc #$keyErrorNumber))
+
+(defun get-error-string (the-desc &optional (errorp t))
+  (declare (ignore errorp))
+  (getparam the-desc #$keyErrorString))
+
+(defun check-reply-error (reply)
+  "Check an Apple Event reply for errors.  Signal an error if there is one.
+
+reply      An AEDesc record containing the reply to an Apple Event."
+  (let ((error-number (get-error-number reply nil)))
+    (when (and error-number
+               (not (= error-number #$noErr)))
+      (error (make-condition 'appleevent-error
+                             :oserr error-number
+                             :error-string (get-error-string reply nil))))))
 
 ;;;; THE END ;;;;

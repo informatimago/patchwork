@@ -94,13 +94,11 @@ body is evaluated with VAR bound to that rectangle."
     (:adMin . 39)
     (:hilite . 50)))
 
-
 (defun mode-arg (thing)
-  (or
-   (and (fixnump thing) (<= 0 thing 64) thing)
-   (position thing *pen-modes*)
-   (cdr (assq thing *pen-modes-alist*))
-   (error "Unknown pen mode: ~a" thing)))
+  (or (and (fixnump thing) (<= 0 thing 64)
+           thing)
+      (position thing *pen-modes*)
+      (error "Unknown pen mode: ~a" thing)))
 
 (defgeneric origin (view)
   (:method ((view simple-view))

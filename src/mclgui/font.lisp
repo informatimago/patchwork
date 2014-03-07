@@ -392,6 +392,9 @@ MS-CODE:        The mode-size code, a 32-bit integer indicating the
                        style)
                    (list (list :color-index color))))))
 
+(defun sys-font-codes ()
+  (values 0 0))
+
 (defun sys-font-spec ()
   (font-spec 0 0))
 

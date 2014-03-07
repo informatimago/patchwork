@@ -207,22 +207,25 @@
     (setf (value self) (eval (slot-value self 'value))))
   (set-view-font self '("Monaco" 9 :SRCOR :PLAIN)))
 
-(defmethod value ((self C-ttybox))
-  (dialog-item-text self))
+(defgeneric value (self)
+  (:method ((self C-ttybox))
+    (dialog-item-text self)))
 
-(defmethod (setf value) (value (self C-ttybox))
-  (set-dialog-item-text self
-                        (if (not (stringp value))
-                          (format () "~D" value)
-                          (string-downcase value))))
+(defgeneric (setf value) (value self)
+  (:method (value (self C-ttybox))
+    (set-dialog-item-text self
+                          (if (not (stringp value))
+                              (format () "~D" value)
+                              (string-downcase value)))))
 
-(defmethod decompile ((self C-ttybox))
-  `(make-instance ',(class-name (class-of self))
-     :view-position ,(view-position self)
-     :view-size ,(view-size self)
-     :dialog-item-text ,(dialog-item-text self)
-     :doc-string ,(doc-string self)
-     :type-list ',(type-list self)))
+(defgeneric decompile (self)
+  (:method ((self C-ttybox))
+    `(make-instance ',(class-name (class-of self))
+                    :view-position ,(view-position self)
+                    :view-size ,(view-size self)
+                    :dialog-item-text ,(dialog-item-text self)
+                    :doc-string ,(doc-string self)
+                    :type-list ',(type-list self))))
 
 (defmethod x+w ((self C-ttybox)) (+ (x self)(w self)))
 ;;=========================
@@ -238,11 +241,12 @@
     (draw-rect* 0 0 (w self) (h self))))
 
 
-(defmethod set-open-state ((self C-ttybox) fl)
-  (setf (open-state self) fl)
-  (with-focused-view self
-    (erase-view-inside-rect self))
-  (view-draw-contents self))
+(defgeneric set-open-state (self fl)
+  (:method ((self C-ttybox) fl)
+    (setf (open-state self) fl)
+    (with-focused-view self
+      (erase-view-inside-rect self))
+    (view-draw-contents self)))
 
 ;;=========================
 ;;events
@@ -251,8 +255,9 @@
   (declare (ignore where))
   (open-pw-controls-dialog self))   
 
-(defmethod set-dialog-item-text-from-dialog ((self C-ttybox) text)
-  (set-dialog-item-text self text))
+(defgeneric set-dialog-item-text-from-dialog (self text)
+  (:method ((self C-ttybox) text)
+    (set-dialog-item-text self text)))
 
 (defmethod view-click-event-handler ((self C-ttybox) where)
   (if (and (open-state self) (double-click-p))
@@ -261,12 +266,14 @@
 ;;=========================
 ;;PW
 
-(defmethod patch-value ((self C-ttybox) obj) 
-  (declare (ignore obj))
-  (read-from-string (dialog-item-text self)))
+(defgeneric patch-value (self obj)
+  (:method ((self C-ttybox) obj) 
+    (declare (ignore obj))
+    (read-from-string (dialog-item-text self))))
 
-(defmethod set-special-text ((self C-ttybox) value)
-  (declare (ignore value)))
+(defgeneric set-special-text (self value)
+  (:method ((self C-ttybox) value)
+    (declare (ignore value))))
 
 ;;===========================================================================
 
@@ -390,8 +397,9 @@
   (declare (ignore initargs))
   (set-numbox-item-text view (value view)))
 
-(defmethod set-numbox-item-text  ((view C-numbox) value)
-  (set-dialog-item-text view (format nil "~5D" value))) 
+(defgeneric set-numbox-item-text (view value)
+  (:method ((view C-numbox) value)
+    (set-dialog-item-text view (format nil "~5D" value)))) 
 
 (defmethod set-dialog-item-text-from-dialog ((self C-numbox) text)
   (let ((value (read-from-string text)))
@@ -483,8 +491,9 @@
 
 (defmethod set-menu-box-list  ((self C-menubox) list) (setf (menu-box-list self) list))
 
-(defmethod menubox-value  ((self C-menubox))
-  (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self))) 
+(defgeneric menubox-value (self)
+  (:method ((self C-menubox))
+    (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self)))) 
 
 (defmethod set-numbox-item-text  ((self C-menubox) value)
   (if (stringp value)

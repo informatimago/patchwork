@@ -35,6 +35,7 @@
 
 (defpackage "MIDI-PLAYER"
   (:use "COMMON-LISP")
+  (:import-from "UI" "NIY")
   (:export "BAR" "BEAT" "UNIT" "S-BAR" "S-BEAT" "S-UNIT" "S-CURDATE"
            "S-TEMPO" "S-NUM" "S-DENOM" "S-CLICK" "S-QUARTER" "S-STATE"
            "S-SYNCIN" "S-SYNCOUT" "MF-FORMAT" "MF-TIMEDEF" "MF-CLICKS"
@@ -52,7 +53,7 @@
            "GETPARAMPLAYER" "MIDIFILESAVE" "MIDIFILELOAD"
            "MIDI-FILE-LOAD" "MIDI-FILE-SAVE"))
 (in-package "MIDI-PLAYER")
-(import 'ui:niy)
+
 
 
 #||
@@ -413,8 +414,10 @@ home:
 
 (defmacro define-entry-point ((name (library)) (&rest arguments) &optional result-type)
   (declare (ignorable name library arguments result-type))
-  `(defun ,(intern (string-upcase name)) ,(mapcar (function first) arguments)
-     (niy  ,(intern (string-upcase name)) ,@(mapcar (function first) arguments))))
+  (let ((fun  (intern (string-upcase name)))
+        (pars (mapcar (function first) arguments)))
+    `(defun ,fun ,pars
+       (niy  ,fun ,@pars))))
 
 (defmacro with-cstrs (bindings &body body) `(let ,bindings ,@body))
 (defmacro with-pstrs (bindings &body body) `(let ,bindings ,@body))

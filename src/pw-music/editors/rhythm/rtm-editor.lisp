@@ -285,7 +285,7 @@
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self))))))       
       (play-sequence (make-instance 'C-chord-line 
-                       :chords (remove nil (flat (rtm-chords (ask-all editors 'measure-line))))) 
+                       :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line))))) 
                      (cond ((eq *current-approx-scale* *1/4-tone-chromatic-scale*) 4)
                            ((eq *current-approx-scale* *1/8-tone-chromatic-scale*) 8)
                            (t 2))))))|#
@@ -304,7 +304,7 @@
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self))))))       
       (let ((c-line (make-instance 'C-chord-line 
-                       :chords (remove nil (flat (rtm-chords (ask-all editors 'measure-line)))))))
+                       :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
           (play-your-chords c-line)
           (progn (setf patch-work.scheduler::*print-on-late?* t)
@@ -327,7 +327,7 @@
                           (tell (ask-all editors 'measure-line)
                                 'play-measure-line (get-play-speed self))))))       
       (let ((c-line (make-instance 'C-chord-line 
-                       :chords (remove nil (flat (rtm-chords (ask-all editors 'measure-line)))))))
+                       :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
           (play-your-chords c-line)
           (progn (setf patch-work.scheduler::*print-on-late?* t)

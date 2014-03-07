@@ -271,7 +271,7 @@ context."
 according to <direction> ( > or < )"
   (setq chord (sort-list chord  direction))
   (let ( (oper (if (equal direction '>) '- '+)) (note (pop chord)))
-    (while (funcall direction note (pw::l-last chord))
+    (while (funcall direction note (epw::l-last chord))
       (setq note (funcall oper note 1200)))
     (append chord (list note))))
 

@@ -48,7 +48,7 @@
 
 (in-package "C-PATCH-FILE-BUFFER")
 
-(defvar *file-box-popUpMenu* 
+(defparameter *file-box-popUpMenu* 
   (new-menu " "
             (new-leafmenu "New" 
                           (lambda () (get-new *target-action-object*)))

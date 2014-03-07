@@ -241,17 +241,19 @@
 (defvar *BPF-window-counter* 0)
 
 (defun make-BPF-editor (bp &optional editor-view-class)
-  (let* ((win-string (concatenate  'string  "BPF" (format nil "~D" (incf *BPF-window-counter*))))
-         (win (make-instance 
-                'C-BPF-window :window-title win-string :close-box-p nil :window-show nil
-                :view-position #@(10 40) :view-size #@(250 275)))
-         (bp-view 
-          (make-instance 
-            (if editor-view-class editor-view-class 'C-bpf-view) 
-               :view-container win
-               :view-position #@(2 2) :view-size #@(240 217) 
-               :break-point-function bp 
-               :track-thumb-p t)))
+  (let* ((win-string (mk-nuevo-name-box "bpf"))
+         (win        (make-instance 'C-BPF-window
+                                    :window-title win-string
+                                    :close-box-p nil
+                                    :window-show nil
+                                    :view-position #@(10 40)
+                                    :view-size #@(250 275)))
+         (bp-view     (make-instance (or editor-view-class 'C-bpf-view) 
+                                     :view-container win
+                                     :view-position #@(2 2)
+                                     :view-size #@(240 217) 
+                                     :break-point-function bp 
+                                     :track-thumb-p t)))
       (add-subviews win bp-view)
       (setf (BPF-editor-object win) bp-view)
       (scale-to-fit-in-rect bp-view)

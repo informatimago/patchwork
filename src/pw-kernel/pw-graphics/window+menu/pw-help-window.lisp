@@ -78,13 +78,21 @@
 (defun make-PW-help-window ()
   (let (view-now scroller)
     (setq *PW-help-window*
-          (make-instance 'C-pw-help-window :window-title "PW help" :GROW-ICON-P t
-                         :view-position (make-point 50 25) :view-size (make-point 550 455) :close-box-p nil))
-    (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 550 8) (- 455 16)) 
-                                  :view-container *PW-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
+          (make-instance 'C-pw-help-window
+                         :window-title "PW help"
+                         :GROW-ICON-P t
+                         :view-position (make-point 50 25)
+                         :view-size (make-point 550 455)
+                         :close-box-p nil))
+    (setq scroller (make-instance 'C-pw-help-window-view
+                                  :view-size (make-point (- 550 8) (- 455 16)) 
+                                  :view-container *PW-help-window*
+                                  :v-scrollp t :h-scrollp nil
+                                  :track-thumb-p t))
     (add-subviews scroller
-                  (setq view-now (make-instance 'static-text-dialog-item :view-position (make-point 5 5) :dialog-item-text 
-                                                "   PW keyboard shortcuts:
+                  (setq view-now (make-instance 'static-text-dialog-item
+                                                :view-position (make-point 5 5)
+                                                :dialog-item-text "   PW keyboard shortcuts:
     h        open help window
     Return   select super-window,hide PW window 
     Enter    select super-window

@@ -143,7 +143,9 @@
          #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
          asdf:*central-registry* :test (function equalp))
 
-#+(and ccl darwin (not cl-user::no-cocoa))
+
+;; AppleEvents are not used for now.
+#+(and use-apple-events ccl darwin (not cl-user::no-cocoa))
 (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
 
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)

@@ -244,7 +244,7 @@
   (car (editor-objects (car (subviews (application-object self))))))
 
 ;;====================
-(defparameter *collector-popUp-menu*
+(defvar *collector-popUp-menu*
   (new-menu " "
             (new-leafmenu "Save" (lambda () (save *target-action-object*)))))
 

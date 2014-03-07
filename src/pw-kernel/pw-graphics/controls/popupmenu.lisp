@@ -75,8 +75,6 @@ located in the x,y position specified by the &rest key arguments"
     the-Box) )
 
 (defmethod view-click-event-handler ((self C-PopUpbox) mouse)
-  (declare (special *target-action-object*)
-           (ignore mouse))
   (unwind-protect
     (progn
       (ui:add-menu-items *pw-menu-apps* (menu self))    ;adds the PUMenu in the menu-bar
@@ -105,8 +103,9 @@ located in the x,y position specified by the &rest key arguments"
 (defun leafmenu-p (menu)
   (string= (type-of menu) 'MENU-ITEM))
 
-(defmethod set-box-title ((self C-PopUpbox) title)
-  (set-dialog-item-text self title))
+(defgeneric set-box-title (self title)
+  (:method ((self C-PopUpbox) title)
+    (set-dialog-item-text self title)))
 
 #|
 (setq fi (make-instance 'window :window-title "fi"))

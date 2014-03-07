@@ -541,7 +541,7 @@ NEW-SCROLLEE: The new scrollee of item.
          (max (scroll-bar-max item))
          (horizontal? (eq (scroll-bar-direction item) :horizontal))
          (position (view-position item))
-         (last-mouse (rref *current-event* :eventRecord.where))
+         (last-mouse (event-where *current-event*))
          (size (view-size item))
          (real-time-tracking (scroll-bar-track-thumb-p item))
          width length old-mouse left right mouse setting)
@@ -1057,6 +1057,43 @@ NEW-VALUE:      The new width of item.
 (defgeneric pane-splitter-limiting-container (scrollee)
   (:method ((scrollee simple-view))
     (view-window scrollee)))
+
+(defun track-and-draw (container function pos direction delta min-pos max-pos)
+  (niy track-and-draw container function pos direction delta min-pos max-pos)
+  #-(and)
+  (let* ((mouse-pos (view-mouse-position container))
+         ;(wait-ticks 1)
+         ;(time (get-internal-run-time))
+         (size (view-size container))
+         (drawn t))
+    (with-focused-view container
+      (with-pen-saved-simple
+        (#_PenPat *gray-pattern*)
+        (#_PenMode (xfer-mode-arg :patxor))
+        (funcall function pos)
+        (unwind-protect
+          (with-timer
+            (loop
+              (when (not (#_stilldown))(return))
+              (when (eql (%get-local-mouse-position) mouse-pos)
+                (when (not (wait-mouse-up-or-moved))(return)))
+              (let* ((new-mouse (%get-local-mouse-position))
+                     (new-pos (+ delta (case direction
+                                         (:vertical (point-v new-mouse))
+                                         (t (point-h new-mouse)))))
+                     (in-range (and (<= min-pos pos max-pos)
+                                    (point<= #@(0 0) mouse-pos size))))                
+                (when (and drawn  (or (not (eql new-pos pos))(not in-range)))
+                  (funcall function pos)
+                  (setq drawn (not drawn))
+                  )
+                (setq pos new-pos mouse-pos new-mouse)
+                (when (and (not drawn) in-range)                  
+                  (setq drawn (not drawn))
+                  (funcall function  pos)))
+              ))
+          (when drawn (funcall function pos)))))
+    (values pos drawn)))
 
 
 (defmethod view-click-event-handler ((item pane-splitter) where)

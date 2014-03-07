@@ -214,6 +214,7 @@ list.
   [self release]
   (setf *initializer* nil)]
 
+
 (on-restore add-application-did-finish-launching-initializer
   (setf *initializer* [MclguiInitializer new])
   [[NSNotificationCenter defaultCenter]

@@ -48,26 +48,26 @@
 (in-package :pw)
 
 (defunp midi-o ((bytes (list (:value "(144 60 100)" :type-list (list midic))))) list
-        "<midi-o> sends <bytes> out of the Macintosh serial modem port. For example, 
+    "<midi-o> sends <bytes> out of the Macintosh serial modem port. For example, 
     if we give the list (144 60 64) for bytes, our MIDI synthesizer (assuming it is 
     connected) play middle-C on channel 1 with a velocity of 64.  To turn off the 
     note, we would have to give bytes the argument (144 60 0)."
-        (when bytes
-          (let ((event (midishare::MidiNewEv midishare::typeStream)))
-            (unless (midishare:null-event-p event)	
-              (midishare::chan event 0)			
-              (midishare::port event 0)
-              (dolist (byte (list! bytes))
-                (midishare::midiaddfield event byte))
-              (midishare::MidiSendIm midi::*pw-refnum* event)))))
+  (when bytes
+    (let ((event (midishare::MidiNewEv midishare::typeStream)))
+      (unless (midishare:null-event-p event)	
+        (midishare::chan event 0)			
+        (midishare::port event 0)
+        (dolist (byte (list! bytes))
+          (midishare::midiaddfield event byte))
+        (midishare::MidiSendIm midi::*pw-refnum* event)))))
 
 (defunp pgmout1 ((son fix (:value 1 :min-val 1  :max-val 128))
-                (canal approx )) list
-"numéro de programme --> Midi out"
+                 (canal approx )) list
+    "numéro de programme --> Midi out"
   (midi-o (list (+ 191 canal)(- son 1) )) )
 
 (defunp pgmout ((pgms numbers? (:value 1)) (chans numbers? (:value 1))) list 
-        "<pgmout> sends a MIDI program change message out
+    "<pgmout> sends a MIDI program change message out
  of the Macintosh serial modem port. <pgms>  is the program
  number and <chans>  is the MIDI channel. Both of these can be
  lists. In this case a list of MIDI program change  messages is sent out."
@@ -78,12 +78,12 @@
         (t (mapc #'pgmout1 pgms chans))))
 
 (defun bendout1 (son canal)
-"pitch bend --> Midi out"
+  "pitch bend --> Midi out"
   (setq son (+ 8192 (max -8192 (min 8190 son))))
   (midi-o (list (+ #16rdf canal) (ldb (byte 7 0) son) (ldb (byte 8 7) son )) ))
 
 (defunp bendout ((values numbers?) (chans numbers? (:value 1))) list 
-"<bendout> sends a MIDI pitch bend message(s) <values> in the given MIDI 
+    "<bendout> sends a MIDI pitch bend message(s) <values> in the given MIDI 
 channel(s) <chans>.  <values> and <chans> can be single numbers or lists. 
 The range of pitch bend is between -8192 and 8190."
   (cond ((not (consp values))
@@ -97,7 +97,7 @@ The range of pitch bend is between -8192 and 8190."
 
 (defunp volume ((vol numbers? (:value 127))
                 (chans numbers?)) list
-" volume sends a MIDI volume  message(s) values in the given MIDI channel(s) 
+    " volume sends a MIDI volume  message(s) values in the given MIDI channel(s) 
 chans.  vol   and chans  can be single numbers or lists. The range of  volume is 
 between 
 0  and 127.
@@ -119,7 +119,7 @@ between
 
 (defunp play-sequence ((ch-l list (:value '() :type-list (collector)))
                        (chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
-        "Plays a chord sequence (first argument). The second argument is a channel
+    "Plays a chord sequence (first argument). The second argument is a channel
 for chord notes. The third (optional) argument gives the approximation (default: quarter tone)"
   
   (let* ((chords (chords ch-l))
@@ -129,18 +129,18 @@ for chord notes. The third (optional) argument gives the approximation (default:
          (vels (mapcar (lambda (note) (ask-all note 'vel)) notes))
          (durs (mapcar (lambda (note) (ask-all note 'dur)) notes))
          (offs (mapcar (lambda (note) (ask-all note 'offset-time)) notes))
-         (chans (mapcar (lambda (note) (l+ (ask-all note 'chan) -1)) notes)))
+         (chans (mapcar (lambda (note) (epw::l+ (ask-all note 'chan) -1)) notes)))
     (C-pw-send-midi-note:snd-midinote  (epw::approx-m midics approx) vels
                                        (if (= chan 0)
-                                         (mapcar (lambda (lis1 lis2) (l+ lis1 lis2)) (epw::microtone midics approx) chans)
-                                         (ll-oper (epw::microtone midics approx) (1- chan) '+))
+                                           (mapcar (lambda (lis1 lis2) (epw::l+ lis1 lis2)) (epw::microtone midics approx) chans)
+                                           (epw::ll-oper (epw::microtone midics approx) (1- chan) '+))
                                        durs offs atimes)))
 
 
 ;; GA Pw2.6.2 101096
 (defunp play-object ((object list (:value '() :type-list ()))
                      (chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
-"play-object plays a note-object, a chord-object, a chord-line object, a measure-line object (rtm)
+    "play-object plays a note-object, a chord-object, a chord-line object, a measure-line object (rtm)
 or a list of such, connected to it. Typing 's' while the box is selected stops the play.
 
 chan:
@@ -159,13 +159,14 @@ to the following mapping: chan (semitones), chan + 1 (eighth-tones),
 chan + 2 (quartertones),  chan + 3 (three-eighths tones).
 "
 
-(let ((*play-chseq-w/offset* t)) (MidiPlayAny object approx chan)))
+  (let ((*play-chseq-w/offset* t))
+    (MidiPlayAny object approx chan)))
 
 
 #|
 ;; GA Pw2.6.2 101096
 (defunp play-object ((object list (:value '() :type-list ()))
-                     (chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
+(chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
 "play-object plays a note, chord, or chord sequence specified in its input object 
 through 
 the   MIDI ;channel specified in chan . The approx input is the approximation 
@@ -183,58 +184,58 @@ if you set chan to 8, semitones are sent out channel 8, eighth-tones are sent ou
 channel 
 9, quartertones are sent out channel 10, and so on.
 "
-  (if (subtypep (type-of object) 'C-measure-line)
-    (play-sequence (make-instance 'C-chord-line 
-                        :chords (car (rtm-chords (list object)))) chan approx)
-    (play-yourself-as-object object chan approx)))
+(if (subtypep (type-of object) 'C-measure-line)
+(play-sequence (make-instance 'C-chord-line 
+:chords (car (rtm-chords (list object)))) chan approx)
+(play-yourself-as-object object chan approx)))
 
 (defmethod play-yourself-as-object ((object C-chord) chan approx)
-  (let* ((notes (notes object))
-              (midics (ask-all notes 'midic)))
-         (C-pw-send-midi-note:snd-midinote (approx-m midics approx)
-                                           (ask-all (notes object) 'vel)
-                                           (l+ (epw::microtone midics approx) (1- chan))
-                                           (ask-all (notes object) 'dur)
-                                           (ask-all (notes object) 'offset-time))))
+(let* ((notes (notes object))
+(midics (ask-all notes 'midic)))
+(C-pw-send-midi-note:snd-midinote (approx-m midics approx)
+(ask-all (notes object) 'vel)
+(l+ (epw::microtone midics approx) (1- chan))
+(ask-all (notes object) 'dur)
+(ask-all (notes object) 'offset-time))))
 
 (defmethod play-yourself-as-object ((object C-note) chan approx)
-  (C-pw-send-midi-note:snd-midinote (approx-m (midic object) approx) (vel object)
-                                         (+ (car (epw::microtone (list (midic object)) approx))
-                                            chan)
-                                         (dur object) (offset-time object)))
+(C-pw-send-midi-note:snd-midinote (approx-m (midic object) approx) (vel object)
+(+ (car (epw::microtone (list (midic object)) approx))
+chan)
+(dur object) (offset-time object)))
 |#
 
 #|
 (defmethod play-yourself-as-object ((object C-chord-line) chan approx)
-  (play-sequence object chan approx))
+(play-sequence object chan approx))
 
 (defmethod play-yourself-as-object ((object C-chord) chan approx)
-  (let* ((notes (notes object))
-         (midics (ask-all notes 'midic))
-         (chans (l+ (ask-all notes 'chan) -1)))
-         (C-pw-send-midi-note:snd-midinote (epw::approx-m midics approx)
-                                           (ask-all (notes object) 'vel)
-                                           (l+ (epw::microtone midics approx) (if (= chan 0) chans (1- chan)))
-                                           (ask-all (notes object) 'dur)
-                                           (ask-all (notes object) 'offset-time))))
+(let* ((notes (notes object))
+(midics (ask-all notes 'midic))
+(chans (l+ (ask-all notes 'chan) -1)))
+(C-pw-send-midi-note:snd-midinote (epw::approx-m midics approx)
+(ask-all (notes object) 'vel)
+(l+ (epw::microtone midics approx) (if (= chan 0) chans (1- chan)))
+(ask-all (notes object) 'dur)
+(ask-all (notes object) 'offset-time))))
 
 (defmethod play-yourself-as-object ((object C-note) chan approx)
-  (C-pw-send-midi-note:snd-midinote (epw::approx-m (midic object) approx) (vel object)
-                                         (+ (car (epw::microtone (list (midic object)) approx))
-                                            (if (= chan 0) (1- (chan object)) (1- chan)))
-                                         (dur object) (offset-time object)))
+(C-pw-send-midi-note:snd-midinote (epw::approx-m (midic object) approx) (vel object)
+(+ (car (epw::microtone (list (midic object)) approx))
+(if (= chan 0) (1- (chan object)) (1- chan)))
+(dur object) (offset-time object)))
 
 (defmethod play-yourself-as-object ((object cons) chan approx)
-  (if (dolist (obj object t) 
-             (unless (subtypep (type-of obj) 'C-measure-line) (return nil)))
-         (play-sequence (make-instance 'C-chord-line
-                          :chords (sort (apply #'append (rtm-chords object)) '< :key #'t-time))
-                        chan approx)
-         (tell object #'play-object chan approx)))
+(if (dolist (obj object t) 
+(unless (subtypep (type-of obj) 'C-measure-line) (return nil)))
+(play-sequence (make-instance 'C-chord-line
+:chords (sort (apply #'append (rtm-chords object)) '< :key #'t-time))
+chan approx)
+(tell object #'play-object chan approx)))
 
 (defmethod play-yourself-as-object ((object t) chan approx)
-  (format t "don't know how to play object: ~S ~%" object)
-         (ui:ed-beep))
+(format t "don't know how to play object: ~S ~%" object)
+(ui:ed-beep))
 |#
 
 
@@ -248,18 +249,18 @@ channel
   (while (and note-forms (= prev-delay (caar note-forms)))
     (play-note-form (cdr (pop note-forms))))
   (if note-forms
-    (re-dfuncall (- (caar note-forms) prev-delay)  note-forms (caar note-forms))))
+      (re-dfuncall (- (caar note-forms) prev-delay)  note-forms (caar note-forms))))
 
 (defun play-note-form (note-form)
   (write-midi-note (first note-form) (second note-form) (truncate (third note-form) 100)
-                       (fourth note-form)))
-    
+                   (fourth note-form)))
+
 (defun set-note-forms (midics channel vels durs offs t-time)
   (let* ((midics midics) (channel channel) (vels vels) (durs durs) (offs offs)
          (def-vels (or (car (last vels)) 100))
          (def-chan (or (car (last channel)) 1))
          (def-dur (or (car (last durs)) 75))
-        note-forms)
+         note-forms)
     (while (or midics vels channel durs offs)
       (push (list (+ t-time (or (pop offs) 0))
                   (or (pop durs) def-dur) (or (pop channel) def-chan) (or (pop midics) 6000)
@@ -267,11 +268,11 @@ channel
     (nreverse note-forms)))
 
 (defunp snd-midinote ((midics midic) (vels (midic (:value 100)))
-                        (chan (approx (:type-list (fixnum list))))
-                        (durs (fix>=0 (:type-list (fixnum list))))
-                        &optional (offs (integer (:type-list (fixnum list))))
-                                  (at-time (fix>=0 (:type-list (fixnum list))))) list
-"<snd-midinote> formats and plays MIDI note events.  
+                      (chan (approx (:type-list (fixnum list))))
+                      (durs (fix>=0 (:type-list (fixnum list))))
+                      &optional (offs (integer (:type-list (fixnum list))))
+                      (at-time (fix>=0 (:type-list (fixnum list))))) list
+    "<snd-midinote> formats and plays MIDI note events.  
 If <midics> is a list, then the result is a chord.  Notes are played with 
 a channel <chan>  velocity  
 <vels>  and duration <durs> as determined by the inputs. The 
@@ -290,20 +291,20 @@ argument lists is shorter than <midics>, the last value of those lists
 are used to play the 
 remaining notes."
   (let* ((midics (list! midics))
-        (vels (list! vels))
-        (def-vels (or (car (last vels)) 100))
-        (channel (list! chan))
-        (def-chan (or (car (last channel)) 1))
-        (durs (list! durs))
-        (def-dur (or (car (last durs)) 75))
-        (offs (if offs
-                (list! offs)
-                (list 0)))
-        (t-times (if at-time
-                   (list! at-time)
+         (vels (list! vels))
+         (def-vels (or (car (last vels)) 100))
+         (channel (list! chan))
+         (def-chan (or (car (last channel)) 1))
+         (durs (list! durs))
+         (def-dur (or (car (last durs)) 75))
+         (offs (if offs
+                   (list! offs)
                    (list 0)))
-        (acum-t 0)
-        notes-form)
+         (t-times (if at-time
+                      (list! at-time)
+                      (list 0)))
+         (acum-t 0)
+         notes-form)
     (while (or midics vels channel durs offs t-times)
       (setq notes-form
             (append 
@@ -337,7 +338,7 @@ remaining notes."
                      (durs (fix>=0 (:value 100 :type-list (fixnum list))))
                      &optional (offs (integer (:type-list (fixnum list))))
                      (at-time (fix>=0 (:type-list (fixnum list))))) list
-        "Constructs and sends a note, list of notes, or list of lists of notes with the
+    "Constructs and sends a note, list of notes, or list of lists of notes with the
 given parameters to MIDI"
   (let* ((acum-t 0) chord-list
          (midics (list! midics))
@@ -348,11 +349,11 @@ given parameters to MIDI"
          (durs (list! durs))
          (def-dur 75)
          (offs (if offs
-                 (list! offs)
-                 (list 0)))
+                   (list! offs)
+                   (list 0)))
          (t-times (if at-time
-                    (list! at-time)
-                    (list 0))))
+                      (list! at-time)
+                      (list 0))))
     (while (or midics vels channel durs offs t-times)
       (push 
        (pw::mk-chord-at
@@ -376,17 +377,11 @@ given parameters to MIDI"
        chord-list))
     (let ((pw::*play-chseq-w/offset* t)) 
       (pw::MidiPlayAny (make-instance 'pw::c-chord-line :chords (reverse chord-list))
-                 (pw::compute-approx)
-                 0))))
+                       (pw::compute-approx)
+                       0))))
 
-  
-(defpackage "C-PW-MIDI-IN"
-  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
-  (:import-from "PATCH-WORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
-  (:import-from "MIDI" "MIDI-READ")
-  (:export "PW-MIDI-IN" "M-DATA" "C-PW-MIDI-IN" "DELAY" "STATUS" "MIDI-CHAN" "DATA1"
-           "DATA2" "MIDI-OPCODE" "C-PW-MIDI-IN-TOP" "C-PW-DELAY-BOX" "C-PW-NOTE-IN"
-           "NOTE-IN" "C-PW-NOTE-ON-IN" "NOTE-ON-IN" "C-PW-CHORD-IN" "CHORD-IN"))
+
+
 
 (in-package "C-PW-MIDI-IN")
 
@@ -399,41 +394,41 @@ given parameters to MIDI"
   (set-output self :off)
   (call-next-method))
 
-(defvar *Midi-box-popUpMenu*
+(defparameter *Midi-box-popUpMenu*
   (new-menu " "
-         (new-leafmenu "Deactivate" (lambda () (set-output *target-action-object* :off)))))
+            (new-leafmenu "Deactivate" (lambda () (set-output *target-action-object* :off)))))
 
 (defmethod initialize-instance :after ((self C-pw-midi-in) &key controls)
-  (declare (ignore controls) (special *Midi-box-popUpMenu*))
+  (declare (ignore controls))
   (setf (popUpBox self) 
         (make-popUpbox  "D" self
-                       *Midi-box-popUpMenu*
-                       :view-position (ui:make-point (- (w self) 19)
-                                                  (- (h self) 13))
-                       :view-container self
-                       :view-font '("monaco"  9  :srcor))))
+                        *Midi-box-popUpMenu*
+                        :view-position (ui:make-point (- (w self) 19)
+                                                      (- (h self) 13))
+                        :view-container self
+                        :view-font '("monaco"  9  :srcor))))
 
 (defmethod set-output ((self C-pw-midi-in) type)
   (case  type (:on (setf (state self) nil) (set-box-title (popUpbox self) "A"))
-              (:off (setf (state self) t) (set-box-title (popUpbox self) "D"))))
+         (:off (setf (state self) t) (set-box-title (popUpbox self) "D"))))
 
 (defmethod patch-value ((self C-pw-midi-in) obj)
   (midi::midi-reset)
   (if (state self)
-    (set-output self :on))
+      (set-output self :on))
   (let ((box (first (input-objects self))))
     (unless (eq (first (pw-controls self)) box)
       (start (apdfuncall 5 (priority) 10 'pw-schedule-midi-in 
                          self box (second (input-objects self))
                          (if (third (input-objects self))
-                           (patch-value (third (input-objects self)) obj)
-                           1 ))))
+                             (patch-value (third (input-objects self)) obj)
+                             1 ))))
     "active"))
 
 (defmethod pw-schedule-midi-in ((self C-pw-midi-in) box patch delay)
   (let ((data (midi-read)))
     (if (and (not (midishare:null-event-p data)) (pw-midi-filtered self data))
-      (progn
+        (progn
           (setf (value box) (format-midi self data))
           (patch-value patch self)
           (pw-schedule-midi-in self box patch delay))
@@ -444,10 +439,10 @@ given parameters to MIDI"
 (defmethod pw-midi-filtered ((self C-pw-midi-in) data)
   (not (equal (midishare::type data) midishare::typeClock)))
 
- (defunp pw-midi-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
+(defunp pw-midi-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
                     (patch (list (:type-list ())))
                     &optional (delay (fix>0 (:value 10)))) nil
-"
+    "
 <pw-midi-in> & <m-data> are used to gather incoming MIDI data from the
 Macintosh serial ports.  In order for the two to work, there must
 always be a loop with pw-midi-in at the bottom, <m-data> at the top,
@@ -465,9 +460,9 @@ midi-data2, and midi-status.
   (declare (ignore in-box patch delay)))
 
 (defunp raw-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
-                    (patch (list (:type-list ())))
-                    &optional (delay (fix>0 (:value 10)))) nil
-                    "
+                (patch (list (:type-list ())))
+                &optional (delay (fix>0 (:value 10)))) nil
+    "
 The modules raw-in and m-data together gather incoming MIDI data from
 the Macintosh serial ports.  In order for them to work, there must
 always be a loop with raw-in at the bottom, m-data ;at the top, and
@@ -493,7 +488,7 @@ midi-data1;, midi- data2;, and midi-status;.
   (value self))
 
 (defunp m-data () nil
-"A box always connected to a pw-midi-in box. Gives successive midi events."
+    "A box always connected to a pw-midi-in box. Gives successive midi events."
   )
 
 ;;================
@@ -519,7 +514,7 @@ midi-data1;, midi- data2;, and midi-status;.
 (defunp note-on-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
                     (patch (list (:type-list ())))
                     &optional (delay (fix>0 (:value 10)))) nil
-"<note-on-in> & <m-data> are used to gather incoming MIDI data from the Macintosh serial ports
+    "<note-on-in> & <m-data> are used to gather incoming MIDI data from the Macintosh serial ports
  ( it filters out all events other than note-on).
   In order for the two to work, there must always be a loop with pw-midi-in at the bottom,
  <m-data> at the top, and some kind of <patch> dealing with the MIDI data in between.
@@ -530,9 +525,9 @@ When you are finished collecting MIDI data, select deactivate in the pw-midi-in 
   (declare (ignore in-box patch delay)))
 
 (defunp note-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
-                    (patch (list (:type-list ())))
-                    &optional (delay (fix>0 (:value 10)))) nil
-"
+                 (patch (list (:type-list ())))
+                 &optional (delay (fix>0 (:value 10)))) nil
+    "
 The note-in and m-data modules are invoked simultaneously.  They gather
 incoming MIDI data from the Macintosh serial ports.  note-in filters
 out all events other than note-on messages.  In order for the two
@@ -554,25 +549,25 @@ endlessly: 'late Task'.
 
 (defmethod format-midi ((self C-pw-chord-in) data)
   (let* ((the-chord (the-chord self))
-        (the-notes (pw::notes the-chord))
-        (a-note (pw::make-C-note   
-                             (* 100 (midishare::pitch data)) nil nil 100 
-                             (midishare::vel data) (1+ (midishare::chan data))
-                              nil 0 0)))
+         (the-notes (pw::notes the-chord))
+         (a-note (pw::make-C-note   
+                  (* 100 (midishare::pitch data)) nil nil 100 
+                  (midishare::vel data) (1+ (midishare::chan data))
+                  nil 0 0)))
     (setf (pw::order a-note) (length the-notes))
     (setf (pw::notes the-chord)
-         (push (pw::make-C-note   
-                             (* 100 (midishare::pitch data)) nil nil 100 
-                             (midishare::vel data) (1+ (midishare::chan data))
-                              nil 0 0) the-notes))
+          (push (pw::make-C-note   
+                 (* 100 (midishare::pitch data)) nil nil 100 
+                 (midishare::vel data) (1+ (midishare::chan data))
+                 nil 0 0) the-notes))
     (pw::update-chord the-chord)
     the-chord))
 
 (defmethod patch-value ((self C-pw-chord-in) obj)
   (declare (ignore obj))
-  ;(midi::midi-reset)
+                                        ;(midi::midi-reset)
   (setf (the-chord self) (make-instance 'pw::C-chord :notes ()))
-  ;(setf (pw::notes (the-chord self)) nil)
+                                        ;(setf (pw::notes (the-chord self)) nil)
   (call-next-method))
 
 (defmethod pw::disconnect-ctrl ((self C-pw-chord-in) ctrl)
@@ -581,9 +576,9 @@ endlessly: 'late Task'.
   (call-next-method))
 
 (defunp chord-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
-                    (patch (list (:type-list ())))
-                    &optional (delay (fix>0 (:value 10)))) nil
-"The chord-in and   m-data ;modules work in a similar way as   note-in;. The 
+                  (patch (list (:type-list ())))
+                  &optional (delay (fix>0 (:value 10)))) nil
+    "The chord-in and   m-data ;modules work in a similar way as   note-in;. The 
 chord-in module filters   MIDI ;events other than note-on messages. The patch 
 connected to patch  is repeatedly evaluated for each new MIDI note-on event. 
 The output of the m-data box is a chord object with all accumulated notes  
@@ -599,7 +594,7 @@ endlessly: 'late Task'."
 
 (defunp delay ((delay (fix>0 (:value 10))) 
                (patch (list (:value "()" :type-list ())))) nil
- "<delay> takes the evaluation of <patch>  after the <delay>"
+    "<delay> takes the evaluation of <patch>  after the <delay>"
   (declare (ignore delay patch)))
 
 (defclass C-pw-delay-box (C-patch)
@@ -610,7 +605,7 @@ endlessly: 'late Task'."
   (sleep (/ (patch-value (first (input-objects self)) obj) 100 ))
   (patch-value (second (input-objects self)) obj))
 
- 
+
 ;;(defmethod patch-value ((self C-pw-delay-box) obj)
 ;;  (start (apdfuncall 0 (priority)
 ;;                     (round (patch-value (first (input-objects self)) obj))
@@ -623,11 +618,11 @@ endlessly: 'late Task'."
   (setf (state self) nil))
 
 (defun pw::pw-reset-for-midi()
-  ;(patch-work.scheduler:set-scheduler-state :oot)
+                                        ;(patch-work.scheduler:set-scheduler-state :oot)
   (midi:midi-close)
   (patch-work.scheduler::init-scheduler)
   (midi:midi-open)  
-  ;(patch-work.scheduler:set-scheduler-state :rt)
+                                        ;(patch-work.scheduler:set-scheduler-state :rt)
   )
 
 
@@ -637,29 +632,29 @@ endlessly: 'late Task'."
 
 
 (defmethod patch-value ((self C-jouer/eteindre) obj)
- (let* ((result nil)
-        (accord (patch-value (first (pw::input-objects self)) obj))
-        (approx (patch-value (second (pw::input-objects self)) obj))
-        (canal (patch-value (third (pw::input-objects self)) obj))
-        (hauteurs (pw::ask-all (pw::notes accord) 'pw::midic))
-        (velo     (pw::ask-all (pw::notes accord) 'pw::vel))
-        (dur (if (nth 3 (pw-controls self))
-               (patch-value (fourth (input-objects self)) obj)  0)))
+  (let* ((result nil)
+         (accord (patch-value (first (pw::input-objects self)) obj))
+         (approx (patch-value (second (pw::input-objects self)) obj))
+         (canal (patch-value (third (pw::input-objects self)) obj))
+         (hauteurs (pw::ask-all (pw::notes accord) 'pw::midic))
+         (velo     (pw::ask-all (pw::notes accord) 'pw::vel))
+         (dur (if (nth 3 (pw-controls self))
+                  (patch-value (fourth (input-objects self)) obj)  0)))
     (while hauteurs (let ((hauteur (epw::approx-m (nextl hauteurs) approx)))
-                    (push (+ 143 canal (/ (mod  hauteur 100) 25)) result)
-                    (push (truncate hauteur 100) result)
-                    (if  (etat self) (push 0 result) (push (nextl velo) result) ) ))
+                      (push (+ 143 canal (/ (mod  hauteur 100) 25)) result)
+                      (push (truncate hauteur 100) result)
+                      (if  (etat self) (push 0 result) (push (nextl velo) result) ) ))
     (pw::midi-o (setq result (nreverse result)))
     (if (not (or (etat self) (zerop dur)))
         (start (apdfuncall 0 (priority) dur 'stop-the-notes self 
                            (modify-velocity result))))
     (setf (etat self) (null (etat self)))
-  nil))
+    nil))
 
 (defunp play/stop ((midics list (:type-list () :value '(6000))) (vel fix>=0 (:value 100)) (channel approx)
-                        (approx fix (:value 4))
-                        &optional (dur fix>=0)) list
-"The play/stop module plays a chord object through the   MIDI ;channel given 
+                   (approx fix (:value 4))
+                   &optional (dur fix>=0)) list
+    "The play/stop module plays a chord object through the   MIDI ;channel given 
 in channel. The approx variable is the approximation value for midicents, which 
 can be set to whole tone (approx = 1), semitone (approx  = 2), quartertone 
 (approx = 4, the default)  or eighth-tone (approx = 8).  If no duration is supplied 
@@ -689,7 +684,7 @@ on."
          channel (pw::list! (patch-value (third (input-objects self)) obj))))
     (setq approx (patch-value (fourth (input-objects self)) obj)
           dur (if (nth 4 (pw-controls self))
-                   (patch-value (fifth (input-objects self)) obj)  0)
+                  (patch-value (fifth (input-objects self)) obj)  0)
           def-vel (first (last vel))
           def-chan (first (last channel)))
     (dolist (midic midics)
@@ -699,10 +694,10 @@ on."
       (if  (etat self) (push 0 result) (push (or (pop vel) def-vel) result) ) )
     (pw::midi-o (setq result (nreverse result)))
     (if (not (or (etat self) (zerop dur)))
-      ;(start (apdfuncall 0 (priority) dur 'stop-the-notes self
-      ;                   (modify-velocity result)))
-      (print "Option dur is not available")
-      )
+                                        ;(start (apdfuncall 0 (priority) dur 'stop-the-notes self
+                                        ;                   (modify-velocity result)))
+        (print "Option dur is not available")
+        )
     (setf (etat self) (null (etat self))) ))
 
 (defmethod stop-the-notes ((self C-jouer/eteindre) notes)
@@ -726,7 +721,7 @@ on."
 
 
 
-  
 
-  
+
+
 

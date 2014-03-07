@@ -42,14 +42,13 @@
 (defmethod view-cursor ((item control-dialog-item) where)
   (declare (ignore where))
   *arrow-cursor*)
+(defmethod installed-item-p ((item control-dialog-item))
+  (let ((dialog (view-container item)))
+    (and dialog
+         ;; (wptr dialog)
+         ;; (dialog-item-handle item)
+         )))
 
-(defgeneric installed-item-p (item)
-  (:method ((item control-dialog-item))
-    (let ((dialog (view-container item)))
-      (and dialog
-           ;; (wptr dialog)
-           ;; (dialog-item-handle item)
-           ))))
 
 (defmethod  install-view-in-window :after ((button control-dialog-item) w)
   (when (and (not (typep button 'scroll-bar-dialog-item)))

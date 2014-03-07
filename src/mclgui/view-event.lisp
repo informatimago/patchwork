@@ -42,6 +42,7 @@
   (values))
 
 
+(defgeneric view-double-click-event-handler (view where))
 
 (defmethod view-activate-event-handler ((view view))
   (dovector (v (view-subviews view))

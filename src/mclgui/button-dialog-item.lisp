@@ -91,16 +91,14 @@ NEW-BUTTON:     The button that should be made the default button, or
         (without-interrupts
             (when default-button
               (invalidate-view-border default-button t)
-              (niy set-default-button dialog new-button)
-              #-(and)
+              (niy set-default-button dialog new-button) #-(and)
               (#_setwindowdefaultbutton (wptr dialog) (%null-ptr)))
           (setf (%get-default-button dialog) new-button)
           (when new-button
+            (niy set-default-button dialog new-button) #-(and)
             (when (dialog-item-handle new-button)
               (if (dont-throb new-button) ;(and (osx-p) (neq (view-container new-button)(view-window new-button)))
                   nil  ;; so we act like a default button but dont look like one
-                  (niy set-default-button dialog new-button)
-                  #-(and)
                   (#_setwindowdefaultbutton (wptr dialog) (dialog-item-handle new-button))))
             (invalidate-view-border new-button)))))
     new-button))
@@ -246,14 +244,14 @@ dialog-item-action method for button.
 (defmethod view-draw-contents ((item button-dialog-item))
   (let ((no-border (view-get item 'no-border)))
     (if no-border
-      (with-item-rect (rect item)
-        (niy view-draw-contents item)
-        ;; (#_eraserect rect)
-        (clip-inside-view item 2 2)
-        (call-next-method))
-      (progn
-        (call-next-method)
-        (maybe-draw-default-button-outline item)))))
+        (niy view-draw-contents item) #-(and)
+        (with-item-rect (rect item)
+          ;; (#_eraserect rect)
+          (clip-inside-view item 2 2)
+          (call-next-method))
+        (progn
+          (call-next-method)
+          (maybe-draw-default-button-outline item)))))
 
 
 (defgeneric draw-default-button-outline (item)

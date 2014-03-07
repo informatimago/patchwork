@@ -368,6 +368,7 @@
          (x-origo (truncate 
                    (scaled-mouse-h  a-panel (point-h (view-scroll-position a-panel)))))
         all-the-chords notes beginT)
+    (declare (ignorable beginT))
     (dolist (panel the-panels)
       (let ((chords 
              (cond (all (chords (chord-line panel)))
@@ -658,6 +659,8 @@
           (apply #'append (ask-all panels 'selected-chords)))
     ;(unselect-all-chords (car panels) 0 0)
     (call-next-method)))
+
+(defvar *the-chord-editors* ())
 
 (defmethod window-close ((self C-mn-window-mod))
   (dolist (the-ed *the-chord-editors*)

@@ -49,7 +49,7 @@
 ;;;methods:
 ;;;  patch-value          ;builds a chord object
 ;;;============================================
-(in-package :patch-work)
+(in-package :pw)
 (pw:enable-patchwork-reader-macros)
 
 (defunp Chbuild ((midics (fixs (:dialog-item-text "()" :type-list (fixnum list))))
@@ -140,6 +140,11 @@ the slot corresponding to an exhausted list."
   (chbuild midic dur offset-time vel chan order comment objects (or ch-type 'pw::C-chord)))
 
 (defclass C-patch-MD-set-slot (C-patch) ())
+
+(defun class-instance-slots (class)
+  (remove-if-not (lambda (slot)
+                   (eq :instance (slot-definition-allocation slot)))
+                 (class-slots class)))
 
 (defun class-slot-names (obj)
   ;;(mapcar #'car (class-slots (find-class (class-name (class-of obj)))))

@@ -286,8 +286,8 @@ ITEM:           A table dialog item.
 
 
 (defmethod installed-item-p ((item table-dialog-item))
-  ;;(wptr item)
-  t)
+  (let ((dialog (view-container item)))
+    dialog))
 
 
 (defgeneric map-selected-cells (item fun)
@@ -1362,10 +1362,11 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 (defgeneric separator-pattern (item)
   (:method ((item table-dialog-item))
     (let ((pattern (separator-pattern-slot item)))
-      (cond ((macptrp pattern) pattern)
-            ((symbolp pattern) (and (boundp pattern) (symbol-value pattern)))
-            ((functionp pattern) (funcall pattern))
-            (t nil)))))
+      (typecase pattern
+        (pattern  pattern)
+        (symbol   (and (boundp pattern) (symbol-value pattern)))
+        (function (funcall pattern))
+        (t        nil)))))
 
 (defgeneric (setf separator-pattern) (new-pattern item)
   (:method :around (new-pattern (item table-dialog-item))
@@ -1377,7 +1378,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 (defun string-width-for-focused-control (string ff ms)
   (niy string-width-for-focused-control string ff ms)
-  #- (and)
+  #-(and)
   (let ((len (length string)))
     (%stack-block ((sb (%i+ len len)))
                   (copy-string-to-ptr string 0 len sb)
@@ -1615,9 +1616,9 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                                        table
                                        :end-column columns
                                        :from-end t)))
-            (set-view-position hscroll (if (osx-p) pos-h  (1- pos-h)) (+ pos-v size-v))
+            (set-view-position hscroll pos-h (+ pos-v size-v))
             (set-view-size hscroll
-                           (+ size-h (if (osx-p) 0 2) (if (and (not vscroll) grow-icon-p) -15 0))
+                           (+ size-h (if (and (not vscroll) grow-icon-p) -15 0))
                            16)
             (let ((old-max (scroll-bar-max hscroll))
                   (new-max (max 0 (- columns visible-end-columns))))
@@ -1630,10 +1631,10 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                                     table
                                     :end-row rows
                                     :from-end t)))
-            (set-view-position vscroll (+ pos-h size-h) (if (osx-p) pos-v (1- pos-v)))
+            (set-view-position vscroll (+ pos-h size-h)  pos-v)
             (set-view-size vscroll 
                            16
-                           (+ size-v (if (osx-p) 0 2) (if (and (not hscroll) grow-icon-p) -15 0)))
+                           (+ size-v  (if (and (not hscroll) grow-icon-p) -15 0)))
             (let ((old-max (scroll-bar-max vscroll))
                   (new-max (max 0 (- rows visible-end-rows))))
               (set-scroll-bar-max vscroll new-max)
@@ -1866,9 +1867,8 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                         (when back-color
                           (#_erasergn rgn)
                           #+ignore
-                          (when (osx-p)
-                            (with-fore-color back-color
-                              (#_paintrgn rgn))))
+                          (with-fore-color back-color
+                            (#_paintrgn rgn)))
                         (when (and *updating* dialog-item-enabled-p)
                           (let ((selection-rgn (if (view-active-p item)
                                                    (table-selection-region item)
@@ -2126,6 +2126,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 
 
 (defmethod view-click-event-handler ((item table-dialog-item) where)
+  (niy view-click-event-handler item where)
   (progn                                ;without-interrupts
     (let* ((pos (view-position item))
            (botright (add-points pos (table-inner-size item))))
@@ -2264,8 +2265,10 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                         #-(and)
                         (when (not (#_stilldown))
                           (return))
+                        #-(and)
                         (if (eql where (%get-local-mouse-position))                   
-                            (unless (wait-mouse-up-or-moved) (return)))
+                            (unless (wait-mouse-up-or-moved)
+                              (return)))
                         (setq where (view-mouse-position container))))))
               (dialog-item-action item)))))))
 
@@ -2354,8 +2357,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
   (declare (fixnum where-h where-v left top right bottom))
   (unless (or (and (<= left where-h) (< where-h right)
                    (<= top where-v) (< where-v bottom))
-              (> *auto-scroll-period*
-                 (%tick-difference (get-tick-count) *last-auto-scroll-time*)))
+              (< (- (get-tick-count) *last-auto-scroll-time*) *auto-scroll-period*))
     (setq *last-auto-scroll-time* (get-tick-count))
     (let* ((cell-size (cell-size item))
            (cell-size-h (point-h cell-size))

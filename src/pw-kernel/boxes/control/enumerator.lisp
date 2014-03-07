@@ -79,29 +79,29 @@
 
 (defmethod patch-value ((self C-enum-collect-sink) obj)
   (mapcar (lambda (val)
-              (store-buffer (first (input-objects self)) val)
-              (patch-value (second (input-objects self)) obj))
+            (store-buffer (first (input-objects self)) val)
+            (patch-value (second (input-objects self)) obj))
           (get-list (first (input-objects self)) obj)))
 
 (defmethod disconnect-ctrl ((self C-enum-collect-sink) ctrl)
   (if (eq ctrl (car (pw-controls self)))
-     (progn (ui:ed-beep)(format t "Disconnection of the first input is not allowed !"))
-     (call-next-method)))
+      (progn (ui:ed-beep)(format t "Disconnection of the first input is not allowed !"))
+      (call-next-method)))
 
 (defparameter *enum-collect-type*
   (make-instance 'C-pw-type
-    :control-form 
-    `(make-instance 'C-ttybox :view-size (make-point 36 12) 
-                    :dialog-item-text "coll" :type-list '(collector))))
+                 :control-form 
+                 `(make-instance 'C-ttybox :view-size (make-point 36 12) 
+                                           :dialog-item-text "coll" :type-list '(collector))))
 
 (defparameter *MD-object-type*
   (make-instance 'C-pw-type
-    :control-form `(make-instance 'C-ttybox :view-size (make-point 36 12)
-                                  :dialog-item-text "coll" :type-list '())))
+                 :control-form `(make-instance 'C-ttybox :view-size (make-point 36 12)
+                                                         :dialog-item-text "coll" :type-list '())))
 
 (defunp enum+loop ((en-ob (symbol (:type-list (loop))))
                    (patch (list (:type-list ())))) list
-   "loops thru a list of elements supplied as input to Enum box and evaluates
+    "loops thru a list of elements supplied as input to Enum box and evaluates
     the second input"
   (declare (ignore en-ob patch)))
 
@@ -110,16 +110,16 @@
 
 (defunp trigger ((patch1 list (:value "patch" :type-list ()))
                  (patch2 list (:value "patch" :type-list ()))
- &rest (patch list (:value "patch" :type-list ()))) nil "This extensible module launches the evaluation of many patches in sequence. 
+                 &rest (patch list (:value "patch" :type-list ()))) nil "This extensible module launches the evaluation of many patches in sequence. 
 The sequence of evaluation is equal to the sequence of the inputs."
-(declare (ignore patch1 patch2 patch)))
+  (declare (ignore patch1 patch2 patch)))
 
 (defclass C-map-first (C-pw-functional) ())
 
 (defunp pwmap ((en-ob (symbol (:type-list (loop))))
-                   (patch (list (:type-list ())))
-                   &rest (en-obs (symbol (:type-list (loop))))) list
-   "This group of modules creates a list starting with the evaluation of a patch that takes 
+               (patch (list (:type-list ())))
+               &rest (en-obs (symbol (:type-list (loop))))) list
+    "This group of modules creates a list starting with the evaluation of a patch that takes 
 into account all the elements of a list connected to the module enum. The output of the 
 patch must be connected to the input patch of pwmap. Since this module is extensible, 
 it is possible to control many lists, by opening the inputs arg to which is connected a 
@@ -129,7 +129,7 @@ module enum. In the case of lists ofvarious sizes, pwmap will select the shortes
 (defunp map-first ((en-ob (symbol (:type-list (loop))))
                    (patch (list (:type-list ())))
                    &rest (en-obs (symbol (:type-list (loop))))) list
-   "loops thru a list of elements supplied as input to Enum box and evaluates
+    "loops thru a list of elements supplied as input to Enum box and evaluates
     the second input"
   (declare (ignore en-ob patch en-obs)))
 
@@ -145,23 +145,24 @@ module enum. In the case of lists ofvarious sizes, pwmap will select the shortes
       (push (patch-value (second inputs) obj) res))))
 
 (defmethod correct-extension-box ((self C-map-first) new-box values)
+  (declare (ignore values))
   (call-next-method)
   (let ((enum (make-PW-standard-box 'C-enum-collect-source 'enum))
         (even (zerop (rem (length (pw-controls new-box)) 2))))
     (add-subviews *active-patch-window* enum)
-       (set-view-position enum 
-          (make-point (if even 
-                        (+ (x new-box) (w new-box))
-                        (x new-box)) (- (y new-box) (h new-box) )))
-       (connect-ctrl new-box (car (last (pw-controls new-box))) enum)
-       (setf (open-state (car (last (pw-controls new-box)) )) nil)
-       (tell (controls *active-patch-window*) 'draw-connections)))
+    (set-view-position enum 
+                       (make-point (if even 
+                                       (+ (x new-box) (w new-box))
+                                       (x new-box)) (- (y new-box) (h new-box) )))
+    (connect-ctrl new-box (car (last (pw-controls new-box))) enum)
+    (setf (open-state (car (last (pw-controls new-box)) )) nil)
+    (tell (controls *active-patch-window*) 'draw-connections)))
 
 (defmethod disconnect-ctrl ((self C-map-first) ctrl)
   (if (eq ctrl (second (pw-controls self)))
-    (call-next-method)
-     (progn (ui:ed-beep)(format t "Disconnection of the enum input is not allowed !"))
-     ))
-    
+      (call-next-method)
+      (progn (ui:ed-beep)
+             (format t "Disconnection of the enum input is not allowed !"))))
 
-    
+
+

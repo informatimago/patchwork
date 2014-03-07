@@ -22,11 +22,22 @@
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
 *** TODO no way to make multiple selections by click-and-dragging an rect arround boxes?
 ** Features
+*** TODO [#A] Events: revise the event sources and event handling
+
+There seem to be two paths of event handling, with MacOSX events being
+delivered directly to views thru MclGui, and some other events being
+delivered thru get-next-event.
+
+Check that all events (key, mouse, etc) and all modifiers are
+correctly transmitted where they must go.
+
 *** TODO [#A] Delivery: debug de/serialization of wrapper/NSObjects save-image.
 *** TODO [#A] Windows
 *** TODO [#B] Dialog Items
 *** TODO [#B] Dialogs
-*** TODO Quickdraw
+*** TODO Midi: revise midi stuff, and restructure it: midiplay redefines methods.
+*** TODO Pathnames: revise the handling of pathnames, Mac pathnames, logical pathnames, loading libraries, resources, saving images.
+*** TODO [#B] Quickdraw
 *** TODO [#B] Views
 *** TODO [#C] Fonts
 *** TODO [#C] Clipboard

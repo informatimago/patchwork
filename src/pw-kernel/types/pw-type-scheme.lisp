@@ -60,20 +60,24 @@
   (make-instance 'C-PW-type-set 
                  :type-list (mapcar (lambda (type) (cons (type-name type) type)) list)))
 
-(defmethod get-type ((self C-PW-type-set) type-name)
-  (cdr (assoc type-name (type-list self) :test #'string=)))
+(defgeneric get-type (self type-name)
+  (:method ((self C-PW-type-set) type-name)
+    (cdr (assoc type-name (type-list self) :test #'string=))))
 
-(defmethod get-type-specs ((self C-PW-type-set) type-name)
-  (let ((type (get-type self type-name)))
-    (and type (type-specs type))))
+(defgeneric get-type-specs (self type-name)
+  (:method ((self C-PW-type-set) type-name)
+    (let ((type (get-type self type-name)))
+      (and type (type-specs type)))))
 
-(defmethod delete-type ((self C-PW-type-set) type-name)
-  (setf (type-list self) 
-        (delete (list type-name) (type-list self) :key #'car :test #'string=)))
+(defgeneric delete-type (self type-name)
+  (:method ((self C-PW-type-set) type-name)
+    (setf (type-list self) 
+          (delete (list type-name) (type-list self) :key #'car :test #'string=))))
 
-(defmethod add-type ((self C-PW-type-set) type)
-  (unless (get-type self (type-name type))
-    (setf (type-list self) (acons (type-name type) type (type-list self)))))
+(defgeneric add-type (self type)
+  (:method ((self C-PW-type-set) type)
+    (unless (get-type self (type-name type))
+      (setf (type-list self) (acons (type-name type) type (type-list self))))))
 
 (defclass C-pw-type-obj ()
   ((type-name :initform 'type :initarg :type-name :accessor type-name)
@@ -85,8 +89,9 @@
   (make-instance 'C-pw-type-obj 
                  :type-name name :type-class class :type-specs specs))
 
-(defmethod merge-specs ((self C-pw-type-obj) new-specs)
-  (do-merge-specs (type-specs self) new-specs))
+(defgeneric merge-specs (self new-specs)
+  (:method ((self C-pw-type-obj) new-specs)
+    (do-merge-specs (type-specs self) new-specs)))
 
 (defun do-merge-specs (old-specs new-specs)
   "replaces old-spec values by new-specs values in all equal keys. Adds the spec if
@@ -405,15 +410,16 @@
 
 ;; (nconc (cassq 'function *define-type-alist*) (list "unp" "unt"))
   
-(defmethod set-PW-symbolic-type-data ((me symbol) intypes outtype)
-  "the symbol stores information about its function"
-  (mapc (lambda (type) (check-input-types type  me)) intypes)
-  (check-io-type outtype :output me)
-  (setf (get me '*type-intypes*) intypes)
-  (setf (get me '*type-outtype*) (find-out-type outtype))
-  ;;(import me)
-  ;;(export me)
-  me)
+(defgeneric set-PW-symbolic-type-data (me intypes outtype)
+  (:documentation "the symbol stores information about its function")
+  (:method ((me symbol) intypes outtype)
+    (mapc (lambda (type) (check-input-types type  me)) intypes)
+    (check-io-type outtype :output me)
+    (setf (get me '*type-intypes*) intypes)
+    (setf (get me '*type-outtype*) (find-out-type outtype))
+    ;;(import me)
+    ;;(export me)
+    me))
 
 (defun copy-PW-symbolic-type-data (pw-function new-name)
   "copies type-data from pw-function to new-name"
@@ -653,8 +659,11 @@
     `(progn
        (defmethod pw::patch-value ((self ,class-argument) ,obj-var)
          (let ,(match-inputs-to-args lambda-list obj-var) ,@body))
-        (defun ,name ,lambda-list ,documentation nil)
-        (set-PW-symbolic-type-data ',name  ',parsed-list ',outtype))))
+       (defun ,name ,lambda-list
+         (declare (ignore ,@lambda-list))
+         ,documentation
+         nil)
+       (set-PW-symbolic-type-data ',name  ',parsed-list ',outtype))))
 
 ;;(defclass C-fru (C-PW-functional) ((boa :initform 5 :accessor boa)))
 ;;(macroexpand (defmethodp fifi C-fru ((x fix) (y fix)) fix "fu" (+ x y  (boa self))))

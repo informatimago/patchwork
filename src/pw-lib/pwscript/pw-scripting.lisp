@@ -35,12 +35,6 @@
 (in-package :pw)
 
 
-(defvar *list-pw-script-objects* nil)
-(defvar *contador-pw-script-object* 0)
-(defvar *si-record* t)
-(defvar *position-new-box* nil)
-(defvar *charge?* nil)
-
 (defun put-appleevent-par (aevent param-key data)
   (closae:putparam aevent param-key data)
   ;; (if (macptrp data) 
@@ -77,7 +71,7 @@
 
 
 (defun find-pw-menu-item (item)
-  (if (igual item "window comment")
+  (if (string-equal item "window comment")
     (find-menu-item pw::*pwoper-menu* "Window Comment")
   (let* ((all-menus (concatenate 'list (menu-items pw::*pw-kernel-menu*)
                                  (menu-items pw::*pw-menu-Music*)
@@ -134,14 +128,14 @@
         (t nil)))))
 
 (defun getbox-name (name lis)
-  (flet ((match (item ) (igual name (pw-function-string item))))
+  (flet ((match (item) (string-equal name (pw-function-string item))))
     (let* ((thebox (find-if #'match lis)))
       thebox)))
 
 (defun getpatch-name (patch)
   (if (null patch)
     *active-patch-window*
-    (flet ((match (item ) (igual patch (win-title item))))
+    (flet ((match (item) (string-equal patch (win-title item))))
         (let* ((thepatch (find-if #'match *pw-window-list*)))
           (if (null thepatch)
             *active-patch-window*
@@ -155,9 +149,6 @@
 (defun win-title (win)
  (remove #\† (window-title win)))
 
-
-(defun igual (str1 str2)
-  (equal (string-downcase str1) (string-downcase str2)))
 
 (defmethod get-chords-from-beat ((self c-beat))
   (let* ((beat-chord (beat-chord self)) rep)
@@ -181,7 +172,8 @@
     (if (patch-type-p Pname)
         (open-patch-win Pname)
         (let ((name Pname)
-              (*compile-definitions* ()))  
+              ;; #+ccl (ccl:*compile-definitions* nil)
+              )  
           (with-cursor *watch-cursor* 
             (load name :verbose t)
             (pw::PW-update-wins-menu name))))))
@@ -219,17 +211,19 @@
       ((equal eltipo :|cbox|) (let* ((bclase (closae:getparam AE-clos-Ob :|mbcn|))
                                      (bname (closae:getparam AE-clos-Ob :|mbnb|))
                                      (bposi (closae:getparam AE-clos-Ob :|mbpb|))
-                                     (themenu (if (igual bclase "funlisp") t (find-pw-menu-item bclase)))
+                                     (themenu (if (string-equal bclase "funlisp")
+                                                  t
+                                                  (find-pw-menu-item bclase)))
                                      thebox)
                                 (when themenu
                                   (setf *position-new-box* (make-point 15 15 ))
                                   (when bposi 
                                     (setf *position-new-box* (make-point (first bposi) (second bposi) )))
-                                  (if (igual bclase "funlisp")
+                                  (if (string-equal bclase "funlisp")
                                       (setf thebox (make-lisp-pw-boxes (read-from-string bname) *active-patch-window*))
                                       (setf thebox (menu-item-action themenu)))
                                   (setf *position-new-box* nil)
-                                  (when  (and bname (not (igual bclase "funlisp")))
+                                  (when  (and bname (not (string-equal bclase "funlisp")))
                                     (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog))
                                     (setf *pw-controls-current-pw-control* thebox)
                                     (set-dialog-item-text *pw-controls-dialog-text-item* bname)
@@ -270,17 +264,17 @@
          (Playop (closae:getparam AE-clos-Ob :|oppl| )))
     (when Scale
       (cond
-       ((igual Scale "Chromatic") (set-globally-scale *chromatic-scale*))
-       ((igual Scale "C-major") (set-globally-scale *c-major-scale*))))
+       ((string-equal Scale "Chromatic") (set-globally-scale *chromatic-scale*))
+       ((string-equal Scale "C-major") (set-globally-scale *c-major-scale*))))
     (when Appro
       (cond
-       ((igual Appro "SemiTone") (set-globally-scale *c-major-scale*))
-       ((igual Appro "Quarter tone") (set-globally-scale *1/4-tone-chromatic-scale*))
-       ((igual Appro "Eigth tone") (set-globally-scale *1/8-tone-chromatic-scale*))))
+       ((string-equal Appro "SemiTone") (set-globally-scale *c-major-scale*))
+       ((string-equal Appro "Quarter tone") (set-globally-scale *1/4-tone-chromatic-scale*))
+       ((string-equal Appro "Eigth tone") (set-globally-scale *1/8-tone-chromatic-scale*))))
     (when Playop
       (cond
-       ((igual Playop "Pitch Bend") (set-playing-option :pb))
-       ((igual Playop "Multi Channel") (set-playing-option :mc))))))
+       ((string-equal Playop "Pitch Bend") (set-playing-option :pb))
+       ((string-equal Playop "Multi Channel") (set-playing-option :mc))))))
 
 
 
@@ -660,7 +654,7 @@
                (clase (class-name (class-of boite))))
           (setf *target-action-object* boite)
           (cond
-            ((or (igual (menu-item-title iteme) "Save Chord") (igual (menu-item-title iteme) "Save"))
+            ((or (string-equal (menu-item-title iteme) "Save Chord") (string-equal (menu-item-title iteme) "Save"))
              (let* ((new-name parametro)
                     (*print-pretty* nil)
                     (*decompile-chords-mode* t))
@@ -671,7 +665,7 @@
                    (prin1 '(in-package :pw) out)
                    (let ((*package* :pw))
                      (prin1 `(add-patch-box *active-patch-window* ,(decompile *target-action-object*)) out))))))
-            ((and (igual (menu-item-title iteme) "Open") (equal 'C-patch-file-buffer clase))
+            ((and (string-equal (menu-item-title iteme) "Open") (equal 'C-patch-file-buffer clase))
              (cond ((and (c-patch-file-buffer::fred-win boite) (wptr (c-patch-file-buffer::fred-win boite)))
                     (window-select (c-patch-file-buffer::fred-win boite)))
                    ((c-patch-file-buffer::fred-win boite) (script-get-selected-file boite parametro))
@@ -681,9 +675,9 @@
                            (win (c-patch-file-buffer::find-window w-name)))
                       (if (and win (wptr win))
                           (window-select win)
-                          (script-get-selected-file boite))))
+                          (script-get-selected-file boite parametro))))
                    (t (script-get-selected-file boite parametro))))
-            ((and (igual (menu-item-title iteme) "Open File") 
+            ((and (string-equal (menu-item-title iteme) "Open File") 
                   (or (equal 'c-patch-file-buffer::C-patch-file-buffer clase) 
                       (equal 'c-patch-file-buffer::c-patch-ascii-buffer clase)))
              (script-get-selected-file boite parametro))
@@ -744,11 +738,11 @@
 
 
 (defmethod even-record ((a application) theAppleEvent reply handlerRefcon)
-  (declare (ignore handlerRefcon))
+  (declare (ignore theAppleEvent reply handlerRefcon))
   t)
 
 (defmethod even-unrecord ((a application) theAppleEvent reply handlerRefcon)
-  (declare (ignore handlerRefcon))
+  (declare (ignore theAppleEvent reply handlerRefcon))
   t)
 
 (install-appleevent-handler :|core| :|clos| #'even-close)

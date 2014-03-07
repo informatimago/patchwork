@@ -91,7 +91,7 @@
     (unless (midishare:null-event-p event)	; if the allocation was succesfull
       (midishare::chan event    ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
-                              (1- (micro-channel (approx-m  (midic note) approx))))))
+                              (1- (micro-channel (epw::approx-m  (midic note) approx))))))
       (midishare::port event 0)			; set the destination port to Modem
       (midishare::field event 0 (truncate (midic note) 100))		; set the pitch field
       (midishare::field event 1 (round (vel note)))		        ; set the velocity field
@@ -108,9 +108,9 @@
     (unless (midishare:null-event-p event)	; if the allocation was succesfull
       (midishare::chan event    ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
-                              (1- (micro-channel (approx-m  (midic note) approx))))))
+                              (1- (micro-channel (epw::approx-m  (midic note) approx))))))
       (midishare::port event 0)			; set the destination port to Modem
-      (midishare::field event 0 (truncate (approx-m (midic note) approx) 100))		; set the pitch field
+      (midishare::field event 0 (truncate (epw::approx-m (midic note) approx) 100))		; set the pitch field
       (midishare::field event 1 (round (vel note)))		        ; set the velocity field
       (midishare::field event 2 (round (convert-time-1 (dur note) unit/sec)))		; set the duration field to 1 second
       (midishare::date event (+  *MidiShare-start-time* at))
@@ -161,6 +161,7 @@
 
 ;;====play Chord
 
+#-(and) ; already in pw-chord-box.lisp
 (defmethod play ((self C-patch-chord-box-M ))
   (let ((approx (scale2approx (local-approx (car (subviews (mus-not-editor self))))))
         (object (car (chords (chord-line (car (pw-controls self)))))))
@@ -223,7 +224,7 @@
     (MidiPlayAny (ask-all editors 'measure-line)  (compute-approx) 0)) )
 
 
-
+#-(and) ; already in rtm-editor.lisp
 (defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
@@ -233,6 +234,7 @@
         (let ((*play-chseq-w/offset* t)) (MidiPlayAny c-line  (compute-approx) 0))
         (MidiPlayAny c-line  (compute-approx) 0)))))
 
+#-(and) ; already in rtm-paging+kill
 (defun play-rtms+scroll (self)
   (play-rtm-with-options self))
 

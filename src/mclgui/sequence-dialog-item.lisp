@@ -64,28 +64,26 @@ dialog item wraps to the next row or column. This number overrides the
 
 (defmethod initialize-instance ((item sequence-dialog-item) &rest rest
                                 &key
-                                (table-sequence nil sequencep) table-dimensions 
-                                sequence-order sequence-wrap-length)
+                                  (table-sequence nil sequencep) table-dimensions 
+                                  sequence-order sequence-wrap-length)
   (declare (dynamic-extent rest))
   (let ((sequence-length))
-   (when (null sequencep)
-     (setf table-sequence (slot-value item 'default-table-sequence)))
-   (setf sequence-length (length table-sequence))
-   (when (null table-dimensions)
-     (setf table-dimensions
-           (let* ((dimen-prime 1)
-                  (dimen-aux 1))
-             (if (<= sequence-length sequence-wrap-length)
-                 (setf dimen-prime sequence-length)
-                 (setf dimen-prime sequence-wrap-length
-                       dimen-aux (ceiling sequence-length sequence-wrap-length)))
-             (case sequence-order
-               (:vertical
-                (make-big-point dimen-aux dimen-prime))
-               (:horizontal
-                (make-big-point dimen-prime dimen-aux))
-               (otherwise
-                (report-bad-arg sequence-order '(member :horizontal :vertical))))))))
+    (when (null sequencep)
+      (setf table-sequence (slot-value item 'default-table-sequence)))
+    (setf sequence-length (length table-sequence))
+    (when (null table-dimensions)
+      (setf table-dimensions
+            (let* ((dimen-prime 1)
+                   (dimen-aux 1))
+              (if (<= sequence-length sequence-wrap-length)
+                  (setf dimen-prime sequence-length)
+                  (setf dimen-prime sequence-wrap-length
+                        dimen-aux (ceiling sequence-length sequence-wrap-length)))
+              (ecase sequence-order
+                (:vertical
+                 (make-big-point dimen-aux dimen-prime))
+                (:horizontal
+                 (make-big-point dimen-prime dimen-aux)))))))
   (apply #'call-next-method
          item 
          :table-sequence table-sequence
@@ -138,15 +136,16 @@ NEW-SEQUENCE:   The sequence to be associated with the sequence dialog
              (prim (min length sequence-wrap-length))
              (sec (if (= prim 0) 0 (ceiling length prim)))
              new-dims)
-        (let* (                    ;(handle (dialog-item-handle item))
-                                        ;(active-p (and handle (href handle :ListRec.lactive)))
+        (let* (
+               ;;(handle (dialog-item-handle item))
+               ;;(active-p (and handle (href handle :ListRec.lactive)))
                (f (lambda (item h v)
-                      (let ((index (cell-to-index item h v)))
-                        (when (and index (>= index length))
-                          (cell-deselect item h v))))))
-          (new-map-selected-cells item f))
+                    (let ((index (cell-to-index item h v)))
+                      (when (and index (>= index length))
+                        (cell-deselect item h v))))))
+          (map-selected-cells item f))
         (without-interrupts
-            (setf (slot-value item 'table-sequence) new-seq)
+          (setf (slot-value item 'table-sequence) new-seq)
           (set-table-dimensions 
            item
            (setf new-dims
@@ -168,11 +167,11 @@ NEW-SEQUENCE:   The sequence to be associated with the sequence dialog
          (table-sequence (table-sequence item))
          (sequence-order (slot-value item 'sequence-order))
          (index (if (eq sequence-order :horizontal)
-                  (+ (* (point-h table-dimensions) v) h)
-                  (+ (* (point-v table-dimensions) h) v))))
+                    (+ (* (point-h table-dimensions) v) h)
+                    (+ (* (point-v table-dimensions) h) v))))
     (if (< index (length table-sequence))
-      index
-      nil)))
+        index
+        nil)))
 
 
 (defgeneric index-to-cell (item index)
@@ -215,10 +214,11 @@ INDEX:          An index to the sequence (zero based, as would be
 
 ;; put-scrap a lisp object and a textual representation thereof
 (defun put-scraps (value text)
+  (niy put-scraps value text)
+  #-(and)
   (put-scrap :lisp value)
+  #-(and)
   (let ((mactext text))
-    (niy put-scraps value text)
-    #-(and)
     (when (not (7bit-ascii-p text))
       (setf mactext (convert-string text #$kcfstringencodingunicode #$kcfstringencodingmacroman)))
     (put-scrap-flavor :text mactext)

@@ -35,7 +35,7 @@
 
 
 (cl:defpackage "PATCH-WORK.SCHEDULER"
-  (:use "COMMON-LISP" "CLOSER-MOP" "MCLGUI" "LELISP-MACROS" "MIDI")
+  (:use "COMMON-LISP" "CLOSER-MOP" "UI" "LELISP-MACROS" "MIDI")
 
   (:shadowing-import-from "CLOSER-MOP"
                           "STANDARD-CLASS" "STANDARD-GENERIC-FUNCTION" "STANDARD-METHOD"
@@ -58,8 +58,12 @@
 
 (cl:defpackage "PATCH-WORK"
   (:nicknames "PW")
-  (:use "COMMON-LISP-STEPPER" "LELISP-MACROS" "UI" "PATCH-WORK.SCHEDULER")
-
+  (:use "COMMON-LISP")
+  ;; (:use "COMMON-LISP-STEPPER")
+  (:use "CLOSER-MOP" "UI" "LELISP-MACROS" "PATCH-WORK.SCHEDULER")
+  (:shadowing-import-from "CLOSER-MOP"
+                          "STANDARD-CLASS" "STANDARD-GENERIC-FUNCTION" "STANDARD-METHOD"
+                          "DEFMETHOD" "DEFGENERIC")
   (:export "ENABLE-PATCHWORK-READER-MACROS"
            "DISABLE-PATCHWORK-READER-MACROS")
   
@@ -127,18 +131,33 @@
   (:export "NEW-MENU" "PW-ADDMENU"))
 
 (cl:defpackage "C-PATCH-BUFFER"
-  (:use "COMMON-LISP-STEPPER" "UI" "PATCH-WORK")
+  (:use "COMMON-LISP")
+  ;; (:use "COMMON-LISP-STEPPER")
+  (:use "UI" "PATCH-WORK")
   (:export "C-PATCH-BUFFER" "THE-BUFFER" "BUFFER" "C-RADIO-BUTTON"
            "GET-LOCK-BUTTON-FUN" "VALUE"))
 
 (cl:defpackage "C-PATCH-ACCUM"
-  (:use "COMMON-LISP-STEPPER" "UI" "PATCH-WORK"  "C-PATCH-BUFFER")
+  (:use "COMMON-LISP")
+  ;; (:use "COMMON-LISP-STEPPER")
+  (:use "UI" "PATCH-WORK"  "C-PATCH-BUFFER")
   (:export "C-PATCH-ACCUM" "THE-BUFFER" "ACCUM" "*ACCUM-BUFFER-LIMIT*"))
 
 (cl:defpackage "C-PATCH-FILE-BUFFER"
-  (:use "COMMON-LISP-STEPPER" "LELISP-MACROS" "UI" "PATCH-WORK")
+  (:use "COMMON-LISP")
+  ;; (:use "COMMON-LISP-STEPPER")
+  (:use "LELISP-MACROS" "UI" "PATCH-WORK")
   (:intern "ASCII-WIN" "C-PATCH-ASCII-BUFFER")
   (:export "C-PATCH-FILE-BUFFER"))
+
+(defpackage "C-PW-MIDI-IN"
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
+  (:import-from "PATCH-WORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
+  (:import-from "MIDI" "MIDI-READ")
+  (:export "PW-MIDI-IN" "M-DATA" "C-PW-MIDI-IN" "DELAY" "STATUS" "MIDI-CHAN" "DATA1"
+           "DATA2" "MIDI-OPCODE" "C-PW-MIDI-IN-TOP" "C-PW-DELAY-BOX" "C-PW-NOTE-IN"
+           "NOTE-IN" "C-PW-NOTE-ON-IN" "NOTE-ON-IN" "C-PW-CHORD-IN" "CHORD-IN"
+           "*MIDI-BOX-POPUPMENU*"))
 
 ;; A few circular dependencies:
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -151,7 +170,7 @@
 
 
 (cl:defpackage "CLOS-APPLE-EVENT"
-  (:use "COMMON-LISP" "MCLGUI")
+  (:use "COMMON-LISP" "UI")
   (:nicknames "CLOSAE")
   (:export "APPLEEVENT" "GETPARAM" "PUTPARAM"
            "AEDESC" "GETDESCRECPTR" "ASAEDESC"
@@ -159,7 +178,7 @@
            "GETCLASS" "GETCONTAINER" "GETFORM" "GETDATA"
            "SETCLASS" "SETCONTAINER" "SETFORM" "SETDATA"
            "WITH-AEDESCS" "CREATE-SELF-TARGET" "CREATE-APPLEEVENT"
-           "AESEND"))
+           "AESEND" "CHECK-REPLY-ERROR"))
  
 ;; (cl:defpackage "PW-MIDI"
 ;;   (:nicknames "MIDI")

@@ -94,7 +94,7 @@
    (value :initform nil :accessor value)))
 
 (defmethod initialize-instance :after ((self C-patch-function) &key controls)
-  (declare (ignore controls) (special *collector-popup-menu*))
+  (declare (ignore controls))
   (setf (popUpBox self) 
         (make-popUpbox "  " self
                        *bpf-popUp-menu*

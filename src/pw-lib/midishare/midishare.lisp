@@ -49,6 +49,7 @@
 
 (defpackage "MIDISHARE" 
   (:use "COMMON-LISP")
+  (:import-from "UI" "NIY")
   (:export "TYPENOTE" "TYPEKEYON" "TYPEKEYOFF" "TYPEKEYPRESS"
            "TYPECTRLCHANGE" "TYPEPROGCHANGE"  "TYPECHANPRESS"
            "TYPEPITCHWHEEL" "TYPESONGPOS" "TYPESONGSEL" "TYPECLOCK"
@@ -97,7 +98,6 @@
            "VEL" "DUR" "XFIELDS" "TEXT"  "FIRSTEV" "LASTEV"
            "FILTERBIT"  "ACCEPTPORT" "ACCEPTTYPE" "ACCEPTCHAN"))
 (in-package :midishare)
-(import 'ui:niy)
 
 
 (defmacro defrecord (name &rest slots)
@@ -117,7 +117,7 @@
 ;; Extension record for typeSysEx events
 
 (defrecord TMidiSEX  
-    (link (:pointer TMidiSEX))
+  (link (:pointer TMidiSEX))
   (data (:array :byte 12)))
 
 

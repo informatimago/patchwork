@@ -35,8 +35,26 @@
 (in-package "MCLGUI")
 
 (declaim (declaration stepper))
+(declaim (inline point-string point-h point-v
+                 make-point add-points subtract-points
+                 make-big-point add-big-points subtract-big-points
+                 point-list
+                 signed-byte-16-p))
 
-(deftype point () '(unsigned-byte 32))
+(deftype point      () '(unsigned-byte 32))
+
+
+
+(defun require-type (value type)
+  (declare (stepper disable))
+  (if (typep value type)
+      value
+      (error 'type-error :datum value :expected-type type)))
+
+(defun signed-byte-16-p (value)
+  (declare (stepper disable))
+  (and (integerp value) (<= #x-8000 value #x7fff)))
+
 
 (defun make-point (h &optional v)
   "
@@ -50,8 +68,33 @@ RETURN:         If V is given then the encoded point #@(H V), else H.
 "
   (declare (stepper disable))
   (if v
-    (dpb (ldb (byte 16 0) (round v)) (byte 16 16) (ldb (byte 16 0) (round h)))
-    h))
+      (if (and (signed-byte-16-p h)
+               (signed-byte-16-p v))
+          (logior (logand #xffff h) (ash v 16))
+          (make-point (max #x-8000 (min (round h) #x7fff))
+                      (max #x-8000 (min (round v) #x7fff))))
+      (if (consp h)
+          (make-point (car h) (cdr h))
+          (require-type h 'integer))))
+
+
+(defun make-big-point (h &optional v)
+  "
+Big points are couples of coordinates.
+Big points are represented as integers or cons cells.
+"
+  (declare (stepper disable))
+  (if v
+      (if (and (signed-byte-16-p h)
+               (signed-byte-16-p v))
+          (logior (logand #xffff h) (ash v 16))
+          (cons (round h) (round v)))
+      (if (consp h)
+          (if (and (integerp (car h))
+                   (integerp (cdr h)))
+              h
+              (cons (round (car h)) (round (cdr h))))
+          (require-type h 'integer))))
 
 
 (defun point-string (point)
@@ -69,10 +112,12 @@ EXAMPLE:        (point-string (make-point 10 20)) --> \"#@(10 20)\"
 RETURN:         The horizontal coordinate of POINT.
 "
   (declare (stepper disable))
-  (let ((u (ldb (byte 16  0) point)))
-    (if (< 32767 u)
-      (- u 65536)
-      u)))
+  (if (consp point)
+      (require-type (car point) 'integer)
+      (let ((u (ldb (byte 16  0) point)))
+        (if (< 32767 u)
+            (- u 65536)
+            u))))
 
 
 (defun point-v (point)
@@ -80,10 +125,13 @@ RETURN:         The horizontal coordinate of POINT.
 RETURN:         The vertical coordinate of POINT.
 "
   (declare (stepper disable))
-  (let ((u (ldb (byte 16 16) point)))
-    (if (< 32767 u)
-      (- u 65536)
-      u)))
+  (if (consp point)
+      (require-type (cdr point) 'integer)
+      (let ((u (ldb (byte 16 16) point)))
+        (if (< 32767 u)
+            (- u 65536)
+            u))))
+
 
 
 (defun point<= (point &rest other-points)
@@ -112,6 +160,7 @@ OTHER-POINTS:   Zero or more other points represented by integers.
           (return nil))))))
 
 
+
 (defun add-points (a b)
   "
 RETURN:         The point that is the vectorial sum of points A and B.
@@ -129,6 +178,26 @@ RETURN:         The point that is the vectorial difference of points A from B.
               (- (point-v a) (point-v b))))
 
 
+
+
+(defun add-big-points (a b)
+  "
+RETURN:         The point that is the vectorial sum of points A and B.
+"
+  (declare (stepper disable))
+  (make-big-point (+ (point-h a) (point-h b))
+                  (+ (point-v a) (point-v b))))
+
+(defun subtract-big-points (a b)
+  "
+RETURN:         The point that is the vectorial difference of points A from B.
+"
+  (declare (stepper disable))
+  (make-big-point (- (point-h a) (point-h b))
+                  (- (point-v a) (point-v b))))
+
+
+
 (defun point-to-list (p)
   "
 RETURN:         The point P as a list of coordinates (H V).
@@ -136,10 +205,6 @@ RETURN:         The point P as a list of coordinates (H V).
   (declare (stepper disable))
   (list (point-h p) (point-v p)))
 
-
-(declaim (inline make-point point-string point-h point-v
-                 point-h point-v add-points subtract-points
-                 point-list))
 
 
 

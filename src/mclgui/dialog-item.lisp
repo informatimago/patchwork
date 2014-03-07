@@ -655,8 +655,9 @@ V:              Vertical index. If the value of v is NIL, h is assumed
 "))
 
 (defgeneric set-view-level (item level))
-
-
-
+(defgeneric installed-item-p (item)
+  (:method (item)
+    (declare (ignore item))
+    nil))
 
 ;;;; THE END ;;;;

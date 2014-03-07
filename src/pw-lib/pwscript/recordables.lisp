@@ -55,7 +55,7 @@
                                                        (can-switch-layer nil) (dont-reconnect nil)
                                                        (want-receipt nil) (priority #$kAENormalPriority)
                                                        (timeout #$kAEDefaultTimeout)
-                                                       (idleproc appleevent-idle)
+                                                       (idleproc 'appleevent-idle)
                                                        filterproc)
   (let ((mode (+ (ecase reply-mode
                    (:no-reply #$kAENoReply)
@@ -72,16 +72,17 @@
                  (if dont-reconnect #$kAEDontReconnect 0)
                  (if want-receipt #$kAEWantReceipt 0))))
     (ae-error 
-      (let ((*inside-aesend* t)
-            (res #-(and) (#_AESend the-appleevent the-reply mode priority 
-                                   timeout idleproc (or filterproc (%null-ptr)))
-                 #+(and) (closae:aesend the-appleevent the-reply mode priority 
-                                        timeout idleproc filterproc)))
+      (let* ((*inside-aesend* t)
+             (res #-(and) (#_AESend the-appleevent the-reply mode priority 
+                                    timeout idleproc (or filterproc (%null-ptr)))
+                  #+(and) (closae:aesend the-appleevent the-reply mode priority 
+                                         timeout idleproc filterproc)))
+        (declare (special *inside-aesend*))
         (if (eq res #$errAEWaitCanceled)        ; be silent about aborts
             #$noErr
             res)))
     (when (eq reply-mode :wait-reply)
-      (ui::check-reply-error the-reply)
+      (closae:check-reply-error the-reply)
       the-reply)))
 
 
@@ -108,62 +109,45 @@
 
 
 ;;RENAME
-(defmethod set-dialog-item-text-from-dialog ((view C-patch) str)
+(defmethod set-dialog-item-text-from-dialog :before  ((view C-patch) str)
   (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
-                                (,:|newn| ,(string-downcase str))))
-  (setf (pw-function-string view) (string-downcase str))
-  (with-focused-view view
-    (draw-function-name view 2 (- (h view) 5))))
+                                (,:|newn| ,(string-downcase str)))))
 
-(defmethod set-dialog-item-text-from-dialog ((view C-patch-application) str)
-  (let ((win (application-object view)))
-    (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
-                                  (,:|newn| ,(string-downcase str))))
-    (setf (pw-function-string view) (string-downcase str))
-    (if (and win (wptr win)) 
-        (set-window-title win (string-downcase str)))
-    (with-focused-view view
-      (draw-function-name view 2 (- (h view) 5)))))
+(defmethod set-dialog-item-text-from-dialog :before  ((view C-patch-application) str)
+  (record--ae :|PWst| :|rena| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
+                                  (,:|newn| ,(string-downcase str)))))
 
 
 ;;SET
 
-(defmethod set-dialog-item-text-from-dialog ((self C-ttybox-out) text)
+(defmethod set-dialog-item-text-from-dialog :before  ((self C-ttybox-out) text)
   (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
                                                  :|indx| 1))
-                                (,:|data| ,text)))
-  (set-dialog-item-text self text)
-  (set (intern text "USER-SUPPLIED-IN-OUTS") (view-container self)))
+                                (,:|data| ,text))))
 
 
-(defmethod set-dialog-item-text-from-dialog ((self C-ttybox-in-box) text)
+(defmethod set-dialog-item-text-from-dialog :before  ((self C-ttybox-in-box) text)
   (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
                                                  :|indx| 1))
-                                (,:|data| ,text)))
-  (set-dialog-item-text self text))
+                                (,:|data| ,text))))
 
 
-(defmethod set-dialog-item-text-from-dialog ((self C-ttybox-instrument) text)
-  (set-dialog-item-text self text)
-  (when (dialog-item-action-function self)
-     (funcall (dialog-item-action-function  self) self)))
+(defmethod set-dialog-item-text-from-dialog :before  ((self C-ttybox-instrument) text)
+  (declare (ignorable self) (ignore text))
+  ;; nothing?
+  )
 
 
-(defmethod set-dialog-item-text-from-dialog ((self C-ttybox-absin) text)
-  (set-dialog-item-text self text)
+(defmethod set-dialog-item-text-from-dialog :before  ((self C-ttybox-absin) text)
   (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
                                                  :|indx| (+ (position self (pw-controls (view-container self))) 1)))
-                                (,:|data| ,text)))
-  (update-absin-doc-string (view-container self)))
+                                (,:|data| ,text))))
 
 
-(defmethod set-dialog-item-text-from-dialog ((self C-ttybox-absout) text)
-  (set-dialog-item-text self text)
-  (setf (doc-string self) text)
+(defmethod set-dialog-item-text-from-dialog :before  ((self C-ttybox-absout) text)
   (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))
                                                  :|indx| 1))
-                                (,:|data| ,text)))
-  (update-absout-doc-string (view-container self)))
+                                (,:|data| ,text))))
 
 
 (defmethod item-action-after-drag ((self C-numbox))
@@ -175,22 +159,19 @@
     (funcall (dialog-item-action-function  self) self)))
 
 
-(defmethod set-dialog-item-text-from-dialog ((self C-ttybox) text)
+(defmethod set-dialog-item-text-from-dialog :before  ((self C-ttybox) text)
   (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
                                                  :|indx| (+ (position self (pw-controls (view-container self))) 1)))
-                                (,:|data| ,text)))
-  (set-dialog-item-text self text))
+                                (,:|data| ,text))))
 
 
-(defmethod set-dialog-item-text-from-dialog ((self C-numbox) text)
+(defmethod set-dialog-item-text-from-dialog :before  ((self C-numbox) text)
   (let ((value (read-from-string text)))
-    (when (numberp value)
-      (setf (value self) value)
-      (if (patch-type-p (view-container self))
-          (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
-                                                         :|indx| (+ (position self (pw-controls (view-container self))) 1)))
-                                        (,:|data| ,value))))
-      (set-numbox-item-text self value))))
+    (when (and (numberp value)
+                (patch-type-p (view-container self)))
+      (record--ae :|core| :|setd| `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string (view-container self))) 
+                                                     :|indx| (+ (position self (pw-controls (view-container self))) 1)))
+                                    (,:|data| ,value))))))
 
 
 (defun original-args (fun)
@@ -322,14 +303,6 @@
 (defmethod mouse-pressed-no-active-extra :after ((self C-patch-PolifMN) x y) 
   (declare (ignore x y))
   (remove-yourself-control self))
-
-(defmethod mouse-pressed-no-active-extra :after ((self C-patch-PolifRTM) x y) 
-  (declare (ignore x y))
-  (remove-yourself-control self))
-
-
-
-
 
 (defmethod mouse-pressed-no-active-extra ((self C-pw-extend) x y) 
   (declare (ignore x y)) 
@@ -498,12 +471,6 @@
 
 
 
-(defmethod init-pw-function-string ((self C-patch))
-  (setf (pw-function-string self) 
-        (mk-nuevo-name-box  (string-downcase (string (pw-function self))))))
-
-
-
 (defmethod draw-function-name ((self C-patch-application) x y)
   (let* ((win (application-object self))
          (str (if (and win (wptr win))
@@ -512,27 +479,8 @@
         (draw-string x y str)
         (draw-string x y (subseq  str 0 (min 5 (length str) ))))))
 
+
 ;;EDITORES A CAMBIAR
-
-
-
-(defun make-BPF-editor (bp &optional editor-view-class)
-  (let* ((win-string (mk-nuevo-name-box  "bpf") )
-         (win (make-instance 
-                  'C-BPF-window :window-title win-string :close-box-p nil :window-show nil
-                  :view-position #@(10 40) :view-size #@(250 275)))
-         (bp-view 
-          (make-instance 
-              (if editor-view-class editor-view-class 'C-bpf-view) 
-              :view-container win
-              :view-position #@(2 2) :view-size #@(240 217) 
-              :break-point-function bp 
-              :track-thumb-p t)))
-    (add-subviews win bp-view)
-    (setf (BPF-editor-object win) bp-view)
-    (scale-to-fit-in-rect bp-view)
-    win))
-
 
 
 (defun make-rtm-editor-window (measure-line)
@@ -672,24 +620,11 @@
 
 (in-package :pw)
 
-(defmethod save ((self C-patch))
-  (if *pw-nosave-mode* 
-      (ui::message-dialog "Sorry this version cannot save files.")
-      (let* ((new-name 
-              (choose-new-file-dialog :directory (string (pw-function self)) 
-                                      :button-string "Save patch as"))
-             
-             (*print-pretty* nil)
-             (*decompile-chords-mode* t))
-        (record-menu (if (equal (class-name (class-of self)) 'C-patch-chord-box-M )
-                         "Save Chord" "Save") (string-downcase  (pathname-name new-name)) self) 
-        (setf (pw-function-string self) (string-downcase  (pathname-name new-name)))
-        (delete-file new-name)   ;ML
-        (with-cursor *watch-cursor*
-          (WITH-OPEN-FILE (out new-name :direction :output :if-exists :supersede :if-does-not-exist :create)
-            (prin1 '(in-package :pw) out)
-            (let ((*package* :pw))
-              (prin1 `(add-patch-box *active-patch-window* ,(decompile self)) out)))))))
+(defmethod actual-save :before ((self C-patch) file-name)
+  (record-menu (if (equal (class-name (class-of self)) 'C-patch-chord-box-M )
+                   "Save Chord" "Save")
+               (string-downcase  (pathname-name file-name))
+               self))
 
 (defun record-menu  (title para self)
   (if para
@@ -701,15 +636,15 @@
 
 (defun make-box-menu-recordables (theboxmenu)
   (mapc (lambda (par) 
-            (if (not (or (igual (menu-item-title par) "Save Chord")
-                         (igual (menu-item-title par) "Save")
-                         (igual (menu-item-title par) "Open")
-                         (igual (menu-item-title par) "Open File")))
-              (let* ((fun (menu-item-action-function par)))
-                (set-menu-item-action-function par 
-                                               (lambda () 
-                                                   (record-menu (menu-item-title par) nil *target-action-object*)
-                                                 (funcall fun))))))
+          (unless (or (string-equal (menu-item-title par) "Save Chord")
+                      (string-equal (menu-item-title par) "Save")
+                      (string-equal (menu-item-title par) "Open")
+                      (string-equal (menu-item-title par) "Open File"))
+            (let ((fun (menu-item-action-function par)))
+              (set-menu-item-action-function par 
+                                             (lambda () 
+                                               (record-menu (menu-item-title par) nil *target-action-object*)
+                                               (funcall fun))))))
         (menu-items theboxmenu)))
 
 
@@ -752,10 +687,6 @@
     (tell (controls *active-patch-window*) 'draw-connections) ) )
 
 
-(make-box-menu-recordables *Chord-box-popUpMenu*)
-(make-box-menu-recordables C-PW-MIDI-IN::*Midi-box-popUpMenu*)
-(make-box-menu-recordables c-patch-file-buffer::*file-box-popUpMenu*)
-
 
 (defmethod view-position ((self null)) (make-point 0 0))
 (defmethod view-size     ((self null)) (make-point 1000 1000))
@@ -778,7 +709,17 @@
 
 
 
+
+(defvar *Chord-box-popUpMenu*)
+(defvar C-PW-MIDI-IN:*Midi-box-popUpMenu*)
+(defvar c-patch-file-buffer::*file-box-popUpMenu*)
+
+(defun initialize/recordables ()
+  (make-box-menu-recordables *Chord-box-popUpMenu*)
+  (make-box-menu-recordables C-PW-MIDI-IN:*Midi-box-popUpMenu*)
+  (make-box-menu-recordables c-patch-file-buffer::*file-box-popUpMenu*))
+
+
+;; (initialize/recordables)
+
 ;;;; THE END ;;;;
-
-
-

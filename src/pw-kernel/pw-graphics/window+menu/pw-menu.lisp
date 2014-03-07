@@ -164,14 +164,20 @@
 (defvar *option-click-menu*   nil)
 
 
+(defun clear-patchwork ()
+  (niy clear-patchwork)
+  #-(and) (midi::midi-close))
+
 (defun save-special-pw-image ()
+  (niy save-special-pw-image)
+  #-(and)
   (let ((file (choose-new-file-dialog
                :prompt "Save new image as:"
                :button-string  "Save"
                :directory (merge-pathnames "Desktop/" (user-homedir-pathname))
                #-(and)"CL:images;Pw.image")) ;; PJB-TODO:  check logical pathnames in patchwork.
-        (sizes (list (* 8500 1024)
-                     (* 6500  1024))))
+        #-(and) (sizes (list (* 8500 1024)
+                             (* 6500 1024))))
     (when file
       (clear-patchwork)
       (eval-enqueue        
@@ -268,6 +274,15 @@ DO:       Execute the BODY with a handler for CONDITION and
   (menu-item-disable *apps-PW-menu-item*))
 
 
+(defvar *c-major-scale*            nil)
+(defvar *chromatic-scale*          nil)
+(defvar *1/4-tone-chromatic-scale* nil)
+(defvar *1/8-tone-chromatic-scale* nil)
+(defvar *standard-music-notation-scale* *c-major-scale*)
+(defvar *current-music-notation-scale*  *c-major-scale*            "the scale selected by the user")
+(defvar *current-approx-scale*          *1/4-tone-chromatic-scale* "the scale for user selected appro")
+
+
 (defun initialize-menus ()
   ;;------------------------------
   (setf *pw-menu-apps*         (new-menu "Patchwork"))
@@ -362,11 +377,6 @@ DO:       Execute the BODY with a handler for CONDITION and
           (when item
             (add-menu-items *PWoper-menu* item))))))
 
-  (defvar *c-major-scale*)
-  (defvar *chromatic-scale*)
-  (defvar *1/4-tone-chromatic-scale*)
-  (defvar *1/8-tone-chromatic-scale*)
-  
   ;;------------------------------
   (setf *g-option-c-major*     (new-leafmenu "C-major"        (lambda () (set-globally-scale *c-major-scale*))))
   (setf *play-Pbend-menu*      (new-leafmenu "Pitch Bend"     (lambda () (set-playing-option :pb))))
@@ -420,4 +430,5 @@ DO:       Execute the BODY with a handler for CONDITION and
 
 
 (initialize-menus)
+ 
 ;;;; THE END ;;;;

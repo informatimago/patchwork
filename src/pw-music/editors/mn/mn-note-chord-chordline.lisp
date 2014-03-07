@@ -45,16 +45,6 @@
 (provide 'MN-note-chord-chordline)
 
 ;;=================================================================================================
-(defvar *mn-view-dyn-flag* nil)
-(defvar *mn-view-dur-flag* nil)
-(defvar *mn-view-ins-flag* nil)
-(defvar *MN-global-ins-y* 0)
-(defvar *staff-num* 3)
-(defvar *mn-view-offset-flag* nil)
-(defvar  *MN-VIEW-ARP-FLAG* nil)
-(defvar  *MN-NOTE-INS-Y* 0)
-(defvar *GLOBAL-SELECTED-NOTE* nil)
-;;=================================================================================================
 (defclass C-scale ()
    ((alteration-vector :initform nil :initarg :alteration-vector :accessor alteration-vector)
     (diatone-vector    :initform nil :initarg :diatone-vector    :accessor diatone-vector)
@@ -144,7 +134,6 @@
        ,(order self)
        ,(comm self)))
 
-(defvar *current-MN-window* ())
 
 (defun make-C-note (midic diatone alteration dur vel chan &optional instrument offset order comm)
   (let ((note (make-instance 'C-note 
@@ -609,7 +598,6 @@
 (defmethod stop-play ((self C-chord-line))
   (setf (play-flag self) ()))
 
-(defvar *MN-play-flag* nil)
 
 (defmethod play-chords ((self C-chord-line) &optional begin-time)
   (setf *MN-play-flag* t)

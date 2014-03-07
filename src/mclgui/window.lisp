@@ -37,8 +37,6 @@
 (objcl:enable-objcl-reader-macros)
 
 
-
-
 (defvar *window-list* '()
   "A list of window instances.")
 
@@ -474,6 +472,11 @@ NEW-TITLE:      A string to be used as the new title.
         (when nswindow
           (on-main-thread [nswindow setTitle:(objcl:objcl-string new-title)])))
       new-title)))
+
+
+(defgeneric set-window-filename (window filename)
+  (:method ((window window) filename)
+    (set-window-title window (file-namestring filename))))
 
 
 
@@ -1052,7 +1055,7 @@ RETURN:         A BOOLEAN value indicating whether view can perform
     (with-handle (winh window)
       [winh setBackgroundColor:(unwrap color)])
     (when redisplay-p
-      (invalidate-view w t))))
+      (invalidate-view window t))))
 
 
 (defmethod get-fore-color ((window window))

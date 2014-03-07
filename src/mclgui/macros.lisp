@@ -35,11 +35,11 @@
 (in-package "MCLGUI")
 (objcl:enable-objcl-reader-macros)
 
-(defmacro niy (item &rest vars)
+(defmacro niy (operator &rest parameters)
   `(format *trace-output* "~&(~40A (~S~:{ (~S ~S)~}))~%"
            "not implemented yet:"
-           ',item (mapcar (lambda (var) (list var (type-of var)))
-                          (list ,@vars))))
+           ',operator (mapcar (lambda (var) (list var (type-of var)))
+                              (list ,@parameters))))
 
 (defmacro uiwarn (control-string &rest args)
   `(format *trace-output* "~&(~?)~%" ',control-string' (list ,@args)))

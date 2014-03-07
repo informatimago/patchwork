@@ -61,7 +61,6 @@
 
 
 (defun midi-new-filter (&key chan port type)
-  (declare (ignore chan port type))
   (niy midi-new-filter chan port type)
   ;; (let ((f (ui::make-record :tfilter)))
   ;;   (cond ((eq chan t) (dotimes (i 16) (midishare::acceptchan f i t)))
@@ -136,7 +135,6 @@
 
 ;;;;MidiWrite
 (defun midi-write-time (event time)
-  (declare (ignore event time))
   (niy midi-write-time event time)
   ;; (when *pw-refnum*
   ;;   (midishare::MidiSendAt *pw-refnum* event time))p

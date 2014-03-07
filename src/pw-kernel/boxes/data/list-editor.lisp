@@ -69,7 +69,6 @@
 ;;;  add-upward-element
 ;;;  add-downward-element
 ;;;==========================================
-(defvar *my-menu* '*collector-popup-menu*)
 
 (defpackage "C-LIST-ITEM-H"    ;the package for inheritance
   (:use "COMMON-LISP" "LELISP-MACROS" "UI" "PATCH-WORK")

@@ -571,8 +571,17 @@ RETURN:         If called during event processing, return true if
             (caps-lock-key-p))))
 
 
+(defun wait-mouse-up-or-moved ()
+  (niy wait-mouse-up-or-moved)
+  t)
 
+(defmacro with-timer (&body body)
+  (niy with-timer)
+  `(progn ,@body))
 
+(defmacro with-event-processing-enabled  (&body body)
+  (niy with-event-processing-enabled)
+  `(progn ,@body))
 
 (defun event-dispatch (&optional (idle *idle*))
   "
@@ -599,9 +608,9 @@ IDLE:           An argument representing whether the main Lisp process
     (when (get-next-event *current-event* idle)
       (when (and *eventhook*  (funcall *eventhook*))
         (return-from event-dispatch))
-      (when (and (= app1-evt (event-what *current-event*))
-                 (process-ae-event *current-event*))
-        (return-from event-dispatch))
+      ;; (when (and (= app1-evt (event-what *current-event*))
+      ;;            (process-ae-event *current-event*))
+      ;;   (return-from event-dispatch))
       (process-event *current-event*))))
 
 
@@ -616,6 +625,7 @@ IDLE:           An argument representing whether the main Lisp process
 (defvar *out-of-band-event-queue* (cons nil nil))
 
 (defmacro with-mutex (object &body body)
+  (declare (ignore object))
   `(progn ,@body))
 
 (defun post-event (event)

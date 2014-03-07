@@ -414,11 +414,13 @@ RETURN:         DST.
   "RETURN: The time in second since startup."
   (/ (get-internal-real-time) internal-time-units-per-second))
 
+(defun get-tick-count ()
+  (truncate (timestamp) (/ +tick-per-second+)))
 
 (defun get-null-event ()
   "RETURN: A new null event."
   (make-event :what null-event
-              :when (truncate (timestamp) (/ +tick-per-second+))
+              :when (get-tick-count)
               :where (nspoint-to-point
                       (let ((win (front-window)))
                         (if win

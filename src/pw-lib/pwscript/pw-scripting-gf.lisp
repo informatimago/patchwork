@@ -34,6 +34,13 @@
 
 (in-package :pw)
 
+(defvar *list-pw-script-objects* nil)
+(defvar *contador-pw-script-object* 0)
+(defvar *si-record* t)
+(defvar *position-new-box* nil)
+(defvar *charge?* nil)
+
+
 (defgeneric even-open     (application theAppleEvent reply handlerRefcon))
 (defgeneric even-close    (application theAppleEvent reply handlerRefcon))
 (defgeneric even-new      (application theAppleEvent reply handlerRefcon))

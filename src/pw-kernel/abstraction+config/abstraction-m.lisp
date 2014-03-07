@@ -129,7 +129,8 @@
              ((member nil in-docs-temp)
               (ui:message-dialog 
                "WARNING! absin box connected to irreducible types. ALL-type used")
-              (mapcar (lambda (type-spec) '(nilNum)) in-docs-temp))
+              (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum))
+                      in-docs-temp))
              (t in-docs-temp))))
          (abstract-box 
           (make-std-patch-box (type-of self)  
@@ -204,7 +205,7 @@
          (message-dialog  
           "WARNING! absin box connected to irreducible types. ALL-type used.")
          (setq in-put-docs
-               (mapcar (lambda (type-spec) '(nilNum))
+               (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum))
                        in-put-docs))))
      (make-std-patch-box abstract-class  
             (read-from-string (window-title new-win)) in-put-docs new-win in-boxes)))
@@ -223,7 +224,8 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
       (set-window-title new-win (string fun-name)))
     (let ((arg-names (mapcar (lambda (absin) (read-from-string (doc-string absin)))
                              in-boxes))
-          (thename (read-from-string (concatenate 'string "USER-ABSTRACTION::" (string fun-name)))))
+          ;; (thename (read-from-string (concatenate 'string "USER-ABSTRACTION::" (string fun-name))))
+          )
       (if (all-absins-different arg-names)
         (progn
           (set-PW-symbolic-type-data fun-name
@@ -233,7 +235,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
                      '(&optional) '(&rest)) 'nil)  ;output type is nil, for the moment...
           (setf (fdefinition fun-name)
                 (eval `(function (lambda ,arg-names (declare (ignore ,@arg-names)) nil))))
-          ;(eval `(defun ,thename ,arg-names (declare (ignore ,@arg-names)) nil))
+          ;;(eval `(defun ,thename ,arg-names (declare (ignore ,@arg-names)) nil))
           (make-PW-standard-box class fun-name (make-point 15 15)
                                 (get-current-inbox-vals type-specs)))
         (progn

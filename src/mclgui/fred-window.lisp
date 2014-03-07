@@ -48,35 +48,42 @@
   (:method (buffer file-pathname)
     (niy buffer-insert-file buffer file-pathname)))
 
+(defgeneric buffer-insert (buffer text)
+  (:method (buffer text)
+    (niy buffer-insert buffer text)))
+
 (defgeneric buffer-write-file (buffer file-pathname &key if-exists if-does-not-exists)
   (:method (buffer file-pathname &key if-exists if-does-not-exists)
     (niy buffer-write-file buffer file-pathname  if-exists if-does-not-exists)))
 
 (defgeneric buffer-size (buffer)
   (:method (buffer)
-    (declare (ignorable buffer))
+    (niy buffer-size buffer)
     0))
 
 (defgeneric buffer-current-sexp (buffer &optional position)
   (:method (buffer &optional position)
-    (declare (ignorable buffer position))
+    (niy buffer-current-sexp buffer position)
     'nil))
 
 (defgeneric buffer-char (buffer position)
   (:method  (buffer position)
-    (declare (ignorable buffer position))
+    (niy buffer-char buffer position)
     nil))
 
 (defgeneric set-fred-display-start-mark (dialog-item position)
   (:method  (dialog-item position)
-    (declare (ignorable dialog-item position))
     (niy set-fred-display-start-mark dialog-item position)
     (values)))
 
 (defgeneric fred-update (dialog-item)
   (:method  (dialog-item)
-    (declare (ignorable dialog-item))
     (niy fred-update dialog-item)
     (values)))
+
+(defgeneric buffer-skip-fwd-wsp&comments (buffer length size)
+  (:method (buffer length size)
+    (niy buffer-skip-fwd-wsp&comments buffer length size)
+    nil))
 
 ;;;; THE END ;;;;

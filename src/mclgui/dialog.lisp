@@ -102,7 +102,9 @@ recent outstanding catch-cancel.
 
 
 (defun process-multi-clicks (event)
-  )
+  (niy process-multi-clicks event))
+
+
 (defvar *eventhooks-in-progress* nil)
 (defun process-event (event)
   (let ((e-code (event-what event)))
@@ -144,10 +146,59 @@ recent outstanding catch-cancel.
 (defvar *first-menustate* nil)
 
 
+(defun %return-from-modal-dialog (&rest values)
+  (niy %return-from-modal-dialog values)
+  #-(and)
+  (when *modal-dialog-on-top* ; << maybe its gone or not set yet
+    (let ((process (modal-dialog-process (car *modal-dialog-on-top*))))
+      (when process
+        (apply (function process-interrupt)
+               process
+               (lambda (&rest values)
+                 (throw '%modal-dialog (apply #'values values)))
+               values)))))
+
+
+(defmacro return-from-modal-dialog (form)
+  "
+
+The macro RETURN-FROM-MODAL-DIALOG causes one or more values to be
+returned from the most recent call to MODAL-DIALOG. 
+
+The dialog is hidden or closed according to the value of CLOSE-ON-EXIT
+that was passed to the call to MODAL-DIALOG.  (Any throw past the
+modaldialog call also causes the dialog box to be hidden or closed).
+If the dialog box is only hidden, its contents remain intact and it
+continues to take up memory until the window-close function is
+explicitly called. 
+
+VALUES:         Any values.  The following two values have special
+                meanings:
+
+                :CLOSED:        If a dialog that is used modally has
+                                a close box and the window is closed,
+                                RETURN-FROM-MODAL-DIALOG is called
+                                with the value :CLOSED. 
+
+                :CANCEL:        If the user selects the cancel
+                                button, RETURN-FROM-MODAL-DIALOG is
+                                called returning :CANCEL.  The
+                                function MODAL-DIALOG then performs a
+                                THROW-CANCEL. 
+
+"
+  `(multiple-value-call '%return-from-modal-dialog ,form))
+
+
+
+(defun return-cancel (i)
+  (declare (ignore i))
+  (return-from-modal-dialog :cancel))
+
+
 (defmethod window-close :before ((dialog window))
   (when (assoc dialog *modal-dialog-on-top*)
     (return-from-modal-dialog :closed)))
-
 
 
 (defgeneric modal-dialog (dialog &optional close-on-exit eventhook)
@@ -298,56 +349,6 @@ EVENTHOOK:       A hook.  The function modal-dialog binds *EVENTHOOK*
                           )))))))))
 
 
-(defun %return-from-modal-dialog (&rest values)
-  (niy %return-from-modal-dialog values)
-  #-(and)
-  (when *modal-dialog-on-top* ; << maybe its gone or not set yet
-    (let ((process (modal-dialog-process (car *modal-dialog-on-top*))))
-      (when process
-        (apply (function process-interrupt)
-               process
-               (lambda (&rest values)
-                 (throw '%modal-dialog (apply #'values values)))
-               values)))))
-
-
-(defmacro return-from-modal-dialog (form)
-  "
-
-The macro RETURN-FROM-MODAL-DIALOG causes one or more values to be
-returned from the most recent call to MODAL-DIALOG. 
-
-The dialog is hidden or closed according to the value of CLOSE-ON-EXIT
-that was passed to the call to MODAL-DIALOG.  (Any throw past the
-modaldialog call also causes the dialog box to be hidden or closed).
-If the dialog box is only hidden, its contents remain intact and it
-continues to take up memory until the window-close function is
-explicitly called. 
-
-VALUES:         Any values.  The following two values have special
-                meanings:
-
-                :CLOSED:        If a dialog that is used modally has
-                                a close box and the window is closed,
-                                RETURN-FROM-MODAL-DIALOG is called
-                                with the value :CLOSED. 
-
-                :CANCEL:        If the user selects the cancel
-                                button, RETURN-FROM-MODAL-DIALOG is
-                                called returning :CANCEL.  The
-                                function MODAL-DIALOG then performs a
-                                THROW-CANCEL. 
-
-"
-  `(multiple-value-call '%return-from-modal-dialog ,form))
-
-
-
-(defun return-cancel (i)
-  (declare (ignore i))
-  (return-from-modal-dialog :cancel))
-
-
 
 
 
@@ -389,12 +390,6 @@ STRING:         A string against which to compare the text of the
 (defclass color-dialog (dialog)
   ()
   (:default-initargs :color-p t))
-
-
-
-(defmethod installed-item-p (item)
-  (let ((dialog (view-container item)))
-    (and dialog (wptr dialog))))
 
 
 

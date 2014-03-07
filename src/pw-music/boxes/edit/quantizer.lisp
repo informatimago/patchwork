@@ -56,7 +56,7 @@
 (defun minimum-pulses (attack-times tmin tmax)
   (min *maximum-pulses*
        (max 1 ;;;;;(1- (length attack-times))
-              (truncate (- tmax tmin) (* 3 (apply 'min (- tmax tmin) (pw::x->dx attack-times)))))))
+              (truncate (- tmax tmin) (* 3 (apply 'min (- tmax tmin) (epw::x->dx attack-times)))))))
 ;;;;=====================
 (defun needed-pulses (nb-pulse-max attack-times tmin tmax)
   (if (not attack-times) '(1)
@@ -84,7 +84,7 @@
 (defun adjust-time-to-grid (time pulses tmin tmax)
   (+ tmin (* (- tmax tmin) (/ pulses) (round (* (- time tmin) pulses) (- tmax tmin)))))
 
-(defun deletions (quantized-times) (count 0 (pw::x->dx quantized-times) :test #'=))
+(defun deletions (quantized-times) (count 0 (epw::x->dx quantized-times) :test #'=))
 
 ;;euclidean distance
 (defun distance (list qlist)
@@ -111,8 +111,8 @@
           (t (count-different-proportions (rest prop1) (rest prop2) count)))))
 
 (defun count-slope-signs (prop1 prop2)
-  (abs (apply '+ (pw::g- (mapcar (lambda (x) (if (>= x 1) 1 -1)) prop1)
-                         (mapcar (lambda (x) (if (>= x 1) 1 -1)) prop2)))))
+  (abs (apply '+ (epw::g- (mapcar (lambda (x) (if (>= x 1) 1 -1)) prop1)
+                          (mapcar (lambda (x) (if (>= x 1) 1 -1)) prop2)))))
 
 ;;;This is computer generated code from Joshua's error measure patch [931026]
 
@@ -147,8 +147,8 @@
      3)))
 
 (defun proportion-distance (l ll tmin tmax) 
-  (win3 (remove 0 (pw::x->dx (cons tmin (append l (list tmax)))) :test #'=)
-        (remove 0 (pw::x->dx (cons tmin (append ll (list tmax)))) :test #'=)))
+  (win3 (remove 0 (epw::x->dx (cons tmin (append l (list tmax)))) :test #'=)
+        (remove 0 (epw::x->dx (cons tmin (append ll (list tmax)))) :test #'=)))
 
 ;;;another possibility: proportion distance weighted by proportions slope difference
 (defvar *weight-geom* 1)
@@ -156,8 +156,8 @@
 
 #|
 (defun proportion-distance (l ll tmin tmax)
-  (let* ((prop1 (x->propx (pw::x->dx (cons tmin (append l (list tmax))))))
-         (prop2 (x->propx (pw::x->dx (cons tmin (append ll (list tmax))))))
+  (let* ((prop1 (x->propx (epw::x->dx (cons tmin (append l (list tmax))))))
+         (prop2 (x->propx (epw::x->dx (cons tmin (append ll (list tmax))))))
          (length (length prop1)))
     (if (<= length 1) (distance l ll)      ;;;no proportions
       (+ (* *weight-geom* (/ (count-different-proportions prop1 prop2 0) length))
@@ -252,7 +252,7 @@
   (mapcar (lambda (qtime) (pulse-number qtime (caar note) tmax tmin)) (cdr note)))
 
 (defun get-scaled-atimes (atimes dur-max)
-  (dx->x (car atimes) (l-scaler/sum (x->dx atimes) dur-max)))
+  (epw::dx->x (car atimes) (epw::l-scaler/sum (epw::x->dx atimes) dur-max)))
 
 (defun get-list-section (list from to)          
   (let (result (epsilon -1e-3))
@@ -365,7 +365,7 @@ becomes prev-slur in the next call)."
 
 (defun beat-structure (quants slur? from to)
   (let* ((atimes (form-atimes-list (copy-list (quanti-of quants)) from to))
-         (durs (remove 0.0 (x->dx atimes) :test #'=))
+         (durs (remove 0.0 (epw::x->dx atimes) :test #'=))
          (min-dur (/ (- (car (last atimes)) (first atimes)) (pulses-of quants)))
          (beats (and durs (remove 0
                                   (if slur? 
@@ -527,7 +527,7 @@ box."
         (def-measure (cons (first (car (last measures))) (second (car (last measures)))))
         (durs (if (zerop offset) durs 
                   (cons (- (* offset (get-beat-duration (car tempos) (second (car measures))))) durs)))
-        (positive-durs (pw::ll-abs durs))
+        (positive-durs (epw::ll-abs durs))
         (deftempo (car (last tempos)))
         (atimes (dx->x 0.0 positive-durs)) (c-time 0)
         result slur-fl current-tempo current-unit
@@ -581,8 +581,8 @@ box."
 
 ;;;;;;;;;;;;;;;;;===============================================
 (defun set-grace-notes-pos (grace-notes durs)
-  (let ((atimes (pw::g-round (pw::dx->x 0 durs) 1)) (count -1))
-    (mapcar (lambda (pair) (cons (- (position (pw::g-round (first pair) 1) atimes :test #'=) (incf count))
+  (let ((atimes (epw::g-round (dx->x 0 durs) 1)) (count -1))
+    (mapcar (lambda (pair) (cons (- (position (epw::g-round (first pair) 1) atimes :test #'=) (incf count))
                                    (cdr pair)))
             (sort grace-notes '< :key #'first))))
 ;;;;;;;;;;;;;;;================================================
@@ -690,11 +690,11 @@ A list of forbidden unit divisions can optionally be given."
                      (e-tempo fix/float (:value 120))) list
         "transforms durations according to a continuous linear tempo change between the given
 initial ('b-tempo') and final ('e-tempo') tempi. "
-  (let ((tattack (pw::dx->x 0 durs))
+  (let ((tattack (dx->x 0 durs))
         (final-tempo (/ e-tempo b-tempo 100))
         (start-tempo (/ 100)))
-    (pw::ll/round 
-     (pw::l/ (pw::x->dx 
+    (epw::ll/round 
+     (epw::l/ (epw::x->dx 
               (mapcar (linear-tempo-ch final-tempo start-tempo
                                        (/ (car (last tattack)) (* 0.5 (+ final-tempo start-tempo))) 0)
                        tattack)) 100) 1)))

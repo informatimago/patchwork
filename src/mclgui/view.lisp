@@ -1445,6 +1445,47 @@ RETURN:         The cursor shape to display when the mouse is at
   (:method ((view simple-view))
     view))
 
+(defgeneric invalidate-view-border (view &optional erase-p right-and-bottom-only))
+
+(defmethod invalidate-view-border ((view simple-view) &optional erase-p right-and-bottom-only)
+  (niy view erase-p right-and-bottom-only) #-(and)
+  (when (wptr view)
+    (let* ((container (or (view-container view) view))
+           (ul (view-position view))
+           (lr (add-points ul (view-size view)))
+           (ul-h (point-h ul))
+           (ul-v (point-v ul))
+           (lr-h (point-h lr))
+           (lr-v (point-v lr)))
+      (multiple-value-bind (bul blr) (view-corners view)
+        (unless (and (eql ul bul) (eql lr blr))
+          (with-focused-view container
+            (without-interrupts
+             (let* ((rgn *temp-rgn*)
+                    (rgn2 *temp-rgn-2*)
+                    (bul-h (point-h bul))
+                    (bul-v (point-v bul))
+                    (blr-h (point-h blr))
+                    (blr-v (point-v blr))
+                    rgn-ul-h rgn-ul-v)
+               (if right-and-bottom-only
+                 (setq rgn-ul-h ul-h rgn-ul-v ul-v)
+                 (setq rgn-ul-h bul-h rgn-ul-v bul-v))
+               (#_SetRectRgn rgn rgn-ul-h rgn-ul-v blr-h blr-v)
+               (#_SetRectRgn rgn2 ul-h ul-v lr-h lr-v)
+               (#_DiffRgn rgn rgn2 rgn)
+               #-carbon-compat
+               (#_InvalRgn rgn)
+               #+carbon-compat
+               (inval-window-rgn (wptr view) rgn)
+               (when erase-p
+                 (let ((org (view-origin container))
+                       (erase-rgn (window-erase-region (view-window container))))
+                   (when erase-rgn
+                     (unless (eql #@(0 0) org)
+                       (#_OffsetRgn rgn (- (point-h org)) (- (point-v org))))
+                     (#_UnionRgn rgn erase-rgn erase-rgn))))))))))))
+
 
 (defun initialize/view ()
   (niy initialize/view))

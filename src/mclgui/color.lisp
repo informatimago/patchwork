@@ -340,5 +340,14 @@ RETURN:         A list of key parts that can be colored in the THING.
         *dark-gray-color*    (make-color 16384 16384 16384)
         *background-color*   *white-color*))
 
+(defgeneric color-or-gray-p (item)
+  (:method (item)
+    (declare (ignore item))
+    nil))
+
+(defgeneric window-color-p (item)
+  (:method (item)
+    (declare (ignore item))
+    nil))
 
 ;;;; THE END ;;;;

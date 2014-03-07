@@ -86,7 +86,7 @@
   box)
 
 ;;A popUpMenu for selecting the type of chord-box output (patch-value)
-(defvar *Chord-box-popUpMenu*
+(defparameter *Chord-box-popUpMenu*
   (new-menu " "
             (new-leafmenu "Midics" (lambda () (set-output *target-action-object* :midic)))
             (new-leafmenu "Durations" (lambda () (set-output *target-action-object* :duration)))
@@ -97,7 +97,7 @@
             (new-leafmenu "Save Chord" (lambda () (save *target-action-object* )))))
 
 (defmethod initialize-instance :after ((self C-patch-chord-box-M ) &key controls)
-  (declare (ignore controls) (special *Chord-box-popUpMenu*))
+  (declare (ignore controls))
   (setf (popUpBox self) 
         (make-popUpbox  "M" self
                        *Chord-box-popUpMenu*
@@ -206,10 +206,10 @@
       (PV-from-input self (list! (patch-value my-connect obj)))))
     (get-output-dimension self))
 
-(defmethod patch-work-type-of((self C-patch-chord-box-M) ctrl-index)
+(defmethod patch-work-type-of ((self C-patch-chord-box-M) ctrl-index)
   (declare (ignore ctrl-index))
   (list 'list (list :value 
-                    (format nil "~D" (get-chord-midics (car (pw-controls self))) 'midic)
+                    (format nil "~D" (get-chord-midics (car (pw-controls self))))
                     :type-list '(list midic chord))))
 
 (defmethod PV-from-input ((self C-patch-chord-box-M ) val)
