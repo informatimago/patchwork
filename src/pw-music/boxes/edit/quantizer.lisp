@@ -40,10 +40,10 @@
 ;;;===========================================================================
 
 (defpackage "QUANTIZING"
-  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
+  (:use "COMMON-LISP")
+  (:use "LELISP-MACROS" "PATCHWORK")
   (:import-from "EPW"  "L-SCALER/SUM" "DX->X" "X->DX")
   (:export "QUANT-MEASURE"))
-
 (in-package "QUANTIZING")
 
 (defparameter *maximum-pulses* 32)
@@ -130,20 +130,20 @@
                    (let (J)
                      (mapcar (lambda (K) (setf J K) (cond ((= (length J) 1) J) (t (epw::g-scaling/sum J '100))))
                              (mapcar 'list
-                                     (epw:x-append (patch-work:const var1)
-                                                   (epw::create-list (epw::g-abs (epw::g- (max (length (patch-work:const var1))
-                                                                                               (length (patch-work:const var2)))
-                                                                                          (length (patch-work:const var1)))) 1)))))
+                                     (epw:x-append (patchwork:const var1)
+                                                   (epw::create-list (epw::g-abs (epw::g- (max (length (patchwork:const var1))
+                                                                                               (length (patchwork:const var2)))
+                                                                                          (length (patchwork:const var1)))) 1)))))
                    (let (M)
                      (mapcar (lambda (N)
                                  (setf M N)
                                  (cond ((= (length M) 1) M)
                                        (t (epw::g-scaling/sum M '100))))
                              (mapcar 'list
-                                     (epw:x-append (patch-work:const var2)
-                                                   (epw::create-list (epw::g-abs (epw::g- (max (length (patch-work:const var1))
-                                                                                               (length (patch-work:const var2)))
-                                                                                          (length (patch-work:const var2)))) 1)))))))))
+                                     (epw:x-append (patchwork:const var2)
+                                                   (epw::create-list (epw::g-abs (epw::g- (max (length (patchwork:const var1))
+                                                                                               (length (patchwork:const var2)))
+                                                                                          (length (patchwork:const var2)))) 1)))))))))
      3)))
 
 (defun proportion-distance (l ll tmin tmax) 

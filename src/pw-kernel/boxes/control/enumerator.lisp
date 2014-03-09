@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,15 +32,8 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
+(in-package :pw)
+
 
 ;;===========================================================================
 ;; Classes for looping and Multi-Dimensional treatment
@@ -59,15 +53,16 @@
 ;;
 ;;===========================================================================
 
-(in-package :pw)
 
 (defclass C-enum-collect-source (C-patch)
   ((buffer :initform () )
    (comp-var)))
 
+(defgeneric store-buffer (self val))
 (defmethod store-buffer ((self C-enum-collect-source) val)
   (setf (slot-value self 'buffer) val))
 
+(defgeneric get-list (self obj))
 (defmethod get-list ((self C-enum-collect-source) obj)
   (patch-value (car (input-objects self)) obj))
 

@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    A general buffer box
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,29 +32,13 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
-;;
-;; A general buffer box
-;;
-
 (in-package "C-PATCH-BUFFER")
 
-#|
-(defclass C-radio-button (static-text-dialog-item) ())
-
-(defmethod type-list ((self C-radio-button)) )
-
-(defmethod decompile ((self C-radio-button)) )
-|#
+;; (defclass C-radio-button (static-text-dialog-item) ())
+;; 
+;; (defmethod type-list ((self C-radio-button)) )
+;; 
+;; (defmethod decompile ((self C-radio-button)) )
 
 (defclass C-patch-buffer (C-patch)
   ((the-buffer :initform nil :initarg :the-buffer :accessor the-buffer)

@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Assayag-Agon
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -16,7 +17,7 @@
 ;;;;LEGAL
 ;;;;    GPL3
 ;;;;    
-;;;;    Copyright IRCAM 1986 - 2012
+;;;;    Copyright IRCAM 1986 - 1996
 ;;;;    
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
@@ -31,26 +32,12 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  Assayag-Agon
-;;;;  © 1986-1996 IRCAM 
-;;;;
-;;;;=========================================================
 
-;; =============================================================================-======
-;;                MIDI.Lisp
-;; =============================================================================-======
 (defpackage "MIDI"
   (:use "COMMON-LISP" "MCLGUI")
   (:export "MIDI-OPEN" "MIDI-CLOSE" "MIDI-WRITE" "MIDI-WRITE-TIME"
            "MIDI-WRITE-NOW" "MIDI-READ" "CLOCK-TIME" "MIDI-CLEAR"))
 (in-package "MIDI")
-
-;;(proclaim '(optimize (speed 3) (safety 0) (space 1)))
 
 ;;;;Global vars
 
@@ -142,7 +129,9 @@
 
 
 (defun midi-write (event)
-  (midi-write-time event (midishare::MidiGetTime)))
+  (niy midi-write event)
+  ;; (midi-write-time event (midishare::MidiGetTime))
+  )
 
 
 ;;;;Midi-read 

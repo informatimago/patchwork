@@ -67,6 +67,7 @@
 ;;changed from paw-modifs 140397 aaa
 |#
 
+(defgeneric MidiPlayANy (object &optional approx chanbase))
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
   (niy  MidiPlayANy  object approx chanbase)
   ;; (when (and  midi::*pw-refnum* midi::*player* )
@@ -102,17 +103,18 @@
 ;;changed from paw-modifs 140397 aaa
 |#
 
+(defgeneric MidiPlay (note at approx chanbase seq unit/sec))
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
-  (let ((event (midishare:MidiNewEv midishare::typeNote)))	; ask for a new note event
+  (let ((event (midishare:MidiNewEv midishare::typeNote))) ; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (midishare:null-event-p event)	; if the allocation was succesfull
-      (midishare::chan event    ; set the midi channel to 0 (means channel 1)
+    (unless (midishare:null-event-p event) ; if the allocation was succesfull
+      (midishare::chan event ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (epw::approx-m  (midic note) approx))))))
-      (midishare::port event 0)			; set the destination port to Modem
-      (midishare::field event 0 (truncate (epw::approx-m (midic note) approx) 100))		; set the pitch field
-      (midishare::field event 1 (round (vel note)))		        ; set the velocity field
-      (midishare::field event 2 (round (convert-time-1 (dur note) unit/sec)))		; set the duration field to 1 second
+      (midishare::port event 0)    ; set the destination port to Modem
+      (midishare::field event 0 (truncate (epw::approx-m (midic note) approx) 100)) ; set the pitch field
+      (midishare::field event 1 (round (vel note))) ; set the velocity field
+      (midishare::field event 2 (round (convert-time-1 (dur note) unit/sec))) ; set the duration field to 1 second
       (midishare::date event (+  *MidiShare-start-time* at))
       (midishare::MidiAddSeq seq event)
       )))

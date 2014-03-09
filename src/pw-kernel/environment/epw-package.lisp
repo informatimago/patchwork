@@ -6,12 +6,14 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    This file (and no other one) contains also the definition of the package "EPW".
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
+;;;;    1991-09-13 [jack] EPW-Package.Lisp
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -31,25 +33,11 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;; ==========================================================
-;; [jack] 910913               EPW-Package.Lisp
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-;; This file (and no other one) contains also the definition of the package "EPW"
-
-
 (defpackage "EPW" 
-  (:use "COMMON-LISP" "LELISP-MACROS" "CLPF-UTIL" "PATCH-WORK" "PW-STYPE")
+  (:use "COMMON-LISP" "LELISP-MACROS" "CLPF-UTIL" "PATCHWORK" "PW-STYPE")
   (:shadow "MAKE-NUM-FUN")
   (:export "*ASCII-NOTE-C-SCALE*" "*ASCII-NOTE-DO-SCALE*"
-           "*ASCII-NOTE-SCALES*" "*NO-SHARP-READ-TABLE*" "ARITHM-SER"
+           "*ASCII-NOTE-SCALES*" "ARITHM-SER"
            "AVERAGE" "DEFUNE" "DISTOR" "DISTOR-EXT" "F-BINARY-SEARCH"
            "FLAT" "FLAT-ONCE" "FUN-MINMAX" "G-MAX" "G-MIN" "G-SCALING"
            "INCLUDED?" "INTERPOLATION" "L-LAST" "L-MAX" "L-MIN"
@@ -60,9 +48,6 @@
            "X-INTERSECT" "X-UNION" "X-XOR" "MAKE-NUM-FUN" "LAGRANGE"
            "LINEAR" "POWER-FUN" "POWER/2" "POWER/3" "PARABOLE/2"
            "PARABOLE/3"))
-
-;; =============================================================================-======
-
 (in-package "EPW")
 
 
@@ -79,4 +64,4 @@
     ;"EPW:EPW-Menus"
     ))
 
-;; =============================================================================-======
+;;;; THE END ;;;;

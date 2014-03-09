@@ -70,7 +70,7 @@ RETURN:         If V is given then the encoded point #@(H V), else H.
   (if v
       (if (and (signed-byte-16-p h)
                (signed-byte-16-p v))
-          (logior (logand #xffff h) (ash v 16))
+          (dpb (ldb (byte 16 0) v) (byte 16 16) (ldb (byte 16 0) h))
           (make-point (max #x-8000 (min (round h) #x7fff))
                       (max #x-8000 (min (round v) #x7fff))))
       (if (consp h)
@@ -87,7 +87,7 @@ Big points are represented as integers or cons cells.
   (if v
       (if (and (signed-byte-16-p h)
                (signed-byte-16-p v))
-          (logior (logand #xffff h) (ash v 16))
+          (dpb (ldb (byte 16 0) v) (byte 16 16) (ldb (byte 16 0) h))
           (cons (round h) (round v)))
       (if (consp h)
           (if (and (integerp (car h))

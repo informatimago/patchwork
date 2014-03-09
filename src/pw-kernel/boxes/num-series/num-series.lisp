@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    Numeric series functions
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda, Gérard Assayag.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,22 +32,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda, Gérard Assayag.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
-;;;
-;;;Numeric series functions
-;;;
-
 (in-package "EPW")
-
 
 
 (defunp arithm-ser ((begin fix/float) (step (fix/float (:value 1)))

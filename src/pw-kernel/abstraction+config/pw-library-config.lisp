@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    User Library configuration
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,18 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-;;;;  User Library configuration
-;;;;
-
 (in-package :pw)
 
 (defvar *config-default-libr-path*  "PW-USER:library-autoload;")
@@ -81,7 +70,7 @@
 (defun load-abstr-config ()
   (let* ((thestring (choose-directory-dialog :directory "cl:PW-user;")))
     (load&form-abstr-menu thestring)
-    (record--ae :|PWst| :|ploa| `((,:|----| ,(mkSO :|obab| nil :|name| (namestring (truename thestring))))))))
+    (record-event :|PWst| :|ploa| `((,:|----| ,(mkSO :|obab| nil :|name| (namestring (truename thestring))))))))
 
 
 (defun load&form-abstr-menu (path &optional index)
@@ -143,7 +132,7 @@
 (defun load-library-config ()
   (let* ((thestring (choose-file-dialog :directory "cl:User-library;" :button-string "load lib")))
     (load-one-user-library thestring)
-    (record--ae :|PWst| :|ploa| `((,:|----| ,(mkSO :|obli| nil :|name| (namestring (truename thestring))))))))
+    (record-event :|PWst| :|ploa| `((,:|----| ,(mkSO :|obli| nil :|name| (namestring (truename thestring))))))))
 
 
 

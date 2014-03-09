@@ -405,7 +405,7 @@ FUNCTION:       A function to be called when the reply comes back.
 REFCON:         An optional reference identifier, which can be any MCL
                 object.  It identifies the specific installation of a handler.
 "
-  ;; (when (macptrp appleevent-or-id)
+  ;; (when (ccl:macptrp appleevent-or-id)
   ;;   (setq appleevent-or-id
   ;;         (ae-get-attribute-longinteger appleevent-or-id #$|keyReturnIDAttr|)))
   (setf (gethash appleevent-or-id %queued-reply-handlers%)

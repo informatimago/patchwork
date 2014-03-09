@@ -241,7 +241,8 @@ window, do it inside a without-interrupts form to prevent multiple
 redisplays.
 "
   ;; Note: the mcl implementation doesn't seem to do anything more:
-  `(progn ,@body))
+  #+ccl `(ccl:without-interrupts ,@body)
+  #-ccl `(progn ,@body))
 
 
 ;;;

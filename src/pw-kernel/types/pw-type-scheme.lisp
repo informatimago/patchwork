@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    A typing scheme for PW.
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,25 +32,18 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
-;;=====================================================
-;;  A typing scheme for PW.
-;;
-;;Class C-pw-type-set
-;;=====================================================
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
+;;=====================================================
+;;Class C-pw-type-set
+;;=====================================================
+
+(defgeneric play                (patch) (:method (patch) (declare (ignorable patch))))
+(defgeneric stop-play           (patch) (:method (patch) (declare (ignorable patch))))
+(defgeneric open-patch-win      (patch) (:method (patch) (declare (ignorable patch))))
+(defgeneric record              (patch) (:method (patch) (declare (ignorable patch))))
+(defgeneric browse              (patch) (:method (patch) (declare (ignorable patch)))) 
 
 (defclass C-PW-type-set ()
   ((type-list :initform () :initarg :type-list :accessor type-list))

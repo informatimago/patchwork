@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,15 +32,23 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
+(defpackage "C-LIST-ITEM-H"    ;the package for inheritance
+  (:use "COMMON-LISP" "LELISP-MACROS" "UI" "PATCHWORK")
+  (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
+           "ADD-DOWNWARD-ELEMENT" "*CELL-WIDTH*" "*CELL-HEIGHT*" "C-LIST-ITEM" "MY-ARRAY"
+           "OUT-SIDE-LIST-P" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" 
+           "ADD-UPWARD-ROW" "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
+           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
+
+(defpackage "C-LIST-ITEM"      ;the package for a user
+  (:use "C-LIST-ITEM-H" "COMMON-LISP" "UI")
+  (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
+           "ADD-DOWNWARD-ELEMENT" "*CELL-WIDTH*" "*CELL-HEIGHT*" "OUT-SIDE-LIST-P" 
+           "C-LIST-ITEM" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" "ADD-UPWARD-ROW"
+           "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
+           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
+
+(in-package "C-LIST-ITEM-H")
 
 ;;;======================================================
 ;;; A list editor 
@@ -50,7 +59,6 @@
 ;;; arrow keys adds cells in positions indicated by the direction of the arrow.
 ;;;======================================================
 
-(in-package :pw)
 
 ;;;==========================================
 ;;; The class of table dialog items with editable cells
@@ -70,26 +78,9 @@
 ;;;  add-downward-element
 ;;;==========================================
 
-(defpackage "C-LIST-ITEM-H"    ;the package for inheritance
-  (:use "COMMON-LISP" "LELISP-MACROS" "UI" "PATCH-WORK")
-  (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
-           "ADD-DOWNWARD-ELEMENT" "CELL-WIDTH" "CELL-HIGHT" "C-LIST-ITEM" "MY-ARRAY"
-           "OUT-SIDE-LIST-P" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" 
-           "ADD-UPWARD-ROW" "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
-           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
 
-(defpackage "C-LIST-ITEM"      ;the package for a user
-  (:use "C-LIST-ITEM-H" "COMMON-LISP" "UI")
-  (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
-           "ADD-DOWNWARD-ELEMENT" "CELL-WIDTH" "CELL-HIGHT" "OUT-SIDE-LIST-P" 
-           "C-LIST-ITEM" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" "ADD-UPWARD-ROW"
-           "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
-           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
-
-(in-package "C-LIST-ITEM-H")
-
-(defparameter cell-width 60)
-(defparameter cell-hight 12)
+(defparameter *cell-width*  60)
+(defparameter *cell-height* 12)
 
 (defclass C-list-item (C-array-item) ())
 
@@ -113,8 +104,7 @@
           (edit-selected-cell self)) )))
 
 (defmethod update-size ((self C-list-item) size)
-  (set-view-size self 
-                 (subtract-points  size (make-point cell-width (* 2 cell-hight)))))
+  (set-view-size self (subtract-points  size (make-point *cell-width* (* 2 *cell-height*)))))
 
 (defmethod dialog-item-action ((self C-list-item))
   (if (double-click-p)
@@ -127,11 +117,11 @@
     (open-pw-controls-dialog
      self 
      (make-point 
-      (*  (- (point-h selection) (point-h (scroll-position self)))
-          cell-width)
+      (* (- (point-h selection) (point-h (scroll-position self)))
+          *cell-width*)
       (* (- (point-v selection) (point-v (scroll-position self)))
-         cell-hight))
-     (make-point cell-width cell-hight))))
+         *cell-height*))
+     (make-point *cell-width* *cell-height*))))
 
 (defmethod set-dialog-item-text-from-dialog ((self C-list-item) text)
   (set-array-item self (car (selected-cells self))
@@ -277,7 +267,7 @@
 ;;;==================================================
 
 (defpackage "C-TABLE-WINDOW-H"
-  (:use "COMMON-LISP" "UI" "C-LIST-ITEM"  "PATCH-WORK")
+  (:use "COMMON-LISP" "UI" "C-LIST-ITEM"  "PATCHWORK")
   (:export "C-TABLE-WINDOW" "THE-LIST"))
 
 (defpackage "C-TABLE-WINDOW"
@@ -341,7 +331,7 @@
 (set-array table (the-list (pw-object self)))
 (set-view-size self
 (add-points (view-size table)
-(make-point cell-width (* 2 cell-hight)))))))|#
+(make-point *cell-width* (* 2 *cell-height*)))))))|#
 
 (defmethod open-application-window ((self C-table-window))
   (let ((table (first (subviews self))))
@@ -349,7 +339,7 @@
       (set-array table (the-list (pw-object self)))
       (set-view-size self
                      (add-points (view-size table)
-                                 (make-point cell-width (* 2 cell-hight)))))))
+                                 (make-point *cell-width* (* 2 *cell-height*)))))))
 
 (defmethod window-close ((self C-table-window))
   (when (and pw::*pw-controls-dialog* (wptr pw::*pw-controls-dialog*))
@@ -372,16 +362,16 @@
 ;;;======================================
 
 (defpackage "C-PATCH-LIST-EDITOR"
-  (:use "COMMON-LISP" "UI" "PATCH-WORK"  "C-TABLE-WINDOW" "C-LIST-ITEM")
+  (:use "COMMON-LISP" "UI" "PATCHWORK"  "C-TABLE-WINDOW" "C-LIST-ITEM")
   (:export "C-PATCH-LIST-EDITOR" "THE-LIST"))
 
 (in-package "C-PATCH-LIST-EDITOR")
 
 (defclass C-patch-list-editor (C-patch-application) 
-  ((the-list :initform (list (list 0 0) (list 0 0)) :initarg :the-list :accessor the-list)
+  ((the-list :initform (list (list 0 0) (list 0 0)) :initarg  :the-list :accessor the-list)
    (popUpBox :accessor popUpBox)
-   (lock :initform nil :accessor lock)
-   (value :initform nil :accessor value)))
+   (lock     :initform nil                          :accessor lock)
+   (value    :initform nil                          :accessor value)))
 
 (defmethod make-application-object ((self C-patch-list-editor))
   (make-instance 'C-table-window
@@ -389,7 +379,7 @@
     (list (make-instance 'C-list-item
               :view-font '("Monaco" 9  :plain)
               :table-dimensions (make-point 2 2)
-              :cell-size (make-point cell-width cell-hight)
+              :cell-size (make-point *cell-width* *cell-height*)
               :view-size (make-point 100 80)))
     :window-show nil
     :window-title (pw-function-string self)))
@@ -442,7 +432,7 @@
     (set-array table (the-list self))
     (set-view-size (application-object self)
                    (add-points (view-size table)
-                               (make-point cell-width (* 2 cell-hight))))
+                               (make-point *cell-width* (* 2 *cell-height*))))
     (call-next-method)))
 
 (in-package :pw)

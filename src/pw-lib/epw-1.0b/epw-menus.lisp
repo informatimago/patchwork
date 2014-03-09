@@ -9,9 +9,13 @@
 ;;;;    Defines the EPW menus.
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
+;;;;    Contributions by Tristan Murail
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
+;;;;    1992-12-00 <Tristan Murail> révision finale
+;;;;    1991-01-18 [jack] EPW-Menus.Lisp
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -31,28 +35,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;  révision finale -  décembre 92 -  Tristan Murail
-;;;;=========================================================
-
-;; =============================================================================-======
-;; [jack] 18.01.91               EPW-Menus.Lisp
-;; =============================================================================-======
-
-;; Esquisse PW menus 
-
 (in-package "EPW")
-
-
-
-;; =============================================================================-======
 
 ;; defining the menu hierarchy
 
@@ -69,7 +52,7 @@
 (defparameter *epw-Ianalysis-menu*       (new-menu "Analysis"))
 (defparameter *epw-Utilities-menu*       (new-menu "Utilities"))
 
-#|(let ((menus (memq patch-work::*pw-menu-Music* patch-work::*patch-work-menu-root*))
+#|(let ((menus (memq patchwork::*pw-menu-Music* patch-work::*patch-work-menu-root*))
       (menu *epw-menu*))
   (check-type menus cons)
   (when (and (rest menus)

@@ -320,4 +320,6 @@ DO:             Remove the property KEY from the VIEW.
     (declare (ignore view))
     (values)))
 
+(defgeneric get-window-visrgn (view region))
+
 ;;;; THE END ;;;;

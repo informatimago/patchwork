@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,15 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
 (in-package :pw)
 
 (provide 'MN-note-chord-chordline)
@@ -50,11 +42,12 @@
     (diatone-vector    :initform nil :initarg :diatone-vector    :accessor diatone-vector)
     (approx-factor :initform 100 :initarg :approx-factor :reader approx-factor)))
 
+(defgeneric give-alteration (self midic))
 (defmethod give-alteration  ((self C-scale) midic)
   (let* ((vlength (length (diatone-vector self)))
          (int-cents (mod midic 1200))
-        (index (round (/ int-cents (approx-factor self) )))
-        (up-octave (truncate (/ index (length (diatone-vector self))))))
+         (index (round (/ int-cents (approx-factor self) )))
+         (up-octave (truncate (/ index (length (diatone-vector self))))))
     (setq index (mod index (length (diatone-vector self))))
     (if (and (= (approx-factor self) 25) (= index (1- vlength))) (incf up-octave))
     (list (svref  (diatone-vector self) index) (svref  (alteration-vector self) index) up-octave)))
@@ -155,6 +148,7 @@
   (when (not (alteration self))
     (update-note self)))
 
+(defgeneric make-a-copy (self))
 (defmethod make-a-copy ((self C-note))
   (make-C-note 
    (midic self) (diatone self) (alteration self)
@@ -166,11 +160,12 @@
 
 ;;Camilo 26/3/91
 
+(defgeneric update-note (self))
 (defmethod update-note ((self C-note))
   (let* ((scale-change? 
-          (zerop (mod (* (approx-factor *current-approx-scale*)
-                         (round (mod (midic self) 100)
-                                (approx-factor *current-approx-scale*))) 100)))
+           (zerop (mod (* (approx-factor *current-approx-scale*)
+                          (round (mod (midic self) 100)
+                                 (approx-factor *current-approx-scale*))) 100)))
          (dia-alt (give-alteration 
                    (if scale-change?  *current-music-notation-scale* *current-approx-scale*) 
                    (midic self))))
@@ -181,9 +176,11 @@
 ;; 35 = diatone of C5
 ;; 2 = 1 ditone in pixels
 
+(defgeneric give-pixel-y (self C5))
 (defmethod give-pixel-y  ((self C-note) C5)
-   (+ 1 (- C5 (* 2 (- (diatone self) 35)))))
+  (+ 1 (- C5 (* 2 (- (diatone self) 35)))))
 
+(defgeneric transpose-note (self cents))
 (defmethod transpose-note ((self C-note) cents)
   (setf (midic self) (+ (midic self) cents))
   (update-note self))
@@ -193,19 +190,22 @@
 ;;___________________________
 ;; instrument
 
+(defgeneric open-instrument-editor (self win x y))
 (defmethod open-instrument-editor ((self C-note) win x y)
   (if (instrument self) 
-    (progn 
-      (setq *global-selected-note* self)
-      (open-instrument-editor (instrument self) win x y))
-    (ui:ed-beep)))
+      (progn 
+        (setq *global-selected-note* self)
+        (open-instrument-editor (instrument self) win x y))
+      (ui:ed-beep)))
 
+(defgeneric remove-instrument-item (self x y))
 (defmethod remove-instrument-item ((self C-note) x y)
   (when (instrument self) 
     (setq *global-selected-note* self)
     (remove-instrument-item (instrument self) x y)))
 
 ;;___________________________
+(defgeneric draw-note-4 (self x C5 t-scfactor))
 (defmethod draw-note-4  ((self C-note) x C5 t-scfactor)
   (declare (special *mn-view-time-flag*))
   (let ((y-now (give-pixel-y self C5))
@@ -214,71 +214,80 @@
     (draw-char x-now y-now #\w)
     (when t-scfactor
       (if *mn-view-dyn-flag*
-        (draw-note-symbolic-dynamic self x-now y-now))
+          (draw-note-symbolic-dynamic self x-now y-now))
       (if *mn-view-dur-flag*
-        (draw-note-duration-line self x-now y-now t-scfactor))
+          (draw-note-duration-line self x-now y-now t-scfactor))
       (if (and *mn-view-offset-flag* (not *mn-view-time-flag*))
-        (draw-note-offset-line self x-now y-now t-scfactor)) )   
+          (draw-note-offset-line self x-now y-now t-scfactor)) )   
     (when (and (instrument self) *mn-view-ins-flag* t-scfactor) 
-       (draw-char x-now y-now #\Ω)
-       (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
-    (if (and alt (not (eq *staff-num* 7) ))  ; empty staff
+      (draw-char x-now y-now #\Ω)
+      (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
+    (if (and alt (not (eq *staff-num* 7) )) ; empty staff
         (draw-char (+ x (alt-delta-x self)) y-now alt))))
 
+(defgeneric draw-note-duration-line (self x1 y-now t-scfactor))
 (defmethod draw-note-duration-line ((self C-note) x1 y-now t-scfactor)
-   (draw-line (+ 3 x1) (- y-now 2)
-        (round (+ (* t-scfactor (dur self)) (+ 3 x1))) (- y-now 2)))
+  (draw-line (+ 3 x1) (- y-now 2)
+             (round (+ (* t-scfactor (dur self)) (+ 3 x1))) (- y-now 2)))
 
 ;; used when editing
 
+(defgeneric draw-note-duration-line-xor (self x C5 t-scfactor))
 (defmethod draw-note-duration-line-xor ((self C-note) x C5 t-scfactor)
   (let ((y-now (give-pixel-y self C5))
         (x-now (+ x (delta-x self))))
     (with-pen-state  (:mode :patxor) 
-       (draw-line (+ 3 x-now) (- y-now 2)
-          (round (+ (* t-scfactor (dur self)) (+ 3 x-now))) (- y-now 2)))))
+      (draw-line (+ 3 x-now) (- y-now 2)
+                 (round (+ (* t-scfactor (dur self)) (+ 3 x-now))) (- y-now 2)))))
 
+(defgeneric draw-note-symbolic-dynamic-xor (self x C5 t-scfactor))
 (defmethod draw-note-symbolic-dynamic-xor ((self C-note) x C5 t-scfactor)
   (declare (ignore t-scfactor))
   (let ((y-now (give-pixel-y self C5))
         (x-now (+ x (delta-x self))))
     (if *mn-view-arp-flag*
-      (draw-char (- x-now 2) (+ y-now 8) (map-to-note-symbolic-dynamic self))
-      (draw-char (+ 10 x-now) y-now  (map-to-note-symbolic-dynamic self)))))
+        (draw-char (- x-now 2) (+ y-now 8) (map-to-note-symbolic-dynamic self))
+        (draw-char (+ 10 x-now) y-now  (map-to-note-symbolic-dynamic self)))))
 
+(defgeneric draw-note-offset-line (self x1 y-now t-scfactor))
 (defmethod draw-note-offset-line ((self C-note) x1 y-now t-scfactor)
-   (draw-line (+ 3 x1) (- y-now 2)
-        (round (+ (* t-scfactor (offset-time self)) (+ 3 x1))) (- y-now 2)))
+  (draw-line (+ 3 x1) (- y-now 2)
+             (round (+ (* t-scfactor (offset-time self)) (+ 3 x1))) (- y-now 2)))
 
+(defgeneric draw-note-offset-line-xor (self x C5 t-scfactor))
 (defmethod draw-note-offset-line-xor ((self C-note) x C5 t-scfactor)
   (let ((y-now (give-pixel-y self C5))
         (x-now (+ x (delta-x self))))
     (with-pen-state (:mode :patxor) 
-       (draw-line (+ 3 x-now) (- y-now 2)
-          (round (+ (* t-scfactor (offset-time self)) (+ 3 x-now))) (- y-now 2)))))
+      (draw-line (+ 3 x-now) (- y-now 2)
+                 (round (+ (* t-scfactor (offset-time self)) (+ 3 x-now))) (- y-now 2)))))
 
 ;;__
 
+(defgeneric map-to-note-symbolic-dynamic (self))
 (defmethod map-to-note-symbolic-dynamic ((self C-note))
-   (cond 
-     ((< (vel self) 60) #\π)
-     ((< (vel self) 75) #\p)
-     ((< (vel self) 90) #\P)
-     ((< (vel self) 105) #\F)
-     ((< (vel self) 115) #\f)
-     (t #\ƒ)))
+  (cond 
+    ((< (vel self) 60) #\π)
+    ((< (vel self) 75) #\p)
+    ((< (vel self) 90) #\P)
+    ((< (vel self) 105) #\F)
+    ((< (vel self) 115) #\f)
+    (t #\ƒ)))
 
+(defgeneric draw-note-symbolic-dynamic (self x y-now))
 (defmethod draw-note-symbolic-dynamic ((self C-note) x y-now)
   (if *mn-view-arp-flag*
       (draw-char (- x 2) (+ y-now 8) (map-to-note-symbolic-dynamic self))
       (draw-char (+ 10 x) y-now  (map-to-note-symbolic-dynamic self))))
 
+(defgeneric inside-note\?-3 (self mouse-x chord-x y-val))
 (defmethod inside-note?-3 ((self C-note) mouse-x chord-x y-val)
   (when (and (eq y-val (diatone self)) 
              (< (- (+ chord-x (delta-x self)) 3) mouse-x 
                 (+ (+ chord-x (delta-x self)) 5)))
-         self))
+    self))
 
+(defgeneric draw-note-channel (self x y))
 (defmethod draw-note-channel ((self C-note) x y)
   (draw-string x y (format () "~D" (chan self))))
 
@@ -288,12 +297,13 @@
   (write-midicent-note (dur self) (chan self) (midic self) (vel self))) 
 |#
 
+(defgeneric play-note (self &optional approx))
 (defmethod play-note ((self C-note) &optional approx)
   (if (instrument self) 
-    (play-instrument (instrument self) self)
-  (write-midicent-note (dur self) (chan self) 
-                       (if approx (epw::approx-m (midic self) approx) (midic self))
-                       (vel self))))
+      (play-instrument (instrument self) self)
+      (write-midicent-note (dur self) (chan self) 
+                           (if approx (epw::approx-m (midic self) approx) (midic self))
+                           (vel self))))
 
 ;;============================================
 
@@ -330,9 +340,11 @@
   (declare (ignore notes))
   (update-chord self))
 
+(defgeneric make-copy (self t-time))
 (defmethod make-copy ((self C-chord) t-time)
   (make-C-chord t-time (ask-all (notes self) 'make-a-copy)))
 
+(defgeneric play-chord (self))
 (defmethod play-chord ((self C-chord))
   (cond ((eq *playing-option* :pb) (tell (notes self) 'play-note))
         ((eq *playing-option* :mc)
@@ -343,84 +355,99 @@
              (write-midi-note (dur note) (+ (chan note) (micro-channel approx-m) -1)
                               (truncate approx-m 100) (vel note)))))))
 
+(defgeneric add-new-note (self note))
 (defmethod add-new-note ((self C-chord) note)
   (push note (notes self))
   (update-chord self))
 
+(defgeneric remove-note (self note))
 (defmethod remove-note ((self C-chord) note)
   (remove-instrument-item note ()())
   (setf (notes self) (remove note (notes self) :test 'eq))
   (update-chord self))
 
+(defgeneric kill-notes (self))
 (defmethod kill-notes ((self C-chord))
   (tell (notes self) 'remove-instrument-item ()()))
 ;;__________
 
+(defgeneric calc-chord-pixel-x (self t-scfactor beg-x time1))
 (defmethod calc-chord-pixel-x ((self C-chord) t-scfactor beg-x time1)
   (+ beg-x (round (* t-scfactor (- (t-time self) time1)))))
 
 ;;__________
 ;; (reverse (notes self)) ->  because of drawing of instrument information
 
+(defgeneric give-all-draw-notes (self))
 (defmethod give-all-draw-notes  ((self C-chord))
   (reverse (notes self)))
 
+(defgeneric draw-chord (self t-scfactor beg-x time1 C5 &optional mode))
 (defmethod draw-chord  ((self C-chord) t-scfactor beg-x time1 C5 &optional mode)
- (setq *MN-note-ins-y* *MN-global-ins-y*)
- (when (notes self)
-  (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
-    (draw-stem self x-now C5 mode)
-    (tell (give-all-draw-notes self) 'draw-note-4 x-now C5 t-scfactor) 
-    (draw-extra-info self x-now C5 mode))))
+  (setq *MN-note-ins-y* *MN-global-ins-y*)
+  (when (notes self)
+    (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
+      (draw-stem self x-now C5 mode)
+      (tell (give-all-draw-notes self) 'draw-note-4 x-now C5 t-scfactor) 
+      (draw-extra-info self x-now C5 mode))))
 ;;__________
 
+(defgeneric draw-extra-info (self x-now C5 mode))
 (defmethod draw-extra-info ((self C-chord) x-now C5 mode)
   (declare (ignore x-now C5 mode)))
    
+(defgeneric draw-single-note (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-note  ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
     (draw-note-4 note x-now C5 ())))
 
+(defgeneric draw-single-dur-line (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-dur-line ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
     (draw-note-duration-line-xor note x-now C5 t-scfactor))) 
 
+(defgeneric draw-single-symbolic-dynamic (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-symbolic-dynamic ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
     (draw-note-symbolic-dynamic-xor note x-now C5 t-scfactor))) 
 
+(defgeneric draw-single-offset-line (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-offset-line ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
     (draw-note-offset-line-xor note x-now C5 t-scfactor)))
 
 ;;___________
 ;; stem shows the exact time
+(defgeneric draw-stem (self x C5 &optional mode))
 (defmethod draw-stem ((self C-chord) x C5 &optional mode)
   (declare (ignore mode)) 
   (let ((y-min (1- (give-pixel-y (car (notes self)) C5)))
         (y-max (give-pixel-y (car (last (notes self))) C5)))
-;;    (let-window-pen win :mode (if mode :patxor  :srcor)
-      (draw-line x y-min x (- y-max 18))
+    ;;    (let-window-pen win :mode (if mode :patxor  :srcor)
+    (draw-line x y-min x (- y-max 18))
     (draw-ledger-lines self x y-min y-max C5)))
 
+(defgeneric inside-chord-? (self x rel-offset))
 (defmethod inside-chord-? ((self C-chord) x rel-offset)
-   (when (and (> (t-time self) (- x rel-offset))
-              (< (t-time self) (+ x rel-offset))) self))
+  (when (and (> (t-time self) (- x rel-offset))
+             (< (t-time self) (+ x rel-offset))) self))
 
 ;;_______________
 
+(defgeneric get-dias-with-alts (self))
 (defmethod get-dias-with-alts ((self C-chord))
   (let ((dias (ask-all (notes self) 'diatone))
         (alts (ask-all (notes self) 'alteration))
         (dias-with-alts))
     (while dias
       (when (pop alts)
-         (push (car dias) dias-with-alts))
+        (push (car dias) dias-with-alts))
       (pop dias))
-   dias-with-alts))  
+    dias-with-alts))  
 
 (defvar *alt-tolerance* 6)
 
+(defgeneric make-alt-groups (self))
 (defmethod make-alt-groups ((self C-chord))
   (let ((notes (notes self))
         (group-length 1)
@@ -430,15 +457,16 @@
       (if notes (setq alt-now (diatone (pop notes))))
       (while (and notes (not (alteration (car notes)))) (pop notes))
       (while (and notes 
-                  ;(< (- alt-now (diatone (car notes))) *alt-tolerance*))   
+                                        ;(< (- alt-now (diatone (car notes))) *alt-tolerance*))   
                   (< (-  (diatone (car notes)) alt-now) *alt-tolerance*))
-         (incf group-length)
-         (pop notes)
-         (while (and notes (not (alteration (car notes)))) (pop notes)))
+        (incf group-length)
+        (pop notes)
+        (while (and notes (not (alteration (car notes)))) (pop notes)))
       (push group-length big-alt-temp)
       (setq group-length 1))
-   (nreverse big-alt-temp)))
+    (nreverse big-alt-temp)))
 
+(defgeneric make-alt-zig-zag (self))
 (defmethod make-alt-zig-zag ((self C-chord))
   (let ((alt-groups (make-alt-groups self))
         (x-values)(left)(right)(alt-group-temp)
@@ -451,10 +479,10 @@
       (push  x-now x-values)
       (repeat (1- alt-group-temp)
         (if left?
-          (push (incf x-now right) x-values)
-          (push (decf x-now left) x-values))
+            (push (incf x-now right) x-values)
+            (push (decf x-now left) x-values))
         (setq left? (not left?))))
-     x-values))
+    x-values))
 ;;___________
 ;; ledger-lines  
 ;;*g2-g-staffs* *g-plain-staffs* -> (low-y-off-set  (+ C5 0)
@@ -481,6 +509,7 @@
   (let ((midic (round-midic (midic note))))
     (and (> midic 3550) (< midic 3775))))
 
+(defgeneric draw-ledger-lines (self x y-min y-max C5))
 (defmethod draw-ledger-lines ((self C-chord) x y-min y-max C5)
   (draw-ledger-for-notes (notes self) x y-min y-max C5))
 
@@ -509,12 +538,14 @@
 (defun draw-ledger-line-f (x y)
   (draw-line (- x 10) y (+ x 6) y))
 
+(defgeneric draw-ledger-line (self x y))
 (defmethod draw-ledger-line ((self C-chord) x y)
   (draw-line (- x 10) y (+ x 6) y))
 
 ;;___________
 ;;  noteheads
 
+(defgeneric make-diatone-groups (self))
 (defmethod make-diatone-groups ((self C-chord))
   (let ((notes (notes self))
         (group-length 1)
@@ -527,8 +558,9 @@
         (pop notes))
       (push group-length big-dia-temp)
       (setq group-length 1))
-   (nreverse big-dia-temp)))
+    (nreverse big-dia-temp)))
 
+(defgeneric make-chord-zig-zag (self))
 (defmethod make-chord-zig-zag ((self C-chord))
   (let ((dia-groups (make-diatone-groups self))
         (x-values)(left)(right)(dia-group-temp)
@@ -541,15 +573,17 @@
       (push  x-now x-values)
       (repeat (1-  dia-group-temp)
         (if left?
-          (push (decf x-now right) x-values)
-          (push (incf x-now left) x-values))
+            (push (decf x-now right) x-values)
+            (push (incf x-now left) x-values))
         (setq left? (not left?))))
-     (nreverse x-values)))
+    (nreverse x-values)))
 
+(defgeneric calc-chord-x-values (self))
 (defmethod calc-chord-x-values ((self C-chord)) (make-chord-zig-zag self)) 
 
 ;;___________
 
+(defgeneric sort-notes (self))
 (defmethod sort-notes ((self C-chord))
   (let ((min (midic (car (notes self)))))
     (unless (dolist (note (cdr (notes self)) t)
@@ -558,23 +592,26 @@
             (sort (notes self) #'< :key (lambda (note)(midic note)))))
     (notes self)))
             
+(defgeneric update-chord (self))
 (defmethod update-chord ((self C-chord))
   (when (notes self)
-    (unless *mn-view-arp-flag* (sort-notes self))    ;Camilo 910404
+    (unless *mn-view-arp-flag* (sort-notes self)) ;Camilo 910404
     (let ((notes (notes self))
           ;;[Camilo] 18/3/91
           (x-heads (calc-chord-x-values self))
           (alt-x-values (make-alt-zig-zag self)))
-        (while notes
-             (setf (alt-delta-x (car notes)) 
-                (if  (alteration (car notes))  (- (pop alt-x-values) 12) 0))
-             (setf (delta-x  (car notes)) (- (pop x-heads) 6))
-             (pop notes))))
-    self)
+      (while notes
+        (setf (alt-delta-x (car notes)) 
+              (if  (alteration (car notes))  (- (pop alt-x-values) 12) 0))
+        (setf (delta-x  (car notes)) (- (pop x-heads) 6))
+        (pop notes))))
+  self)
 
+(defgeneric max-dur (self))
 (defmethod max-dur ((self C-chord))
   (apply #'max (ask-all (notes self) 'dur)))  
 
+(defgeneric min-max-diatone (self))
 (defmethod min-max-diatone ((self C-chord))
   (let ((dias (ask-all (notes self) 'diatone)))
     (cons (apply #'min dias)(apply #'max dias))))
@@ -588,8 +625,9 @@
 
 (defmethod decompile ((self C-chord-line))
   `(make-instance ',(class-name (class-of self))
-                             :chords  (list ,@(ask-all (chords self) 'decompile)))) 
+                  :chords  (list ,@(ask-all (chords self) 'decompile)))) 
 
+(defgeneric kill-chords (self))
 (defmethod kill-chords ((self C-chord-line))
   (tell (chords self) 'kill-notes))
 
@@ -599,6 +637,7 @@
   (setf (play-flag self) ()))
 
 
+(defgeneric play-chords (self &optional begin-time))
 (defmethod play-chords ((self C-chord-line) &optional begin-time)
   (setf *MN-play-flag* t)
   (when (chords self)
@@ -607,18 +646,21 @@
           (chords (chords self)))
       (dfuncall  start-time 'continue-play-chords self chords start-time))))
 
+(defgeneric play-visible-chords (self visible-chords t-offset))
 (defmethod play-visible-chords ((self C-chord-line) visible-chords t-offset)
   (when visible-chords
     (setf (play-flag self) t)
     (let ((start-time (t-time (car visible-chords))))
       (dfuncall (- start-time t-offset) 'continue-play-chords self visible-chords start-time))))
 
+(defgeneric play-selected-chords (self chords t-offset))
 (defmethod play-selected-chords ((self C-chord-line) chords t-offset)
   (when chords
     (setf (play-flag self) t)
     (let ((start-time (t-time (car chords))))
       (dfuncall  (- start-time t-offset) 'continue-play-chords self chords start-time))))
 
+(defgeneric continue-play-chords (self chords start-time))
 (defmethod continue-play-chords ((self C-chord-line) chords start-time)
   (when (and (play-flag self) *MN-play-flag*)
     (play-chord (pop chords)) 
@@ -632,15 +674,18 @@
 ;;  (set-visible-chords self time1 time2)
 ;;  (tell (visible-chords self)  'draw-chord t-scfactor beg-x time1 C5)) 
 
+(defgeneric draw-active-chord (self chord t-scfactor beg-x time1 C5))
 (defmethod draw-active-chord  ((self C-chord-line) chord t-scfactor beg-x time1 C5) 
   (draw-chord chord t-scfactor beg-x time1 C5 t)) 
 
+(defgeneric add-new-chord (self new-chord))
 (defmethod add-new-chord ((self C-chord-line) new-chord)
-   (sort-chord-by-time self new-chord))
+  (sort-chord-by-time self new-chord))
 
+(defgeneric remove-chord (self chord &optional kill-lock))
 (defmethod remove-chord ((self C-chord-line) chord &optional kill-lock)
   (unless kill-lock 
-     (tell (notes chord) 'remove-instrument-item ()()))
+    (tell (notes chord) 'remove-instrument-item ()()))
   (setf (chords self) (remove chord (chords self) :test 'eq)))
 
 ;;  (stable-sort  (chords self) '< :key '(lambda (obj) (t-time obj)))
@@ -648,20 +693,22 @@
 ;;(defmethod set-visible-chords ((self C-chord-line) time1 time2)
 ;;   (setf (visible-chords self) (find-visible-chords self time1 time2)))
 
+(defgeneric find-visible-chords (self time1 time2))
 (defmethod find-visible-chords ((self C-chord-line) time1 time2)
-   (let ((chords (chords self))
-         (visible-chords))
-      (while (and chords (> time1 (t-time (car chords))))(pop chords))
-      (while (and chords (> time2 (t-time (car chords))))
-            (push  (pop chords) visible-chords))
-      (nreverse visible-chords)))
+  (let ((chords (chords self))
+        (visible-chords))
+    (while (and chords (> time1 (t-time (car chords))))(pop chords))
+    (while (and chords (> time2 (t-time (car chords))))
+      (push  (pop chords) visible-chords))
+    (nreverse visible-chords)))
        
+(defgeneric sort-chord-by-time (self new-chord))
 (defmethod sort-chord-by-time ((self C-chord-line) new-chord)
-   (let ((chords (chords self))
-         (time1 (t-time new-chord))
-         (chords1))
-     (while (and chords (> time1 (t-time (car chords))))(push (pop chords) chords1))
-     (setf (chords self)
-        (append  (nreverse chords1)(list new-chord) chords))))
+  (let ((chords (chords self))
+        (time1 (t-time new-chord))
+        (chords1))
+    (while (and chords (> time1 (t-time (car chords))))(push (pop chords) chords1))
+    (setf (chords self)
+          (append  (nreverse chords1)(list new-chord) chords))))
 
 

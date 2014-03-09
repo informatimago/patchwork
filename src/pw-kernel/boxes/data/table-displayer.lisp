@@ -37,7 +37,8 @@
 ;;Allegro CL version of the table displayer, for now .....
 ;;======================
 
-(in-package :patch-work)
+(in-package :pw)
+
 
 (defclass C-disp-window (C-application-window) ())
 
@@ -50,18 +51,17 @@
   ((my-array :initform (make-array '(2 2)) :initarg :my-array :accessor my-array)))
 
 (defmethod update-size ((self C-array-item) size)
-  (set-view-size self 
-                 (subtract-points  size (make-point 20 20))))
+  (set-view-size self (subtract-points  size (make-point 20 20))))
 
 (defmethod cell-contents ((self C-array-item) h &optional v)
   (if v (aref (my-array self) h v) (aref (my-array self) (point-h h) (point-v h))))
 
 (defmethod set-array ((self C-array-item) the-array)
   (let* ((dims (array-dimensions the-array))
-        (dialog (view-container self))
-        (max-dims (apply #'max dims))
-        (size-h (+ 20 (* 20 max-dims)))
-        (size-v (+ 12 (* 12 max-dims))))
+         (dialog (view-container self))
+         (max-dims (apply #'max dims))
+         (size-h (+ 20 (* 20 max-dims)))
+         (size-v (+ 12 (* 12 max-dims))))
     (remove-subviews dialog self)
     (set-view-size self size-h size-v)
     (set-table-dimensions self  (first dims) (second dims))
@@ -115,7 +115,7 @@
 
 (defmethod open-patch-win ((self C-table-displayer))
   (if (not (wptr (application-object self)))
-    (setf (application-object self) (make-application-object self)))
+      (setf (application-object self) (make-application-object self)))
   (set-array (car (subviews (application-object self))) (table self))
   (window-select (application-object self)))
 
@@ -127,18 +127,18 @@
     
     (cond ((eq option 'cc)
            (fill-table-disp self  maxlength data 2))
-           ((eq option 'r) 
-            (fill-table-disp self maxlength data 1)))))
+          ((eq option 'r) 
+           (fill-table-disp self maxlength data 1)))))
 
 (defmethod fill-table-disp ((self C-table-displayer) maxlength data increm)
   (let ((init-pos 0) (index 0))
     (setf (table self)
           (make-array  (list  (* maxlength increm)(length data))
-                  :initial-element #\Space))
+                       :initial-element #\Space))
     (dolist (row data)
       (setq init-pos (- maxlength (length (list! row)) increm))
       (mapc (lambda (elem) 
-                (setf (aref (table self) (incf init-pos increm) index) elem))
+              (setf (aref (table self) (incf init-pos increm) index) elem))
             (list! row))
       (incf index))))
 

@@ -189,7 +189,9 @@ delta and output mode."
   )
 
 
+(defgeneric MidiSaveAny (object))
 (defmethod MidiSaveAny ((object t))
+  (niy MidiSaveAny object) #-(and)
   (when (and  midi::*pw-refnum* midi::*player* )
     (setf *play-chseq-w/offset* t)
     (let ((seq (midishare::midinewseq)))
@@ -311,6 +313,7 @@ Input may be any PatchWork object that could be played through play-object
 
 
 (defun mievents2midilist (seq units/sec)
+  (niy mievents2midilist seq units/sec) #-(and)
   (when (and  midi::*pw-refnum* midi::*player* )
     (let (event date initdate rep
                 (cur-tempo *midi-tempo*)

@@ -10,6 +10,7 @@
 ;;;;    
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
 ;;;;BUGS
@@ -31,18 +32,15 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
 
 (in-package :pw)
 (enable-patchwork-reader-macros)
+
+(defgeneric value (self))
+(defgeneric set-value (self value))
+(defgeneric patch-value (self obj))
+(defgeneric set-special-text (self value))
+
 
 ;;=========================
 ;; dialog for tty-box and numbox
@@ -207,9 +205,9 @@
     (setf (value self) (eval (slot-value self 'value))))
   (set-view-font self '("Monaco" 9 :SRCOR :PLAIN)))
 
-(defgeneric value (self)
-  (:method ((self C-ttybox))
-    (dialog-item-text self)))
+
+(defmethod value ((self C-ttybox))
+  (dialog-item-text self))
 
 (defgeneric (setf value) (value self)
   (:method (value (self C-ttybox))
@@ -266,14 +264,12 @@
 ;;=========================
 ;;PW
 
-(defgeneric patch-value (self obj)
-  (:method ((self C-ttybox) obj) 
-    (declare (ignore obj))
-    (read-from-string (dialog-item-text self))))
+(defmethod patch-value ((self C-ttybox) obj) 
+  (declare (ignore obj))
+  (read-from-string (dialog-item-text self)))
 
-(defgeneric set-special-text (self value)
-  (:method ((self C-ttybox) value)
-    (declare (ignore value))))
+(defmethod set-special-text ((self C-ttybox) value)
+  (declare (ignore value)))
 
 ;;===========================================================================
 
@@ -410,6 +406,10 @@
 ;;=========================
 ;;events
 
+(defgeneric map-mouse-increment (view))
+(defgeneric item-action-while-drag (self))
+(defgeneric item-action-after-drag (self))
+
 (defmethod item-action-while-drag ((self C-numbox)))
 (defmethod item-action-after-drag ((self C-numbox))
   (when (dialog-item-action-function self)
@@ -489,15 +489,16 @@
      :max-val ,(max-val self)
      :menu-box-list ',(menu-box-list self)))
 
-(defmethod set-menu-box-list  ((self C-menubox) list) (setf (menu-box-list self) list))
+(defgeneric set-menu-box-list (self list)
+  (:method ((self C-menubox) list) (setf (menu-box-list self) list)))
 
 (defgeneric menubox-value (self)
   (:method ((self C-menubox))
     (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self)))) 
 
-(defmethod set-numbox-item-text  ((self C-menubox) value)
+(defmethod set-numbox-item-text ((self C-menubox) value)
   (if (stringp value)
-    (setf (value self) (position value (menu-box-list self) :test #'string=)))
+      (setf (value self) (position value (menu-box-list self) :test #'string=)))
   (set-dialog-item-text self (menubox-value self)))
 
 (defmethod view-double-click-event-handler ((self C-menubox) where)

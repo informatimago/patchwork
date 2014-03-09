@@ -697,13 +697,13 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
   (let ((nsevent [[NSApplication sharedApplication]
                   nextEventMatchingMask: (mac-event-mask-to-ns-event-mask every-event)
                   untilDate: [NSDate dateWithTimeIntervalSinceNow:
-                                     (cgfloat (* 60
-                                                 (or sleep-ticks
-                                                     (if *foreground* 
-                                                         (if idle
-                                                             *idle-sleep-ticks*
-                                                             *foreground-sleep-ticks*)
-                                                         *background-sleep-ticks*))))]
+                                     (nstimeinterval (* 60
+                                                        (or sleep-ticks
+                                                            (if *foreground* 
+                                                                (if idle
+                                                                    *idle-sleep-ticks*
+                                                                    *foreground-sleep-ticks*)
+                                                                *background-sleep-ticks*))))]
                   inMode:#$NSDefaultRunLoopMode
                   dequeue:YES]))
     (assign-event event

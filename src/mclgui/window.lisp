@@ -299,7 +299,7 @@ close box or chooses Close from the File menu.
 ;; (defmethod view-position ((w window) &aux (wptr (wptr w)))  
 ;;   (rlet ((rect :rect))
 ;;     (#_getwindowportbounds wptr rect)
-;;     (%local-to-global wptr (pref rect :rect.topleft))))
+;;     (local-to-global wptr (pref rect :rect.topleft))))
 
 
 (defun center-window (size position)

@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,20 +32,9 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
-;;==================================================================================================================
 
 #|
 (defun scale-to-fit-in-rect (view)
@@ -219,17 +209,19 @@
   (when (break-point-function self)
     (scale-to-fit-in-rect self))) 
 
-(defmethod set-break-point-function-to-mini ((self C-mini-bpf-view) bpf)
-  (setf (break-point-function self) bpf)
-  (scale-to-fit-in-rect self))
+(defgeneric set-break-point-function-to-mini (self bpf)
+  (:method ((self C-mini-bpf-view) bpf)
+    (setf (break-point-function self) bpf)
+    (scale-to-fit-in-rect self)))
 
-(defmethod update-mini-view ((self C-mini-bpf-view))
-  (with-focused-view self
-    (with-pen-state (:pattern *white-pattern*)
+(defgeneric update-mini-view (self)
+  (:method ((self C-mini-bpf-view))
+    (with-focused-view self
+      (with-pen-state (:pattern *white-pattern*)
         (fill-rect*  (point-h (view-scroll-position self)) 
                      (point-v (view-scroll-position self)) (w self)(h self))))
-  (scale-to-fit-in-rect self)
-  (view-draw-contents self))
+    (scale-to-fit-in-rect self)
+    (view-draw-contents self)))
 
 ;;=====================================
 ;;draw

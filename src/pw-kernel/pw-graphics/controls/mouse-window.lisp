@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,20 +32,10 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================  
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
-;;==================================================================================================================
+
 (defvar *xy-windoid* ())
 (defvar *x-value-text* ())
 (defvar *y-value-text* ())
@@ -53,7 +44,6 @@
 (defvar *next-point-h-val* ())
 (defvar *bpf-view-draw-lock* ())
 
-;;==================================================================================================================
 
 (defun make-xy-windoid-instance ()
   (setf *xy-windoid* (make-instance 'windoid :view-size #@(90 32) :close-box-p nil :window-show nil))
@@ -94,6 +84,7 @@
         (view-mouse-moved active-subview mouse))
       (no-active-mouse-moved self)))))
              
+(defgeneric no-active-mouse-moved (self))
 (defmethod no-active-mouse-moved ((self C-mouse-window)))
 
 (defmethod window-update-cursor :around ((self C-mouse-window) where) 

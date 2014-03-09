@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    User Patch configuration
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,20 +32,9 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
+(in-package :pw)
 
 ;;;============================================================
-;;;
-;;; User Patch configuration
-;;;
 ;;;A dynamic user library configuration scheme for PW. Each function in a PW 
 ;;;user library can be surrounded by an 'eval-if-key' macro call which does
 ;;;selecting loading based on an a-list of user supplied keywords. The a-list takes
@@ -122,10 +112,11 @@
 
 ;;;============================================================
 ;;for surrounding definitions in libraries
-(in-package :patch-work)
+
 
 (defmacro eval-list (form-list)
   `(mapc #'eval ,form-list))
+
 (defmacro eval-if-key (&rest key-code-pairList)
   "evaluates body if key-code is in *library-selection* "
   (let((sym (gensym "pair")))

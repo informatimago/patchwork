@@ -98,7 +98,9 @@
   (event-dispatch)
   (window-update-event-handler self))
 
-(defmethod editor-collection-object ((self C-rtm-editor-window)) (car (subviews self)))
+(defgeneric editor-collection-object (self)
+  (:method ((self C-rtm-editor-window))
+    (car (subviews self))))
 
 (defun record-rtm-chords-from-midi (beat-objs)
   (let ( midics t-time dur vel ins chord 

@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,16 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
@@ -123,10 +114,10 @@
       (if (value (view-container item))
         (progn 
           (set-dialog-item-text item "o")
-          (record--ae :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self))))))
+          (record-event :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self))))))
         (progn
           (set-dialog-item-text item "x")
-          (record--ae :|PWst| :|cand| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
+          (record-event :|PWst| :|cand| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
       (setf (value (view-container item))
             (not (value (view-container item))))))
 
@@ -143,7 +134,7 @@
   (setf (current-str self)
         (case o-type
           (:bpf #\B) (:x-points #\X) (:y-points #\Y)))
-  (set-box-title (popUpBox self) "  ") ;(string (current-str self)))
+  (set-box-title (popUpBox self) "  ")  ;(string (current-str self)))
   (draw-appl-label self (current-str self))
   )
 
@@ -151,8 +142,9 @@
   (set-box-title (popUpBox self) "  ")
   (call-next-method))
 
-(defmethod erase-BPF-label? ((self C-patch-function)) 
-  (set-box-title (popUpBox self) "  "))
+(defgeneric erase-BPF-label? (self)
+  (:method ((self C-patch-function)) 
+    (set-box-title (popUpBox self) "  ")))
 
 (defmethod draw-appl-label ((self C-patch-function) label)
   (when label
@@ -165,23 +157,26 @@
     (draw-appl-label self
       (if (eq (front-window) (application-object self)) #\* (current-str self)))))
 
+
 (defmethod erase-my-connections ((self C-patch-function))
   (let ((patches (subviews *active-patch-window*)))
     (dolist (patch patches)
       (if (am-i-connected? patch self)
-        (progn 
-          (draw-connections patch t)
-          (disconnect-my-self patch self)
-          (draw-connections patch ))))))
+          (progn 
+            (draw-connections patch t)
+            (disconnect-my-self patch self)
+            (draw-connections patch ))))))
 
-(defmethod set-the-points-view ((self C-patch-function))
-  (setf (points-state self) (not (points-state self)))
-  (let ((*no-line-segments* (points-state self)))
-    (update-mini-view (give-mini-bpf self))
-    (view-draw-contents (application-object self))))
+(defgeneric set-the-points-view (self)
+  (:method ((self C-patch-function))
+    (setf (points-state self) (not (points-state self)))
+    (let ((*no-line-segments* (points-state self)))
+      (update-mini-view (give-mini-bpf self))
+      (view-draw-contents (application-object self)))))
 
-(defmethod display-only-points ((self C-patch-function))
-  (points-state self))
+(defgeneric display-only-points (self)
+  (:method ((self C-patch-function))
+    (points-state self)))
 
 (defmethod decompile ((self C-patch-function))
   (let ((bpf (break-point-function (give-mini-bpf self))))
@@ -208,7 +203,8 @@
   (setf (application-object self)
         (make-BPF-editor (make-break-point-function '(0 100) '(0 100)))))
 
-(defmethod give-mini-bpf ((self C-patch-function)) (third (pw-controls self)))
+(defgeneric give-mini-bpf (self)
+  (:method ((self C-patch-function)) (third (pw-controls self))))
 
 (defmethod patch-value ((self C-patch-function) obj)
   (unless (or (value self)
@@ -306,6 +302,7 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
  which corresponds to <x-val> (or list of x values) for the connected bpf"
     (get-transfer-output bpf-ob x-val))
 
+(defgeneric get-transfer-output (self points))
 (defmethod get-transfer-output ((self null) points) (declare (ignore points)) nil)
 
 (defmethod get-transfer-output ((self C-break-point-function) points)
@@ -319,7 +316,7 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
       (if (rest y-vals) y-vals (first y-vals)))
     (progn (format t "input is not a bpf or lists of bpfs ~%") (ui:ed-beep))))
 
-(defunp bpf-sample ((bpf-ob0 list (:value 'nil :type-list (list patch-work::bpf)))
+(defunp bpf-sample ((bpf-ob0 list (:value 'nil :type-list (list pw::bpf)))
                     (echan1 fix>0 (:min-val 2 :value 2)) (xinit2 fix) (xend3 fix (:value 100))
                     (fact4 fix/float (:value 1)) (nbdec5 fix)) list 
 "  The bpf-sample module creates a list starting by sampling a  
@@ -331,6 +328,7 @@ and nbdec  is the number of decimals desired in the output.
 
   (get-bpf-sample-output bpf-ob0 echan1 xinit2 xend3 fact4 nbdec5))
 
+(defgeneric get-bpf-sample-output (self echan1 xinit2 xend3 fact4 nbdec5))
 (defmethod get-bpf-sample-output ((self null) echan1 xinit2 xend3 fact4 nbdec5)
   (declare (ignore echan1 xinit2 xend3 fact4 nbdec5)) self)
 

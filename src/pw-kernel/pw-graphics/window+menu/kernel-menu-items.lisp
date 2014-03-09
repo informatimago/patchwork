@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,19 +32,23 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 
-;;===============================================================================
+
+(defun init-patch-pos (win patch)
+  (unless *position-new-box*
+    (setf *position-new-box*
+          (if win
+              (add-points (view-position win)
+                          (make-point (random (point-h (view-size win)))
+                                      (random (point-v (view-size win)))))
+              (make-point 10 10))))
+  (let* ((x (point-h *position-new-box*))
+         (y (point-v *position-new-box*)))
+    (when win
+      (setf x (min x (point-h (view-size win)))
+            y (min y (point-v (view-size win)))))
+    (set-view-position patch (make-point x y))))
 
 (defun new-PW-sub-menu-item (main-menu mtitle patch-type box-title type-forms
                              &optional type-list defaults-list)

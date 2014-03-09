@@ -664,7 +664,7 @@ default menu item.  Otherwise the value itself is displayed as if by
         (a-rect (pop-up-menu-rect menu))
         (pos (with-focused-view (view-container menu)
                #-(and)
-               (%local-to-global
+               (local-to-global
                 (wptr menu)
                 (rref a-rect :rect.topleft)))))
     (declare (ignore selection a-rect pos))

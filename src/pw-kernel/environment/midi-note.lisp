@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,19 +32,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
- 
 (in-package :pw)
-
-;;=========================
 
 ;;(require "LELISP-MACROS")
 ;;(use-package "LELISP-MACROS")
@@ -55,16 +44,15 @@
 ;;(use-package "MIDI")
 
 ;;(require "SCHEDULER")
-;;(use-package "PATCH-WORK.SCHEDULER")
+;;(use-package "PATCHWORK.SCHEDULER")
 
-;;=================================================================================================
-;;=================================================================================================
 
 ;;(latency) ??
 (defun write-midi-note (dur chan key vel) 
   (unless (or (minusp key) (> key 127))
     (setq chan (1- chan))
     (setf dur (* 10 dur))
+    (niy write-midi-note dur chan key vel) #-(and)
     (let ((event (midishare::MidiNewEv midishare::typeNote)))	
       (unless (midishare:null-event-p event)	
         (midishare::chan event chan)			
@@ -84,9 +72,9 @@
     (for (i 0 1 99)
       (setq temp (/ (* i steps) 100))  
       (setf (svref *cents-vector* i)
-        (cons 
-          (+ 64 (truncate (/ temp 128)))    ; high
-          (truncate (mod temp 128))))))) ; low
+            (cons 
+             (+ 64 (truncate (/ temp 128)))    ; high
+             (truncate (mod temp 128))))))) ; low
 
 ;; (for (i 0 1 99) (print (svref *cents-vector* i)))
 
@@ -99,6 +87,7 @@
       (write-pitch-bend-value chan (car cents) (cdr cents))
       (setq chan (1- chan))
       (setf dur (* 10 dur))
+      (niy write-midicent-note dur chan key vel) #-(and)
       (let ((event (midishare::MidiNewEv midishare::typeNote)))	
         (unless (midishare:null-event-p event)	
           (midishare::chan event chan)			
@@ -111,39 +100,43 @@
 ;;========================================================================
 
 (defun write-pitch-bend-value (chan value &optional (ls 0))
-    (setq chan (1- chan))
-    (let ((event (midishare::MidiNewEv midishare::typePitchWheel)))	
-     (unless (midishare:null-event-p event)	
-       (midishare::chan event chan)			
-       (midishare::port event 0)			
-       (midishare::field event 0 ls)		
-       (midishare::field event 1 value)		
-       (midishare::MidiSendIm midi::*pw-refnum* event))))
+  (setq chan (1- chan))
+  (niy write-pitch-bend-value chan value ls) #-(and)
+  (let ((event (midishare::MidiNewEv midishare::typePitchWheel)))	
+    (unless (midishare:null-event-p event)	
+      (midishare::chan event chan)			
+      (midishare::port event 0)			
+      (midishare::field event 0 ls)		
+      (midishare::field event 1 value)		
+      (midishare::MidiSendIm midi::*pw-refnum* event))))
 
 (defun write-controller-value (chan controller value)
-    (setq chan (1- chan))
-    (let ((event (midishare::MidiNewEv midishare::typeCtrlChange)))	
-     (unless (midishare:null-event-p event)	
-       (midishare::chan event chan)			
-       (midishare::port event 0)			
-       (midishare::field event 0 controller)		
-       (midishare::field event 1 value)		
-       (midishare::MidiSendIm midi::*pw-refnum* event))))
- 
+  (setq chan (1- chan))
+  (niy write-controller-value chan controller value) #-(and)
+  (let ((event (midishare::MidiNewEv midishare::typeCtrlChange)))	
+    (unless (midishare:null-event-p event)	
+      (midishare::chan event chan)			
+      (midishare::port event 0)			
+      (midishare::field event 0 controller)		
+      (midishare::field event 1 value)		
+      (midishare::MidiSendIm midi::*pw-refnum* event))))
+
 
 ;; ????
 (defun write-program-change-value (chan program) 
-    (setq chan (1- chan))
-    (let ((event (midishare::MidiNewEv midishare::typeProgChange)))	
-     (unless (midishare:null-event-p event)	
-       (midishare::chan event chan)			
-       (midishare::port event 0)			
-       (midishare::field event 0 program)		
-       (midishare::MidiSendIm midi::*pw-refnum* event))))
+  (setq chan (1- chan))
+  (niy write-program-change-value chan program) #-(and)
+  (let ((event (midishare::MidiNewEv midishare::typeProgChange)))	
+    (unless (midishare:null-event-p event)	
+      (midishare::chan event chan)			
+      (midishare::port event 0)			
+      (midishare::field event 0 program)		
+      (midishare::MidiSendIm midi::*pw-refnum* event))))
 
 
 (defun write-pressure-value (chan key value)
   (setq chan (1- chan))
+  (niy write-pressure-value chan key value) #-(and)
   (let ((event (midishare::MidiNewEv midishare::typeKeyPress)))	
     (unless (midishare:null-event-p event)	
       (midishare::chan event chan)			
@@ -161,18 +154,18 @@
   (let ((res)(temp)(status))
     (while list
       (cond 
-         ((>= (caar list) #x80)
-           (setq status (caar list))
-           (setq temp (list (cadar list)))
-           (push status temp)
-           (pop list)
-           (repeat 2 (push (car (pop list)) temp)))
-         (t
-           (setq temp (list (cadar list)))
-           (push status temp)
-           (repeat 2 (push (car (pop list)) temp))))
+        ((>= (caar list) #x80)
+         (setq status (caar list))
+         (setq temp (list (cadar list)))
+         (push status temp)
+         (pop list)
+         (repeat 2 (push (car (pop list)) temp)))
+        (t
+         (setq temp (list (cadar list)))
+         (push status temp)
+         (repeat 2 (push (car (pop list)) temp))))
       (push (nreverse temp) res))
-      (nreverse res)))
+    (nreverse res)))
 
 (defun read-from-midi ()
   (let ((res)(temp)(start-time)  res2)
@@ -192,37 +185,37 @@
   (let ((pitches))
     (while lst-lst
       (when (< (1- 144) (second (car lst-lst)) (+ 16 144))
-         (push (third (car lst-lst)) pitches))
+        (push (third (car lst-lst)) pitches))
       (pop lst-lst))
-      (nreverse pitches)))
+    (nreverse pitches)))
 
 (defun quantize-chords (list)
   (let ((chords)(notes-on)(res-temp)(time-now)(tolerance 10))
     (while list
       (when (and (not (= 0 (fourth (car list))))(> (second (car list)) 143)) ;  only note-on   
         (push (car list) notes-on))
-       (pop list))
+      (pop list))
     (setq notes-on (nreverse notes-on))
     (while notes-on
       (setq res-temp (list (setq time-now (caar notes-on))))
       (push (cdar notes-on) res-temp)
       (pop notes-on)
       (while (and notes-on (< (- (caar notes-on) time-now) tolerance)) 
-         (push (cdar notes-on) res-temp)
-         (pop notes-on))
+        (push (cdar notes-on) res-temp)
+        (pop notes-on))
       (push (nreverse res-temp) chords))
-     (nreverse chords)))
+    (nreverse chords)))
 
 #|
 (defun rec-MN (midi-obj)
-  (let ((mn-editor (give-MN-editor midi-obj))
-        (midics)(t-time)
-        (list (quantize-chords (read-from-midi))))
-     (while list
-        (setq t-time (caar list))
-        (setq midics (mapcar #'* (mapcar #'second (cdar list)) (cirlist 100))) 
-        (add-new-chord (chord-line mn-editor) (make-chord-object midics t-time))
-        (pop list))
-     (update-editor (give-MN-editor midi-obj) ())
-     midi-obj))
+(let ((mn-editor (give-MN-editor midi-obj))
+(midics)(t-time)
+(list (quantize-chords (read-from-midi))))
+(while list
+(setq t-time (caar list))
+(setq midics (mapcar #'* (mapcar #'second (cdar list)) (cirlist 100))) 
+(add-new-chord (chord-line mn-editor) (make-chord-object midics t-time))
+(pop list))
+(update-editor (give-MN-editor midi-obj) ())
+midi-obj))
 |#

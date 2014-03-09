@@ -35,19 +35,23 @@
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
+(defclass appleevent-recorder ()
+  ())
+
+(defmethod record-event* ((recorder appleevent-recorder) class keyword lis)
+  (record--ae class keyword lis))
+(defmethod record-select-list* ((recorder appleevent-recorder) list)
+  (record--ae--select-list list))
+(defmethod record-patch* ((recorder appleevent-recorder) class posi name)
+  (record--ae--patch clas posi name))
+(defmethod record-menu* ((recorder appleevent-recorder) title para self)
+  (record--ae--menu title para self))
+
+
+
+
 (defvar *record-enable* nil)
 
-(defun check-s ()
-  (declare (special *record-enable*))
-  (setf *record-enable* nil)
-  (niy *record-enable*)
-  ;; (if (ui::gestalt :|ascr|) 
-  ;;   (setf *record-enable* t)
-  ;;   (setf *record-enable* nil))
-  )
-
-(on-load-and-now check-script
-  (check-s))
 
 ;;RECORDABLES
 (defun pw::send-appleevent (the-appleevent the-reply &key
@@ -98,7 +102,7 @@
       (send-appleevent event reply :interact-mode :notexecute))))
 
 
-(defun record-select-list (lista)
+(defun record--ae--select-list (lista)
   (when (and *si-record* *record-enable*)
     (closae:with-aedescs (event reply target )
       (closae:create-self-target target)
@@ -185,6 +189,7 @@
       (setf theargs (cdr theargs)))
     i))
 
+(defgeneric correct-extension-box-2 (self new-box values))
 (defmethod correct-extension-box-2 ((self C-map-first) new-box values)
   (declare (ignore new-box values)))
 
@@ -222,18 +227,18 @@
 (defmethod delete-extra-inputs ((self C-pw-extend)) 
   (let* ((values (butlast (ask-all (pw-controls self) 'patch-value ())))
          (box-now
-          (make-patch-box  (class-name (class-of self)) (give-new-extended-title self)
-                           (generate-extended-inputs self) (type-list self))))
+           (make-patch-box  (class-name (class-of self)) (give-new-extended-title self)
+                            (generate-extended-inputs self) (type-list self))))
     (setf (pw-function-string box-now) (pw-function-string self))
     (set-view-position box-now (make-point (x self) (y self))) 
     (for (i 0 1 (1- (length values)))
-         (set-dialog-item-text (nth i (pw-controls box-now)) 
-                               (if (numberp (nth i values))
-                                   (format () "~D" (nth i values))
-                                   (string (nth i values)))) 
-         (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
-           (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
-           (setf (open-state (nth i (pw-controls box-now))) nil)))
+      (set-dialog-item-text (nth i (pw-controls box-now)) 
+                            (if (numberp (nth i values))
+                                (format () "~D" (nth i values))
+                                (string (nth i values)))) 
+      (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+        (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
+        (setf (open-state (nth i (pw-controls box-now))) nil)))
     (correct-extension-box self box-now values)
     (tell (controls (view-window self)) 'draw-connections t)
     (setf *position-new-box* (view-position self))
@@ -422,9 +427,7 @@
 
 ;;NEW 
 
-
-
-(defun record-patch (clase posi name)
+(defun record--ae--patch (clase posi name)
   (when (and *si-record* *record-enable*)
     (if (equal (string-downcase clase) "text")
         (setf clase "Window Comment"))
@@ -442,33 +445,6 @@
 
 
 ;;PARA GENERACION DE NOMBRES
-
-(defun application-window-name (obj string)
-  (if (null (position obj (controls *active-patch-window*) :test 'equal))
-      (mk-nuevo-name-box  string) (pw-function-string obj)))
-
-
-(defun mk-nuevo-name-box (string )
-  (if (null *active-patch-window*)
-      string
-      (let* ((nompot string)
-             (i 0)
-             (seguir (match-name nompot)))
-        (while seguir
-          (incf i)
-          (setf nompot (concatenate 'string string (format nil "~D" i)))
-          (setf seguir (match-name nompot)))
-        nompot)))
-
-(defun match-name (name)
-  (let* ((lista (controls *active-patch-window*)) (i 0)
-         (leng (length lista)) (next t))
-    (while (and (< i leng) next)
-      (if (equal name (pw-function-string (nth i lista)))
-          (setf next nil))
-      (incf i))
-    (if next nil t)))
-
 
 
 (defmethod draw-function-name ((self C-patch-application) x y)
@@ -569,7 +545,7 @@
           (list (make-instance 'C-list-item
                     :view-font '("Monaco" 9  :plain)
                     :table-dimensions (make-point 2 2)
-                    :cell-size (make-point cell-width cell-hight)
+                    :cell-size (make-point *cell-width* *cell-height*)
                     :view-size (make-point 100 80)))
           :window-show nil
           :window-title (pw::application-window-name self "lst-ed"))))
@@ -615,7 +591,7 @@
     (set-array table (the-list self))
     (set-view-size (application-object self)
                    (add-points (view-size table)
-                               (make-point cell-width (* 2 cell-hight))))
+                               (make-point *cell-width* (* 2 *cell-height*))))
     (call-next-method)))
 
 (in-package :pw)
@@ -626,7 +602,7 @@
                (string-downcase  (pathname-name file-name))
                self))
 
-(defun record-menu  (title para self)
+(defun record--ae---menu  (title para self)
   (if para
       (record--ae :|PWst| :|come| `((,:|----| ,(mkSO :|cmen| (mkSO :|cbox| nil :|name| (pw-function-string self)) :|name| 
                                                      title))
@@ -692,34 +668,26 @@
 (defmethod view-size     ((self null)) (make-point 1000 1000))
 
 
-(defun init-patch-pos (win patch)
-  (unless *position-new-box*
-    (setf *position-new-box*
-          (if win
-              (add-points (view-position win)
-                          (make-point (random (point-h (view-size win)))
-                                      (random (point-v (view-size win)))))
-              (make-point 10 10))))
-  (let* ((x (point-h *position-new-box*))
-         (y (point-v *position-new-box*)))
-    (when win
-      (setf x (min x (point-h (view-size win)))
-            y (min y (point-v (view-size win)))))
-    (set-view-position patch (make-point x y))))
-
-
-
-
 (defvar *Chord-box-popUpMenu*)
 (defvar C-PW-MIDI-IN:*Midi-box-popUpMenu*)
 (defvar c-patch-file-buffer::*file-box-popUpMenu*)
 
+(defun check-s ()
+  (setf *record-enable* nil)
+  (niy *record-enable*)
+  ;; (if (ui::gestalt :|ascr|) 
+  ;;   (setf *record-enable* t)
+  ;;   (setf *record-enable* nil))
+  )
+
 (defun initialize/recordables ()
   (make-box-menu-recordables *Chord-box-popUpMenu*)
   (make-box-menu-recordables C-PW-MIDI-IN:*Midi-box-popUpMenu*)
-  (make-box-menu-recordables c-patch-file-buffer::*file-box-popUpMenu*))
+  (make-box-menu-recordables c-patch-file-buffer::*file-box-popUpMenu*)
+  (setf *recorder* (make-instance 'appleevent-recorder))
+  (check-s))
 
-
-;; (initialize/recordables)
+(on-load-and-now check-script
+  (initialize/recordables))
 
 ;;;; THE END ;;;;

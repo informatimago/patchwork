@@ -86,11 +86,18 @@
   (set-box-title (popUpBox self) (current-str self))
   (do-menu-action self o-type))
 
-(defmethod get-default-char ((self C-patch&popUp)) (current-str self))
+(defgeneric get-default-char (self)
+  (:method ((self C-patch&popUp))
+    (current-str self)))
 
-(defmethod do-menu-action ((self C-patch&popUp) o-type) (declare (ignore o-type)) nil)
+(defgeneric do-menu-action (self o-type)
+  (:method ((self C-patch&popUp) o-type)
+    (declare (ignore o-type))
+    nil))
 
-(defmethod get-local-menu ((self C-patch&popUp)) )
+(defgeneric get-local-menu (self)
+  (:method ((self C-patch&popUp))
+    nil))
 
 #|
 TEST

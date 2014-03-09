@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,18 +32,12 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
+
+(defgeneric editor-objects (self))
+(defgeneric draw-clef (self x y))
+(defgeneric draw-staff (self x C5))
 
 ;;=================================================================================================
 (defvar *current-mn-window*    nil)
@@ -163,6 +158,7 @@
 ;;=============================
 ;;scales + approximations
 
+(defgeneric use-all-approx-scale (self scale))
 (defmethod use-all-approx-scale ((self C-mus-not-view) scale)
   (unless (eq (local-approx self) scale)
     (setf (local-approx self) scale)
@@ -171,6 +167,7 @@
           (*current-approx-scale* scale))
       (mapc #'update-all-notes (editor-objects (car (subviews *active-mn-window*))))) ))
 
+(defgeneric use-all-scale (self scale))
 (defmethod use-all-scale ((self C-mus-not-view) scale)
   (unless (eq (local-scale self) scale)
     (setf (local-approx self) scale)
@@ -226,13 +223,13 @@
   (erase-all-scale-marks)
   (setf *current-approx-scale* scale *current-music-notation-scale* scale)
   (set-scale-mark scale)
-  (record--ae :|PWst| :|gloo| `((,(if (or (equal scale *chromatic-scale*) (equal scale *c-major-scale*))
-                                      :|opsc| :|opap|)
-                                 ,(cond ((equal scale *chromatic-scale*) "Chromatic")
-                                        ((equal scale *1/4-tone-chromatic-scale*) "Quarter tone")
-                                        ((equal scale *1/8-tone-chromatic-scale*) "Eigth tone")
-                                        ((equal scale *c-major-scale*) "C-major")
-                                        )))))
+  (record-event :|PWst| :|gloo| `((,(if (or (equal scale *chromatic-scale*) (equal scale *c-major-scale*))
+                                        :|opsc| :|opap|)
+                                   ,(cond ((equal scale *chromatic-scale*) "Chromatic")
+                                          ((equal scale *1/4-tone-chromatic-scale*) "Quarter tone")
+                                          ((equal scale *1/8-tone-chromatic-scale*) "Eigth tone")
+                                          ((equal scale *c-major-scale*) "C-major")
+                                          )))))
 
 (defclass C-zoomer (C-numbox) 
   ( (the-view :initarg :the-view :reader the-view)))
@@ -254,11 +251,13 @@
 (defmethod view-double-click-event-handler ((self C-zoomer) where)
   (declare (ignore where)))
 
+(defgeneric erase-the-view (self))
 (defmethod erase-the-view ((self C-mus-not-view))
   (with-focused-view self
     (with-pen-state (:mode :srccopy :pattern *white-pattern*)
       (fill-rect* 0 0 (- (w self) 9)(- (h self) 17)))) )
 
+(defgeneric make-extra-controls (self))
 (defmethod make-extra-controls ((self C-mus-not-view))
   (let ((v-extreme (+  (point-v (view-position self)) (point-v (view-size self)) 10))
         (h-initial (+ 2 (point-h (view-position self)))))
@@ -295,6 +294,7 @@
     (setf (ctrl-settings self)
           (list (cons :ins nil) (cons :dur nil) (cons :dyn nil) (cons :offs nil))) ) )
 
+(defgeneric add-to-radio-cluster (self x y txt type))
 (defmethod add-to-radio-cluster ((self C-mus-not-view) x y txt type)
   (make-instance 
    'radio-button-dialog-item
@@ -307,6 +307,7 @@
      (set-value-ctrl self item type)
      (update-view-controler self))))
 
+(defgeneric set-value-ctrl (self item kind))
 (defmethod set-value-ctrl ((self C-mus-not-view) item kind)
   (if (cdr (assoc kind (ctrl-settings self)))
       (progn (radio-button-unpush item)
@@ -317,6 +318,7 @@
 
 (defparameter *MN-view-ctrls-space* (make-point 9 36))
 
+(defgeneric update-view-controler (self))
 (defmethod update-view-controler ((self C-mus-not-view))
   (with-focused-view self
     (with-pen-state (:mode :srccopy :pattern *white-pattern*)
@@ -324,11 +326,13 @@
                   (- (h self) (point-v *MN-view-ctrls-space*)))))
   (view-draw-contents self))
 
+(defgeneric reset-view-ctrls (self))
 (defmethod reset-view-ctrls ((self C-mus-not-view))
   (let ((ctrl-a-list (cdr (ctrl-settings self))))
     (dolist (item ctrl-a-list)
       (rplacd item nil))))
 
+(defgeneric get-ctrl-setting (self ctrl))
 (defmethod get-ctrl-setting ((self C-mus-not-view) ctrl)
   (cdr (assoc ctrl (ctrl-settings self))))
 
@@ -343,6 +347,7 @@
 
 ;;This method should really send a "view-size-changed" to the external controls, which
 ;;should be sub-classes of dialog-items... [Camilo]
+(defgeneric set-extCtrl-view-size (self h &optional v))
 (defmethod set-extCtrl-view-size ((self C-mus-not-view)  h &optional v)
   (let ((ctrls (external-controls self))
         (old-size (view-size self)))
@@ -388,6 +393,7 @@
   (round (point-h (view-size view)) 4))
 
 ;;==============
+(defgeneric pretty-visible-layout (self))
 (defmethod pretty-visible-layout ((self C-mus-not-view))
   (tell (editor-objects self) 'pretty-visible-layout)
   (set-view-size (view-window self) (make-point (w self)(+ (h self) 2))))
@@ -410,6 +416,7 @@
   (if (active-editor self)
       (view-mouse-dragged (active-editor self) mouse)))
 
+(defgeneric key-pressed-MN-editor (self char))
 (defmethod key-pressed-MN-editor ((self C-mus-not-view) char)
   (cond ((eq char #\p) (play-all-staffs self))
         ((eq char #\s) (stop-all-staffs self))
@@ -423,6 +430,7 @@
         ((eq char #\A) (Do-selections-all self))
         (t (when (active-editor self) (handle-key-event (active-editor self) char)) )))
 
+(defgeneric Do-selections-all (self))
 (defmethod Do-selections-all ((self C-mus-not-view)) )
 
 (defmethod cut ((self C-mus-not-view))
@@ -441,15 +449,16 @@
   (cond ((eq option :pb)
          (set-menu-item-check-mark *play-Pbend-menu* t)
          (set-menu-item-check-mark *play-Multichan-menu* nil)
-         (record--ae :|PWst| :|gloo| `((,:|oppl| ,"Pitch Bend"))))
+         (record-event :|PWst| :|gloo| `((,:|oppl| ,"Pitch Bend"))))
         ((eq option :mc)
          (set-menu-item-check-mark *play-Pbend-menu* nil)
          (set-menu-item-check-mark *play-Multichan-menu* t)
-         (record--ae :|PWst| :|gloo| `((,:|oppl| ,"Multi Channel"))))))
+         (record-event :|PWst| :|gloo| `((,:|oppl| ,"Multi Channel"))))))
 
 
 
 ;;aaa from pw-modifs le 10-9-95
+(defgeneric stop-all-staffs (self))
 (defmethod stop-all-staffs ((self C-mus-not-view))
   (setf *MN-play-flag* nil)
   (tell (ask-all (editor-objects self) 'chord-line) 'stop-play))
@@ -459,14 +468,15 @@
 (tell (ask-all (editor-objects self) 'chord-line) 'stop-play))
 |#
 
+(defgeneric play-all-staffs (self))
 (defmethod play-all-staffs ((self C-mus-not-view))
   (let ((panels (editor-objects self)))
     (if (monofonic-mn? self)
-        (progn (setf patch-work.scheduler::*print-on-late?* t)
+        (progn (setf patchwork.scheduler::*print-on-late?* t)
                (start
                  (apdfuncall 10  2 20 
                              'play-chords (chord-line (car panels)))))
-        (progn (setf patch-work.scheduler::*print-on-late?* t)
+        (progn (setf patchwork.scheduler::*print-on-late?* t)
                (start (setf (advance) 30)
                  (dolist (panel panels)
                    (dfuncall 40
@@ -477,6 +487,7 @@
         ((eq *current-approx-scale* *1/8-tone-chromatic-scale*) 8)
         (t 2)))
 
+(defgeneric approx-for-playing (midic &optional approx))
 (defmethod approx-for-playing (midic &optional approx)
   (epw::approx-m midic (or approx (compute-approx))))
 
@@ -525,15 +536,18 @@
   (setf (active-chord self) nil)
   (setf (active-note self) nil))
 
+(defgeneric set-visible-chords (self))
 (defmethod set-visible-chords ((self C-music-notation-panel))
   (let* ((time1 (+ (scaled-origin self)
                    (scaled-mouse-h self (point-h (view-scroll-position  self)))))
          (time2 (+ time1 (scaled-mouse-h self (point-h (view-size self))))))
     (setf (visible-chords self) (find-visible-chords (chord-line self) time1 time2))))
 
+(defgeneric scaled-origin (self))
 (defmethod scaled-origin ((self C-music-notation-panel))
   (round (scaled-mouse-h self (origin self))))
 
+(defgeneric update-all-notes (self))
 (defmethod update-all-notes ((self C-music-notation-panel))
   (let* ((chords (chords (chord-line self))))
     (dolist (chord chords)
@@ -544,6 +558,7 @@
 ;;==============
 ;;draw&print
 
+(defgeneric print-draw-contents (self))
 (defmethod print-draw-contents ((self C-music-notation-panel))
   (declare (special *current-MN-editor* *MN-global-ins-y*))
   (setf *current-MN-editor* self)
@@ -607,20 +622,24 @@
       (set-view-font  (view-window self) '("Monaco"  9 :srcor))
       (draw-string 5 10 (window-title (super-win (view-window self)))))))
 
+(defgeneric view-draw-specific (self zoom-scale scroll-pos MN-offset MN-C5))
 (defmethod view-draw-specific ((self C-music-notation-panel) 
                                zoom-scale scroll-pos MN-offset MN-C5)
   (tell (set-visible-chords self) #'draw-chord 
         zoom-scale (+ MN-offset (point-h scroll-pos))
         (point-h scroll-pos) MN-C5))
 
+(defgeneric draw-ledger-lines-arp (self note x y-min y-max C5))
 (defmethod draw-ledger-lines-arp ((self C-music-notation-panel) note x y-min y-max C5)
   (draw-ledger-for-notes (list note) x y-min y-max C5))
 
+(defgeneric draw-ledger-line-arp (self x y))
 (defmethod draw-ledger-line-arp ((self C-music-notation-panel) x y)
   (draw-line (- x 10) y (+ x 6) y))
 
 (defvar *staff-lines-short* (make-string 1 :initial-element #\= ))
 
+(defgeneric draw-staff-lines-short (self))
 (defmethod draw-staff-lines-short  ((self C-music-notation-panel))
   (declare (special *mn-first-click-mouse*))
   (let ((y-off (- *MN-C5* 39)))
@@ -630,6 +649,7 @@
           (-  (point-h  
                *MN-first-click-mouse*) 10)) (+ (* 20 i) y-off) *staff-lines-short*))))
 
+(defgeneric erase-yourself (view))
 (defmethod erase-yourself ((view C-music-notation-panel))
   (let ((w (point-h (view-size view)))
         (h (point-v (view-size view)))
@@ -648,16 +668,20 @@
     (update-all-selections view)))
 ;;==============
 ;;misc
+(defgeneric scaled-mouse-h (self mouse-h))
 (defmethod scaled-mouse-h ((self C-music-notation-panel) mouse-h)
   (/  mouse-h  (MN-zoom-scaler (view-container self))))
 
+(defgeneric find-mouse-point-in-chords (self mouse-h))
 (defmethod find-mouse-point-in-chords ((self C-music-notation-panel) mouse-h)
   (ask (visible-chords self) #'inside-chord-?
        (scaled-mouse-h self (+ mouse-h (origin self))) 5))
 
+(defgeneric give-y-diatone (self y))
 (defmethod give-y-diatone ((self C-music-notation-panel) y) 
   (+ 35 (truncate (/ (- *MN-C5* y) 2))))
 
+(defgeneric give-y-value (self y))
 (defmethod give-y-value ((self C-music-notation-panel) y) 
   (let ((c-c5-to-0 (- *MN-C5* y))) 
     (* 100 (+ (* 12 (truncate (/  (give-y-diatone self (+ (if (< c-c5-to-0 0) 1 0) y)) 7)))
@@ -665,6 +689,7 @@
                 (0 0)(1 1)(2 2)(3 3)(4 4)(5 4)(6 5)(7 6)(8 7)(9 8)
                 (10 9)(11 10)(12 11)(13 11))))))
 
+(defgeneric remove-all-chords-from-chord-line (self))
 (defmethod remove-all-chords-from-chord-line ((self C-music-notation-panel))
   (tell (apply #'append (ask-all (chords (chord-line self)) 'notes)) 'remove-instrument-item ()())
   (setf (chords (chord-line self)) ()) 
@@ -696,6 +721,7 @@
                  (give-y-diatone self  mouse-v ))))))
 
 (defvar *MN-first-click-mouse* ())
+(defgeneric get-old-click (self))
 (defmethod get-old-click ((self C-music-notation-panel))
   *MN-first-click-mouse*)
 
@@ -712,6 +738,7 @@
 (defmethod view-mouse-up ((self C-music-notation-panel)) (erase+view-draw-contents self))
 
 ;;to be used by sub-classes
+(defgeneric draw-single-dur-line-2 (self chord note))
 (defmethod draw-single-dur-line-2  ((self C-music-notation-panel) chord note)
   (with-focused-view self
     (draw-single-dur-line chord note
@@ -720,6 +747,7 @@
                           (origin self)
                           *MN-C5*)))
 
+(defgeneric draw-dragged-duration (self))
 (defmethod draw-dragged-duration ((self C-music-notation-panel))
   (let* ((mouse-diff (- (point-v (get-old-click self))
                         (point-v (view-mouse-position self)))))
@@ -727,6 +755,7 @@
     (setf (dur (active-note self))  (max 0 (+ *old-MN-dur*  (* (if (shift-key-p) 10 1) mouse-diff))))
     (draw-single-dur-line-2 self (active-chord self) (active-note self))))
 
+(defgeneric open-object-editor (self window))
 (defmethod open-object-editor ((self C-music-notation-panel) window )
   (let ((*menubar-frozen* t))
     (if (active-note self)
@@ -737,6 +766,7 @@
           (tell active-notes #'open-instrument-editor  window 0 0)))))
   (draw-menubar-if))
 
+(defgeneric remove-chord-or-note (self))
 (defmethod remove-chord-or-note ((self C-music-notation-panel))  )
 
 (defmethod mn-cut ((self C-music-notation-panel))  )
@@ -751,12 +781,15 @@
 (defun list-of-notes (list)
   (typep (car list) 'C-note))
 
+(defgeneric add-pw-window (self window))
 (defmethod add-pw-window ((self C-music-notation-panel) window)
   (declare (ignore window)))
 
+(defgeneric handle-key-event (self char))
 (defmethod handle-key-event ((self C-music-notation-panel) char )
   (declare (ignore char)))
 
+(defgeneric update-all-selections (self))
 (defmethod update-all-selections ((self C-music-notation-panel)) )
 
 ;;===========================================================

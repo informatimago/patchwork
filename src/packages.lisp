@@ -34,7 +34,7 @@
 ;;;;**************************************************************************
 
 
-(cl:defpackage "PATCH-WORK.SCHEDULER"
+(cl:defpackage "PATCHWORK.SCHEDULER"
   (:use "COMMON-LISP" "CLOSER-MOP" "UI" "LELISP-MACROS" "MIDI")
 
   (:shadowing-import-from "CLOSER-MOP"
@@ -56,11 +56,11 @@
            "*RESET-ON-ERROR?*"))
 
 
-(cl:defpackage "PATCH-WORK"
+(cl:defpackage "PATCHWORK"
   (:nicknames "PW")
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
-  (:use "CLOSER-MOP" "UI" "LELISP-MACROS" "PATCH-WORK.SCHEDULER")
+  (:use "CLOSER-MOP" "UI" "LELISP-MACROS" "PATCHWORK.SCHEDULER")
   (:shadowing-import-from "CLOSER-MOP"
                           "STANDARD-CLASS" "STANDARD-GENERIC-FUNCTION" "STANDARD-METHOD"
                           "DEFMETHOD" "DEFGENERIC")
@@ -88,7 +88,7 @@
            "GET-PW-TYPE-SPECS" 
            "INPUT-OBJECTS" "KEY-PRESSED-EXTRA" "LIST!" "LOCK"
            "MAKE-APPLICATION-OBJECT" "MAKE-INSTRUMENT-FOR-CHORD"
-           "MAKE-POPUPBOX" "MAKE-PW-STANDARD-BOX" "MIDI-WRITE"
+           "MAKE-POPUPBOX" "MAKE-PW-STANDARD-BOX" 
            "MY-ARRAY" "NEW-LEAFMENU" "NEW-MENU" "NOTES"
            "OPEN-PATCH-WIN" "OPEN-PW-CONTROLS-DIALOG" "OUT-PUT"
            "PATCH-VALUE" "PW-ADDMENU" "PW-CONTROLS" "PW-FUNCTION"
@@ -98,6 +98,8 @@
            "SET-PW-WIN+PW-OBJ" "T-TIME" "TYPE-LIST" "UPDATE-EDITOR"
            "UPDATE-NOTE" "VALUE"  "STOP-PLAY"
            "YOURSELF-IF-COLLECTING"
+           
+           "GET-LOCK-BUTTON-FUN"
            
            "SCALE%" "RANDOM2" "MAPCAR-FUN" "CIRLIST" "CUMUL-SUM"
            "INTERPOL" "BREAK-POINT-FUN" "NTH-REMOVE"  "FIRSTN")
@@ -133,27 +135,28 @@
 (cl:defpackage "C-PATCH-BUFFER"
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
-  (:use "UI" "PATCH-WORK")
+  (:use "UI" "PATCHWORK")
   (:export "C-PATCH-BUFFER" "THE-BUFFER" "BUFFER" "C-RADIO-BUTTON"
            "GET-LOCK-BUTTON-FUN" "VALUE"))
 
 (cl:defpackage "C-PATCH-ACCUM"
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
-  (:use "UI" "PATCH-WORK"  "C-PATCH-BUFFER")
+  (:use "UI" "PATCHWORK"  "C-PATCH-BUFFER")
   (:export "C-PATCH-ACCUM" "THE-BUFFER" "ACCUM" "*ACCUM-BUFFER-LIMIT*"))
 
 (cl:defpackage "C-PATCH-FILE-BUFFER"
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
-  (:use "LELISP-MACROS" "UI" "PATCH-WORK")
+  (:use "LELISP-MACROS" "UI" "PATCHWORK")
   (:intern "ASCII-WIN" "C-PATCH-ASCII-BUFFER")
   (:export "C-PATCH-FILE-BUFFER"))
 
 (defpackage "C-PW-MIDI-IN"
-  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
-  (:import-from "PATCH-WORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
+  (:import-from "PATCHWORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
   (:import-from "MIDI" "MIDI-READ")
+  (:import-from "UI" "NIY")
   (:export "PW-MIDI-IN" "M-DATA" "C-PW-MIDI-IN" "DELAY" "STATUS" "MIDI-CHAN" "DATA1"
            "DATA2" "MIDI-OPCODE" "C-PW-MIDI-IN-TOP" "C-PW-DELAY-BOX" "C-PW-NOTE-IN"
            "NOTE-IN" "C-PW-NOTE-ON-IN" "NOTE-ON-IN" "C-PW-CHORD-IN" "CHORD-IN"
@@ -166,7 +169,7 @@
             C-patch-file-buffer:C-patch-file-buffer
             C-patch-file-buffer::Ascii-win
             C-patch-file-buffer::C-patch-ascii-buffer)
-          "PATCH-WORK"))
+          "PATCHWORK"))
 
 
 (cl:defpackage "CLOS-APPLE-EVENT"

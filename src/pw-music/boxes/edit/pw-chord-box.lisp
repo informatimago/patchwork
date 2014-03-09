@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    The chord box with Menu chosen functionalities. 
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,22 +32,8 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
+(in-package :pw)
 
-;;====================================================================================================
-;;
-;;the chord box with Menu chosen functionalities. 
-;
-;;=======================================================================================
-;;;
 ;;; The Class of  chord box patch, with menu chosen output type
 ;;;Class-name: C-patch-chord-box-M
 ;;;inherits from: C-patch-application
@@ -64,7 +51,6 @@
 ;;; PV-from-input         ; gets input from normal input patch
 ;;; get-output-dimension  ; produces the appropriate output according to Menu selection
 
-(in-package :patch-work)
 
 (defclass C-patch-chord-box-M (C-patch-application) 
  ((mus-not-editor :initform nil  :accessor mus-not-editor)
@@ -123,14 +109,15 @@
       (if (value (view-container item))
         (progn 
           (set-dialog-item-text item "o")
-          (record--ae :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self))))))
+          (record-event :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self))))))
         (progn
           (set-dialog-item-text item "x")
-          (record--ae :|PWst| :|cand| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
+          (record-event :|PWst| :|cand| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
       (setf (value (view-container item))
             (not (value (view-container item))))))
 
 (defmethod get-initial-button-text ((self C-patch-chord-box-M)) "o")
+
 
 (defmethod set-output ((self C-patch-chord-box-M) o-type)
   (cond ((and (eq o-type :object) (not (eq (out-type self) :object)))
@@ -154,14 +141,15 @@
     (draw-string x (- y 2) (string-downcase (pw-function-string self)))
     (set-view-font   (view-container self) '("monaco"  9 :srcor))))
 
+
 (defmethod erase-my-connections ((self C-patch-chord-box-M))
   (let ((patches (subviews *active-patch-window*)))
     (dolist (patch patches)
       (if (am-i-connected? patch self)
-        (progn 
-          (draw-connections patch t)
-          (disconnect-my-self patch self)
-          (draw-connections patch ))))
+          (progn 
+            (draw-connections patch t)
+            (disconnect-my-self patch self)
+            (draw-connections patch ))))
     ))
 
 (defmethod draw-patch-extra ((self C-patch-chord-box-M )) )
@@ -177,20 +165,21 @@
         (in-box (car (pw-controls self))))
     (setf (chord-line editor) (chord-line in-box))
     (set-pw-win+pw-obj (mus-not-editor self) *active-patch-window* self)
-    (window-select (mus-not-editor self))
-    ))
+    (window-select (mus-not-editor self))))
 
+(defgeneric rebuild-editor (self))
 (defmethod rebuild-editor ((self C-patch-chord-box-M))
   (setf (mus-not-editor self) (make-MN-editor-chord-box-M *g2-g-f-f2-staffs*))
   (setf (chord-line (car (editor-objects (editor-view-object (mus-not-editor self)))))
         (chord-line (car (pw-controls self))))
   (if *active-patch-window*
-    (set-my-win-pos self (mus-not-editor self))))
+      (set-my-win-pos self (mus-not-editor self))))
 
 (defmethod remove-yourself-control ((self C-patch-chord-box-M))
   (if (not (window-killed-p (mus-not-editor self)))
     (remove-yourself-control (mus-not-editor self))))
 
+(defgeneric set-my-win-pos (self MN-win))
 (defmethod set-my-win-pos ((self C-patch-chord-box-M) MN-win)
   (set-view-position MN-win 
                      (add-points (view-position self) 
@@ -212,26 +201,28 @@
                     (format nil "~D" (get-chord-midics (car (pw-controls self))))
                     :type-list '(list midic chord))))
 
+(defgeneric PV-from-input (self val))
 (defmethod PV-from-input ((self C-patch-chord-box-M ) val)
   (let* ((my-in (car (pw-controls self)))
-        (old-chords (chords  (chord-line my-in))))
-    (cond ((subtypep (type-of (car val)) (type-of (car old-chords)))     ;entry is an object
+         (old-chords (chords  (chord-line my-in))))
+    (cond ((subtypep (type-of (car val)) (type-of (car old-chords))) ;entry is an object
            (setf (t-time (car val)) 0)
            (setf (chords  (chord-line my-in)) val)) 
           (t
            (setf (chords  (chord-line my-in))
-                   (list (make-chord-object val 0 (type-of (car old-chords)))))
+                 (list (make-chord-object val 0 (type-of (car old-chords)))))
            (if (and old-chords (notes (car old-chords)))
-             (mapc (lambda (new-note old-note)
+               (mapc (lambda (new-note old-note)
                        (setf (dur new-note) (dur old-note))
                        (setf (vel new-note) (vel old-note))
                        (setf (offset-time new-note) (offset-time old-note))
                        (setf (comm new-note) (comm old-note))
-                       ;(setf (order new-note) (order old-note))
+                                        ;(setf (order new-note) (order old-note))
                        )
-                   (notes (car (chords  (chord-line my-in)))) (notes (car old-chords))))))
+                     (notes (car (chords  (chord-line my-in)))) (notes (car old-chords))))))
     (update-control my-in)))
 
+(defgeneric get-output-dimension (self))
 (defmethod get-output-dimension ((self C-patch-chord-box-M ))
   (let ((my-in (car (pw-controls self))))
     (case (out-type self)
@@ -244,6 +235,7 @@
       (:order (order-chord-midics self (get-chord-midics my-in) 
                                   (get-chord-order my-in))))))
 
+(defgeneric order-chord-midics (self midics order))
 (defmethod order-chord-midics ((self C-patch-chord-box-M ) midics order)
   (mapcar #'cdr (sort (pairlis order midics) #'< :key #'car)))
 

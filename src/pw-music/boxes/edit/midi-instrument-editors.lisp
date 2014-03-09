@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,16 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
@@ -120,19 +111,27 @@
  
 ;;=========================
 
+(defgeneric update-low-limit (self ctrl))
+(defgeneric update-high-limit (self ctrl))
+(defgeneric update-status (self ctrl))
+(defgeneric update-controller (self ctrl))
+(defgeneric update-sample-rate (self ctrl))
+(defgeneric update-label (self ctrl))
+(defgeneric update-value (self ctrl))
+
 (defmethod update-status ((self C-fix-window) ctrl)
-   (setf (status (midi-ins-object self)) (patch-value ctrl ())))
+  (setf (status (midi-ins-object self)) (patch-value ctrl ())))
 
 (defmethod update-controller ((self C-fix-window) ctrl)
-   (setf (controller (midi-ins-object self)) (patch-value ctrl ())))
+  (setf (controller (midi-ins-object self)) (patch-value ctrl ())))
 
 (defmethod update-value ((self C-fix-window) ctrl)
-   (setf (value (midi-ins-object self)) (patch-value ctrl ()))
-   (erase+view-draw-contents *current-mn-editor*))
+  (setf (value (midi-ins-object self)) (patch-value ctrl ()))
+  (erase+view-draw-contents *current-mn-editor*))
 
 (defmethod update-label ((self C-fix-window) ctrl)
-   (setf (label (midi-ins-object self)) (dialog-item-text ctrl))
-   (erase+view-draw-contents *current-mn-editor*))
+  (setf (label (midi-ins-object self)) (dialog-item-text ctrl))
+  (erase+view-draw-contents *current-mn-editor*))
 
 ;;(defmethod play-selected-note ((self C-fix-window) ctrl) (play-note *global-selected-note*))
 
@@ -150,10 +149,11 @@
 ;;==============================================================================
 ;; abstract data type
 (defclass C-midi-ins-data-type ()
-  ((status :initform 0 :initarg :status :accessor status)
-   (controller :initform 0 :initarg :controller :accessor controller)
-   (label :initform "" :initarg :label :accessor label)))
+  ((status     :initform 0  :initarg :status     :accessor status)
+   (controller :initform 0  :initarg :controller :accessor controller)
+   (label      :initform "" :initarg :label      :accessor label)))
 
+(defgeneric make-connections-to-instrument-editor (self))
 (defmethod make-connections-to-instrument-editor ((self C-midi-ins-data-type))
   (setf (midi-ins-object (editor-object self)) self))
 
@@ -194,9 +194,9 @@
   (declare (ignore y-now dur))
   (with-focused-view *current-MN-editor*
     (draw-string x-now *MN-note-ins-y* (label self))
-  (incf *MN-note-ins-y* 10)
-  (draw-string x-now *MN-note-ins-y* (format nil "~3d" (value self)))
-  (incf *MN-note-ins-y* 10)))
+    (incf *MN-note-ins-y* 10)
+    (draw-string x-now *MN-note-ins-y* (format nil "~3d" (value self)))
+    (incf *MN-note-ins-y* 10)))
 
 #|
 (defmethod play-instrument ((self C-midi-ins-fix) chan dur)
@@ -275,24 +275,26 @@
 
 ;;=========================
 
+
 (defmethod update-low-limit ((self C-bpf-view-ins-win) ctrl)
-   (setf (low-limit (midi-ins-object self)) (patch-value ctrl ())))
+  (setf (low-limit (midi-ins-object self)) (patch-value ctrl ())))
+
 
 (defmethod update-high-limit ((self C-bpf-view-ins-win) ctrl)
-   (setf (high-limit (midi-ins-object self)) (patch-value ctrl ())))
+  (setf (high-limit (midi-ins-object self)) (patch-value ctrl ())))
 
 (defmethod update-status ((self C-bpf-view-ins-win) ctrl)
-   (setf (status (midi-ins-object self)) (patch-value ctrl ())))
+  (setf (status (midi-ins-object self)) (patch-value ctrl ())))
 
 (defmethod update-controller ((self C-bpf-view-ins-win) ctrl)
-   (setf (controller (midi-ins-object self)) (patch-value ctrl ())))
+  (setf (controller (midi-ins-object self)) (patch-value ctrl ())))
 
 (defmethod update-sample-rate ((self C-bpf-view-ins-win) ctrl)
-   (setf (sample-rate (midi-ins-object self)) (patch-value ctrl ())))
+  (setf (sample-rate (midi-ins-object self)) (patch-value ctrl ())))
 
 (defmethod update-label ((self C-bpf-view-ins-win) ctrl)
-   (setf (label (midi-ins-object self)) (dialog-item-text ctrl))
-   (erase+view-draw-contents *current-mn-editor*))
+  (setf (label (midi-ins-object self)) (dialog-item-text ctrl))
+  (erase+view-draw-contents *current-mn-editor*))
 
 ;;==========================================
 ;; layout
@@ -407,11 +409,13 @@
 ;;    (set-break-point-function-to-mini (BPF-mini-view self) (break-point-function self))
 ;;    (view-draw-contents (BPF-mini-view self))))
 
+(defgeneric continue-play-pitchb (self delay chan points))
 (defmethod continue-play-pitchb ((self C-midi-ins-bpf) delay chan points)
   (write-pitch-bend-value chan (pop points))
   (when points 
     (dfuncall delay 'continue-play-pitchb self delay chan points)))
 
+(defgeneric continue-play-contr (self delay chan controller points))
 (defmethod continue-play-contr ((self C-midi-ins-bpf) delay chan controller points)
   (write-controller-value chan controller (pop points))
   (when points 
@@ -519,6 +523,7 @@
 )
               funs)) 
      (make-pw-pop-up (pairlis (nreverse labels) funs))))
+
 
 (defmethod make-super-note-connections ((self C-midi-ins-collection) super-note super-win)
   (declare (ignore super-note super-win)))

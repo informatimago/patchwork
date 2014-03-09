@@ -156,4 +156,45 @@
 (ql:quickload :patchwork                                  :verbose t :explain t)
 
 
+
+;; (ql:quickload :com.informatimago.tools)
+;; (use-package :com.informatimago.tools.symbol)
+;; (use-package :com.informatimago.common-lisp.cesarum.package)
+;; 
+;; (defun duplicate-symbols (&key (packages (list-all-packages)) (exported nil))
+;;   "Return: a list of list of symbols that have the same name."
+;;   (let ((symbols (make-hash-table :test (function equal))) ; maps names to list of unique symbols
+;;         (duplicates '()))
+;;     (dolist (p packages)
+;;       (dolist (s (list-all-symbols p))
+;;         (pushnew s (gethash (symbol-name s) symbols '()))))
+;;     (maphash (lambda (name symbols)
+;;                (declare (ignore name))
+;;                (when (cdr symbols)
+;;                  (push symbols duplicates)))
+;;              symbols)
+;;     (if exported
+;;         (remove-if-not (lambda (symbols)
+;;                          (some (lambda (symbol)
+;;                                  (eq :external
+;;                                      (nth-value 1 (find-symbol (symbol-name symbol)
+;;                                                                (symbol-package symbol)))))
+;;                                symbols))
+;;                        duplicates)
+;;         duplicates)))
+;; 
+;; (defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" "MIDI-PLAYER" "MIDISHARE"
+;;                               "MIDI" "PATCHWORK.SCHEDULER" "PATCHWORK" "C-PATCH-BUFFER"
+;;                               "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN"
+;;                               "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE"
+;;                               "EPW" "C-LIST-ITEM-H" "C-LIST-ITEM" "C-TABLE-WINDOW-H"
+;;                               "C-TABLE-WINDOW" "C-PATCH-LIST-EDITOR" "C-GET-NOTE-SLOTS"
+;;                               "C-GET-SELECTIONS" "USER-ABSTRACTION" "C-PATCH-CHORD-LINE"
+;;                               "C-PW-SEND-MIDI-NOTE" "CLENI" "COMBINATORIAL-INTERV"
+;;                               "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING"))
+
+;; (map nil 'print (DUPLICATE-SYMBOLS :packages *pw-packages* :exported t))
+
+
+
 ;;;; THE END ;;;;

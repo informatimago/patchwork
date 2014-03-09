@@ -101,11 +101,12 @@
           (list nil  (if *decompile-chords-mode* 
                             `(list ,@(get-measureline-form self))))))
 
+(defgeneric get-measureline-form (self))
 (defmethod get-measureline-form ((self C-patch-application-rtm-editor))
   (let ((win (application-object self)))
     (if (wptr win)
-      (list `',(get-window-state self win) (decompile (measure-line self)) (value self))
-      (list `',(window-state self) (decompile (measure-line self)) (value self)))))
+        (list `',(get-window-state self win) (decompile (measure-line self)) (value self))
+        (list `',(window-state self) (decompile (measure-line self)) (value self)))))
 
 (defmethod complete-box ((self C-patch-application-rtm-editor) args)
   (when args
@@ -121,6 +122,8 @@
   (setf (process self) 'continue-record)
   (make-rtm-lock self))
 
+
+(defgeneric make-rtm-lock (self))
 (defmethod make-rtm-lock ((self C-patch-application-rtm-editor))
   (-make-lock self (make-point (- (w self) 30) (- (h self) 10))))
 
@@ -143,8 +146,9 @@
 (defmethod make-application-object ((self C-patch-application-rtm-editor))
   (setf (application-object self) (make-rtm-editor-window (measure-line self))))
 
-(defmethod give-measure-line ((self C-patch-application-rtm-editor))
-  (measure-line (car (beat-editors (editor-collection-object (application-object self))))))
+(defgeneric give-measure-line (self)
+  (:method ((self C-patch-application-rtm-editor))
+    (measure-line (car (beat-editors (editor-collection-object (application-object self)))))))
 
 (defmethod patch-value ((self C-patch-application-rtm-editor) obj)
   (declare (ignore obj))
@@ -313,8 +317,8 @@
 (defmethod get-measureline-form ((self C-patch-Polifrtm))
   (let ((win (application-object self)))
     (if (wptr win)
-      (list `',(get-window-state self win) `(list ,@(ask-all (measure-line-list self) 'decompile)) (value self))
-      (list `',(window-state self) `(list ,@(ask-all (measure-line-list self) 'decompile)) (value self) ))))
+        (list `',(get-window-state self win) `(list ,@(ask-all (measure-line-list self) 'decompile)) (value self))
+        (list `',(window-state self) `(list ,@(ask-all (measure-line-list self) 'decompile)) (value self) ))))
 
 
 

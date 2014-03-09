@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,18 +32,8 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
-;;====================================================================================================
+
 (defclass  C-patch-application-midi (C-patch-application) ())
 
 (defmethod make-application-object ((self C-patch-application-midi))
@@ -84,20 +75,22 @@
   (if (second (second args))
     (put-window-state self (application-object self) (second (second args)))))
   
+(defgeneric get-chordline-form (self))
 (defmethod get-chordline-form ((self C-chord-line))
   (mapcar 
    (lambda (chord) 
-       `(list ,(t-time chord) ,@(mapcar #'get-useful-note-slots (notes chord))))
+     `(list ,(t-time chord) ,@(mapcar #'get-useful-note-slots (notes chord))))
    (chords self)))
 
+(defgeneric form-to-chord-line (self chords-form))
 (defmethod form-to-chord-line ((self C-chord-line) chords-form)
   (if chords-form
-    (setf (chords self)
-          (mapcar (lambda (form) 
-                    (make-instance 'C-chord
-                                   :t-time (car form)
-                                   :notes (apply #'form-note-objs (cdr form))))
-                chords-form))))
+      (setf (chords self)
+            (mapcar (lambda (form) 
+                      (make-instance 'C-chord
+                                     :t-time (car form)
+                                     :notes (apply #'form-note-objs (cdr form))))
+                    chords-form))))
 
 (defun make-pw-chord-line-box (box mode chords-form)
   (form-to-chord-line (chord-seq box) chords-form)
@@ -107,6 +100,7 @@
        (ui:uiwarn "in ~S ~S,  (give-MN-editor box) is nil" 'make-pw-chord-line-box '(box mode chords-form)))
   box)
 
+(defgeneric yourself-if-collecting (self))
 (defmethod yourself-if-collecting ((self C-patch-midi)) self)
 
 (defmethod draw-patch-extra :after ((self C-patch-midi))
@@ -116,6 +110,7 @@
   (when (application-object self) 
     (remove-yourself-control (application-object self))))
 
+(defgeneric give-structured-begin-time (self))
 (defmethod give-structured-begin-time ((self C-patch-midi))
   (give-structured-begin-time (view-window self)))
 
@@ -141,56 +136,59 @@
                           'play-chosen-chords ch-l notes (cdr (car notes)))))))
 |#
 
+(defgeneric draw-clock (self))
 (defmethod draw-clock ((self C-patch-midi))
- (with-focused-view self
-   (set-view-font  (view-container  self) '(:srccopy))
-   (draw-string  52 (- (h self) 4) (format nil "~5D" (clock (clock-obj self))))
-   (set-view-font  (view-container  self) '(:srcor))))
+  (with-focused-view self
+    (set-view-font  (view-container  self) '(:srccopy))
+    (draw-string  52 (- (h self) 4) (format nil "~5D" (clock (clock-obj self))))
+    (set-view-font  (view-container  self) '(:srcor))))
 
+(defgeneric continue-record (self))
 (defmethod continue-record ((self C-patch-midi))
- (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
-  (if  (>= (clock (clock-obj self)) (begin-time self))
-    (progn 
-      (draw-clock self)
-      (let ((clock (- (clock (clock-obj self)) (begin-time self)))
-            (delay (patch-value (first (input-objects self)) self))
-            dur key vel chan
-            note-list instrument)
-       (if (minusp delay)        ; if negative delay -> a rest and no evaluation of remaining args
-         (setq delay (abs delay))
+  (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
+    (if  (>= (clock (clock-obj self)) (begin-time self))
          (progn 
-           (setq dur   (patch-value (nth 1 (input-objects self)) self))
-           (setq key   (patch-value (nth 2 (input-objects self)) self))
-           (setq vel   (patch-value (nth 3 (input-objects self)) self))
-           (setq chan  (patch-value (nth 4 (input-objects self)) self))
-           (unless (eq (nth 5 (input-objects self))(nth 5 (pw-controls self)))
-             (setq instrument (patch-value (nth 5 (input-objects self)) self)))
-           (if (listp key)
-             (while key
-                (push (make-instrument-note (pop key) dur chan vel instrument (application-object self)) 
-                      note-list))
-             (and (numberp key)
-                  (setq note-list
-                        (list (make-instrument-note key dur chan vel instrument
-                                                    (application-object self))))))
-            (if (or (numberp key) (listp key))
-              (push (make-instrument-chord clock (nreverse note-list))
-                    (chord-line-list self))
-              (push (make-instrument-for-chord key clock instrument 
-                                              (application-object self))
-                   (chord-line-list self)))))
-        (incf (clock self) delay)
-        (dfuncall-process self delay)))
-    (dfuncall-process self (begin-time self)))))
+           (draw-clock self)
+           (let ((clock (- (clock (clock-obj self)) (begin-time self)))
+                 (delay (patch-value (first (input-objects self)) self))
+                 dur key vel chan
+                 note-list instrument)
+             (if (minusp delay) ; if negative delay -> a rest and no evaluation of remaining args
+                 (setq delay (abs delay))
+                 (progn 
+                   (setq dur   (patch-value (nth 1 (input-objects self)) self))
+                   (setq key   (patch-value (nth 2 (input-objects self)) self))
+                   (setq vel   (patch-value (nth 3 (input-objects self)) self))
+                   (setq chan  (patch-value (nth 4 (input-objects self)) self))
+                   (unless (eq (nth 5 (input-objects self))(nth 5 (pw-controls self)))
+                     (setq instrument (patch-value (nth 5 (input-objects self)) self)))
+                   (if (listp key)
+                       (while key
+                         (push (make-instrument-note (pop key) dur chan vel instrument (application-object self)) 
+                               note-list))
+                       (and (numberp key)
+                            (setq note-list
+                                  (list (make-instrument-note key dur chan vel instrument
+                                                              (application-object self))))))
+                   (if (or (numberp key) (listp key))
+                       (push (make-instrument-chord clock (nreverse note-list))
+                             (chord-line-list self))
+                       (push (make-instrument-for-chord key clock instrument 
+                                                        (application-object self))
+                             (chord-line-list self)))))
+             (incf (clock self) delay)
+             (dfuncall-process self delay)))
+         (dfuncall-process self (begin-time self)))))
 
 ;;for taking direct input from a chord object
+(defgeneric make-instrument-for-chord (self clock instrument win))
 (defmethod make-instrument-for-chord ((self C-chord) clock instrument win)
   (setf (t-time self) clock)
   (dolist (note (notes self))
-    (unless (instrument note)  ; to check if there is already an instrument in the note 
+    (unless (instrument note) ; to check if there is already an instrument in the note 
       (setf (instrument note) instrument)
       (if (and instrument win)
-        (make-super-note-connections instrument note win))))
+          (make-super-note-connections instrument note win))))
   self)
 
 (defmethod  begin-process  ((self C-patch-midi))
@@ -199,10 +197,11 @@
   (setf (clock self) 0)
   (funcall (process self) self))
 
+(defgeneric rebuild-collector-win (self))
 (defmethod rebuild-collector-win ((self C-patch-midi))
-   (setf (application-object self) (make-application-object self))
-    (set-pw-win+pw-obj (application-object self) *active-patch-window* self)
-    )
+  (setf (application-object self) (make-application-object self))
+  (set-pw-win+pw-obj (application-object self) *active-patch-window* self)
+  )
 
 (defmethod stop-process ((self C-patch-midi))
   (if (window-killed-p (application-object self))
@@ -237,9 +236,11 @@
   (chord-seq self))
   ;( give-MN-editor-chord-line self 0))
 
+(defgeneric give-MN-editor-chord-line (self i))
 (defmethod give-MN-editor-chord-line ((self C-patch-midi) i)
   (declare (ignore i))
   (chord-line (give-MN-editor self))) 
+(defgeneric give-MN-editor (self))
 (defmethod give-MN-editor ((self C-patch-midi)) 
   (car (editor-objects (car (subviews (application-object self))))))
 
@@ -272,12 +273,11 @@
   
 
 (defmethod rebuild-collector-win ((self C-patch-midi-Mod))
-   (setf (application-object self)
-         (make-music-notation-editor 'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
-                              (make-point 350 200) *g2-g-f-f2-staffs*
-                              (pw-function-string self)))
-    (set-pw-win+pw-obj (application-object self) *active-patch-window* self)
-    )
+  (setf (application-object self)
+        (make-music-notation-editor 'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
+                                    (make-point 350 200) *g2-g-f-f2-staffs*
+                                    (pw-function-string self)))
+  (set-pw-win+pw-obj (application-object self) *active-patch-window* self))
 
 #|
 (defmethod open-patch-win ((self C-patch-midi-Mod))
@@ -312,6 +312,7 @@
                     :value 6000 :min-val 0 :max-val 12700 
                     :type-list '(fixnum list chord))))
 
+(defgeneric polifonic? (self))
 (defmethod polifonic? ((self C-patch-midi-mod)) nil)
 
 (defmethod collect ((self C-patch-midi-mod))
@@ -614,6 +615,7 @@ information."
 
 ;;(defmethod patch-value ((self C-pw-stop-time) obj) (patch-value (car (input-objects self)) obj))
 
+(defgeneric give-stop-time (self))
 (defmethod give-stop-time ((self C-patch)))
 (defmethod give-stop-time ((self C-pw-stop-time)) (patch-value self ()))
 

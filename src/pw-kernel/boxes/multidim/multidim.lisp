@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    Functions and objects for constructing a chord.
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,26 +32,15 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
+(in-package :pw)
+(pw:enable-patchwork-reader-macros)
 
 ;;;==========================================
-;;;Functions and objects for constructing a chord.
-;;;
 ;;;Class: C-patch-chord-setUp
 ;;;inherits from:   C-patch
 ;;;methods:
 ;;;  patch-value          ;builds a chord object
 ;;;============================================
-(in-package :pw)
-(pw:enable-patchwork-reader-macros)
 
 (defunp Chbuild ((midics (fixs (:dialog-item-text "()" :type-list (fixnum list))))
                  (durs (fixs (:dialog-item-text "()" :type-list (fixnum list))))
@@ -219,7 +209,7 @@ module returns the list of the valid slots of the object in the first input <obj
       (if (string= (string-downcase (format () "~S" name)) (pw-function-string box))
         (return box)))))
 
-;;a function for storing slot values from a patch-work box
+;;a function for storing slot values from a patchwork box
 (defun method-sf (obj field val) (setf (slot-value obj field) val))
 
 (defclass  C-patch-make-note (C-pw-functional) ())

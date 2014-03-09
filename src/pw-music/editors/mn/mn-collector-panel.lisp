@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,15 +32,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
+(in-package :pw)
 
 ;;;=======================================================
 ;;;
@@ -71,7 +64,6 @@
 ;;;   update-cursor-state            ;changes cursor when out of editor bounds
 ;;;========================================================
 
-(in-package :pw)
 
 (defvar *current-editing-chord* ())
 
@@ -82,13 +74,15 @@
 
 ;;A horrible kludge so that inter-class editing works (because CLOS allocates in the
 ;;class of the instance rather than in the class where the slot is defined)
-(defmethod editor-scrap ((self C-music-notation-panel))
-  (declare (special *MN-editor-scrap*))
-  *MN-editor-scrap*)
+(defgeneric editor-scrap (self)
+  (:method ((self C-music-notation-panel))
+    (declare (special *MN-editor-scrap*))
+    *MN-editor-scrap*))
 
-(defmethod (setf editor-scrap) (thing (self C-music-notation-panel))
-  (declare (special *MN-editor-scrap*))
-  (setf *MN-editor-scrap* thing))
+(defgeneric (setf editor-scrap) (thing self)
+  (:method (thing (self C-music-notation-panel))
+    (declare (special *MN-editor-scrap*))
+    (setf *MN-editor-scrap* thing)))
 
 (defmethod update-editor ((self C-MN-panel-Mod))
   (let ((selections (selected-chords self)))
@@ -132,11 +126,13 @@
                            (+ 10 (calc-chord-pixel-x chord zoom-scale MN-offset org))
                            (give-pixel-y note MN-C5))))))
 
+(defgeneric draw-with-offset-view (self the-chords zoom-scale MN-offset MN-C5))
 (defmethod draw-with-offset-view ((self C-MN-panel-Mod) the-chords
                                   zoom-scale MN-offset MN-C5)
   (mapc (lambda (chord) (draw-chord-with-offs self chord zoom-scale MN-offset MN-C5))
         the-chords))
 
+(defgeneric draw-chord-with-offs (self chord zoom-scale MN-offset MN-C5 &optional mode))
 (defmethod draw-chord-with-offs  ((self C-MN-panel-Mod) 
                                   chord zoom-scale MN-offset MN-C5 &optional mode)
   (declare (ignore mode))
@@ -159,8 +155,7 @@
                MN-C5)
     (draw-extra-info chord 
                      (calc-chord-pixel-x chord zoom-scale  MN-offset
-                                         (- (scaled-origin self))) MN-C5 nil)
-    ))
+                                         (- (scaled-origin self))) MN-C5 nil)))
 
 (defmethod view-mouse-moved ((self C-MN-panel-Mod) mouse)
   (declare (ignore mouse))
@@ -201,27 +196,32 @@
              (give-y-diatone self y)))
       (if active-tmp (return active-tmp)))))
 
+(defgeneric unhilite-if-not-selected (self chord x y))
 (defmethod unhilite-if-not-selected ((self C-MN-panel-Mod) chord x y)
   (declare (ignore x y))
   (if (and chord (not (member chord (selected-chords self))))
       (unhilite-chord chord self (MN-zoom-scaler (view-container  self)) 
                       *MN-draw-offset* (scaled-origin self) *MN-C5*)))
 
+(defgeneric hilite-if-not-selected (self chord x y))
 (defmethod hilite-if-not-selected ((self C-MN-panel-Mod) chord x y)
   (declare (ignore x y))
   (if (and chord (not (member chord (selected-chords self))))
       (hilite-chord chord self (MN-zoom-scaler (view-container  self))
                     *MN-draw-offset* (scaled-origin self) *MN-C5*)))
 
+(defgeneric hilite-chord (self view t-scfactor beg-x time1 C5))
 (defmethod hilite-chord ((self C-chord) view t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
     (if (get-ctrl-setting (view-container view) :offs)
         (draw-offset-hilite-chord self view t-scfactor beg-x time1 C5))
     (hilite-rect self view x-now C5 )))
 
+(defgeneric unhilite-chord (self win t-scfactor beg-x time1 C5))
 (defmethod unhilite-chord ((self C-chord) win t-scfactor beg-x time1 C5)
   (hilite-chord self win t-scfactor beg-x time1 C5))
 
+(defgeneric draw-offset-hilite-chord (self view t-scfactor beg-x time1 C5))
 (defmethod draw-offset-hilite-chord ((self C-chord) view t-scfactor beg-x time1 C5)
   (let ( (notes (notes self))
          (y-min) (alt) (dx))
@@ -237,12 +237,14 @@
                      C5)
         (setf (alt-delta-x one-note) alt (delta-x one-note) dx)))))
 
+(defgeneric hilite-note (self x C5))
 (defmethod hilite-note ((self C-note) x C5)
   (let ((y-now (give-pixel-y self C5))
         (x-now (+ x (delta-x self))))
     (draw-char x-now y-now #\w)
     (draw-char x-now y-now #\266)))
 
+(defgeneric hilite-rect (self view x C5))
 (defmethod hilite-rect ((self C-chord) view x C5 )
   (let ((y-min (1- (give-pixel-y (car (notes self)) C5)))
         (y-max (give-pixel-y (car (last (notes self))) C5)))
@@ -251,6 +253,7 @@
         (fill-rect*  x (- y-max 18) 3 (- y-min y-max -18 ))))))
 
 
+(defgeneric inside-hilit-rect (self x y))
 (defmethod inside-hilit-rect ((self C-MN-panel-Mod) x y)
   (let* ((chord (active-chord self))
          (x-now (calc-chord-pixel-x chord (MN-zoom-scaler (view-container  self))
@@ -279,22 +282,27 @@
        (select-chord self x y))
       (t (unselect-all-chords self 0 0)))))
 
+(defgeneric in-selection (self active))
 (defmethod in-selection ((self C-MN-panel-Mod) active)
   (member active (selected-chords self)))
 
+(defgeneric open-selected-chord (self x y))
 (defmethod open-selected-chord ((self C-MN-panel-Mod) x y)
   (unselect-all-chords self x y)
   (setf *current-editing-chord* (active-chord self))
   (open-chord-win self x y))
 
+(defgeneric select-chord (self x y))
 (defmethod select-chord ((self C-MN-panel-Mod) x y)
   (if (selected-already-p self (active-chord self))
       (unselect-chords self (active-chord self) x y)
       (add-to-selection self (active-chord self) x y)))
 
+(defgeneric selected-already-p (self chord))
 (defmethod selected-already-p ((self C-MN-panel-Mod) chord)
   (member chord (selected-chords self)))
 
+(defgeneric unselect-all-chords (self x y))
 (defmethod unselect-all-chords ((self C-MN-panel-Mod) x y)
   (let ((ed-objs (editor-objects (view-container self)))
         (selections))
@@ -304,12 +312,14 @@
       (dolist (sel-chord selections)
         (unhilite-if-not-selected panel sel-chord x y)))))
 
+(defgeneric unselect-chords (self chord x y))
 (defmethod unselect-chords ((self C-MN-panel-Mod) chord x y)
   (cond ((shift-key-p)
          (setf (selected-chords self) (remove chord (selected-chords self)))
          (unhilite-if-not-selected self chord x y))
         (t (unselect-all-chords self x y))))
 
+(defgeneric add-to-selection (self chord x y))
 (defmethod add-to-selection ((self C-MN-panel-Mod) chord x y)
   (unless (shift-key-p)
     (unselect-all-chords self x y))
@@ -324,6 +334,7 @@
       (hilite-if-not-selected self chord 0 0))
     (setf (selected-chords self) selection)))
 
+(defgeneric insert-in-time (self the-list chord))
 (defmethod insert-in-time ((self C-MN-panel-Mod) the-list chord)
   (merge 'list the-list (list chord) #'< :key #'t-time))
 
@@ -350,6 +361,7 @@
 
 (defvar *current-chord-ed* 0)
 
+(defgeneric open-chord-win (self x y))
 (defmethod open-chord-win ((self C-MN-panel-Mod) x y)
   (declare (special *active-MN-window* *the-chord-editors*))
   (let ((the-chord-ed (get-chord-window *current-editing-chord*)))
@@ -380,6 +392,7 @@
             (car (push (make-MN-editor-chordMN *g2-g-f-f2-staffs*) *the-chord-editors*))
             ))))
 
+(defgeneric add-new-chord-to-mn (self x y))
 (defmethod add-new-chord-to-mn ((self C-MN-panel-Mod) x y)
   (declare (special *current-editing-chord* *MN-draw-offset*))
   (unselect-all-chords self x y)
@@ -412,6 +425,7 @@
                                        (dur (active-note self)))))
         (drag-selection-in-time self  mouse-h mouse-v m-diff-h))))
 
+(defgeneric begin-dragged-mn-control (self x y))
 (defmethod begin-dragged-mn-control ((self C-MN-panel-Mod) x y)
   (unless (get-ctrl-setting (view-container self) :dur)
     (when (selected-chords self)
@@ -429,6 +443,7 @@
 (defvar *top-rect* 0)
 (defvar *bottom-rect* 0)
 (defvar *time-drag* nil)
+(defgeneric begin-rectangle-dragging (self chord t-scfactor beg-x time1 C5))
 (defmethod begin-rectangle-dragging ((self C-MN-panel-Mod)
                                      chord t-scfactor beg-x time1 C5 )
   (declare (special *top-rect* *bottom-rect* *time-drag*))
@@ -440,11 +455,13 @@
     (setf *time-drag* t)
     (draw-dragging-rectangle self  *top-rect* *bottom-rect*)))
 
+(defgeneric draw-dragging-rectangle (self top bottom))
 (defmethod draw-dragging-rectangle ((self C-MN-panel-Mod) top bottom)
   (with-focused-view self
     (with-pen-state (:pattern *black-pattern* :mode :patXor)
       (draw-rect* (point-h top) (point-v top) 11 bottom))))
 
+(defgeneric update-rectangle-dragging (self mouse-h mouse-v mouse-diff))
 (defmethod  update-rectangle-dragging ((self C-MN-panel-Mod) mouse-h mouse-v mouse-diff)
   (declare (ignore mouse-v mouse-diff))
   (declare (special *top-rect* *bottom-rect*))
@@ -452,6 +469,7 @@
   (setf *top-rect* (make-point (- mouse-h 5) (point-v *top-rect*)))
   (draw-dragging-rectangle self *top-rect* *bottom-rect*))
 
+(defgeneric drag-selection-in-time (self mouse-h mouse-v mouse-diff))
 (defmethod drag-selection-in-time ((self C-MN-panel-Mod)  mouse-h mouse-v mouse-diff)
   (declare (special *time-drag*))
   (when *time-drag*
@@ -483,6 +501,7 @@
                                         ;(hilite-all-selected self)
          )))
 
+(defgeneric move-all-the-selections (self))
 (defmethod move-all-the-selections ((self C-MN-panel-Mod))
   (dolist (panel (editor-objects (view-container self)))
     (let ((selection (selected-chords panel)))
@@ -490,6 +509,7 @@
         (remove-chord  (chord-line panel) chord t)
         (add-new-chord (chord-line panel) chord)))))
 
+(defgeneric hilite-all-selected (self))
 (defmethod hilite-all-selected ((self C-MN-panel-Mod))
   (dolist (panel (editor-objects (view-container self)))
     (let ((selection (selected-chords panel)))
@@ -585,6 +605,7 @@
   (setf (selected-chords self) (second (undo-MN-edit self)))
   (update-editor self))
 
+(defgeneric save-all-undo (self))
 (defmethod save-all-undo ((self C-MN-panel-mod))
   (menu-item-enable *undo-MN-menu*)
   (tell (editor-objects (view-container self)) 'save-undo))
@@ -593,11 +614,13 @@
   (setf (undo-MN-edit self) 
         (list (chords (chord-line self)) (selected-chords self))))
 
+(defgeneric reset-undo (self))
 (defmethod reset-undo ((self C-MN-panel-Mod))
   (menu-item-disable *undo-MN-menu*))
 
 (defmethod draw-appl-label ((self  C-MN-panel-Mod) label)
   (declare (ignore label)))
+
 
 (defmethod save-window-state ((self  C-MN-panel-Mod) win)
   (declare (ignore win)))

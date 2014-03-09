@@ -9,9 +9,11 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
+;;;;    1991-08-21 [jack] CLPF-UTILs.Lisp
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -31,30 +33,14 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;; =============================================================================-======
-;; [jack] 910821               CLPF-UTILs.Lisp
-;; =============================================================================-======
-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (defpackage "CLPF-UTIL"
   (:use "COMMON-LISP" "LELISP-MACROS")
   (:export
    "SYNONYM" "VECTOR-TO-LIST" "COMPILE-FILE?"
    "FILE-COMPARE…" "FILE-COMPARE" "READ-LISTS-FROM"
    "PREFIX-EXPR" "PREFIX-HELP" "*COMPILE-NUM-LAMBDA*" "MAKE-NUM-FUN" "MAKE-NUM-LAMBDA"))
-
 (in-package "CLPF-UTIL")
 
-;; =============================================================================-======
 
 (defun synonym (new-fun old-fun)
   "make symbol <new-fun> a synonym function of symbol <old-fun>"

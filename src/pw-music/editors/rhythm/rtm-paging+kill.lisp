@@ -124,20 +124,22 @@
                       (tell (ask-all (cdr editors) 'measure-line) 'play-measure-line (get-play-speed self)))))))
 |#
  
-(defmethod play-measure-line+scroll ((self C-measure-line) win t-scfactor beat-number next-page-beat-num)
-  (setf (stop-flag self) nil)
-  (play-measure-line-continue+scroll  self win (measures self) t-scfactor beat-number next-page-beat-num))
+(defgeneric play-measure-line+scroll (self win t-scfactor beat-number next-page-beat-num)
+  (:method ((self C-measure-line) win t-scfactor beat-number next-page-beat-num)
+    (setf (stop-flag self) nil)
+    (play-measure-line-continue+scroll  self win (measures self) t-scfactor beat-number next-page-beat-num)))
 
-(defmethod play-measure-line-continue+scroll ((self C-measure-line) win measures t-scfactor beat-number next-page-beat-num)
-   (unless (stop-flag self)
-    (when measures 
-      (when (= (1+ beat-number) next-page-beat-num)
-         (calc-next-rtm-page+scroll win (1+ beat-number))
-         (setq next-page-beat-num (calc-next-rtm-page win)))
-      (incf beat-number)
-      (let ((delay (play-measure (pop measures) t-scfactor)))
-        (dfuncall (truncate (abs delay)) 
-            'play-measure-line-continue+scroll self win measures t-scfactor beat-number next-page-beat-num)))))
+(defgeneric play-measure-line-continue+scroll (self win measures t-scfactor beat-number next-page-beat-num)
+  (:method ((self C-measure-line) win measures t-scfactor beat-number next-page-beat-num)
+    (unless (stop-flag self)
+      (when measures 
+        (when (= (1+ beat-number) next-page-beat-num)
+          (calc-next-rtm-page+scroll win (1+ beat-number))
+          (setq next-page-beat-num (calc-next-rtm-page win)))
+        (incf beat-number)
+        (let ((delay (play-measure (pop measures) t-scfactor)))
+          (dfuncall (truncate (abs delay)) 
+                    'play-measure-line-continue+scroll self win measures t-scfactor beat-number next-page-beat-num))))))
 
 
 #|

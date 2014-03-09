@@ -41,7 +41,7 @@
 ;;;;**************************************************************************
 
 
-(in-package "PATCH-WORK.SCHEDULER")
+(in-package "PATCHWORK.SCHEDULER")
 
 
 ;; =============================================================================-======
@@ -125,7 +125,7 @@ It cannot be changed, except in the source code.")
   `(task-logtime *current-task*))
 
 
-(in-package "PATCH-WORK.SCHEDULER")
+(in-package "PATCHWORK.SCHEDULER")
 
  ;; TODO:
 #-(and)

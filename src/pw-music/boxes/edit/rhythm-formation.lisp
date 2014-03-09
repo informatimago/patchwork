@@ -137,6 +137,10 @@ editor opened for more information."
   (call-next-method)
   (draw-char (+ -15 (w self)) (- (h self) 4) #\E))
 
+(defgeneric get-measure-object (self))
+(defgeneric build-a-chord (self))
+(defgeneric build-a-note (self))
+
 (defmethod get-measure-object ((self cons))
   (mapcar #'get-measure-object self))
 

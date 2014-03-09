@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,28 +32,18 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;========================================================= 
+(in-package :pw)
 
-;;;;=============================================================
-;;;;
-;;;;       Pop-Up  Box class
-;;;;
-;;;;The class of boxes triggering a Pop-Up-Menu dialog when clicked at. If within a box,
-;;;;then coordinates must be relative to box origin. The box class is responsible for 
-;;;;building up the Pop up menu hierarchy
-;;;;       
-;;==============================================================
-;;(defpackage :popUp-menu)
+;;;=============================================================
+;;;
+;;;       Pop-Up  Box class
+;;;
+;;;The class of boxes triggering a Pop-Up-Menu dialog when clicked at. If within a box,
+;;;then coordinates must be relative to box origin. The box class is responsible for 
+;;;building up the Pop up menu hierarchy
+;;;       
+;;;==============================================================
 
-(in-package :patch-work)
 
 (defclass C-PopUpbox (static-text-dialog-item)
    ((menu :initarg :menu :accessor menu)

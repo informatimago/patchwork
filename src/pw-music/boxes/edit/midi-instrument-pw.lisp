@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,33 +32,23 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 
 (provide 'midi-instrument-PW)
 
-;;====================================================================================================
 ;;==============================================================================
 ;; PW boxes
 ;;==============================================================================
 
 (defclass C-patch-midi-fix (C-patch)())
 
+(defgeneric decompile-ins-object (self obj))
 (defmethod decompile-ins-object ((self C-patch-midi-fix) obj)
   `(make-instance 'C-midi-ins-fix
-      :status               ,(patch-value (nth 0 (input-objects self)) obj)
-      :controller           ,(patch-value (nth 1 (input-objects self)) obj)
-      :value                ,(patch-value (nth 2 (input-objects self)) obj)
-      :label               ',(patch-value (nth 3 (input-objects self)) obj)))
+                  :status               ,(patch-value (nth 0 (input-objects self)) obj)
+                  :controller           ,(patch-value (nth 1 (input-objects self)) obj)
+                  :value                ,(patch-value (nth 2 (input-objects self)) obj)
+                  :label               ',(patch-value (nth 3 (input-objects self)) obj)))
 
 (defmethod patch-value ((self C-patch-midi-fix) obj)
   (eval (decompile-ins-object self obj)))

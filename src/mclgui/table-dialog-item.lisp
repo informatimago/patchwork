@@ -211,15 +211,14 @@ the entire table is visible.
   (let* ((cell-pos    (cell-position item h v))
          (cell-width  (table-column-width item h))
          (cell-height (table-row-height item v)))
-    (declare (ignore cell-width cell-height))
     (when cell-pos
       (with-focused-view (view-container item)
-        (niy redraw-cell item h v)
-        #-(and)
-        (rlet ((cell-rect :rect
-                          :topleft cell-pos
-                          :bottomright (add-points cell-pos (make-point cell-width cell-height))))
-              (%draw-table-cell-new item h v cell-rect (cell-selected-p item h v)))))))
+        (let* ((botright (add-points cell-pos (make-point cell-width cell-height)))
+               (cell-rect (make-rect (point-h cell-pos)
+                                     (point-v cell-pos)
+                                     (point-h botright)
+                                     (point-v botright))))
+          (%draw-table-cell-new item h v cell-rect (cell-selected-p item h v)))))))
 
 
 
@@ -1658,14 +1657,14 @@ V:              Vertical index. If the value of v is NIL, h is assumed
   (niy compute-selection-regions item min-row max-row min-column max-column)
   #-(and)
   (let ((rgn (table-selection-region item)))
-    (if (and rgn (macptrp rgn))
+    (if (and rgn (ccl:macptrp rgn))
         (unless min-row
           (#_SetEmptyRgn rgn))
         (setf (table-selection-region item) (#_NewRgn)
               min-row nil)))
   #-(and)
   (let ((rgn (table-outline-region item)))
-    (if (and rgn (macptrp rgn))
+    (if (and rgn (ccl:macptrp rgn))
         (unless min-row
           (#_SetEmptyRgn rgn))
         (setf (table-outline-region item) (#_NewRgn)
@@ -1894,7 +1893,7 @@ V:              Vertical index. If the value of v is NIL, h is assumed
                                (separator-pattern (separator-pattern item))
                                (might-draw-separator (and separator-visible-p
                                                           (not (eql separator-size #@(0 0)))
-                                                          (macptrp separator-pattern)))
+                                                          (ccl:macptrp separator-pattern)))
                                (draw-col-separator (and might-draw-separator (> columns 1))) ;nil)
                                (top-left (view-position item))
                                (bottom-right (add-points top-left (table-inner-size item)))

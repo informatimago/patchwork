@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    Midi boxes for PW
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,19 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
-;;;====================================
-;;; Midi boxes for PW
-;;;====================================
 
 (in-package :pw)
 
@@ -52,6 +40,7 @@
     if we give the list (144 60 64) for bytes, our MIDI synthesizer (assuming it is 
     connected) play middle-C on channel 1 with a velocity of 64.  To turn off the 
     note, we would have to give bytes the argument (144 60 0)."
+  (niy midi-o bytes) #-(and)
   (when bytes
     (let ((event (midishare::MidiNewEv midishare::typeStream)))
       (unless (midishare:null-event-p event)	
@@ -110,11 +99,13 @@ between
         (t (mapc #'volum1 vol chans))))
 
 
-(defpackage "C-PW-SEND-MIDI-NOTE"
-  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
-  (:import-from "PATCH-WORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL")
-  (:export "SND-MIDINOTE" "C-PW-SEND-MIDI-NOTE"))
 
+(defpackage "C-PW-SEND-MIDI-NOTE"
+  (:use "COMMON-LISP")
+  (:use "LELISP-MACROS" "PATCHWORK")
+  (:import-from "UI" "NIY")
+  (:import-from "PATCHWORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL")
+  (:export "SND-MIDINOTE" "C-PW-SEND-MIDI-NOTE"))
 
 
 (defunp play-sequence ((ch-l list (:value '() :type-list (collector)))
@@ -136,6 +127,7 @@ for chord notes. The third (optional) argument gives the approximation (default:
                                            (epw::ll-oper (epw::microtone midics approx) (1- chan) '+))
                                        durs offs atimes)))
 
+(defvar *play-chseq-w/offset* nil)
 
 ;; GA Pw2.6.2 101096
 (defunp play-object ((object list (:value '() :type-list ()))
@@ -158,7 +150,7 @@ Notes with microtonal accidentals are sent to different output channels accordin
 to the following mapping: chan (semitones), chan + 1 (eighth-tones), 
 chan + 2 (quartertones),  chan + 3 (three-eighths tones).
 "
-
+  (niy play-object object chan approx)#-(and)
   (let ((*play-chseq-w/offset* t))
     (MidiPlayAny object approx chan)))
 
@@ -332,6 +324,7 @@ remaining notes."
     nil
     ))
 
+
 (in-package "C-PW-SEND-MIDI-NOTE")
 (defunp play-chords ((midics midic) (vels (midic (:value 100)))
                      (chan (approx (:type-list (fixnum list))))
@@ -375,6 +368,7 @@ given parameters to MIDI"
               ((consp (car channel)) (pop channel))
               (t (prog1 channel (setq channel nil)))))
        chord-list))
+    (niy play-chords midics vels chan durs offs at-time)#-(and)
     (let ((pw::*play-chseq-w/offset* t)) 
       (pw::MidiPlayAny (make-instance 'pw::c-chord-line :chords (reverse chord-list))
                        (pw::compute-approx)
@@ -426,6 +420,7 @@ given parameters to MIDI"
     "active"))
 
 (defmethod pw-schedule-midi-in ((self C-pw-midi-in) box patch delay)
+  (niy pw-schedule-midi-in self box patch delay) #-(and)
   (let ((data (midi-read)))
     (if (and (not (midishare:null-event-p data)) (pw-midi-filtered self data))
         (progn
@@ -437,6 +432,7 @@ given parameters to MIDI"
 (defmethod format-midi ((self C-pw-midi-in) data) data)
 
 (defmethod pw-midi-filtered ((self C-pw-midi-in) data)
+  (niy pw-midi-filtered self data) #-(and)
   (not (equal (midishare::type data) midishare::typeClock)))
 
 (defunp pw-midi-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
@@ -497,11 +493,13 @@ midi-data1;, midi- data2;, and midi-status;.
 (defclass C-pw-note-in (C-pw-midi-in) ())
 
 (defmethod format-midi ((self C-pw-note-in) data)
+  (niy format-midi self data) #-(and)
   (list (midishare::pitch data) (midishare::vel data) 
         (1+ (midishare::chan data))))
 
 
 (defmethod pw-midi-filtered ((self C-pw-note-in) data)
+  (niy pw-midi-filtered self data) #-(and)
   (member (midishare::type data) (list 0 1 2)))
 
 
@@ -509,6 +507,7 @@ midi-data1;, midi- data2;, and midi-status;.
 (defclass C-pw-note-on-in (C-pw-note-in) ())
 
 (defmethod pw-midi-filtered ((self C-pw-note-on-in) data)
+  (niy pw-midi-filtered self data) #-(and)
   (and (call-next-method) (not (zerop (midishare::vel data)))))
 
 (defunp note-on-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
@@ -548,6 +547,7 @@ endlessly: 'late Task'.
   ((the-chord :initform (make-instance 'pw::C-chord :notes ()) :accessor the-chord)))
 
 (defmethod format-midi ((self C-pw-chord-in) data)
+  (niy format-midi self data) #-(and)
   (let* ((the-chord (the-chord self))
          (the-notes (pw::notes the-chord))
          (a-note (pw::make-C-note   
@@ -618,11 +618,11 @@ endlessly: 'late Task'."
   (setf (state self) nil))
 
 (defun pw::pw-reset-for-midi()
-                                        ;(patch-work.scheduler:set-scheduler-state :oot)
+  ;;(patchwork.scheduler:set-scheduler-state :oot)
   (midi:midi-close)
-  (patch-work.scheduler::init-scheduler)
+  (patchwork.scheduler::init-scheduler)
   (midi:midi-open)  
-                                        ;(patch-work.scheduler:set-scheduler-state :rt)
+  ;;(patchwork.scheduler:set-scheduler-state :rt)
   )
 
 
@@ -717,11 +717,3 @@ on."
   (dotimes (c 15)
     (dotimes (n 127)
       (pw::midi-o (list (+ 144 c) n 0)))))
-
-
-
-
-
-
-
-

@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,15 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
 (in-package :PW)
 
 ;;================================================
@@ -50,13 +42,14 @@
    (scaled-x-points :initform ())
    (scaled-y-points :initform ())))
 
-(defmethod scale-x&y-points ((self C-points-collection) points w h)
-  (setf (x-points self) (first points))
-  (setf (y-points self) (second points))
-  (setf (slot-value self 'scaled-x-points)
-      (mapcar #'round (scale-low-high (x-points self) 0 w)))
-  (setf (slot-value self 'scaled-y-points)
-      (mapcar #'round (scale-low-high (y-points self) 0 h))))
+(defgeneric scale-x&y-points (self points w h)
+  (:method ((self C-points-collection) points w h)
+    (setf (x-points self) (first points))
+    (setf (y-points self) (second points))
+    (setf (slot-value self 'scaled-x-points)
+          (mapcar #'round (scale-low-high (x-points self) 0 w)))
+    (setf (slot-value self 'scaled-y-points)
+          (mapcar #'round (scale-low-high (y-points self) 0 h)))))
 
 ;;================================================
 
@@ -74,12 +67,13 @@
           (h (h self)))
        (while x-points (draw-point (pop x-points) (- h (pop y-points)))))))
 
-(defmethod set-points-list-to-rect ((self C-points-rect) points sort-mode)
-  (when (string= sort-mode "sort")
-    (setq points 
-      (sort (mapcar #'list (first points)(second points)) #'< :key (lambda (a)(car a))))
-    (setq points (list (mapcar #'first points)(mapcar #'second points))))
-  (scale-x&y-points self points (w self)(h self))) 
+(defgeneric set-points-list-to-rect (self points sort-mode)
+  (:method ((self C-points-rect) points sort-mode)
+    (when (string= sort-mode "sort")
+      (setq points 
+            (sort (mapcar #'list (first points)(second points)) #'< :key (lambda (a)(car a))))
+      (setq points (list (mapcar #'first points)(mapcar #'second points))))
+    (scale-x&y-points self points (w self)(h self)))) 
 
 ;;=====================================
 

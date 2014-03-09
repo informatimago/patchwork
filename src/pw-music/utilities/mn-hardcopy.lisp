@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,23 +32,14 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
+(in-package :pw)
 
 ;;
 ;; Printing MN windows 
 ;; 
 
-(in-package :pw)
 
-(eval-when (eval compile)
+(eval-when (:compile-toplevel :execute)
   ;; (require 'traps)
   (defconstant $PrintErr #x944)  
   (defconstant $prJob.bjDocLoop (+ 62 6))
@@ -55,8 +47,7 @@
   (defconstant $bSpoolLoop 1)
   (defconstant $err-printer 94)
   (defconstant $err-printer-load 95)
-  (defconstant $err-printer-start 97)
-)
+  (defconstant $err-printer-start 97))
 
 (defmethod window-hardcopy ((self pw::C-MN-window) &optional show-fl)
   (niy window-hardcopy self show-fl)
@@ -113,23 +104,25 @@
                  max-val)
             (setq max-val temp)))))))
 
+(defgeneric pw::scroll-for-print (self panels))
 (defmethod pw::scroll-for-print ((self pw::C-MN-window) panels)
   (let ((size (- (point-h (view-size (car panels))) pw::*MN-draw-offset*))
         (posn (view-scroll-position (car panels)))
         (mus-view (car (subviews self))))
     (set-scroll-bar-setting (ui::h-scroller mus-view)
-          (+ (if (pw::monofonic-mn? mus-view)
-               (* (length panels) size)
-               size)
-             (point-h posn)))
+                            (+ (if (pw::monofonic-mn? mus-view)
+                                   (* (length panels) size)
+                                   size)
+                               (point-h posn)))
     (scroll-bar-changed (car (subviews self)) (ui::h-scroller (car (subviews self))))
     (get-last-chord self panels)))
 
+(defgeneric get-last-chord (self panels))
 (defmethod get-last-chord ((self pw::C-MN-window) panels)
   (truncate 
-         (pw::scaled-mouse-h (car panels)
-              (+ (origin (car  panels))
-                 (point-h (view-scroll-position (car panels)))))))
+   (pw::scaled-mouse-h (car panels)
+                       (+ (origin (car  panels))
+                          (point-h (view-scroll-position (car panels)))))))
 
 (defmethod print-all-subviews ((self pw::C-MN-window))
   (let ((views (subviews (car (subviews self)))))

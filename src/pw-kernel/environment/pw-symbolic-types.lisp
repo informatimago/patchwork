@@ -9,9 +9,11 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
+;;;;    1990-06-30 [jack] PW-Symbolic-Types.Lisp
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
@@ -31,24 +33,9 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
-;; ==========================================================================
-;; [jack] 30.06.90               PW-Symbolic-Types.Lisp
-;; ==========================================================================
-
 (defpackage "PW-STYPE"
-  (:use "COMMON-LISP" "LELISP-MACROS" "PATCH-WORK")
-  (:export
-   "CAR!" "LIST!" "DEEP-MAPCAR" "DOUBLE-MAPCAR"))
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
+  (:export "CAR!" "LIST!" "DEEP-MAPCAR" "DOUBLE-MAPCAR"))
 (in-package "PW-STYPE")
 
 ;; =============================================================================-======

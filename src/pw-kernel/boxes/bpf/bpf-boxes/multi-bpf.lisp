@@ -197,6 +197,7 @@
 
 ;;So that it really becomes generic [Camilo 930113]
 
+(defgeneric convert-to-lists (self))
 (defmethod convert-to-lists ((self number)) (list (list self)))
 
 (defmethod convert-to-lists ((self cons)) (if (consp (first self)) self (list self)))
@@ -218,6 +219,7 @@
     (:x-points (mapcar (lambda (bpf) (slot-value bpf 'X-points)) bpfs))
     (:y-points (mapcar (lambda (bpf) (slot-value bpf 'Y-points)) bpfs)))))
 
+(defgeneric construct-bpfs-objects (self &optional ts-exp))
 (defmethod construct-bpfs-objects ((self number) &optional ts-exp)
   (let* ((ts (convert-to-lists ts-exp))
          (vs (fill-to-equal-length-lst (first ts) (list self))))
@@ -251,7 +253,9 @@
 ;;=====================================
 ;;draw
 
-(defmethod break-point-functions ((self simple-view)) nil)
+(defgeneric break-point-functions (self)
+  (:method ((self simple-view))
+    nil))
 
 (defmethod application-object ((self C-menubox-bpf)) (declare (ignore self)) nil)
 

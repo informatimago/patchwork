@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,16 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
@@ -115,17 +106,19 @@
 
 ;;================
 
+(defgeneric add-bpf-editor-radio-cluster (self x y txt))
 (defmethod add-bpf-editor-radio-cluster ((self C-BPF-window) x y txt)
   (make-instance 
-            'radio-button-dialog-item
-            :view-container (view-window self)
-            :view-position (make-point x y)
-            :dialog-item-text txt
-            :view-font '("monaco"  9  :srcor) 
-            :dialog-item-action
-            (lambda (item)
-                (set-bpf-edit-mode self item (dialog-item-text item)))))
+   'radio-button-dialog-item
+   :view-container (view-window self)
+   :view-position (make-point x y)
+   :dialog-item-text txt
+   :view-font '("monaco"  9  :srcor) 
+   :dialog-item-action
+   (lambda (item)
+     (set-bpf-edit-mode self item (dialog-item-text item)))))
 
+(defgeneric set-bpf-edit-mode (self item text))
 (defmethod set-bpf-edit-mode ((self C-BPF-window) item text)
   (tell (bpf-radio-ctrls self) #'radio-button-unpush)
   (radio-button-push item)
@@ -158,7 +151,7 @@
 
 ;;(defmethod give-mini-view-class-name ((self C-BPF-window))
 ;;  (class-name (class-of (mini-view (car (editor-objects (car (controls self))))))))
-;;  (when (eq (give-mini-view-class-name self) 'patch-work::c-mini-bpf-view-chant)
+;;  (when (eq (give-mini-view-class-name self) 'patchwork::c-mini-bpf-view-chant)
 ;;    (setf (window-visible-p self) nil))
 
 (defmethod view-deactivate-event-handler :after ((self C-BPF-window))
@@ -172,11 +165,15 @@
 ;;==================
 ;; PW interface
 
+(defgeneric set-mini-view (self mini-view))
 (defmethod set-mini-view ((self C-BPF-window) mini-view)
   (setf (mini-view (editor-view-object self)) mini-view))
 
-(defmethod set-pw-win ((self C-BPF-window) win) (setf (pw-win self) win))
+(defgeneric set-pw-win (self win))
+(defmethod set-pw-win ((self C-BPF-window) win)
+  (setf (pw-win self) win))
 
+(defgeneric add-bpf-to-bpf-editor-from-PW (self bpf))
 (defmethod add-bpf-to-bpf-editor-from-PW ((self C-BPF-window) bpf)  
   (setf (break-point-function (editor-view-object self)) bpf)
   (scale-to-fit-in-rect (editor-view-object self)) 
@@ -185,27 +182,38 @@
 ;;==========================================
 ;; layout
 
-(defmethod BPF-window-ctrl-1st-y ((self C-BPF-window)) (- (h self) 47))
-(defmethod BPF-window-ctrl-2nd-y ((self C-BPF-window)) (- (h self) 35))
-(defmethod BPF-window-ctrl-3rd-y ((self C-BPF-window)) (- (h self) 18))
+(defgeneric BPF-window-ctrl-1st-y (self)
+  (:method ((self C-BPF-window))
+    (- (h self) 47)))
+(defgeneric BPF-window-ctrl-2nd-y (self)
+  (:method ((self C-BPF-window))
+    (- (h self) 35)))
+(defgeneric BPF-window-ctrl-3rd-y (self)
+  (:method ((self C-BPF-window))
+    (- (h self) 18)))
 
-(defmethod set-ctrl-positions-extra ((self C-BPF-window)))
-(defmethod make-extra-bpf-view-ins-controls ((self C-BPF-window)))
+(defgeneric set-ctrl-positions-extra (self)
+  (:method ((self C-BPF-window))
+    (values)))
+(defgeneric make-extra-bpf-view-ins-controls (self)
+  (:method ((self C-BPF-window))
+    (values)))
 
-(defmethod set-ctrl-positions ((self C-BPF-window))
- (let ((y1 (BPF-window-ctrl-1st-y self)) 
-       (y2 (BPF-window-ctrl-2nd-y self))
-       (y3 (BPF-window-ctrl-3rd-y self)))
-   (set-view-position (text-disp-ctrl self) (make-point 5 y1)) 
-   (set-view-position (x-origo-ctrl self)   (make-point 2 y2)) 
-   (set-view-position (y-origo-ctrl self)   (make-point 42 y2))
-   (set-view-position (x-disp-ctrl self)    (make-point 82 y2)) 
-   (set-view-position (y-disp-ctrl self)    (make-point 122 y2))
-   (set-view-position (x-zoom-ctrl self)    (make-point 162 y2)) 
-   (set-view-position (y-zoom-ctrl self)    (make-point 202 y2))
-   (for (i 0 1 (1- (length (bpf-radio-ctrls self))))
-      (set-view-position (nth  i (bpf-radio-ctrls self)) (make-point (* i 60)  y3)))
-   (set-ctrl-positions-extra self)))
+(defgeneric set-ctrl-positions (self)
+  (:method ((self C-BPF-window))
+    (let ((y1 (BPF-window-ctrl-1st-y self)) 
+          (y2 (BPF-window-ctrl-2nd-y self))
+          (y3 (BPF-window-ctrl-3rd-y self)))
+      (set-view-position (text-disp-ctrl self) (make-point 5 y1)) 
+      (set-view-position (x-origo-ctrl self)   (make-point 2 y2)) 
+      (set-view-position (y-origo-ctrl self)   (make-point 42 y2))
+      (set-view-position (x-disp-ctrl self)    (make-point 82 y2)) 
+      (set-view-position (y-disp-ctrl self)    (make-point 122 y2))
+      (set-view-position (x-zoom-ctrl self)    (make-point 162 y2)) 
+      (set-view-position (y-zoom-ctrl self)    (make-point 202 y2))
+      (for (i 0 1 (1- (length (bpf-radio-ctrls self))))
+        (set-view-position (nth  i (bpf-radio-ctrls self)) (make-point (* i 60)  y3)))
+      (set-ctrl-positions-extra self))))
 
 ;;==========================================
 

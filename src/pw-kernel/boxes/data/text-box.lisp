@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    A text box for PW Windows
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,31 +32,19 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
+(in-package :pw)
 (pw:enable-patchwork-reader-macros)
 
-;;=======================================
-;;A text box for PW Windows
-;;=======================================
 
 (defpackage "C-PW-TEXT-INPUT"
-  (:use "COMMON-LISP" "PATCH-WORK")
+  (:use "COMMON-LISP" "PATCHWORK")
   (:export "C-PW-TEXT-INPUT"))
 (in-package "C-PW-TEXT-INPUT")
 
 (defclass C-pw-text-input (C-ttybox) ())
 
 (defpackage "C-PW-TEXT-BOX"
-  (:use "COMMON-LISP" "UI"  "PATCH-WORK")
+  (:use "COMMON-LISP" "UI"  "PATCHWORK")
   (:export "C-PW-TEXT-BOX"))
 (in-package "C-PW-TEXT-BOX")
 

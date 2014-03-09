@@ -1,20 +1,20 @@
 * Patchwork TO DO List
 ** Avancement
 
+ 1. Points              :  17/ 17 fonctions implémentées [100%]
+ 2. Fonts               :  76/ 79 fonctions implémentées [ 96%]
+ 3. Menus               :  98/ 98 fonctions implémentées [100%]
+ 4. Views               :  90/ 93 fonctions implémentées [ 96%]
+ 5. Windows             :  82/ 82 fonctions implémentées [100%]
+ 6. Dialogs             :  43/ 53 fonctions implémentées [ 81%]
+ 7. Dialog Items        : 356/445 fonctions implémentées [ 80%]
+ 8. Colors              :  32/ 32 fonctions implémentées [100%]
+ 9. Events              : 110/115 fonctions implémentées [ 95%]
 10. Clipboard           :   2/  8 fonctions implémentées [ 25%]
 11. Apple Events        :   9/ 16 fonctions implémentées [ 56%]
- 7. Dialog Items        : 355/441 fonctions implémentées [ 80%]
- 6. Dialogs             :  43/ 52 fonctions implémentées [ 82%]
-12. Quickdraw           : 129/137 fonctions implémentées [ 94%]
- 5. Windows             :  77/ 81 fonctions implémentées [ 95%]
- 2. Fonts               :  75/ 78 fonctions implémentées [ 96%]
- 4. Views               :  80/ 82 fonctions implémentées [ 97%]
-14. Divers              : 255/256 fonctions implémentées [ 99%]
- 1. Points              :  12/ 12 fonctions implémentées [100%]
- 3. Menus               :  98/ 98 fonctions implémentées [100%]
- 8. Colors              :  30/ 30 fonctions implémentées [100%]
- 9. Events              : 107/107 fonctions implémentées [100%]
+12. Quickdraw           : 119/179 fonctions implémentées [ 66%]
 13. Files               :  18/ 18 fonctions implémentées [100%]
+14. Divers              : 257/258 fonctions implémentées [ 99%]
 
 ** Bugs
 *** TODO clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.

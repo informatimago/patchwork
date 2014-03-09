@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,15 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
 
 (in-package :pw)
 
@@ -53,6 +45,7 @@
    (processes :initform () :accessor processes)  
    (wait-list :initform () :accessor wait-list)))
 
+(defgeneric start-clock (self stop-time processes))
 (defmethod  start-clock ((self C-clock) stop-time processes)
   (setf (processes self) processes)
   (setf (clock self) 0)
@@ -61,33 +54,36 @@
   (tell processes 'begin-process)
   (continue-clock self))
 
+(defgeneric insert-in-wait-list (self form))
 (defmethod  insert-in-wait-list ((self C-clock) form)
-   (let ((wait-list (wait-list self))
-         (time1 (car form))
-         (new-wait-list))
-     (while (and wait-list (> time1 (caar wait-list)))(push (pop wait-list) new-wait-list))
-     (setf (wait-list self)
-        (append  (nreverse new-wait-list) (list form) wait-list))))
+  (let ((wait-list (wait-list self))
+        (time1 (car form))
+        (new-wait-list))
+    (while (and wait-list (> time1 (caar wait-list)))(push (pop wait-list) new-wait-list))
+    (setf (wait-list self)
+          (append  (nreverse new-wait-list) (list form) wait-list))))
 
+(defgeneric stop-clock (self))
 (defmethod  stop-clock ((self C-clock)) (setf (stop-time self) (clock self)))
 
+(defgeneric continue-clock (self))
 (defmethod  continue-clock ((self C-clock))
-;;  (print (list 'clock (clock self)))
+  ;;  (print (list 'clock (clock self)))
   (if (>= (clock self) (stop-time self))
-    (tell (processes self) 'stop-process)
-    (let ((ready-list)
-          (wait-list (wait-list self)))
-      (while wait-list
-         (if (= (clock self) (caar (wait-list self)))
-            (progn 
-               (push (pop (wait-list self)) ready-list)
-               (pop wait-list))
-            (setq wait-list ())))
-      (setq ready-list (nreverse ready-list))
-      (while ready-list
-        (eval (cadr (pop ready-list))))
-       (incf (clock self))
-       (continue-clock self)))) 
+      (tell (processes self) 'stop-process)
+      (let ((ready-list)
+            (wait-list (wait-list self)))
+        (while wait-list
+          (if (= (clock self) (caar (wait-list self)))
+              (progn 
+                (push (pop (wait-list self)) ready-list)
+                (pop wait-list))
+              (setq wait-list ())))
+        (setq ready-list (nreverse ready-list))
+        (while ready-list
+          (eval (cadr (pop ready-list))))
+        (incf (clock self))
+        (continue-clock self)))) 
 
 ;;______________
 
@@ -100,15 +96,18 @@
   (unless (clock-obj self)
     (setf (clock-obj self)(make-instance 'C-clock))))
 
+(defgeneric stop-process (self))
 (defmethod  stop-process  ((self C-process))
   (print 'stopped))
 
+(defgeneric begin-process (self))
 (defmethod  begin-process  ((self C-process))
   (funcall (process self) self))
 
+(defgeneric dfuncall-process (self delay))
 (defmethod  dfuncall-process  ((self C-process) delay)
   (insert-in-wait-list (clock-obj self) 
-    (*dfuncall* (+ delay (clock (clock-obj self))) (process self) self)))
+                       (*dfuncall* (+ delay (clock (clock-obj self))) (process self) self)))
 
 ;;______________
 
@@ -153,8 +152,10 @@
   ((begin-time :initform 0  :initarg  :begin-time :accessor begin-time)
    (duration-time  :initform 0 :initarg :duration-time :accessor duration-time)))
 
+(defgeneric set-begin-time (self time))
 (defmethod  set-begin-time  ((self C-process-begin+end) time)
   (setf (begin-time self) time))
+(defgeneric set-duration-time (self time))
 (defmethod  set-duration-time  ((self C-process-begin+end) time)
   (setf (duration-time self) time))
 

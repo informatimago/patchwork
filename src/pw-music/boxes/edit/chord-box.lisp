@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,15 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
 (in-package :pw)
 
 (defclass C-chord-box (C-ttybox)
@@ -54,9 +46,10 @@
   `(note
     ,@(mapcar #'get-useful-note-slots (notes (car (chords (chord-line self)))))))
 
-(defmethod get-useful-note-slots ((self C-note))
-  `(list ,(midic self) ,(dur self) ,(offset-time self) ,(order self) ,(comm self) ,(chan self) ,(vel self)
-        ,(if (instrument self) (decompile (instrument self)))))
+(defgeneric get-useful-note-slots (self)
+  (:method ((self C-note))
+    `(list ,(midic self) ,(dur self) ,(offset-time self) ,(order self) ,(comm self) ,(chan self) ,(vel self)
+           ,(if (instrument self) (decompile (instrument self))))))
 
 (defmethod (setf value) (notes (self C-chord-box))
   (setf (chord-line self)
@@ -83,13 +76,16 @@
               note)
           (apply #'list list))))
   
-(defmethod give-mid-y ((self C-chord-box)) (+ 5 (y self)(truncate (/ (h self) 2))))
+(defgeneric give-mid-y (self)
+  (:method ((self C-chord-box))
+    (+ 5 (y self) (truncate (/ (h self) 2)))))
 
-(defmethod draw-cb-staffs ((self C-chord-box) mid-y) 
-  (draw-string 0 (- mid-y 31) "==")
-  (draw-string 0 (- mid-y 3) "==")
-  (draw-string 0 (+ mid-y 21) "==")
-  (draw-string 0 (+ mid-y 49) "=="))
+(defgeneric draw-cb-staffs (self mid-y)
+  (:method ((self C-chord-box) mid-y) 
+    (draw-string 0 (- mid-y 31) "==")
+    (draw-string 0 (- mid-y 3) "==")
+    (draw-string 0 (+ mid-y 21) "==")
+    (draw-string 0 (+ mid-y 49) "==")))
 
 (defmethod view-draw-contents ((self C-chord-box))
   (let ((*mn-view-dyn-flag* nil)
@@ -111,11 +107,12 @@
         (draw-cb-staffs self mid-y))
       (set-view-font  (view-container (view-container  self)) pw-win-font))))
 
-(defmethod update-control ((self C-chord-box))
-  (with-focused-view self
-     (with-pen-state (:mode :srccopy :pattern *white-pattern*)
+(defgeneric update-control (self)
+  (:method ((self C-chord-box))
+    (with-focused-view self
+      (with-pen-state (:mode :srccopy :pattern *white-pattern*)
         (fill-rect* 0 0 (w self) (h self)))
-     (view-draw-contents self)))
+      (view-draw-contents self))))
 
 (defmethod view-double-click-event-handler ((self C-chord-box) where)
   (declare (ignore where)) )
@@ -124,20 +121,25 @@
   (declare (ignore where)) )
 
 ;;New value selection methods for the new chord patch box
-(defmethod get-chord-midics ((self C-chord-box))
-  (ask-all (notes (car (chords (chord-line self)))) 'midic))
+(defgeneric get-chord-midics (self)
+  (:method ((self C-chord-box))
+    (ask-all (notes (car (chords (chord-line self)))) 'midic)))
 
 
-(defmethod get-chord-offset ((self C-chord-box)) 
-  (ask-all (notes (car (chords (chord-line self)))) 'offset-time))
+(defgeneric get-chord-offset (self)
+  (:method ((self C-chord-box)) 
+    (ask-all (notes (car (chords (chord-line self)))) 'offset-time)))
  
-(defmethod get-chord-duration ((self C-chord-box))
-  (ask-all (notes (car (chords (chord-line self)))) 'dur))
+(defgeneric get-chord-duration (self)
+  (:method ((self C-chord-box))
+    (ask-all (notes (car (chords (chord-line self)))) 'dur)))
 
-(defmethod get-chord-dynamic ((self C-chord-box))
-  (ask-all (notes (car (chords (chord-line self)))) 'vel))
+(defgeneric get-chord-dynamic (self)
+  (:method ((self C-chord-box))
+    (ask-all (notes (car (chords (chord-line self)))) 'vel)))
 
-(defmethod get-chord-order ((self C-chord-box))
-  (ask-all (notes (car (chords (chord-line self)))) 'order))
+(defgeneric get-chord-order (self)
+  (:method ((self C-chord-box))
+    (ask-all (notes (car (chords (chord-line self)))) 'order)))
 
 

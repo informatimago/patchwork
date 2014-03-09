@@ -1211,16 +1211,18 @@ DO:             Inspect the application main menu, and build the
 
 RETURN:         The list of MENUs collected.
 "
-  (let ((menubar (menu-items (wrap [[NSApplication sharedApplication] mainMenu]))))
-    (dolist (menu menubar)
-      (setf (slot-value menu 'owner) nil))
-    (setf *apple-menu*   (change-class (first menubar) 'apple-menu)
-          *file-menu*    (find "File"    menubar :key (function menu-title) :test (function string=))
-          *edit-menu*    (find "Edit"    menubar :key (function menu-title) :test (function string=))
-          *lisp-menu*    (find "Lisp"    menubar :key (function menu-title) :test (function string=))
-          *tool-menu*    (find "Tool"    menubar :key (function menu-title) :test (function string=))
-          *windows-menu* (find "Windows" menubar :key (function menu-title) :test (function string=)))
-    menubar))
+  (let ((menu (wrap [[NSApplication sharedApplication] mainMenu])))
+    (when menu
+      (let ((menubar (menu-items menu)))
+        (dolist (menu menubar)
+          (setf (slot-value menu 'owner) nil))
+        (setf *apple-menu*   (change-class (first menubar) 'apple-menu)
+              *file-menu*    (find "File"    menubar :key (function menu-title) :test (function string=))
+              *edit-menu*    (find "Edit"    menubar :key (function menu-title) :test (function string=))
+              *lisp-menu*    (find "Lisp"    menubar :key (function menu-title) :test (function string=))
+              *tool-menu*    (find "Tool"    menubar :key (function menu-title) :test (function string=))
+              *windows-menu* (find "Windows" menubar :key (function menu-title) :test (function string=)))
+        menubar))))
 
 
 (defun initialize/menu ()
@@ -1232,20 +1234,20 @@ RETURN:         The list of MENUs collected.
         ;; Notice this menubar instance is immediately replaced by the following SET-MENUBAR call.
         *menubar*      (make-instance 'menubar :menus (copy-list *default-menubar*)))
   (setf *bring-windows-front-item* (make-instance 'menu-item
-                                       :menu-item-title "Bring All to Front"
-                                       :menu-item-action 'bring-all-windows-front))
+                                                  :menu-item-title "Bring All to Front"
+                                                  :menu-item-action 'bring-all-windows-front))
   (dolist (item (list  (make-instance 'menu-item
-                           :menu-item-title "Abort"
-                           :menu-item-action (lambda () (invoke-restart 'abort)))
+                                      :menu-item-title "Abort"
+                                      :menu-item-action (lambda () (invoke-restart 'abort)))
                        (make-instance 'menu-item
-                           :menu-item-title "Break"
-                           :menu-item-action (lambda () (invoke-restart 'break)))
+                                      :menu-item-title "Break"
+                                      :menu-item-action (lambda () (invoke-restart 'break)))
                        (make-instance 'menu-item
-                           :menu-item-title "Continue"
-                           :menu-item-action (lambda () (invoke-restart 'continue)))
+                                      :menu-item-title "Continue"
+                                      :menu-item-action (lambda () (invoke-restart 'continue)))
                        (make-instance 'menu-item
-                           :menu-item-title "Force Quit"
-                           :menu-item-action (lambda () (ccl:quit)))))
+                                      :menu-item-title "Force Quit"
+                                      :menu-item-action (lambda () (ccl:quit)))))
     (when (and *lisp-menu*
                (not (find-menu-item *lisp-menu* (menu-item-title item))))
       (add-menu-items *lisp-menu* item)))

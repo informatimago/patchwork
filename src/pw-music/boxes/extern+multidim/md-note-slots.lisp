@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    Multi-dimensional boxes for chord and chord-line objects.
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,24 +32,10 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
-;;;============================================
-;;; Multi-dimensional boxes for chord and chord-line objects
-;;;===========================================
-
 (defpackage "C-GET-NOTE-SLOTS"
-  (:use "COMMON-LISP" "PATCH-WORK" "LELISP-MACROS")
+  (:use "COMMON-LISP")
+  (:use "PATCHWORK" "LELISP-MACROS")
   (:export "GET-NOTE-SLOTS" "SET-NOTE-SLOTS"))
-
 (in-package "C-GET-NOTE-SLOTS")
 
 (defvar *no-notes-error* 
@@ -159,7 +146,7 @@ them the given <value(s)>."
 
 (defpackage "C-GET-SELECTIONS"
   (:use "COMMON-LISP")
-  (:import-from "PATCH-WORK"
+  (:import-from "PATCHWORK"
                 "DEFUNP" "C-PATCH-MIDI-MOD" "SAVED-SELECTED"
                 "APPLICATION-OBJECT" "C-PATCH" "PATCH-VALUE" "INPUT-OBJECTS")
   (:import-from "UI" "SUBVIEWS" "WPTR")

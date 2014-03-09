@@ -54,10 +54,11 @@
   "Return A ⊻ B"
   (or (and a (not b)) (and (not a) b)))
 
+(defun nstimeinterval (value) (coerce value 'double-float))
 (defun cgfloat    (value) (coerce value 'ns:cgfloat))
 (defun fontsize   (value) (values (round  value)))
 (defun coord      (value) (values (round  value)))
-(declaim (inline cgfloat fontsize coord))
+(declaim (inline nstimeinterval cgfloat fontsize coord))
 
 
 (defstruct (nspoint

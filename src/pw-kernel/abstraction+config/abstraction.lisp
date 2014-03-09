@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,35 +32,21 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
-
-;; (provide 'abstraction)
-
-;;====================================================================================================
-;;====================================================================================================
 
 (defclass C-abstract-in (C-patch)
   ((in-index :initform nil :accessor in-index)
    (abstract-box :initform nil :accessor abstract-box)))
 
-(defmethod connect-to-nth-input ((self C-abstract-in) nth-connection abstract-box)
-  (setf (in-index self) nth-connection)
-  (setf (abstract-box self) abstract-box))
+(defgeneric connect-to-nth-input (self nth-connection abstract-box)
+  (:method ((self C-abstract-in) nth-connection abstract-box)
+    (setf (in-index self) nth-connection)
+    (setf (abstract-box self) abstract-box)))
 
 (defmethod update-absin-doc-string ((self C-abstract-in))
   (when (abstract-box self)
     (setf (doc-string (nth (in-index self) (input-objects (abstract-box self))))
-      (doc-string self))))
+          (doc-string self))))
 
 (defmethod doc-string ((self C-abstract-in)) (dialog-item-text (car (pw-controls self))))
 
@@ -91,13 +78,14 @@ It is advised to give a name to the absin module after having made the patch con
 (defclass C-abstract-out (C-patch) 
   ((abstract-obj :initform nil :accessor abstract-obj)))
 
-(defmethod update-absout-doc-string ((self C-abstract-out))
-  (when (abstract-obj self)
-    (let* ((new-string (dialog-item-text (car (pw-controls self))))
-           (the-abstraction (abstract-obj self)))
-      (set-window-title (view-window self) new-string)
-      (setf (pw-function-string the-abstraction) new-string)
-      (view-focus-and-draw-contents the-abstraction))))
+(defgeneric update-absout-doc-string (self)
+  (:method ((self C-abstract-out))
+    (when (abstract-obj self)
+      (let* ((new-string (dialog-item-text (car (pw-controls self))))
+             (the-abstraction (abstract-obj self)))
+        (set-window-title (view-window self) new-string)
+        (setf (pw-function-string the-abstraction) new-string)
+        (view-focus-and-draw-contents the-abstraction)))))
 
 (defmethod toggle-patch-active-mode ((self C-abstract-out))
   (when (not (abstract-obj self))(call-next-method)))
@@ -188,30 +176,33 @@ name)
 
 ;;=================================
 
-(defmethod find-active-rectangle ((self C-pw-window))
-  (let ((ctrls (active-patches self)) min-x min-y)
-    (list (setq min-x (apply 'min (ask-all ctrls 'x))) 
-          (setq min-y (apply 'min (ask-all ctrls 'y))) 
-          (- (apply 'max (ask-all ctrls 'x+w)) min-x) 
-          (- (apply 'max (ask-all ctrls 'y+h)) min-y)))) 
+(defgeneric find-active-rectangle (self)
+  (:method ((self C-pw-window))
+    (let ((ctrls (active-patches self)) min-x min-y)
+      (list (setq min-x (apply 'min (ask-all ctrls 'x))) 
+            (setq min-y (apply 'min (ask-all ctrls 'y))) 
+            (- (apply 'max (ask-all ctrls 'x+w)) min-x) 
+            (- (apply 'max (ask-all ctrls 'y+h)) min-y))))) 
 
 
-(defmethod find-abstract-out-box ((self C-pw-window) patches)
-  (let ((out-box))
-    (while patches
-           (when (eq (pw-function (car patches)) 'absout)
-             (push (car patches) out-box))
-           (pop patches))
-    out-box))
+(defgeneric find-abstract-out-box (self patches)
+  (:method ((self C-pw-window) patches)
+    (let ((out-box))
+      (while patches
+        (when (eq (pw-function (car patches)) 'absout)
+          (push (car patches) out-box))
+        (pop patches))
+      out-box)))
 
-(defmethod find-abstract-in-boxes ((self C-pw-window) patches)
-  (let ((in-boxes))
-    (while patches
-           (when 
-              (eq (pw-function (car patches)) 'absin)
-              (push (car patches) in-boxes))
-           (pop patches))
-    (sort in-boxes '< :key (lambda (a) (patch-value (second (pw-controls a)) ())))))
+(defgeneric find-abstract-in-boxes (self patches)
+  (:method ((self C-pw-window) patches)
+    (let ((in-boxes))
+      (while patches
+        (when 
+            (eq (pw-function (car patches)) 'absin)
+          (push (car patches) in-boxes))
+        (pop patches))
+      (sort in-boxes '< :key (lambda (a) (patch-value (second (pw-controls a)) ()))))))
 
 (defun make-pair-list-pw-types (type1 lst)
   (let ((res))

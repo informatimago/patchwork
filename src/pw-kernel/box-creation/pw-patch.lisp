@@ -9,6 +9,7 @@
 ;;;;    XXX
 ;;;;    
 ;;;;AUTHORS
+;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -31,37 +32,58 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;;=========================================================
-;;;;
-;;;;  PATCH-WORK
-;;;;  By Mikael Laurson, Jacques Duthen, Camilo Rueda.
-;;;;  © 1986-1992 IRCAM 
-;;;;
-;;;;=========================================================
-
 (in-package :pw)
 (enable-patchwork-reader-macros)
+
+(defun application-window-name (obj string)
+  (if (null (position obj (controls *active-patch-window*) :test 'equal))
+      (mk-nuevo-name-box  string) (pw-function-string obj)))
+
+
+(defun mk-nuevo-name-box (string )
+  (if (null *active-patch-window*)
+      string
+      (let* ((nompot string)
+             (i 0)
+             (seguir (match-name nompot)))
+        (while seguir
+          (incf i)
+          (setf nompot (concatenate 'string string (format nil "~D" i)))
+          (setf seguir (match-name nompot)))
+        nompot)))
+
+(defun match-name (name)
+  (let* ((lista (controls *active-patch-window*)) (i 0)
+         (leng (length lista)) (next t))
+    (while (and (< i leng) next)
+      (if (equal name (pw-function-string (nth i lista)))
+          (setf next nil))
+      (incf i))
+    (if next nil t)))
+
+
 
 (defvar *object-connection-draw-mode* *gray-pattern*) 
 (defvar *normal-connection-draw-mode* *black-pattern*) 
 
-;;=======================================================================================
-;;=======================================================================================
 
 (defclass C-pw-outrect (BUTTON-DIALOG-ITEM) ())
 
 (defmethod view-draw-contents ((self C-pw-outrect))
   (draw-rect* (x self) (y self) (w self) (h self)))
 
-(defmethod fill-patch-outrect ((self C-pw-outrect))
-  (with-focused-view self 
-    (with-pen-state (:mode :patxor)
-      (fill-rect* 1 1 8 3))))      
+(defgeneric fill-patch-outrect (self)
+  (:method ((self C-pw-outrect))
+    (with-focused-view self 
+      (with-pen-state (:mode :patxor)
+        (fill-rect* 1 1 8 3)))))      
 
-(defmethod mid-x ((self C-pw-outrect)) (+ (x (view-container self)) (x self) 4))
-(defmethod mid-y ((self C-pw-outrect)) (+ (y (view-container self)) (h (view-container self)) -2))
+(defgeneric mid-x (self)
+  (:method ((self C-pw-outrect))
+    (+ (x (view-container self)) (x self) 4)))
+(defgeneric mid-y (self)
+  (:method ((self C-pw-outrect))
+    (+ (y (view-container self)) (h (view-container self)) -2)))
 
 #|(defmethod view-click-event-handler ((self C-pw-outrect) where)
 (if (option-key-p)
@@ -92,7 +114,7 @@
                   `(format t "PW->~S~%"
                            (patch-value ',(view-container self) ',(view-container self))))
                                         ;aaa
-                 (record--ae :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self))))))
+                 (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self))))))
                  )
           (drag-out-line self where))
       (if (option-key-p)
@@ -103,60 +125,62 @@
                            (patch-value ',(view-container self) ',(view-container self)))))
           )))
 
-(defmethod drag-out-line ((view C-pw-outrect) where)
-  (let* ((win (view-window view))
-         (last-mp (view-mouse-position win)))
-    (setq where (view-mouse-position win)) 
-    (with-pen-state (:mode :patxor)
-      (with-focused-view (view-window view)
-        (loop
-          (unless (mouse-down-p) (return))
-          (let ((mp (view-mouse-position win)))
-            (unless (eql mp last-mp)
-              (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp))
-              (setq last-mp mp)
-              (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp)))))
-        (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp))))
-    (connect-patch? view (find-view-containing-point win last-mp))
-    (with-focused-view view
-      (erase-view-inside-rect view))))
+(defgeneric drag-out-line (view where)
+  (:method ((view C-pw-outrect) where)
+    (let* ((win (view-window view))
+           (last-mp (view-mouse-position win)))
+      (setq where (view-mouse-position win)) 
+      (with-pen-state (:mode :patxor)
+        (with-focused-view (view-window view)
+          (loop
+            (unless (mouse-down-p) (return))
+            (let ((mp (view-mouse-position win)))
+              (unless (eql mp last-mp)
+                (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp))
+                (setq last-mp mp)
+                (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp)))))
+          (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp))))
+      (connect-patch? view (find-view-containing-point win last-mp))
+      (with-focused-view view
+        (erase-view-inside-rect view)))))
 
-(defmethod connect-patch? ((self C-pw-outrect) ctrl)
-  (unless (eq ctrl self)
-    (let* ((patch (view-container ctrl)))
-      (when patch
-        (let ((inde (if (patch-type-p patch) (find-nth-ctrl patch ctrl))))
-          (when (and (patch-type-p (view-container ctrl)) 
-                     (not (eq (class-name (class-of ctrl)) 'C-pw-outrect)))
-            (if (and (and (not (equal (type-list ctrl) '(no-connection)))  
-                          (not (equal (type-list (view-container self)) '(no-connection))))  
-                     (or (intersection  (type-list ctrl) (type-list (view-container self)) :test 'eq)
-                         (not (type-list ctrl))(not (type-list (view-container self))))) ; no type-list specified
-                (progn 
-                  (tell (subviews (view-window patch)) 'draw-connections t)
-                  (connect-ctrl patch ctrl (view-container self))
-                  (if (check-recursive-connections (view-container self)(view-container self))
-                      (progn 
-                        (ED-BEEP)
-                        (setf inde nil)
-                        (disconnect-ctrl-1 patch ctrl)
-                        (print "Recursive connections not allowed !")
-                        (set-open-state ctrl t)) 
-                      (progn 
-                        (when (or (eq (pw-function (view-container self)) 'absin)
-                                  (eq (pw-function (view-container self)) 'absin2))
-                          (set-dialog-item-text (car (pw-controls (view-container self))) (doc-string ctrl)))
-                        (set-view-font (view-window self) '("Monaco" 9 :SRCOR :PLAIN)) ;??
-                        (set-open-state ctrl nil)))
-                  (tell (subviews (view-window patch)) 'draw-connections)
-                  (when inde 
-                    (record--ae :|PWst| :|conn| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self))))
-                                                  (,:|data| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string patch)) 
-                                                                   :|indx| (+ inde 1)))))))
-                (progn 
-                  (ED-BEEP)
-                  (format t "Mismatch of type ! ~%~a~%" 
-                          (list 'output (type-list (view-container self)) 'input (type-list ctrl)))))))))))
+(defgeneric connect-patch? (self ctrl)
+  (:method ((self C-pw-outrect) ctrl)
+    (unless (eq ctrl self)
+      (let* ((patch (view-container ctrl)))
+        (when patch
+          (let ((inde (if (patch-type-p patch) (find-nth-ctrl patch ctrl))))
+            (when (and (patch-type-p (view-container ctrl)) 
+                       (not (eq (class-name (class-of ctrl)) 'C-pw-outrect)))
+              (if (and (and (not (equal (type-list ctrl) '(no-connection)))  
+                            (not (equal (type-list (view-container self)) '(no-connection))))  
+                       (or (intersection  (type-list ctrl) (type-list (view-container self)) :test 'eq)
+                           (not (type-list ctrl))(not (type-list (view-container self))))) ; no type-list specified
+                  (progn 
+                    (tell (subviews (view-window patch)) 'draw-connections t)
+                    (connect-ctrl patch ctrl (view-container self))
+                    (if (check-recursive-connections (view-container self)(view-container self))
+                        (progn 
+                          (ED-BEEP)
+                          (setf inde nil)
+                          (disconnect-ctrl-1 patch ctrl)
+                          (print "Recursive connections not allowed !")
+                          (set-open-state ctrl t)) 
+                        (progn 
+                          (when (or (eq (pw-function (view-container self)) 'absin)
+                                    (eq (pw-function (view-container self)) 'absin2))
+                            (set-dialog-item-text (car (pw-controls (view-container self))) (doc-string ctrl)))
+                          (set-view-font (view-window self) '("Monaco" 9 :SRCOR :PLAIN)) ;??
+                          (set-open-state ctrl nil)))
+                    (tell (subviews (view-window patch)) 'draw-connections)
+                    (when inde 
+                      (record-event :|PWst| :|conn| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self))))
+                                                    (,:|data| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string patch)) 
+                                                                     :|indx| (+ inde 1)))))))
+                  (progn 
+                    (ED-BEEP)
+                    (format t "Mismatch of type ! ~%~a~%" 
+                            (list 'output (type-list (view-container self)) 'input (type-list ctrl))))))))))))
 
 ;;=======================================================================================
 ;;=======================================================================================
@@ -173,26 +197,28 @@
    (pw-function-string :initform "+"  :accessor pw-function-string)
    (pw-function :initform '+ :initarg :pw-function :accessor pw-function)))
 
-(defmethod decompile-connections ((self C-patch) patch-controls)
-  (let ((input-objects (input-objects self))
-        (connections) input-objects-now
-        (nth-control-self (nth? self patch-controls))
-        nth-control)
-    (for (i 0 1 (1- (length input-objects))) 
-      (when (not (eq (nth i input-objects) (nth i (pw-controls self))))
-        (setq input-objects-now
-              (if (atom (nth i input-objects))
-                  (list (nth i input-objects))
-                  (nth i input-objects)))
-        (while input-objects-now
-          (setq nth-control (nth? (pop input-objects-now)  patch-controls))
-          (when nth-control 
-            (push  
-             `(connect-nth-control (nth ,nth-control-self controls) ,i (nth ,nth-control controls)) 
-             connections)))))
-    (nreverse connections)))
+(defgeneric decompile-connections (self patch-controls)
+  (:method ((self C-patch) patch-controls)
+    (let ((input-objects (input-objects self))
+          (connections) input-objects-now
+          (nth-control-self (nth? self patch-controls))
+          nth-control)
+      (for (i 0 1 (1- (length input-objects))) 
+        (when (not (eq (nth i input-objects) (nth i (pw-controls self))))
+          (setq input-objects-now
+                (if (atom (nth i input-objects))
+                    (list (nth i input-objects))
+                    (nth i input-objects)))
+          (while input-objects-now
+            (setq nth-control (nth? (pop input-objects-now)  patch-controls))
+            (when nth-control 
+              (push  
+               `(connect-nth-control (nth ,nth-control-self controls) ,i (nth ,nth-control controls)) 
+               connections)))))
+      (nreverse connections))))
 
 
+(defgeneric actual-save (self file-name))
 (defmethod actual-save ((self c-patch) file-name)
   (let ((*print-pretty* nil)
         (*decompile-chords-mode* t))
@@ -230,20 +256,24 @@
   (init-pw-function-string self)
   (init-xs-ys self))
 
-(defmethod init-pw-function-string ((self C-patch))
-  (setf (pw-function-string self) 
-        (mk-nuevo-name-box  (string-downcase (string (pw-function self))))))
+(defgeneric init-pw-function-string (self)
+  (:method ((self C-patch))
+    (setf (pw-function-string self) 
+          (mk-nuevo-name-box  (string-downcase (string (pw-function self)))))))
 
-(defmethod init-xs-ys ((self C-patch))
-  (let* ((ctrls  (pw-controls self))
-         (nctrls (length ctrls)))
-    (setf (in-xs self) (make-list nctrls)) 
-    (setf (in-ys self) (make-list nctrls)) 
-    (for (i 0 1 (1- nctrls)) 
-      (setf (nth i (in-xs self)) (if (> (x (nth i ctrls)) 5) (- (w self) 3) 0))
-      (setf (nth i (in-ys self)) (+ (y (nth i ctrls)) (- (truncate (h (nth i ctrls)) 2) 3))))))
+(defgeneric init-xs-ys (self)
+  (:method ((self C-patch))
+    (let* ((ctrls  (pw-controls self))
+           (nctrls (length ctrls)))
+      (setf (in-xs self) (make-list nctrls)) 
+      (setf (in-ys self) (make-list nctrls)) 
+      (for (i 0 1 (1- nctrls)) 
+        (setf (nth i (in-xs self)) (if (> (x (nth i ctrls)) 5) (- (w self) 3) 0))
+        (setf (nth i (in-ys self)) (+ (y (nth i ctrls)) (- (truncate (h (nth i ctrls)) 2) 3)))))))
 
-(defmethod erase-BPF-label? ((self C-patch)) nil) 
+(defgeneric erase-BPF-label (self)
+  (:method ((self C-patch))
+    nil)) 
 
 ;;======================================================
 ;;events
@@ -289,7 +319,7 @@
         (let ((ctrl (ask (pw-controls self) #'view-contains-point-p+self where)))
           (when ctrl 
             (disconnect-ctrl self ctrl)
-            (record--ae :|PWst| :|unco|
+            (record-event :|PWst| :|unco|
                         `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string self)) 
                                            :|indx| (+ (position ctrl (input-objects self)) 1)))))))))) 
 
@@ -312,67 +342,10 @@
     (draw-function-name self 2 (- (h self) 5))
     (draw-rect* 0 0 (w self)(h self))))
 
-(defmethod print-connections ((self C-patch) &optional erase-mode)
-  (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
-  (with-pen-state (:mode :srccopy) ;srccopy  
-    (let* ((input-objects (input-objects self)) (pw-controls (pw-controls self))
-           (x-self (x self))
-           (y-self (y self))
-           (in-xs (in-xs self))
-           (in-ys (in-ys self))
-           ctrl x-off x-off2 
-           x1 y1 xi yi right?) 
-      (for (i 0 1 (1- (length pw-controls)))
-        (setq x-off (if (setq right? (> (car in-xs) 0)) 6 -4))
-        (setq x-off2 (if right? (* (truncate i 2) 2) (* (truncate i 2) -2)))
-        (when (and (setq ctrl (pop input-objects))
-                   (not (eq ctrl (pop pw-controls))))
-          (when (atom ctrl)(setq ctrl (list ctrl))) ; for nargs  
-          (while ctrl
-            (unless (eq erase-mode *white-pattern*) 
-              (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
-                                   *object-connection-draw-mode* *normal-connection-draw-mode*)))
-            (with-pen-state (:pattern erase-mode)
-              (setq x1 (mid-x (out-put (car ctrl))))
-              (setq y1 (mid-y (out-put (pop ctrl))))
-              (setq xi (+ x-self (car in-xs)))
-              (setq yi (+ y-self (car in-ys)))
-              (draw-line x1 (+ 1 y1) x1 (+ 3 y1)) 
-              (draw-line x1 (+ 4 y1) (+ x-off2  x-off xi) (+ 4 y1))
-              (draw-line (+ x-off2  x-off xi) (+ 4 y1) 
-                         (+ x-off2 x-off xi) (+ 2 yi))
-              (draw-line (+ x-off2 x-off xi)(+ 2 yi)
-                         (if (= x-off 6)(+ 3 xi)(1- xi)) (+ 2 yi)))))
-        (pop in-xs)(pop in-ys)))))
-
-(defmethod draw-patch-extra ((self C-patch)))
-
-(defmethod draw-patch-view-outline ((self C-patch))
-  (draw-line 0 3 (w self) 3) 
-  (when (active-mode self) 
-    (with-pen-state (:pattern *black-pattern*) (fill-rect* 0 0 (w self) 3)))
-  (draw-patch-extra self))
-
-(defmethod draw-function-name ((self C-patch) x y)
-  (draw-string x y (pw-function-string self)))
-
-(defmethod update-absin-doc-string ((self C-patch)) )
-
-(defmethod draw-small-rects ((self C-patch))
-  (for (i 0 1 (1- (length (pw-controls self))))
-    (unless (member 'no-connection (type-list (nth i (pw-controls self))) :test 'eq)
-      (draw-rect* (nth i (in-xs self)) (nth i (in-ys self)) 3 6))))
-
-;; draw-connections is called only by the window not by a patch !
-
-
-(defun pw-object-p (types-list) 
-  (intersection types-list *pw-object-type-list* :test 'eq))
-
-(defmethod draw-connections ((self C-patch) &optional erase-mode from-patches)
-  (with-focused-view (view-window self)
+(defgeneric print-connections (self &optional erase-mode)
+  (:method ((self C-patch) &optional erase-mode)
     (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
-    (with-pen-state (:mode :srccopy) ;srccopy  
+    (with-pen-state (:mode :srccopy)    ;srccopy  
       (let* ((input-objects (input-objects self)) (pw-controls (pw-controls self))
              (x-self (x self))
              (y-self (y self))
@@ -384,9 +357,8 @@
           (setq x-off (if (setq right? (> (car in-xs) 0)) 6 -4))
           (setq x-off2 (if right? (* (truncate i 2) 2) (* (truncate i 2) -2)))
           (when (and (setq ctrl (pop input-objects))
-                     (not (eq ctrl (pop pw-controls)))
-                     (or (null from-patches) (member ctrl from-patches :test #'eq)))
-            (if (atom ctrl) (setq ctrl (list ctrl))) ; for nargs  
+                     (not (eq ctrl (pop pw-controls))))
+            (when (atom ctrl)(setq ctrl (list ctrl))) ; for nargs  
             (while ctrl
               (unless (eq erase-mode *white-pattern*) 
                 (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
@@ -404,16 +376,86 @@
                            (if (= x-off 6)(+ 3 xi)(1- xi)) (+ 2 yi)))))
           (pop in-xs)(pop in-ys))))))
 
-(defmethod repaint-connections ((self C-patch) all-dead)
-  (let ((objects (set-difference (input-objects self) all-dead)))
-    (dolist (dead-patch all-dead)
-      (if (intersection objects (input-objects dead-patch))
-          (draw-connections self)))))
+
+(defmethod draw-patch-extra ((self C-patch))
+  (values))
+
+(defgeneric draw-patch-view-outline (self)
+  (:method ((self C-patch))
+    (draw-line 0 3 (w self) 3) 
+    (when (active-mode self) 
+      (with-pen-state (:pattern *black-pattern*) (fill-rect* 0 0 (w self) 3)))
+    (draw-patch-extra self)))
+
+(defmethod draw-function-name ((self C-patch) x y)
+  (draw-string x y (pw-function-string self)))
+
+(defgeneric update-absin-doc-string (self)
+  (:method ((self C-patch))
+    (values)))
+
+(defgeneric draw-small-rects (self)
+  (:method ((self C-patch))
+    (for (i 0 1 (1- (length (pw-controls self))))
+      (unless (member 'no-connection (type-list (nth i (pw-controls self))) :test 'eq)
+        (draw-rect* (nth i (in-xs self)) (nth i (in-ys self)) 3 6)))))
+
+;; draw-connections is called only by the window not by a patch !
+
+
+(defun pw-object-p (types-list) 
+  (intersection types-list *pw-object-type-list* :test 'eq))
+
+(defgeneric draw-connections (self &optional erase-mode from-patches)
+  (:method ((self C-patch) &optional erase-mode from-patches)
+    (with-focused-view (view-window self)
+      (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
+      (with-pen-state (:mode :srccopy)  ;srccopy  
+        (let* ((input-objects (input-objects self)) (pw-controls (pw-controls self))
+               (x-self (x self))
+               (y-self (y self))
+               (in-xs (in-xs self))
+               (in-ys (in-ys self))
+               ctrl x-off x-off2 
+               x1 y1 xi yi right?) 
+          (for (i 0 1 (1- (length pw-controls)))
+            (setq x-off (if (setq right? (> (car in-xs) 0)) 6 -4))
+            (setq x-off2 (if right? (* (truncate i 2) 2) (* (truncate i 2) -2)))
+            (when (and (setq ctrl (pop input-objects))
+                       (not (eq ctrl (pop pw-controls)))
+                       (or (null from-patches) (member ctrl from-patches :test #'eq)))
+              (if (atom ctrl) (setq ctrl (list ctrl))) ; for nargs  
+              (while ctrl
+                (unless (eq erase-mode *white-pattern*) 
+                  (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
+                                       *object-connection-draw-mode* *normal-connection-draw-mode*)))
+                (with-pen-state (:pattern erase-mode)
+                  (setq x1 (mid-x (out-put (car ctrl))))
+                  (setq y1 (mid-y (out-put (pop ctrl))))
+                  (setq xi (+ x-self (car in-xs)))
+                  (setq yi (+ y-self (car in-ys)))
+                  (draw-line x1 (+ 1 y1) x1 (+ 3 y1)) 
+                  (draw-line x1 (+ 4 y1) (+ x-off2  x-off xi) (+ 4 y1))
+                  (draw-line (+ x-off2  x-off xi) (+ 4 y1) 
+                             (+ x-off2 x-off xi) (+ 2 yi))
+                  (draw-line (+ x-off2 x-off xi)(+ 2 yi)
+                             (if (= x-off 6)(+ 3 xi)(1- xi)) (+ 2 yi)))))
+            (pop in-xs)(pop in-ys)))))))
+
+(defgeneric repaint-connections (self all-dead)
+  (:method ((self C-patch) all-dead)
+    (let ((objects (set-difference (input-objects self) all-dead)))
+      (dolist (dead-patch all-dead)
+        (if (intersection objects (input-objects dead-patch))
+            (draw-connections self))))))
 
 ;;======================================================
 ;;connect
 
-(defmethod check-recursive-connections ((self simple-view) patch) (declare (ignore patch)) nil)
+(defgeneric check-recursive-connections (self patch))
+(defmethod check-recursive-connections ((self simple-view) patch)
+  (declare (ignore patch))
+  nil)
 
 (defmethod check-recursive-connections ((self C-patch) patch)
   (if (member patch (input-objects self) :test #'eq)
@@ -428,32 +470,38 @@
             (pop inputs))
           flag))))
 
-(defmethod connect-nth-control ((self C-patch) nth-ctrl ctrl-panel)
-  (setf (nth nth-ctrl (input-objects self)) ctrl-panel)
-  (setf (open-state (nth nth-ctrl (pw-controls self))) ()))
+(defgeneric connect-nth-control (self nth-ctrl ctrl-panel)
+  (:method ((self C-patch) nth-ctrl ctrl-panel)
+    (setf (nth nth-ctrl (input-objects self)) ctrl-panel)
+    (setf (open-state (nth nth-ctrl (pw-controls self))) ())))
 
-(defmethod find-nth-ctrl ((self C-patch) ctrl)
-  (let ((ctrls (pw-controls self))
-        (nth-count))
-    (for (i 0 1 (1- (length ctrls)))
-      (when (eq (nth i ctrls) ctrl)
-        (setq nth-count i) (setq i 1000)))
-    nth-count))
+(defgeneric find-nth-ctrl (self ctrl)
+  (:method ((self C-patch) ctrl)
+    (let ((ctrls (pw-controls self))
+          (nth-count))
+      (for (i 0 1 (1- (length ctrls)))
+        (when (eq (nth i ctrls) ctrl)
+          (setq nth-count i) (setq i 1000)))
+      nth-count)))
 
-(defmethod connect-ctrl ((self C-patch) ctrl patch)
-  (setf (nth (find-nth-ctrl self ctrl) (input-objects self)) patch))
+(defgeneric connect-ctrl (self ctrl patch)
+  (:method ((self C-patch) ctrl patch)
+    (setf (nth (find-nth-ctrl self ctrl) (input-objects self)) patch)))
 
-(defmethod disconnect-my-self ((self C-patch) patch)
-  (for (i 0 1 (1- (length (input-objects self))))
-    (when (eq (nth i (input-objects self)) patch)
-      (setf (nth i (input-objects self))(nth i (pw-controls self)))
-      (setf (open-state (nth i (pw-controls self))) t))))
+(defgeneric disconnect-my-self (self patch)
+  (:method ((self C-patch) patch)
+    (for (i 0 1 (1- (length (input-objects self))))
+      (when (eq (nth i (input-objects self)) patch)
+        (setf (nth i (input-objects self))(nth i (pw-controls self)))
+        (setf (open-state (nth i (pw-controls self))) t)))))
 
-(defmethod disconnect-ctrl-1 ((self C-patch) ctrl)
-  (let ((nth-count (find-nth-ctrl self ctrl)))
-    (setf (nth nth-count (input-objects self)) ctrl)))
+(defgeneric  disconnect-ctrl-1 (self ctrl)
+  (:method ((self C-patch) ctrl)
+    (let ((nth-count (find-nth-ctrl self ctrl)))
+      (setf (nth nth-count (input-objects self)) ctrl))))
 
-(defmethod disconnect-ctrl ((self C-patch) ctrl)
+(defgeneric disconnect-ctrl (self ctrl))
+(defmethod  disconnect-ctrl ((self C-patch) ctrl)
   (let ((nth-count (find-nth-ctrl self ctrl)))
     (when (not (eq ctrl (nth nth-count (input-objects self))))
       (tell (controls (view-window self)) 'draw-connections t)
@@ -474,30 +522,32 @@
   (declare (ignore h v))
   (inval-r-view-sides view))
 
-(defmethod inval-r-view-sides ((view C-patch) &optional top&left?)
-  (niy inval-r-view-sides view top&left?)
-  ;; (when (wptr view)
-  ;;   (let* ((pos (view-scroll-position view))
-  ;;          (size (view-size view))
-  ;;          (end-pos (add-points pos size))
-  ;;          (rgn *r-view-temp-region*))
-  ;;     (unless top&left?
-  ;;       (setq pos (subtract-points pos #@(1 1))))
-  ;;     (#_SetRectRgn :ptr rgn :long pos :long end-pos)
-  ;;     (#_InsetRgn :ptr rgn :long #@(1 1))
-  ;;     (#_DiffRgn :ptr (view-clip-region view) :ptr rgn :ptr rgn)
-  ;;     (with-focused-view view
-  ;;       (#_EraseRgn :ptr rgn)
-  ;;       (#_InvalRgn :ptr rgn))))
-  )
+(defgeneric inval-r-view-sides (view &optional top&left\?)
+  (:method ((view C-patch) &optional top&left?)
+    (niy inval-r-view-sides view top&left?)
+    ;; (when (wptr view)
+    ;;   (let* ((pos (view-scroll-position view))
+    ;;          (size (view-size view))
+    ;;          (end-pos (add-points pos size))
+    ;;          (rgn *r-view-temp-region*))
+    ;;     (unless top&left?
+    ;;       (setq pos (subtract-points pos #@(1 1))))
+    ;;     (#_SetRectRgn :ptr rgn :long pos :long end-pos)
+    ;;     (#_InsetRgn :ptr rgn :long #@(1 1))
+    ;;     (#_DiffRgn :ptr (view-clip-region view) :ptr rgn :ptr rgn)
+    ;;     (with-focused-view view
+    ;;       (#_EraseRgn :ptr rgn)
+    ;;       (#_InvalRgn :ptr rgn))))
+    ))
 
 ;;======================================================
 ;;move
 
-(defmethod dmove-patch ((self C-patch) dx dy)
-  ;; (record--ae :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
-  ;;                                     (,:|insh| ,(cl-user::getDescRecPtr (cl-user::asAEDesc (list (+ (x self) dx) (+ (y self) dy)))))))
-  (set-view-position self (+ (x self) dx)(+ (y self) dy)))
+(defgeneric dmove-patch (self dx dy)
+  (:method ((self C-patch) dx dy)
+    ;; (record-event :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
+    ;;                                     (,:|insh| ,(cl-user::getDescRecPtr (cl-user::asAEDesc (list (+ (x self) dx) (+ (y self) dy)))))))
+    (set-view-position self (+ (x self) dx)(+ (y self) dy))))
 
 (defmethod set-view-scroll-position ((view C-patch) h &optional v scroll-visibly?)
   (declare (ignore scroll-visibly?))
@@ -512,15 +562,16 @@
         (setf (slot-value view 'view-position) pos)))
     (inval-r-view-sides view t)))
 
-(defmethod handle-edit-events ((self C-patch) char)
-  (case char
-    (#\Newline 
-     (set-dialog-item-text-from-dialog *pw-controls-current-pw-control* 
-                                       (dialog-item-text *pw-controls-dialog-text-item*))
-     (kill-text-item))
-    (otherwise (view-key-event-handler *pw-controls-dialog-text-item* char)
-     (set-fred-display-start-mark *pw-controls-dialog-text-item* 0)
-     (fred-update *pw-controls-dialog-text-item*))))
+(defgeneric handle-edit-events (self char)
+  (:method ((self C-patch) char)
+    (case char
+      (#\Newline 
+       (set-dialog-item-text-from-dialog *pw-controls-current-pw-control* 
+                                         (dialog-item-text *pw-controls-dialog-text-item*))
+       (kill-text-item))
+      (otherwise (view-key-event-handler *pw-controls-dialog-text-item* char)
+       (set-fred-display-start-mark *pw-controls-dialog-text-item* 0)
+       (fred-update *pw-controls-dialog-text-item*)))))
 
 
 (defun push-modules-to-back (actives)
@@ -536,117 +587,124 @@
           (unless rest (return )))
         (decf index)))))
 
-(defmethod push-to-top ((view C-patch))
-  (let* ((modules (slot-value (view-container view) 'view-subviews))
-         (length (1- (length modules)))
-         (index (for (i 0 1 length) (if (eq view (aref modules i)) (return i)))))
-    (if (> index 2)
-        (psetf (aref modules 0) (aref modules index) 
-               (aref modules index) (aref modules 0)))))
+(defgeneric push-to-top (view)
+  (:method ((view C-patch))
+    (let* ((modules (slot-value (view-container view) 'view-subviews))
+           (length (1- (length modules)))
+           (index (for (i 0 1 length) (if (eq view (aref modules i)) (return i)))))
+      (if (> index 2)
+          (psetf (aref modules 0) (aref modules index) 
+                 (aref modules index) (aref modules 0))))))
 
-(defmethod move-or-resize-view ((view C-patch) where &optional resize-fl)
-  (let* ((container (view-container view))
-         (prev-mp (view-mouse-position container))
-         (last-mp prev-mp)
-         (delta where)
-         (fix-pos prev-mp)
-         (current-pos (view-position view))
-         (w (view-window view))
-         (from-end (subtract-points (view-size view) where))
-         (change-size? (and (resize-patch? view) resize-fl))
-         (active-patches (active-patches w))
-         (active-patches-rest (remove view active-patches :test 'eq))
-         (group-move? (and (member view active-patches :test 'eq)
-                           active-patches))
-         (moving-patches (or group-move? (list view)))
-         (the-rest (set-difference (controls w) moving-patches :test #'eq)))
-    (if change-size?
-        (change-your-size view w from-end where)
+(defgeneric move-or-resize-view (view where &optional resize-fl)
+  (:method ((view C-patch) where &optional resize-fl)
+    (let* ((container (view-container view))
+           (prev-mp (view-mouse-position container))
+           (last-mp prev-mp)
+           (delta where)
+           (fix-pos prev-mp)
+           (current-pos (view-position view))
+           (w (view-window view))
+           (from-end (subtract-points (view-size view) where))
+           (change-size? (and (resize-patch? view) resize-fl))
+           (active-patches (active-patches w))
+           (active-patches-rest (remove view active-patches :test 'eq))
+           (group-move? (and (member view active-patches :test 'eq)
+                             active-patches))
+           (moving-patches (or group-move? (list view)))
+           (the-rest (set-difference (controls w) moving-patches :test #'eq)))
+      (if change-size?
+          (change-your-size view w from-end where)
+          (progn
+            (connect/unconn moving-patches the-rest t)
+            (tell moving-patches 'view-frame-patch current-pos delta prev-mp prev-mp)
+            (loop
+              (event-dispatch)
+              (unless (mouse-down-p) (return))
+              (let ((mp (view-mouse-position container)))
+                (unless (eql mp last-mp)
+                  (setq last-mp mp)
+                  (tell moving-patches 'view-frame-patch current-pos delta prev-mp mp)
+                  (setq prev-mp mp)
+                  )))
+            (tell moving-patches 'view-frame-patch current-pos delta prev-mp prev-mp)
+            (unless (eql last-mp fix-pos)
+              (push-to-top view)
+              (set-view-position view (subtract-points prev-mp delta))
+              #-(and) ;; TODO
+              (record-event :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
+                                            (,:|insh| ,(cl-user::getDescRecPtr
+                                                        (cl-user::asAEDesc 
+                                                         (list (point-h (subtract-points prev-mp delta)) 
+                                                               (point-v (subtract-points prev-mp delta))))))))
+              (if group-move?
+                  (let ((dif-h (- (point-h prev-mp) (point-h fix-pos)))
+                        (dif-v (- (point-v prev-mp) (point-v fix-pos)))
+                        (max-h (- *screen-width* 10 
+                                  (point-h (view-position container))))
+                        (max-v (- *screen-height* 10 
+                                  (point-v (view-position container)))))
+                    (dolist (patch active-patches-rest)
+                      (dmove-patch patch 
+                                   (min dif-h (- max-h
+                                                 (point-h (view-position patch))))
+                                   (min dif-v (- max-v 
+                                                 (point-v (view-position patch))))))))
+              (if (shift-key-p) (push-modules-to-back moving-patches))
+              )
+            (connect/unconn moving-patches the-rest)
+            (setf *current-move-patch-box* nil)
+            )))))
+
+(defgeneric view-frame-patch (self current-pos delta prev next)
+  (:method ((self C-patch) current-pos delta prev next)
+    (with-pen-state (:pattern *gray-pattern* :mode :patXor)
+      (with-focused-view (view-container self)
+        (let ((diff-prev (add-points (subtract-points (view-position self) current-pos)
+                                     (subtract-points prev delta)))
+              (diff-next (add-points (subtract-points (view-position self) current-pos)
+                                     (subtract-points next delta))))
+          (draw-rect* (point-h diff-prev) (point-v diff-prev) (w self) (h self))
+          (unless (= prev next)
+            (draw-rect* (point-h diff-next) (point-v diff-next) (w self) (h self))))))))
+
+(defgeneric change-your-size (view win delta last-mp)
+  (:method ((view C-patch) win delta last-mp)
+    (let ((the-rest (remove view (controls win) :test #'eq)))
+      (connect/unconn (list view) the-rest t)
+      (let ((posn (view-position view)))
+        (view-frame-patch view posn 0 posn posn)
+        (loop
+          (unless (mouse-down-p) (return))
+          (let ((mp (view-mouse-position view)))
+            (unless (eql mp last-mp)
+              (view-frame-patch view posn 0 posn posn)
+              (setq last-mp mp)        
+              (resize-patch-box view mp delta)
+              (view-frame-patch view posn 0 posn posn)
+              )))
+        (connect/unconn (list view) the-rest)
+        (setf *current-move-patch-box* nil)
+        (view-draw-contents view)))))
+
+(defmethod resize-patch-box ((self C-patch) mp delta)
+  (declare (ignore mp delta))
+  (values))
+
+(defgeneric rename-yourbox (view)
+  (:method ((view C-patch))
+    (if (pw-controls view)
         (progn
-          (connect/unconn moving-patches the-rest t)
-          (tell moving-patches 'view-frame-patch current-pos delta prev-mp prev-mp)
-          (loop
-            (event-dispatch)
-            (unless (mouse-down-p) (return))
-            (let ((mp (view-mouse-position container)))
-              (unless (eql mp last-mp)
-                (setq last-mp mp)
-                (tell moving-patches 'view-frame-patch current-pos delta prev-mp mp)
-                (setq prev-mp mp)
-                )))
-          (tell moving-patches 'view-frame-patch current-pos delta prev-mp prev-mp)
-          (unless (eql last-mp fix-pos)
-            (push-to-top view)
-            (set-view-position view (subtract-points prev-mp delta))
-            #-(and) ;; TODO
-            (record--ae :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
-                                          (,:|insh| ,(cl-user::getDescRecPtr
-                                                      (cl-user::asAEDesc 
-                                                       (list (point-h (subtract-points prev-mp delta)) 
-                                                             (point-v (subtract-points prev-mp delta))))))))
-            (if group-move?
-                (let ((dif-h (- (point-h prev-mp) (point-h fix-pos)))
-                      (dif-v (- (point-v prev-mp) (point-v fix-pos)))
-                      (max-h (- *screen-width* 10 
-                                (point-h (view-position container))))
-                      (max-v (- *screen-height* 10 
-                                (point-v (view-position container)))))
-                  (dolist (patch active-patches-rest)
-                    (dmove-patch patch 
-                                 (min dif-h (- max-h
-                                               (point-h (view-position patch))))
-                                 (min dif-v (- max-v 
-                                               (point-v (view-position patch))))))))
-            (if (shift-key-p) (push-modules-to-back moving-patches))
-            )
-          (connect/unconn moving-patches the-rest)
-          (setf *current-move-patch-box* nil)
-          ))))
-
-(defmethod view-frame-patch ((self C-patch) current-pos delta prev next)
-  (with-pen-state (:pattern *gray-pattern* :mode :patXor)
-    (with-focused-view (view-container self)
-      (let ((diff-prev (add-points (subtract-points (view-position self) current-pos)
-                                   (subtract-points prev delta)))
-            (diff-next (add-points (subtract-points (view-position self) current-pos)
-                                   (subtract-points next delta))))
-        (draw-rect* (point-h diff-prev) (point-v diff-prev) (w self) (h self))
-        (unless (= prev next)
-          (draw-rect* (point-h diff-next) (point-v diff-next) (w self) (h self)))))))
-
-(defmethod change-your-size ((view C-patch) win delta last-mp)
-  (let ((the-rest (remove view (controls win) :test #'eq)))
-    (connect/unconn (list view) the-rest t)
-    (let ((posn (view-position view)))
-      (view-frame-patch view posn 0 posn posn)
-      (loop
-        (unless (mouse-down-p) (return))
-        (let ((mp (view-mouse-position view)))
-          (unless (eql mp last-mp)
-            (view-frame-patch view posn 0 posn posn)
-            (setq last-mp mp)        
-            (resize-patch-box view mp delta)
-            (view-frame-patch view posn 0 posn posn)
-            )))
-      (connect/unconn (list view) the-rest)
-      (setf *current-move-patch-box* nil)
-      (view-draw-contents view))))
-
-(defmethod resize-patch-box ((self C-patch) mp delta) (declare (ignore mp delta)))
-
-(defmethod rename-yourbox ((view C-patch))
-  (if (pw-controls view)
-      (progn
-        (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog))
-        (setf *pw-controls-current-pw-control* view)
-        (set-dialog-item-text *pw-controls-dialog-text-item* (pw-function-string view))
-        (set-view-position *pw-controls-dialog-text-item* 
-                           (make-point 1 (- (h view) 14)))
-        (resize-text-item view (make-point (w view) 13))
-        (add-subviews view *pw-controls-dialog-text-item*)
-        (setf *current-small-inBox* (car (pw-controls view)))
-        (change-menu-actions) )
-      (ui:ed-beep)) )
+          (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog))
+          (setf *pw-controls-current-pw-control* view)
+          (set-dialog-item-text *pw-controls-dialog-text-item* (pw-function-string view))
+          (set-view-position *pw-controls-dialog-text-item* 
+                             (make-point 1 (- (h view) 14)))
+          (resize-text-item view (make-point (w view) 13))
+          (add-subviews view *pw-controls-dialog-text-item*)
+          (setf *current-small-inBox* (car (pw-controls view)))
+          (change-menu-actions) )
+        (ui:ed-beep)) ))
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch) str)
   (setf (pw-function-string view) (string-downcase str))
@@ -656,89 +714,97 @@
 ;;====================================================
 ;;misc
 
-(defmethod am-i-connected? ((self C-patch) patch)
-  (member patch (input-objects self) :test 'eq))
+(defgeneric am-i-connected? (self patch)
+  (:method ((self C-patch) patch)
+    (member patch (input-objects self) :test 'eq)))
 
-(defmethod connected-out-side? ((self C-patch) win)
-  (let ((ctrls (controls win))(connect-flag))
-    (while (and ctrls (not connect-flag))
-      (setq connect-flag (am-i-connected? (pop ctrls) self)))
-    (or connect-flag
-        (not (equal (pw-controls self) (input-objects self))))))
+(defgeneric connected-out-side? (self win)
+  (:method ((self C-patch) win)
+    (let ((ctrls (controls win))(connect-flag))
+      (while (and ctrls (not connect-flag))
+        (setq connect-flag (am-i-connected? (pop ctrls) self)))
+      (or connect-flag
+          (not (equal (pw-controls self) (input-objects self)))))))
 
-(defmethod connect-new-patch? ((self C-patch) old-patch new-patch)
-  (for (i 0 1 (1- (length (input-objects self))))
-    (when (eq (nth i (input-objects self)) old-patch)
-      (setf (nth i (input-objects self)) new-patch))))
+(defgeneric connect-new-patch? (self old-patch new-patch)
+  (:method ((self C-patch) old-patch new-patch)
+    (for (i 0 1 (1- (length (input-objects self))))
+      (when (eq (nth i (input-objects self)) old-patch)
+        (setf (nth i (input-objects self)) new-patch)))))
 
-(defmethod toggle-patch-active-mode ((self C-patch))
-  (with-focused-view self
-    (cond ((shift-key-p) 
-           (setf (active-mode self) (not (active-mode self)))
-           (record--ae :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
-                                         (,:|chif| ,t)) )
-           (with-pen-state (:mode :patxor :pattern *black-pattern*)
-             (fill-rect* 1 1 (- (w self) 2) 2)))
-          (t 
-           (unless  (active-mode self)
-             (tell  (controls (view-window self)) 'deactivate-control)
-             (setf (active-mode self) t)
-             (with-pen-state  (:pattern *black-pattern*)
-               (fill-rect* 1 1 (- (w self) 2) 2))
-             (record--ae :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))) )
-             )))))
-
-(defmethod activate-control ((self C-patch))
-  (when (not (active-mode self)) 
+(defgeneric toggle-patch-active-mode (self)
+  (:method ((self C-patch))
     (with-focused-view self
-      (with-pen-state (:mode :patxor :pattern *black-pattern*)
-        (fill-rect* 1 1 (- (w self) 2) 2))
-      (setf (active-mode self) t))))
+      (cond ((shift-key-p) 
+             (setf (active-mode self) (not (active-mode self)))
+             (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
+                                           (,:|chif| ,t)) )
+             (with-pen-state (:mode :patxor :pattern *black-pattern*)
+               (fill-rect* 1 1 (- (w self) 2) 2)))
+            (t 
+             (unless  (active-mode self)
+               (tell  (controls (view-window self)) 'deactivate-control)
+               (setf (active-mode self) t)
+               (with-pen-state  (:pattern *black-pattern*)
+                 (fill-rect* 1 1 (- (w self) 2) 2))
+               (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))) )
+               ))))))
 
-(defmethod deactivate-control ((self C-patch))
-  (when (active-mode self) 
-    (with-focused-view self
-      (with-pen-state (:mode :patxor :pattern *black-pattern*)
-        (fill-rect* 1 1 (- (w self) 2) 2))
-      (setf (active-mode self) ()))))
+(defgeneric activate-control (self)
+  (:method ((self C-patch))
+    (when (not (active-mode self)) 
+      (with-focused-view self
+        (with-pen-state (:mode :patxor :pattern *black-pattern*)
+          (fill-rect* 1 1 (- (w self) 2) 2))
+        (setf (active-mode self) t)))))
 
-(defmethod flip-controls ((self C-patch) flag)
-  (for (i 0 1 (1- (length (pw-controls self)))) 
-    (when (eq (nth i (pw-controls self))(nth i (input-objects self)))
-      (set-open-state (nth i (pw-controls self)) flag))))
+(defgeneric deactivate-control (self)
+  (:method ((self C-patch))
+    (when (active-mode self) 
+      (with-focused-view self
+        (with-pen-state (:mode :patxor :pattern *black-pattern*)
+          (fill-rect* 1 1 (- (w self) 2) 2))
+        (setf (active-mode self) ())))))
+
+(defgeneric flip-controls (self flag)
+  (:method ((self C-patch) flag)
+    (for (i 0 1 (1- (length (pw-controls self)))) 
+      (when (eq (nth i (pw-controls self))(nth i (input-objects self)))
+        (set-open-state (nth i (pw-controls self)) flag)))))
 
 (defmethod patch-value ((self C-patch) obj)
   (let ((args (ask-all (input-objects self) 'patch-value obj)))
     (apply (pw-function self) args)))
 
-(defmethod active-mode+self ((self C-patch)) (when (active-mode self) self))
+(defgeneric active-mode+self (self)
+  (:method ((self C-patch)) (when (active-mode self) self)))
 
 (defmethod x+w ((self C-patch)) (+ (x self)(w self)))
 
-(defmethod delete-r-view ((view C-patch) where)
-  (declare (ignore where))
-  (set-view-container view nil))
+(defgeneric delete-r-view (view where)
+  (:method ((view C-patch) where)
+    (declare (ignore where))
+    (set-view-container view nil)))
 
 ;;______________
-(defmethod nth-connected-p ((self C-patch) nth-input)
-  (not (eq (nth nth-input (input-objects self))(nth nth-input (pw-controls self)))))
+(defgeneric nth-connected-p (self nth-input)
+  (:method ((self C-patch) nth-input)
+    (not (eq (nth nth-input (input-objects self))(nth nth-input (pw-controls self))))))
 
-(defgeneric play                (patch) (:method (patch) (declare (ignorable patch))))
-(defgeneric stop-play           (patch) (:method (patch) (declare (ignorable patch))))
-(defgeneric open-patch-win      (patch) (:method (patch) (declare (ignorable patch))))
 ;;;(defmethod mouse-released-control-after ((self C-patch) ctrl win))
-(defgeneric record              (patch) (:method (patch) (declare (ignorable patch))))
-(defgeneric update-win-pointers (patch window) (:method (patch window) (declare (ignorable patch window))))
+(defmethod  update-win-pointers (patch window)
+  (declare (ignorable patch window))
+  (values))
 
 (defmethod clock ((self C-patch)) (clock (clock-obj self)))
 
-(defgeneric browse (patch)) 
 ;; (defmethod browse ((self C-patch)) (print "no browse boxes"))
 
 (defmethod remove-yourself-control ((self C-patch)))
 (defmethod set-pw-window-pointers ((self C-patch) win)(declare (ignore win))) 
 (defmethod resize-patch? ((self C-patch)) nil) 
 
+(defgeneric patch-type-p (self))
 (defmethod patch-type-p ((self T)) nil) 
 (defmethod patch-type-p ((self simple-view)) nil) 
 (defmethod patch-type-p ((self C-patch)) t) 
@@ -746,6 +812,7 @@
 ;;so that clocked modules don't give an error on clicking
 (defmethod clock-obj ((self C-patch)) *global-clock*)
 
+(defgeneric are-you-handling-keys\? (self char))
 (defmethod are-you-handling-keys? ((self C-patch) char)
   (declare (ignore char)) nil)
 
@@ -767,11 +834,12 @@
 
 ;; ------------------------------ tutorial search scheme --------------------------------
 
-(defmethod get-tutorial-patch ((self C-patch))
-  (let ((fun (pw-function self)))
-    (if (symbolp fun)
-        (or (get-patch-file fun) (format t "no tutorial available for box: ~S ~%" fun))
-        (format t "no tutorial available for box: ~S ~%" (pw-function-string self)))))
+(defgeneric get-tutorial-patch (self)
+  (:method ((self C-patch))
+    (let ((fun (pw-function self)))
+      (if (symbolp fun)
+          (or (get-patch-file fun) (format t "no tutorial available for box: ~S ~%" fun))
+          (format t "no tutorial available for box: ~S ~%" (pw-function-string self))))))
 
 (defvar *tutorial-a-list* ())
 (defvar *tutorial-dirs* '("PW-HELP-DOC:**;"))
@@ -863,7 +931,7 @@ tutorial file only if the names differ"
                              (new-leafmenu win-string (lambda () (window-select win)))))
     (push win *pw-window-list*) 
     (update-wins-menu-items win)
-    (record--ae :|core| :|crel| `((,:|kocl| ,:|cpat| )))
+    (record-event :|core| :|crel| `((,:|kocl| ,:|cpat| )))
     win))
 
 
