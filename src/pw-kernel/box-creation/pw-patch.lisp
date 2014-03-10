@@ -300,21 +300,29 @@
   (if (eq self (call-next-method))
       (progn                                                  ;inside patch,no active controls
         (with-focused-view self
-          (cond ((double-click-p) (open-patch-win self))
-                ((and (control-key-p) (option-key-p)) (delete-extra-inputs self))
-                ((control-key-p) (setf *current-move-patch-box* self)(move-or-resize-view self where))
-                ((inside-rectangle?  (point-h where)(point-v where) 0 0 (w self) 5) 
-                 (setf *current-move-patch-box* self)(move-or-resize-view self where))
-                ((inside-rectangle?  (point-h where)(point-v where) (- (w self) 5) (- (h self) 5) 5 5) 
-                 (setf *current-move-patch-box* self)(move-or-resize-view self where t))
-                ((inside-rectangle?  (point-h where)(point-v where) 0 (- (h self) 12) 15 12) 
+          (cond ((double-click-p)
+                 (open-patch-win self))
+                ((and (control-key-p) (option-key-p))
+                 (delete-extra-inputs self))
+                ((control-key-p)
+                 (setf *current-move-patch-box* self)
+                 (move-or-resize-view self where))
+                ((inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5) ; top bar
+                 (setf *current-move-patch-box* self)
+                 (move-or-resize-view self where))
+                ((inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5) ; botright corner
+                 (setf *current-move-patch-box* self)
+                 (move-or-resize-view self where t))
+                ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom box
                  (cond ((option-key-p)  (print (list 'outputtype (type-list self)))) 
                        ((command-key-p) (print (list 'inputtypes (mapcar 'list 
                                                                          (ask-all (pw-controls self) 'doc-string)
                                                                          (ask-all (pw-controls self) 'type-list))))) 
                        (t (flip-controls self (setf (flip-flag self) (not (flip-flag self))))))) 
-                ((option-key-p) (mouse-pressed-no-active-extra self (point-h where) (point-v where)))
-                (t (toggle-patch-active-mode self)))))
+                ((option-key-p)
+                 (mouse-pressed-no-active-extra self (point-h where) (point-v where)))
+                (t
+                 (toggle-patch-active-mode self)))))
       (when (option-key-p)                                   ;inside controls
         (let ((ctrl (ask (pw-controls self) #'view-contains-point-p+self where)))
           (when ctrl 
