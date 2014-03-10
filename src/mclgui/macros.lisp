@@ -31,19 +31,45 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
 (in-package "MCLGUI")
 (objcl:enable-objcl-reader-macros)
+(declaim (declaration stepper))
+
+(defmacro unfrequently (frequency &body body)
+  (let ((vcount (gensym))
+        (vfrequency (gensym)))
+    `(let ((*print-case* :downcase)
+           (,vcount (load-time-value (list 0)))
+           (,vfrequency ,frequency))
+       (when (<= 1 (incf (car ,vcount) ,vfrequency))
+         (setf (car ,vcount) 0)
+         ,@body))))
+
 
 (defmacro niy (operator &rest parameters)
-  `(format *trace-output* "~&(~40A (~S~:{ (~S ~S)~}))~%"
-           "not implemented yet:"
-           ',operator (mapcar (lambda (var) (list var (type-of var)))
-                              (list ,@parameters))))
+  (let ((vonce (gensym)))
+   `(let ((*print-case* :downcase)
+          (,vonce (load-time-value (list t))))
+      (when (prog1 (car ,vonce) (setf (car ,vonce) nil))
+        (format *trace-output* "~&(~40A (~S~:{ (~S ~S)~}))~%"
+                "not implemented yet:"
+                ',operator (mapcar (lambda (var) (list var (type-of var)))
+                                   (list ,@parameters)))
+        (force-output *trace-output*)))))
+
 
 (defmacro uiwarn (control-string &rest args)
-  `(format *trace-output* "~&(~?)~%" ',control-string' (list ,@args)))
+  `(let ((*print-case* :downcase))
+     (format *trace-output* "~&(~?)~%" ',control-string (list ,@args))
+     (force-output *trace-output*)))
 
+
+(defun format-trace (method &rest arguments)
+  (declare (stepper disable))
+  (let ((*print-case* :downcase))
+    (format *trace-output* "~&(~40A ~{~S~^ ~})~%" method arguments)
+    (force-output *trace-output*)
+    (first arguments)))
 
 
 (define-modify-macro appendf (&rest args) 

@@ -122,11 +122,11 @@ RGB colors into Macintosh color-table entries, see Inside Macintosh.
 
 
 (defmethod wrap ((nscolor ns:ns-color))
-  (wrapping nscolor
-   (make-color [nscolor redComponent]
-               [nscolor greenComponent]
-               [nscolor blueComponent]
-               [nscolor alphaComponent])))
+  ;; (format-trace 'wrap nscolor)
+  (make-color [nscolor redComponent]
+              [nscolor greenComponent]
+              [nscolor blueComponent]
+              [nscolor alphaComponent]))
 
 (defmethod unwrap ((self color))
   (unwrapping self

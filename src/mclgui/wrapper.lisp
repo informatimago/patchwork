@@ -11,12 +11,13 @@
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
+;;;;    2014-03-10 <PJB> Corrected WRAPPING macro.
 ;;;;    2012-06-11 <PJB> Created.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
 ;;;;    
-;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
+;;;;    Copyright Pascal J. Bourguignon 2012 - 2014
 ;;;;    
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
@@ -158,7 +159,7 @@ RETURN:         The result of BODY if the WRAPPER has a handle, NIL
 ;;;------------------------------------------------------------
 
 (defgeneric structure (object element-function)
-  (:documentation "The object should call element-function on each of it's element."))
+  (:documentation "The object should call element-function on each of its elements."))
 
 (defgeneric wrap (object)
   (:documentation "
@@ -186,14 +187,13 @@ NOTE:           WRAPPING updates the instance from a NS object.
 "
   (let ((fbody (gensym)))
     `(let ((*wrapping* t))
-       (flet ((,fbody ()
-                (wrap-walk :root ,object)
-                ,@body))
+       (flet ((,fbody () ,@body))
          (declare (inline ,fbody))
          (if *circular-references*
-           (,fbody)
-           (with-circular-references ()
-             (,fbody)))))))
+             (,fbody)
+             (with-circular-references ()
+               (wrap-walk :root ,object)
+               (,fbody)))))))
 
 (defmethod wrap :around (object)
   (wrapping object
@@ -470,11 +470,10 @@ RETURN:         NEW-HANDLE.
 
 
 (defmethod wrap ((object ns:ns-number))
-  (let ((objctype (char-code
-                   (aref #+ccl (ccl:%get-cstring [object objCType])
-                         #-ccl (error "Decoding [object objCType] is not implemented in ~S"
-                                      (lisp-implementation-type))
-                         0))))
+  (let ((objctype (aref #+ccl (ccl:%get-cstring [object objCType])
+                        #-ccl (error "Decoding [object objCType] is not implemented in ~S"
+                                     (lisp-implementation-type))
+                        0)))
     (cond
       ((find objctype #.(vector +C-FLT+ +C-DBL+))
        [object doubleValue])
@@ -494,10 +493,9 @@ RETURN:         NEW-HANDLE.
     (funcall element i [nsarray objectAtIndex:i])))
 
 (defmethod wrap ((object ns:ns-array))
-  (wrapping object
-    (let ((result (make-array [object count])))
-      (dotimes (i [object count] result)
-        (setf (aref result i) (wrap (substitute-object [object objectAtIndex:i])))))))
+  (let ((result (make-array [object count])))
+    (dotimes (i [object count] result)
+      (setf (aref result i) (wrap (substitute-object [object objectAtIndex:i]))))))
 
 
 ;;------------------------------------------------------------
@@ -519,60 +517,18 @@ DO:             Keys that are NSString are converted to keywords,
                 lisp type if possible, or else left as foreign types.
 
 "
-  (wrapping object
-    (let ((result (make-hash-table)) ; !!!!
-          ;; Since we map all the Objective-C key object to a lisp object,
-          ;; it doesn't matter what test function is used in the lisp hash-table.
-          ;; Hash-table test functions cannot be customized on lisp
-          ;; object to match isEqual: on the wrapped nsobjects.
-          (keyword (load-time-value (find-package "KEYWORD"))))
-      (do-nsdictionary (key value object result)
-        (let ((lisp-key   (if [key isKindOfClass:(oclo:@class "NSString")]
+  (let ((result (make-hash-table)) ; !!!!
+        ;; Since we map all the Objective-C key object to a lisp object,
+        ;; it doesn't matter what test function is used in the lisp hash-table.
+        ;; Hash-table test functions cannot be customized on lisp
+        ;; object to match isEqual: on the wrapped nsobjects.
+        (keyword (load-time-value (find-package "KEYWORD"))))
+    (do-nsdictionary (key value object result)
+      (let ((lisp-key   (if [key isKindOfClass:(oclo:@class "NSString")]
                             (intern (objcl:lisp-string key) keyword)
                             (wrap (substitute-object key))))
-              (lisp-value (wrap (substitute-object value))))
-          (setf (gethash lisp-key result) lisp-value))))))
-
-
-;;------------------------------------------------------------
-;;------------------------------------------------------------
-
-;; (eql ccl:+null-ptr+ ccl:+null-ptr+) 
-;; (class-of )#<built-in-class ccl:macptr>
-
-
-(defun wrap-circularly (object)
-  (with-circular-references ()
-    (labels ((walk (key object)
-               (declare (ignore key))
-               (when (circular-register object)
-                 (structure object (function walk)))))
-      (walk :root object))
-    (wrap object)
-    ;; (com.informatimago.common-lisp.cesarum.utility:print-hashtable (car *circular-references*))
-    ))
-
-
-'(("NSArray"
-   (lambda (nsarray)
-       (when (circular-register nsarray)
-         (dotimes (i [nsarray count])
-           (walk [nsarray objectAtIndex:i]))))
-   (lambda (nsarray)
-       (let ((index (circular-reference nsarray)))
-         (if (and index (cdr index))
-           (wrap-reference (car index))
-           (progn
-             (if index
-               (wrap-referenced-object (car index) "NSArray"
-                                       (dotimes (i [nsarray count])
-                                         (wrap  [nsarray objectAtIndex:i])))
-               (wrap-unreferenced-object "NSArray"
-                                         (dotimes (i [nsarray count])
-                                           (wrap  [nsarray objectAtIndex:i]))))))))))
-
-
-
+            (lisp-value (wrap (substitute-object value))))
+        (setf (gethash lisp-key result) lisp-value)))))
 
 
 

@@ -2,6 +2,49 @@
 
 (objcl:set-objective-cl-syntax)
 
+;;------------------------------------------------------------
+
+;; (eql ccl:+null-ptr+ ccl:+null-ptr+) 
+;; (class-of )#<built-in-class ccl:macptr>
+
+#-(and)
+(defun wrap-circularly (object)
+  (with-circular-references ()
+    (labels ((walk (key object)
+               (declare (ignore key))
+               (when (circular-register object)
+                 (structure object (function walk)))))
+      (walk :root object))
+    (wrap object)
+    ;; (com.informatimago.common-lisp.cesarum.utility:print-hashtable (car *circular-references*))
+    ))
+
+
+
+#-(and)
+'(("NSArray"
+   (lambda (nsarray)
+       (when (circular-register nsarray)
+         (dotimes (i [nsarray count])
+           (walk [nsarray objectAtIndex:i]))))
+   (lambda (nsarray)
+       (let ((index (circular-reference nsarray)))
+         (if (and index (cdr index))
+           (wrap-reference (car index))
+           (progn
+             (if index
+               (wrap-referenced-object (car index) "NSArray"
+                                       (dotimes (i [nsarray count])
+                                         (wrap  [nsarray objectAtIndex:i])))
+               (wrap-unreferenced-object "NSArray"
+                                         (dotimes (i [nsarray count])
+                                           (wrap  [nsarray objectAtIndex:i]))))))))))
+
+
+;;------------------------------------------------------------
+
+
+
 #-(and)
 (progn
   [[NSApplication sharedApplication] mainMenu]

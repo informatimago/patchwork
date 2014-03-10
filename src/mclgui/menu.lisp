@@ -1146,28 +1146,28 @@ DO:             Add to the NSMenu of MENU a NSItem with the NSMenu of
   "
 RETURN:         A new instance of MENUITEM representing the NSMenuItem ITEM.
 "
-  (wrapping item
-    (let ((submenu [item submenu]))
-      (apply (function make-instance) (if (nullp submenu)
+;; (format-trace 'wrap item)
+  (let ((submenu [item submenu]))
+    (apply (function make-instance) (if (nullp submenu)
                                         'original-menu-item
                                         'original-menu)
-             :handle (if (nullp submenu)
+           :handle (if (nullp submenu)
                        item
                        submenu)
-             :menu-item-title (objcl:lisp-string [item title])
-             :enabledp [item isEnabled]
-             :checkedp (if (zerop [item state])
+           :menu-item-title (objcl:lisp-string [item title])
+           :enabledp [item isEnabled]
+           :checkedp (if (zerop [item state])
                          nil
                          *check-mark*)
-             (if (nullp submenu)
+           (if (nullp submenu)
                (list :command-key (let ((ke (objcl:lisp-string [item keyEquivalent])))
                                     (if (zerop (length ke))
-                                      nil
-                                      (let ((km (decode-key-mask [item keyEquivalentModifierMask])))
-                                        (if km
-                                          (list km (aref ke 0))
-                                          (aref ke 0))))))
-               (list :menu-items (%wrap-items submenu)))))))
+                                        nil
+                                        (let ((km (decode-key-mask [item keyEquivalentModifierMask])))
+                                          (if km
+                                              (list km (aref ke 0))
+                                              (aref ke 0))))))
+               (list :menu-items (%wrap-items submenu))))))
 
 
 (defmethod structure ((nsmenu ns:ns-menu) element)
@@ -1180,14 +1180,14 @@ RETURN:         A new instance of MENUITEM representing the NSMenuItem ITEM.
   "
 RETURN:         A new instance of MENU representing the NSMenu NSMENU.
 "
-  (wrapping nsmenu
-   (make-instance 'original-menu
-       :handle nsmenu
-       :menu-title (objcl:lisp-string [nsmenu title])
-       :enabledp t
-       :checkedp nil
-       :menu-items (%wrap-items nsmenu)
-       :menu-font (wrap [nsmenu font]))))
+  ;; (format-trace 'wrap nsmenu)
+  (make-instance 'original-menu
+                 :handle nsmenu
+                 :menu-title (objcl:lisp-string [nsmenu title])
+                 :enabledp t
+                 :checkedp nil
+                 :menu-items (%wrap-items nsmenu)
+                 :menu-font (wrap [nsmenu font])))
 
 
 

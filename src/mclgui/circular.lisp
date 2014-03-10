@@ -90,15 +90,18 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
                                   (princ ")" stream)))))))))
        (print-node node))))
   tree)
+(defun test/print-identified-conses/1 ()
+  (let ((result (substitute-if #\9 (function digit-char-p) ; reference numbers may be different.
+                               (with-output-to-string (stream)
+                                 (let ((*print-case* :upcase))
+                                   (print-identified-conses/1 '((a . #2=(b . (c . d))) #1=(c d . #2#) (e . #1#)) stream)))))
+        (expected "((A . #9=(B . (#9=C . #9=D))) . (#9=(#9# . (#9# . #9#)) . ((E . #9#) . ())))"))
+    (assert (string= result expected) ()
+            "expected = ~S~%  result = ~S~%" expected result))
+  :success)
 
-(let ((result (substitute-if #\9 (function digit-char-p) ; reference numbers may be different.
-                             (with-output-to-string (stream)
-                               (let ((*print-case* :upcase))
-                                 (print-identified-conses/1 '((a . #2=(b . (c . d))) #1=(c d . #2#) (e . #1#)) stream)))))
-      (expected "((A . #9=(B . (#9=C . #9=D))) . (#9=(#9# . (#9# . #9#)) . ((E . #9#) . ())))"))
-  (assert (string= result expected) ()
-          "expected = ~S~%  result = ~S~%" expected result))
 
+;;; --------------------------------------------------------------------
 
 (defvar *circular-references* nil)
 
@@ -111,6 +114,7 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
     (if count
       (= 1 (incf (gethash object (car *circular-references*) 0)))
       (progn
+        ;; (invoke-debugger (make-condition 'simple-error :format-control "circular-register: Re-registering."))
         (warn "BAD: re-registering ~S" object)
         nil))))
 
@@ -125,8 +129,7 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
                                nil))))
       (t       index))))
 
-
-
+;;; --------------------------------------------------------------------
 
 (defun print-identified-conses/2 (tree  &optional (stream *standard-output*))
   "
@@ -167,12 +170,16 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
       (print-node tree)))
   tree)
 
-(let ((result (with-output-to-string (stream)
-                (let ((*print-case* :upcase))
-                  (print-identified-conses/2 '((a . #2=(b . (c . d))) #1=(c d . #2#) (e . #1#)) stream))))
-      (expected "((A . #1=(B . (#2=C . #3=D))) . (#4=(#2# . (#3# . #1#)) . ((E . #4#) . ())))"))
-  (assert (string= result expected) ()
-          "expected = ~S~%  result = ~S~%" expected result))
+
+(defun test/print-identified-conses/2 ()
+  (let ((result (with-output-to-string (stream)
+                  (let ((*print-case* :upcase))
+                    (print-identified-conses/2 '((a . #2=(b . (c . d))) #1=(c d . #2#) (e . #1#)) stream))))
+        (expected "((A . #1=(B . (#2=C . #3=D))) . (#4=(#2# . (#3# . #1#)) . ((E . #4#) . ())))"))
+    (assert (string= result expected) ()
+            "expected = ~S~%  result = ~S~%" expected result))
+  :success)
+
 
 
 ;; (with-output-to-string (stream)
@@ -205,6 +212,9 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
 ;;     (archive-object-circularly object)))
 
 
+
+(test/print-identified-conses/1)
+(test/print-identified-conses/2)
 
 ;;;; THE END ;;;;
 

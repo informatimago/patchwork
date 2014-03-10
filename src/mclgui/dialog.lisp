@@ -101,6 +101,8 @@ recent outstanding catch-cancel.
           p))))
 
 
+
+
 (defun process-multi-clicks (event)
   (niy process-multi-clicks event))
 
@@ -134,7 +136,7 @@ recent outstanding catch-cancel.
                                  (when (process-eventhook item)
                                    (return t)))
                                (process-eventhook eventhook))))
-              (niy process-event)
+              (unfrequently 1/10 (niy process-event))
               ;; (return-from foo (catch-cancel (do-event)))
               ))))
       e-code)))
