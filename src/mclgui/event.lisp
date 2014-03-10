@@ -72,8 +72,7 @@ VIEW:           A simple view or view.
 The generic function VIEW-CLICK-EVENT-HANDLER is called by the
 event system when a mouse click occurs. The SIMPLE-VIEW method does
 nothing.  The view method calls VIEW-CONVERT-COORDINATES-AND-CLICK
-on the first subview for which POINT-IN-CLICK-REGION-P
-returns T.
+on the first subview for which POINT-IN-CLICK-REGION-P returns T.
 
 The VIEW-CLICK-EVENT-HANDLER function is not called when the user
 clicks the title bar, close box, zoom box, or size box of a
@@ -403,13 +402,14 @@ RETURN:         T if the mouse button is pressed and NIL
 
 
 (defun multi-click-count ()
-  (let ((nsevent [[NSApplication sharedApplication] currentEvent]))
-    (if (and nsevent
-             (find [nsevent type] '#.(list #$NSLeftMouseDown #$NSRightMouseDown #$NSOtherMouseDown)))
-        [nsevent clickCount]
-        (if (zerop [NSEvent pressedMouseButtons])
-            0
-            1))))
+  (format-trace 'multi-click-count
+   (let ((nsevent [[NSApplication sharedApplication] currentEvent]))
+     (if (and nsevent
+              (find [nsevent type] '#.(list #$NSLeftMouseDown #$NSRightMouseDown #$NSOtherMouseDown)))
+         [nsevent clickCount]
+         (if (zerop [NSEvent pressedMouseButtons])
+             0
+             1)))))
 
 
 (define-symbol-macro *multi-click-count* (multi-click-count))
@@ -582,6 +582,47 @@ RETURN:         If called during event processing, return true if
 (defmacro with-event-processing-enabled  (&body body)
   (niy with-event-processing-enabled)
   `(progn ,@body))
+
+
+
+
+
+'(
+  window-close-event-handler
+  window-grow-event-handler
+  window-select-event-handler
+  window-zoom-event-handler)
+
+
+#-(and)
+(defun dispatch-event (event)
+  (case (event-what event)
+    ((#.null-event)    (window-null-event-handler )
+     (view-mouse-moved-event-handler))
+    ((#.mouse-down)    (view-click-event-handler)
+     (view-double-click-event-handler))
+    ((#.mouse-up)      (view-mouse-up-event-handler )
+     (window-mouse-up-event-handler))
+    ((#.key-down
+      #.auto-key)      (view-key-event-handler ))
+    ((#.key-up))
+    ((#.update-evt)    (let ((window (event-message event)))
+                         (window-update-event-handler window)))
+    ((#.disk-evt))
+    ((#.activate-evt)  (let ((window (event-message event)))
+                         (if (logbitp active-flag (event-modifier event))
+                             (view-activate-event-handler window)
+                             (view-deactivate-event-handler window))))
+    ((#.network-evt))
+    ((#.driver-evt))
+    ((#.app1-evt))
+    ((#.app2-evt))
+    ((#.app3-evt))
+    ((#.app4-evt))
+    (otherwise)))
+
+
+
 
 (defun event-dispatch (&optional (idle *idle*))
   "

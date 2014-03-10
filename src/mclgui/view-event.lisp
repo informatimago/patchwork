@@ -41,9 +41,6 @@
 (defmethod view-deactivate-event-handler ((view simple-view))
   (values))
 
-
-(defgeneric view-double-click-event-handler (view where))
-
 (defmethod view-activate-event-handler ((view view))
   (dovector (v (view-subviews view))
     (view-activate-event-handler v))
@@ -56,6 +53,12 @@
 
 
 
+
+
+(defgeneric view-double-click-event-handler (view where)
+  (:method (view where)
+    (declare (ignore view where))
+    view))
 
 (defmethod view-click-event-handler ((view simple-view) where)
   (declare (ignore where))

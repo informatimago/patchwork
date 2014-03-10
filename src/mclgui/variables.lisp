@@ -309,6 +309,7 @@ processed.  This is bound by EVENT-DISPATCH and is valid only during
 event processing.
 ")
 
+;; (defvar *multi-click-count* 0) ; defined as a symbol-macro in event.lisp
 
 (defvar *eventhook* nil
   "
