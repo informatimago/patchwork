@@ -129,6 +129,17 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
                                nil))))
       (t       index))))
 
+(defmacro resolve-circular-reference (object substitution)
+  (let ((vindex (gensym))
+        (vsubstitution (gensym)))
+    `(let ((,vindex (circular-reference ,object)))
+       (if (and ,vindex (cdr ,vindex))
+           (cdr ,vindex)
+           (let ((,vsubstitution ,substitution))
+             (if ,vindex
+                 (setf (cdr ,vindex) ,vsubstitution)
+                 ,vsubstitution))))))
+
 ;;; --------------------------------------------------------------------
 
 (defun print-identified-conses/2 (tree  &optional (stream *standard-output*))

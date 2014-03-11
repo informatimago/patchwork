@@ -39,7 +39,7 @@
 ;; Fonts:
 
 (defvar *font-list* '()
-  "Contains a list of all the fonts installed in the
+  "Contains a list of the names of all the fonts installed in the
 current Macintosh Operating System, sorted alphabetically.")
 
 (defvar *default-font-spec* '("Monaco" 9 :plain))
@@ -309,7 +309,16 @@ processed.  This is bound by EVENT-DISPATCH and is valid only during
 event processing.
 ")
 
-;; (defvar *multi-click-count* 0) ; defined as a symbol-macro in event.lisp
+(defvar *multi-click-count* 0
+  "
+The *MULTI-CLICK-COUNT* variable is incremented during event
+processing if the current event is part of a series of multiple
+clicks. It is reset to 1 when there is a mouse click that is not part
+of a series.
+
+Determination of whether a click is part of a series is done as for
+DOUBLE-CLICK-P.
+")
 
 (defvar *eventhook* nil
   "

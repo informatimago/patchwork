@@ -751,7 +751,7 @@ RETURN: A NSRect containing the frame of the window.
           (let ((*current-event* (get-null-event))
                 (*multi-click-count* 0))
             (setf (event-what *current-event*) activate-evt
-                  (event-mocdifiers *current-event*)
+                  (event-modifiers *current-event*)
                   (logandc2 (event-modifiers *current-event*)
                             active-flag)
                   (event-message *current-event*) window)
@@ -826,7 +826,7 @@ RETURN: A NSRect containing the frame of the window.
   body:
   ;; (format-trace "-[MclguiView mouseDown:]" self (nsview-view self) theEvent)
   (when (nsview-view self)
-    (let ((*current-event*     (wrap theEvent))
+    (let ((*current-event* (wrap theEvent))
           (*multi-click-count* [theEvent clickCount]))
       (format-trace '|mouseDown:| *multi-click-count* *current-event*)
       (view-click-event-handler (nsview-view self) (event-where *current-event*))

@@ -171,12 +171,25 @@ STRING or NUMBER
 
 
 
-(defvar *wrapping* nil)
 
-(defun wrap-walk (key object)
+(defun recursive-circular-register (key object)
   (declare (ignore key))
   (when (circular-register object)
-    (structure object (function wrap-walk))))
+    (structure object (function recursive-circular-register))))
+
+(defvar *wrapping* nil)
+
+(defmethod wrap :around (object)
+  (let ((*wrapping* t))
+   (if *circular-references*
+       (call-next-method)
+       (with-circular-references ()
+         (recursive-circular-register :root object)
+         (call-next-method)))))
+
+(defun wrap-resolving-circular-references (object)
+  (resolve-circular-reference object (wrap object)))
+
 
 (defmacro wrapping (object &body body)
   "
@@ -192,12 +205,8 @@ NOTE:           WRAPPING updates the instance from a NS object.
          (if *circular-references*
              (,fbody)
              (with-circular-references ()
-               (wrap-walk :root ,object)
+               (recursive-circular-register :root ,object)
                (,fbody)))))))
-
-(defmethod wrap :around (object)
-  (wrapping object
-    (call-next-method)))
 
 
 (defmacro unwrapping (object &body body)
@@ -389,16 +398,15 @@ RETURN:         NEW-HANDLE.
           (referenced-object referenced) object)
     [referenced autorelease]))
 
-(defun substitute-object (object)
+(defun flatten-circular-reference (object)
   (let ((index (circular-reference object)))
     (if index
       (if (cdr index)
-        (make-reference :index (cdr index))
+        (make-reference :index (car index))
         (let ((referenced (make-referenced :index (car index) :object object)))
           (setf (cdr index) referenced)
           referenced))
       object)))
-
 
 
 
@@ -428,7 +436,7 @@ RETURN:         NEW-HANDLE.
 ;;------------------------------------------------------------
 
 (defmethod wrap ((object ns:ns-string))
-  ;; TODO: substitute-object for long strings.
+  ;; TODO: resolve-circular-reference for long strings.
   (objcl:lisp-string object))
 
 
@@ -495,7 +503,7 @@ RETURN:         NEW-HANDLE.
 (defmethod wrap ((object ns:ns-array))
   (let ((result (make-array [object count])))
     (dotimes (i [object count] result)
-      (setf (aref result i) (wrap (substitute-object [object objectAtIndex:i]))))))
+      (setf (aref result i) (wrap-resolving-circular-references [object objectAtIndex:i])))))
 
 
 ;;------------------------------------------------------------
@@ -526,8 +534,8 @@ DO:             Keys that are NSString are converted to keywords,
     (do-nsdictionary (key value object result)
       (let ((lisp-key   (if [key isKindOfClass:(oclo:@class "NSString")]
                             (intern (objcl:lisp-string key) keyword)
-                            (wrap (substitute-object key))))
-            (lisp-value (wrap (substitute-object value))))
+                            (wrap-resolving-circular-references key)))
+            (lisp-value (wrap-resolving-circular-references value)))
         (setf (gethash lisp-key result) lisp-value)))))
 
 

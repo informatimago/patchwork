@@ -146,6 +146,7 @@
                  (:file "pw-lib/midishare/midirecord" 
                         :depends-on ("packages"
                                      "pw-kernel/drivers+resources/midi"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-mn-pw-interface"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/types/pw-type-scheme"
@@ -325,6 +326,7 @@
                  
                  (:file "pw-kernel/boxes/multidim/multidim" 
                         :depends-on ("packages"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-mn-pw-interface"
                                      "pw-kernel/environment/reader-macros"
                                      "pw-kernel/types/pw-types"
                                      "pw-kernel/types/pw-type-scheme"
@@ -668,6 +670,7 @@
                  (:file "pw-music/boxes/edit/pw-mn-collector" 
                         :depends-on ("packages"
                                      "gf"
+                                     "pw-kernel/boxes/bpf/bpf-editors/bpf-mn-pw-interface"
                                      "pw-kernel/box-creation/application-box"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/types/pw-types"

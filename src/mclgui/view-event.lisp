@@ -57,7 +57,7 @@
 
 (defgeneric view-double-click-event-handler (view where)
   (:method (view where)
-    (declare (ignore view where))
+    (declare (ignore where))
     view))
 
 (defmethod view-click-event-handler ((view simple-view) where)

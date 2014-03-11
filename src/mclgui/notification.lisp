@@ -71,9 +71,9 @@ RETURN:         A new NOTIFICATION instance filled with data from the
                 NSNOTIFICATION.
 "
   (make-instance 'notification
-      :name (objcl:lisp-string [nsnotification name])
-      :nsobject [nsnotification object]
-      :user-info (wrap [nsnotification userInfo])))
+                 :name (objcl:lisp-string [nsnotification name])
+                 :nsobject (wrap-resolving-circular-references [nsnotification object])
+                 :user-info (wrap-resolving-circular-references [nsnotification userInfo])))
 
 
 

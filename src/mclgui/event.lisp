@@ -412,20 +412,6 @@ RETURN:         T if the mouse button is pressed and NIL
              1)))))
 
 
-(define-symbol-macro *multi-click-count* (multi-click-count))
-(setf (documentation '*multi-click-count* 'variable)
-      "
-The *MULTI-CLICK-COUNT* variable is incremented during event
-processing if the current event is part of a series of multiple
-clicks. It is reset to 1 when there is a mouse click that is not part
-of a series.
-
-Determination of whether a click is part of a series is done as for
-DOUBLE-CLICK-P.
-")
-
-
-
 (defun double-click-p ()
   "
 

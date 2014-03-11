@@ -80,30 +80,33 @@
       (:c-l (midiseq2cl (outseq self) delta)))))
 
 (defmethod play ((self C-patch-record))
-  (unless *pw-recording-midi*
-    (when (and  midi::*pw-refnum* midi::*player* )
-      (print "Recording...")
-      (setf *pw-recorder* (midi-player:open-player "PatchWorkRecorder"))
-      (setf *pw-recording-midi* nil)
-      (when (> *pw-recorder* 0)
-        (setf *pw-recording-midi* t)
-        (midi-player:recordplayer *pw-recorder* 1)
-        (midi-player:startplayer *pw-recorder*)))))
+  (niy play self)
+  ;; (unless *pw-recording-midi*
+  ;;   (when (and  midi::*pw-refnum* midi::*player* )
+  ;;     (print "Recording...")
+  ;;     (setf *pw-recorder* (midi-player:open-player "PatchWorkRecorder"))
+  ;;     (setf *pw-recording-midi* nil)
+  ;;     (when (> *pw-recorder* 0)
+  ;;       (setf *pw-recording-midi* t)
+  ;;       (midi-player:recordplayer *pw-recorder* 1)
+  ;;       (midi-player:startplayer *pw-recorder*))))
+  )
 
 
 ;; (midi-player:closeplayer midi::*player*)
 ;; (setf midi::*player* (midi-player:open-player "PatchWorkPlayer"))
 
 (defmethod stop-play ((self c-patch-record))
-  (when *pw-recording-midi*
-    (print "Recording Off...")
-    (midi-player:stopplayer *pw-recorder*)
-    (let (recording-seq )
-      (setf recording-seq (midi-player:getAllTrackplayer *pw-recorder*))
-      (when recording-seq
-        (setf *midi-tempo* 1000000)
-        (setf (outseq self) (mievents2midilist recording-seq 1000))))
-    (midi-player:closeplayer *pw-recorder*))
+  (niy stop-play self)
+  ;; (when *pw-recording-midi*
+  ;;   (print "Recording Off...")
+  ;;   (midi-player:stopplayer *pw-recorder*)
+  ;;   (let (recording-seq )
+  ;;     (setf recording-seq (midi-player:getAllTrackplayer *pw-recorder*))
+  ;;     (when recording-seq
+  ;;       (setf *midi-tempo* 1000000)
+  ;;       (setf (outseq self) (mievents2midilist recording-seq 1000))))
+  ;;   (midi-player:closeplayer *pw-recorder*))
   (setf *pw-recording-midi* nil))
       
 

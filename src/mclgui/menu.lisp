@@ -1129,18 +1129,16 @@ DO:             Add to the NSMenu of MENU a NSItem with the NSMenu of
 
 
 
-(defun %wrap-items (nsmenu)
-  (let ((items '()))
-    (dotimes (i [nsmenu numberOfItems] (nreverse items))
-      (push (wrap [nsmenu itemAtIndex:i]) items))))
-
-
 (defmethod structure ((nsmenuitem ns:ns-menu-item) element)
   (funcall element :title [nsmenuitem title])
   (let ((submenu [nsmenuitem submenu]))
     (unless (nullp submenu)
       (funcall element :submenu submenu))))
 
+(defun %wrap-items (nsmenu)
+  (let ((items '()))
+    (dotimes (i [nsmenu numberOfItems] (nreverse items))
+      (push (wrap-resolving-circular-references [nsmenu itemAtIndex:i]) items))))
 
 (defmethod wrap ((item ns:ns-menu-item))
   "
@@ -1187,7 +1185,7 @@ RETURN:         A new instance of MENU representing the NSMenu NSMENU.
                  :enabledp t
                  :checkedp nil
                  :menu-items (%wrap-items nsmenu)
-                 :menu-font (wrap [nsmenu font])))
+                 :menu-font (wrap-resolving-circular-references [nsmenu font])))
 
 
 
