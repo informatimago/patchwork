@@ -104,8 +104,8 @@ body is evaluated with VAR bound to that rectangle."
     (view-scroll-position view)))
 
 (defgeneric set-origin (view h &optional v)
-  (:method set-origin ((view simple-view) h &optional v)
-           (set-view-scroll-position view h v nil)))
+  (:method ((view simple-view) h &optional v)
+    (set-view-scroll-position view h v nil)))
 
 
 (defgeneric clip-region (view &optional save-region))

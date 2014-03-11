@@ -1041,6 +1041,9 @@ NOTE:           H and V are in VIEW's coordinates.
 
 RETURN:         (make-point h v)
 ")
+  (:method ((view simple-view) h &optional v scroll-visibly)
+    (declare (ignore scroll-visibly))
+    (make-point h v))
   (:method ((view view) h &optional v (scroll-visibly t))
     (let* ((pt         (make-point h v))
            ;; (container  (view-container view))
