@@ -38,6 +38,20 @@
 
 (defvar *default-directory* nil)
 
+(defun panel-directory (panel)
+  (pathname (concatenate 'string (objcl:lisp-string
+                                  #+(and ccl-1.6 (not ccl-1.7))
+                                  [panel directory]
+                                  #-(and ccl-1.6 (not ccl-1.7))
+                                  [[panel directoryURL] path]) "/")))
+
+(defun panel-path (panel)
+  (pathname (objcl:lisp-string
+             #+(and ccl-1.6 (not ccl-1.7))
+             [panel filename]
+             #-(and ccl-1.6 (not ccl-1.7))
+             [(objc:send panel "URL") path])))
+
 
 (defun choose-file-dialog (&key
                            (directory *default-directory*)
@@ -80,15 +94,19 @@ PROMPT:         A string, displayed as title of the choose file dialog.
     [panel setExtensionHidden:nil]
     [panel setTreatsFilePackagesAsDirectories:nil]
     [panel setAllowsOtherFileTypes:t]
-    [panel setShowsHiddenFiles:nil]
+    #-(and ccl-1.6 (not ccl-1.7)) [panel setShowsHiddenFiles:nil]
     (if file-types
         [panel setAllowedFileTypes:(list-to-nsarray (ensure-list file-types))]
         [panel setAllowedFileTypes:nil])
     ;; --
-    [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
-    [panel setNameFieldStringValue:(objcl:objcl-string "")]
+    #+(and ccl-1.6 (not ccl-1.7))
+    [panel setDirectory:(objcl:objcl-string (namestring directory))]
+    #-(and ccl-1.6 (not ccl-1.7)) 
+    (progn
+      [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
+      [panel setNameFieldStringValue:(objcl:objcl-string "")])
     (when (= [panel runModal] #$NSFileHandlingPanelOKButton)
-      (setf *default-directory* (pathname (concatenate 'string (objcl:lisp-string [[panel directoryURL] path]) "/")))
+      (setf *default-directory* (panel-directory panel))
       (let* ((urls  (objc:send panel "URLs"))
              (files '()))
         (dotimes (i [urls count])
@@ -131,14 +149,18 @@ PROMPT:         A string, displayed as title of the choose new file dialog.
     [panel setExtensionHidden:nil]
     [panel setTreatsFilePackagesAsDirectories:nil]
     [panel setAllowsOtherFileTypes:t]
-    [panel setShowsHiddenFiles:nil]
+    #-(and ccl-1.6 (not ccl-1.7)) [panel setShowsHiddenFiles:nil]
     [panel setAllowedFileTypes:nil]
     ;; --
-    [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
-    [panel setNameFieldStringValue:(objcl:objcl-string "")]
+    #+(and ccl-1.6 (not ccl-1.7))
+    [panel setDirectory:(objcl:objcl-string (namestring directory))]
+    #-(and ccl-1.6 (not ccl-1.7))
+    (progn
+      [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
+      [panel setNameFieldStringValue:(objcl:objcl-string "")])
     (when (= [panel runModal] #$NSFileHandlingPanelOKButton)
-      (setf *default-directory* (pathname (concatenate 'string (objcl:lisp-string [[panel directoryURL] path]) "/")))
-      (pathname (objcl:lisp-string [(objc:send panel "URL") path])))))
+      (setf *default-directory* (panel-directory panel))
+      (panel-path panel))))
 
 
 
@@ -172,13 +194,17 @@ PROMPT:         A string, displayed as title of the choose directory dialog.
     [panel setExtensionHidden:nil]
     [panel setTreatsFilePackagesAsDirectories:nil]
     [panel setAllowsOtherFileTypes:t]
-    [panel setShowsHiddenFiles:nil]
+    #-(and ccl-1.6 (not ccl-1.7)) [panel setShowsHiddenFiles:nil]
     [panel setAllowedFileTypes:nil]
     ;; --
-    [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
-    [panel setNameFieldStringValue:(objcl:objcl-string "")]
+    #+(and ccl-1.6 (not ccl-1.7))
+    [panel setDirectory:(objcl:objcl-string (namestring directory))]
+    #-(and ccl-1.6 (not ccl-1.7))
+    (progn
+      [panel setDirectoryURL:[NSURL fileURLWithPath:(objcl:objcl-string (namestring directory)) isDirectory:t]]
+      [panel setNameFieldStringValue:(objcl:objcl-string "")])
     (when (= [panel runModal] #$NSFileHandlingPanelOKButton)
-      (setf *default-directory* (pathname (concatenate 'string (objcl:lisp-string [[panel directoryURL] path]) "/")))
+      (setf *default-directory* (panel-directory panel))
       (let* ((urls  (objc:send panel "URLs"))
              (files '()))
         (dotimes (i [urls count])
