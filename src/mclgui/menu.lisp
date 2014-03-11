@@ -1170,6 +1170,7 @@ RETURN:         A new instance of MENUITEM representing the NSMenuItem ITEM.
 
 (defmethod structure ((nsmenu ns:ns-menu) element)
   (funcall element :title [nsmenu title])
+  #-(and ccl-1.6 (not ccl-1.7))
   (funcall element :font [nsmenu font])
   (dotimes (i [nsmenu numberOfItems])
     (funcall element i [nsmenu itemAtIndex:i])))
@@ -1185,7 +1186,11 @@ RETURN:         A new instance of MENU representing the NSMenu NSMENU.
                  :enabledp t
                  :checkedp nil
                  :menu-items (%wrap-items nsmenu)
-                 :menu-font (wrap-resolving-circular-references [nsmenu font])))
+                 :menu-font (wrap-resolving-circular-references
+                             #+(and ccl-1.6 (not ccl-1.7))
+                             [NSFont systemFontOfSize:(cgfloat 16.0d0)]
+                             #-(and ccl-1.6 (not ccl-1.7))
+                             [nsmenu font])))
 
 
 

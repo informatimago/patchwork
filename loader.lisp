@@ -45,6 +45,8 @@
 #-cl-user::no-cocoa (require :cocoa)
 
 
+#+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
+
 #||
 
 (progn (ql:quickload :swank) (eval (read-from-string
@@ -124,9 +126,10 @@
     translation-file))
 
 (defun install-patchwork (&key (force nil))
-  (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/"                            :force force)
+  (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/patchwork/"                            :force force)
   (generate-logical-pathname-translation-file "PW-USER"   #P"/home/pjb/works/patchwork/pw-user/"                    :force force)
   (generate-logical-pathname-translation-file "CLENI"     #P"/home/pjb/works/patchwork/patchwork/src/pw-lib/cleni/" :force force))
+;; (install-patchwork :force t)
 
 (load-logical-pathname-translations "PATCHWORK")
 (load-logical-pathname-translations "PW-USER")

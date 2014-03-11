@@ -397,6 +397,10 @@ RETURN:         T if the mouse button is pressed and NIL
                 otherwise. This function may be called at any time,
                 not only during event processing.
 "
+  #+(and ccl-1.6 (not ccl-1.7))
+  (loop :for button :below 2
+    :thereis (#_CGEventSourceButtonState #$kCGEventSourceStateCombinedSessionState button))
+  #-(and ccl-1.6 (not ccl-1.7))
   (not (zerop [NSEvent pressedMouseButtons])))
 
 
@@ -407,9 +411,9 @@ RETURN:         T if the mouse button is pressed and NIL
      (if (and nsevent
               (find [nsevent type] '#.(list #$NSLeftMouseDown #$NSRightMouseDown #$NSOtherMouseDown)))
          [nsevent clickCount]
-         (if (zerop [NSEvent pressedMouseButtons])
-             0
-             1)))))
+         (if (mouse-down-p)
+             1
+             0)))))
 
 
 (defun double-click-p ()
