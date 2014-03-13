@@ -85,14 +85,13 @@
   (:method ((self C-pw-outrect))
     (+ (y (view-container self)) (h (view-container self)) -2)))
 
-#|(defmethod view-click-event-handler ((self C-pw-outrect) where)
-(if (option-key-p)
-(progn (incf (clock *global-clock*))
-(eval-enqueue
-`(format t "PW->~S~%"
-(patch-value ',(view-container self) ',(view-container self)))))
-(drag-out-line self where)
-))|#
+;; (defmethod view-click-event-handler ((self C-pw-outrect) where)
+;;   (if (option-key-p)
+;;       (progn (incf (clock *global-clock*))
+;;              (eval-enqueue
+;;               `(format t "PW->~S~%"
+;;                        (patch-value ',(view-container self) ',(view-container self)))))
+;;       (drag-out-line self where)))
 
 (defvar *standard-click-eval* t)
 
@@ -114,16 +113,14 @@
                   `(format t "PW->~S~%"
                            (patch-value ',(view-container self) ',(view-container self))))
                                         ;aaa
-                 (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self))))))
-                 )
+                 (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))))))
           (drag-out-line self where))
       (if (option-key-p)
           (drag-out-line self where)
           (progn (incf (clock *global-clock*))
                  (eval-enqueue
                   `(format t "PW->~S~%"
-                           (patch-value ',(view-container self) ',(view-container self)))))
-          )))
+                           (patch-value ',(view-container self) ',(view-container self))))))))
 
 (defgeneric drag-out-line (view where)
   (:method ((view C-pw-outrect) where)
@@ -285,7 +282,6 @@
   (declare (ignore x y))
   nil)
 
-(defvar *current-move-patch-box* ())
 (defvar *draw-dragging-mode* ())
 
 (defun flip-draw-mode ()
@@ -297,39 +293,54 @@
     (setf *draw-dragging-mode* (not *draw-dragging-mode*))))
 
 (defmethod view-click-event-handler ((self C-patch) where)
-  (if (eq self (call-next-method))
-      (progn                                                  ;inside patch,no active controls
-        (with-focused-view self
-          (cond ((double-click-p)
-                 (open-patch-win self))
-                ((and (control-key-p) (option-key-p))
-                 (delete-extra-inputs self))
-                ((control-key-p)
-                 (setf *current-move-patch-box* self)
-                 (move-or-resize-view self where))
-                ((inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5) ; top bar
-                 (setf *current-move-patch-box* self)
-                 (move-or-resize-view self where))
-                ((inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5) ; botright corner
-                 (setf *current-move-patch-box* self)
-                 (move-or-resize-view self where t))
-                ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom box
-                 (cond ((option-key-p)  (print (list 'outputtype (type-list self)))) 
-                       ((command-key-p) (print (list 'inputtypes (mapcar 'list 
-                                                                         (ask-all (pw-controls self) 'doc-string)
-                                                                         (ask-all (pw-controls self) 'type-list))))) 
-                       (t (flip-controls self (setf (flip-flag self) (not (flip-flag self))))))) 
-                ((option-key-p)
-                 (mouse-pressed-no-active-extra self (point-h where) (point-v where)))
-                (t
-                 (toggle-patch-active-mode self)))))
-      (when (option-key-p)                                   ;inside controls
-        (let ((ctrl (ask (pw-controls self) #'view-contains-point-p+self where)))
-          (when ctrl 
-            (disconnect-ctrl self ctrl)
-            (record-event :|PWst| :|unco|
-                        `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string self)) 
-                                           :|indx| (+ (position ctrl (input-objects self)) 1)))))))))) 
+  (let ((res  (call-next-method)))
+    (format-trace 'view-click-event-handler (point-to-list where) (list (h self) (w self))
+                  :dbl (double-click-p)
+                  :c-o (and (control-key-p) (option-key-p))
+                  :c (control-key-p)
+                  :topbar (inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5)
+                  :botright (inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5)
+                  :botbox (inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12)
+                  :o (option-key-p)
+                  :methods (compute-applicable-methods (function view-click-event-handler) (list self where))
+                  :res res
+                  :self self)
+    (cond ((eq self res) ;inside patch,no active controls
+           (cond ((double-click-p)
+                  (open-patch-win self))
+                 ((and (control-key-p) (option-key-p))
+                  (delete-extra-inputs self))
+                 ((control-key-p)
+                  (change-position self where))
+                 ((inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5) ; top bar
+                  (format-trace 'view-click-event-handler "move top bar " (list (point-h where) (point-v where)) self)
+                  (change-position self where))
+                 ((inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5) ; botright corner
+                  (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
+                  (change-size self (subtract-points (view-size self) where)))
+                 ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom box
+                  (format-trace 'view-click-event-handler "bottom box" (list (point-h where) (point-v where)) self)
+                  (cond ((option-key-p)  (print (list 'outputtype (type-list self)))) 
+                        ((command-key-p) (print (list 'inputtypes (mapcar 'list 
+                                                                          (ask-all (pw-controls self) 'doc-string)
+                                                                          (ask-all (pw-controls self) 'type-list))))) 
+                        (t (flip-controls self (setf (flip-flag self) (not (flip-flag self))))))) 
+                 ((option-key-p)
+                  (format-trace 'view-click-event-handler "no active extra" (list (point-h where) (point-v where)) self)
+                  (mouse-pressed-no-active-extra self (point-h where) (point-v where)))
+                 (t
+                  (format-trace 'view-click-event-handler "toggle patch active" (list (point-h where) (point-v where)) self)
+                  (toggle-patch-active-mode self))))
+          ((option-key-p)                ;inside controls
+           (format-trace 'view-click-event-handler 'bad-call-next-method)
+           (let ((ctrl (ask (pw-controls self) #'view-contains-point-p+self where)))
+             (when ctrl 
+               (disconnect-ctrl self ctrl)
+               (record-event :|PWst| :|unco|
+                             `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string self)) 
+                                                :|indx| (+ (position ctrl (input-objects self)) 1))))))))
+          (t          (format-trace 'view-click-event-handler 'bad-call-next-method))))) 
+
 
 ;;======================================================
 ;;draw
@@ -604,95 +615,89 @@
           (psetf (aref modules 0) (aref modules index) 
                  (aref modules index) (aref modules 0))))))
 
-(defgeneric move-or-resize-view (view where &optional resize-fl)
-  (:method ((view C-patch) where &optional resize-fl)
-    (let* ((container (view-container view))
-           (prev-mp (view-mouse-position container))
-           (last-mp prev-mp)
-           (delta where)
-           (fix-pos prev-mp)
-           (current-pos (view-position view))
-           (w (view-window view))
-           (from-end (subtract-points (view-size view) where))
-           (change-size? (and (resize-patch? view) resize-fl))
-           (active-patches (active-patches w))
+(defgeneric view-frame-patch (self offset)
+  (:method ((self C-patch) offset)
+    (let ((position (add-points (view-position self) offset)))
+      (with-focused-view (view-window self)
+        (with-pen-state (:pattern *gray-pattern* :mode :patCopy)
+          (draw-rect* (point-h position) (point-v position) (w self) (h self)))))))
+
+(defgeneric change-position (view where)
+  ;; where = offset from the topleft
+  (:method ((view C-patch) where)
+    (let* ((container           (view-container view))
+           (orig-mp             (add-points (view-position view) where))
+           (prev-mp             orig-mp)
+           (window              (view-window view))
+           (active-patches      (active-patches window))
            (active-patches-rest (remove view active-patches :test 'eq))
-           (group-move? (and (member view active-patches :test 'eq)
-                             active-patches))
-           (moving-patches (or group-move? (list view)))
-           (the-rest (set-difference (controls w) moving-patches :test #'eq)))
-      (if change-size?
-          (change-your-size view w from-end where)
-          (progn
-            (connect/unconn moving-patches the-rest t)
-            (tell moving-patches 'view-frame-patch current-pos delta prev-mp prev-mp)
-            (loop
-              (event-dispatch)
-              (unless (mouse-down-p) (return))
-              (let ((mp (view-mouse-position container)))
-                (unless (eql mp last-mp)
-                  (setq last-mp mp)
-                  (tell moving-patches 'view-frame-patch current-pos delta prev-mp mp)
-                  (setq prev-mp mp)
-                  )))
-            (tell moving-patches 'view-frame-patch current-pos delta prev-mp prev-mp)
-            (unless (eql last-mp fix-pos)
-              (push-to-top view)
-              (set-view-position view (subtract-points prev-mp delta))
-              #-(and) ;; TODO
-              (record-event :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
-                                            (,:|insh| ,(cl-user::getDescRecPtr
-                                                        (cl-user::asAEDesc 
-                                                         (list (point-h (subtract-points prev-mp delta)) 
-                                                               (point-v (subtract-points prev-mp delta))))))))
-              (if group-move?
-                  (let ((dif-h (- (point-h prev-mp) (point-h fix-pos)))
-                        (dif-v (- (point-v prev-mp) (point-v fix-pos)))
-                        (max-h (- *screen-width* 10 
-                                  (point-h (view-position container))))
-                        (max-v (- *screen-height* 10 
-                                  (point-v (view-position container)))))
-                    (dolist (patch active-patches-rest)
-                      (dmove-patch patch 
-                                   (min dif-h (- max-h
-                                                 (point-h (view-position patch))))
-                                   (min dif-v (- max-v 
-                                                 (point-v (view-position patch))))))))
-              (if (shift-key-p) (push-modules-to-back moving-patches))
-              )
-            (connect/unconn moving-patches the-rest)
-            (setf *current-move-patch-box* nil)
-            )))))
+           (group-move?         (and (member view active-patches :test 'eq)
+                                     active-patches))
+           (moving-patches      (or group-move? (list view)))
+           (the-rest            (set-difference (controls window) moving-patches :test #'eq)))
+      (connect/unconn moving-patches the-rest t)
+      (unwind-protect
+           (progn
+             (with-instance-drawing container
+               (tell moving-patches 'view-frame-patch (subtract-points prev-mp orig-mp))
+               (loop
+                 (event-dispatch)
+                 (unless (mouse-down-p) (return))
+                 (let ((mp (view-mouse-position container)))
+                   (unless (eql prev-mp mp)
+                     (new-instance container)
+                     (tell moving-patches 'view-frame-patch (subtract-points prev-mp orig-mp))
+                     (setq prev-mp mp))))
+               (new-instance container))
+             (unless (eql prev-mp orig-mp)
+               (push-to-top view)
+               (let ((new-position  (add-points (view-position view)
+                                                (subtract-points prev-mp orig-mp))))
+                 (set-view-position view new-position)
+                 #-(and) ;; TODO
+                 (record-event :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string view)))
+                                                 (,:|insh| ,(cl-user::getDescRecPtr
+                                                             (cl-user::asAEDesc
+                                                              (point-to-list new-position)))))))
+               (when group-move? 
+                 (let ((dif-h (- (point-h prev-mp) (point-h orig-mp)))
+                       (dif-v (- (point-v prev-mp) (point-v orig-mp)))
+                       (max-h (- *screen-width* 10 
+                                 (point-h (view-position container))))
+                       (max-v (- *screen-height* 10 
+                                 (point-v (view-position container)))))
+                   (dolist (patch active-patches-rest)
+                     (dmove-patch patch 
+                                  (min dif-h (- max-h
+                                                (point-h (view-position patch))))
+                                  (min dif-v (- max-v 
+                                                (point-v (view-position patch))))))))
+               (when (shift-key-p)
+                 (push-modules-to-back moving-patches))))
+        (connect/unconn moving-patches the-rest)))))
 
-(defgeneric view-frame-patch (self current-pos delta prev next)
-  (:method ((self C-patch) current-pos delta prev next)
-    (with-pen-state (:pattern *gray-pattern* :mode :patXor)
-      (with-focused-view (view-container self)
-        (let ((diff-prev (add-points (subtract-points (view-position self) current-pos)
-                                     (subtract-points prev delta)))
-              (diff-next (add-points (subtract-points (view-position self) current-pos)
-                                     (subtract-points next delta))))
-          (draw-rect* (point-h diff-prev) (point-v diff-prev) (w self) (h self))
-          (unless (= prev next)
-            (draw-rect* (point-h diff-next) (point-v diff-next) (w self) (h self))))))))
-
-(defgeneric change-your-size (view win delta last-mp)
-  (:method ((view C-patch) win delta last-mp)
-    (let ((the-rest (remove view (controls win) :test #'eq)))
-      (connect/unconn (list view) the-rest t)
-      (let ((posn (view-position view)))
-        (view-frame-patch view posn 0 posn posn)
-        (loop
-          (unless (mouse-down-p) (return))
-          (let ((mp (view-mouse-position view)))
-            (unless (eql mp last-mp)
-              (view-frame-patch view posn 0 posn posn)
-              (setq last-mp mp)        
-              (resize-patch-box view mp delta)
-              (view-frame-patch view posn 0 posn posn)
-              )))
-        (connect/unconn (list view) the-rest)
-        (setf *current-move-patch-box* nil)
+(defgeneric change-size (view where)
+  ;; where = offset from the botright.
+  (:method ((view C-patch) where)
+    (when (resize-patch? view)
+      (let ((the-rest (remove view (controls (view-window view)) :test #'eq)))
+        (connect/unconn (list view) the-rest t)
+        (unwind-protect
+             (let* ((container (view-container view))
+                    (last-mp   (add-points (view-position view) where))
+                    (delta     (subtract-points 0 last-mp)))
+               (with-instance-drawing container
+                 (view-frame-patch view 0)
+                 (loop
+                   (unless (mouse-down-p) (return))
+                   (let ((mp (view-mouse-position view)))
+                     (unless (eql mp last-mp)
+                       (setq last-mp mp)        
+                       (resize-patch-box view mp delta)
+                       (new-instance container)
+                       (view-frame-patch view 0))))
+                 (new-instance container)))
+          (connect/unconn (list view) the-rest))
         (view-draw-contents view)))))
 
 (defmethod resize-patch-box ((self C-patch) mp delta)
@@ -740,39 +745,36 @@
       (when (eq (nth i (input-objects self)) old-patch)
         (setf (nth i (input-objects self)) new-patch)))))
 
-(defgeneric toggle-patch-active-mode (self)
+(defgeneric draw-active-mode (self)
   (:method ((self C-patch))
     (with-focused-view self
-      (cond ((shift-key-p) 
+      (with-pen-state (:mode :patcopy :pattern (if (active-mode self) *black-pattern* *white-pattern*))
+        (fill-rect* 1 1 (- (w self) 2) 2)))))
+
+(defgeneric toggle-patch-active-mode (self)
+  (:method ((self C-patch))
+    (cond ((shift-key-p)
              (setf (active-mode self) (not (active-mode self)))
              (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
-                                           (,:|chif| ,t)) )
-             (with-pen-state (:mode :patxor :pattern *black-pattern*)
-               (fill-rect* 1 1 (- (w self) 2) 2)))
-            (t 
-             (unless  (active-mode self)
-               (tell  (controls (view-window self)) 'deactivate-control)
-               (setf (active-mode self) t)
-               (with-pen-state  (:pattern *black-pattern*)
-                 (fill-rect* 1 1 (- (w self) 2) 2))
-               (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))) )
-               ))))))
+                                             (,:|chif| ,t))))
+            ((active-mode self))
+            (t
+             (tell (controls (view-window self)) 'deactivate-control)
+             (setf (active-mode self) t)
+             (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
+    (draw-active-mode self)))
 
 (defgeneric activate-control (self)
   (:method ((self C-patch))
-    (when (not (active-mode self)) 
-      (with-focused-view self
-        (with-pen-state (:mode :patxor :pattern *black-pattern*)
-          (fill-rect* 1 1 (- (w self) 2) 2))
-        (setf (active-mode self) t)))))
+    (unless (active-mode self)
+      (setf (active-mode self) t)
+      (draw-active-mode self))))
 
 (defgeneric deactivate-control (self)
   (:method ((self C-patch))
-    (when (active-mode self) 
-      (with-focused-view self
-        (with-pen-state (:mode :patxor :pattern *black-pattern*)
-          (fill-rect* 1 1 (- (w self) 2) 2))
-        (setf (active-mode self) ())))))
+    (when (active-mode self)
+      (setf (active-mode self) nil)
+      (draw-active-mode self))))
 
 (defgeneric flip-controls (self flag)
   (:method ((self C-patch) flag)
@@ -820,7 +822,7 @@
 ;;so that clocked modules don't give an error on clicking
 (defmethod clock-obj ((self C-patch)) *global-clock*)
 
-(defgeneric are-you-handling-keys\? (self char))
+(defgeneric are-you-handling-keys? (self char))
 (defmethod are-you-handling-keys? ((self C-patch) char)
   (declare (ignore char)) nil)
 

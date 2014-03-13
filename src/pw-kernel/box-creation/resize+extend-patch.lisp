@@ -48,14 +48,17 @@
 
 (defgeneric resize-patch-box (self mp delta))
 (defmethod resize-patch-box ((self C-pw-resize-x) mp delta)
-  (let ((point-now (make-point (point-h (add-points mp delta)) (h self)))
+  (let ((point-now (make-point (point-h (add-points mp delta)) ; horizontal
+                               (h self))) ; height
         (min-w 46))
     (when (< min-w (point-h point-now)) 
       (set-view-size self point-now)
       (set-view-size (car (pw-controls self)) 
-                     (make-point (- (point-h point-now) 10)(h (car (pw-controls self))))) 
+                     (make-point (- (point-h point-now) 10)
+                                 (h (car (pw-controls self))))) 
       (set-view-position (out-put self) 
-                         (make-point (- (round (w self) 2) 6) (- (h self) 5))))))
+                         (make-point (- (round (w self) 2) 6)
+                                     (- (h self) 5))))))
 
 ;;Added 920412
 (defmethod resize-patch-box :after ((self C-pw-resize-x) mp delta)

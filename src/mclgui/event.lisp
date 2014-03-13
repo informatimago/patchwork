@@ -94,7 +94,8 @@ WHERE:          For a view, the mouse click position (the position when
                 container.
 ")
   (:method (view where)
-    (declare (ignore view where))
+    ;; (declare (ignore view where))
+    (format-trace 'view-click-event-handler 't view (point-to-list where))
     nil))
 
 
@@ -371,21 +372,20 @@ VIEW:           A simple view.
     (nspoint-to-point (get-nspoint [NSEvent mouseLocation])))
   (:method ((view simple-view))
     (if (handle view)
-      ;; We don't use the *current-event* since it may not be an event
-      ;; relative to (view-window view).
-      (let* ((winpt  (with-handle (winh (view-window view))
-                       #-(and)    ; only for 10.6+
-                       (get-nsrect [winh convertRectFromScreen:(ns:make-ns-rect (nspoint-x pt) (nspoint-y pt) 1 1)])
-                       ;; deprecated, but 10.6+ doesn't work on ccl-1.8.
-                       (get-nspoint [winh convertScreenToBase:[NSEvent mouseLocation]]))))
-        ;; (print winpt)
-        (with-view-handle (viewh view)
-          (nspoint-to-point (get-nspoint [viewh convertPoint:(unwrap winpt)
-                                                fromView:*null*]))))
-
-      ;; The following is not very meaningful, but then why a view
-      ;; without a handle would need a view-mouse-position?
-      (call-next-method))))
+        ;; We don't use the *current-event* since it may not be an event
+        ;; relative to (view-window view).
+        (nspoint-to-point
+         (with-handle (winh (first (windows)))
+           #-(and)                     ; only for 10.6+
+           (get-nsrect [winh convertRectFromScreen:(ns:make-ns-rect (nspoint-x pt) (nspoint-y pt) 1 1)])
+           ;; deprecated, but 10.6+ doesn't work on ccl-1.8.
+           (with-view-handle (viewh (first(windows)))
+             (get-nspoint
+              [viewh convertPoint:[winh convertScreenToBase:[NSEvent mouseLocation]]
+                     fromView:*null*]))))
+        ;; The following is not very meaningful, but then why a view
+        ;; without a handle would need a view-mouse-position?
+        (call-next-method))))
 
 ;; (point-to-list (view-mouse-position nil))
 ;; (view-convert-coordinates-and-click subview where view)

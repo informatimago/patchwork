@@ -49,6 +49,7 @@
 (defun initialize ()
   "Initialize the MCL GUI."
   (unless *initialized*
+    (initialize/application)
     (initialize/screen)
     (initialize/region)
     (initialize/color)
@@ -64,7 +65,6 @@
     (initialize/file)
     (initialize/event)
     (initialize/eval)
-    (initialize/application)
     #+has-appleevent (initialize/apple-event)
     (setf *initialized* t))
   (values))

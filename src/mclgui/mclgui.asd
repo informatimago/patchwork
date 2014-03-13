@@ -39,6 +39,7 @@
     :version "1.0.3"
     :license "GPL3"
     :depends-on ("closer-mop" ; window.lisp uses closer-mop:class-precedence-list, etc.
+                 "bordeaux-threads"
                  "cffi" 
                  "trivial-gray-streams"
                  "alexandria"
@@ -49,6 +50,9 @@
     :components ((:file "package")
 
                  (:file "macros"
+                        :depends-on ("package"))
+
+                 (:file "process"
                         :depends-on ("package"))
 
                  (:file "variables"
@@ -109,7 +113,7 @@
                                      "wrapper"))
 
                  (:file "view"
-                        :depends-on ("package" 
+                        :depends-on ("package" "process"
                                      "macros" "variables" "color"
                                      "point" "region" "font" "pen" 
                                      "wrapper" "view-classes" "objc-classes"))
@@ -120,7 +124,7 @@
                                      "view-classes" "view" "graphics"))
 
                  (:file "window"
-                        :depends-on ("package" 
+                        :depends-on ("package" "process"
                                      "macros" "variables" "color"
                                      "point" "region" "font"
                                      "view-classes" "objc-classes"
@@ -305,7 +309,7 @@
                                      "event" "key-handler-mixin"))
 
                  (:file "window-event"
-                        :depends-on ("package" 
+                        :depends-on ("package" "process"
                                      "macros" "variables" "point" "system" "view-classes" "window"
                                      "view-event" "event" "application"))
 
@@ -326,7 +330,7 @@
                  ;; Chapter 11: Apple Events
 
                  (:file "application"
-                        :depends-on ("package" 
+                        :depends-on ("package" "process"
                                      "macros" "variables" "wrapper"
                                      "objc-classes"))
                  

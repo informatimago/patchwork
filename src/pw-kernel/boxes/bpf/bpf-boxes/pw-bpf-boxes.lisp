@@ -241,8 +241,7 @@
                          (make-point (- (w self) 8) (- (h self) 14)))
       (set-view-position (lock self) (add-points (view-position (out-put self)) #@(20 -6)))
       (let ((*no-line-segments* (display-only-points self)))
-        (update-mini-view (give-mini-bpf self)))
-      )))
+        (update-mini-view (give-mini-bpf self))))))
 
 (defmethod view-draw-contents ((self C-patch-function))
   (let ((*no-line-segments* (display-only-points self)))

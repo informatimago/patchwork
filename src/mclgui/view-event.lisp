@@ -61,18 +61,20 @@
     view))
 
 (defmethod view-click-event-handler ((view simple-view) where)
-  (declare (ignore where))
+  ;; (declare (ignore where))
+  (format-trace 'view-click-event-handler 'simple-view view (point-to-list where))
   view)
 
 (defmethod view-click-event-handler ((view view) where)
-  (loop
-    :for subview :across (reverse (view-subviews view))
-    :when (point-in-click-region-p subview where)
-    :do (progn
-          (view-convert-coordinates-and-click subview where view)
-          (return t))
-    :finally (return (call-next-method))))
-
+  (format-trace 'view-click-event-handler 'view view (point-to-list where))
+  (let ((subview (find-if (lambda (subview)
+                            (point-in-click-region-p subview where))
+                          (view-subviews view)
+                          :from-end t)))
+    (format-trace 'view-click-event-handler 'view view (point-to-list where) :subview subview)
+    (if subview
+        (view-convert-coordinates-and-click subview where view)
+        (call-next-method))))
 
 
 (defmethod view-key-event-handler ((view simple-view) key)

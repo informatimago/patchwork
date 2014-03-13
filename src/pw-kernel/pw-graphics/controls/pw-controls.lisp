@@ -431,7 +431,6 @@
              (first-v (point-v (view-mouse-position win)))
              (last-mp (view-mouse-position win))
              (last-value (value self)))
-      ;;;(pfloop                                 ;!!
         (loop
           (event-dispatch)
           (unless (mouse-down-p) (return))

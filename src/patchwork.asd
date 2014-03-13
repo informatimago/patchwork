@@ -93,6 +93,7 @@
                  #-(and)
                  (:file "pw-lib/pwscript/recordables" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-lib/pwscript/record"
                                      "pw-kernel/box-creation/application-box"
                                      "pw-kernel/abstraction+config/abstraction-m"
@@ -261,10 +262,12 @@
                  
                  (:file "pw-kernel/types/pw-box-to-menu" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/types/pw-type-scheme"))
                  
                  (:file "pw-kernel/types/pw-type-scheme" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/environment/reader-macros"
                                      "pw-kernel/pw-graphics/controls/pw-controls"))
 
@@ -287,6 +290,7 @@
 
                  (:file "pw-kernel/boxes/data/file-buffer" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -359,6 +363,7 @@
                  
                  (:file "pw-kernel/boxes/bpf/bpf-boxes/multi-bpf" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/box-creation/application-box"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-menu+library"
@@ -462,6 +467,7 @@
                  
                  (:file "pw-kernel/box-creation/patch+popupbox" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
@@ -480,7 +486,8 @@
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
                  (:file "pw-kernel/box-creation/resize+extend-patch" 
-                        :depends-on ("packages"))
+                        :depends-on ("packages"
+                                     "pw-kernel/box-creation/application-box"))
 
                  
                  (:file "pw-kernel/pw-graphics/controls/mouse-window" 
@@ -501,7 +508,8 @@
                                      "pw-kernel/environment/reader-macros"))
                  
                  (:file "pw-kernel/pw-graphics/window+menu/application-window" 
-                        :depends-on ("packages"))
+                        :depends-on ("packages"
+                                     "pw-kernel/pw-graphics/controls/pw-controls"))
                  
                  (:file "pw-kernel/pw-graphics/window+menu/pw-hardcopy" 
                         :depends-on ("packages"))
@@ -540,6 +548,7 @@
                  
                  (:file "pw-kernel/abstraction+config/abstraction" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/box-creation/pw-patch"
                                      "pw-kernel/pw-graphics/window+menu/pw-window"))
@@ -556,6 +565,7 @@
                  
                  (:file "pw-kernel/abstraction+config/pw-library-config" 
                         :depends-on ("packages"
+                                     "pw-kernel/abstraction+config/abstraction-m"
                                      "pw-lib/pwscript/record"))
 
 
@@ -613,7 +623,8 @@
                                      "pw-music/editors/mn/mn-note-chord-chordline"))
                  
                  (:file "pw-music/boxes/extern+multidim/structured-time2" 
-                        :depends-on ("packages"))
+                        :depends-on ("packages"
+                                     "pw-music/boxes/extern+multidim/structured-time"))
 
                  
                  (:file "pw-music/boxes/edit/ascii-chord-box-pw" 
@@ -654,6 +665,7 @@
                  
                  (:file "pw-music/boxes/edit/mn-editor-polif" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/box-creation/application-box"))
                  
                  (:file "pw-music/boxes/edit/pw-chord-box" 
@@ -704,6 +716,7 @@
                  
                  (:file "pw-music/boxes/edit/rtm-patch" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-kernel/box-creation/application-box"
                                      "pw-kernel/types/pw-type-scheme"
                                      "pw-kernel/types/pw-box-to-menu"
@@ -722,6 +735,7 @@
                  
                  (:file "pw-music/editors/rhythm/beat-measure-measure-line" 
                         :depends-on ("packages"
+                                     "pw-kernel/box-creation/application-box"
                                      "pw-music/editors/mn/mn-chord-ed"
                                      "pw-music/editors/mn/mn-collector-panel"
                                      "pw-music/editors/mn/mn-editor"
@@ -736,6 +750,7 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-cleni-interface" 
                         :depends-on ("packages"
+                                     "pw-music/menu/rtm-menu"
                                      "pw-lib/cleni/cleni"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
@@ -743,6 +758,7 @@
                  (:file "pw-music/editors/rhythm/rtm-dialog-win" 
                         :depends-on ("packages"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
+                                     "pw-music/menu/rtm-menu"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"
                                      "pw-music/editors/rhythm/rtm-window"))
@@ -763,6 +779,8 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-paging+kill" 
                         :depends-on ("packages"
+                                     "gf"
+                                     "pw-music/menu/rtm-menu"
                                      "pw-music/editors/rhythm/global-vars"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -801,6 +819,7 @@
                         :depends-on ("packages"
                                      "gf"
                                      "pw-music/menu/mn-menu"
+                                     "pw-kernel/box-creation/application-box"
                                      "pw-music/editors/mn/mn-window"
                                      "pw-music/editors/mn/mn-editor"
                                      "pw-music/editors/mn/mn-chord-ed"
@@ -812,6 +831,7 @@
                         :depends-on ("packages"
                                      "gf"
                                      ;; "pw-kernel/environment/reader-macros"
+                                     "pw-kernel/pw-graphics/controls/popupmenu"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
@@ -844,6 +864,7 @@
 
                  (:file "pw-music/editors/mn/mn-window" 
                         :depends-on ("packages"
+                                     "gf"
                                      "pw-music/editors/mn/mn-help-window"
                                      "pw-kernel/pw-graphics/controls/mouse-window"
                                      "pw-kernel/pw-graphics/window+menu/application-window"))
