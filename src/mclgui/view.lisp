@@ -1490,6 +1490,56 @@ RETURN:         The cursor shape to display when the mouse is at
                      (#_UnionRgn rgn erase-rgn erase-rgn))))))))))))
 
 
+
+
+
+
+
+
+
+(defun focused-screenshot (view)
+  (with-view-handle (viewh view)
+    (let ((image [[[NSImage alloc] initWithSize:(unwrap (size-to-nssize (view-size view)))] autorelease])
+          bitmap)
+      [viewh lockFocus]
+      (unwind-protect
+           (setf bitmap [[[NSBitmapImageRep alloc] initWithFocusedViewRect:[viewh bounds]] autorelease])
+        [viewh unlockFocus])
+      [image addRepresentation:bitmap]
+      image)))
+
+(defun new-instance (view)
+  (when (view-instance view)
+    (with-focused-view view
+      (with-view-handle (viewh view)
+        [(first (view-instance view))
+         drawInRect:[viewh bounds]
+         fromRect:(unwrap (make-nsrect :x 0 :y 0 :size (view-size view)))
+         operation:#$NSCompositeCopy
+         fraction:(cgfloat 1.0)
+         respectFlipped:yes
+         hints: *null*]))))
+
+(defmacro with-instance-drawing (view &body body)
+  (let ((vview (gensym)))
+    `(let ((,vview ,view))
+       (push (focused-screenshot ,vview) (view-instance ,vview))
+       (unwind-protect (progn ,@body)
+         (pop (view-instance ,vview))))))
+
+
+(defun example/instance-drawing ()
+  (let ((view (first (windows))))
+    (with-instance-drawing view
+      (loop for i from 0 to 200 by 10 do
+        (sleep 0.1)
+        (new-instance view)
+        (with-focused-view view
+          (draw-line 0 i 100 200)))
+      (new-instance view))))
+
+;; (example/instance-drawing)
+
 (defun initialize/view ()
   (niy initialize/view))
 

@@ -48,6 +48,10 @@
                           "DEFMETHOD" "DEFGENERIC")
   (:import-from "COM.INFORMATIMAGO.OCLO"  "*NULL*" "NULLP")
   (:import-from "COM.INFORMATIMAGO.OBJCL" "YES" "NO")
+
+  (:export ; debugging
+   "NIY" "UIWARN" "FORMAT-TRACE")
+
   (:export
 
    ;; Extensions:
@@ -494,10 +498,12 @@
    "FIXNUMP"
    
    "WPTR"         ; this one won't be implemented, change the sources!
-   "NIY"
-   "UIWARN"
    )
 
+  (:export
+   ;; Instance drawing, to replace srcXor 
+   "WITH-INSTANCE-DRAWING" "NEW-INSTANCE")
+  
   (:export
    ;; FRED editor
    ;; FRED-Window will be replaced by hemlock-frame and hemlock-listener-frame.
