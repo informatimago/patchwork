@@ -228,8 +228,11 @@
 |#
 
 (defparameter *application*
-  (make-instance (lds 'lisp-development-system
-                      'app-loader-class)))
+  #+ccl (or ccl:*application*
+            (make-instance (lds 'lisp-development-system
+                                'app-loader-class)))
+  #-ccl (make-instance (lds 'lisp-development-system
+                            'app-loader-class)))
 
 (defun current-app-name ()
   (%get-string  (#_LMGetCurApName)))  ;; trap ain't defined - BUT IT IS
