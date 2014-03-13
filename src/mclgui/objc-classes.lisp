@@ -435,7 +435,7 @@ RETURN:         DST.
                   (if (nullp winh)
                       ;; If the event has no window, let's leave it in
                       ;; screen coordinates (not quite useful yet,
-                      ;; since screen coordinates are not flipped).
+                      ;; since screen coordinates are not flipped). TODO
                       (nspoint-to-point (get-nspoint [nsevent locationInWindow]))
                       ;; If the event has a window, convert the
                       ;; coordinates to contentView coordinate system.
@@ -772,8 +772,7 @@ RETURN: A NSRect containing the frame of the window.
                    (aref chars 0)))))
     ;; (format-trace "-[MclguiWindow keyDown:]" window key)
     (when (and window key)
-      (let ((*current-event* (wrap event))
-            (*multi-click-count* [event clickCount]))
+      (let ((*current-event* (wrap event)))
         (format-trace '|keyDown:| *current-event*)
         (view-key-event-handler window key))))]
 
@@ -827,13 +826,18 @@ RETURN: A NSRect containing the frame of the window.
   body:
   ;; (format-trace "-[MclguiView mouseDown:]" self (nsview-view self) theEvent)
   (when (nsview-view self)
-    (let ((*current-event* (wrap theEvent))
-          (*multi-click-count* [theEvent clickCount]))
+    (let* ((*multi-click-count* [theEvent clickCount])
+           (*current-event*     (wrap theEvent))
+           (view                (nsview-view self))
+           (where               (convert-coordinates
+                                 (event-where *current-event*)
+                                 (view-window view)
+                                 view)))
       (format-trace '|mouseDown:| *multi-click-count* *current-event*)
-      (view-click-event-handler (nsview-view self) (event-where *current-event*))
+      (view-click-event-handler view where)
       (when (= 2 *multi-click-count*)
-        (view-double-click-event-handler (nsview-view self)
-                                         (event-where *current-event*)))))]
+        (view-double-click-event-handler view where))))]
+
 
 @[MclguiView
   method: (mouseUp:(:id)theEvent)
@@ -841,10 +845,12 @@ RETURN: A NSRect containing the frame of the window.
   body:
   ;; (format-trace "-[MclguiView mouseUp:]" self (nsview-view self) theEvent)
   (when (nsview-view self)
-    (let ((*current-event* (wrap theEvent))
-          (*multi-click-count* [theEvent clickCount]))
+    (let ((*multi-click-count* [theEvent clickCount])
+          (*current-event*     (wrap theEvent))
+          (view                (nsview-view self)))
       (format-trace '|mouseUp:| *current-event*)
-      (window-mouse-up-event-handler (view-window (nsview-view self)))))]
+      (window-mouse-up-event-handler (view-window view))))]
+
 
 @[MclguiView
   method: (mouseMoved:(:id)theEvent)
@@ -856,6 +862,7 @@ RETURN: A NSRect containing the frame of the window.
           (*multi-click-count* [theEvent clickCount]))
       (unfrequently 1/10 (format-trace '|mouseMoved:| *current-event*))
       (window-null-event-handler (view-window (nsview-view self)))))]
+
 
 @[MclguiView
   method: (mouseDragged:(:id)theEvent)
