@@ -31,15 +31,14 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
-
 (in-package "MCLGUI")
+(objcl:enable-objcl-reader-macros)
 
 
-(defclass application (wrapper)
+(defclass application (wrapper #+ccl ccl::application)
   ())
 
-(defclass lisp-development-system (application)
+(defclass lisp-development-system (application #+ccl ccl::lisp-development-system)
   ())
 
 
@@ -165,7 +164,7 @@ RETURN:         A view instance containing dialog items to display in
                 the application's name.
 
 APPLICATION:    The application.  MCL standard event handling always
-                uses the value of *APPLICATION*.
+                uses the value of *APPLICATION**.
 ")
   (:method ((application application))
     (niy application-about-view)))
@@ -242,9 +241,16 @@ FORM:           A symbol, function or lisp form.
 
 
 
-
 (defun initialize/application ()
-  (setf *application* (make-instance 'application))
+  (setf *application*
+        #+ccl (setf ccl:*application*
+                    (if ccl:*application*
+                        (change-class ccl:*application*
+                                      (if (typep ccl:*application* 'ccl::lisp-development-system)
+                                          'lisp-development-system
+                                          'application))
+                        (make-instance 'application)))
+        #-ccl (make-instance 'application))
   (values))
 
 ;;;; THE END ;;;;
