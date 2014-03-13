@@ -188,31 +188,31 @@ list.
 (define-on-operators startup      *lisp-startup-functions*)
 
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *initializer* nil)
 
-(defvar *initializer* nil)
-
-@[NSObject subClass:MclguiInitializer
-           slots:()]
+  @[NSObject subClass:MclguiInitializer
+             slots:()]
 
 
-@[MclguiInitializer
-  method:(applicationDidFinishLaunching:(:id)notification)
-  resultType:(:void)
-  body:
-  (declare (ignore notification))
-  (with-simple-restart (abort "Abort (possibly crucial) startup functions.")
-    (flet ((call-with-restart (f)
-             (with-simple-restart 
-                 (continue "Skip (possibly crucial) startup function ~S."
-                           (if (symbolp f)
-                               f
-                               #+ccl(ccl::function-name f)
-                               #-ccl f))
-               (funcall f))))
-      (map nil (function call-with-restart) *application-did-finish-launching-functions*)))
-  [[NSNotificationCenter defaultCenter] removeObserver:self]
-  [self release]
-  (setf *initializer* nil)]
+  @[MclguiInitializer
+    method:(applicationDidFinishLaunching:(:id)notification)
+    resultType:(:void)
+    body:
+    (declare (ignore notification))
+    (with-simple-restart (abort "Abort (possibly crucial) startup functions.")
+      (flet ((call-with-restart (f)
+               (with-simple-restart 
+                   (continue "Skip (possibly crucial) startup function ~S."
+                             (if (symbolp f)
+                                 f
+                                 #+ccl(ccl::function-name f)
+                                 #-ccl f))
+                 (funcall f))))
+        (map nil (function call-with-restart) *application-did-finish-launching-functions*)))
+    [[NSNotificationCenter defaultCenter] removeObserver:self]
+    [self release]
+    (setf *initializer* nil)])
 
 
 (on-restore add-application-did-finish-launching-initializer
