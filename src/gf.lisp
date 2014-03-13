@@ -59,4 +59,8 @@
 (defgeneric make-super-note-connections (self super-note super-win))
 (defgeneric set-output (self o-type))
 (defgeneric erase-my-connections (self))
+
+(defgeneric remove-yourself-control (self))
+(defgeneric complete-box (box args))
+
 ;;;; THE END ;;;;
