@@ -392,9 +392,9 @@ VIEW:           A simple view.
 
 
 (defun modifier-flags ()
-  #+(and ccl-1.6 (not ccl-1.7))
+  #-cocoa-10.6
   (#_CGEventSourceFlagsState  #$kCGEventSourceStateCombinedSessionState)
-  #-(and ccl-1.6 (not ccl-1.7))
+  #+cocoa-10.6
   [NSEvent modifierFlags])
 
 
@@ -404,12 +404,12 @@ RETURN:         T if the mouse button is pressed and NIL
                 otherwise. This function may be called at any time,
                 not only during event processing.
 "
-  #+(and ccl-1.6 (not ccl-1.7))
-  (loop :for button :below 2
-    :thereis (#_CGEventSourceButtonState #$kCGEventSourceStateCombinedSessionState button))
-  #-(and ccl-1.6 (not ccl-1.7))
+  #-cocoa-10.6
+  (loop
+    :for button :below 2
+    :thereis (not (zerop (#_CGEventSourceButtonState #$kCGEventSourceStateCombinedSessionState button))))
+  #+cocoa-10.6
   (not (zerop [NSEvent pressedMouseButtons])))
-
 
 
 (defun multi-click-count ()

@@ -44,7 +44,6 @@
 
 #-cl-user::no-cocoa (require :cocoa)
 
-
 #+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
 
 #||
@@ -148,6 +147,8 @@
          #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
          asdf:*central-registry* :test (function equalp))
 
+(load #+(or ccl allegro) #P"PATCHWORK:gestalt"
+      #-(or ccl allegro) #P"PATCHWORK:GESTALT")
 
 ;; AppleEvents are not used for now.
 #+(and use-apple-events ccl darwin (not cl-user::no-cocoa))

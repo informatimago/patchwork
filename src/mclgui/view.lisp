@@ -1491,11 +1491,9 @@ RETURN:         The cursor shape to display when the mouse is at
 
 
 
-
-
-
-
-
+;;; ------------------------------------------------
+;;; instance drawing
+;;; ------------------------------------------------
 
 (defun focused-screenshot (view)
   (with-view-handle (viewh view)
@@ -1506,12 +1504,20 @@ RETURN:         The cursor shape to display when the mouse is at
            (setf bitmap [[[NSBitmapImageRep alloc] initWithFocusedViewRect:[viewh bounds]] autorelease])
         [viewh unlockFocus])
       [image addRepresentation:bitmap]
+      #-cocoa-10.6 [image setFlipped:YES]
       image)))
 
 (defun new-instance (view)
   (when (view-instance view)
     (with-focused-view view
       (with-view-handle (viewh view)
+        #-cocoa-10.6
+        [(first (view-instance view))
+         drawInRect:[viewh bounds]
+         fromRect:(unwrap (make-nsrect :x 0 :y 0 :size (view-size view)))
+         operation:#$NSCompositeCopy
+         fraction:(cgfloat 1.0)]
+        #+cocoa-10.6
         [(first (view-instance view))
          drawInRect:[viewh bounds]
          fromRect:(unwrap (make-nsrect :x 0 :y 0 :size (view-size view)))

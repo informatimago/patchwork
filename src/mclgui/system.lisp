@@ -37,7 +37,6 @@
 
 
 
-
 ;;;
 ;;; The hairy subject of saving and reloading images, with the
 ;;; restoration of resources and pointers.  

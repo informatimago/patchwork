@@ -33,10 +33,9 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
 (in-package "COMMON-LISP-USER")
 
-(defparameter *patchwork-version* "10.0-0.999")
+(defparameter *patchwork-version* "10.0-0.998")
 
 (setf *load-verbose* t)
 
@@ -120,6 +119,9 @@
 (pushnew #+(or ccl allegro) (truename #P"PATCHWORK:src;mclgui;")
          #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
          asdf:*central-registry* :test (function equalp))
+
+(load #+(or ccl allegro) #P"PATCHWORK:gestalt"
+      #-(or ccl allegro) #P"PATCHWORK:GESTALT")
 
 ;; (pushnew 'cl-user::no-cocoa *features*)
 (pushnew 'cocoa-midi-player *features*)
@@ -265,5 +267,6 @@
 #+lispworks
 (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
                             :console :always)
+
 
 ;;;; the END ;;;;
