@@ -175,7 +175,7 @@ appropriately.
                    :message 0
                    :when (truncate (ui::timestamp) (/ ui::+tick-per-second+))
                    :where (ui::nspoint-to-point (ui::get-nspoint [NSEvent mouseLocation]))
-                   :modifiers (ui::nsmodifier-to-macmodifier [NSEvent modifierFlags])
+                   :modifiers (ui::nsmodifier-to-macmodifier (ui::modifier-flags))
                    ;; ---
                    :appleevent the-appleevent
                    :reply the-reply

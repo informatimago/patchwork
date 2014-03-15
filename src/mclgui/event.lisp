@@ -391,6 +391,13 @@ VIEW:           A simple view.
 ;; (view-convert-coordinates-and-click subview where view)
 
 
+(defun modifier-flags ()
+  #+(and ccl-1.6 (not ccl-1.7))
+  (#_CGEventSourceFlagsState  #$kCGEventSourceStateCombinedSessionState)
+  #-(and ccl-1.6 (not ccl-1.7))
+  [NSEvent modifierFlags])
+
+
 (defun mouse-down-p ()
   "
 RETURN:         T if the mouse button is pressed and NIL
@@ -462,6 +469,7 @@ POINT2:         The cursor position during the second click.
            (point<= point1 (add-points point2 (make-point 4 4))))))
 
 
+
 (defun command-key-p ()
   "
 RETURN:         If called during event processing, return true if the
@@ -472,7 +480,7 @@ RETURN:         If called during event processing, return true if the
                 the command key is currently pressed; otherwise,
                 return NIL.
 "
-  (not (zerop (logand [NSEvent modifierFlags] #$NSCommandKeyMask))))
+  (not (zerop (logand (modifier-flags) #$NSCommandKeyMask))))
 
 
 (defun control-key-p ()
@@ -485,7 +493,7 @@ RETURN:         If called during event processing, return true if the
                 the control key is currently pressed; otherwise,
                 return NIL.
 "
-  (not (zerop (logand [NSEvent modifierFlags] #$NSControlKeyMask))))
+  (not (zerop (logand (modifier-flags) #$NSControlKeyMask))))
 
 
 (defun option-key-p ()
@@ -498,7 +506,7 @@ RETURN:         If called during event processing, return true if the
                 the option key is currently pressed; otherwise,
                 return NIL.
 "
-  (not (zerop (logand [NSEvent modifierFlags] #$NSAlternateKeyMask))))
+  (not (zerop (logand (modifier-flags) #$NSAlternateKeyMask))))
 
 
 (defun shift-key-p ()
@@ -511,7 +519,7 @@ RETURN:         If called during event processing, return true if the
                 the shift key is currently pressed; otherwise,
                 return NIL.
 "
-  (not (zerop (logand [NSEvent modifierFlags] #$NSShiftKeyMask))))
+  (not (zerop (logand (modifier-flags) #$NSShiftKeyMask))))
 
 
 (defun caps-lock-key-p ()
@@ -524,7 +532,7 @@ RETURN:         If called during event processing, return true if the
                 the caps-lock key is currently pressed; otherwise,
                 return NIL.
 "
-  (not (zerop (logand [NSEvent modifierFlags] #$NSAlphaShiftKeyMask))))
+  (not (zerop (logand (modifier-flags) #$NSAlphaShiftKeyMask))))
 
 
 (defun any-modifier-keys-p ()
@@ -537,7 +545,7 @@ RETURN:         If called during event processing, return true if
                 any modifier key is currently pressed; otherwise,
                 return NIL.
 "
-  (not (zerop (logand [NSEvent modifierFlags]
+  (not (zerop (logand (modifier-flags)
                       (logior #$NSCommandKeyMask
                               #$NSControlKeyMask
                               #$NSAlternateKeyMask

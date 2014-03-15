@@ -464,7 +464,7 @@ RETURN:         DST.
                               (get-nspoint [winh mouseLocationOutsideOfEventStream])
                               (get-nspoint [NSEvent mouseLocation])))
                           (get-nspoint [NSEvent mouseLocation]))))
-              :modifiers  (nsmodifier-to-macmodifier [NSEvent modifierFlags])))
+              :modifiers  (nsmodifier-to-macmodifier (modifier-flags))))
 
 
 ;;;------------------------------------------------------------

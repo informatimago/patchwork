@@ -65,15 +65,26 @@
   (format-trace 'view-click-event-handler 'simple-view view (point-to-list where))
   view)
 
+;; (defmethod view-click-event-handler ((view view) where)
+;;   (unless (do* ((subviews (view-subviews view))
+;;                 (i (1- (length subviews)) (1- i))
+;;                 subview)
+;;                ((< i 0) nil)
+;;             (setq subview (aref subviews i))
+;;             (when (point-in-click-region-p subview where)
+;;               (view-convert-coordinates-and-click subview where view)
+;;               (return t)))
+;;     (call-next-method)))
+
 (defmethod view-click-event-handler ((view view) where)
-  (format-trace 'view-click-event-handler 'view view (point-to-list where))
   (let ((subview (find-if (lambda (subview)
                             (point-in-click-region-p subview where))
                           (view-subviews view)
                           :from-end t)))
     (format-trace 'view-click-event-handler 'view view (point-to-list where) :subview subview)
     (if subview
-        (view-convert-coordinates-and-click subview where view)
+        (progn (view-convert-coordinates-and-click subview where view)
+               nil)
         (call-next-method))))
 
 
