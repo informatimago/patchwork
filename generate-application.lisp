@@ -129,8 +129,12 @@
       #-(or ccl allegro) #P"PATCHWORK:GESTALT")
 
 #+(and ccl (not cl-user::no-cocoa)) (defparameter *cocoa-readtable* (copy-readtable *readtable*))
-#+(and ccl (not cl-user::no-cocoa)) (say "Loading MacOSX Libraries")
-#+(and ccl (not cl-user::no-cocoa)) (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
+
+;; AppleEvents are not used for now.
+#+(and use-apple-events ccl darwin (not cl-user::no-cocoa))
+(progn
+  (say "Loading MacOSX Libraries")
+  (load #P"PATCHWORK:src;macosx;load-libraries.lisp"))
 
 
 (ql:quickload :com.informatimago.common-lisp.cesarum)
