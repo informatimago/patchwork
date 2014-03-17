@@ -221,7 +221,7 @@ RETURN:         The point P as a list of coordinates (H V).
                 ((and (listp object) (= 2 (length object)))
                  (apply (function make-point) object))
                 (t
-                 (error 'type-error :datum object :exepcted-type (or list string))))))))
+                 (error 'type-error :datum object :exepcted-type '(or list string))))))))
 
 
 (defmacro enable-sharp-at-reader-macro ()
