@@ -164,7 +164,7 @@ RETURN:         A view instance containing dialog items to display in
                 the application's name.
 
 APPLICATION:    The application.  MCL standard event handling always
-                uses the value of *APPLICATION**.
+                uses the value of *APPLICATION*.
 ")
   (:method ((application application))
     (niy application-about-view)))

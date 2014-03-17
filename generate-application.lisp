@@ -120,13 +120,14 @@
          #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
          asdf:*central-registry* :test (function equalp))
 
-(load #+(or ccl allegro) #P"PATCHWORK:gestalt"
-      #-(or ccl allegro) #P"PATCHWORK:GESTALT")
-
 ;; (pushnew 'cl-user::no-cocoa *features*)
 (pushnew 'cocoa-midi-player *features*)
 #+(and ccl (not cl-user::no-cocoa)) (say "Loading :cocoa (takes some time to start…)")
 #+(and ccl (not cl-user::no-cocoa)) (require :cocoa)
+
+(load #+(or ccl allegro) #P"PATCHWORK:gestalt"
+      #-(or ccl allegro) #P"PATCHWORK:GESTALT")
+
 #+(and ccl (not cl-user::no-cocoa)) (defparameter *cocoa-readtable* (copy-readtable *readtable*))
 #+(and ccl (not cl-user::no-cocoa)) (say "Loading MacOSX Libraries")
 #+(and ccl (not cl-user::no-cocoa)) (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
@@ -200,8 +201,6 @@
                                :|public.filename-extension| #("pwpatch")))))
 
 
-(ui::unwrap *exported-type-utis*)
-
 
 #+(and ccl (not cl-user::no-cocoa))
 (ccl::build-application
@@ -211,31 +210,31 @@
  :directory #P"~/Desktop/"
  :copy-ide-resources t   ; whether to copy the IDE's resources
  ;; :info-plist nil         ; optional user-defined info-plist
- ;; :info-plist (ccl::make-info-dict
- ;;              ;; (development-region $default-info-plist-development-region)
- ;;              ;; (executable $default-info-plist-executable)
- ;;              :getinfo-string (format nil "\"~A Copyright © 2013\"" *patchwork-version*)
- ;;              ;; (help-book-folder $default-info-plist-help-book-folder)
- ;;              ;; (help-book-name $default-info-plist-help-book-name)
- ;;              ;; (icon-file $default-info-plist-icon-file)
- ;;              :bundle-identifier "com.informatiamgo.patchwork"
- ;;              ;; (dictionary-version $default-info-dictionary-version)
- ;;              ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
- ;;              ;; overriden by write-info-plist (bundle-package-type $default-info-plist-bundle-package-type)
- ;;              ;; overriden by write-info-plist (bundle-signature $default-info-plist-bundle-signature)
- ;;              :short-version-string  (format nil "\"~A\"" *patchwork-version*)
- ;;              :version (format nil "\"~A\"" *patchwork-version*)
- ;;              ;; (has-localized-display-name $default-info-plist-has-localized-display-name)
- ;;              ;; (minimum-system-version $default-info-plist-minimum-system-version)
- ;;              ;; (main-nib-file $default-info-plist-main-nib-file)
- ;;              ;; (principal-class $default-info-plist-principal-class)
- ;;              )
+ :info-plist (ccl::make-info-dict
+              ;; (development-region $default-info-plist-development-region)
+              ;; (executable $default-info-plist-executable)
+              :getinfo-string (format nil "\"~A Copyright © 2014\"" *patchwork-version*)
+              ;; (help-book-folder $default-info-plist-help-book-folder)
+              ;; (help-book-name $default-info-plist-help-book-name)
+              ;; (icon-file $default-info-plist-icon-file)
+              :bundle-identifier "com.informatimago.patchwork"
+              ;; (dictionary-version $default-info-dictionary-version)
+              ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
+              ;; overriden by write-info-plist (bundle-package-type $default-info-plist-bundle-package-type)
+              ;; overriden by write-info-plist (bundle-signature $default-info-plist-bundle-signature)
+              :short-version-string  (format nil "\"~A\"" *patchwork-version*)
+              :version (format nil "\"~A\"" *patchwork-version*)
+              ;; (has-localized-display-name $default-info-plist-has-localized-display-name)
+              ;; (minimum-system-version $default-info-plist-minimum-system-version)
+              ;; (main-nib-file $default-info-plist-main-nib-file)
+              ;; (principal-class $default-info-plist-principal-class)
+              )
  :nibfiles '()           ; a list of user-specified nibfiles
                                         ; to be copied into the app bundle
  :main-nib-name nil     ; the name of the nib that is to be loaded
                                         ; as the app's main. this name gets written
                                         ; into the Info.plist on the "NSMainNibFile" key
- :application-class #-ccl-1.9 'gui::cocoa-application #+ccl-1.9 'gui::lisp-application
+ ;; :application-class #-ccl-1.9 'gui::cocoa-application #+ccl-1.9 'gui::lisp-application
  :private-frameworks '()
  :toplevel-function nil
  :altconsole t)

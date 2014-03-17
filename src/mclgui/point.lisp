@@ -212,10 +212,16 @@ RETURN:         The point P as a list of coordinates (H V).
   "#@(x y) reads a Point."
   (declare (ignore subchar arg))
   (declare (stepper disable))
-  (let ((coord  (read stream)))
+  (let ((object (read stream)))
     (if *read-suppress*
       (values)
-      (values (apply (function make-point) coord)))))
+      (values (cond
+                ((stringp object)
+                 (objcl:objcl-string object))
+                ((and (listp object) (= 2 (length object)))
+                 (apply (function make-point) object))
+                (t
+                 (error 'type-error :datum object :exepcted-type (or list string))))))))
 
 
 (defmacro enable-sharp-at-reader-macro ()

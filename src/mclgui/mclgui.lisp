@@ -70,6 +70,5 @@
   (values))
 
 
-(initialize) ; It should be better done at application launch…
 
 ;;;; THE END ;;;;
