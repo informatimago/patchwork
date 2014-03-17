@@ -266,10 +266,10 @@ DO:       Execute the BODY with a handler for CONDITION and
 
 (defun pw-menu-action ()
   (if *active-patch-window* 
-    (if (window-visiblep *active-patch-window*) 
-      (window-select *active-patch-window*)
-      (search-for-next-pw-window)) 
-    (make-new-pw-window t))
+      (if (window-visiblep *active-patch-window*) 
+          (window-select *active-patch-window*)
+          (search-for-next-pw-window)) 
+      (make-new-pw-window t))
   (enable-all-apps-menu-items)
   (menu-item-disable *apps-PW-menu-item*))
 
@@ -353,20 +353,20 @@ DO:       Execute the BODY with a handler for CONDITION and
   (add-menu-items *PWoper-menu*
                   (new-leafmenu "Lisp function…"
                                 (lambda () 
-                                    (let ((string
-                                           (get-string-from-user  "Lisp function"
-                                                                  :size (make-point 200 85)
-                                                                  :position :centered
-                                                                  :initial-string "list")))
-                                      (when string
-                                        (let ((patch (let ((*si-record* nil))
-                                                       (make-lisp-pw-boxes (read-from-string string) 
-                                                                           *active-patch-window*))))
-                                          (when patch
-                                            (record-patch "funlisp"
-                                                          (list (point-h (view-position patch))
-                                                                (point-h (view-position patch)))
-                                                          string)))))))
+                                  (let ((string
+                                          (get-string-from-user  "Lisp function"
+                                                                 :size (make-point 200 85)
+                                                                 :position :centered
+                                                                 :initial-string "list")))
+                                    (when string
+                                      (let ((patch (let ((*si-record* nil))
+                                                     (make-lisp-pw-boxes (read-from-string string) 
+                                                                         *active-patch-window*))))
+                                        (when patch
+                                          (record-patch "funlisp"
+                                                        (list (point-h (view-position patch))
+                                                              (point-h (view-position patch)))
+                                                        string)))))))
                   (new-leafmenu "-" nil)
                   ;; (new-leafmenu "Abort" (lambda () (toplevel))))
                   )
@@ -430,5 +430,5 @@ DO:       Execute the BODY with a handler for CONDITION and
 
 
 (initialize-menus)
- 
+
 ;;;; THE END ;;;;
