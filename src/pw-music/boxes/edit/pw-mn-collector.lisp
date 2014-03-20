@@ -482,10 +482,11 @@
       (when (and win (wptr win)) (update-editor  view-object))
       (chord-line-list self))))
 
+
 (defmethod correct-extension-box ((self C-patch-polifMN-mod) new-box values)
   (declare (ignore values))
   (let* ((new-editors-list 
-         (editor-objects (car (subviews (application-object new-box)))))
+           (editor-objects (car (subviews (application-object new-box)))))
          (last-ed (1- (length new-editors-list))))
     (setf (nthcdr last-ed (chord-line-list self))
           (list (chord-line (nth last-ed  new-editors-list))))
@@ -560,7 +561,7 @@ The collector-box can be stopped in real-time by pressing s.
 In non-real-time the process is stopped at a time-point
 that can be set with a stime-box (stop-time-box).
 This value is set by default to 1000 ticks (10 seconds)
-(the default value will be used if there is no stime-box in the 
+\(the default value will be used if there is no stime-box in the 
 current PW-window).
 The collector-box also owns a music-notation-editor (MN-editor) that can
 be opened by selecting the collector-box and pressing o.
@@ -586,7 +587,7 @@ Then you have to make a request by option-clicking the out-put-box
 of the Poly Collector box.
 This box can be both opened by selecting it and pressing o from
 the keyboard or extended by option-clicking bottom-right 
-(EA = extend+application)."
+\(EA = extend+application)."
 (declare (ignore coll1 colln)))
 
 (defunp multiseq ((coll1 (symbol (:dialog-item-text "obj" :type-list (collector list))))

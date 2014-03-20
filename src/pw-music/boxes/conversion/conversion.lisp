@@ -267,7 +267,7 @@ major third down 6m-1, returns -400 in midicents ."
   "mc->n takes a midi-cent value <midics> or list of midi-cent values,
  and returns corresponding symbolic (ASCII) note names. 
  Symbolic note names follow standard notation with middle c 
-(midi-cent 6000) being C3.  Semitones are labeled with a '#' or a 'b.'  
+\(midi-cent 6000) being C3.  Semitones are labeled with a '#' or a 'b.'  
 Quartertone flats are labeled with a '_', and quartertone sharps with a '+'.  Thus, 
 C3 a quartertone sharp (midi-cent 6050), would be labeled 'C+3'.  Gradations 
 smaller than a quartertone are expressed as the closest  quartertone + or - the 
@@ -385,9 +385,9 @@ to linear. The input can be a list of numbers. In this case a list of
 linear values is returned."
   (epw::deep-mapcar/1  'epw::db->lin1 amps))
 
-#|
-(defvar *midic* -6000)
-(for (midic *midic* 10 20000)
-  (unless (= (setf *midic* midic) (n->mc1 (mc->n1 midic)))
-      (error "Bad midic ~S" midic)))
-|#
+;; (defvar *midic* -6000)
+;; (for (midic *midic* 10 20000)
+;;   (unless (= (setf *midic* midic) (n->mc1 (mc->n1 midic)))
+;;     (error "Bad midic ~S" midic)))
+
+;;;; THE END ;;;;

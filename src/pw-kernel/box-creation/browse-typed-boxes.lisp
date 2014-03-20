@@ -34,9 +34,6 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(provide 'browse-typed-boxes)
-
-
 (setq *active-patch-window* ())
 ;;(make-new-pw-window)
 

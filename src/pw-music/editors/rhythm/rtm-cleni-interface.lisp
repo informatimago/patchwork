@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :PW)
 
 ;; ==============================================
@@ -338,5 +336,5 @@
      (cleni:translate-score *rtm-cleni-score* new-name)))
 
 ;;(save-cleni-rtm-score)
-(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as ENIGMA..." (lambda () (save-cleni-rtm-score))))  
-(ui:add-menu-items  *RTM-menu-file*  (new-leafmenu "Save as 1/4-ENIGMA..." (lambda () (let ((*cleni-temperament-mode* 4))(save-cleni-rtm-score)))))  
+
+;;;; THE END ;;;;

@@ -238,4 +238,4 @@
 ;;   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "0" 
 ;;      :type-list '(fixnum float list))))
 
-(provide 'PW-types)
+;;;; THE END ;;;;

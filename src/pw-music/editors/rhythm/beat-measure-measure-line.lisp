@@ -129,16 +129,14 @@
            (-1  (if (eq notehead-type 'rest) #\W #\h)) ;1/2
            (t (if (eq notehead-type 'rest) #\W #\w)))  ;1/1
            note-head-info))) 
-#|
-(case level
-           (4 (if (eq notehead-type 'rest) #\R #\…))   ;1/64
-           (3 (if (eq notehead-type 'rest) #\R #\≈))   ;1/32
-           (2 (if (eq notehead-type 'rest) #\r #\x))   ;1/16
-           (1 (if (eq notehead-type 'rest) #\‰ #\e))   ;1/8
-           (0  (if (eq notehead-type 'rest) #\Œ #\q))  ;1/4
-           (-1  (if (eq notehead-type 'rest) #\W #\h)) ;1/2
-           (t (if (eq notehead-type 'rest) #\W #\w)))  ;1/1
-|#
+;; (case level
+;;            (4 (if (eq notehead-type 'rest) #\R #\…))   ;1/64
+;;            (3 (if (eq notehead-type 'rest) #\R #\≈))   ;1/32
+;;            (2 (if (eq notehead-type 'rest) #\r #\x))   ;1/16
+;;            (1 (if (eq notehead-type 'rest) #\‰ #\e))   ;1/8
+;;            (0  (if (eq notehead-type 'rest) #\Œ #\q))  ;1/4
+;;            (-1  (if (eq notehead-type 'rest) #\W #\h)) ;1/2
+;;            (t (if (eq notehead-type 'rest) #\W #\w)))  ;1/1
 
 ;;rtm-sum > unit-count
 ;;(calc-next-note-head 2 5 1 0)
@@ -1170,101 +1168,100 @@ metronome units
   (if sel-chords (member last-chord sel-chords) t))
 
 ;;========================================================
-#|
 
-#|
-
-;;(beat-constructor 1 '(1 2 (1 (1 1 1))))
-;;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
-;;(beat-constructor 1 '(1 2 1))
-(setq bs (make-instance 'C-beat :unit-length 1
-    :rtm-list  
-      (list (make-instance 'C-beat :unit-length 1)
-            (make-instance 'C-beat :unit-length 2)
-            (make-instance 'C-beat :unit-length 1))))
-;;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
-(setq bs2 (make-instance 'C-beat :unit-length 1
-    :rtm-list  
-      (list  (make-instance 'C-beat :unit-length 1)
-             (make-instance 'C-beat :unit-length 1 
-               :rtm-list  
-                  (list (make-instance 'C-beat :unit-length 1)
-                        (make-instance 'C-beat :unit-length 1)
-                        (make-instance 'C-beat :unit-length 1)))
-             (make-instance 'C-beat :unit-length 1 
-               :rtm-list  
-                  (list (make-instance 'C-beat :unit-length 1 
-                          :rtm-list  
-                           (list (make-instance 'C-beat :unit-length 1)
-                                 (make-instance 'C-beat :unit-length 1)
-                                 (make-instance 'C-beat :unit-length 1)))
-                        (make-instance 'C-beat :unit-length 1))))))
-|#
-
-;;============================
-;;____________________________
-
-(setq bc11 (beat-constructor 2 '((1 (3 4))  -1  (1 (1 (2 (1 1 1)))))))
-(setq bc12 (beat-constructor 1 '(1 -1 1)))
-(setq bc13 (beat-constructor 1 '(1.0 -3)))
-(setq bc14 (beat-constructor 1 '(1 (2 (4 3 7)) 1 1)))
-(setq bc15 (beat-constructor 1 '(1 2 1 1)))
-(setq bc16 (beat-constructor 1 '(1 4 1 1)))
-(setq bc17 (beat-constructor 1 '(1.0 -3 1 1 -1 1 1)))
-
-;;(decompile bc17) 
+;; ;;(beat-constructor 1 '(1 2 (1 (1 1 1))))
+;; ;;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
+;; ;;(beat-constructor 1 '(1 2 1))
+;; (setq bs (make-instance 'C-beat :unit-length 1
+;;     :rtm-list  
+;;       (list (make-instance 'C-beat :unit-length 1)
+;;             (make-instance 'C-beat :unit-length 2)
+;;             (make-instance 'C-beat :unit-length 1))))
+;; ;;(beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1))))
+;; (setq bs2 (make-instance 'C-beat :unit-length 1
+;;     :rtm-list  
+;;       (list  (make-instance 'C-beat :unit-length 1)
+;;              (make-instance 'C-beat :unit-length 1 
+;;                :rtm-list  
+;;                   (list (make-instance 'C-beat :unit-length 1)
+;;                         (make-instance 'C-beat :unit-length 1)
+;;                         (make-instance 'C-beat :unit-length 1)))
+;;              (make-instance 'C-beat :unit-length 1 
+;;                :rtm-list  
+;;                   (list (make-instance 'C-beat :unit-length 1 
+;;                           :rtm-list  
+;;                            (list (make-instance 'C-beat :unit-length 1)
+;;                                  (make-instance 'C-beat :unit-length 1)
+;;                                  (make-instance 'C-beat :unit-length 1)))
+;;                         (make-instance 'C-beat :unit-length 1))))))
 
 
-(setq bed1 (make-instance 'C-beat-editor-panel :view-position (make-point 10 2) :view-size (make-point  690 140)))
+;; ;;============================
+;; ;;____________________________
+;; 
+;; (setq bc11 (beat-constructor 2 '((1 (3 4))  -1  (1 (1 (2 (1 1 1)))))))
+;; (setq bc12 (beat-constructor 1 '(1 -1 1)))
+;; (setq bc13 (beat-constructor 1 '(1.0 -3)))
+;; (setq bc14 (beat-constructor 1 '(1 (2 (4 3 7)) 1 1)))
+;; (setq bc15 (beat-constructor 1 '(1 2 1 1)))
+;; (setq bc16 (beat-constructor 1 '(1 4 1 1)))
+;; (setq bc17 (beat-constructor 1 '(1.0 -3 1 1 -1 1 1)))
+;; 
+;; ;;(decompile bc17) 
+;; 
+;; 
+;; (setq bed1 (make-instance 'C-beat-editor-panel :view-position (make-point 10 2) :view-size (make-point  690 140)))
+;; 
+;; (setf (measure-line bed1)
+;;   (make-instance 'C-measure-line :measures
+;;     (list 
+;;       (make-instance 'C-measure  :low "4" 
+;;          :beat-objects (list bc11 bc12 bc13))
+;;       (make-instance 'C-measure  :low "4" 
+;;          :beat-objects (list bc14 bc15 bc16 ))
+;;       (make-instance 'C-measure  :low "4" 
+;;          :beat-objects (list bc17)))))
+;; 
+;; ;;(setf (measure-line bed1) (eval (decompile (measure-line bed1))))
+;; 
+;; ;;(decompile  (beat-constructor 1 '((2 (1.0 1 3)) 1)))
+;; 
+;; ;;____________________________
+;; ;;(beat-constructor 1 '(1 (1)))  
+;; (setq bc1 (beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1)) )))
+;; (setq bc2 (beat-constructor 1 '(1  (2 (1 3 1))  (1 (1 2)) 1 (2 (1 1 1)))))
+;; (setq bc3 (beat-constructor 1 '(1 (3 (1 1 1 3)) 1 (1 (1 1)) 1)))
+;; (setq bc4 (beat-constructor 2 '((1 (1 -1 1 1 1))(1 (1 -1 1 -1 1)) (1 (1 1 -1 1 1)))))
+;; (setq bc5 (beat-constructor 1 '(1 1 1 1 1 1)))
+;; (setq ml6 (beat-constructor 1 '((2 (1.0 1 3)) 1)))
+;; (setq ml7 (beat-constructor 2 '(2.0 2 2 (3 (1 -1 1 -1)))))
+;; 
+;; (setq bed2 (make-instance 'C-beat-editor-panel :view-position (make-point 10 150) :view-size (make-point 690 140)))
+;; 
+;; 
+;; (setf (measure-line bed2)
+;;   (make-instance 'C-measure-line :measures
+;;     (list 
+;;       (make-instance 'C-measure  :low "4" 
+;;          :beat-objects  (list bc3 bc4 bc5))
+;;       (make-instance 'C-measure :low "4" 
+;;          :beat-objects  
+;; (list ml6 ml7)))))
+;; ;;(list bc1 bc2 bc3 bc4 bc5)))))
+;; 
+;; ;;====================================
+;; (setq wws (make-instance 'C-rtm-editor-window :view-position (make-point 10 50) 
+;;                                               :view-size (make-point 710 345) :window-title "Measure test"))
+;; 
+;; (setq bedcol (make-instance 'C-beat-editor-collection 
+;;                    :view-position (make-point 5 5) 
+;;                    :view-size (make-point 700 340)  
+;;                    :beat-editors (list bed1 bed2)))
+;; 
+;; (add-subviews wws bedcol)
+;; 
+;; ;;====================================
+;; (window-select wws)
 
-(setf (measure-line bed1)
-  (make-instance 'C-measure-line :measures
-    (list 
-      (make-instance 'C-measure  :low "4" 
-         :beat-objects (list bc11 bc12 bc13))
-      (make-instance 'C-measure  :low "4" 
-         :beat-objects (list bc14 bc15 bc16 ))
-      (make-instance 'C-measure  :low "4" 
-         :beat-objects (list bc17)))))
 
-;;(setf (measure-line bed1) (eval (decompile (measure-line bed1))))
-
-;;(decompile  (beat-constructor 1 '((2 (1.0 1 3)) 1)))
-
-;;____________________________
-;;(beat-constructor 1 '(1 (1)))  
-(setq bc1 (beat-constructor 1 '(1  (1 (1 1 1))  (1 ((1 (1 1 1)) 1)) )))
-(setq bc2 (beat-constructor 1 '(1  (2 (1 3 1))  (1 (1 2)) 1 (2 (1 1 1)))))
-(setq bc3 (beat-constructor 1 '(1 (3 (1 1 1 3)) 1 (1 (1 1)) 1)))
-(setq bc4 (beat-constructor 2 '((1 (1 -1 1 1 1))(1 (1 -1 1 -1 1)) (1 (1 1 -1 1 1)))))
-(setq bc5 (beat-constructor 1 '(1 1 1 1 1 1)))
-(setq ml6 (beat-constructor 1 '((2 (1.0 1 3)) 1)))
-(setq ml7 (beat-constructor 2 '(2.0 2 2 (3 (1 -1 1 -1)))))
-
-(setq bed2 (make-instance 'C-beat-editor-panel :view-position (make-point 10 150) :view-size (make-point 690 140)))
-
-
-(setf (measure-line bed2)
-  (make-instance 'C-measure-line :measures
-    (list 
-      (make-instance 'C-measure  :low "4" 
-         :beat-objects  (list bc3 bc4 bc5))
-      (make-instance 'C-measure :low "4" 
-         :beat-objects  
-(list ml6 ml7)))))
-;;(list bc1 bc2 bc3 bc4 bc5)))))
-
-;;====================================
-(setq wws (make-instance 'C-rtm-editor-window :view-position (make-point 10 50) 
-                                              :view-size (make-point 710 345) :window-title "Measure test"))
-
-(setq bedcol (make-instance 'C-beat-editor-collection 
-                   :view-position (make-point 5 5) 
-                   :view-size (make-point 700 340)  
-                   :beat-editors (list bed1 bed2)))
-
-(add-subviews wws bedcol)
-
-;;====================================
-(window-select wws)
-|#
+;;;; THE END ;;;;

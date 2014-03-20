@@ -100,14 +100,6 @@ between
 
 
 
-(defpackage "C-PW-SEND-MIDI-NOTE"
-  (:use "COMMON-LISP")
-  (:use "LELISP-MACROS" "PATCHWORK")
-  (:import-from "UI" "NIY")
-  (:import-from "PATCHWORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL")
-  (:export "SND-MIDINOTE" "C-PW-SEND-MIDI-NOTE"))
-
-
 (defunp play-sequence ((ch-l list (:value '() :type-list (collector)))
                        (chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
     "Plays a chord sequence (first argument). The second argument is a channel

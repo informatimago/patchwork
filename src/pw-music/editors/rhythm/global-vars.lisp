@@ -62,6 +62,6 @@
 (defvar *measure-edit-mode* ()) ;???
 
 (defvar *apps-RTM-menu-item* ())
-(defvar *RTM-menu-root* ())
+(defvar *RTM-menu-root* () "menubar for RTM")
 (defvar *rtm-help-window* ())
 

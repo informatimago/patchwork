@@ -536,60 +536,62 @@
 ;;=========================================================================== 
 ;;=========================================================================== 
 
-#|
-;;=========================
-;;for INTERFACE-TOOLS
-;;=========================
-(INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
-(make-instance 'C-menubox
-:value 0
-;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)
-:menu-box-list '("  ac" " czx" "  bx" "   z")))
+;; (progn
+;;   ;;=========================
+;;   ;;for INTERFACE-TOOLS
+;;   ;;=========================
+;;   (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
+;;    (make-instance 'C-menubox
+;;                   :value 0
+;;                   ;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)
+;;                   :menu-box-list '("  ac" " czx" "  bx" "   z")))
+;; 
+;;   (defmethod INTERFACE-TOOLS::add-editor-items :after ((menubox C-menubox) editor)
+;;     (let ((position (add-points INTERFACE-TOOLS::*editor-items-start-pos* #@(0 66))))
+;;       (add-subviews
+;;        editor
+;;        (make-dialog-item 'button-dialog-item
+;;                          position #@(130 16) "Set Menubox Strings"
+;;                          (lambda (item)
+;;                            (declare (ignore item))
+;;                            (set-menu-box-list
+;;                             menubox
+;;                             (INTERFACE-TOOLS::get-new-table-data 
+;;                              (menu-box-list menubox) "strings")))))))
+;; 
+;;   (defmethod INTERFACE-TOOLS::copy-instance ((item C-menubox))
+;;     (let* ((new-item (call-next-method)))
+;;       (setf (value new-item) (value item))
+;;       (setf (menu-box-list new-item) (menu-box-list item))
+;;       new-item))
+;; 
+;;   (defmethod INTERFACE-TOOLS::object-source-code ((item C-menubox))
+;;     (nconc (call-next-method)
+;;            `(:menu-box-list ',(menu-box-list item))))
+;; 
+;;   ;;====================================================================================================
+;;   |#
+;; #|
+;;   ;;=========================
+;;   ;;for INTERFACE-TOOLS
+;;   ;;=========================
+;;   (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
+;;    (make-instance 'C-numbox
+;;                   :view-position #@(5 22)
+;;                   :value 0))
+;;   ;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)))
+;; 
+;;   (defmethod INTERFACE-TOOLS::copy-instance ((item C-numbox))
+;;     (let* ((new-item (call-next-method))
+;;            (value (value item)))
+;;       (set-numbox-item-text new-item value)
+;;       new-item))
+;; 
+;;   (defmethod INTERFACE-TOOLS::object-source-code ((item C-numbox))
+;;     (nconc (call-next-method)
+;;            `(:value ,(value item))))
+;; 
+;;   ;;=========================
+;;   )
 
-(defmethod INTERFACE-TOOLS::add-editor-items :after ((menubox C-menubox) editor)
-(let ((position (add-points INTERFACE-TOOLS::*editor-items-start-pos* #@(0 66))))
-(add-subviews
-editor
-(make-dialog-item 'button-dialog-item
-position #@(130 16) "Set Menubox Strings"
-(lambda (item)
-(declare (ignore item))
-(set-menu-box-list
-menubox
-(INTERFACE-TOOLS::get-new-table-data 
-(menu-box-list menubox) "strings")))))))
-
-(defmethod INTERFACE-TOOLS::copy-instance ((item C-menubox))
-(let* ((new-item (call-next-method)))
-(setf (value new-item) (value item))
-(setf (menu-box-list new-item) (menu-box-list item))
-new-item))
-
-(defmethod INTERFACE-TOOLS::object-source-code ((item C-menubox))
-(nconc (call-next-method)
-`(:menu-box-list ',(menu-box-list item))))
-
-;;====================================================================================================
-|#
-#|
-;;=========================
-;;for INTERFACE-TOOLS
-;;=========================
-(INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
-(make-instance 'C-numbox
-:view-position #@(5 22)
-:value 0))
-;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)))
-
-(defmethod INTERFACE-TOOLS::copy-instance ((item C-numbox))
-(let* ((new-item (call-next-method))
-(value (value item)))
-(set-numbox-item-text new-item value)
-new-item))
-
-(defmethod INTERFACE-TOOLS::object-source-code ((item C-numbox))
-(nconc (call-next-method)
-`(:value ,(value item))))
-
-;;=========================
-|#
+;;;; THE END ;;;;

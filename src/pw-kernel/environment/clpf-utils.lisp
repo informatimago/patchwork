@@ -33,12 +33,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "CLPF-UTIL"
-  (:use "COMMON-LISP" "LELISP-MACROS")
-  (:export
-   "SYNONYM" "VECTOR-TO-LIST" "COMPILE-FILE?"
-   "FILE-COMPARE…" "FILE-COMPARE" "READ-LISTS-FROM"
-   "PREFIX-EXPR" "PREFIX-HELP" "*COMPILE-NUM-LAMBDA*" "MAKE-NUM-FUN" "MAKE-NUM-LAMBDA"))
 (in-package "CLPF-UTIL")
 
 
@@ -54,19 +48,18 @@
        (index (1- (length vector)) (1- index)))
       ((< index 0) list)))
 
-#|
-(defun vector-to-list1 (vector &aux (length (length vector)) (list ()))
-  "Takes the elements of a simple vector and collects them into a list."
-  (dotimes (index length)
-    (push (svref vector (decf length)) list))
-  list )
+;; (defun vector-to-list1 (vector &aux (length (length vector)) (list ()))
+;;   "Takes the elements of a simple vector and collects them into a list."
+;;   (dotimes (index length)
+;;     (push (svref vector (decf length)) list))
+;;   list )
+;; 
+;; (time (dotimes (i 10000) (vector-to-list #(a b c d))))
+;; (dotimes (i 10000) (vector-to-list #(a b c d))) took 205 ticks (3.417 seconds) to run.
+;; 
+;; (time (dotimes (i 10000) (vector-to-list1 #(a b c d))))
+;; (dotimes (i 10000) (vector-to-list1 #(a b c d))) took 218 ticks (3.633 seconds) to run.
 
-(time (dotimes (i 10000) (vector-to-list #(a b c d))))
-(dotimes (i 10000) (vector-to-list #(a b c d))) took 205 ticks (3.417 seconds) to run.
-
-(time (dotimes (i 10000) (vector-to-list1 #(a b c d))))
-(dotimes (i 10000) (vector-to-list1 #(a b c d))) took 218 ticks (3.633 seconds) to run.
-|#
 ;; =============================================================================-======
 
 (defun compile-file? (file)
@@ -414,39 +407,40 @@ The resulting function is a lambda list not compiled."
    (t (mapc #'rw-vars-expr (cdr expr)))))
 
 ;; =============================================================================-======
-#| tests
-
-'#i(^ a b)
-'#i(a + * b)
-'#i(a + b *)
-(equal '#i(+ a b) '(+ a b))
-(equal '#i(a + () + b)  	'(+ a () b))
-(equal '#i(a + b * c)   	'(+ a (* b c)))
-(equal '#i(a + b * c + d)	'(+ a (* b c) d))
-(equal '#i(a + b c + d) 	'(+ a (* b c) d))
-(equal '#i(a (cos (w t + f)))	'(* a (cos (+ (* w t) f))))
-(equal '#i(a ^ b ** c + d)	'(+ (expt (expt a b) c) d))
-(equal '#i(a ** b ** c + d)	'(+ (expt (expt a b) c) d))
-(equal '#i(a + b + c + d)	'(+ a b c d))
-(equal '#i(a + b - c + d)	'(+ a b (- c) d))
-(equal '#i(a - b - c - d)	'(- a b c d))
-(equal '#i(a ^ b ^ c ^ d)	'(expt (expt (expt a b) c) d))
-(equal '#i(y := x + 2 \; y * y + y)
-       '(progn (setq y (+ x 2)) (+ (* y y) y)))
-(equal (make-num-lambda '(y := x + 2 \; y * y + y))
-       '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
-(equal (make-num-lambda '(y := x + z \; y * z + y))
-       '(lambda (x z) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
-(equal (make-num-lambda '(f(z x)= y := x + z \; y * z + y))
-       '(lambda (z x) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
-(equal (make-num-lambda '(f(x)= y := x + 2 \; y * y + y))
-       '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
-(equal
- (make-num-lambda '(f(z)= y := (if (z > -1) (z + 1) 0) + 2 \; y * y + y))
- '(lambda (z) (let (y) (progn (setq y (+ (if (> z -1) (+ z 1) 0) 2)) (+ (* y y) y)))))
-(equal
- (make-num-lambda '(f(y)= y := (if (y > -1) (y + 1) 0) + 2 \; y * y + y))
- '(lambda (y) (progn (setq y (+ (if (> y -1) (+ y 1) 0) 2)) (+ (* y y) y))))
-(make-num-lambda '(f(z)= y := x + 2 \; y * y + y))
-|# :EOF
+;; (defun tests ()
+;; 
+;;   '#i(^ a b)
+;;   '#i(a + * b)
+;;   '#i(a + b *)
+;;   (equal '#i(+ a b) '(+ a b))
+;;   (equal '#i(a + () + b)  	'(+ a () b))
+;;   (equal '#i(a + b * c)   	'(+ a (* b c)))
+;;   (equal '#i(a + b * c + d)	'(+ a (* b c) d))
+;;   (equal '#i(a + b c + d) 	'(+ a (* b c) d))
+;;   (equal '#i(a (cos (w t + f)))	'(* a (cos (+ (* w t) f))))
+;;   (equal '#i(a ^ b ** c + d)	'(+ (expt (expt a b) c) d))
+;;   (equal '#i(a ** b ** c + d)	'(+ (expt (expt a b) c) d))
+;;   (equal '#i(a + b + c + d)	'(+ a b c d))
+;;   (equal '#i(a + b - c + d)	'(+ a b (- c) d))
+;;   (equal '#i(a - b - c - d)	'(- a b c d))
+;;   (equal '#i(a ^ b ^ c ^ d)	'(expt (expt (expt a b) c) d))
+;;   (equal '#i(y := x + 2 \; y * y + y)
+;;          '(progn (setq y (+ x 2)) (+ (* y y) y)))
+;;   (equal (make-num-lambda '(y := x + 2 \; y * y + y))
+;;          '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
+;;   (equal (make-num-lambda '(y := x + z \; y * z + y))
+;;          '(lambda (x z) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
+;;   (equal (make-num-lambda '(f(z x)= y := x + z \; y * z + y))
+;;          '(lambda (z x) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
+;;   (equal (make-num-lambda '(f(x)= y := x + 2 \; y * y + y))
+;;          '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
+;;   (equal
+;;    (make-num-lambda '(f(z)= y := (if (z > -1) (z + 1) 0) + 2 \; y * y + y))
+;;    '(lambda (z) (let (y) (progn (setq y (+ (if (> z -1) (+ z 1) 0) 2)) (+ (* y y) y)))))
+;;   (equal
+;;    (make-num-lambda '(f(y)= y := (if (y > -1) (y + 1) 0) + 2 \; y * y + y))
+;;    '(lambda (y) (progn (setq y (+ (if (> y -1) (+ y 1) 0) 2)) (+ (* y y) y))))
+;;   (make-num-lambda '(f(z)= y := x + 2 \; y * y + y)))
 ;; =============================================================================-======
+
+;;;; THE END ;;;;

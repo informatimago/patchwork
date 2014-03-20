@@ -130,13 +130,12 @@
       (if (typep view 'pw::C-music-notation-panel)
         (pw::print-draw-contents view)))))
 
-#|
-(let* ((panels (pw::editor-objects (car (subviews pw::*active-mn-window*))))
-       (last-time (max-time panels))
-       (last-visible -1))
-  (while (>= last-time last-visible)
-    (print "draw")
-    (setq last-visible (pw::scroll-for-print pw::*active-mn-window* panels))))
+;; (let* ((panels (pw::editor-objects (car (subviews pw::*active-mn-window*))))
+;;        (last-time (max-time panels))
+;;        (last-visible -1))
+;;   (while (>= last-time last-visible)
+;;     (print "draw")
+;;     (setq last-visible (pw::scroll-for-print pw::*active-mn-window* panels))))
 
 
-|#
+;;;; THE END ;;;;

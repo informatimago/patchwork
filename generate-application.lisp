@@ -122,13 +122,17 @@
 
 ;; (pushnew 'cl-user::no-cocoa *features*)
 (pushnew 'cocoa-midi-player *features*)
-#+(and ccl (not cl-user::no-cocoa)) (say "Loading :cocoa (takes some time to start…)")
-#+(and ccl (not cl-user::no-cocoa)) (require :cocoa)
+
+#+(and ccl (not cl-user::no-cocoa))
+(progn
+  (say "Loading :cocoa (takes some time to start…)")
+  (require :cocoa))
 
 (load #+(or ccl allegro) #P"PATCHWORK:gestalt"
       #-(or ccl allegro) #P"PATCHWORK:GESTALT")
 
-#+(and ccl (not cl-user::no-cocoa)) (defparameter *cocoa-readtable* (copy-readtable *readtable*))
+#+(and ccl (not cl-user::no-cocoa))
+(defparameter *cocoa-readtable* (copy-readtable *readtable*))
 
 ;; AppleEvents are not used for now.
 #+(and use-apple-events ccl darwin (not cl-user::no-cocoa))

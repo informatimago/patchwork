@@ -32,11 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
-(defpackage "C-PATCH-CHORD-LINE"
-  (:use "COMMON-LISP")
-  (:use "UI" "LELISP-MACROS" "PATCHWORK")
-  (:export "C-PATCH-CHORD-LINE" "CHORD-SEQN"))
 (in-package "C-PATCH-CHORD-LINE")
 (enable-patchwork-reader-macros)
 

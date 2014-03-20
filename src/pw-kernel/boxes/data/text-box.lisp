@@ -114,10 +114,9 @@
   (add-patch-box *active-patch-window* 
          (make-PW-standard-box 'C-pw-text-box:C-pw-text-box 'C-pw-text-box::text)))
 
-#|
+;; (add-patch-box *active-patch-window* 
+;;                (make-patch-box  'C-pw-text-box:C-pw-text-box 'C-pw-text-box::text  
+;;                                '(*Text-input-pw-type* "text") '(no-connection)))
+;; (unintern 'controls)
 
-(add-patch-box *active-patch-window* 
-               (make-patch-box  'C-pw-text-box:C-pw-text-box 'C-pw-text-box::text  
-                               '(*Text-input-pw-type* "text") '(no-connection)))
-(unintern 'controls)
-|#
+;;;; THE END ;;;;

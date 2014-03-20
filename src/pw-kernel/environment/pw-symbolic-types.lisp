@@ -33,9 +33,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "PW-STYPE"
-  (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
-  (:export "CAR!" "LIST!" "DEEP-MAPCAR" "DOUBLE-MAPCAR"))
+
 (in-package "PW-STYPE")
 
 ;; =============================================================================-======

@@ -34,9 +34,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "COMBINATORIAL-INTERV"
-  (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
-  (:export "FIND-INTERVALS" "INT-REC"))
 (in-package "COMBINATORIAL-INTERV")
 
 (defun num-min( n)
@@ -189,9 +186,8 @@ value 'nil' is returned. "
 
 (defunp int-rec () list "current hits" *found-chords*)
 
-#|
-(length (setq foo (find-intervals 19 '(17 4 7 6 1 5) '((12)(4 7)) 7 10 '(7))))
-(constraint '(0 2 6 7 10) '((1 3)))
-|#
+;; (length (setq foo (find-intervals 19 '(17 4 7 6 1 5) '((12)(4 7)) 7 10 '(7))))
+;; (constraint '(0 2 6 7 10) '((1 3)))
+;; (mapcar  (lambda (x) (remove 0 x)) '((0 1 2) (2 0 5 8)))
 
-(mapcar  (lambda (x) (remove 0 x)) '((0 1 2) (2 0 5 8)))
+

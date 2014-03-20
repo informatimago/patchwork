@@ -34,8 +34,6 @@
 ;;;;**************************************************************************
 (in-package :PW)
 
-(provide 'BPF-MN-PW-interface)
-
 
 (defun interpol5 (time t1 t2 v1 v2)
    (+ v1 (* (- time t1) (/ (- v2 v1) (- t2 t1)))) )

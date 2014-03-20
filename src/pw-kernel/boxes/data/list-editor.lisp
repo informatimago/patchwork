@@ -325,13 +325,14 @@
   (call-next-method)
   (update-size (first (subviews self)) (view-size self)))
 
-#|(defmethod view-activate-event-handler :after ((self C-table-window)) ())
-(let ((table (first (subviews self))))
-(when (pw-object self)
-(set-array table (the-list (pw-object self)))
-(set-view-size self
-(add-points (view-size table)
-(make-point *cell-width* (* 2 *cell-height*)))))))|#
+;; (defmethod view-activate-event-handler :after ((self C-table-window))
+;;   ())
+;; (let ((table (first (subviews self))))
+;;   (when (pw-object self)
+;;     (set-array table (the-list (pw-object self)))
+;;     (set-view-size self
+;;                    (add-points (view-size table)
+;;                                (make-point *cell-width* (* 2 *cell-height*))))))
 
 (defmethod open-application-window ((self C-table-window))
   (let ((table (first (subviews self))))
@@ -444,10 +445,8 @@ To obtain more information, type ‘o’ with the module open."
         (declare (ignore list)))
 
 
-#|
-(in-package :pw)
-(add-patch-box *active-patch-window* 
-(make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd  
-'(*symbol-eval-pw-type* "list") '(list)))
+;; (in-package :pw)
+;; (add-patch-box *active-patch-window* 
+;; (make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd  
+;; '(*symbol-eval-pw-type* "list") '(list)))
 
-|#

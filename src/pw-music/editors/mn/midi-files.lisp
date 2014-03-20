@@ -34,8 +34,6 @@
 ;;;;**************************************************************************
 (in-package :PW)
 
-(provide 'midi-files)
-
 (defun variable-length-midi-time (ticks)
   (let ((high-byte1 0)(high-byte2 0)(high-byte3 0)
         (mod-ticks (mod ticks #x80)))
@@ -196,14 +194,12 @@
       '(#x00 #x60)
        (apply 'append tracks))))
 
-#|
+;; (progn
+;;   (setq *print-base* 16)
+;;   (print (length (make-midi-file-0
+;;                   (chords (chord-line (car (editor-objects (editor-view-object *active-MN-window*))))))))
+;;   (setq *print-base* 10))
 
-(setq *print-base* 16)
-(print (length (make-midi-file-0
-   (chords (chord-line (car (editor-objects (editor-view-object *active-MN-window*))))))))
-(setq *print-base* 10) 
-
-|#
 
 ;;======================================================
 
@@ -227,36 +223,34 @@
        (write-byte  (pop midi-data-list) out)))
    (set-mac-file-type new-name "Midi")))
 ;;=======================================================
-#|
 
-(setq m1
-'(
- #x4D #x54 #x68 #x64 
- #x00 #x00 #x00 #x06  
- #x00 #x00   
- #x00 #x01
- #x00 #x60
- 
- #x4D #x54 #x72 #x6B 
- #x00 #x00 #x00 #x3B
+;; (setq m1
+;;       '(
+;;         #x4D #x54 #x68 #x64 
+;;         #x00 #x00 #x00 #x06  
+;;         #x00 #x00   
+;;         #x00 #x01
+;;         #x00 #x60
+;;         
+;;         #x4D #x54 #x72 #x6B 
+;;         #x00 #x00 #x00 #x3B
+;; 
+;;         #x00 #xff #x58 #x04 #x04 #x02 #x18 #x08
+;;         #x00 #xff #x51 #x03 #x07 #xa1 #x20 
+;;         #x00 #xc0 #x05 
+;;         #x00 #xc1 #x2e 
+;;         #x00 #xc2 #x46 
+;;         #x00 #x92 #x30 #x60 
+;;         #x00 #x3c #x60   
+;;         #x60 #x91 #x43 #x40    
+;;         #x60 #x90 #x4c #x20    
+;;         #x81 #x40 #x82 #x30 #x40    
+;;         #x00 #x3c #x40    
+;;         #x00 #x81 #x43 #x40     
+;;         #x00 #x80 #x4c #x40     
+;;         #x00 #xff #x2f #x00
+;;         ))
 
- #x00 #xff #x58 #x04 #x04 #x02 #x18 #x08
- #x00 #xff #x51 #x03 #x07 #xa1 #x20 
- #x00 #xc0 #x05 
- #x00 #xc1 #x2e 
- #x00 #xc2 #x46 
- #x00 #x92 #x30 #x60 
- #x00 #x3c #x60   
- #x60 #x91 #x43 #x40    
- #x60 #x90 #x4c #x20    
- #x81 #x40 #x82 #x30 #x40    
- #x00 #x3c #x40    
- #x00 #x81 #x43 #x40     
- #x00 #x80 #x4c #x40     
- #x00 #xff #x2f #x00
-))     
-
-|#
-  
+;;;; THE END ;;;;
 
   

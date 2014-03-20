@@ -32,9 +32,53 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
 (in-package "MCLGUI")
 (objcl:enable-objcl-reader-macros)
+
+(defun ns-set-enabled (nsitem enabled)
+  (when nsitem
+    [nsitem setEnabled:enabled]))
+
+(defun ns-add-item (nsmenu nsitem)
+  "
+DO:             Add the NSItem NSITEM to the NSMenu NSMENU.
+
+NOTE:           NSITEM is removed from its menu if it is in one
+                already, before being added to NSMENU.
+"
+  (unless (nullp [nsitem menu])
+    ;; (format t "~&  removing item ~S from menu ~S~%" (objcl:lisp-string  [nsitem title]) (objcl:lisp-string  [[nsitem menu] title])) (finish-output)
+    [[nsitem retain] autorelease]                             
+    [[nsitem menu] removeItem:nsitem])
+  ;; (format t "~&  adding item ~S to menu ~S~%" (objcl:lisp-string [nsitem title]) (objcl:lisp-string  [nsmenu title])) (finish-output)
+  [nsmenu addItem:nsitem])
+
+
+(defun ns-attach-submenu (nsmenu submenu)
+  "
+DO:             Add to the NSMenu of MENU a NSItem with the NSMenu of
+                SUBMENU as submenu.  If the NSMenu of the submenu
+                doesn't already have a NSMenuItem, one is created.
+"
+  (let ((nsitem (handle-of-menu-item-of submenu)))
+    ;;     menu -- menu -- item
+    ;;                  -- item
+    ;;          -- item
+    ;; maps to:
+    ;;     NSMenu -- NSItem -- NSMenu -- NSItem
+    ;;                                -- NSItem
+    ;;            -- NSItem
+    (if nsitem
+        (progn
+          (ns-add-item nsmenu nsitem)
+          [nsmenu setSubmenu:(unwrap submenu) forItem:nsitem])
+        (let ((nsitem [[NSMenuItem alloc]
+                            initWithTitle:(objcl:objcl-string (menu-title submenu))
+                            action:*null*
+                            keyEquivalent:(objcl:objcl-string "")]))
+          (ns-add-item nsmenu nsitem)
+          [nsmenu setSubmenu:(unwrap submenu) forItem:nsitem]))))
+
 
 
 ;;;---------------------------------------------------------------------
@@ -42,10 +86,11 @@
 ;;;---------------------------------------------------------------------
 
 (defclass menubar (colored)
-  ((menus :initform '()
-          :initarg :menus
-          :accessor menubar-menus)))
+  ((menu :initform nil :reader menubar-menu)))
 
+(defgeneric menubar-menus (self)
+  (:method   ((self menubar))
+    (menu-items (menubar-menu self))))
 
 (defmethod color-parts ((thing menubar))
   '(:menubar :default-item-title :default-menu-background :default-menu-title))
@@ -85,9 +130,11 @@ menus, then *DEFAULT-MENUBAR* will contain the changed menus. Calling
 The variable *APPLE-MENU* contains the Apple menu from the initial
 menubar.
 
-NOTE: This is a shadow placeholder.  OpenStep doesn't have an \"Apple
-Menu\", and Cocoa manages its own Apple menu outside of the reach of
-the applications.
+NOTE: This is actually the application menu; it's title should be the
+application name, and it contains the About <application name> and
+Quit menu items.  The actual apple menu is managed by the system out
+of reach of the application, on OpenStep or Cocoa.
+This *APPLE-MENU* is never removed from the menubar.
 ")
 
 
@@ -112,9 +159,9 @@ menubar.
 ")
 
 
-(defvar *tool-menu*       nil
+(defvar *tools-menu*       nil
   "
-The variable *TOOL-MENU* contains the Tool menu from the initial
+The variable *TOOLS-MENU* contains the Tools menu from the initial
 menubar.
 ")
 
@@ -147,21 +194,9 @@ DRAW-MENUBAR-IF.  The menubar is not redrawn automatically.
 (defgeneric empty-menubar (menubar)
   (:method ((mb menubar))
     ;; [[[NSApplication sharedApplication] mainMenu] removeAllItems]
-    (dolist (menu (menubar-menus mb) mb)
+    (dolist (menu (nreverse (menubar-menus mb)) mb)
       (unless (eq *apple-menu* menu)
         (menu-deinstall menu)))))
-
-(defgeneric menubar-add-menu (menubar menu)
-  (:method ((mb menubar) menu)
-    (setf (menubar-menus mb) (nconc (menubar-menus mb) (list menu)))
-    menu))
-
-(defgeneric  menubar-delete-menu (menubar menu)
-  (:method ((mb menubar) menu)
-    (unless (eq *apple-menu* menu)
-      (setf (menubar-menus mb) (delete menu (menubar-menus mb))))
-    menu))
-
 
 
 (defun menubar ()
@@ -169,7 +204,7 @@ DRAW-MENUBAR-IF.  The menubar is not redrawn automatically.
 RETURN:         A list of the menus currently installed in the *MENUBAR*.
 "
   (when *menubar*
-    (copy-list (menubar-menus *menubar*))))
+    (menubar-menus *menubar*)))
 
 
 (defun set-menubar (new-menubar-list)
@@ -192,6 +227,7 @@ NOTE:           You can never remove the Apple menu. Even if you call
     (empty-menubar *menubar*)
     (mapc (function menu-install) new-menubar-list))
   (draw-menubar-if)
+  (reset-application-in-menubar *apple-menu*)
   new-menubar-list)
 
 
@@ -200,8 +236,9 @@ NOTE:           You can never remove the Apple menu. Even if you call
 RETURN:         The first menu in the menubar that has string as its
                 title.  If no matching menu is found, it returns NIL.
 "
-  (find name  (menubar-menus *menubar*)
-        :key (function menu-title) :test (function string-equal)))
+  (find name (menubar-menus *menubar*)
+        :key (function menu-title)
+        :test (function string-equal)))
 
 
 
@@ -214,12 +251,12 @@ DO:             Redraw the menubar if the value of *MENUBAR-FROZEN* is
   ;; Doesn't seem to be needed with OpenStep.
   ;; (unless *menubar-frozen*
   ;;   (n iy draw-menubar-if))
-  )
+  (values))
 
 
 
 ;;;---------------------------------------------------------------------
-;;; Menus
+;;; MENU-ELEMENT
 ;;;---------------------------------------------------------------------
 
 
@@ -275,6 +312,10 @@ other styles.")
   ;; self
   )
 
+
+;;;---------------------------------------------------------------------
+;;; MENU
+;;;---------------------------------------------------------------------
 
 (defclass menu (menu-element)
   ((item-list   :initform '())
@@ -335,14 +376,7 @@ DO:             Set the menu title to NEW-TITLE.  If the menu is
 RETURN:         NEW-TITLE
 ")
   (:method ((menu menu) new-title)
-    (if (menu-owner menu)
-        (set-menu-item-title menu new-title)
-        (progn
-          (setf (slot-value menu 'title) (copy-seq new-title))
-          (let ((nsmenu (handle menu)))
-            (when nsmenu
-              [nsmenu setTitle:(objcl:objcl-string new-title)]))))
-    new-title))
+    (set-menu-item-title menu new-title)))
 
 
 (defgeneric menu-install (menu)
@@ -350,13 +384,12 @@ RETURN:         NEW-TITLE
 DO:             Add the menu to the menubar at the rightmost position.
 RETURN:         T.
 ")
-  (:method ((me menu-element))
-    t)
   (:method ((menu menu))
-    (unless (menu-owner menu)
-      (menubar-add-menu *menubar* menu)
-      (ns-attach-submenu [[NSApplication sharedApplication] mainMenu]
-                         menu))
+    (let ((mbmenu (menubar-menu *menubar*))
+          (owner  (menu-owner menu)))
+      (when owner
+        (remove-menu-items owner menu))
+      (add-menu-items mbmenu menu))
     t))
 
 
@@ -365,17 +398,10 @@ RETURN:         T.
 DO:             Remove a menu from the menubar.
 RETURN:         NIL.
 ")
-  (:method ((me menu-element))
-    nil)
   (:method ((menu menu))
-    (unless (menu-owner menu)
-      (menubar-delete-menu *menubar* menu)
-      (let ((item (if (typep menu 'menu)
-                      (handle-of-menu-item-of menu)
-                      (handle menu))))
-        (when item
-          [[[NSApplication sharedApplication] mainMenu] removeItem:item]))
-      (release menu))
+    (let ((owner (menu-owner menu)))
+      (when owner
+        (remove-menu-items owner menu)))
     nil))
 
 
@@ -384,13 +410,8 @@ RETURN:         NIL.
 RETURN:         Whether the menu is installed.
 ")
   (:method ((menu menu))
-    (not (null (handle menu)))))
+    (eq (menubar-menu *menubar*) (menu-owner menu))))
 
-
-
-(defun ns-set-enabled (nsitem enabled)
-  (when nsitem
-    [nsitem setEnabled:enabled]))
 
 
 (defgeneric menu-disable (menu)
@@ -439,6 +460,7 @@ You can specialize menu-update, but you normally do not need to call
 it. (It is called by the MCL run-time system.)
 ")
   (:method ((menu menu))
+    (format-trace 'menu-update menu) ; TODO: cf. NSMenuValidation
     (let ((updater (menu-update-function menu)))
       (if updater
           (funcall updater menu)
@@ -532,14 +554,11 @@ DO:             Set the menu item title to NEW-TITLE.  If the menu
 RETURN:         NEW-TITLE
 ")
   (:method ((item menu-element) new-title)
-    (let ((owner (menu-item-owner item)))
-      (setf (slot-value item 'title) (copy-seq new-title))
-      (when owner
-        (when (string= new-title "-")
-          (menu-item-disable item)))
-      (let ((nsitem (handle item)))
-        (when nsitem
-          [nsitem setTitle:(objcl:objcl-string new-title)])))
+    (setf (slot-value item 'title) (copy-seq new-title))
+    (when (string= new-title "-")
+      (menu-item-disable item))
+    (with-handle (nsitem item)
+      [nsitem setTitle:(objcl:objcl-string new-title)])
     new-title))
 
 
@@ -591,7 +610,7 @@ RETURN:         two values: the key equivalent NSString and the key
                 returned by default.
 "
   (values (cond
-            ((null command-key)  (objcl:objcl-string ""))
+            ((null  command-key) (objcl:objcl-string ""))
             ((consp command-key) (objcl:objcl-string (second command-key)))
             (t                   (objcl:objcl-string command-key)))
           (encode-key-mask (if (atom command-key)
@@ -755,19 +774,16 @@ RETURN:         NIL.
                                   (error 'menu-already-installed-error :menu item))
                                 item)
                               menu-items)))
+      (unwrap menu)
       (loop
         :for item :in menu-items
-        :do (progn
-              (setf (slot-value menu 'item-list) (nconc (slot-value menu 'item-list) (list item))
-                    (slot-value item 'owner) menu)
-              (when (and (stringp (slot-value item 'title))
-                         (string= (slot-value item 'title) "-"))
-                (setf (slot-value item 'enabledp) nil))
-              (when (typep item 'menu)
-                (when (menu-installed-p menu)
-                  (menu-install item)))
-              (set-part-color-loop item (slot-value item 'color-list))))
-      (unwrap menu))))
+        :do (setf (slot-value menu 'item-list) (nconc (slot-value menu 'item-list) (list item))
+                  (slot-value item 'owner) menu)
+            (when (and (stringp (slot-value item 'title))
+                       (string= (slot-value item 'title) "-"))
+              (setf (slot-value item 'enabledp) nil))
+            (%attach-item-to-menu item menu)
+            (set-part-color-loop item (slot-value item 'color-list))))))
 
 
 (defgeneric remove-menu-items (menu &rest menu-items)
@@ -783,17 +799,15 @@ RETURN:         NIL.
     (dolist (item menu-items)
       (when item
         (let ((owner (menu-item-owner item)))
-          (when owner
-            (if (eq owner menu)
-                (progn
-                  (setf (slot-value item 'owner) nil)
-                  (when (typep item 'menu)
-                    (let ((*menubar-frozen* t))
-                      (menu-deinstall item)))
-                  (setf (slot-value menu 'item-list) (delete item (slot-value menu 'item-list)))
-                  (release item))
-                ;; (cerror "Continue" 'menu-item-not-owned-error :menu menu :item item)
-                )))))))
+          (when (and owner (eq owner menu))
+            (with-handle (nsmenu menu)
+              (let ((nsitem (if (typep item 'menu)
+                                (handle-of-menu-item-of item)
+                                (handle item))))
+                (when nsitem
+                  [nsmenu removeItem:nsitem])))
+            (setf (slot-value item 'owner) nil)
+            (setf (slot-value menu 'item-list) (delete item (slot-value menu 'item-list)))))))))
 
 
 (defgeneric find-menu-item (menu title)
@@ -871,7 +885,7 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 
 
-;;;Menu-item objects
+;;; Menu-item objects
 
 (defgeneric menu-item-number (item)
   (:method ((item menu-element))
@@ -880,11 +894,24 @@ This is the menu-item-update-function for the items in the Edit menu.
         (position item (slot-value owner 'item-list))))))
 
 
+;;; Specific menu subclasses
+(defclass menubar-menu (menu)
+  ())
 
 
 (defclass apple-menu (menu)
   ()
   (:default-initargs :menu-title "Apple"))
+
+
+(defun reset-application-in-menubar (menu)
+    (let ((title (menu-title menu)))
+      (set-menu-title menu "Application") ; we need to reset it so it's updated in the menubar.
+      (set-menu-title menu title)))
+
+(defmethod update-instance-for-different-class :after (menu (new-menu apple-menu) &key &allow-other-keys)
+  (declare (ignore menu))
+  (reset-application-in-menubar new-menu))
 
 (defmethod menu-deinstall ((menu apple-menu))
   ;;The apple menu cannot be removed by the user (it causes multifinder
@@ -1013,63 +1040,25 @@ RETURN: The handle of the menu-item that has (handle menu) as submenu.
               nil
               [supermenu itemAtIndex:index])))))))
 
-
-(defun ns-add-item (nsmenu nsitem)
-  "
-DO:             Add the NSItem NSITEM to the NSMenu NSMENU.
-
-NOTE:           NSITEM is removed from its menu if it is in one
-                already, before being added to NSMENU.
-"
-  (unless (nullp [nsitem menu])
-    ;; (format t "~&  removing item ~S from menu ~S~%" (objcl:lisp-string  [nsitem title]) (objcl:lisp-string  [[nsitem menu] title])) (finish-output)
-    [[nsitem retain] autorelease]                             
-    [[nsitem menu] removeItem:nsitem])
-  ;; (format t "~&  adding item ~S to menu ~S~%" (objcl:lisp-string [nsitem title]) (objcl:lisp-string  [nsmenu title])) (finish-output)
-  [nsmenu addItem:nsitem])
-
-
-(defun ns-attach-submenu (nsmenu submenu)
-  "
-DO:             Add to the NSMenu of MENU a NSItem with the NSMenu of
-                SUBMENU as submenu.  If the NSMenu of the submenu
-                doesn't already have a NSMenuItem, one is created.
-"
-  (let ((nsitem (handle-of-menu-item-of submenu)))
-    ;;     menu -- menu -- item
-    ;;                  -- item
-    ;;          -- item
-    ;; maps to:
-    ;;     NSMenu -- NSItem -- NSMenu -- NSItem
-    ;;                                -- NSItem
-    ;;            -- NSItem
-    (if nsitem
-        (progn
-          (ns-add-item nsmenu nsitem)
-          [nsmenu setSubmenu:(unwrap submenu) forItem:nsitem])
-        (let ((nsitem [[NSMenuItem alloc]
-                            initWithTitle:(objcl:objcl-string (menu-title submenu))
-                            action:*null*
-                            keyEquivalent:(objcl:objcl-string "")]))
-          (ns-add-item nsmenu nsitem)
-          [nsmenu setSubmenu:(unwrap submenu) forItem:nsitem]))))
-
+(defun %attach-item-to-menu (item menu)
+  (with-handle (nsmenu menu)
+    (if (typep item 'menu)
+        (ns-attach-submenu nsmenu item)
+        (let ((item-handle (handle item)))
+          (if item-handle
+              (ns-add-item nsmenu item-handle)
+              (ns-add-item nsmenu (unwrap item)))))))
 
 (defmethod update-handle ((menu menu))
   (let ((nsmenu (or (handle menu)
                     [[NSMenu alloc] initWithTitle:(objcl:objcl-string (menu-title menu))])))
+    (setf (handle menu) nsmenu)
     ;; (format t "~&unwrap menu ~S~%" (menu-title menu)) (finish-output)
     (when (slot-value menu 'menu-font)
       [nsmenu setFont:(unwrap (slot-value menu 'menu-font))])
     (dolist (item (slot-value menu 'item-list))
       ;; (format t "~&item ~S~%"  (menu-title item)) (finish-output)
-      (if (typep item 'menu)
-        (ns-attach-submenu nsmenu item)
-        (let ((item-handle (handle item)))
-          (if item-handle
-            (ns-add-item nsmenu item-handle)
-            (ns-add-item nsmenu (unwrap item))))))
-    (setf (handle menu) nsmenu)))
+      (%attach-item-to-menu item menu))))
 
 
 (defmethod unwrap ((menu menu))
@@ -1205,55 +1194,57 @@ RETURN:         A new instance of MENU representing the NSMenu NSMENU.
 
 
 
-(defun fetch-current-menubar ()
+(defun initialize-menubar ()
   "
 DO:             Inspect the application main menu, and build the
                 lisp-side view of the menu bar.  This updates the
                 variables *APPLE-MENU* *FILE-MENU* *EDIT-MENU*
-                *LISP-MENU* *TOOL-MENU* *WINDOWS-MENU*.
+                *LISP-MENU* *TOOLS-MENU* *WINDOWS-MENU*.
 
 RETURN:         The list of MENUs collected.
 "
+  (setf *menubar* (make-instance 'menubar))
   (let ((menu (wrap [[NSApplication sharedApplication] mainMenu])))
-    (when menu
-      (let ((menubar (menu-items menu)))
-        (dolist (menu menubar)
-          (setf (slot-value menu 'owner) nil))
-        (setf *apple-menu*   (change-class (first menubar) 'apple-menu)
-              *file-menu*    (find "File"    menubar :key (function menu-title) :test (function string=))
-              *edit-menu*    (find "Edit"    menubar :key (function menu-title) :test (function string=))
-              *lisp-menu*    (find "Lisp"    menubar :key (function menu-title) :test (function string=))
-              *tool-menu*    (find "Tool"    menubar :key (function menu-title) :test (function string=))
-              *windows-menu* (find "Windows" menubar :key (function menu-title) :test (function string=)))
-        menubar))))
+    (setf (slot-value *menubar* 'menu) menu)
+    (let ((menubar (menu-items menu)))
+      (setf *default-menubar* menubar
+            *apple-menu*      (change-class (first menubar) 'apple-menu)
+            *file-menu*       (find "File"    menubar :key (function menu-title) :test (function string=))
+            *edit-menu*       (find "Edit"    menubar :key (function menu-title) :test (function string=))
+            *lisp-menu*       (find "Lisp"    menubar :key (function menu-title) :test (function string=))
+            *tools-menu*      (find "Tools"   menubar :key (function menu-title) :test (function string=))
+            *windows-menu*    (find "Window"  menubar :key (function menu-title) :test (function string=))))
+    (values)))
 
 
 (defun initialize/menu ()
-  (let ((main-menu [[NSApplication sharedApplication] mainMenu]))
+  (initialize-menubar)
+  (with-handle (main-menu (menubar-menu *menubar*))
     (setf *menubar-bottom* (if (nullp main-menu)
                                22.0
-                               (ceiling [main-menu menuBarHeight]))))
-  (setf *default-menubar* (fetch-current-menubar)
-        ;; Notice this menubar instance is immediately replaced by the following SET-MENUBAR call.
-        *menubar*      (make-instance 'menubar :menus (copy-list *default-menubar*)))
-  (setf *bring-windows-front-item* (make-instance 'menu-item
-                                                  :menu-item-title "Bring All to Front"
-                                                  :menu-item-action 'bring-all-windows-front))
-  (dolist (item (list  (make-instance 'menu-item
-                                      :menu-item-title "Abort"
-                                      :menu-item-action (lambda () (invoke-restart 'abort)))
-                       (make-instance 'menu-item
-                                      :menu-item-title "Break"
-                                      :menu-item-action (lambda () (invoke-restart 'break)))
-                       (make-instance 'menu-item
-                                      :menu-item-title "Continue"
-                                      :menu-item-action (lambda () (invoke-restart 'continue)))
-                       (make-instance 'menu-item
-                                      :menu-item-title "Force Quit"
-                                      :menu-item-action (lambda () (ccl:quit)))))
-    (when (and *lisp-menu*
-               (not (find-menu-item *lisp-menu* (menu-item-title item))))
-      (add-menu-items *lisp-menu* item)))
+                               (ceiling [main-menu  menuBarHeight]))))
+  (when *windows-menu*
+    (setf *bring-windows-front-item* (find-menu-item *windows-menu* "Bring All to Front"))
+    (unless *bring-windows-front-item*
+      (setf *bring-windows-front-item* (make-instance 'menu-item
+                                                      :menu-item-title "Bring All to Front"
+                                                      :menu-item-action 'bring-all-windows-front))
+      (add-menu-items *windows-menu* *bring-windows-front-item*)))
+  (when *lisp-menu*
+    (dolist (item (list  (make-instance 'menu-item
+                                        :menu-item-title "Abort"
+                                        :menu-item-action (lambda () (invoke-restart 'abort)))
+                         (make-instance 'menu-item
+                                        :menu-item-title "Break"
+                                        :menu-item-action (lambda () (invoke-restart 'break)))
+                         (make-instance 'menu-item
+                                        :menu-item-title "Continue"
+                                        :menu-item-action (lambda () (invoke-restart 'continue)))
+                         (make-instance 'menu-item
+                                        :menu-item-title "Force Quit"
+                                        :menu-item-action (lambda () (ccl:quit)))))
+      (unless (find-menu-item *lisp-menu* (menu-item-title item))
+        (add-menu-items *lisp-menu* item))))
   (values))
 
 
@@ -1276,5 +1267,17 @@ RETURN:         The list of MENUs collected.
 ;; [(handle (find-menu-item (find-menu "Patchwork") "PW")) target]
 ;; #<A Null Foreign Pointer>
 ;; (menu-item :title "PW" :enabledp t :checkedp nil "x30200259B94D")
+
+(defgeneric print-menu (menu &optional stream level)
+  (:method ((menubar menubar) &optional (*standard-output* *standard-output*) (level 0))
+    (dolist (menu (menubar-menus menubar) (values))
+      (print-menu menu *standard-output* (1+ level))))
+  (:method ((menu menu) &optional (*standard-output* *standard-output*) (level 0))
+    (format t "~VA~A~%" (* 4 level) "" (menu-title menu))
+    (dolist (menu (menu-items menu) (values))
+      (print-menu menu *standard-output* (1+ level))))
+  (:method ((item menu-item) &optional (*standard-output* *standard-output*) (level 0))
+    (format t "~VA~A~%" (* 4 level) "" (menu-item-title item))))
+
 
 ;;;; THE END ;;;;

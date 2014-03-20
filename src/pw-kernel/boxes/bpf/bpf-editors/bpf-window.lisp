@@ -269,4 +269,4 @@
 
 ;;(window-select (make-BPF-editor (make-break-point-function '(0 100) '(0 100)))) 
 
-(provide 'BPF-window)
+;;;; THE END ;;;;

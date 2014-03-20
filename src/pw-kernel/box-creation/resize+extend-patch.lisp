@@ -34,8 +34,6 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(provide 'resize+extend-patch)
-
 
 ;; resizable PW box in x direction 
 (defclass  C-pw-resize-x (C-patch) ())
@@ -121,9 +119,4 @@
         (tell (controls *active-patch-window*) 'draw-connections))
       nil))
 
-
-
-
-
-
-
+;;;; THE END ;;;;

@@ -34,7 +34,7 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(eval-when (eval load compile)
+(eval-when (:compile-toplevel :load-toplevel :execute)
   ;; (require 'traps)
   ;(load-once "ui:Examples;NotInROM;NotInROM")
   ;(load-once "ui:Library;interfaces;SERIAL")
@@ -44,8 +44,7 @@
   (defconstant $bSpoolLoop 1)
   (defconstant $err-printer 94)
   (defconstant $err-printer-load 95)
-  (defconstant $err-printer-start 97)
-)
+  (defconstant $err-printer-start 97))
 
 ;;(import '(traps::$baud9600 traps::$data8 traps::$stop20 traps::$noParity
 ;;          traps::$boutrefnum traps::$sPortB))

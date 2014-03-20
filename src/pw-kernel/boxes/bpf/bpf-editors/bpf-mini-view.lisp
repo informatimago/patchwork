@@ -223,50 +223,34 @@
     (scale-to-fit-in-rect self)
     (view-draw-contents self)))
 
-;;=====================================
-;;draw
-
-;; ;; Defined in multi-bpf.lisp:
-;;
-;; (defmethod view-draw-contents ((self C-mini-bpf-view))
-;;  (with-focused-view self
-;;    (draw-rect* (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
-;;     (if (open-state self)
-;;      (when (break-point-function self)
-;;        (draw-bpf-function 
-;;             (break-point-function self) self nil (h-view-scaler self)(v-view-scaler self)))
-;;        (draw-string 3 9 (doc-string self)))))
 
 
+;; (setq foo2 (make-instance 'window :window-title "BPF-mini"))
+;; (setq bb (make-instance 'C-break-point-function
+;;                    :break-point-list (list (make-point 0 20)(make-point 50 0)(make-point 80 80))))
+;; (setq bb2 (make-instance 'C-break-point-function
+;;      :break-point-list (list (make-point 0 10)(make-point 20 10)(make-point 80 70)(make-point 180 5))))
+;; (setq bm (make-instance 'C-mini-bpf-view 
+;;                  :break-point-function bb
+;;                  :view-container foo2
+;;                  :view-position #@(5 5)
+;;                  :view-size #@(125 125)))
+;; 
+;; (setq bm2 (make-instance 'C-mini-bpf-view 
+;;                  :break-point-function bb2
+;;                  :view-container foo2
+;;                  :view-position #@(145 5)
+;;                  :view-size #@(80 80)))
+;; 
+;; (setq bm3 (make-instance 'C-mini-bpf-view 
+;;                  :break-point-function bb
+;;                  :view-container foo2
+;;                  :view-position #@(5 145)
+;;                  :view-size #@(60 100)))
+;; 
+;; ;;(time (repeat 400 (view-draw-contents bm)))  
+;; ;;(time (repeat 100 (scale-to-fit-in-rect bm)))
+;; ;;(set-break-point-function-to-mini bm bb2)
 
-#|    
-
-(setq foo2 (make-instance 'window :window-title "BPF-mini"))
-(setq bb (make-instance 'C-break-point-function
-                   :break-point-list (list (make-point 0 20)(make-point 50 0)(make-point 80 80))))
-(setq bb2 (make-instance 'C-break-point-function
-     :break-point-list (list (make-point 0 10)(make-point 20 10)(make-point 80 70)(make-point 180 5))))
-(setq bm (make-instance 'C-mini-bpf-view 
-                 :break-point-function bb
-                 :view-container foo2
-                 :view-position #@(5 5)
-                 :view-size #@(125 125)))
-
-(setq bm2 (make-instance 'C-mini-bpf-view 
-                 :break-point-function bb2
-                 :view-container foo2
-                 :view-position #@(145 5)
-                 :view-size #@(80 80)))
-
-(setq bm3 (make-instance 'C-mini-bpf-view 
-                 :break-point-function bb
-                 :view-container foo2
-                 :view-position #@(5 145)
-                 :view-size #@(60 100)))
-
-;;(time (repeat 400 (view-draw-contents bm)))  
-;;(time (repeat 100 (scale-to-fit-in-rect bm)))
-;;(set-break-point-function-to-mini bm bb2)
-
-|#    
+;;;; THE END ;;;;
 

@@ -84,19 +84,17 @@
 (defunp Buffer ((buff nilNum)) nil
         "The buffer module stores the results of patch calculations connected to its 
 input. It has two states: open (indicated by a small o on the module) and closed 
-(indicated by x). The user can switch between these two states by clicking on 
+\(indicated by x). The user can switch between these two states by clicking on 
 the o or the x. When the module is open, it behaves exactly like the module 
 const. When it is closed it returns the last value evaluated. It is advisable to 
 close the module immediately after evaluation to avoid recalculating the input."
   (declare (ignore buff)))
 
-#|
-(in-package :pw)
-(add-patch-box *active-patch-window* 
-               (make-patch-box  'C-patch-buffer:C-patch-buffer 'Buff  
-                               '(*nil-numbox-pw-type* "value") '()))
-(unintern 'pw-function)
-|#
+;; (in-package :pw)
+;; (add-patch-box *active-patch-window* 
+;;                (make-patch-box  'C-patch-buffer:C-patch-buffer 'Buff  
+;;                                '(*nil-numbox-pw-type* "value") '()))
+;; (unintern 'pw-function)
 
 
 

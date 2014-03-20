@@ -58,7 +58,7 @@ The commands to edit the table are the following:
 To edit each cell, click twice on the cell, type the desired values and then hit return.
 
 To add cells (lines or columns), it is necessary to first select a cell 
-(i.e., position the cursor on the cell and click once).
+\(i.e., position the cursor on the cell and click once).
 After selecting the cell one has access to the following commands:
       To add a cell before the current cell:   hit '->'
       To add a cell after the current cell:   hit '<-'

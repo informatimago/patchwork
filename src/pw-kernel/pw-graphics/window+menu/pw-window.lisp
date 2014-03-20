@@ -289,23 +289,21 @@
   (when (wins-menu-item self)
     (menu-item-disable (wins-menu-item self)))) 
 
-#||
-(defmethod view-activate-event-handler :after ((self C-pw-window))
-(when (abstract-box self)
-(draw-appl-label (abstract-box self) #\*))
-(ui:set-menubar *patch-work-menu-root*)
-(enable-all-apps-menu-items)
-(menu-item-disable *apps-PW-menu-item*)
-(update-PW-file-menu-items
-(top-level-patch-win? self) (save-changes-to-file-flag self))
-(update-wins-menu-items self)
-(setq *active-patch-window* self))
-||#
+;; (defmethod view-activate-event-handler :after ((self C-pw-window))
+;;   (when (abstract-box self)
+;;     (draw-appl-label (abstract-box self) #\*))
+;;   (ui:set-menubar *patch-work-menu-root*)
+;;   (enable-all-apps-menu-items)
+;;   (menu-item-disable *apps-PW-menu-item*)
+;;   (update-PW-file-menu-items
+;;    (top-level-patch-win? self) (save-changes-to-file-flag self))
+;;   (update-wins-menu-items self)
+;;   (setq *active-patch-window* self))
 
 (defmethod view-activate-event-handler :after ((self C-pw-window))
   (when (abstract-box self)
     (draw-appl-label (abstract-box self) #\*))
-  (unless (equal (ui:menubar)  *patch-work-menu-root*)
+  (unless (equal (ui:menubar) *patch-work-menu-root*)
     (ui:set-menubar *patch-work-menu-root*)
     (enable-all-apps-menu-items))
   (menu-item-disable *apps-PW-menu-item*)
@@ -323,14 +321,14 @@
     (mapc #'menu-enable (cdr *default-CCL-menubar*))
     (menu-item-disable *apps-lisp-menu-item*)))
 
-#|(defmethod view-deactivate-event-handler :after ((self C-pw-window))
-(when (abstract-box self)
-(draw-appl-label (abstract-box self) #\A))
-(when (eq *active-patch-window* self) ; no PW window selected
-(menu-item-enable *apps-PW-menu-item*)
-(enable-Lisp-apps-menu-item?))
-(when (wins-menu-item self)
-(MENU-item-ENABLE (wins-menu-item self))))|#
+;; (defmethod view-deactivate-event-handler :after ((self C-pw-window))
+;;   (when (abstract-box self)
+;;     (draw-appl-label (abstract-box self) #\A))
+;;   (when (eq *active-patch-window* self) ; no PW window selected
+;;     (menu-item-enable *apps-PW-menu-item*)
+;;     (enable-Lisp-apps-menu-item?))
+;;   (when (wins-menu-item self)
+;;     (MENU-item-ENABLE (wins-menu-item self))))
 
 (defmethod view-deactivate-event-handler :after ((self C-pw-window))
   (when (abstract-box self)

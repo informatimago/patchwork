@@ -206,12 +206,7 @@
                  
                  
                  (:file "pw-kernel/environment/epw-package"  
-                        :depends-on ("packages"
-                                     "pw-kernel/environment/lelisp-macros"
-                                     "pw-kernel/environment/pw-symbolic-types"
-                                     "pw-kernel/box-creation/resize+extend-patch"
-                                     "pw-kernel/environment/clpf-utils"
-                                     "pw-kernel/types/pw-type-scheme"))
+                        :depends-on ("packages"))
 
                  
                  (:file "pw-kernel/drivers+resources/midi" 
@@ -226,14 +221,7 @@
                                      "pw-kernel/drivers+resources/midi"))
 
                  (:file "pw-lib/epw-1.0b/epw-menus" 
-                        :depends-on ("pw-kernel/environment/epw-package"  
-                                     "pw-kernel/types/pw-box-to-menu"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"
-                                     "pw-lib/epw-1.0b/harmonicity"
-                                     "pw-lib/epw-1.0b/crime-fm"
-                                     "pw-lib/epw-1.0b/chord-filter"
-                                     "pw-lib/epw-1.0b/combinatorial"
-                                     "pw-lib/epw-1.0b/freq-harmony"))
+                        :depends-on ("pw-kernel/environment/epw-package"))
 
                  (:file "pw-lib/epw-1.0b/chord-filter" 
                         :depends-on ("pw-kernel/environment/epw-package"  
@@ -263,7 +251,8 @@
                  (:file "pw-kernel/types/pw-box-to-menu" 
                         :depends-on ("packages"
                                      "gf"
-                                     "pw-kernel/types/pw-type-scheme"))
+                                     "pw-kernel/types/pw-type-scheme"
+                                     "pw-kernel/box-creation/resize+extend-patch"))
                  
                  (:file "pw-kernel/types/pw-type-scheme" 
                         :depends-on ("packages"
@@ -524,6 +513,7 @@
                  (:file "pw-kernel/pw-graphics/window+menu/pw-menu"
                         :depends-on ("packages"
                                      "pw-lib/pwscript/record"
+                                     "pw-lib/epw-1.0b/epw-menus"
                                      ;; "pw-kernel/environment/make-image"
                                      "pw-lib/pwscript/pw-scripting-gf"))
 
@@ -688,6 +678,7 @@
                                      "pw-kernel/types/pw-types"
                                      "pw-kernel/environment/pw-scheduler"
                                      "pw-kernel/pw-graphics/window+menu/pw-window"
+                                     "pw-kernel/box-creation/resize+extend-patch"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-music/editors/mn/mn-collector-view"
@@ -731,7 +722,8 @@
                  (:file "pw-music/menu/rtm-menu" 
                         :depends-on ("packages"
                                      "pw-music/editors/rhythm/global-vars"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
+                                     "pw-kernel/pw-graphics/window+menu/pw-menu"
+                                     "pw-music/editors/rhythm/rtm-cleni-interface"))
                  
                  (:file "pw-music/editors/rhythm/beat-measure-measure-line" 
                         :depends-on ("packages"
@@ -750,7 +742,6 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-cleni-interface" 
                         :depends-on ("packages"
-                                     "pw-music/menu/rtm-menu"
                                      "pw-lib/cleni/cleni"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))
@@ -793,6 +784,7 @@
                  
                  (:file "pw-music/editors/rhythm/rtm-window" 
                         :depends-on ("packages"
+                                     "pw-music/menu/rtm-menu"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-music/editors/rhythm/global-vars"
                                      "pw-kernel/pw-graphics/window+menu/application-window"
@@ -869,19 +861,6 @@
                                      "pw-kernel/pw-graphics/controls/mouse-window"
                                      "pw-kernel/pw-graphics/window+menu/application-window"))
 
-                 (:file "pw-music/menu/music-basic-library" 
-                        :depends-on ("packages"
-                                     "gf"
-                                     "pw-kernel/types/pw-box-to-menu"
-                                     "pw-kernel/environment/epw-package"
-                                     "pw-kernel/pw-graphics/window+menu/pw-menu"
-                                     "pw-music/menu/mn-menu"
-                                     "pw-music/boxes/extern+multidim/md-note-slots"
-                                     "pw-music/boxes/midi/pw-midi-box" 
-                                     "pw-music/boxes/edit/pw-mn-collector"
-                                     "pw-music/boxes/edit/pw-chord-box"
-                                     "pw-music/boxes/edit/ch-line-build"))
-                 
                  (:file "pw-music/menu/mn-menu" 
                         :depends-on ("packages"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"))

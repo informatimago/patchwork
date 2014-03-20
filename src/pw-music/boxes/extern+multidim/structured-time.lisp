@@ -34,10 +34,6 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(provide 'structured-time)
-
-;; MN-window
-
 
 (defgeneric give-structured-duration2 (self rel-dur super-note)
   (:method ((self C-MN-window) rel-dur super-note) 

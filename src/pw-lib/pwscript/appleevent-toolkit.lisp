@@ -615,5 +615,4 @@ reply      An AEDesc record containing the reply to an Apple Event."
 
 ||#
 
-(provide :appleevent-toolkit)
 ;;;; THE END ;;;;

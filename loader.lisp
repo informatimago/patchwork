@@ -32,17 +32,28 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
+(load #P"~/works/patchwork/ccl-1.9-patch.lisp")
 (defpackage "PATCHWORK.LOADER"
   (:use "COMMON-LISP"))
 (in-package "PATCHWORK.LOADER")
 
 (declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
 
+(defun say (fmt &rest args)
+  (format *trace-output* "~%;;; ~?~%" fmt args)
+  (finish-output *trace-output*))
+
+
 ;; (pushnew 'cl-user::no-cocoa *features*)
 ;; (pushnew 'cl-user::cocoa-midi-player *features*)
 
-#-cl-user::no-cocoa (require :cocoa)
+
+#+(and ccl (not cl-user::no-cocoa))
+(progn
+  (say "Loading :cocoa (takes some time to start…)")
+  (require :cocoa))
+
+(defparameter *cocoa-readtable* (copy-readtable *readtable*))
 
 #+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
 
@@ -125,7 +136,7 @@
     translation-file))
 
 (defun install-patchwork (&key (force nil))
-  (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/patchwork/"                            :force force)
+  (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/patchwork/"                  :force force)
   (generate-logical-pathname-translation-file "PW-USER"   #P"/home/pjb/works/patchwork/pw-user/"                    :force force)
   (generate-logical-pathname-translation-file "CLENI"     #P"/home/pjb/works/patchwork/patchwork/src/pw-lib/cleni/" :force force))
 ;; (install-patchwork :force t)
@@ -160,6 +171,7 @@
 (ql:quickload :mclgui                                     :verbose t :explain t)
 (mclgui:initialize)
 (ql:quickload :patchwork                                  :verbose t :explain t)
+
 
 
 

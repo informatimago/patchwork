@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
 ;;========================================================
@@ -47,12 +45,11 @@
        rtm-win))
  
 ;;========================
-#|  ; for printing ...
+;; for printing ...
 ;;*screen-width* 
-(progn 
-  (set-view-size pw::*active-rtm-window* *screen-width* 1650) 
-  (pw::resize-new-rtm-w (pw::editor-collection-object pw::*active-rtm-window*) (view-size pw::*active-rtm-window*)))
-|#
+;; (progn 
+;;   (set-view-size pw::*active-rtm-window* *screen-width* 1650) 
+;;   (pw::resize-new-rtm-w (pw::editor-collection-object pw::*active-rtm-window*) (view-size pw::*active-rtm-window*)))
 
 ;;========================
 (defmethod window-close ((self C-rtm-editor-window))
@@ -65,13 +62,12 @@
          (make-rtm-help-window))
    (window-select *rtm-help-window*))
 
-#|
-(defmethod window-grow-event-handler ((self C-rtm-editor-window) where)
-  (declare (ignore where))
-  (call-next-method)
-  (resize-new-rtm-w (editor-collection-object self)(view-size self))
-  (erase+view-draw-contents self))
-|#
+
+;; (defmethod window-grow-event-handler ((self C-rtm-editor-window) where)
+;;   (declare (ignore where))
+;;   (call-next-method)
+;;   (resize-new-rtm-w (editor-collection-object self)(view-size self))
+;;   (erase+view-draw-contents self))
 
 (defmethod window-grow-event-handler ((self C-rtm-editor-window) where)
   (declare (ignore where))
@@ -217,3 +213,5 @@
   (when (eq *active-RTM-window* self)  ; no RTM window selected
     (menu-item-enable *apps-RTM-menu-item*)
     (enable-Lisp-apps-menu-item?)))
+
+;;;; THE END ;;;;

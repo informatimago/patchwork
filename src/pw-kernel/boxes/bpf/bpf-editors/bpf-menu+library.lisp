@@ -140,28 +140,25 @@
        (make-point 100 0))))
 
 
-#|
+;; (setq w2 (make-instance 'window :window-title "Test-bpflib"))
+;; 
+;; (setq bpfmenu1 (make-instance 'C-menubox-bpf 
+;;    :view-position (make-point 50 150) :view-size (make-point 74 54) :doc-string "BPFlib"
+;;                     :menu-box-list *pw-BPF-library*))
+;; 
+;; (add-subviews w2 bpfmenu1)
+;; 
+;; (setq bpfmenu2 (make-instance 'C-menubox-bpf 
+;;     :view-position (make-point 50 20) :view-size (make-point 74 54) :doc-string "BPFlib"
+;;                     :menu-box-list *pw-BPF-library*))
+;; (add-subviews w2 bpfmenu2)
+;; 
+;; (setq bpfmenu3 (make-instance 'C-menubox-bpf 
+;;     :view-position (make-point 140 5) :view-size (make-point 84 34) :doc-string "BPFlib"
+;;                     :menu-box-list *pw-BPF-library*))
+;; (add-subviews w2 bpfmenu3)
+;; ;;(patch-value bpfmenu1 ())
 
-(setq w2 (make-instance 'window :window-title "Test-bpflib"))
-
-(setq bpfmenu1 (make-instance 'C-menubox-bpf 
-   :view-position (make-point 50 150) :view-size (make-point 74 54) :doc-string "BPFlib"
-                    :menu-box-list *pw-BPF-library*))
-
-(add-subviews w2 bpfmenu1)
-
-(setq bpfmenu2 (make-instance 'C-menubox-bpf 
-    :view-position (make-point 50 20) :view-size (make-point 74 54) :doc-string "BPFlib"
-                    :menu-box-list *pw-BPF-library*))
-(add-subviews w2 bpfmenu2)
-
-(setq bpfmenu3 (make-instance 'C-menubox-bpf 
-    :view-position (make-point 140 5) :view-size (make-point 84 34) :doc-string "BPFlib"
-                    :menu-box-list *pw-BPF-library*))
-(add-subviews w2 bpfmenu3)
-;;(patch-value bpfmenu1 ())
-
-|#
 ;;==============================================================================
 
 
@@ -203,3 +200,4 @@
      (add-bpf-to-bpf-editor-from-PW win bpf)
      (update-bpf-view BPF-editor-object)))
 
+;;;; THE END ;;;;

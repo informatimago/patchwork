@@ -61,5 +61,5 @@
     "Double click the input and type in any list of ascii symbolic notes, for example:
 \"(C3 C3+25 C+3 C#3-25 C#3 Db3 C#3+25)\"
 The pw-ascii-chord-box will return the corresponding midic notes, in this case:
-(6000 6025 6050 6075 6100 6100 6125). "
+\(6000 6025 6050 6075 6100 6100 6125). "
   (declare (ignore chord)))
