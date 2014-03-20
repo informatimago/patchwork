@@ -136,12 +136,11 @@
   (say "Loading MacOSX Libraries")
   (load #P"PATCHWORK:src;macosx;load-libraries.lisp"))
 
-
+(pushnew #P"~/src/public/lisp/" ql:*local-project-directories* :test (function equalp))
 (ql:quickload :com.informatimago.common-lisp.cesarum)
 
 ;; DEBUG ;;
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper)
-;; (print *features*)
 (ql:quickload :com.informatimago.clext) ; closer-weak
 
 (ql:quickload :mclgui)
