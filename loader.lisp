@@ -154,6 +154,7 @@
 #+(and use-apple-events ccl darwin (not cl-user::no-cocoa))
 (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
 
+(pushnew #P"~/src/public/lisp/" ql:*local-project-directories* :test (function equalp))
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)
 (ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
 (ql:quickload :com.informatimago.clext                    :verbose t :explain t)
