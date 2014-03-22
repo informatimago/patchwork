@@ -120,7 +120,7 @@
     (draw-appl-label (pw-object self) #\A))
   (when (eq *active-MN-window* self)  ; no MN window selected
     (menu-item-enable *apps-MN-menu-item*)
-    (enable-Lisp-apps-menu-item?)))|#
+    (enable-Lisp-apps-menu-item)))|#
 
 (defmethod view-deactivate-event-handler :after ((self C-MN-window))
   (if (pw-object self)

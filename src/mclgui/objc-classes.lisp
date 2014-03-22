@@ -888,9 +888,7 @@ RETURN: A NSRect containing the frame of the window.
 @[MclguiEvaluator
   method:(evaluate)
   resultType:(:void)
-  body:
-  (format-trace "evaluate"  (evaluator-thunk self))
-  (funcall (evaluator-thunk self))]
+  body:(funcall (evaluator-thunk self))]
 
 
 ;;;------------------------------------------------------------

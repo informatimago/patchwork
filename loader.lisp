@@ -175,7 +175,7 @@
 (ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
 (ql:quickload :com.informatimago.clext                    :verbose t :explain t)
 (ql:quickload :mclgui                                     :verbose t :explain t)
-(mclgui:initialize)
+(ui:initialize)
 (ui:on-main-thread/sync
   (ql:quickload :patchwork                                  :verbose t :explain t))
 (ui:on-main-thread/sync

@@ -79,15 +79,17 @@
 ;;___________
 
 (defun enable-all-apps-menu-items ()
+  (set-menubar *patchwork-menubar*)
+  (mapc #'menu-enable (cdr *patchwork-menubar*))
   (let ((menus (menu-list *pw-menu-apps*)))
-    (while menus (menu-item-enable (pop menus)))))
+    (while menus (menu-item-enable (pop menus))))
+  (menu-item-disable *apps-PW-menu-item*))
 
-(defun enable-Lisp-apps-menu-item? ()
-  (unless (member nil (mapcar #'menu-enabled-p (menu-list *pw-menu-apps*)))
-    (set-menubar *lisp-menubar*)
-    ;;added 920818 [Camilo]
-    (mapc #'menu-enable (cdr *lisp-menubar*))
-    (menu-item-disable *apps-lisp-menu-item*)))
+(defun enable-Lisp-apps-menu-item ()
+  (set-menubar *lisp-menubar*)
+  ;;added 920818 [Camilo]
+  (mapc #'menu-enable (cdr *lisp-menubar*))
+  (menu-item-disable *apps-lisp-menu-item*))
 
 (defun add-apps-item-to-apps-menu (title action)
   (let ((menu (new-leafmenu title action)))
@@ -223,7 +225,7 @@
 ;;============================================
 ;; menubar for PW
 
-(defvar *patch-work-menu-root* nil)
+(defvar *patchwork-menubar* nil)
 
 
 
@@ -260,8 +262,7 @@ DO:       Execute the BODY with a handler for CONDITION and
                            (windows))))
     (when listener
       (window-select listener)))
-  (menu-item-disable *apps-lisp-menu-item*)
-  (enable-Lisp-apps-menu-item?))
+  (enable-Lisp-apps-menu-item))
 
 
 (defun pw-menu-action ()
@@ -270,8 +271,7 @@ DO:       Execute the BODY with a handler for CONDITION and
           (window-select *active-patch-window*)
           (search-for-next-pw-window)) 
       (make-new-pw-window t))
-  (enable-all-apps-menu-items)
-  (menu-item-disable *apps-PW-menu-item*))
+  (enable-all-apps-menu-items))
 
 
 (defvar *c-major-scale*            nil)
@@ -546,8 +546,9 @@ DO:       Execute the BODY with a handler for CONDITION and
                   (new-leafmenu "-" nil)
                   (new-leafmenu "Save Image"          (lambda () (save-special-pw-image))))
   ;;------------------------------
-  (setf *patch-work-menu-root* 
-        (list *pw-menu-apps*
+  (setf *patchwork-menubar* 
+        (list *apple-menu*
+              *pw-menu-apps*
               *pw-menu-file*
               *pw-menu-edit* 
               *PWoper-menu*
@@ -556,7 +557,7 @@ DO:       Execute the BODY with a handler for CONDITION and
               *pw-menu-patch*
               *pw-windows-menu*))
   ;;------------------------------
-  (setf *lisp-menubar*  (list* (first *original-menubar*) ;; apple-menu
+  (setf *lisp-menubar*  (list* *apple-menu*
                                *pw-menu-apps*
                                (rest *original-menubar*)))
   ;;------------------------------

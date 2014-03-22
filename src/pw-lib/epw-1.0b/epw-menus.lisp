@@ -53,7 +53,7 @@
 (defvar *epw-Utilities-menu*       nil)
 (defvar *epw-midi-menu*            nil)
 
-#|(let ((menus (memq patchwork::*pw-menu-Music* patch-work::*patch-work-menu-root*))
+#|(let ((menus (memq patchwork::*pw-menu-Music* patch-work::*patchwork-menubar*))
       (menu *epw-menu*))
   (check-type menus cons)
   (when (and (rest menus)

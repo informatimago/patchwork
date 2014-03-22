@@ -292,7 +292,7 @@
 ;; (defmethod view-activate-event-handler :after ((self C-pw-window))
 ;;   (when (abstract-box self)
 ;;     (draw-appl-label (abstract-box self) #\*))
-;;   (ui:set-menubar *patch-work-menu-root*)
+;;   (ui:set-menubar *patchwork-menubar*)
 ;;   (enable-all-apps-menu-items)
 ;;   (menu-item-disable *apps-PW-menu-item*)
 ;;   (update-PW-file-menu-items
@@ -303,8 +303,8 @@
 (defmethod view-activate-event-handler :after ((self C-pw-window))
   (when (abstract-box self)
     (draw-appl-label (abstract-box self) #\*))
-  (unless (equal (ui:menubar) *patch-work-menu-root*)
-    (ui:set-menubar *patch-work-menu-root*)
+  (unless (equal (ui:menubar) *patchwork-menubar*)
+    (ui:set-menubar *patchwork-menubar*)
     (enable-all-apps-menu-items))
   (menu-item-disable *apps-PW-menu-item*)
   (update-PW-file-menu-items (top-level-patch-win? self)
@@ -326,7 +326,7 @@
 ;;     (draw-appl-label (abstract-box self) #\A))
 ;;   (when (eq *active-patch-window* self) ; no PW window selected
 ;;     (menu-item-enable *apps-PW-menu-item*)
-;;     (enable-Lisp-apps-menu-item?))
+;;     (enable-Lisp-apps-menu-item))
 ;;   (when (wins-menu-item self)
 ;;     (MENU-item-ENABLE (wins-menu-item self))))
 

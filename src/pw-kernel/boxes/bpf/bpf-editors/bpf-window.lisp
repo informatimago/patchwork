@@ -160,7 +160,7 @@
     (draw-appl-label (pw-object self) #\A))
   (when (eq *active-BPF-window* self)  ; no BPF window selected
      (menu-item-enable *apps-BPF-menu-item*)
-     (enable-Lisp-apps-menu-item?)))
+     (enable-Lisp-apps-menu-item)))
 
 ;;==================
 ;; PW interface

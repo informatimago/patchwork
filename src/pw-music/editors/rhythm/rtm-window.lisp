@@ -212,6 +212,6 @@
     (draw-appl-label (pw-object self) #\A))
   (when (eq *active-RTM-window* self)  ; no RTM window selected
     (menu-item-enable *apps-RTM-menu-item*)
-    (enable-Lisp-apps-menu-item?)))
+    (enable-Lisp-apps-menu-item)))
 
 ;;;; THE END ;;;;
