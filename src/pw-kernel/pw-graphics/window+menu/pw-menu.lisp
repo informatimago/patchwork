@@ -68,12 +68,12 @@
 (defvar *pw-menu-apps*        nil)
 
 (defvar *apps-lisp-menu-item* nil)
-(defvar *apps-PW-menu-item*   nil)
+(defvar *apps-pw-menu-item*   nil)
 
 ;;_________________
 
-(defvar *original-CCL-menubar* (copy-list ui:*default-menubar*))
-(defvar *default-CCL-menubar*  '())
+(defvar *original-menubar* (copy-list ui:*default-menubar*))
+(defvar *lisp-menubar*  '())
 
 
 ;;___________
@@ -84,9 +84,9 @@
 
 (defun enable-Lisp-apps-menu-item? ()
   (unless (member nil (mapcar #'menu-enabled-p (menu-list *pw-menu-apps*)))
-    (ui:set-menubar *default-CCL-menubar*)
+    (set-menubar *lisp-menubar*)
     ;;added 920818 [Camilo]
-    (mapc #'menu-enable (cdr *default-CCL-menubar*))
+    (mapc #'menu-enable (cdr *lisp-menubar*))
     (menu-item-disable *apps-lisp-menu-item*)))
 
 (defun add-apps-item-to-apps-menu (title action)
@@ -294,15 +294,15 @@ DO:       Execute the BODY with a handler for CONDITION and
 
 (defun initialize-menus ()
   ;;------------------------------
+  (setf *lisp-menubar*  (list* (first *original-menubar*) ;; apple-menu
+                               *pw-menu-apps*
+                               (rest *original-menubar*)))
+  ;;------------------------------
   (setf *pw-menu-apps*         (new-menu "Patchwork"))
-  (setf *default-CCL-menubar*  (list* (first *original-CCL-menubar*)
-                                      *pw-menu-apps*
-                                      (rest *original-CCL-menubar*)))
-  ;;------------------------------
   (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
+  (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"   'pw-menu-action))
   ;;------------------------------
-  (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"    'pw-menu-action))
-  ;;------------------------------
+  
   (setf *pw-menu-file-close-item*       (item "Close"        #\W        (kill-patch-window *active-patch-window*)))
   (setf *pw-menu-file-only-Save-item*   (item "Save"         #\S        (PW-WINDOW-SAVE *active-patch-window*)))
   (setf *pw-menu-file-only-SaveMN-item* (item "Save with MN"        nil (PW-WINDOW-SAVE-MN *active-patch-window*)))
@@ -561,7 +561,7 @@ DO:       Execute the BODY with a handler for CONDITION and
               *pw-menu-patch*
               *pw-windows-menu*))
   ;;------------------------------
-  (set-menubar       *default-CCL-menubar*)
+  (set-menubar       *lisp-menubar*)
   (menu-item-disable *apps-lisp-menu-item*)
   (set-command-key   *apps-lisp-menu-item* #\L)
   (set-command-key   *apps-PW-menu-item*   #\1)

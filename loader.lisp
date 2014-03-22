@@ -32,7 +32,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(load #P"~/works/patchwork/ccl-1.9-patch.lisp")
+;; (load #P"~/works/patchwork/ccl-1.9-patch.lisp")
 (defpackage "PATCHWORK.LOADER"
   (:use "COMMON-LISP"))
 (in-package "PATCHWORK.LOADER")
@@ -171,6 +171,7 @@
 (ql:quickload :mclgui                                     :verbose t :explain t)
 (mclgui:initialize)
 (ql:quickload :patchwork                                  :verbose t :explain t)
+(patchwork::initialize-menus)
 
 
 

@@ -315,10 +315,10 @@
   (setq *active-patch-window* self))
 
 (defmethod view-activate-event-handler :after ((self ui::fred-window))
-  (unless (equal (ui:menubar)  *default-CCL-menubar*)
-    (ui:set-menubar *default-CCL-menubar*)
+  (unless (equal (ui:menubar)  *lisp-menubar*)
+    (ui:set-menubar *lisp-menubar*)
     ;;added 920818 [Camilo]
-    (mapc #'menu-enable (cdr *default-CCL-menubar*))
+    (mapc #'menu-enable (cdr *lisp-menubar*))
     (menu-item-disable *apps-lisp-menu-item*)))
 
 ;; (defmethod view-deactivate-event-handler :after ((self C-pw-window))
