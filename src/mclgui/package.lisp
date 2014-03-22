@@ -61,6 +61,9 @@
 
    "*TEXT-MODES*"
 
+   "ON-MAIN-THREAD" "ON-MAIN-THREAD/SYNC")
+
+  (:export
    
    ;; ----------------------------------------
    ;; Chapter 2: Points and Fonts
