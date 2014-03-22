@@ -294,15 +294,10 @@ DO:       Execute the BODY with a handler for CONDITION and
 
 (defun initialize-menus ()
   ;;------------------------------
-  (setf *lisp-menubar*  (list* (first *original-menubar*) ;; apple-menu
-                               *pw-menu-apps*
-                               (rest *original-menubar*)))
-  ;;------------------------------
   (setf *pw-menu-apps*         (new-menu "Patchwork"))
   (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
   (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"   'pw-menu-action))
   ;;------------------------------
-  
   (setf *pw-menu-file-close-item*       (item "Close"        #\W        (kill-patch-window *active-patch-window*)))
   (setf *pw-menu-file-only-Save-item*   (item "Save"         #\S        (PW-WINDOW-SAVE *active-patch-window*)))
   (setf *pw-menu-file-only-SaveMN-item* (item "Save with MN"        nil (PW-WINDOW-SAVE-MN *active-patch-window*)))
@@ -560,6 +555,10 @@ DO:       Execute the BODY with a handler for CONDITION and
               *pw-menu-Music*
               *pw-menu-patch*
               *pw-windows-menu*))
+  ;;------------------------------
+  (setf *lisp-menubar*  (list* (first *original-menubar*) ;; apple-menu
+                               *pw-menu-apps*
+                               (rest *original-menubar*)))
   ;;------------------------------
   (set-menubar       *lisp-menubar*)
   (menu-item-disable *apps-lisp-menu-item*)

@@ -17,7 +17,7 @@
 ;;;;LEGAL
 ;;;;    GPL3
 ;;;;    
-;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
+;;;;    Copyright Pascal J. Bourguignon 2012 - 2014
 ;;;;    
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,13 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;; (load #P"~/works/patchwork/ccl-1.9-patch.lisp")
+
+#+ccl-1.9
+(handler-bind ((simple-error (lambda (c)
+                               (princ c) (terpri)
+                               (invoke-restart 'continue))))
+  (load #P"~/works/patchwork/ccl-1.9-patch.lisp"))
+
 (defpackage "PATCHWORK.LOADER"
   (:use "COMMON-LISP"))
 (in-package "PATCHWORK.LOADER")
@@ -170,8 +176,10 @@
 (ql:quickload :com.informatimago.clext                    :verbose t :explain t)
 (ql:quickload :mclgui                                     :verbose t :explain t)
 (mclgui:initialize)
-(ql:quickload :patchwork                                  :verbose t :explain t)
-(patchwork::initialize-menus)
+(ui:on-main-thread/sync
+  (ql:quickload :patchwork                                  :verbose t :explain t))
+(ui:on-main-thread/sync
+  (mclgui:on-main-thread (patchwork::initialize-menus)))
 
 
 

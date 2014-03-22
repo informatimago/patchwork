@@ -37,15 +37,26 @@
 
 
 
+;;; --------------------------------------------------------------------
+;;;
+;;; MAILBOX: to send one message between two threads.
+;;;
+;;; The consummer may call MAILBOX-COLLECT before or after the
+;;; producer calls MAILBOX-POST.   If it calls before, then it waits
+;;; until the producer notifies the mailbox is full.
+;;;
+
 (defstruct (mailbox
             (:conc-name %mailbox-)
             (:constructor %make-mailbox (lock condition)))
   lock condition message full)
 
 (defun make-mailbox (&optional (name "mailbox"))
+  (declare (stepper disable))
   (%make-mailbox (bt:make-lock name) (bt:make-condition-variable :name name)))
 
 (defun mailbox-collect (mailbox)
+  (declare (stepper disable))
   (let (result)
     (bt:with-lock-held ((%mailbox-lock mailbox))
       (unless (%mailbox-full mailbox)
@@ -54,6 +65,7 @@
     result))
 
 (defun mailbox-post (mailbox message)
+  (declare (stepper disable))
   (bt:with-lock-held ((%mailbox-lock mailbox))
     (setf (%mailbox-message mailbox) message
           (%mailbox-full mailbox) t)
@@ -76,7 +88,7 @@
       (assert (<= 0 (- end start) 1))))
   :success)
 
-
+;;; --------------------------------------------------------------------
 
 
 (defvar *initial-process* nil)
