@@ -471,15 +471,27 @@ RETURN:         DST.
 
 
 (defmacro report-errors (&body body)
+  (let ((vhandler (gensym)))
+    `(block ,vhandler
+       (handler-bind ((error (lambda (err)
+                               (declare (stepper disable))
+                               #+ccl (format *trace-output* "~{~A~%~}" (ccl::backtrace-as-list))
+                               (format *trace-output* "~%ERROR while ~S:~%~A~2%"
+                                       ',(if (= 1 (length body)) body `(progn ,@body))
+                                       err)
+                               (finish-output *trace-output*)
+                               (return-from ,vhandler nil))))
+         ,@body)))
+  #-(and)
   `(handler-case
        (progn ,@body)
      (error (err)
-            (declare (stepper disable))
-            (format *trace-output* "~%ERROR while ~S:~%~A~2%"
-                    ',(if (= 1 (length body)) body `(progn ,@body))
-                    err)
-            (finish-output *trace-output*)
-            nil)))
+       (declare (stepper disable))
+       (format *trace-output* "~%ERROR while ~S:~%~A~2%"
+               ',(if (= 1 (length body)) body `(progn ,@body))
+               err)
+       (finish-output *trace-output*)
+       nil)))
 
 
 ;;;------------------------------------------------------------
