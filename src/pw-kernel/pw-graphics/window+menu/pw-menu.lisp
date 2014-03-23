@@ -72,9 +72,9 @@
 
 ;;_________________
 
-(defvar *original-menubar* (copy-list ui:*default-menubar*))
-(defvar *lisp-menubar*  '())
-
+(defvar *original-menubar*   (copy-list ui:*default-menubar*))
+(defvar *lisp-menubar*      '())
+(defvar *patchwork-menubar* '())
 
 ;;___________
 
@@ -220,13 +220,6 @@
   (dis/enable-menu-item *pw-menu-file-SaveMN-item* fl)
   (dis/enable-menu-item *pw-menu-file-only-Save-item* (and fl change-fl))
   (dis/enable-menu-item *pw-menu-file-only-SaveMN-item* (and fl change-fl)))
-
-;;============================================
-;;============================================
-;; menubar for PW
-
-(defvar *patchwork-menubar* nil)
-
 
 
 ;;==================================================
