@@ -708,7 +708,7 @@ NEW-STYLES:     A keyword or list of keywords. Allowable keywords are
     (setf (slot-value item 'style) newstyle)
     (let ((nsitem (handle item)))
       (when nsitem
-        [nsitem setAttributedTitle:[NSAttributedString
+        [nsitem setAttributedTitle:[[NSAttributedString alloc] 
                                     initWithString:(objcl:objcl-string (slot-value item 'title))
                                     attributes:(style-to-attributes newstyle)]]))))
 
