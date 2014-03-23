@@ -491,7 +491,7 @@
 
 (defmethod view-click-event-handler ((self C-mus-not-view) where)
   (declare (ignore where))
-  (call-next-method) )
+  (call-next-method))
 
 (defmethod view-mouse-up ((self C-mus-not-view))
   (setf *default-MN-cursor* *note-head-cursor*)
