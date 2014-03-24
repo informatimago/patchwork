@@ -50,42 +50,32 @@
   (setq *r-view-temp-region* (new-region)))
 
 ;;======================================
+(defun grow-gray-rect (anchor float view limit)
+  (let* ((float     (add-points float anchor))
+         (old-mouse (view-mouse-position nil))
+         (new-mouse old-mouse)
+         (offset    (subtract-points float old-mouse))
+         (delta     (add-points offset old-mouse))
+         (limit     (and limit (add-points anchor (make-point limit limit))))
+         (event     (make-event)))
+    (flet ((draw-gray-rect (rect)
+             (with-focused-view view
+               (with-pen-state (:pattern *gray-pattern* :mode :patCopy)
+                 (draw-rect rect)))))
+      (with-instance-drawing view
+        (draw-gray-rect (pt2rect anchor delta))
+        (loop :while (mouse-down-p) :do
+          (setf new-mouse (view-mouse-position nil))
+          (unless (eql old-mouse new-mouse)  ;has the mouse moved?
+            (new-instance view)
+            (setf delta (add-points offset new-mouse))
+            (when limit (setq delta (point-max delta limit)))
+            (draw-gray-rect (pt2rect anchor delta))
+            (get-next-event event nil 0 1)
+            (setf old-mouse new-mouse)))      
+        (new-instance view)))
+    delta))
 
-(defun grow-gray-rect (anchor float port limit)
-  (niy grow-gray-rect anchor float port limit)
-  ;; (setq float (add-points float anchor))
-  ;; (let* ((old-mouse (view-mouse-position nil))
-  ;;        (new-mouse old-mouse)
-  ;;        (offset (subtract-points float old-mouse))
-  ;;        (delta (add-points offset old-mouse)))
-  ;;   (when limit
-  ;;     (setq limit (add-points anchor
-  ;;                             (make-point limit limit))))
-  ;;   (with-port port
-  ;;     (with-pen-saved
-  ;;       (with-clip-rect (rref port :grafport.portrect)
-  ;;         (#_PenMode :word (position :patxor *pen-modes*))
-  ;;         (#_PenPat :ptr *gray-pattern*)
-  ;;         (rlet ((rect :rect :topleft anchor
-  ;;                      :bottomright float)
-  ;;                (event :eventRecord))
-  ;;           (#_frameRect :ptr rect)              ;draw the rectangle first time
-  ;;           ;repeat while the button is down
-  ;;           (ui::while (mouse-down-p)
-  ;;             (setq new-mouse (view-mouse-position nil))
-  ;;             (unless (eq old-mouse new-mouse)  ;has the mouse moved?
-  ;;               (#_FrameRect :ptr rect)          ;erase the old rect
-  ;;               (setq delta (add-points offset new-mouse))
-  ;;               (when limit (setq delta (point-max delta limit)))
-  ;;               (#_pt2rect :long anchor
-  ;;                         :long delta
-  ;;                         :ptr rect)
-  ;;               (#_FrameRect :ptr rect)          ;draw the new rect
-  ;;               (get-next-event event nil 0 1)
-  ;;               (setq old-mouse new-mouse)))
-  ;;           (#_FrameRect :ptr rect)              ;a final erasure
-  ;;           delta)))))
-  )
 
 (defun point-max (point-1 point-2)
   (make-point (max (point-h point-1) (point-h point-2))

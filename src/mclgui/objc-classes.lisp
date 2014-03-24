@@ -516,35 +516,49 @@ RETURN:         DST.
 ;; vv = sy - wy - sv
 
 
+(defun screen-frames ()
+  "RETURN: A list of frame for each of the screen. The mainScreen frame is first.
+The coordinates are in Cocoa coordinates."
+  (let ((results '())
+        (main     [NSScreen mainScreen]))
+    (cons (get-nsrect [main frame])
+          (do-nsarray (screen [NSScreen screens] (nreverse results))
+            (unless (eql screen main)
+              (push (get-nsrect [screen frame]) results))))))
 
-(defun window-to-nswindow-origin (position size)
-  "
-RETURN: A NSPoint containing the origin of the nswindow.
-"
-  (multiple-value-bind (screen-pos screen-siz) (main-screen-frame)
-    (ns:make-ns-point (+ (point-h screen-pos) (point-h position))
-                      (- (+ (point-v screen-pos) (point-v screen-siz))
-                         (point-v position) (point-v size)))))
-
-
-
+;; (screen-frames)
+;; (#S(nsrect :x 0.0D0 :y 0.0D0 :width 1920.0D0 :height 1080.0D0))
 
 
 (defun main-screen-frame ()
   "
-RETURN:         Position and size of the main screen.
+RETURN:         x y w h of the main screen (in Cocoa rounded coordinates).
 "
+  
   (multiple-value-bind (x y w h) (frame [[NSScreen mainScreen] frame])
-    (values (make-point (round x) (round y))
-            (make-point (round w) (round h)))))
+    (values (round x) (round y)
+            (round w) (round h))))
+
+(defun nsscreen-to-screen-point (nspoint)
+  (multiple-value-bind (sx sy sw sh) (main-screen-frame)
+    (declare (ignore sw))
+    (make-point (round (nspoint-x nspoint))
+                (round (- (+ sy sh) (nspoint-y nspoint))))))
+
+(defun screen-to-nsscreen-point (point)
+  (multiple-value-bind (sx sy sw sh) (main-screen-frame)
+    (declare (ignore sw))
+    (make-nspoint (point-h point)
+                  (- (+ sy sh) (point-v point)))))
+
 
 (defun nswindow-to-window-rect (frame)
   "
 FRAME:  A NSRECT (in screen coordinates).
 RETURN: a RECT (in flipped \"screen coordinates\").
 "
-  (multiple-value-bind (sx sy sw sh) (frame [[NSScreen mainScreen] frame])
-    (declare ( ignore sw))
+  (multiple-value-bind (sx sy sw sh) (main-screen-frame)
+    (declare (ignore sw))
     (make-rect (- (nsrect-x frame)                           sx) ; left
                (- (+ sy sh)   (+ (nsrect-y frame) (nsrect-height frame))) ; top
                (- (+ (nsrect-x frame) (nsrect-width frame))  sx) ; right
@@ -554,14 +568,21 @@ RETURN: a RECT (in flipped \"screen coordinates\").
   "
 RETURN: A NSRect containing the frame of the window.
 "
-  (multiple-value-bind (sx sy sw sh) (frame [[NSScreen mainScreen] frame])
-    (declare ( ignore sw))
+  (multiple-value-bind (sx sy sw sh) (main-screen-frame)
+    (declare (ignore sw))
     (ns:make-ns-rect (+ sx (point-h position))
                      (- (+ sy sh) (+ (point-v position) (point-v size)))
                      (point-h size)
                      (point-v size))))
 
-
+(defun window-to-nswindow-origin (position size)
+  "
+RETURN: A NSPoint containing the origin of the nswindow.
+"
+  (multiple-value-bind (sx sy sw sh) (main-screen-frame)
+    (declare (ignore sw))
+    (ns:make-ns-point (+ sx (point-h position))
+                      (- (+ sy sh) (point-v position) (point-v size)))))
 
 ;;;------------------------------------------------------------
 ;;; Types.

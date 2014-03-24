@@ -64,6 +64,15 @@
    "ON-MAIN-THREAD" "ON-MAIN-THREAD/SYNC")
 
   (:export
+   "MAKE-RECT" "RECT-TOPLEFT" "RECT-BOTTOMRIGHT"
+   "RECT-LEFT" "RECT-RIGHT" "RECT-TOP" "RECT-BOTTOM"
+   "RECT-SIZE" "RECT-WIDTH" "RECT-HEIGHT"
+   "EQUAL-RECT" "EMPTY-RECT-P" "RECT-CENTER" "OFFSET-RECT"
+   "INSET-RECT" "INTERSECT-RECT" "UNION-RECT"
+   "POINT-IN-RECT-P" "POINTS-TO-RECT" "POINT-TO-ANGLE"
+   "PT2RECT")
+  
+  (:export
    
    ;; ----------------------------------------
    ;; Chapter 2: Points and Fonts
@@ -479,7 +488,6 @@
 
    "WITH-RECTANGLE-ARG"
    
-    
    ;; Extension:
    "VIEW-PEN"
 
@@ -489,6 +497,7 @@
    "DRAW-STRING"
    "DRAW-POINT"
    "DRAW-LINE"
+   "DRAW-RECT"    "FILL-RECT"    "ERASE-RECT"
    "DRAW-RECT*"   "FILL-RECT*"   "ERASE-RECT*"
    "DRAW-ELLIPSE" "FILL-ELLIPSE"
 

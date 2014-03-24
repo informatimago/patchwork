@@ -155,7 +155,8 @@ name)
 
 (defmethod init-patch ((self C-abstract)) (init-patch (out-obj self)))
 
-(defmethod open-patch-win ((self C-abstract)) (window-select (patch-win self)))
+(defmethod open-patch-win ((self C-abstract))
+  (window-select (patch-win self)))
 
 (defmethod draw-patch-extra ((self C-abstract))
   (draw-appl-label self

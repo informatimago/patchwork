@@ -37,10 +37,10 @@
 
 
 (defun initialize/screen ()
-  (multiple-value-bind (pos siz) (main-screen-frame)
-    (declare (ignore pos))
-    (setf *screen-width*       (point-h siz)
-          *screen-height*      (point-v siz)))
+  (multiple-value-bind (sx sy sw sh) (main-screen-frame)
+    (declare (ignore sx sy))
+    (setf *screen-width*   sw
+          *screen-height*  sh))
   (values))
 
 

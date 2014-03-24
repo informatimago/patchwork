@@ -116,7 +116,6 @@
             [path fill]))))))
 
 
-
 (defun draw-rect* (x y w h)
   ;; (format-trace "draw-rect*" x y w h *current-view* (when *current-view* (view-window *current-view*)))
   (when *current-view*
@@ -191,6 +190,16 @@
           [color setFill]
           (#_NSRectFill (ns:make-ns-rect x y w h)))
       [NSGraphicsContext restoreGraphicsState])))
+
+
+(defun draw-rect (rect)
+  (draw-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
+
+(defun fill-rect (rect)
+  (fill-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
+
+(defun erase-rect (rect)
+  (erase-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
 
 ;; (setf *color-available* t)
 ;; (with-focused-view (front-window)
