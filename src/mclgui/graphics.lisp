@@ -195,11 +195,11 @@
 (defun draw-rect (rect)
   (draw-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
 
-(defun fill-rect (rect)
-  (fill-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
-
-(defun erase-rect (rect)
-  (erase-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
+;; (defun fill-rect (rect)
+;;   (fill-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
+;; 
+;; (defun erase-rect (rect)
+;;   (erase-rect* (rect-left rect) (rect-top rect) (rect-width rect) (rect-height rect)))
 
 ;; (setf *color-available* t)
 ;; (with-focused-view (front-window)

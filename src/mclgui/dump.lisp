@@ -109,6 +109,9 @@
 (defmethod object-slots append ((window window))
   (collect-slots window (:title (ignore-errors (window-title window)))))
 
+#+#.(cl:if (cl:find-package "PW") '(:and) '(:or))
+(defmethod object-slots append ((patch pw:c-patch))
+  (collect-slots patch (:active-mode (ignore-errors (active-mode patch)))))
 
 (defvar *object-slots-processed* '())
 
