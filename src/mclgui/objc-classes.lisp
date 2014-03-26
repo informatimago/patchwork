@@ -541,13 +541,13 @@ RETURN:         x y w h of the main screen (in Cocoa rounded coordinates).
 
 (defun nsscreen-to-screen-point (nspoint)
   (multiple-value-bind (sx sy sw sh) (main-screen-frame)
-    (declare (ignore sw))
+    (declare (ignore sx sw))
     (make-point (round (nspoint-x nspoint))
                 (round (- (+ sy sh) (nspoint-y nspoint))))))
 
 (defun screen-to-nsscreen-point (point)
   (multiple-value-bind (sx sy sw sh) (main-screen-frame)
-    (declare (ignore sw))
+    (declare (ignore sx sw))
     (make-nspoint (point-h point)
                   (- (+ sy sh) (point-v point)))))
 
