@@ -17,10 +17,28 @@
 14. Divers              : 257/258 fonctions implémentées [ 99%]
 
 ** Bugs
-*** TODO clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
-*** TODO click-and-drag to move a box doesn't work.
+*** TODO menubar switching doesn't work in the generated application    :bug:
+*** TODO I/O redirection doesn't work in the generated application      :bug:
+*** TODO editing text boxes doesn't work                                :bug:
+clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
+*** TODO key down events are not processed correctly                    :bug:
+*** TODO drawing links doesn't work                                     :bug:
+*** TODO drawing of outboxes doesn't work                               :bug:
+*** DONE click-and-drag to move a box doesn't work.
+    CLOSED: [2014-03-26 Wed 03:47]
+    - State "DONE"       from "TODO"       [2014-03-26 Wed 03:47] \\
+      Implemented, it's actually control-click-and-drag.
+*** TODO dragging the top bar of a patch doesn't move it.               :bug:
+*** TODO moving a box works only the first time.                        :bug:
+with control click and drag.
+*** TODO resizing a box works only the first time.                      :bug:
+with click and drag on the grow box.
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
-*** TODO no way to make multiple selections by click-and-dragging an rect arround boxes?
+Note: option-click and command-click have specific meanings.
+*** DONE no way to make multiple selections by click-and-dragging an rect arround boxes?
+    CLOSED: [2014-03-26 Wed 03:49]
+    - State "DONE"       from "TODO"       [2014-03-26 Wed 03:49] \\
+      Implemented.
 ** Features
 *** TODO [#A] Events: revise the event sources and event handling
 
@@ -35,7 +53,7 @@ correctly transmitted where they must go.
 *** TODO [#A] Windows
 *** TODO [#B] Dialog Items
 *** TODO [#B] Dialogs
-*** TODO Midi: revise midi stuff, and restructure it: midiplay redefines methods.
+*** TODO [#B] Midi: revise midi stuff, and restructure it: midiplay redefines methods.
 *** TODO Pathnames: revise the handling of pathnames, Mac pathnames, logical pathnames, loading libraries, resources, saving images.
 *** TODO [#B] Quickdraw
 *** TODO [#B] Views
