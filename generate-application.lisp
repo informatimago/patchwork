@@ -35,6 +35,8 @@
 ;;;;**************************************************************************
 (in-package "COMMON-LISP-USER")
 
+(declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
+
 (defparameter *patchwork-version* "10.0-0.998")
 
 (setf *load-verbose* t)
@@ -142,19 +144,57 @@
 
 
 (ql:quickload :com.informatimago.common-lisp.cesarum)
-
-;; DEBUG ;;
-(ql:quickload :com.informatimago.common-lisp.lisp.stepper)
-;; (print *features*)
+(ql:quickload :com.informatimago.common-lisp.lisp.stepper) ;; DEBUG ;;
+(ql:quickload :com.informatimago.objcl)
 (ql:quickload :com.informatimago.clext) ; closer-weak
-
 (ql:quickload :mclgui)
 (ui:initialize)
 
-(ql:quickload :patchwork)
+(ql:quickload :trivial-gray-streams)
+(load #+(or ccl allegro) #P"PATCHWORK:src;stream;redirecting-stream"
+      #-(or ccl allegro) #P"PATCHWORK:SRC;STREAM;REDIRECTING-STREAM")
+
+(ui:on-main-thread/sync
+  (ql:quickload :patchwork))
+
+(ui:on-main-thread/sync
+  (mclgui:on-main-thread (patchwork::initialize-menus)))
 
 ;;;
 ;;;------------------------------------------------------------
+
+(in-package :pw)
+
+(defparameter *patchwork-io*
+  (make-two-way-stream
+   (make-instance 'redirecting-stream:redirecting-character-input-stream
+                  :input-stream-function
+                  (let ((default-stream
+                          (com.informatimago.common-lisp.cesarum.stream:stream-input-stream *terminal-io*)))
+                    (lambda ()
+                      (or (hemlock-ext:top-listener-input-stream)
+                          default-stream))))
+   (make-instance 'redirecting-stream:redirecting-character-output-stream
+                  :output-stream-function
+                  (let ((default-stream
+                          (com.informatimago.common-lisp.cesarum.stream:stream-output-stream *terminal-io*)))
+                    (lambda ()
+                      (or (hemlock-ext:top-listener-output-stream)
+                          default-stream))))))
+
+;; (on-restore pw-initialization
+;;   (eval-enqueue '(let ((stream (make-synonym-stream '*terminal-io*)))
+;;                   (setf
+;;                    *terminal-io*       *patchwork-io*
+;;                    *standard-input*    stream
+;;                    *standard-output*   stream
+;;                    *error-output*      stream
+;;                    ;; *trace-output*      stream
+;;                    *query-io*          stream
+;;                    *debug-io*          stream
+;;                    *package* (find-package "PATCHWORK")))))
+
+(in-package :cl-user)
 
 ;; Let's reset the readtable to the implementation defined one.
 #+(and ccl (not cl-user::no-cocoa)) (setf *readtable* (copy-readtable *cocoa-readtable*))

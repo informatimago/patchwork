@@ -48,6 +48,7 @@
                  ((#:albert #:docbook #:textcolor) . "black"))
     :depends-on ("alexandria"
                  "closer-mop"
+                 ;; "trivial-gray-streams"
                  "mclgui"
                  ;; "com.informatimago.common-lisp.lisp.stepper"
                  )
@@ -57,6 +58,8 @@
                  (:file "gf" 
                         :depends-on ("packages"))
 
+                 ;; (:file "stream/redirecting-stream") 
+                
                  (:file "pw-kernel/environment/reader-macros" 
                         :depends-on ("packages"
                                      "pw-kernel/environment/clpf-utils"))

@@ -33,11 +33,12 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 
-#+ccl-1.9
-(handler-bind ((simple-error (lambda (c)
-                               (princ c) (terpri)
-                               (invoke-restart 'continue))))
-  (load #P"~/works/patchwork/ccl-1.9-patch.lisp"))
+;; #+ccl-1.9
+;; (handler-bind ((simple-error (lambda (c)
+;;                                (princ c) (terpri)
+;;                                (invoke-restart 'continue))))
+;;   (load #P"~/works/patchwork/ccl-1.9-patch.lisp"))
+
 
 (defpackage "PATCHWORK.LOADER"
   (:use "COMMON-LISP"))
@@ -49,10 +50,19 @@
   (format *trace-output* "~%;;; ~?~%" fmt args)
   (finish-output *trace-output*))
 
+#+swank
+(let ((stream (make-synonym-stream '*terminal-io*)))
+  (setf swank::*current-standard-input*  stream
+        swank::*current-standard-output* stream
+        swank::*current-error-output*    stream
+        ;; swank::*current-trace-output*    stream
+        ;; swank::*current-terminal-io*     stream
+        swank::*current-query-io*        stream
+        swank::*current-debug-io*        stream))
+
 
 ;; (pushnew 'cl-user::no-cocoa *features*)
 ;; (pushnew 'cl-user::cocoa-midi-player *features*)
-
 
 #+(and ccl (not cl-user::no-cocoa))
 (progn
@@ -60,6 +70,7 @@
   (require :cocoa))
 
 (defparameter *cocoa-readtable* (copy-readtable *readtable*))
+
 
 #+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
 
@@ -171,15 +182,109 @@
 #+(and use-apple-events ccl darwin (not cl-user::no-cocoa))
 (load #P"PATCHWORK:src;macosx;load-libraries.lisp")
 
+(ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)
 (ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
 (ql:quickload :com.informatimago.clext                    :verbose t :explain t)
 (ql:quickload :mclgui                                     :verbose t :explain t)
 (ui:initialize)
-(ui:on-main-thread/sync
-  (ql:quickload :patchwork                                  :verbose t :explain t))
-(ui:on-main-thread/sync
-  (mclgui:on-main-thread (patchwork::initialize-menus)))
+
+;;;
+;;; Redirection of streams to the listener window.
+;;;
+
+(ql:quickload :trivial-gray-streams                       :verbose t :explain t)
+(load #+(or ccl allegro) #P"PATCHWORK:src;stream;redirecting-stream"
+      #-(or ccl allegro) #P"PATCHWORK:SRC;STREAM;REDIRECTING-STREAM")
+
+(defparameter *patchwork-io*
+  (make-two-way-stream
+   (make-instance 'redirecting-stream:redirecting-character-input-stream
+                  :input-stream-function
+                  (let ((default-stream
+                          (com.informatimago.common-lisp.cesarum.stream:stream-input-stream *terminal-io*)))
+                    (lambda ()
+                      (or (hemlock-ext:top-listener-input-stream)
+                          default-stream))))
+   (make-instance 'redirecting-stream:redirecting-character-output-stream
+                  :output-stream-function
+                  (let ((default-stream
+                          (com.informatimago.common-lisp.cesarum.stream:stream-output-stream *terminal-io*)))
+                    (lambda ()
+                      (or (hemlock-ext:top-listener-output-stream)
+                          default-stream))))))
+
+(terpri *patchwork-io*)
+(write-line "Welcome to Patchwork Hello" *patchwork-io*)
+
+;;;
+;;; Load patchwork.
+;;;
+
+(let ((*terminal-io* *patchwork-io*))
+ (ui:on-main-thread/sync
+   (ql:quickload :patchwork                                  :verbose t :explain t)))
+
+(let ((*terminal-io* *patchwork-io*))
+ (ui:on-main-thread/sync
+   (mclgui:on-main-thread (patchwork::initialize-menus))))
+
+
+
+;;;
+;;;
+;;;
+
+#+(and ccl cocoa ignore)
+(let* ((*standard-input*
+         (make-instance 'redirecting-stream:redirecting-character-input-stream
+                        :input-stream-function (function hemlock-ext:top-listener-input-stream)))
+       (*standard-output*
+         (make-instance 'redirecting-stream:redirecting-character-output-stream
+                        :output-stream-function (function hemlock-ext:top-listener-output-stream)))
+       (*error-output* *standard-output*)
+       (*trace-output* *standard-output*)
+       (*terminal-io*  (make-two-way-stream
+                        *standard-input*
+                        *standard-output*))
+       (*query-io*     *terminal-io*)
+       (*debug-io*     *terminal-io*))
+
+  (setf *listener-io* *terminal-io*)
+  #+swank
+  (setf swank::*current-error-output*    *error-output*
+        swank::*current-standard-output* *standard-output*
+        swank::*current-trace-output*    *trace-output*
+
+        swank::*current-standard-input*  *standard-input*
+
+        swank::*current-terminal-io*     *terminal-io*
+        swank::*current-debug-io*        *debug-io*
+        swank::*current-query-io*        *query-io*))
+
+
+#-(and)
+(let ((*standard-input*  *patchwork-io*)
+      (*standard-output* *patchwork-io*)
+      (*error-output*    *patchwork-io*)
+      (*trace-output*    *patchwork-io*)
+      ;; (*terminal-io*     *patchwork-io*)
+      (*query-io*        *patchwork-io*)
+      (*debug-io*        *patchwork-io*))
+  (ui:on-main-thread/sync
+    (ql:quickload :patchwork                                  :verbose t :explain t)))
+
+#-(and)
+(let ((*standard-input*  *patchwork-io*)
+      (*standard-output* *patchwork-io*)
+      (*error-output*    *patchwork-io*)
+      (*trace-output*    *patchwork-io*)
+      ;; (*terminal-io*     *patchwork-io*)
+      (*query-io*        *patchwork-io*)
+      (*debug-io*        *patchwork-io*))
+  (ui:on-main-thread/sync
+    (mclgui:on-main-thread (patchwork::initialize-menus))))
+
 
 
 
@@ -221,6 +326,43 @@
 ;;                               "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING"))
 
 ;; (map nil 'print (DUPLICATE-SYMBOLS :packages *pw-packages* :exported t))
+
+
+;; (print (list swank::*current-standard-input*  
+;;              swank::*current-standard-output* 
+;;              swank::*current-error-output*    
+;;              swank::*current-trace-output*    
+;;              swank::*current-terminal-io*  
+;;              swank::*current-query-io*        
+;;              swank::*current-debug-io*        ))
+;; (print (list *patchwork-io*))
+
+(in-package :pw)
+(eval-enqueue '(setf swank::*current-terminal-io* patchwork.loader::*patchwork-io*
+                *package* (find-package "PATCHWORK")))
+
+;; (eval-enqueue '(progn (setf *print-circle* nil
+;;                        *print-right-margin* 80)
+;;                 (pprint (list
+;;                          'swank::*current-standard-input*   swank::*current-standard-input*  
+;;                          'swank::*current-standard-output*  swank::*current-standard-output* 
+;;                          'swank::*current-error-output*     swank::*current-error-output*    
+;;                          'swank::*current-trace-output*     swank::*current-trace-output*    
+;;                          'swank::*current-terminal-io*      swank::*current-terminal-io*  
+;;                          'swank::*current-query-io*         swank::*current-query-io*        
+;;                          'swank::*current-debug-io*         swank::*current-debug-io*)
+;;                  patchwork.loader::*patchwork-io*)
+;;                 (pprint (list
+;;                          *standard-input*  
+;;                          *standard-output* 
+;;                          *error-output*    
+;;                          *trace-output*    
+;;                          *terminal-io*  
+;;                          *query-io*        
+;;                           *debug-io*)
+;;                  patchwork.loader::*patchwork-io*)
+;;                 (print patchwork.loader::*patchwork-io* patchwork.loader::*patchwork-io*)
+;;                 (print *terminal-io* patchwork.loader::*patchwork-io*)))
 
 
 
