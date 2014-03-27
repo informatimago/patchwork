@@ -17,6 +17,7 @@
 14. Divers              : 257/258 fonctions implémentées [ 99%]
 
 ** Bugs
+*** TODO [#A] debug generated applications from recent changes          :bug:
 *** TODO menubar switching doesn't work in the generated application    :bug:
 *** TODO I/O redirection doesn't work in the generated application      :bug:
 *** TODO editing text boxes doesn't work                                :bug:
