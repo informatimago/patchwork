@@ -213,7 +213,7 @@ Handles correctly micro-intervals on different channels, so playing from PatchWo
 from your favorite sequencer is the same.
 
 Input may be any PatchWork object that could be played through play-object
-(chord, chord-line, measure-line (rtm) , or a list of such)"
+\(chord, chord-line, measure-line (rtm) , or a list of such)"
   (declare (ignore objs)))
 
 

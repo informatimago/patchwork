@@ -664,7 +664,7 @@ The SCROLL-BAR-CHANGED generic function is called by the
 DIALOG-ITEM-ACTION method for SCROLL-BAR-DIALOG-ITEM if the
 DIALOG-ITEM-ACTION-FUNCTION specified by the :dialog-item-action
 initialization argument is nil.  The scrollee argument is the value of
-(scroll-bar-scrollee scroll-bar), as set by SET-SCROLL-BAR-SCROLLEE or
+\(scroll-bar-scrollee scroll-bar), as set by SET-SCROLL-BAR-SCROLLEE or
 the :scrollee initialization argument for SCROLL-BAR.  The default
 method does nothing. 
 

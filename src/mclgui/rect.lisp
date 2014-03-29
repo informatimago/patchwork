@@ -367,6 +367,6 @@ V:              Vertical position.  If V is NIL (the default), H is
       ))
   :success)
 
-(test/point-to-angle)
+#+test (test/point-to-angle)
 
 ;;;; THE END ;;;;

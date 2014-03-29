@@ -73,5 +73,5 @@
     [archiver finishEncoding]
     (vector-from-nsdata data)))
 
-(print (test-encode))
+#+test (print (test-encode))
 

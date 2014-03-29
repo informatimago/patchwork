@@ -37,10 +37,10 @@
     :name "Patch Work Application"
     :description "Patch Work: IRCAM Computer Assisted Composition"
     :author "IRCAM"
-    :version "1.0.0"
+    :version "10.0"
     :license "GPL3"
     :properties ((#:author-email                   . "pjb@informatimago.com")
-                 (#:date                           . "Spring 2012")
+                 (#:date                           . "Spring 2014")
                  ((#:albert #:output-dir)          . "../documentation/patchwork/")
                  ((#:albert #:formats)             . ("docbook"))
                  ((#:albert #:docbook #:template)  . "book")
@@ -48,7 +48,7 @@
                  ((#:albert #:docbook #:textcolor) . "black"))
     :depends-on ("alexandria"
                  "closer-mop"
-                 ;; "trivial-gray-streams"
+                 "trivial-gray-streams"
                  "mclgui"
                  ;; "com.informatimago.common-lisp.lisp.stepper"
                  )
@@ -58,7 +58,14 @@
                  (:file "gf" 
                         :depends-on ("packages"))
 
-                 ;; (:file "stream/redirecting-stream") 
+                 (:file "application" 
+                        :depends-on ("packages"
+                                     "stream/redirecting-stream"
+                                     "pw-kernel/pw-graphics/window+menu/pw-menu"
+                                     "pw-music/editors/rhythm/beat-measure-measure-line"))
+
+                 (:file "stream/redirecting-stream"
+                        :depends-on ("packages")) 
                 
                  (:file "pw-kernel/environment/reader-macros" 
                         :depends-on ("packages"
@@ -127,12 +134,12 @@
                  
                  #-(and)
                  (:file "pw-lib/midishare/midishare" 
-                        :depends-on (#+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
+                        :depends-on (#+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
 
                  #-(and)
                  (:file "pw-lib/midishare/midiplay" 
                         :depends-on ("packages"
-                                     #+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
+                                     #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      "pw-kernel/drivers+resources/midi"
                                      "pw-music/boxes/edit/rhythm-formation"
                                      "pw-kernel/box-creation/pw-patch"
@@ -155,12 +162,12 @@
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/types/pw-type-scheme"
                                      ;; "pw-lib/midishare/midiplay"
-                                     ;; #+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
+                                     ;; #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      "pw-music/boxes/edit/pw-mn-collector"
                                      "pw-music/editors/mn/mn-note-chord-chordline"
                                      ))
 
-                 #+cl-user::cocoa-midi-player
+                 #+patchwork.builder::cocoa-midi-player
                  (:file "pw-lib/midishare/cocoa-midi-player" 
                         :depends-on ())
                  
@@ -215,7 +222,7 @@
                  (:file "pw-kernel/drivers+resources/midi" 
                         :depends-on (
                                      ;; "pw-lib/midishare/midishare"
-                                     #+cl-user::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
+                                     #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
                  
                  
                  (:file "pw-kernel/drivers+resources/scheduler" 
@@ -805,6 +812,7 @@
                                      "pw-music/menu/mn-menu"
                                      "pw-music/editors/mn/mn-editor"
                                      "pw-music/editors/mn/mn-note-chord-chordline"
+                                     "pw-music/editors/mn/mn-collector-view" 
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/pw-graphics/controls/popupmenu"
                                      "pw-kernel/pw-graphics/controls/pw-graphics"
@@ -902,3 +910,5 @@
 
 
                  ))
+
+;;;; THE END ;;;;

@@ -172,16 +172,16 @@
 
 #|
 
-;;__________________
-(defclass  C-patch-application-test (C-patch-application) ())
+    ;;__________________
+    (defclass  C-patch-application-test (C-patch-application) ())
 
-(defmethod make-application-object ((self C-patch-application-test))
-  (make-test-application))
+    (defmethod make-application-object ((self C-patch-application-test))
+      (make-test-application))
 
-;;==================
+    ;;==================
 
-(progn 
- (setq pw-appl (make-patch-box 'C-patch-application-test 'T-Appl ()))
- (add-patch-box *active-patch-window* pw-appl))
+    (progn 
+     (setq pw-appl (make-patch-box 'C-patch-application-test 'T-Appl ()))
+     (add-patch-box *active-patch-window* pw-appl))
 
 |#

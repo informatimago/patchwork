@@ -100,22 +100,22 @@
     nil))
 
 #|
-TEST
+    TEST
 
-(defclass C-my-box (C-patch&popUp)
-  ((local-menu :initform '(("ONE" "O") ("TWO" "T") ("THREE" "H")) :accessor local-menu)
-   (default-char :initform "O" :accessor default-char)))
+    (defclass C-my-box (C-patch&popUp)
+      ((local-menu :initform '(("ONE" "O") ("TWO" "T") ("THREE" "H")) :accessor local-menu)
+       (default-char :initform "O" :accessor default-char)))
 
-(defmethod do-menu-action ((self C-my-box) str)
-  (cond ((string= str "O") (print "OK"))
-        (t (print str))))
+    (defmethod do-menu-action ((self C-my-box) str)
+      (cond ((string= str "O") (print "OK"))
+            (t (print str))))
 
-(defmethodp my-box C-my-box ((entry fix)) fix " "
-  (+ entry 
-     (cond ((string= (current-str self) "O") 1)
-           ((string= (current-str self) "T") 2)
-           ((string= (current-str self) "H") 3))))
+    (defmethodp my-box C-my-box ((entry fix)) fix " "
+      (+ entry 
+         (cond ((string= (current-str self) "O") 1)
+               ((string= (current-str self) "T") 2)
+               ((string= (current-str self) "H") 3))))
 
-(pw-addmenu-fun (the-user-menu) 'my-box 'C-my-box)
+    (pw-addmenu-fun (the-user-menu) 'my-box 'C-my-box)
 
 |#

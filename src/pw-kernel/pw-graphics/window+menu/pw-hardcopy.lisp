@@ -34,17 +34,18 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  ;; (require 'traps)
-  ;(load-once "ui:Examples;NotInROM;NotInROM")
-  ;(load-once "ui:Library;interfaces;SERIAL")
-  (defconstant $PrintErr #x944)  
-  (defconstant $prJob.bjDocLoop (+ 62 6))
-  (defconstant $iPrStatSize 26)
-  (defconstant $bSpoolLoop 1)
-  (defconstant $err-printer 94)
-  (defconstant $err-printer-load 95)
-  (defconstant $err-printer-start 97))
+
+;; (require 'traps)
+;;(load-once "ui:Examples;NotInROM;NotInROM")
+;;(load-once "ui:Library;interfaces;SERIAL")
+
+(defconstant $PrintErr #x944)  
+(defconstant $prJob.bjDocLoop (+ 62 6))
+(defconstant $iPrStatSize 26)
+(defconstant $bSpoolLoop 1)
+(defconstant $err-printer 94)
+(defconstant $err-printer-load 95)
+(defconstant $err-printer-start 97)
 
 ;;(import '(traps::$baud9600 traps::$data8 traps::$stop20 traps::$noParity
 ;;          traps::$boutrefnum traps::$sPortB))

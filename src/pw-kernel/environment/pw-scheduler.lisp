@@ -115,32 +115,32 @@
 
 #|
 
-;; examples of different processes
-;; a process has no arguments
+    ;; examples of different processes
+    ;; a process has no arguments
 
-(defmethod  proc-print-bar  ((self C-process))
-  (print (list 'bar (clock (clock-obj self))))
-  (dfuncall-process self  (random2 2 6)))
+    (defmethod  proc-print-bar  ((self C-process))
+      (print (list 'bar (clock (clock-obj self))))
+      (dfuncall-process self  (random2 2 6)))
 
-(defmethod  proc-print-foo  ((self C-process))
-  (print (list 'foo (clock (clock-obj self))))
-  (dfuncall-process self  (random2 10 12))) 
+    (defmethod  proc-print-foo  ((self C-process))
+      (print (list 'foo (clock (clock-obj self))))
+      (dfuncall-process self  (random2 10 12))) 
 
-(defmethod  proc-print-blah  ((self C-process))
-  (print (list 'blah (clock (clock-obj self))))
-  (dfuncall-process self 10))
+    (defmethod  proc-print-blah  ((self C-process))
+      (print (list 'blah (clock (clock-obj self))))
+      (dfuncall-process self 10))
 
-(defmethod  proc-print-blah2  ((self C-process))
-;;  (write-midi-note 10 1 60 100) 
-  (print (list 'blah2 (clock (clock-obj self))))
-  (dfuncall-process self 20))
+    (defmethod  proc-print-blah2  ((self C-process))
+    ;;  (write-midi-note 10 1 60 100) 
+      (print (list 'blah2 (clock (clock-obj self))))
+      (dfuncall-process self 20))
 
-(setq proc1 (make-instance 'C-process :process 'proc-print-bar))
-(setq proc2 (make-instance 'C-process :process 'proc-print-foo))
-(setq proc3 (make-instance 'C-process :process 'proc-print-blah))
-(setq proc4 (make-instance 'C-process :process 'proc-print-blah2))
+    (setq proc1 (make-instance 'C-process :process 'proc-print-bar))
+    (setq proc2 (make-instance 'C-process :process 'proc-print-foo))
+    (setq proc3 (make-instance 'C-process :process 'proc-print-blah))
+    (setq proc4 (make-instance 'C-process :process 'proc-print-blah2))
 
-(start-clock (clock-obj proc1) 300 (list proc1 proc2 proc3 proc4))
+    (start-clock (clock-obj proc1) 300 (list proc1 proc2 proc3 proc4))
 
 |#
 
@@ -159,58 +159,58 @@
 
 #|
 
-(defmethod  proc-print-beg1  ((self C-process-begin+end))
- (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
-   (if  (>= (clock (clock-obj self)) (begin-time self))
-      (progn 
-        (print (list 'beg1 (clock (clock-obj self))))
-        (dfuncall-process self 30))
-      (dfuncall-process self (begin-time self)))))
+    (defmethod  proc-print-beg1  ((self C-process-begin+end))
+     (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
+       (if  (>= (clock (clock-obj self)) (begin-time self))
+          (progn 
+            (print (list 'beg1 (clock (clock-obj self))))
+            (dfuncall-process self 30))
+          (dfuncall-process self (begin-time self)))))
 
-(defmethod  proc-print-beg2  ((self C-process-begin+end))
- (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
-   (if  (>= (clock (clock-obj self)) (begin-time self))
-     (progn 
-       (print (list 'beg2 (clock (clock-obj self))))
-       (dfuncall-process self 20))
-     (dfuncall-process self (begin-time self)))))
+    (defmethod  proc-print-beg2  ((self C-process-begin+end))
+     (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
+       (if  (>= (clock (clock-obj self)) (begin-time self))
+         (progn 
+           (print (list 'beg2 (clock (clock-obj self))))
+           (dfuncall-process self 20))
+         (dfuncall-process self (begin-time self)))))
 
-(defmethod  proc-print-beg3  ((self C-process-begin+end))
- (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
-   (if  (>= (clock (clock-obj self)) (begin-time self))
-     (progn 
-       (print (list 'beg3 (clock (clock-obj self))))
-       (dfuncall-process self 15))
-     (dfuncall-process self (begin-time self)))))
+    (defmethod  proc-print-beg3  ((self C-process-begin+end))
+     (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
+       (if  (>= (clock (clock-obj self)) (begin-time self))
+         (progn 
+           (print (list 'beg3 (clock (clock-obj self))))
+           (dfuncall-process self 15))
+         (dfuncall-process self (begin-time self)))))
 
-(defmethod  proc-print-beg31  ((self C-process-begin+end))
- (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
-   (if  (>= (clock (clock-obj self)) (begin-time self))
-     (progn 
-       (print (list 'beg31 (clock (clock-obj self))))
-       (dfuncall-process self 2))
-     (dfuncall-process self (begin-time self)))))
+    (defmethod  proc-print-beg31  ((self C-process-begin+end))
+     (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
+       (if  (>= (clock (clock-obj self)) (begin-time self))
+         (progn 
+           (print (list 'beg31 (clock (clock-obj self))))
+           (dfuncall-process self 2))
+         (dfuncall-process self (begin-time self)))))
 
-(defmethod  proc-print-beg11  ((self C-process-begin+end))
- (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
-   (if  (>= (clock (clock-obj self)) (begin-time self))
-     (progn 
-       (print (list 'beg11 (clock (clock-obj self))))
-       (dfuncall-process self 5))
-     (dfuncall-process self (begin-time self)))))
+    (defmethod  proc-print-beg11  ((self C-process-begin+end))
+     (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
+       (if  (>= (clock (clock-obj self)) (begin-time self))
+         (progn 
+           (print (list 'beg11 (clock (clock-obj self))))
+           (dfuncall-process self 5))
+         (dfuncall-process self (begin-time self)))))
 
 
-(setq procb1 (make-instance 'C-process-begin+end :process 'proc-print-beg1 
-     :begin-time 0 :duration-time 300))
-(setq procb11 (make-instance 'C-process-begin+end :process 'proc-print-beg11 
-    :begin-time 0 :duration-time 50))
-(setq procb2 (make-instance 'C-process-begin+end :process 'proc-print-beg2 
-    :begin-time 100 :duration-time 150))
-(setq procb31 (make-instance 'C-process-begin+end :process 'proc-print-beg31 
-    :begin-time 150 :duration-time 25))
-(setq procb3 (make-instance 'C-process-begin+end :process 'proc-print-beg3 
-    :begin-time 200 :duration-time 150))
+    (setq procb1 (make-instance 'C-process-begin+end :process 'proc-print-beg1 
+         :begin-time 0 :duration-time 300))
+    (setq procb11 (make-instance 'C-process-begin+end :process 'proc-print-beg11 
+        :begin-time 0 :duration-time 50))
+    (setq procb2 (make-instance 'C-process-begin+end :process 'proc-print-beg2 
+        :begin-time 100 :duration-time 150))
+    (setq procb31 (make-instance 'C-process-begin+end :process 'proc-print-beg31 
+        :begin-time 150 :duration-time 25))
+    (setq procb3 (make-instance 'C-process-begin+end :process 'proc-print-beg3 
+        :begin-time 200 :duration-time 150))
 
-(start-clock (clock-obj procb1) 1000 (list procb1 procb2 procb3 procb11 procb31))
+    (start-clock (clock-obj procb1) 1000 (list procb1 procb2 procb3 procb11 procb31))
 
 |#

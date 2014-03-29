@@ -81,9 +81,9 @@
 
 ;;=================================
 #|
-(new-PW-sub-menu-item *Midi-menu* "nargs-test" 'C-nargs-input-patch  'nargs-test
-    '(*fix-float-pw-type* "1st" *fix-float-pw-type* "2nd" ) '())
+    (new-PW-sub-menu-item *Midi-menu* "nargs-test" 'C-nargs-input-patch  'nargs-test
+        '(*fix-float-pw-type* "1st" *fix-float-pw-type* "2nd" ) '())
 
-(new-PW-sub-menu-item *Midi-menu* "nargs-test" 'C-nargs-input-patch  'nargs-test2
-    '(*fix-float-pw-type* "1st" *fix-float-pw-type* "2nd" *fix-float-pw-type* "3rd" ) '())
+    (new-PW-sub-menu-item *Midi-menu* "nargs-test" 'C-nargs-input-patch  'nargs-test2
+        '(*fix-float-pw-type* "1st" *fix-float-pw-type* "2nd" *fix-float-pw-type* "3rd" ) '())
 |#

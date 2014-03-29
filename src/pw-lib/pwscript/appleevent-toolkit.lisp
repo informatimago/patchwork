@@ -578,41 +578,41 @@ reply      An AEDesc record containing the reply to an Apple Event."
     (if wait?
       (ae-get-parameter-char reply #$keyDirectObject nil))))
 
-#||
 
-;; here's some testing code:
+#-(and)(progn
+         ;; here's some testing code:
 
-(with-aedescs (event reply target)
-  (choose-appleevent-target target)
-  (create-oapp event target)
-  (send-appleevent event reply :reply-mode :no-reply))
+         (with-aedescs (event reply target)
+           (choose-appleevent-target target)
+           (create-oapp event target)
+           (send-appleevent event reply :reply-mode :no-reply))
 
-(with-aedescs (event reply target)
-  (create-self-target target)
-  (create-oapp event target)
-  (send-appleevent event reply :reply-mode :no-reply))
+         (with-aedescs (event reply target)
+           (create-self-target target)
+           (create-oapp event target)
+           (send-appleevent event reply :reply-mode :no-reply))
 
-;; If you choose HyperCard 2.0 here, you'll get the answer "3"
-(with-aedescs (event reply target)
-  (choose-appleevent-target target)
-  (create-eval event target "1 + 2")
-  (send-appleevent event reply :reply-mode :wait-reply)
-  (ae-get-parameter-char reply #$keyDirectObject t))
+         ;; If you choose HyperCard 2.0 here, you'll get the answer "3"
+         (with-aedescs (event reply target)
+           (choose-appleevent-target target)
+           (create-eval event target "1 + 2")
+           (send-appleevent event reply :reply-mode :wait-reply)
+           (ae-get-parameter-char reply #$keyDirectObject t))
 
 
-;; Communucating with HyperCard
-(send-eval-to-hypercard "5*7")
+         ;; Communucating with HyperCard
+         (send-eval-to-hypercard "5*7")
 
-(send-dosc-to-hypercard "put \"Hello from MCL!\"")
+         (send-dosc-to-hypercard "put \"Hello from MCL!\"")
 
-;; To communicate from HyperCard to MCL, try typing the following two lines
-;; to the message box (after loading the file "ccl:examples;eval-server").
-;;
-;;  request "(print (+ 1 2))" from program "MCL 2.0"
-;;  put it
-;;
-;; "3" will be printed in MCL's Listener and in HyperCard's message box.
+         ;; To communicate from HyperCard to MCL, try typing the following two lines
+         ;; to the message box (after loading the file "ccl:examples;eval-server").
+         ;;
+         ;;  request "(print (+ 1 2))" from program "MCL 2.0"
+         ;;  put it
+         ;;
+         ;; "3" will be printed in MCL's Listener and in HyperCard's message box.
 
-||#
+         )
 
 ;;;; THE END ;;;;

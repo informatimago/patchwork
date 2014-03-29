@@ -132,7 +132,7 @@ RETURN: A form performing BODY on the main thread.
                    `(let ((,vmb (make-mailbox)))
                       (application-eval-enqueue *application*
                                                 (lambda ()
-                                                  (mailbox-post ,vmb (progn ,@body))))
+                                                  (mailbox-post ,vmb (ignore-errors ,@body))))
                       (mailbox-collect ,vmb)))
                  `(application-eval-enqueue *application* (lambda () ,@body)))))
       (if (= 1 (length body))

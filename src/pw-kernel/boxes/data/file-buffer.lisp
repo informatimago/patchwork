@@ -221,7 +221,7 @@
 (in-package :pw)
 
 (defunp Text-win ((list list) (fmat (fix>=0 (:value 4)))) list
-  " This module lets one create and communicate with a Lisp text window. The 
+    " This module lets one create and communicate with a Lisp text window. The 
 new window is created by choosing NEW in the front menu (click on A at right 
 to open the menu). The new window appears and makes PatchWork switch to 
 Lisp. To return to PatchWork click on the PatchWork window or type Ù-1. It is 
@@ -258,7 +258,7 @@ window, and in this case the option is Add .
 The second entry of the module  fmat ;(at the right) determines how many 
 elements will be written per line in the corresponding text window. For further 
 information; type h with the selected module open. "
-(declare (ignore list fmat)))
+  (declare (ignore list fmat)))
 
 (in-package "C-PATCH-FILE-BUFFER")
 

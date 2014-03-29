@@ -1269,6 +1269,9 @@ RETURN:         The list of MENUs collected.
 ;; (menu-item :title "PW" :enabledp t :checkedp nil "x30200259B94D")
 
 (defgeneric print-menu (menu &optional stream level)
+  (:method ((menubar list) &optional (*standard-output* *standard-output*) (level 0))
+    (dolist (menu menubar (values))
+      (print-menu menu *standard-output* (1+ level))))
   (:method ((menubar menubar) &optional (*standard-output* *standard-output*) (level 0))
     (dolist (menu (menubar-menus menubar) (values))
       (print-menu menu *standard-output* (1+ level))))

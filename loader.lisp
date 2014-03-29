@@ -32,24 +32,10 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
+(in-package "COMMON-LISP-USER")
 
-;; #+ccl-1.9
-;; (handler-bind ((simple-error (lambda (c)
-;;                                (princ c) (terpri)
-;;                                (invoke-restart 'continue))))
-;;   (load #P"~/works/patchwork/ccl-1.9-patch.lisp"))
-
-
-(defpackage "PATCHWORK.LOADER"
-  (:use "COMMON-LISP"))
-(in-package "PATCHWORK.LOADER")
-
-(declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
-
-(defun say (fmt &rest args)
-  (format *trace-output* "~%;;; ~?~%" fmt args)
-  (finish-output *trace-output*))
-
+;;; --------------------------------------------------------------------
+;;; Redirect swank streams.
 #+swank
 (let ((stream (make-synonym-stream '*terminal-io*)))
   (setf swank::*current-standard-input*  stream
@@ -60,182 +46,95 @@
         swank::*current-query-io*        stream
         swank::*current-debug-io*        stream))
 
+;;; --------------------------------------------------------------------
+;;; remote debugging
+#-(and) 
+(progn
+  (ql:quickload :swank)
+  (eval (read-from-string
+         "(let ((swank::*loopback-interface* \"192.168.7.4\")) (swank:create-server))")))
 
-;; (pushnew 'cl-user::no-cocoa *features*)
-;; (pushnew 'cl-user::cocoa-midi-player *features*)
 
-#+(and ccl (not cl-user::no-cocoa))
+;;; --------------------------------------------------------------------
+;;; Configure quicklisp.
+;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
+#+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
+
+
+;;; --------------------------------------------------------------------
+;;; Load builder stuff.
+(ql:quickload :cffi                                       :verbose t :explain t)
+(ql:quickload :com.informatimago.tools.pathname           :verbose t :explain t)
+(ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
+(load (merge-pathnames "builder.lisp" (or *load-pathname* #P"./")))
+(in-package "PATCHWORK.BUILDER")
+
+
+;;; --------------------------------------------------------------------
+;;; Load patches
+;; #+ccl-1.9
+;; (handler-bind ((simple-error (lambda (c)
+;;                                (princ c) (terpri)
+;;                                (invoke-restart 'continue))))
+;;   (load (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;CCL-1-9-PATCH")))
+
+
+;;; --------------------------------------------------------------------
+;;; configure *features*
+;; (pushnew 'patchwork.builder::no-cocoa *features*)
+;; (pushnew 'patchwork.builder::use-apple-events *features*)
+;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
+
+
+;;; --------------------------------------------------------------------
+;;; Load cocoa
+#+(and ccl (not patchwork.builder::no-cocoa))
 (progn
   (say "Loading :cocoa (takes some time to start…)")
   (require :cocoa))
-
 (defparameter *cocoa-readtable* (copy-readtable *readtable*))
 
-
-#+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
-
-#||
-
-(progn (ql:quickload :swank) (eval (read-from-string
- "(let ((swank::*loopback-interface* \"192.168.7.4\")) (swank:create-server))")))
-
-(ql:quickload :swank)
-(let ((swank::*loopback-interface* "192.168.7.4")) (swank:create-server))
-
-||#
-
-#+ccl (setf ccl:*default-external-format*           :unix
-            ccl:*default-file-character-encoding*   :utf-8
-            ccl:*default-line-termination*          :unix
-            ccl:*default-socket-character-encoding* :utf-8)
-
-(setf *print-right-margin* 110)
-
-;; The logical host PATCHWORK should be set so that the .git/ subdirectory
-;; should be  at its root:
-;; #+ccl (probe-file #P"PATCHWORK:.git;") --> true
-
-;; We use load-logical-pathname-translations to load the logical host PATCHWORK.
-;; You must configure it for each implementation.
-
-;; Note: we only only use the PATCHWORK logical host in this file, the
-;;       rest of the sources are loaded with ql:quickload/asdf.
-
-
-;; Other logical hosts used by patchwork or its dependencies include:
-;;   PW-USER
-;;   CLENI
-
-
-;; Map ccl pathname translations to ~/LOGHOSTS/${logical_host}
-#+ccl (setf (logical-pathname-translations "CCL")
-            (cons  (list "CCL:*.pathname-translations.*"
-                         (merge-pathnames
-                          (make-pathname :defaults (user-homedir-pathname)
-                                         :directory '(:relative "LOGHOSTS")
-                                         :name :wild
-                                         :type :unspecific
-                                         :version :wild)
-                          (user-homedir-pathname)
-                          nil))
-                   (logical-pathname-translations "CCL")))
-
-;; (translate-logical-pathname #P"ccl:PATCHWORK.pathname-translations.newest")
-;; (translate-logical-pathname #P"ccl:PW-USER.pathname-translations.newest")
-;; (translate-logical-pathname #P"PW-USER:A;B;C.D")#P"/home/pjb/works/patchwork/pw-user/A/B/C.D"
+(load (translate-logical-pathname #P"PATCHWORK:GESTALT"))
+(add-cocoa-version-features)
 
 
 
-(defun generate-logical-pathname-translation-file (logical-host base-pathname &key (force nil))
-  "Generate a default logical pathname translation mapping the logical-host to a given base directory."
-  (let ((translation-file (merge-pathnames (make-pathname :directory `(:relative "LOGHOSTS")
-                                                          :name (string-upcase logical-host)
-                                                          :type nil)
-                                           (user-homedir-pathname))))
-    (with-open-file (trans translation-file
-                           :if-does-not-exist :create
-                           :if-exists (if force :supersede nil)
-                           :direction :output
-                           :external-format :default)
-      (if trans
-        (let ((*print-pretty*       t)
-              (*print-right-margin* 60)
-              (*print-circle*       nil))
-          (format trans ";;;; -*- mode:lisp;coding:us-ascii; -*-~2%")
-          (format trans "~S~%" (list
-                                   (list (format nil "~A:**;*.*.*"   logical-host)
-                                         (merge-pathnames #P"**/*.*" base-pathname nil))
-                                   (list (format nil "~A:**;*.*"     logical-host)
-                                         (merge-pathnames #P"**/*.*" base-pathname nil))
-                                   (list (format nil "~A:**;*"       logical-host)
-                                         (merge-pathnames #P"**/*"   base-pathname nil)))))
-        (cerror "~A already exists; aborting." translation-file)))
-    translation-file))
-
-(defun install-patchwork (&key (force nil))
-  (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/patchwork/"                  :force force)
-  (generate-logical-pathname-translation-file "PW-USER"   #P"/home/pjb/works/patchwork/pw-user/"                    :force force)
-  (generate-logical-pathname-translation-file "CLENI"     #P"/home/pjb/works/patchwork/patchwork/src/pw-lib/cleni/" :force force))
-;; (install-patchwork :force t)
-
-(load-logical-pathname-translations "PATCHWORK")
-(load-logical-pathname-translations "PW-USER")
-(load-logical-pathname-translations "CLENI")
+;;; --------------------------------------------------------------------
+;;; AppleEvents are not used for now.
+#+(and patchwork.builder::use-apple-events ccl darwin (not patchwork.builder::no-cocoa))
+(progn
+  (say "Loading MacOSX Libraries")
+  (load (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;LOAD-LIBRARIES")))
 
 
-#+ccl       (ccl::cd (truename #P"PATCHWORK:"))
-#+lispworks (cd      (truename #P"PATCHWORK:"))
-#+clisp     (ext:cd  (truename #P"PATCHWORK:"))
-
-(pushnew #+(or ccl allegro) (truename #P"PATCHWORK:src;")
-         #-(or ccl allegro) (truename #P"PATCHWORK:SRC;")
-         asdf:*central-registry* :test (function equalp))
-
-(pushnew #+(or ccl allegro) (truename #P"PATCHWORK:src;mclgui;")
-         #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
-         asdf:*central-registry* :test (function equalp))
-
-(load #+(or ccl allegro) #P"PATCHWORK:gestalt"
-      #-(or ccl allegro) #P"PATCHWORK:GESTALT")
-
-;; AppleEvents are not used for now.
-#+(and use-apple-events ccl darwin (not cl-user::no-cocoa))
-(load #P"PATCHWORK:src;macosx;load-libraries.lisp")
-
-(ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
-(ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)
+;;; --------------------------------------------------------------------
+;;; Loading dependencies
+(ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t) ; debug
 (ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
-(ql:quickload :com.informatimago.clext                    :verbose t :explain t)
-(ql:quickload :mclgui                                     :verbose t :explain t)
-(ui:initialize)
-
-;;;
-;;; Redirection of streams to the listener window.
-;;;
-
+(ql:quickload :com.informatimago.clext                    :verbose t :explain t) ; closer-weak
 (ql:quickload :trivial-gray-streams                       :verbose t :explain t)
-(load #+(or ccl allegro) #P"PATCHWORK:src;stream;redirecting-stream"
-      #-(or ccl allegro) #P"PATCHWORK:SRC;STREAM;REDIRECTING-STREAM")
-
-(defparameter *patchwork-io*
-  (make-two-way-stream
-   (make-instance 'redirecting-stream:redirecting-character-input-stream
-                  :input-stream-function
-                  (let ((default-stream
-                          (com.informatimago.common-lisp.cesarum.stream:stream-input-stream *terminal-io*)))
-                    (lambda ()
-                      (or (hemlock-ext:top-listener-input-stream)
-                          default-stream))))
-   (make-instance 'redirecting-stream:redirecting-character-output-stream
-                  :output-stream-function
-                  (let ((default-stream
-                          (com.informatimago.common-lisp.cesarum.stream:stream-output-stream *terminal-io*)))
-                    (lambda ()
-                      (or (hemlock-ext:top-listener-output-stream)
-                          default-stream))))))
-
-(terpri *patchwork-io*)
-(write-line "Welcome to Patchwork Hello" *patchwork-io*)
-
-;;;
-;;; Load patchwork.
-;;;
-
-(let ((*terminal-io* *patchwork-io*))
- (ui:on-main-thread/sync
-   (ql:quickload :patchwork                                  :verbose t :explain t)))
-
-(let ((*terminal-io* *patchwork-io*))
- (ui:on-main-thread/sync
-   (mclgui:on-main-thread (patchwork::initialize-menus))))
+(ql:quickload :mclgui                                     :verbose t :explain t)
 
 
+;;; --------------------------------------------------------------------
+;;; Loading patchwork
+(ql:quickload :patchwork                                  :verbose t :explain t)
 
-;;;
-;;;
-;;;
 
-#+(and ccl cocoa ignore)
+;;; --------------------------------------------------------------------
+;;; Initialization of patchwork
+(defun start-patchwork ()
+  (ui:on-main-thread/sync
+    (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
+    (pw::initialize-patchwork)))
+(import 'start-patchwork "COMMON-LISP-USER")
+
+
+;;; --------------------------------------------------------------------
+;;; Done
+;;; --------------------------------------------------------------------
+
+#-(and)
 (let* ((*standard-input*
          (make-instance 'redirecting-stream:redirecting-character-input-stream
                         :input-stream-function (function hemlock-ext:top-listener-input-stream)))
@@ -336,10 +235,6 @@
 ;;              swank::*current-query-io*        
 ;;              swank::*current-debug-io*        ))
 ;; (print (list *patchwork-io*))
-
-(in-package :pw)
-(eval-enqueue '(setf swank::*current-terminal-io* patchwork.loader::*patchwork-io*
-                *package* (find-package "PATCHWORK")))
 
 ;; (eval-enqueue '(progn (setf *print-circle* nil
 ;;                        *print-right-margin* 80)

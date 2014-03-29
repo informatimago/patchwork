@@ -147,26 +147,24 @@
               [path fill])))))))
 
 
-#-(and)
-(loop
-  :for mode :in '(:srcCopy :srcOr :srcXor :srcBic
-                  :notSrcCopy :notSrcOr :notSrcXor :notSrcBic
-                  :patCopy :patOr :patXor :patBic
-                  :notPatCopy :notPatOr :notPatXor :notPatBic)
-  :do (with-focused-view (front-window)
-        (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
-                                  :mode :srcCopy)
-          (draw-rect* 10 20 100 200))
-        (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
-                                  :mode mode)
-          (draw-rect* 10 20 100 200)))
-  (sleep 3))
+#-(and)(loop
+         :for mode :in '(:srcCopy :srcOr :srcXor :srcBic
+                         :notSrcCopy :notSrcOr :notSrcXor :notSrcBic
+                         :patCopy :patOr :patXor :patBic
+                         :notPatCopy :notPatOr :notPatXor :notPatBic)
+         :do (with-focused-view (front-window)
+               (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
+                                :mode :srcCopy)
+                 (draw-rect* 10 20 100 200))
+               (with-pen-state (:pattern *gray-pattern* :size (make-point 10 10)
+                                :mode mode)
+                 (draw-rect* 10 20 100 200)))
+             (sleep 3))
 
-#-(and)
-(with-focused-view (front-window)
-  (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10)
-                            :mode :srcCopy)
-    (draw-rect* 10 20 200 100)))
+#-(and) (with-focused-view (front-window)
+          (with-pen-state (:pattern *light-gray-pattern* :size (make-point 20 10)
+                           :mode :srcCopy)
+            (draw-rect* 10 20 200 100)))
 
 
 (defun fill-rect* (x y w h)

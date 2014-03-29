@@ -39,15 +39,14 @@
 ;; 
 
 
-(eval-when (:compile-toplevel :execute)
-  ;; (require 'traps)
-  (defconstant $PrintErr #x944)  
-  (defconstant $prJob.bjDocLoop (+ 62 6))
-  (defconstant $iPrStatSize 26)
-  (defconstant $bSpoolLoop 1)
-  (defconstant $err-printer 94)
-  (defconstant $err-printer-load 95)
-  (defconstant $err-printer-start 97))
+;; (require 'traps)
+(defconstant $PrintErr #x944)  
+(defconstant $prJob.bjDocLoop (+ 62 6))
+(defconstant $iPrStatSize 26)
+(defconstant $bSpoolLoop 1)
+(defconstant $err-printer 94)
+(defconstant $err-printer-load 95)
+(defconstant $err-printer-start 97)
 
 (defmethod window-hardcopy ((self pw::C-MN-window) &optional show-fl)
   (niy window-hardcopy self show-fl)

@@ -289,8 +289,6 @@ to generate the current object do
                   #(1 2 3 4)))
   :success)
 
-(test/nsdata-vector)
-
 
 (defstruct archive
   wrappers
@@ -461,82 +459,81 @@ to generate the current object do
                 (,value-variable [,vdictionary objectForKey:,key-variable]))
            ,@body)))))
 
-#||
-(let ((*max-level* 2))
-  (declare (special *max-level*))
-  (labels ((dump-nsdictionary (nsdictionary)
-             (princ "(")
-             (when (plusp *max-level*)
-               (let ((*max-level* (1- *max-level*)))
-                 (declare (special *max-level*))
-                 (do-nsdictionary (key value nsdictionary)
-                   (terpri) (prin1 key) (princ " ")
-                   (if [value isKindOfClass:[NSDictionary class]]
-                       (dump-nsdictionary value)
-                       (prin1 value)))))
-             (princ ")")))
-    (dump-nsdictionary (handle (elt *wo* 1)))))
+
+#-(and) (progn
+          (let ((*max-level* 2))
+            (declare (special *max-level*))
+            (labels ((dump-nsdictionary (nsdictionary)
+                       (princ "(")
+                       (when (plusp *max-level*)
+                         (let ((*max-level* (1- *max-level*)))
+                           (declare (special *max-level*))
+                           (do-nsdictionary (key value nsdictionary)
+                             (terpri) (prin1 key) (princ " ")
+                             (if [value isKindOfClass:[NSDictionary class]]
+                                 (dump-nsdictionary value)
+                                 (prin1 value)))))
+                       (princ ")")))
+              (dump-nsdictionary (handle (elt *wo* 1)))))
 
 
-(do-nsarray (str [(handle (elt *wo* 1)) allKeys])
-  (print str))
+          (do-nsarray (str [(handle (elt *wo* 1)) allKeys])
+            (print str))
 
-[(handle (elt *wo* 0)) objectForKey:(objcl:objcl-string "d2")]
-[(handle (elt *wo* 0)) objectForKey: (objcl:objcl-string "d2")]
-[(handle (elt *wo* 1)) objectForKey: (objcl:objcl-string "d1")]
-
-
-
-#<ns-mutable-string "{
-    d2 =     {
-        one = un;
-        two = deux;
-    };
-    one = Hello;
-    two = World;
-}" (#x5CDA20)>
-[(handle (elt *wo* 1)) description]
-
-#<ns-mutable-string "{
-    one = un;
-    two = deux;
-}" (#x55AAF0)>
-(map 'string 'code-char (archive-data *a*))
-"streamtypedè@NSMutableArray NSArray NSObject iNSMutableDictionary NSDictionary NSString+oneHellotwoWorldd2oneuntwodeuxd1"
-
-#S(archive :wrappers (#<wrapper #x302004ED356D> #<wrapper #x302004ED335D>) :data #(4 11 115 116 114 101 97 109 116 121 112 101 100 129 232 3 132 1 64 132 132 132 14 78 83 77 117 116 97 98 108 101 65 114 114 97 121 0 132 132 7 78 83 65 114 114 97 121 0 132 132 8 78 83 79 98 106 101 99 116 0 133 132 1 105 2 146 132 132 132 19 78 83 77 117 116 97 98 108 101 68 105 99 116 105 111 110 97 114 121 0 132 132 12 78 83 68 105 99 116 105 111 110 97 114 121 0 149 150 3 146 132 132 132 8 78 83 83 116 114 105 110 103 1 149 132 1 43 3 111 110 101 134 146 132 154 154 5 72 101 108 108 111 134 146 132 154 154 3 116 119 111 134 146 132 154 154 5 87 111 114 108 100 134 146 132 154 154 2 100 50 134 146 132 151 150 3 146 132 154 154 3 111 110 101 134 146 132 154 154 2 117 110 134 146 132 154 154 3 116 119 111 134 146 132 154 154 4 100 101 117 120 134 146 132 154 154 2 100 49 134 146 150 134 134 146 159 134))
-(apropos "make-weak-list")
-(describe 'make-weak-list)
-make-weak-list
-Type: symbol
-Class: #<built-in-class symbol>
-Function
-external in package: #<Package "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK">
-Print name: "MAKE-WEAK-LIST"
-Value: #<Unbound>
-Function: #<Compiled-function make-weak-list #x3020027FA8EF>
-Arglist: (list)
-Plist: nil
+          [(handle (elt *wo* 0)) objectForKey:(objcl:objcl-string "d2")]
+          [(handle (elt *wo* 0)) objectForKey: (objcl:objcl-string "d2")]
+          [(handle (elt *wo* 1)) objectForKey: (objcl:objcl-string "d1")]
 
 
 
+          ;; #<ns-mutable-string "{
+          ;;     d2 =     {
+          ;;         one = un;
+          ;;         two = deux;
+          ;;     };
+          ;;     one = Hello;
+          ;;     two = World;
+          ;; }" (#x5CDA20)>
+          [(handle (elt *wo* 1)) description]
+
+          ;; #<ns-mutable-string "{
+          ;;     one = un;
+          ;;     two = deux;
+          ;; }" (#x55AAF0)>
+          (map 'string 'code-char (archive-data *a*))
+          ;; "streamtypedè@NSMutableArray NSArray NSObject iNSMutableDictionary NSDictionary NSString+oneHellotwoWorldd2oneuntwodeuxd1"
+
+          ;; #S(archive :wrappers (#<wrapper #x302004ED356D> #<wrapper #x302004ED335D>) :data #(4 11 115 116 114 101 97 109 116 121 112 101 100 129 232 3 132 1 64 132 132 132 14 78 83 77 117 116 97 98 108 101 65 114 114 97 121 0 132 132 7 78 83 65 114 114 97 121 0 132 132 8 78 83 79 98 106 101 99 116 0 133 132 1 105 2 146 132 132 132 19 78 83 77 117 116 97 98 108 101 68 105 99 116 105 111 110 97 114 121 0 132 132 12 78 83 68 105 99 116 105 111 110 97 114 121 0 149 150 3 146 132 132 132 8 78 83 83 116 114 105 110 103 1 149 132 1 43 3 111 110 101 134 146 132 154 154 5 72 101 108 108 111 134 146 132 154 154 3 116 119 111 134 146 132 154 154 5 87 111 114 108 100 134 146 132 154 154 2 100 50 134 146 132 151 150 3 146 132 154 154 3 111 110 101 134 146 132 154 154 2 117 110 134 146 132 154 154 3 116 119 111 134 146 132 154 154 4 100 101 117 120 134 146 132 154 154 2 100 49 134 146 150 134 134 146 159 134))
+          ;; (apropos "make-weak-list")
+          ;; (describe 'make-weak-list)
+          ;; make-weak-list
+          ;; Type: symbol
+          ;; Class: #<built-in-class symbol>
+          ;; Function
+          ;; external in package: #<Package "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK">
+          ;; Print name: "MAKE-WEAK-LIST"
+          ;; Value: #<Unbound>
+          ;; Function: #<Compiled-function make-weak-list #x3020027FA8EF>
+          ;; Arglist: (list)
+          ;; Plist: nil
 
 
-(cl-user::lspack :objcl t)
-
-COM.INFORMATIMAGO.OBJECTIVE-CL
-   Symbols:         14 exported, 1130 total.
-   Nicknames:     COM.INFORMATIMAGO.OBJCL OBJCL 
-   Uses:          COM.INFORMATIMAGO.SIMPLE-TEST COMMON-LISP 
-   Exported:      *OBJECTIVE-CL-READTABLE* @ DISABLE-OBJCL-READER-MACROS ENABLE-OBJCL-READER-MACROS 
-                  LISP-STRING NO OBJC-DEFINITION-READER-MACRO OBJC-EXPRESSION-READER-MACRO OBJCL-STRING 
-                  READ-ERROR READ-ERROR-ARGUMENTS READ-ERROR-CONTROL-STRING SET-OBJECTIVE-CL-SYNTAX YES
-nil
 
 
 
-||#
+          (cl-user::lspack :objcl t)
 
+          ;; COM.INFORMATIMAGO.OBJECTIVE-CL
+          ;;    Symbols:         14 exported, 1130 total.
+          ;;    Nicknames:     COM.INFORMATIMAGO.OBJCL OBJCL 
+          ;;    Uses:          COM.INFORMATIMAGO.SIMPLE-TEST COMMON-LISP 
+          ;;    Exported:      *OBJECTIVE-CL-READTABLE* @ DISABLE-OBJCL-READER-MACROS ENABLE-OBJCL-READER-MACROS 
+          ;;                   LISP-STRING NO OBJC-DEFINITION-READER-MACRO OBJC-EXPRESSION-READER-MACRO OBJCL-STRING 
+          ;;                   READ-ERROR READ-ERROR-ARGUMENTS READ-ERROR-CONTROL-STRING SET-OBJECTIVE-CL-SYNTAX YES
+          ;; nil
+
+
+          )
 
 
 ;; #<MclguiKeyedArchiverDelegate #x369b660> archiver:#<NSKeyedArchiver #x369b130> willEncodeObject:#<__NSArrayM #x3698ff0>
@@ -573,5 +570,7 @@ nil
 ;; #<MclguiKeyedUnarchiverDelegate #x369a0e0> unarchiver:#<NSKeyedUnarchiver #x36994f0> didDecodeObject:#<__NSCFDictionary #x369bca0>
 ;; #<MclguiKeyedUnarchiverDelegate #x369a0e0> unarchiver:#<NSKeyedUnarchiver #x36994f0> didDecodeObject:#<__NSCFDictionary #x3699490>
 ;; #<MclguiKeyedUnarchiverDelegate #x369a0e0> unarchiver:#<NSKeyedUnarchiver #x36994f0> didDecodeObject:#<__NSArrayM #x369a170>
+
+#+test (test/nsdata-vector)
 
 ;;;; THE END ;;;;

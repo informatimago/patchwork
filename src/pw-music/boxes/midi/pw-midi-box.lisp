@@ -147,80 +147,77 @@ chan + 2 (quartertones),  chan + 3 (three-eighths tones).
     (MidiPlayAny object approx chan)))
 
 
-#|
-;; GA Pw2.6.2 101096
-(defunp play-object ((object list (:value '() :type-list ()))
-(chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
-"play-object plays a note, chord, or chord sequence specified in its input object 
-through 
-the   MIDI ;channel specified in chan . The approx input is the approximation 
-value 
-for midicents. This can be the whole tone (approx = 1), semitone (approx  = 2), 
-quartertone (approx = 4, the default) or eighth-tone (approx = 8). The play 
-operation 
-takes the full duration specified in the given object. Notes with microtonal 
-accidentals 
-are sent to different output channels according to the following mapping: chan + 
-1 
-(eighth-tones), chan + 2 (quartertones) or chan + 3 (three-eighths tones). For 
-example, 
-if you set chan to 8, semitones are sent out channel 8, eighth-tones are sent out 
-channel 
-9, quartertones are sent out channel 10, and so on.
-"
-(if (subtypep (type-of object) 'C-measure-line)
-(play-sequence (make-instance 'C-chord-line 
-:chords (car (rtm-chords (list object)))) chan approx)
-(play-yourself-as-object object chan approx)))
 
-(defmethod play-yourself-as-object ((object C-chord) chan approx)
-(let* ((notes (notes object))
-(midics (ask-all notes 'midic)))
-(C-pw-send-midi-note:snd-midinote (approx-m midics approx)
-(ask-all (notes object) 'vel)
-(l+ (epw::microtone midics approx) (1- chan))
-(ask-all (notes object) 'dur)
-(ask-all (notes object) 'offset-time))))
+;; ;; GA Pw2.6.2 101096
+;; (defunp play-object ((object list (:value '() :type-list ()))
+;;                      (chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
+;;     "play-object plays a note, chord, or chord sequence specified in its input object 
+;; through 
+;; the   MIDI ;channel specified in chan . The approx input is the approximation 
+;; value 
+;; for midicents. This can be the whole tone (approx = 1), semitone (approx  = 2), 
+;; quartertone (approx = 4, the default) or eighth-tone (approx = 8). The play 
+;; operation 
+;; takes the full duration specified in the given object. Notes with microtonal 
+;; accidentals 
+;; are sent to different output channels according to the following mapping: chan + 
+;; 1 
+;; (eighth-tones), chan + 2 (quartertones) or chan + 3 (three-eighths tones). For 
+;; example, 
+;; if you set chan to 8, semitones are sent out channel 8, eighth-tones are sent out 
+;; channel 
+;; 9, quartertones are sent out channel 10, and so on.
+;; "
+;;   (if (subtypep (type-of object) 'C-measure-line)
+;;       (play-sequence (make-instance 'C-chord-line 
+;;                                     :chords (car (rtm-chords (list object)))) chan approx)
+;;       (play-yourself-as-object object chan approx)))
+;; 
+;; (defmethod play-yourself-as-object ((object C-chord) chan approx)
+;;   (let* ((notes (notes object))
+;;          (midics (ask-all notes 'midic)))
+;;     (C-pw-send-midi-note:snd-midinote (approx-m midics approx)
+;;                                       (ask-all (notes object) 'vel)
+;;                                       (l+ (epw::microtone midics approx) (1- chan))
+;;                                       (ask-all (notes object) 'dur)
+;;                                       (ask-all (notes object) 'offset-time))))
+;; 
+;; (defmethod play-yourself-as-object ((object C-note) chan approx)
+;;   (C-pw-send-midi-note:snd-midinote (approx-m (midic object) approx) (vel object)
+;;                                     (+ (car (epw::microtone (list (midic object)) approx))
+;;                                        chan)
+;;                                     (dur object) (offset-time object)))
 
-(defmethod play-yourself-as-object ((object C-note) chan approx)
-(C-pw-send-midi-note:snd-midinote (approx-m (midic object) approx) (vel object)
-(+ (car (epw::microtone (list (midic object)) approx))
-chan)
-(dur object) (offset-time object)))
-|#
-
-#|
-(defmethod play-yourself-as-object ((object C-chord-line) chan approx)
-(play-sequence object chan approx))
-
-(defmethod play-yourself-as-object ((object C-chord) chan approx)
-(let* ((notes (notes object))
-(midics (ask-all notes 'midic))
-(chans (l+ (ask-all notes 'chan) -1)))
-(C-pw-send-midi-note:snd-midinote (epw::approx-m midics approx)
-(ask-all (notes object) 'vel)
-(l+ (epw::microtone midics approx) (if (= chan 0) chans (1- chan)))
-(ask-all (notes object) 'dur)
-(ask-all (notes object) 'offset-time))))
-
-(defmethod play-yourself-as-object ((object C-note) chan approx)
-(C-pw-send-midi-note:snd-midinote (epw::approx-m (midic object) approx) (vel object)
-(+ (car (epw::microtone (list (midic object)) approx))
-(if (= chan 0) (1- (chan object)) (1- chan)))
-(dur object) (offset-time object)))
-
-(defmethod play-yourself-as-object ((object cons) chan approx)
-(if (dolist (obj object t) 
-(unless (subtypep (type-of obj) 'C-measure-line) (return nil)))
-(play-sequence (make-instance 'C-chord-line
-:chords (sort (apply #'append (rtm-chords object)) '< :key #'t-time))
-chan approx)
-(tell object #'play-object chan approx)))
-
-(defmethod play-yourself-as-object ((object t) chan approx)
-(format t "don't know how to play object: ~S ~%" object)
-(ui:ed-beep))
-|#
+;; (defmethod play-yourself-as-object ((object C-chord-line) chan approx)
+;;   (play-sequence object chan approx))
+;; 
+;; (defmethod play-yourself-as-object ((object C-chord) chan approx)
+;;   (let* ((notes (notes object))
+;;          (midics (ask-all notes 'midic))
+;;          (chans (l+ (ask-all notes 'chan) -1)))
+;;     (C-pw-send-midi-note:snd-midinote (epw::approx-m midics approx)
+;;                                       (ask-all (notes object) 'vel)
+;;                                       (l+ (epw::microtone midics approx) (if (= chan 0) chans (1- chan)))
+;;                                       (ask-all (notes object) 'dur)
+;;                                       (ask-all (notes object) 'offset-time))))
+;; 
+;; (defmethod play-yourself-as-object ((object C-note) chan approx)
+;;   (C-pw-send-midi-note:snd-midinote (epw::approx-m (midic object) approx) (vel object)
+;;                                     (+ (car (epw::microtone (list (midic object)) approx))
+;;                                        (if (= chan 0) (1- (chan object)) (1- chan)))
+;;                                     (dur object) (offset-time object)))
+;; 
+;; (defmethod play-yourself-as-object ((object cons) chan approx)
+;;   (if (dolist (obj object t) 
+;;         (unless (subtypep (type-of obj) 'C-measure-line) (return nil)))
+;;       (play-sequence (make-instance 'C-chord-line
+;;                                     :chords (sort (apply #'append (rtm-chords object)) '< :key #'t-time))
+;;                      chan approx)
+;;       (tell object #'play-object chan approx)))
+;; 
+;; (defmethod play-yourself-as-object ((object t) chan approx)
+;;   (format t "don't know how to play object: ~S ~%" object)
+;;   (ui:ed-beep))
 
 
 (in-package "C-PW-SEND-MIDI-NOTE")
@@ -649,8 +646,8 @@ endlessly: 'late Task'."
     "The play/stop module plays a chord object through the   MIDI ;channel given 
 in channel. The approx variable is the approximation value for midicents, which 
 can be set to whole tone (approx = 1), semitone (approx  = 2), quartertone 
-(approx = 4, the default)  or eighth-tone (approx = 8).  If no duration is supplied 
-(or if it is equal to zero)  the module keeps playing until you option-click again at 
+\(approx = 4, the default)  or eighth-tone (approx = 8).  If no duration is supplied 
+\(or if it is equal to zero)  the module keeps playing until you option-click again at 
 its output box. Otherwise  it plays for the given duration dur. Notes with 
 microtonal accidentals are sent to different output channels according to the 
 following mapping: channel + 1 (eighth-tones), channel + 2 (quartertones) or 

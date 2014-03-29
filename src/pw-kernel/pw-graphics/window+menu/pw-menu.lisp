@@ -72,7 +72,7 @@
 
 ;;_________________
 
-(defvar *original-menubar*   (copy-list ui:*default-menubar*))
+(defvar *original-menubar*  '())
 (defvar *lisp-menubar*      '())
 (defvar *patchwork-menubar* '())
 
@@ -550,9 +550,10 @@ DO:       Execute the BODY with a handler for CONDITION and
               *pw-menu-patch*
               *pw-windows-menu*))
   ;;------------------------------
-  (setf *lisp-menubar*  (list* *apple-menu*
-                               *pw-menu-apps*
-                               (rest *original-menubar*)))
+  (setf *original-menubar* (copy-list ui:*default-menubar*))
+  (setf *lisp-menubar*     (list* *apple-menu*
+                                  *pw-menu-apps*
+                                  (rest *original-menubar*)))
   ;;------------------------------
   (set-menubar       *lisp-menubar*)
   (menu-item-disable *apps-lisp-menu-item*)

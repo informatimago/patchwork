@@ -110,11 +110,11 @@ partial rankings or the notes corresponding to those partials."
 
 
 
-#|(defunp harm-ser ((mfonda midic) (step fix/float) (begin fix/float) (end fix/float)) chord
-"every <step> harmonics of <mfonda> from <begin> up to <end> harmonics"
-(let ((freq (mc->f1 (car! mfonda))) res)
-(for (n begin step end) (newl res (f->mc1 (* freq n))))
-(nreverse res) ))|#
+;; (defunp harm-ser ((mfonda midic) (step fix/float) (begin fix/float) (end fix/float)) chord
+;;     "every <step> harmonics of <mfonda> from <begin> up to <end> harmonics"
+;;   (let ((freq (mc->f1 (car! mfonda))) res)
+;;     (for (n begin step end) (newl res (f->mc1 (* freq n))))
+;;     (nreverse res) ))
 
 ;; ==== fondamental virtuel ====
 
@@ -145,20 +145,20 @@ partial rankings or the notes corresponding to those partials."
 ;; (interval-around-f 440. 1) => (415.3046975799451 . 466.1637615180899) (G# . A#)
 ;; (f->mc (interval-around-f 440. 1)) => (6800 . 7000)
 
-#|(defun fond-virt-f (freqs approx)
-(let*
-((l-fmin.fmax (mapcar (lambda (freq) (interval-around-f freq approx)) freqs))
-(f1min (caar l-fmin.fmax))
-(f1max (cdar l-fmin.fmax))
-(fvc (funda-virt-choice (- f1max f1min) f1max l-fmin.fmax))
-(f0min (cadr fvc))
-(f0max (cddr fvc))
-(m0s (f->mc (mapcar #'/ freqs (car fvc))))
-(m0 (/ (apply #'+ m0s) (length m0s))))
-    ;(format t "fvc:~S~%" fvc)          ;
-(cond ((< m0 (f->mc1 f0min)) f0min)
-((> m0 (f->mc1 f0max)) f0max)
-(t (mc->f1 m0)))))|#
+;; (defun fond-virt-f (freqs approx)
+;;   (let*
+;;       ((l-fmin.fmax (mapcar (lambda (freq) (interval-around-f freq approx)) freqs))
+;;        (f1min (caar l-fmin.fmax))
+;;        (f1max (cdar l-fmin.fmax))
+;;        (fvc (funda-virt-choice (- f1max f1min) f1max l-fmin.fmax))
+;;        (f0min (cadr fvc))
+;;        (f0max (cddr fvc))
+;;        (m0s (f->mc (mapcar #'/ freqs (car fvc))))
+;;        (m0 (/ (apply #'+ m0s) (length m0s))))
+;;                                         ;(format t "fvc:~S~%" fvc)          ;
+;;     (cond ((< m0 (f->mc1 f0min)) f0min)
+;;           ((> m0 (f->mc1 f0max)) f0max)
+;;           (t (mc->f1 m0)))))
 
 (defun fond-virt-f (freqs approx)
   (tolerant-gcd freqs approx))
@@ -340,35 +340,33 @@ If two or more adjacent min or max have the same value, they are collected in a 
           (newl l (nextl l1)))
         (nreverse l))))
 
-#|
-(defunp virt-fund ((ch chord) (cents fix>=0 (:value 50))) midic
-"Returns the highest midic which corresponds to a \"sum-abs\" harmonic distance
-to the chord <ch> smaller than or equal to <cents>."
-(let* ((ch (list! ch))
-(max (+ (l-min ch) 600)) (freqs (mc->f ch)) minmax)
-(loop
-(setq minmax (flat (sumabs-minmax (- max 1200) ch max)))
-(setq max
-(cond ((null minmax) (- max 1100))
-((null (cdr minmax)) (min (- max 150) (+ (car! minmax) 100)))
-(t (min (- max 150) (+ (car! (cdr minmax)) 100)))))
-(when (cdr minmax) (nextl minmax))
-(mapc
-(lambda (midic)
-(when (<= (sum-abs (mc->f1 (car! midic)) freqs) cents)
-(return-from virt-fund midic)))
-(nreverse minmax)))))
-|#
+;; (defunp virt-fund ((ch chord) (cents fix>=0 (:value 50))) midic
+;;     "Returns the highest midic which corresponds to a \"sum-abs\" harmonic distance
+;; to the chord <ch> smaller than or equal to <cents>."
+;;   (let* ((ch (list! ch))
+;;          (max (+ (l-min ch) 600)) (freqs (mc->f ch)) minmax)
+;;     (loop
+;;       (setq minmax (flat (sumabs-minmax (- max 1200) ch max)))
+;;       (setq max
+;;             (cond ((null minmax) (- max 1100))
+;;                   ((null (cdr minmax)) (min (- max 150) (+ (car! minmax) 100)))
+;;                   (t (min (- max 150) (+ (car! (cdr minmax)) 100)))))
+;;       (when (cdr minmax) (nextl minmax))
+;;       (mapc
+;;        (lambda (midic)
+;;          (when (<= (sum-abs (mc->f1 (car! midic)) freqs) cents)
+;;            (return-from virt-fund midic)))
+;;        (nreverse minmax)))))
+
 
 ;;; [Camilo] This is  probably wrong, but at least it terminates.
 ;;; TM: ajouté options et traitement de listes d'accords et d'approx
 
-#| (defunp virt-fund ((ch chord) (cents fix>=0 (:value 50))) midic
-"Returns the highest midic which corresponds to a \"sum-abs\" harmonic distance
-to the chord <ch> smaller than or equal to <cents>."
-(f->mc (fond-virt-f (mc->f ch) (round (/ 100 cents)))))
+;; (defunp virt-fund ((ch chord) (cents fix>=0 (:value 50))) midic
+;;     "Returns the highest midic which corresponds to a \"sum-abs\" harmonic distance
+;; to the chord <ch> smaller than or equal to <cents>."
+;;   (f->mc (fond-virt-f (mc->f ch) (round (/ 100 cents)))))
 
-|#
 
 
 (defun virt-fund1 (chord cents)
@@ -422,13 +420,13 @@ result returned in midicents, ('midic'), or in hertz ('freq'). The argument
 harmonic distance to the chord <ch> between <locents> and <hicents>."
   (mapcar #'car (sumabs-minsd ch hicents locents)))
 
-                                        ;(oct 1)(nreverse (sumabs-minmax (+ min (* (1- oct) 1200)) ch (+ min (* oct 1200)))))
-#|
-(time (length (sumabs-allminmax -700 '(4100 4900 5100 5700 6000 6600 7000 7400) 2900)))
+;;(oct 1)(nreverse (sumabs-minmax (+ min (* (1- oct) 1200)) ch (+ min (* oct 1200)))))
+
+;; (time (length (sumabs-allminmax -700 '(4100 4900 5100 5700 6000 6600 7000 7400) 2900)))
 ;; took 1800 ticks (30.000 seconds) to run. with remove-duplicates
 ;; took 93 ticks (1.550 seconds) to run. with unique-sorted
 ;;657
-|#
+
 (defunp fv-sumabs-plot ((m0s midics?) (ch chord)) list
     "Returns the list of distances (according to <fun>) between each f0 and <ch>."
   (let ((freqs (mc->f (list! ch))))

@@ -64,21 +64,26 @@
 
 
 ;;========================================================================
-(defvar *cents-vector* (make-array '(100)))
 
-(defun update-cents-vector (pitch-bend-range)
-  (let ((steps (truncate (/  8192 pitch-bend-range))) ; 8192 = high (64) * low (128) -> 1 octave
-        (temp))
-    (for (i 0 1 99)
-      (setq temp (/ (* i steps) 100))  
-      (setf (svref *cents-vector* i)
-            (cons 
-             (+ 64 (truncate (/ temp 128)))    ; high
-             (truncate (mod temp 128))))))) ; low
+(eval-when (:compile-toplevel :load-toplevel :execute)
 
-;; (for (i 0 1 99) (print (svref *cents-vector* i)))
+  (defvar *cents-vector* (make-array '(100)))
 
-(update-cents-vector 1)  ; pitch-bend-range +- 1 semitone
+  (defun update-cents-vector (pitch-bend-range)
+    (let ((steps (truncate (/  8192 pitch-bend-range))) ; 8192 = high (64) * low (128) -> 1 octave
+          (temp))
+      (for (i 0 1 99)
+        (setq temp (/ (* i steps) 100))  
+        (setf (svref *cents-vector* i)
+              (cons 
+               (+ 64 (truncate (/ temp 128)))    ; high
+               (truncate (mod temp 128))))))) ; low
+
+  ;; (for (i 0 1 99) (print (svref *cents-vector* i)))
+
+  (update-cents-vector 1)  ; pitch-bend-range +- 1 semitone
+
+  );;eval-when
 
 (defun write-midicent-note (dur chan key vel)
   (unless (or (minusp key) (> key 12700))
@@ -208,14 +213,17 @@
 
 #|
 (defun rec-MN (midi-obj)
-(let ((mn-editor (give-MN-editor midi-obj))
-(midics)(t-time)
-(list (quantize-chords (read-from-midi))))
-(while list
-(setq t-time (caar list))
-(setq midics (mapcar #'* (mapcar #'second (cdar list)) (cirlist 100))) 
-(add-new-chord (chord-line mn-editor) (make-chord-object midics t-time))
-(pop list))
-(update-editor (give-MN-editor midi-obj) ())
-midi-obj))
+  (let ((mn-editor (give-MN-editor midi-obj))
+        (midics)(t-time)
+        (list (quantize-chords (read-from-midi))))
+    (while list
+      (setq t-time (caar list))
+      (setq midics (mapcar #'* (mapcar #'second (cdar list)) (cirlist 100))) 
+      (add-new-chord (chord-line mn-editor) (make-chord-object midics t-time))
+      (pop list))
+    (update-editor (give-MN-editor midi-obj) ())
+    midi-obj))
 |#
+
+
+;;;; THE END ;;;;

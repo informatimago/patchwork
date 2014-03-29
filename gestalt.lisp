@@ -31,8 +31,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(in-package "COMMON-LISP-USER")
-(ql:quickload :cffi)
+(in-package "PATCHWORK.BUILDER")
 
 
 (defun version (major minor)
@@ -78,11 +77,13 @@
         (list (cffi:mem-ref major :int) (cffi:mem-ref minor :int)))))
   #-cocoa '())
 
-(when (featurep :cocoa)
-  (loop
-    :for minor :from 4 :to 9
-    :when (version<= (version 10 minor) (system-version))
-    :do (pushnew (intern (format nil "COCOA-~A.~A" 10 minor) "KEYWORD") *features*)))
+(defun add-cocoa-version-features ()
+  "Adds :cocoa-10.4 to :cocoa-10.9, according to the system version."
+  (when (featurep :cocoa)
+    (loop
+      :for minor :from 4 :to 9
+      :when (version<= (version 10 minor) (system-version))
+        :do (pushnew (intern (format nil "COCOA-~A.~A" 10 minor) "KEYWORD") *features*))))
 
 
 ;;;; THE END ;;;;

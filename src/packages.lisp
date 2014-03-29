@@ -40,6 +40,13 @@
    "FILE-COMPARE…" "FILE-COMPARE" "READ-LISTS-FROM"
    "PREFIX-EXPR" "PREFIX-HELP" "*COMPILE-NUM-LAMBDA*" "MAKE-NUM-FUN" "MAKE-NUM-LAMBDA"))
 
+(cl:defpackage "REDIRECTING-STREAM"
+  (:use "COMMON-LISP"
+        "TRIVIAL-GRAY-STREAMS")
+  (:export "REDIRECTING-CHARACTER-OUTPUT-STREAM"
+           "REDIRECTING-CHARACTER-INPUT-STREAM"))
+
+
 (cl:defpackage "PATCHWORK.SCHEDULER"
   (:use "COMMON-LISP" "CLOSER-MOP" "UI" "LELISP-MACROS" "MIDI")
 
@@ -67,11 +74,14 @@
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
   (:use "CLOSER-MOP" "UI" "LELISP-MACROS" "PATCHWORK.SCHEDULER")
+  (:use "REDIRECTING-STREAM")
   (:shadowing-import-from "CLOSER-MOP"
                           "STANDARD-CLASS" "STANDARD-GENERIC-FUNCTION" "STANDARD-METHOD"
                           "DEFMETHOD" "DEFGENERIC")
   (:export "ENABLE-PATCHWORK-READER-MACROS"
            "DISABLE-PATCHWORK-READER-MACROS")
+
+  (:export "INITIALIZE")
   
   (:export "DRAW-CHAR" "DRAW-STRING" "DRAW-POINT" "DRAW-LINE" 
            "DRAW-RECT*" "FILL-RECT*" "DRAW-ELLIPSE" "FILL-ELLIPSE"
@@ -229,13 +239,9 @@
            "LINEAR" "POWER-FUN" "POWER/2" "POWER/3" "PARABOLE/2"
            "PARABOLE/3"))
 
-  (eval-when (eval compile load)
-    (shadowing-import
-     '()))
-
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (import
-   '(epw::approx-m epw:arithm-ser epw:average epw::band-filter
+   '(epw:make-list2 epw::approx-m epw:arithm-ser epw:average epw::band-filter
      epw::band-pass epw::band-reject epw::band-select epw::cartesian
      epw::cents->coef epw::coef->cents epw::create-list epw::densifier
      epw:distor epw:distor-ext epw::dx->x epw::f->mc epw::fibo-ser

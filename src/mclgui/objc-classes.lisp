@@ -481,17 +481,7 @@ RETURN:         DST.
                                        err)
                                (finish-output *trace-output*)
                                (return-from ,vhandler nil))))
-         ,@body)))
-  #-(and)
-  `(handler-case
-       (progn ,@body)
-     (error (err)
-       (declare (stepper disable))
-       (format *trace-output* "~%ERROR while ~S:~%~A~2%"
-               ',(if (= 1 (length body)) body `(progn ,@body))
-               err)
-       (finish-output *trace-output*)
-       nil)))
+         ,@body))))
 
 
 ;;;------------------------------------------------------------
@@ -921,7 +911,9 @@ RETURN: A NSPoint containing the origin of the nswindow.
 @[MclguiEvaluator
   method:(evaluate)
   resultType:(:void)
-  body:(funcall (evaluator-thunk self))]
+  body:(if (evaluator-thunk self)
+           (report-errors (funcall (evaluator-thunk self)))
+           (warn "Evaluator got a NIL thunk"))]
 
 
 ;;;------------------------------------------------------------

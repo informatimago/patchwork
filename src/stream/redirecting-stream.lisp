@@ -31,12 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "REDIRECTING-STREAM"
-  (:use "COMMON-LISP"
-        "TRIVIAL-GRAY-STREAMS")
-  (:export "REDIRECTING-CHARACTER-OUTPUT-STREAM"
-           "REDIRECTING-CHARACTER-INPUT-STREAM"))
-
 (in-package "REDIRECTING-STREAM")
 
 ;; ---

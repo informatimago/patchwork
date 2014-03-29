@@ -157,51 +157,52 @@
 
 ;; ==== operation level ====
 
-(defstruct
-  (level
-   (:print-function
-    (lambda (me stream depth)
-      (declare (ignore depth))
-      (format
-       stream
-       "#<ops=~S	; ~:[not~;   ~] associative ~:[~; ;  default=~:*~S~]~
-       ~:[~; 	;   inverse=~:*~S~]~:[~;	;   translations=~:*~S~]>"
-       (level-ops me)
-       (level-associative? me)
-       (level-dop me)
-       (level-iop me)
-       (level-l-op.tr me)))))
-  dop           ;default operators
-  iop           ;inverse operators
-  tr-default    ;default operator translation
-  tr-inverse    ;inverse operator translation
-  ops           ;all operators
-  l-op.tr       ;translations
-  associative?)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defstruct
+      (level
+       (:print-function
+        (lambda (me stream depth)
+          (declare (ignore depth))
+          (format
+           stream
+           "#<ops=~S ~:[not~;   ~] associative ~:[~; ;  default=~:*~S~]~
+       ~:[~;    inverse=~:*~S~]~:[~;   translations=~:*~S~]>"
+           (level-ops me)
+           (level-associative? me)
+           (level-dop me)
+           (level-iop me)
+           (level-l-op.tr me)))))
+    dop                     ;default operators
+    iop                     ;inverse operators
+    tr-default              ;default operator translation
+    tr-inverse              ;inverse operator translation
+    ops                     ;all operators
+    l-op.tr                 ;translations
+    associative?)
 
-(defun create-level (dop iop l-op.tr associative? &aux me ops)
-  "Create a level object from the specification of the default and inverse operators
+  (defun create-level (dop iop l-op.tr associative? &aux me ops)
+    "Create a level object from the specification of the default and inverse operators
 and the associativity."
-  (declare (ignorable ops))
-  (unless (listp dop) (setq dop (list dop)))
-  (unless (listp iop) (setq iop (list iop)))
-  (setq me
-        (make-level
-         :dop dop
-         :iop iop
-         :ops (setq ops (remove-duplicates (append dop iop (mapcar #'car l-op.tr))))
-         :l-op.tr l-op.tr
-         :associative? associative?))
-  (setf (level-tr-default me) (level-translate me (car (level-dop me)))
-        (level-tr-inverse me) (level-translate me (car (level-iop me))))
-  ;; (mapc
-  ;;  (lambda (op)
-  ;;      (check-type op symbol)
-  ;;      (unless (eq (symbol-package op) (load-time-value (find-package "KEYWORD")))
-  ;;        (import op "COMMON-LISP")
-  ;;        (export op "COMMON-LISP")))
-  ;;  ops)
-  me)
+    (declare (ignorable ops))
+    (unless (listp dop) (setq dop (list dop)))
+    (unless (listp iop) (setq iop (list iop)))
+    (setq me
+          (make-level
+           :dop dop
+           :iop iop
+           :ops (setq ops (remove-duplicates (append dop iop (mapcar #'car l-op.tr))))
+           :l-op.tr l-op.tr
+           :associative? associative?))
+    (setf (level-tr-default me) (level-translate me (car (level-dop me)))
+          (level-tr-inverse me) (level-translate me (car (level-iop me))))
+    ;; (mapc
+    ;;  (lambda (op)
+    ;;      (check-type op symbol)
+    ;;      (unless (eq (symbol-package op) (load-time-value (find-package "KEYWORD")))
+    ;;        (import op "COMMON-LISP")
+    ;;        (export op "COMMON-LISP")))
+    ;;  ops)
+    me))
 
 (defun level-has? (me op) (memq op (level-ops me)))
 (defun level-default? (me op) (memq op (level-dop me)))
@@ -211,30 +212,24 @@ and the associativity."
 
 ;; ==== globals and macros ====
 
-(progn
-  (defvar *levels*)
-  (defvar *all-ops*)
+(defvar *levels*  (list
+                   (create-level '\; () '((\; . progn)) t)
+                   (create-level ':= () '((:= . setq)) nil)
+                   (create-level '(==) () '((== . =)) t)
+                   (create-level '(!=) () '((!= . /=)) t)
+                   (create-level '(>) () () t)
+                   (create-level '(<) () () t)
+                   (create-level '(>=) () () t)
+                   (create-level '(<=) () () t)
+                   (create-level '+ '- () t)
+                   (create-level '* '/ () t)
+                   (create-level '(** ) () '((** . expt) ) nil)))
 
-  (setf *levels*
-        (list
-         (create-level '\; () '((\; . progn)) t)
-         (create-level ':= () '((:= . setq)) nil)
-         (create-level '(==) () '((== . =)) t)
-         (create-level '(!=) () '((!= . /=)) t)
-         (create-level '(>) () () t)
-         (create-level '(<) () () t)
-         (create-level '(>=) () () t)
-         (create-level '(<=) () () t)
-         (create-level '+ '- () t)
-         (create-level '* '/ () t)
-         (create-level '(** ) () '((** . expt) ) nil)))
-
-  (setf *all-ops* (apply #'append (mapcar #'level-ops *levels*))))
+(defvar *all-ops* (apply #'append (mapcar #'level-ops *levels*)))
 
 (defvar *default-operation* '*)
 
-(eval-when (eval compile)
-  (defmacro operation? (op) `(memq ,op *all-ops*)))
+(defmacro operation? (op) `(memq ,op *all-ops*))
 
 ;; ==== help, user function and sharp macro character ====
 
