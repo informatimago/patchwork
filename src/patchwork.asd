@@ -78,8 +78,8 @@
                  ;; (:file "pw-lib/pwscript/pw-ae" 
                  ;;        :depends-on ("packages"
                  ;;                     "pw-lib/pwscript/appleevent-toolkit"))
-                 (:file "pw-lib/pwscript/closae" 
-                  :depends-on ("packages"))
+                 ;; (:file "pw-lib/pwscript/closae" 
+                 ;;  :depends-on ("packages"))
 
 
                  (:file "pw-lib/pwscript/pw-scripting-gf"
@@ -88,15 +88,16 @@
                  (:file "pw-lib/pwscript/pw-scripting" 
                         :depends-on ("packages"
                                      ;; "pw-lib/pwscript/pw-ae"
-                                     "pw-lib/pwscript/closae"
-                                     "pw-lib/pwscript/pw-scripting-gf" 
+                                     "pw-kernel/boxes/data/buffer-box"
                                      "pw-kernel/boxes/data/file-buffer"
                                      "pw-kernel/boxes/data/list-editor"
-                                     "pw-kernel/boxes/data/buffer-box"
                                      "pw-kernel/pw-graphics/window+menu/pw-window"
+                                     "pw-kernel/types/pw-type-scheme"
+                                     "pw-lib/pwscript/closae"
+                                     "pw-lib/pwscript/pw-scripting-gf" 
                                      "pw-music/boxes/midi/pw-midi-box"
-                                     "pw-music/editors/rhythm/beat-measure-measure-line"
-                                     "pw-music/editors/mn/mn-note-chord-chordline"))
+                                     "pw-music/editors/mn/mn-note-chord-chordline"
+                                     "pw-music/editors/rhythm/beat-measure-measure-line"))
 
                  (:file "pw-lib/pwscript/record"
                         :depends-on ("packages"))
@@ -141,19 +142,20 @@
                  (:file "pw-lib/midishare/midiplay" 
                         :depends-on ("packages"
                                      #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
-                                     "pw-kernel/drivers+resources/midi"
-                                     "pw-music/boxes/edit/rhythm-formation"
                                      "pw-kernel/box-creation/pw-patch"
-                                     "pw-music/boxes/edit/rtm-patch"
-                                     "pw-music/editors/rhythm/rtm-editor"
-                                     "pw-music/editors/rhythm/rtm-paging+kill"
+                                     "pw-kernel/drivers+resources/midi"
+                                     "pw-kernel/types/pw-type-scheme"
                                      "pw-music/boxes/edit/pw-chord-box"
                                      "pw-music/boxes/edit/pw-mn-collector"
-                                     "pw-music/editors/rhythm/beat-measure-measure-line"
-                                     "pw-music/editors/mn/mn-collector-view"
+                                     "pw-music/boxes/edit/rhythm-formation"
+                                     "pw-music/boxes/edit/rtm-patch"
                                      "pw-music/editors/mn/mn-chord-ed"
+                                     "pw-music/editors/mn/mn-collector-view"
                                      "pw-music/editors/mn/mn-note-chord-chordline"
-                                     "pw-music/editors/mn/mn-note-chord-chordline"))
+                                     "pw-music/editors/mn/mn-note-chord-chordline"
+                                     "pw-music/editors/rhythm/beat-measure-measure-line"
+                                     "pw-music/editors/rhythm/rtm-editor"
+                                     "pw-music/editors/rhythm/rtm-paging+kill"))
                  
                  (:file "pw-lib/midishare/midirecord" 
                         :depends-on ("packages"
@@ -495,7 +497,8 @@
                                      "pw-kernel/environment/reader-macros"))
                  
                  (:file "pw-kernel/pw-graphics/controls/popupmenu" 
-                        :depends-on ("packages"))
+                        :depends-on ("packages"
+                                     "pw-kernel/pw-graphics/window+menu/pw-menu"))
                  
                  (:file "pw-kernel/pw-graphics/controls/pw-controls" 
                         :depends-on ("packages"
@@ -822,14 +825,15 @@
                  (:file "pw-music/editors/mn/mn-collector-panel" 
                         :depends-on ("packages"
                                      "gf"
-                                     "pw-music/menu/mn-menu"
                                      "pw-kernel/box-creation/application-box"
-                                     "pw-music/editors/mn/mn-window"
-                                     "pw-music/editors/mn/mn-editor"
+                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-kernel/types/pw-type-scheme"
                                      "pw-music/editors/mn/mn-chord-ed"
-                                     "pw-music/editors/mn/mn-note-chord-chordline"
                                      "pw-music/editors/mn/mn-collector-view" 
-                                     "pw-kernel/pw-graphics/controls/pw-graphics"))
+                                     "pw-music/editors/mn/mn-editor"
+                                     "pw-music/editors/mn/mn-note-chord-chordline"
+                                     "pw-music/editors/mn/mn-window"
+                                     "pw-music/menu/mn-menu"))
                  
                  (:file "pw-music/editors/mn/mn-collector-view" 
                         :depends-on ("packages"
@@ -846,13 +850,14 @@
                  (:file "pw-music/editors/mn/mn-editor" 
                         :depends-on ("packages"
                                      "gf"
-                                     "pw-lib/pwscript/record"
                                      "pw-kernel/drivers+resources/scheduler"
                                      "pw-kernel/environment/epw-package"
-                                     "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/pw-graphics/controls/pw-controls"
-                                     "pw-music/menu/mn-menu"
-                                     "pw-music/editors/mn/mn-window"))
+                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-kernel/types/pw-type-scheme"
+                                     "pw-lib/pwscript/record"
+                                     "pw-music/editors/mn/mn-window"
+                                     "pw-music/menu/mn-menu"))
                  
                  (:file "pw-music/editors/mn/mn-help-window" 
                         :depends-on ("packages"
@@ -862,8 +867,9 @@
                         :depends-on ("packages"
                                      "gf"
                                      "pw-kernel/drivers+resources/scheduler"
-                                     "pw-kernel/pw-graphics/controls/pw-graphics"
                                      "pw-kernel/environment/epw-package"
+                                     "pw-kernel/pw-graphics/controls/pw-graphics"
+                                     "pw-kernel/types/pw-type-scheme"
                                      "pw-music/editors/mn/mn-editor"))
 
                  (:file "pw-music/editors/mn/mn-window" 
