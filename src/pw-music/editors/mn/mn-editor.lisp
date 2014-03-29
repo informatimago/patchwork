@@ -463,10 +463,8 @@
   (setf *MN-play-flag* nil)
   (tell (ask-all (editor-objects self) 'chord-line) 'stop-play))
 
-#|
-(defmethod stop-all-staffs ((self C-mus-not-view))
-(tell (ask-all (editor-objects self) 'chord-line) 'stop-play))
-|#
+;; (defmethod stop-all-staffs ((self C-mus-not-view))
+;;   (tell (ask-all (editor-objects self) 'chord-line) 'stop-play))
 
 (defgeneric play-all-staffs (self))
 (defmethod play-all-staffs ((self C-mus-not-view))
@@ -493,7 +491,7 @@
 
 (defmethod view-click-event-handler ((self C-mus-not-view) where)
   (declare (ignore where))
-  (call-next-method) )
+  (call-next-method))
 
 (defmethod view-mouse-up ((self C-mus-not-view))
   (setf *default-MN-cursor* *note-head-cursor*)
@@ -865,89 +863,89 @@
     (setf (chord-line-list patch-obj) chordL-list)
     mn-window))
 
-#|
+;; (progn
+;;   ;;=========================================================================================================
+;;   ;;=========================================================================================================
+;;   (defvar mn-window ())
+;;   (defvar first-scroller ())
+;;   (defvar second-scroller ())
+;;   (defvar third-scroller ())
+;;   (defvar fourth-scroller ())
+;; 
+;;   (setf mn-window (make-instance 'C-mn-window :window-title "MN"))
+;; 
+;; 
+;;   (setf first-scroller (make-instance 'C-mus-not-view
+;;                                       :view-container mn-window
+;;                                       :view-size #@(190 270)
+;;                                       :view-position #@(5 5)
+;;                                       :bottom-boarder 20
+;;                                       :v-scrollp nil
+;;                                       :track-thumb-p t))
+;; 
+;;   (setf second-scroller (make-instance 'C-music-notation-panel
+;;                                        :view-container first-scroller
+;;                                        :view-size #@(180 120)
+;;                                        :view-position #@(2 2)
+;;                                        :h-scrollp nil
+;;                                        :track-thumb-p t
+;;                                        :chord-line (make-instance 'C-chord-line)))
+;;   (setf third-scroller (make-instance 'C-music-notation-panel
+;;                                       :view-container first-scroller
+;;                                       :view-size #@(180 120)
+;;                                       :view-position #@(2 132)
+;;                                       :h-scrollp nil
+;;                                       :track-thumb-p t
+;;                                       :chord-line (make-instance 'C-chord-line)))
+;;   (setf fourth-scroller (make-instance 'C-music-notation-panel
+;;                                        :view-container first-scroller
+;;                                        :view-size #@(180 120)
+;;                                        :view-position #@(2 262)
+;;                                        :h-scrollp nil
+;;                                        :track-thumb-p t
+;;                                        :chord-line (make-instance 'C-chord-line)))
+;; 
+;;   (setf (editor-objects first-scroller) (list second-scroller third-scroller fourth-scroller))
+;; 
+;;   ;;(font-codes '("MusNot-j"  18  :srcor))
+;;   ;;*font-list*
+;;   ;;(real-font '("MusNot-j"  18  :srcor))
+;;   ;;(font-info '("MusNot-j"  18  :srcor))
+;;   ;;(view-font  second-scroller)
+;;   ;; (set-view-font second-scroller '("monaco"  9  :srcor))
+;;   ;;(font-codes '("MusNot-j"  18  :srcor))
+;; 
+;;   ;;(set-view-size  first-scroller (make-point 400 380))
+;;   ;;(set-view-size second-scroller (make-point 390 125))
+;;   ;;(set-view-size third-scroller (make-point 390 125))
+;;   ;;(set-view-size fourth-scroller (make-point 390 125))
+;;   ;;(view-size fourth-scroller)
+;;   ;;(view-size first-scroller)
+;;   ;;(point-v (view-position (car (editor-objects first-scroller))))
+;;   ;;(point-h (view-scroll-position second-scroller))
+;;   ;;(point-v (view-scroll-position third-scroller))
+;;   ;;(point-v (view-scroll-position fourth-scroller))
+;;   ;;=========================================================================================================
+;;   ;;=========================================================================================================
+;;   (setf (chords (chord-line second-scroller)) (list 
+;;                                                (make-chord-object '(7000 8900 9000) 0)(make-chord-object '(4500 6900 7200) 60)
+;;                                                (make-chord-object '(3400 7600 9000) 80)(make-chord-object '(4500 5400 6600) 160)
+;;                                                (make-chord-object '(7000 8800 9000) 200)(make-chord-object '(4300 5400 7200) 260)))
+;; 
+;;   (setf (chords (chord-line third-scroller)) (list 
+;;                                               (make-chord-object '(4500 6700 8800) 0)(make-chord-object '(3300 6900 7200) 70)
+;;                                               (make-chord-object '(7000 8900 9000) 88)(make-chord-object '(4500 6900 7200) 120)
+;;                                               (make-chord-object '(3400 7600 9000) 140)(make-chord-object '(4500 5400 6700) 160)
+;;                                               (make-chord-object '(6500 8800 8900) 180)(make-chord-object '(3300 5400 7200) 240)))
+;; 
+;;   (setf (chords (chord-line fourth-scroller)) (list 
+;;                                                (make-chord-object '(4500 6700 8800) 0)(make-chord-object '(3300 6900 7200) 70)
+;;                                                (make-chord-object '(3400 7600 9000) 90)(make-chord-object '(4500 5400 6700) 110)
+;;                                                (make-chord-object '(7000 8900 9000) 128)(make-chord-object '(4500 6900 7200) 170)
+;;                                                (make-chord-object '(6500 8800 8900) 180)(make-chord-object '(3300 5400 7200) 290)))
+;;   ;;(decompile fourth-scroller)
+;; 
+;;   )
 
-;;=========================================================================================================
-;;=========================================================================================================
-(defvar mn-window ())
-(defvar first-scroller ())
-(defvar second-scroller ())
-(defvar third-scroller ())
-(defvar fourth-scroller ())
 
-(setf mn-window (make-instance 'C-mn-window :window-title "MN"))
-
-
-(setf first-scroller (make-instance 'C-mus-not-view
-:view-container mn-window
-:view-size #@(190 270)
-:view-position #@(5 5)
-:bottom-boarder 20
-:v-scrollp nil
-:track-thumb-p t))
-
-(setf second-scroller (make-instance 'C-music-notation-panel
-:view-container first-scroller
-:view-size #@(180 120)
-:view-position #@(2 2)
-:h-scrollp nil
-:track-thumb-p t
-:chord-line (make-instance 'C-chord-line)))
-(setf third-scroller (make-instance 'C-music-notation-panel
-:view-container first-scroller
-:view-size #@(180 120)
-:view-position #@(2 132)
-:h-scrollp nil
-:track-thumb-p t
-:chord-line (make-instance 'C-chord-line)))
-(setf fourth-scroller (make-instance 'C-music-notation-panel
-:view-container first-scroller
-:view-size #@(180 120)
-:view-position #@(2 262)
-:h-scrollp nil
-:track-thumb-p t
-:chord-line (make-instance 'C-chord-line)))
-
-(setf (editor-objects first-scroller) (list second-scroller third-scroller fourth-scroller))
-
-;;(font-codes '("MusNot-j"  18  :srcor))
-;;*font-list*
-;;(real-font '("MusNot-j"  18  :srcor))
-;;(font-info '("MusNot-j"  18  :srcor))
-;;(view-font  second-scroller)
-;; (set-view-font second-scroller '("monaco"  9  :srcor))
-;;(font-codes '("MusNot-j"  18  :srcor))
-
-;;(set-view-size  first-scroller (make-point 400 380))
-;;(set-view-size second-scroller (make-point 390 125))
-;;(set-view-size third-scroller (make-point 390 125))
-;;(set-view-size fourth-scroller (make-point 390 125))
-;;(view-size fourth-scroller)
-;;(view-size first-scroller)
-;;(point-v (view-position (car (editor-objects first-scroller))))
-;;(point-h (view-scroll-position second-scroller))
-;;(point-v (view-scroll-position third-scroller))
-;;(point-v (view-scroll-position fourth-scroller))
-;;=========================================================================================================
-;;=========================================================================================================
-(setf (chords (chord-line second-scroller)) (list 
-(make-chord-object '(7000 8900 9000) 0)(make-chord-object '(4500 6900 7200) 60)
-(make-chord-object '(3400 7600 9000) 80)(make-chord-object '(4500 5400 6600) 160)
-(make-chord-object '(7000 8800 9000) 200)(make-chord-object '(4300 5400 7200) 260)))
-
-(setf (chords (chord-line third-scroller)) (list 
-(make-chord-object '(4500 6700 8800) 0)(make-chord-object '(3300 6900 7200) 70)
-(make-chord-object '(7000 8900 9000) 88)(make-chord-object '(4500 6900 7200) 120)
-(make-chord-object '(3400 7600 9000) 140)(make-chord-object '(4500 5400 6700) 160)
-(make-chord-object '(6500 8800 8900) 180)(make-chord-object '(3300 5400 7200) 240)))
-
-(setf (chords (chord-line fourth-scroller)) (list 
-(make-chord-object '(4500 6700 8800) 0)(make-chord-object '(3300 6900 7200) 70)
-(make-chord-object '(3400 7600 9000) 90)(make-chord-object '(4500 5400 6700) 110)
-(make-chord-object '(7000 8900 9000) 128)(make-chord-object '(4500 6900 7200) 170)
-(make-chord-object '(6500 8800 8900) 180)(make-chord-object '(3300 5400 7200) 290)))
-;;(decompile fourth-scroller)
-|#
-
-
-(provide 'MN-editor)
+;;;; THE END ;;;;

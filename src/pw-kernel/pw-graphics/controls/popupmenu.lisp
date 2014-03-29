@@ -98,8 +98,10 @@ located in the x,y position specified by the &rest key arguments"
   (:method ((self C-PopUpbox) title)
     (set-dialog-item-text self title)))
 
-#|
-(setq fi (make-instance 'window :window-title "fi"))
-(setq foo (make-popupbox "A" fi *MN-popUpMenu* :view-position (make-point 100 100)
-                         :view-container fi))
-|#
+
+;; (setq fi (make-instance 'window :window-title "fi"))
+;; (setq foo (make-popupbox "A" fi *MN-popUpMenu* :view-position (make-point 100 100)
+;;                                                :view-container fi))
+
+
+;;;; THE END ;;;;

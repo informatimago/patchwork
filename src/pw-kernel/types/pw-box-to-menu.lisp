@@ -59,8 +59,7 @@
                                            :menu-item-action
                                            (lambda () 
                                                (make-lisp-pw-boxes
-                                                fun *active-patch-window*))))
-        ))))
+                                                fun *active-patch-window*))))))))
 
 (defun new-PW-box-menu-item (main-menu mtitle function &optional box-class) 
   (if (not (fboundp function))

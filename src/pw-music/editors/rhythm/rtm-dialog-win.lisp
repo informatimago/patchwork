@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
 ;;=======================================
@@ -93,9 +91,6 @@
 ;; selection editing
 ;;================================================================================================
 
-(defvar *RTM-selection-menu* (new-menu "Edit selection"))
-(ui:add-menu-items *RTM-menu* *RTM-selection-menu*)
-
 ;;========================================
 ;;velocity
 
@@ -115,11 +110,9 @@
       (when (check-box-checked-p (car (rtm-radio-ctrls (editor-collection-object self))))
         ;; GA 12/4/94 crashes otherwise
         (invalidate-corners self (make-point 0 0) (view-size self))
-                                        ;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
+        ;;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
         ))))
 
-(ui:add-menu-items  *RTM-selection-menu*                        
-   (new-leafmenu "Velocity..." #'edit-rtm-editor-velocity-menu))
 
 ;;========================================
 ;;transpose
@@ -138,11 +131,9 @@
       (tell chords #'transpose-all-notes cents)
       ;; GA 12/4/94 crashes otherwise
       (invalidate-corners self (make-point 0 0) (view-size self))
-                                        ;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
+      ;;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
       )))
 
-(ui:add-menu-items  *RTM-selection-menu*                        
-   (new-leafmenu "Transpose..." #'edit-rtm-editor-transpose-menu))
 
 ;;========================================
 ;;chans
@@ -160,20 +151,18 @@
     (let ((chords (give-rtm-range-chords (editor-collection-object self) t)))
       (tell chords #'set-all-chans chan))))
 
-(ui:add-menu-items  *RTM-selection-menu*                        
-   (new-leafmenu "Channel..." #'edit-rtm-editor-chans-menu))
+
 
 ;;========================================
 ;;duration
 
-#|
-(defun edit-rtm-editor-duration-menu ()
-   (open-rtm-win 'simple "Duration (in %)" 
-       (lambda (item) (declare (ignore item))
-           (edit-rtm-editor-duration *active-rtm-window*  (value *rtm-win-1st-numbox*))
-           (return-from-modal-dialog ()))
-       :min1 1 :max1 1000 :val1 90))
-|#
+;; (defun edit-rtm-editor-duration-menu ()
+;;    (open-rtm-win 'simple "Duration (in %)" 
+;;        (lambda (item) (declare (ignore item))
+;;            (edit-rtm-editor-duration *active-rtm-window*  (value *rtm-win-1st-numbox*))
+;;            (return-from-modal-dialog ()))
+;;        :min1 1 :max1 1000 :val1 90))
+
 
 ;;changed by aaa 28-08-95 from pw-modif
 (defun edit-rtm-editor-duration-menu ()
@@ -195,11 +184,9 @@
          (get-play-speed (editor-collection-object self)) chords)
         ;; GA 12/4/94 crashes otherwise
         (invalidate-corners self (make-point 0 0) (view-size self))
-                                        ;(erase+view-draw-contents self)
+        ;;(erase+view-draw-contents self)
         ))))
 
-(ui:add-menu-items  *RTM-selection-menu*                        
-   (new-leafmenu "Duration..." #'edit-rtm-editor-duration-menu))
 
 ;;========================================
 ;;Metronome
@@ -228,19 +215,16 @@
                 (pos1 (set-unit+metronome (nth pos1 measures) unit metronome)))
           ;; GA 12/4/94 crashes otherwise
           (invalidate-corners self (make-point 0 0) (view-size self))
-                                        ;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
+          ;;(erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))
           )))))
 
-(ui:add-menu-items  *RTM-selection-menu*                        
-   (new-leafmenu "Metronome..." #'edit-rtm-editor-Metronome-menu))
+
 
 
 ;;================================================================================================
 ;; global editing
 ;;================================================================================================
 
-(defvar *RTM-global-menu* (new-menu "Edit globally"))
-(ui:add-menu-items *RTM-menu* *RTM-global-menu*)
 
 ;;========================================
 
@@ -267,11 +251,8 @@
     (tell (give-all-beat-chord-objects self) #'transpose-all-notes cents)
     ;; GA 12/4/94 crashes otherwise
     (invalidate-corners self (make-point 0 0) (view-size self))
-                                        ;(erase+view-draw-contents (editor-collection-object self))
+    ;;(erase+view-draw-contents (editor-collection-object self))
     ))
-
-(ui:add-menu-items  *RTM-global-menu*                        
-   (new-leafmenu "Transpose..." #'edit-rtm-editor-transpose-global-menu))
 
 ;;========================================
 ;;global chans
@@ -288,9 +269,6 @@
   (with-cursor *watch-cursor*
     (tell (give-all-beat-chord-objects self) #'set-all-chans chan)))
 
-(ui:add-menu-items  *RTM-global-menu*                        
-   (new-leafmenu "Channel..." #'edit-rtm-editor-chans-global-menu))
-
 ;;======
 
 (defgeneric edit-rtm-editor-chans-global-2 (self))
@@ -304,8 +282,6 @@
         (setq chords (ask-all (nth (1- chan) leaves-lst-lst) #'beat-chord))
         (tell chords #'set-all-chans chan)))))
 
-(ui:add-menu-items  *RTM-global-menu*                        
-   (new-leafmenu "Increment channel" (lambda () (edit-rtm-editor-chans-global-2 *active-rtm-window*))))
 
 ;;========================================
 ;;global duration
@@ -318,15 +294,6 @@
            (return-from-modal-dialog ()))
        :min1 1 :max1 1000 :val1 100))
 
-#|
-(defun edit-rtm-editor-duration-global-menu ()
-   (open-rtm-win 'simple "Duration (in %)" 
-       (lambda (item) (declare (ignore item))
-           (edit-rtm-editor-duration-global *active-rtm-window*  (value *rtm-win-1st-numbox*))
-           (return-from-modal-dialog ()))
-       :min1 1 :max1 1000 :val1 90))
-|#
-
 (defgeneric edit-rtm-editor-duration-global (self dur1))
 (defmethod edit-rtm-editor-duration-global ((self C-rtm-editor-window) dur1)
   (with-cursor *watch-cursor* 
@@ -335,12 +302,8 @@
           #'calc-t-time-measure-line (get-play-speed (editor-collection-object self)))
     ;; GA 12/4/94 crashes otherwise
     (invalidate-corners self (make-point 0 0) (view-size self))
-                                        ;(erase+view-draw-contents self)
+    ;;(erase+view-draw-contents self)
     ))
-
-(ui:add-menu-items  *RTM-global-menu*                        
-   (new-leafmenu "Duration..." #'edit-rtm-editor-duration-global-menu))
-
 
 ;;========================================
 ;;Metronome
@@ -363,11 +326,9 @@
         (tell measures 'set-unit+metronome unit metronome)
         ;; GA 12/4/94 crashes otherwise
         (invalidate-corners self (make-point 0 0) (view-size self))
-                                        ;(erase+view-draw-contents self)
+        ;;(erase+view-draw-contents self)
         ))))
 
-(ui:add-menu-items  *RTM-global-menu*                        
-   (new-leafmenu "Metronome..." #'edit-rtm-editor-Metronome-global-menu))
 
 ;;================================================================================================================
 ;;layout
@@ -385,23 +346,7 @@
     (while editors (setf (staff-number (pop editors))  staff)))
   (erase+view-draw-contents self))
 
-(ui:add-menu-items  *RTM-menu*    
-   (new-menu "Choose Staff"
-      (new-menu "Selected staff"
-                           (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 1)))  
-                           (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 2))) 
-                           (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staff-layout *active-rtm-window* 3)))  
-                           (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 4)))  
-                           (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staff-layout *active-rtm-window* 5)))  
-                           (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staff-layout *active-rtm-window* 6)))  
-                           (new-leafmenu "Empty" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 7)))) 
-      (new-menu "All staffs"
-                           (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staffs-layout *active-rtm-window* 1)))  
-                           (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 2))) 
-                           (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staffs-layout *active-rtm-window* 3)))  
-                           (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 4)))  
-                           (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staffs-layout *active-rtm-window* 5)))  
-                           (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staffs-layout *active-rtm-window* 6)))  
-                           (new-leafmenu "Empty" (lambda ()     (edit-rtm-editor-staffs-layout *active-rtm-window* 7))))))
-                                                                                                       
+
+;;;; THE END ;;;;
+
 

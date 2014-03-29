@@ -33,6 +33,19 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 
+(cl:defpackage "CLPF-UTIL"
+  (:use "COMMON-LISP" "LELISP-MACROS")
+  (:export
+   "SYNONYM" "VECTOR-TO-LIST" "COMPILE-FILE?"
+   "FILE-COMPARE…" "FILE-COMPARE" "READ-LISTS-FROM"
+   "PREFIX-EXPR" "PREFIX-HELP" "*COMPILE-NUM-LAMBDA*" "MAKE-NUM-FUN" "MAKE-NUM-LAMBDA"))
+
+(cl:defpackage "REDIRECTING-STREAM"
+  (:use "COMMON-LISP"
+        "TRIVIAL-GRAY-STREAMS")
+  (:export "REDIRECTING-CHARACTER-OUTPUT-STREAM"
+           "REDIRECTING-CHARACTER-INPUT-STREAM"))
+
 
 (cl:defpackage "PATCHWORK.SCHEDULER"
   (:use "COMMON-LISP" "CLOSER-MOP" "UI" "LELISP-MACROS" "MIDI")
@@ -61,11 +74,14 @@
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
   (:use "CLOSER-MOP" "UI" "LELISP-MACROS" "PATCHWORK.SCHEDULER")
+  (:use "REDIRECTING-STREAM")
   (:shadowing-import-from "CLOSER-MOP"
                           "STANDARD-CLASS" "STANDARD-GENERIC-FUNCTION" "STANDARD-METHOD"
                           "DEFMETHOD" "DEFGENERIC")
   (:export "ENABLE-PATCHWORK-READER-MACROS"
            "DISABLE-PATCHWORK-READER-MACROS")
+
+  (:export "INITIALIZE")
   
   (:export "DRAW-CHAR" "DRAW-STRING" "DRAW-POINT" "DRAW-LINE" 
            "DRAW-RECT*" "FILL-RECT*" "DRAW-ELLIPSE" "FILL-ELLIPSE"
@@ -132,6 +148,22 @@
   ;; For EPW:
   (:export "NEW-MENU" "PW-ADDMENU"))
 
+(cl:defpackage "USER-SUPPLIED-IN-OUTS"
+  (:use))
+
+(cl:defpackage "C-GET-NOTE-SLOTS"
+  (:use "COMMON-LISP")
+  (:use "PATCHWORK" "LELISP-MACROS")
+  (:export "GET-NOTE-SLOTS" "SET-NOTE-SLOTS"))
+
+(cl:defpackage "C-GET-SELECTIONS"
+  (:use "COMMON-LISP")
+  (:import-from "PATCHWORK"
+                "DEFUNP" "C-PATCH-MIDI-MOD" "SAVED-SELECTED"
+                "APPLICATION-OBJECT" "C-PATCH" "PATCH-VALUE" "INPUT-OBJECTS")
+  (:import-from "UI" "SUBVIEWS" "WPTR")
+  (:export "GET-SELECTIONS"))
+
 (cl:defpackage "C-PATCH-BUFFER"
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
@@ -152,7 +184,19 @@
   (:intern "ASCII-WIN" "C-PATCH-ASCII-BUFFER")
   (:export "C-PATCH-FILE-BUFFER"))
 
-(defpackage "C-PW-MIDI-IN"
+(cl:defpackage "C-PATCH-CHORD-LINE"
+  (:use "COMMON-LISP")
+  (:use "UI" "LELISP-MACROS" "PATCHWORK")
+  (:export "C-PATCH-CHORD-LINE" "CHORD-SEQN"))
+
+(cl:defpackage "C-PW-SEND-MIDI-NOTE"
+  (:use "COMMON-LISP")
+  (:use "LELISP-MACROS" "PATCHWORK")
+  (:import-from "UI" "NIY")
+  (:import-from "PATCHWORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL")
+  (:export "SND-MIDINOTE" "C-PW-SEND-MIDI-NOTE"))
+
+(cl:defpackage "C-PW-MIDI-IN"
   (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
   (:import-from "PATCHWORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
   (:import-from "MIDI" "MIDI-READ")
@@ -170,6 +214,59 @@
             C-patch-file-buffer::Ascii-win
             C-patch-file-buffer::C-patch-ascii-buffer)
           "PATCHWORK"))
+
+(cl:defpackage "COMBINATORIAL-INTERV"
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
+  (:export "FIND-INTERVALS" "INT-REC"))
+
+(cl:defpackage "PW-STYPE"
+  (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
+  (:export "CAR!" "LIST!" "DEEP-MAPCAR" "DOUBLE-MAPCAR"))
+
+(cl:defpackage "EPW" 
+  (:use "COMMON-LISP" "LELISP-MACROS" "CLPF-UTIL" "PATCHWORK" "PW-STYPE")
+  (:shadow "MAKE-NUM-FUN")
+  (:export "*ASCII-NOTE-C-SCALE*" "*ASCII-NOTE-DO-SCALE*"
+           "*ASCII-NOTE-SCALES*" "ARITHM-SER"
+           "AVERAGE" "DEFUNE" "DISTOR" "DISTOR-EXT" "F-BINARY-SEARCH"
+           "FLAT" "FLAT-ONCE" "FUN-MINMAX" "G-MAX" "G-MIN" "G-SCALING"
+           "INCLUDED?" "INTERPOLATION" "L-LAST" "L-MAX" "L-MIN"
+           "L-NTH" "L-SCALER/MAX" "L-SCALER/SUM" "L-SUPPRESS"
+           "LIST-EXPLODE" "LIST-FILL" "LIST-PART" "LO-FLAT"
+           "MAKE-LIST2" "MAT-TRANS" "NTH-RANDOM" "PERMUT-CIRC"
+           "PERMUT-RANDOM" "SORT-LIST" "X-APPEND" "X-DIFF"
+           "X-INTERSECT" "X-UNION" "X-XOR" "MAKE-NUM-FUN" "LAGRANGE"
+           "LINEAR" "POWER-FUN" "POWER/2" "POWER/3" "PARABOLE/2"
+           "PARABOLE/3"))
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (import
+   '(epw:make-list2 epw::approx-m epw:arithm-ser epw:average epw::band-filter
+     epw::band-pass epw::band-reject epw::band-select epw::cartesian
+     epw::cents->coef epw::coef->cents epw::create-list epw::densifier
+     epw:distor epw:distor-ext epw::dx->x epw::f->mc epw::fibo-ser
+     epw:flat epw::flat-low epw:flat-once epw::fun-bin-search epw::g*
+     epw::g+ epw::g- epw::g-abs epw::g-alea epw::g-average
+     epw::g-ceiling epw::g-div epw::g-exp epw::g-floor epw::g-log
+     epw:g-max epw:g-min epw::g-mod epw::g-oper epw::g-power
+     epw::g-random epw::g-round epw:g-scaling epw::g-scaling/max
+     epw::g-scaling/sum epw::g/ epw::geometric-ser epw:included?
+     epw::int->symb epw:interpolation epw::inverse epw::l* epw::l+
+     epw::l- epw::l-delete epw::l-exp epw:l-last epw:l-max epw:l-min
+     epw:l-nth epw::l-order epw::l-power epw::l-scale% epw:l-scaler/max
+     epw:l-scaler/sum epw::l/ epw::last-elem epw::lin->db
+     epw:list-explode epw:list-fill epw::list-filter epw::list-modulo
+     epw:list-part epw::ll-abs epw::ll-log epw::ll-oper epw::ll/floor
+     epw::ll/mod epw::ll/round epw::llalea epw::lldecimals epw:lo-flat
+     epw:mat-trans epw::matrix-oper epw::mc->f epw::mc->n
+     epw::multi-filter epw::n->mc epw::nbcents-f epw:nth-random
+     epw:permut-circ epw:permut-random epw::posn-match epw::posn-order
+     epw::prime-factors epw::prime-ser epw::prime? epw::range-filter
+     epw::rem-dups epw::sample-fun epw:sort-list epw::symb->int
+     epw::table-filter epw::x->dx epw:x-append epw:x-diff
+     epw:x-intersect epw:x-union epw:x-xor)
+   "PATCHWORK"))
+
 
 
 (cl:defpackage "CLOS-APPLE-EVENT"
@@ -225,7 +322,5 @@
            "typeWildCard" "PenMode"))
 
 
-(defpackage "USER-SUPPLIED-IN-OUTS"
-  (:use))
 
 ;;;; THE END ;;;;

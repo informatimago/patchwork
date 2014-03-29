@@ -34,8 +34,6 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(provide 'basic-library-boxes)
-
 ;;====================================================================================================
 ;; circular buffer
 #|(defclass  C-pw-circ (C-pw-resize-x)  
@@ -158,16 +156,16 @@ and dragging the mouse."
 
 (defvar arg1 () "Applies function (fn) with argument (arg1) 
 This box can be extended by option-clicking bottom-right 
-(E = extend).") 
+\(E = extend).") 
 (defvar arg2 () "Applies function (fn) with arguments (arg1 - arg2)  
 This box can be extended by option-clicking bottom-right 
-(E = extend).") 
+\(E = extend).") 
 (defvar arg3 () "Applies function (fn) with arguments (arg1 - arg3)  
 This box can be extended by option-clicking bottom-right 
-(E = extend).") 
+\(E = extend).") 
 (defvar arg4 () "Applies function (fn) with arguments (arg1 - arg4)  
 This box can be extended by option-clicking bottom-right 
-(E = extend).") 
+\(E = extend).") 
 (defvar arg5 () "Look at the documentation of arg2.")
 (defvar arg6 () "Look at the documentation of arg2.")
 (defvar arg7 () "Look at the documentation of arg2.")
@@ -233,7 +231,7 @@ val3 is evaluated.
 In this case test4 and test5 will never be considered.  If all tests fail, then the 
 else patch is evaluated. If input is a list, a list is returned with the results of 
 applying the module's result to each element of the input list."
-(declare (ignore pred input test-1 val1 else testn)))
+  (declare (ignore pred input test-1 val1 else testn)))
 
 (defvar test2 () "Applies a testfunction (testfn) using as 
 arguments input and one of the test-boxes on the left 
@@ -243,7 +241,7 @@ if one of the tests succeeds,the corresponding val-box is
 evaluated.If none of the tests succeed,else-box is 
 evaluated.  
 This box can be extended by option-clicking bottom-right 
-(E = extend)."
+\(E = extend)."
 )
 
 ;;===================================
@@ -322,14 +320,14 @@ input <patch> is evaluated."
 (defunp out ((patch user-out)) nil
 "The out module allows one to pass 
 the evaluation of a patch to a remote destination 
-(i.e., to another patch or to another window). 
+\(i.e., to another patch or to another window). 
 out modules are assigned a name. in modules with the 
 same name receive the results of the patch evaluation.
 For example:
 It is possible to have to windows that communicate with each other. 
 In the first window , a patch can generate data that will be 
 transmitted through the out module and received in a second window 
-(PW1) by module in. Notice that the two modules (in and out) have identical names.
+\(PW1) by module in. Notice that the two modules (in and out) have identical names.
 
 Warning : it is advised to always load new modules 
 to assign pairs of variables; also, avoid duplicating 
@@ -350,4 +348,7 @@ or changing the names of the already used  in ;and out modules."
 "The in module receives remote messages from  out ;
 modules that share the same name. 
 See an example in the reference of out module."
-(declare (ignore name)))
+  (declare (ignore name)))
+
+;;;; THE END ;;;;
+

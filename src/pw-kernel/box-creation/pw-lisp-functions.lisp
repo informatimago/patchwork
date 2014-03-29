@@ -119,4 +119,4 @@ The length of the list is determined by count."
 ;;(pw-addmenu *pw-menu-patch* '(scale-low-high))
 ;;===============================
 
-(provide 'PW-lisp-functions)
+;;;; THE END ;;;;

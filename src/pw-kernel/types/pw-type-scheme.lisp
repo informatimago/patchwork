@@ -344,8 +344,7 @@
 (defun get-type-default (type-form)
   (if (consp type-form)
     (or (cadr (member :value (cadr type-form)))
-        (cadr (member :value (get-pw-type-specs (car type-form))))
-        )
+        (cadr (member :value (get-pw-type-specs (car type-form)))))
     (cadr (member :value (get-pw-type-specs type-form)))))
 
 (defun set-type-default (type-form value)
@@ -609,21 +608,20 @@
                        function)))))
 
 
-#|
-(setq foo (make-type-object 'bar 'C-numbox 
-                            '(:value 4 :min-val -100 :max-val 400 :doc-string "bar")))
-
-(setq foo2 (make-type-object 'lago 'C-tty 
-                            '(:value 'fru  :doc-string "logo")))
-(setq set (make-type-set (list foo2 foo)))
-(merge-specs (get-type set 'lago) '(min-val 887))
-(get-pw-type-specs 'fix>0s?)
-(defunp my-fun3 ((x symbol) (y (fix (:value 1))) &optional (z fix)) list "my-fun"
-  (mapcar (lambda (item) (+ (if z z 0) (* item y))) x))
-(get 'my-fun3 '*type-intypes*)
-(Get-Pw-Type-Specs 'fix>0)
-(set-function-arg-names 'my-fun3 '(w b d))
-|#
+;; (progn
+;;   (setq foo (make-type-object 'bar 'C-numbox 
+;;                               '(:value 4 :min-val -100 :max-val 400 :doc-string "bar")))
+;; 
+;;   (setq foo2 (make-type-object 'lago 'C-tty 
+;;                                '(:value 'fru  :doc-string "logo")))
+;;   (setq set (make-type-set (list foo2 foo)))
+;;   (merge-specs (get-type set 'lago) '(min-val 887))
+;;   (get-pw-type-specs 'fix>0s?)
+;;   (defunp my-fun3 ((x symbol) (y (fix (:value 1))) &optional (z fix)) list "my-fun"
+;;     (mapcar (lambda (item) (+ (if z z 0) (* item y))) x))
+;;   (get 'my-fun3 '*type-intypes*)
+;;   (Get-Pw-Type-Specs 'fix>0)
+;;   (set-function-arg-names 'my-fun3 '(w b d)))
 
 ;;A macro for PW user classes
 
@@ -661,3 +659,5 @@
 
 ;;(defclass C-fru (C-PW-functional) ((boa :initform 5 :accessor boa)))
 ;;(macroexpand (defmethodp fifi C-fru ((x fix) (y fix)) fix "fu" (+ x y  (boa self))))
+
+;;;; THE END ;;;;

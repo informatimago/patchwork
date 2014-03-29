@@ -31,13 +31,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
-
-;;=======================================================
-;;PW
-;;=======================================================
 
 (defun count-positive-rtms (rtm-list)
   (let ((res 0))
@@ -81,20 +75,18 @@
    (measure-line    :initform (make-instance 'C-measure-line) :initarg    :measure-line   :accessor measure-line)))
 ;;==================
 ;;???
-#|
-(defmethod decompile ((self C-patch-application-rtm-editor))
-  `(let ((patch (make-instance ',(class-name (class-of self))
-               :view-position ,(view-position self)
-               :view-size ,(view-size self)
-               :active-mode  ,(active-mode self)
-               :pw-function  ',(pw-function self)
-               :type-list ',(type-list self) 
-;;               :measure-line-list (list ,@(ask-all (measure-line-list self) 'decompile))
-               :application-object 
-                      ,(when (wptr (application-object self)) (decompile (application-object self)))
-               :view-subviews (list ,@(ask-all (pw-controls self) 'decompile)))))
-     patch))
-|#
+;; (defmethod decompile ((self C-patch-application-rtm-editor))
+;;   `(let ((patch (make-instance ',(class-name (class-of self))
+;;                                :view-position ,(view-position self)
+;;                                :view-size ,(view-size self)
+;;                                :active-mode  ,(active-mode self)
+;;                                :pw-function  ',(pw-function self)
+;;                                :type-list ',(type-list self) 
+;;                                ;;               :measure-line-list (list ,@(ask-all (measure-line-list self) 'decompile))
+;;                                :application-object 
+;;                                ,(when (wptr (application-object self)) (decompile (application-object self)))
+;;                                :view-subviews (list ,@(ask-all (pw-controls self) 'decompile)))))
+;;      patch))
 
 (defmethod decompile ((self C-patch-application-rtm-editor))
   (append (call-next-method) 
@@ -266,38 +258,34 @@
   ((measure-line-list :initform nil :initarg :measure-line-list :accessor measure-line-list)
    (popUpbox :initform nil :accessor popUpbox)))
 
-#|
-(defclass  C-patch-PolifRTM (C-patch-application)
-  ((measure-line-list :initform nil :initarg :measure-line-list :accessor measure-line-list)))
-|#
+;; (defclass  C-patch-PolifRTM (C-patch-application)
+;;   ((measure-line-list :initform nil :initarg :measure-line-list :accessor measure-line-list)))
 
 ;;??????
-#|
-(defmethod decompile ((self C-patch-Polifrtm))
-  `(let ((patch (make-instance ',(class-name (class-of self))
-               :view-position ,(view-position self)
-               :view-size ,(view-size self)
-               :active-mode  ,(active-mode self)
-               :pw-function  ',(pw-function self)
-               :type-list ',(type-list self) 
-               :measure-line-list (list ,@(ask-all (measure-line-list self) 'decompile))
-               :application-object 
-                      ,(when (wptr (application-object self)) (decompile (application-object self)))
-               :view-subviews (list ,@(ask-all (pw-controls self) 'decompile)))))
-     patch))
-(defmethod initialize-instance :after ((self C-patch-Polifrtm) &key controls)
-  (declare (ignore controls))
-  ;(make-rtm-lock self)
-  (let ((ms (ask-all (beat-editors (editor-collection-object (application-object self))) 'measure-line)))
-      (setf (measure-line-list self) ms)))
-|#
+;; (defmethod decompile ((self C-patch-Polifrtm))
+;;   `(let ((patch (make-instance ',(class-name (class-of self))
+;;                                :view-position ,(view-position self)
+;;                                :view-size ,(view-size self)
+;;                                :active-mode  ,(active-mode self)
+;;                                :pw-function  ',(pw-function self)
+;;                                :type-list ',(type-list self) 
+;;                                :measure-line-list (list ,@(ask-all (measure-line-list self) 'decompile))
+;;                                :application-object 
+;;                                ,(when (wptr (application-object self)) (decompile (application-object self)))
+;;                                :view-subviews (list ,@(ask-all (pw-controls self) 'decompile)))))
+;;      patch))
+;; (defmethod initialize-instance :after ((self C-patch-Polifrtm) &key controls)
+;;   (declare (ignore controls))
+;;                                         ;(make-rtm-lock self)
+;;   (let ((ms (ask-all (beat-editors (editor-collection-object (application-object self))) 'measure-line)))
+;;     (setf (measure-line-list self) ms)))
 
-#|(defmethod make-application-object ((self C-patch-PolifRTM))
-  (let (res (length (length (pw-controls self))))
-    (unless (measure-line-list self)
-      (for (i 1 1 length) (push (make-instance 'C-measure-line) res))
-      (setf (measure-line-list self) res))
-    (make-n-rtm-editors-window length (measure-line-list self))))|#
+;; (defmethod make-application-object ((self C-patch-PolifRTM))
+;;   (let (res (length (length (pw-controls self))))
+;;     (unless (measure-line-list self)
+;;       (for (i 1 1 length) (push (make-instance 'C-measure-line) res))
+;;       (setf (measure-line-list self) res))
+;;     (make-n-rtm-editors-window length (measure-line-list self))))
 
 (defmethod make-application-object ((self C-patch-PolifRTM))
   (setf (application-object self)
@@ -322,13 +310,13 @@
 
 
 
-#|(defmethod complete-box ((self C-patch-Polifrtm) args)
-  (when args
-    (setf (measure-line-list self) (second args))
-    (put-window-state self (application-object self) (first args))
-    (let ((eds (beat-editors (editor-collection-object (application-object self)))))
-      (for (i 0 1 (1- (length eds)))
-        (setf (measure-line (nth i eds)) (nth i (measure-line-list self)))))))|#
+;; (defmethod complete-box ((self C-patch-Polifrtm) args)
+;;   (when args
+;;     (setf (measure-line-list self) (second args))
+;;     (put-window-state self (application-object self) (first args))
+;;     (let ((eds (beat-editors (editor-collection-object (application-object self)))))
+;;       (for (i 0 1 (1- (length eds)))
+;;         (setf (measure-line (nth i eds)) (nth i (measure-line-list self)))))))
 
 (defmethod complete-box ((self C-patch-Polifrtm) args)
   (when args
@@ -360,11 +348,9 @@
                        :view-container self
                        :view-font '("monaco"  9  :srcor))))
 
-#|
-(defmethod initialize-instance :after ((self C-patch-Polifrtm) &key controls)
-  (declare (ignore controls))
-  (make-rtm-lock self))
-|#
+;; (defmethod initialize-instance :after ((self C-patch-Polifrtm) &key controls)
+;;   (declare (ignore controls))
+;;   (make-rtm-lock self))
 
 
 (defmethod make-rtm-lock ((self C-patch-Polifrtm))
@@ -408,8 +394,8 @@
         (setf (measure-line (nth i new-editors-list)) (measure-line (nth i editors))))
       (setf (measure-line (car (last new-editors-list))) m-line)   )))
 
-#|(defmethod generate-extended-inputs ((self C-patch-PolifRTM)) 
-  (make-rtm-polif-arg-list (1+ (length (pw-controls self)))))|#
+;; (defmethod generate-extended-inputs ((self C-patch-PolifRTM)) 
+;;   (make-rtm-polif-arg-list (1+ (length (pw-controls self)))))
 
 (defmethod generate-extended-inputs ((self C-patch-PolifRTM)) 
   (make-rtm-polif-arg-list (1+ (length (measure-line-list self)))))
@@ -422,24 +408,24 @@
     (remove-yourself-control self)))
 ;;_________
 
-#|(defmethod patch-value ((self C-patch-PolifRTM) obj)
-  (if (value self)
-    (measure-line-list self)
-    (let ((editors (beat-editors (car (subviews (application-object self)))))
-           m-line)
-      (when (not (wptr (application-object self)))
-        (setf (application-object self) (make-application-object self))
-        (set-pw-win+pw-obj (application-object self) *active-patch-window* self)
-        (restore-window-state self (application-object self))
-        (erase+view-draw-contents self))
-       ; (put-window-state self (application-object self) (window-state self)))
-      (for (i 0 1 (1- (length editors)))
-        (when (nth-connected-p self i)
-          (setq m-line (patch-value (nth i (input-objects self)) obj))
-          (setf (nth i (measure-line-list self)) m-line) 
-          (setf (measure-line (nth i editors)) m-line)
-          (erase+view-draw-contents (nth i editors))))
-      (measure-line-list self))))|#
+;; (defmethod patch-value ((self C-patch-PolifRTM) obj)
+;;   (if (value self)
+;;     (measure-line-list self)
+;;     (let ((editors (beat-editors (car (subviews (application-object self)))))
+;;            m-line)
+;;       (when (not (wptr (application-object self)))
+;;         (setf (application-object self) (make-application-object self))
+;;         (set-pw-win+pw-obj (application-object self) *active-patch-window* self)
+;;         (restore-window-state self (application-object self))
+;;         (erase+view-draw-contents self))
+;;        ; (put-window-state self (application-object self) (window-state self)))
+;;       (for (i 0 1 (1- (length editors)))
+;;         (when (nth-connected-p self i)
+;;           (setq m-line (patch-value (nth i (input-objects self)) obj))
+;;           (setf (nth i (measure-line-list self)) m-line) 
+;;           (setf (measure-line (nth i editors)) m-line)
+;;           (erase+view-draw-contents (nth i editors))))
+;;       (measure-line-list self))))
 
 (defmethod patch-value ((self C-patch-PolifRTM) obj)
   (if (value self)
@@ -505,16 +491,17 @@ unit+rtm and rtm-list is cdr of unit+rtm."
 (defunp make-measure ((low float (:min-val 1 :value 4)) (beats list (:type-list (beat list) :value "beats"))
                       &optional (metro (float (:value 60)))) measure
 "Creates a measure object where low is the denominator and has to be a positive number
-(usually 1,2,4,8,16 or 32,but can be any positive number,even a float).
+\(usually 1,2,4,8,16 or 32,but can be any positive number,even a float).
 The numerator is never given but is calculated as the sum of all units
 of the beat-objects.
 Beats can be a single beat object or a list of beat objects"
  (unless (listp beats)(setq beats (list beats)))
  (make-instance 'C-measure  :low (format () "~A"  low)  :beat-objects beats :metronome metro))
 
-(add-output-type 'measure-line '(measure-line))
 
+(add-output-type 'measure-line '(measure-line))
 (add-output-type 'measure-lines '(list measure-lines))
+
 
 (defunp rtm-collector ((measure list (:type-list (list measure) :value "measures"))
              (note-obj list (:type-list (list note-obj) :value "notes"))) measure-line
@@ -559,36 +546,20 @@ Click 'h' with the <poly-rtm> editor opened for more information."
                   (lambda ()
                       (tell (ask-all editors 'measure-line) 'play-measure-line (get-play-speed editor)))))))
 
-#|
-(defun play-from-pw (self) 
- (let* ((editor (car (subviews (application-object self))))
-         (editors (give-selected-editors editor)))
-    (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls editor))))
-    (start 
-      (apdfuncall 100 (priority) 15
-                  (lambda ()
-                      (tell (ask-all editors 'measure-line) 'play-measure-line (get-play-speed editor)))))))
-|#
+;; (defun play-from-pw (self) 
+;;  (let* ((editor (car (subviews (application-object self))))
+;;          (editors (give-selected-editors editor)))
+;;     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls editor))))
+;;     (start 
+;;       (apdfuncall 100 (priority) 15
+;;                   (lambda ()
+;;                       (tell (ask-all editors 'measure-line) 'play-measure-line (get-play-speed editor)))))))
+
 ;;====================================================================================================
-;;(defvar *rtm-boxes-menu* (new-menu "Rhythm"))
-(defvar *rtm-boxes-menu* *pw-MN-Edit-menu*)
-
-(ui:add-menu-items *rtm-boxes-menu* 
-                (new-leafmenu "-" ()))
-
-;;(pw-addmenu  *rtm-boxes-menu* '(make-beat make-beat2 make-measure))
-
-;;(pw-addmenu-fun *rtm-boxes-menu* 'rtm-collector 'C-patch-application-rtm-editor)
-
-(pw-addmenu-fun *rtm-boxes-menu* 'poly-rtm 'C-patch-PolifRTM)
 
 (defunp get-rchords ((rtmcol list (:type-list (measure-line) :value "rtmco"))) list
  "Returns all chord objects from a rhythm-editor"
   (ask-all (collect-all-chord-beat-leafs rtmcol) #'beat-chord))
-
-;;(pw-addmenu  *rtm-boxes-menu* '(get-rchords))
-
-;;(ui:add-menu-items *pw-MN-Edit-menu* *rtm-boxes-menu*)
 
 
 ;;====================================================================================================
@@ -599,3 +570,4 @@ Click 'h' with the <poly-rtm> editor opened for more information."
 (push-to-object-types 'measure-line)
 (push-to-object-types 'measure-lines)
      
+;;;; THE END ;;;;

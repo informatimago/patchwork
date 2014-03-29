@@ -32,10 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "C-GET-NOTE-SLOTS"
-  (:use "COMMON-LISP")
-  (:use "PATCHWORK" "LELISP-MACROS")
-  (:export "GET-NOTE-SLOTS" "SET-NOTE-SLOTS"))
 (in-package "C-GET-NOTE-SLOTS")
 
 (defvar *no-notes-error* 
@@ -140,17 +136,7 @@ them the given <value(s)>."
                     (error *no-notes-error* note)))  notes)))
     (error *no-notes-error* notes)))
 
-#|
-(pw::PW-addmenu pw::*pw-Multidim-menu* '(set-note-slots ))
-|#
-
-(defpackage "C-GET-SELECTIONS"
-  (:use "COMMON-LISP")
-  (:import-from "PATCHWORK"
-                "DEFUNP" "C-PATCH-MIDI-MOD" "SAVED-SELECTED"
-                "APPLICATION-OBJECT" "C-PATCH" "PATCH-VALUE" "INPUT-OBJECTS")
-  (:import-from "UI" "SUBVIEWS" "WPTR")
-  (:export "GET-SELECTIONS"))
+;; (pw::PW-addmenu pw::*pw-Multidim-menu* '(set-note-slots ))
 
 (in-package "C-GET-SELECTIONS")
 

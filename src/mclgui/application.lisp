@@ -226,7 +226,7 @@ APPLICATION:    The application.  MCL standard event handling always
 
 FORM:           A symbol, function or lisp form.
 ")
-  (:method ((application application) form)
+  (:method ((application t) form)
     (let ((evaluator [[MclguiEvaluator alloc] init]))
       (setf (evaluator-thunk evaluator)
             (typecase form

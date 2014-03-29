@@ -172,8 +172,8 @@
                     (tell (subviews (view-window patch)) 'draw-connections)
                     (when inde 
                       (record-event :|PWst| :|conn| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self))))
-                                                    (,:|data| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string patch)) 
-                                                                     :|indx| (+ inde 1)))))))
+                                                      (,:|data| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string patch)) 
+                                                                       :|indx| (+ inde 1)))))))
                   (progn 
                     (ED-BEEP)
                     (format t "Mismatch of type ! ~%~a~%" 
@@ -754,14 +754,14 @@
 (defgeneric toggle-patch-active-mode (self)
   (:method ((self C-patch))
     (cond ((shift-key-p)
-             (setf (active-mode self) (not (active-mode self)))
-             (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
-                                             (,:|chif| ,t))))
-            ((active-mode self))
-            (t
-             (tell (controls (view-window self)) 'deactivate-control)
-             (setf (active-mode self) t)
-             (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
+           (setf (active-mode self) (not (active-mode self)))
+           (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
+                                           (,:|chif| ,t))))
+          ((active-mode self))
+          (t
+           (tell (controls (view-window self)) 'deactivate-control)
+           (setf (active-mode self) t)
+           (record-event :|PWst| :|sele| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))))))
     (draw-active-mode self)))
 
 (defgeneric activate-control (self)
@@ -858,14 +858,12 @@
 ;; (eval-when (load eval compile)
 ;;   (load-once  "PW-HELP-DOC:box-name-list.lisp" :if-does-not-exist nil))
 
-#|
-(defun get-patch-file (file)
-(let* ((a-list *tutorial-a-list*)
-(file (or (second (assoc file a-list :test #'string=)) file)))
-(let ((name (first (directory (format nil "PW-HELP-DOC:**;~A.pw" file)))))
-(and name (load-a-patch (namestring name)))
-name)))
-|#
+;; (defun get-patch-file (file)
+;;   (let* ((a-list *tutorial-a-list*)
+;;          (file (or (second (assoc file a-list :test #'string=)) file)))
+;;     (let ((name (first (directory (format nil "PW-HELP-DOC:**;~A.pw" file)))))
+;;       (and name (load-a-patch (namestring name)))
+;;       name)))
 
 
 
@@ -874,8 +872,7 @@ name)))
   " adds a directory path to the tutorial directory list. When PatchWork is started the direcotry list
 contains one item: PW-HELP-DOC which is normally pw:documentation;online-help and all subdirectories"
   (when dir
-    (pushnew dir *tutorial-dirs*))
-  )
+    (pushnew dir *tutorial-dirs*)))
 
 (defun push-tutorial-file (file)
   "adds an element to the tutorial list. This list is used to map a module's name to a 
@@ -884,8 +881,7 @@ tutorial file only if the names differ"
          (setf *tutorial-a-list* (append file *tutorial-a-list*)))
         ((and (listp file) (member-if-not #'listp file))
          (pushnew file *tutorial-a-list*))
-        (t ()))
-  )
+        (t ())))
 
 ;;(push-tutorial-file '((filter-spdata llmod-read) (par-spdata iana-read)))
 

@@ -6,9 +6,10 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    PW rythmic input.
 ;;;;    
 ;;;;AUTHORS
+;;;;    Camilo Rueda
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
@@ -16,7 +17,7 @@
 ;;;;LEGAL
 ;;;;    GPL3
 ;;;;    
-;;;;    Copyright IRCAM 1986 - 2012
+;;;;    Copyright IRCAM 1986 - 1992
 ;;;;    
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
@@ -31,16 +32,7 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
-;;;=========================================================================
-;;;
-;;;PW rythmic input. By Camilo Rueda
-;;; (c) 1992 IRCAM
-;;;===========================================================================
-
 (in-package :pw)
-
 
 (defvar *valid-rtm-expands* '(#\/))
 
@@ -234,7 +226,6 @@ editor opened for more information."
 
 ;;; version corrigée du 21/6/94. GA/CR. Dans Rythm-Formation.lisp
 ;;changed by aaa 28-08-95 from pw-modif
-
 (defun put-in-grace-notes (grace-notes chords) ;(print grace-notes)
   (let (piece-chord res sorted-grace-notes pivot-chord needed-chords
                     (max-grace (and grace-notes (apply 'max (mapcar #'first grace-notes))))
@@ -269,28 +260,6 @@ editor opened for more information."
         (update-chord  pivot-chord)
         (setq chords (remove piece-chord chords))))
     chords))
-
-#|
-;;; version corrigée du 21/6/94. GA/CR
-(defun put-in-grace-notes (grace-notes chords)
-(let (piece-chord res
-(max-grace (and grace-notes (apply 'max (mapcar #'first grace-notes))))
-(new-chords chords))
-(when (and max-grace (>= max-grace (length chords)))
-(setq chords 
-(append chords (dotimes (i (- max-grace (length chords) -2) res)
-(push (build-a-chord '(6000)) res)))
-new-chords chords))
-(dolist (pair grace-notes)
-(setq piece-chord (nthcdr (first pair) chords))
-(mapc (lambda (note)
-(setf (offset-time note) (- (floor (cdr pair))))
-(setf (dur note) (floor (cdr pair)))
-(add-new-note (second piece-chord) note))  (notes (first piece-chord)))
-(update-chord (second piece-chord))
-(setq new-chords (remove (first piece-chord) new-chords)))
-new-chords))
-|#
 
 ;;add by aaa 28-08-95 from pw-modif
 (defmethod stop-play ((self C-patch-score-voice)) 
@@ -333,9 +302,6 @@ new-chords))
 
 (defun low-of (sign) (second sign))
 
-;;(pw-addmenu-fun *rtm-boxes-menu* 'score-voice 'C-patch-score-voice)
-(pw-addmenu-fun *rtm-boxes-menu* 'rtm 'C-patch-score-voice)
-
 (defun rtm-tree (measure-lines)
   (mapcar (lambda (m-line) 
             (epw::flat-once
@@ -371,16 +337,6 @@ new-chords))
                      #'notes)))
           measure-lines))
 
-#|
-(defun rtm-durs (measure-lines)
-(mapcar (lambda (m-line)
-(calc-t-time-measure-line m-line 0.99)
-(mapcar (lambda (notes) (dur (car notes)))
-(ask-all
-(ask-all (collect-all-chord-beat-leafs m-line) #'beat-chord)
-#'notes)))
-measure-lines))
-|#
 
 (defun rtm-signs (measure-lines)
   (mapcar (lambda (m-line) 
@@ -431,7 +387,6 @@ be:
                   (7 (rtm-durs meas-lines)))))
          (if (consp m-lines) result (car result)))))
 
-(pw-addmenu *rtm-boxes-menu* '(rtm-dim))
 
 (defmethod C-get-note-slots::get-note-dimensions ((self pw::C-measure-line) the-slots &optional include?)
   (if include?
@@ -441,5 +396,4 @@ be:
       (C-get-note-slots::get-note-dimensions (first (pw::rtm-chords (list self))) the-slots)))
 
 
-
-
+;;;; THE END ;;;;;

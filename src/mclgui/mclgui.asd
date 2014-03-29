@@ -362,7 +362,7 @@
 
                  (:file "mclgui"
                         :depends-on ("package"
-                                     "macros" "variables"
+                                     "macros" "variables" "process"
                                      "objc-classes"
                                      "point" "font" "pen" "pattern" "cursor" "view-stream"
                                      "menu" "view" "window" "dialog" "fred-window"

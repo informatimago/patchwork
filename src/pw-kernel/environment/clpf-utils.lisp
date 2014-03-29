@@ -33,12 +33,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "CLPF-UTIL"
-  (:use "COMMON-LISP" "LELISP-MACROS")
-  (:export
-   "SYNONYM" "VECTOR-TO-LIST" "COMPILE-FILE?"
-   "FILE-COMPARE…" "FILE-COMPARE" "READ-LISTS-FROM"
-   "PREFIX-EXPR" "PREFIX-HELP" "*COMPILE-NUM-LAMBDA*" "MAKE-NUM-FUN" "MAKE-NUM-LAMBDA"))
 (in-package "CLPF-UTIL")
 
 
@@ -54,19 +48,18 @@
        (index (1- (length vector)) (1- index)))
       ((< index 0) list)))
 
-#|
-(defun vector-to-list1 (vector &aux (length (length vector)) (list ()))
-  "Takes the elements of a simple vector and collects them into a list."
-  (dotimes (index length)
-    (push (svref vector (decf length)) list))
-  list )
+;; (defun vector-to-list1 (vector &aux (length (length vector)) (list ()))
+;;   "Takes the elements of a simple vector and collects them into a list."
+;;   (dotimes (index length)
+;;     (push (svref vector (decf length)) list))
+;;   list )
+;; 
+;; (time (dotimes (i 10000) (vector-to-list #(a b c d))))
+;; (dotimes (i 10000) (vector-to-list #(a b c d))) took 205 ticks (3.417 seconds) to run.
+;; 
+;; (time (dotimes (i 10000) (vector-to-list1 #(a b c d))))
+;; (dotimes (i 10000) (vector-to-list1 #(a b c d))) took 218 ticks (3.633 seconds) to run.
 
-(time (dotimes (i 10000) (vector-to-list #(a b c d))))
-(dotimes (i 10000) (vector-to-list #(a b c d))) took 205 ticks (3.417 seconds) to run.
-
-(time (dotimes (i 10000) (vector-to-list1 #(a b c d))))
-(dotimes (i 10000) (vector-to-list1 #(a b c d))) took 218 ticks (3.633 seconds) to run.
-|#
 ;; =============================================================================-======
 
 (defun compile-file? (file)
@@ -164,51 +157,52 @@
 
 ;; ==== operation level ====
 
-(defstruct
-  (level
-   (:print-function
-    (lambda (me stream depth)
-      (declare (ignore depth))
-      (format
-       stream
-       "#<ops=~S	; ~:[not~;   ~] associative ~:[~; ;  default=~:*~S~]~
-       ~:[~; 	;   inverse=~:*~S~]~:[~;	;   translations=~:*~S~]>"
-       (level-ops me)
-       (level-associative? me)
-       (level-dop me)
-       (level-iop me)
-       (level-l-op.tr me)))))
-  dop           ;default operators
-  iop           ;inverse operators
-  tr-default    ;default operator translation
-  tr-inverse    ;inverse operator translation
-  ops           ;all operators
-  l-op.tr       ;translations
-  associative?)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defstruct
+      (level
+       (:print-function
+        (lambda (me stream depth)
+          (declare (ignore depth))
+          (format
+           stream
+           "#<ops=~S ~:[not~;   ~] associative ~:[~; ;  default=~:*~S~]~
+       ~:[~;    inverse=~:*~S~]~:[~;   translations=~:*~S~]>"
+           (level-ops me)
+           (level-associative? me)
+           (level-dop me)
+           (level-iop me)
+           (level-l-op.tr me)))))
+    dop                     ;default operators
+    iop                     ;inverse operators
+    tr-default              ;default operator translation
+    tr-inverse              ;inverse operator translation
+    ops                     ;all operators
+    l-op.tr                 ;translations
+    associative?)
 
-(defun create-level (dop iop l-op.tr associative? &aux me ops)
-  "Create a level object from the specification of the default and inverse operators
+  (defun create-level (dop iop l-op.tr associative? &aux me ops)
+    "Create a level object from the specification of the default and inverse operators
 and the associativity."
-  (declare (ignorable ops))
-  (unless (listp dop) (setq dop (list dop)))
-  (unless (listp iop) (setq iop (list iop)))
-  (setq me
-        (make-level
-         :dop dop
-         :iop iop
-         :ops (setq ops (remove-duplicates (append dop iop (mapcar #'car l-op.tr))))
-         :l-op.tr l-op.tr
-         :associative? associative?))
-  (setf (level-tr-default me) (level-translate me (car (level-dop me)))
-        (level-tr-inverse me) (level-translate me (car (level-iop me))))
-  ;; (mapc
-  ;;  (lambda (op)
-  ;;      (check-type op symbol)
-  ;;      (unless (eq (symbol-package op) (load-time-value (find-package "KEYWORD")))
-  ;;        (import op "COMMON-LISP")
-  ;;        (export op "COMMON-LISP")))
-  ;;  ops)
-  me)
+    (declare (ignorable ops))
+    (unless (listp dop) (setq dop (list dop)))
+    (unless (listp iop) (setq iop (list iop)))
+    (setq me
+          (make-level
+           :dop dop
+           :iop iop
+           :ops (setq ops (remove-duplicates (append dop iop (mapcar #'car l-op.tr))))
+           :l-op.tr l-op.tr
+           :associative? associative?))
+    (setf (level-tr-default me) (level-translate me (car (level-dop me)))
+          (level-tr-inverse me) (level-translate me (car (level-iop me))))
+    ;; (mapc
+    ;;  (lambda (op)
+    ;;      (check-type op symbol)
+    ;;      (unless (eq (symbol-package op) (load-time-value (find-package "KEYWORD")))
+    ;;        (import op "COMMON-LISP")
+    ;;        (export op "COMMON-LISP")))
+    ;;  ops)
+    me))
 
 (defun level-has? (me op) (memq op (level-ops me)))
 (defun level-default? (me op) (memq op (level-dop me)))
@@ -218,30 +212,24 @@ and the associativity."
 
 ;; ==== globals and macros ====
 
-(progn
-  (defvar *levels*)
-  (defvar *all-ops*)
+(defvar *levels*  (list
+                   (create-level '\; () '((\; . progn)) t)
+                   (create-level ':= () '((:= . setq)) nil)
+                   (create-level '(==) () '((== . =)) t)
+                   (create-level '(!=) () '((!= . /=)) t)
+                   (create-level '(>) () () t)
+                   (create-level '(<) () () t)
+                   (create-level '(>=) () () t)
+                   (create-level '(<=) () () t)
+                   (create-level '+ '- () t)
+                   (create-level '* '/ () t)
+                   (create-level '(** ) () '((** . expt) ) nil)))
 
-  (setf *levels*
-        (list
-         (create-level '\; () '((\; . progn)) t)
-         (create-level ':= () '((:= . setq)) nil)
-         (create-level '(==) () '((== . =)) t)
-         (create-level '(!=) () '((!= . /=)) t)
-         (create-level '(>) () () t)
-         (create-level '(<) () () t)
-         (create-level '(>=) () () t)
-         (create-level '(<=) () () t)
-         (create-level '+ '- () t)
-         (create-level '* '/ () t)
-         (create-level '(** ) () '((** . expt) ) nil)))
-
-  (setf *all-ops* (apply #'append (mapcar #'level-ops *levels*))))
+(defvar *all-ops* (apply #'append (mapcar #'level-ops *levels*)))
 
 (defvar *default-operation* '*)
 
-(eval-when (eval compile)
-  (defmacro operation? (op) `(memq ,op *all-ops*)))
+(defmacro operation? (op) `(memq ,op *all-ops*))
 
 ;; ==== help, user function and sharp macro character ====
 
@@ -414,39 +402,40 @@ The resulting function is a lambda list not compiled."
    (t (mapc #'rw-vars-expr (cdr expr)))))
 
 ;; =============================================================================-======
-#| tests
-
-'#i(^ a b)
-'#i(a + * b)
-'#i(a + b *)
-(equal '#i(+ a b) '(+ a b))
-(equal '#i(a + () + b)  	'(+ a () b))
-(equal '#i(a + b * c)   	'(+ a (* b c)))
-(equal '#i(a + b * c + d)	'(+ a (* b c) d))
-(equal '#i(a + b c + d) 	'(+ a (* b c) d))
-(equal '#i(a (cos (w t + f)))	'(* a (cos (+ (* w t) f))))
-(equal '#i(a ^ b ** c + d)	'(+ (expt (expt a b) c) d))
-(equal '#i(a ** b ** c + d)	'(+ (expt (expt a b) c) d))
-(equal '#i(a + b + c + d)	'(+ a b c d))
-(equal '#i(a + b - c + d)	'(+ a b (- c) d))
-(equal '#i(a - b - c - d)	'(- a b c d))
-(equal '#i(a ^ b ^ c ^ d)	'(expt (expt (expt a b) c) d))
-(equal '#i(y := x + 2 \; y * y + y)
-       '(progn (setq y (+ x 2)) (+ (* y y) y)))
-(equal (make-num-lambda '(y := x + 2 \; y * y + y))
-       '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
-(equal (make-num-lambda '(y := x + z \; y * z + y))
-       '(lambda (x z) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
-(equal (make-num-lambda '(f(z x)= y := x + z \; y * z + y))
-       '(lambda (z x) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
-(equal (make-num-lambda '(f(x)= y := x + 2 \; y * y + y))
-       '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
-(equal
- (make-num-lambda '(f(z)= y := (if (z > -1) (z + 1) 0) + 2 \; y * y + y))
- '(lambda (z) (let (y) (progn (setq y (+ (if (> z -1) (+ z 1) 0) 2)) (+ (* y y) y)))))
-(equal
- (make-num-lambda '(f(y)= y := (if (y > -1) (y + 1) 0) + 2 \; y * y + y))
- '(lambda (y) (progn (setq y (+ (if (> y -1) (+ y 1) 0) 2)) (+ (* y y) y))))
-(make-num-lambda '(f(z)= y := x + 2 \; y * y + y))
-|# :EOF
+;; (defun tests ()
+;; 
+;;   '#i(^ a b)
+;;   '#i(a + * b)
+;;   '#i(a + b *)
+;;   (equal '#i(+ a b) '(+ a b))
+;;   (equal '#i(a + () + b)  	'(+ a () b))
+;;   (equal '#i(a + b * c)   	'(+ a (* b c)))
+;;   (equal '#i(a + b * c + d)	'(+ a (* b c) d))
+;;   (equal '#i(a + b c + d) 	'(+ a (* b c) d))
+;;   (equal '#i(a (cos (w t + f)))	'(* a (cos (+ (* w t) f))))
+;;   (equal '#i(a ^ b ** c + d)	'(+ (expt (expt a b) c) d))
+;;   (equal '#i(a ** b ** c + d)	'(+ (expt (expt a b) c) d))
+;;   (equal '#i(a + b + c + d)	'(+ a b c d))
+;;   (equal '#i(a + b - c + d)	'(+ a b (- c) d))
+;;   (equal '#i(a - b - c - d)	'(- a b c d))
+;;   (equal '#i(a ^ b ^ c ^ d)	'(expt (expt (expt a b) c) d))
+;;   (equal '#i(y := x + 2 \; y * y + y)
+;;          '(progn (setq y (+ x 2)) (+ (* y y) y)))
+;;   (equal (make-num-lambda '(y := x + 2 \; y * y + y))
+;;          '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
+;;   (equal (make-num-lambda '(y := x + z \; y * z + y))
+;;          '(lambda (x z) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
+;;   (equal (make-num-lambda '(f(z x)= y := x + z \; y * z + y))
+;;          '(lambda (z x) (let (y) (progn (setq y (+ x z)) (+ (* y z) y)))))
+;;   (equal (make-num-lambda '(f(x)= y := x + 2 \; y * y + y))
+;;          '(lambda (x) (let (y) (progn (setq y (+ x 2)) (+ (* y y) y)))))
+;;   (equal
+;;    (make-num-lambda '(f(z)= y := (if (z > -1) (z + 1) 0) + 2 \; y * y + y))
+;;    '(lambda (z) (let (y) (progn (setq y (+ (if (> z -1) (+ z 1) 0) 2)) (+ (* y y) y)))))
+;;   (equal
+;;    (make-num-lambda '(f(y)= y := (if (y > -1) (y + 1) 0) + 2 \; y * y + y))
+;;    '(lambda (y) (progn (setq y (+ (if (> y -1) (+ y 1) 0) 2)) (+ (* y y) y))))
+;;   (make-num-lambda '(f(z)= y := x + 2 \; y * y + y)))
 ;; =============================================================================-======
+
+;;;; THE END ;;;;

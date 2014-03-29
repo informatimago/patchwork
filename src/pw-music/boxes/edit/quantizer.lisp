@@ -609,7 +609,7 @@ measure, subdivisions by 5 and by 6 are forbidden, and in the second and fifth
 measure, subdivisions by 7 and by 4 are forbidden. As the third and fourth sub-
 lists are empty lists, there are no restrictions for these measures. A second 
 level of sub-lists will permit to control subdivisions of beats. The list (   ((5 4) () 
-(3 6) ())  (() () ( 8 7) ())  (  3 2)  ()  )  indicates :
+\(3 6) ())  (() () ( 8 7) ())  (  3 2)  ()  )  indicates :
 
 first measure
 	first beat - fourth beat : no restriction
@@ -633,8 +633,8 @@ To impose subdivisions, you add a !  at the beginning of the lists.
 
 At a global level
 
-(! 5)		imposes a subdivision by five on the entire sequence
-(! 5 7 6)  	imposes a subdivision by 5, by 7, or by 6 on the entire sequence. 
+\(! 5)		imposes a subdivision by five on the entire sequence
+\(! 5 7 6)  	imposes a subdivision by 5, by 7, or by 6 on the entire sequence. 
 The module will do the necessary computations et will choose one of the 
 subdivisions in such a way that approximation errors are reduced.
 
@@ -642,16 +642,16 @@ The syntax is the same for all other levels:
 
 For measures
 
-((!  3 4) (! 5) () () ())
+\((!  3 4) (! 5) () () ())
 
 and for time units
 
-(   ((! 5 4) () (!  3 6) ())  (() () ( ! 8 7) ())  (!  3 2)  ()  ) .
+\(   ((! 5 4) () (!  3 6) ())  (() () ( ! 8 7) ())  (!  3 2)  ()  ) .
 
 Of course, it is possible to mix syntaxes at the measure level as well as at the 
 beat level. Here is an example:
 
-(   (( 5 4) () (!  3 6) ())  ((! 6) () (  8 7) ())  (!  3 2)  (6 8)  ),
+\(   (( 5 4) () (!  3 6) ())  ((! 6) () (  8 7) ())  (!  3 2)  (6 8)  ),
 
 In this example, some measures and time units have impositions of 
 subdivisions, where in others, we have restrictions of subdivisions.
@@ -672,61 +672,61 @@ A list of forbidden unit divisions can optionally be given."
   (declare (ignore durs tempi measures max/ forbid))
   nil)
 
-(pw-addmenu pw::*rtm-boxes-menu* '(pw::quantify))
 
+;; (progn
+;; ;;;===================================================================
+;; ;;;Tempo variations. Linear, for the moment...
+;; 
+;;   (defun linear-tempo-ch (vf v0 tf t0)
+;;     (lambda (d) (cuad-solve (* 0.5 (/ (- vf v0) (- tf t0))) v0 (- d))))
+;; 
+;;   (defun cuad-solve (a b c)
+;;     (/ (+ (- b) (sqrt (- (sqr b) (* 4.0 a c)))) (* 2.0 a)))
+;; 
+;;   (defunp transf-durs ((durs list) (b-tempo fix/float (:value 60))
+;;                        (e-tempo fix/float (:value 120))) list
+;;       "transforms durations according to a continuous linear tempo change between the given
+;; initial ('b-tempo') and final ('e-tempo') tempi. "
+;;     (let ((tattack (dx->x 0 durs))
+;;           (final-tempo (/ e-tempo b-tempo 100))
+;;           (start-tempo (/ 100)))
+;;       (epw::ll/round 
+;;        (epw::l/ (epw::x->dx 
+;;                  (mapcar (linear-tempo-ch final-tempo start-tempo
+;;                                           (/ (car (last tattack)) (* 0.5 (+ final-tempo start-tempo))) 0)
+;;                          tattack)) 100) 1)))
+;; 
+;;   ;;(pw-addmenu pw::*rtm-boxes-menu* '(transf-durs))
+;;   
+;;   ;;(transf-durs '(100 100 100 100 100 100 100 100 100) 120 60)
+;;   ;;(transf-durs '(100) 120 60)
+;; 
+;;   (defunp mul&subm ((numbers numbers? (:value 100)) (%err fix/float )
+;;                     (unit fix>=0 (:value 100))) numbers?
+;;       "reorganizes numbers" 
+;;     (let ((numbers (pw::list! numbers)) result div)
+;;       (dolist (num numbers (nreverse result))
+;;         (setq div (/ unit num))
+;;         (push 
+;;          (if (> div 1.0)
+;;              (get-adjustement (- (/ unit (truncate div)) num) 
+;;                               (-  num (/ unit (1+ (truncate div)))) num %err)
+;;              (get-adjustement (- (* unit (1+ (truncate (/ div))))  num)
+;;                               (-  num (* unit (truncate (/ div)))) num %err))
+;;          result)
+;;         )))
+;; 
+;;   (defun get-adjustement (plus minus num %err)
+;;     (let ((zone (* num %err)))
+;;       (cond ((and (<= plus zone) (> minus zone)) (round (+ plus num)))
+;;             ((and (<= minus zone) (> plus zone)) (round (- num minus)))
+;;             ((and (> plus zone) (> minus zone)) num)
+;;             ((< plus minus) (round (+ plus num)))
+;;             (t (round (- num minus))))))
+;; 
+;;   ;;(pw-addmenu pw::*pw-menu-patch* '(mul&subm))
+;;   )
 
+;;;; THE END ;;;;
 
-#|
-;;;===================================================================
-;;;Tempo variations. Linear, for the moment...
-
-(defun linear-tempo-ch (vf v0 tf t0)
-  (lambda (d) (cuad-solve (* 0.5 (/ (- vf v0) (- tf t0))) v0 (- d))))
-
-(defun cuad-solve (a b c)
-    (/ (+ (- b) (sqrt (- (sqr b) (* 4.0 a c)))) (* 2.0 a)))
-
-(defunp transf-durs ((durs list) (b-tempo fix/float (:value 60))
-                     (e-tempo fix/float (:value 120))) list
-        "transforms durations according to a continuous linear tempo change between the given
-initial ('b-tempo') and final ('e-tempo') tempi. "
-  (let ((tattack (dx->x 0 durs))
-        (final-tempo (/ e-tempo b-tempo 100))
-        (start-tempo (/ 100)))
-    (epw::ll/round 
-     (epw::l/ (epw::x->dx 
-              (mapcar (linear-tempo-ch final-tempo start-tempo
-                                       (/ (car (last tattack)) (* 0.5 (+ final-tempo start-tempo))) 0)
-                       tattack)) 100) 1)))
-
-;;(pw-addmenu pw::*rtm-boxes-menu* '(transf-durs))
-  
-;;(transf-durs '(100 100 100 100 100 100 100 100 100) 120 60)
-;;(transf-durs '(100) 120 60)
-
-(defunp mul&subm ((numbers numbers? (:value 100)) (%err fix/float )
-                  (unit fix>=0 (:value 100))) numbers?
-"reorganizes numbers" 
-  (let ((numbers (pw::list! numbers)) result div)
-    (dolist (num numbers (nreverse result))
-      (setq div (/ unit num))
-      (push 
-       (if (> div 1.0)
-         (get-adjustement (- (/ unit (truncate div)) num) 
-                          (-  num (/ unit (1+ (truncate div)))) num %err)
-         (get-adjustement (- (* unit (1+ (truncate (/ div))))  num)
-                         (-  num (* unit (truncate (/ div)))) num %err))
-       result)
-      )))
-
-(defun get-adjustement (plus minus num %err)
-  (let ((zone (* num %err)))
-    (cond ((and (<= plus zone) (> minus zone)) (round (+ plus num)))
-          ((and (<= minus zone) (> plus zone)) (round (- num minus)))
-          ((and (> plus zone) (> minus zone)) num)
-          ((< plus minus) (round (+ plus num)))
-          (t (round (- num minus))))))
-
-;;(pw-addmenu pw::*pw-menu-patch* '(mul&subm))
-|#
 

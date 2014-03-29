@@ -34,7 +34,6 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(provide 'structured-time2)
 
 (defclass C-make-structured-win (C-patch) ()) 
 
@@ -84,7 +83,7 @@ Strcoll box is normally used in context of structured time.
 "Strabs (structured abstraction) allows collecting super-notes from Patch Work.
 It should be connected to the ins input of the collector box while collecting.
 To the input box of strabs box should be connected with an abstraction 
-(no input-boxes are allowed for the abstraction).
+\(no input-boxes are allowed for the abstraction).
 The super-notes will contain a PW window with copies of all PW boxes that are inside the 
 original abstraction exept the 'about' box.
 Strabs box is normally used in context of structured time.

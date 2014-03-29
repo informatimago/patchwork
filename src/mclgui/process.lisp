@@ -37,35 +37,58 @@
 
 
 
+;;; --------------------------------------------------------------------
+;;;
+;;; MAILBOX: to send one message between two threads.
+;;;
+;;; The consummer may call MAILBOX-COLLECT before or after the
+;;; producer calls MAILBOX-POST.   If it calls before, then it waits
+;;; until the producer notifies the mailbox is full.
+;;;
+
 (defstruct (mailbox
+            (:conc-name %mailbox-)
             (:constructor %make-mailbox (lock condition)))
-  lock condition message)
+  lock condition message full)
 
 (defun make-mailbox (&optional (name "mailbox"))
+  (declare (stepper disable))
   (%make-mailbox (bt:make-lock name) (bt:make-condition-variable :name name)))
 
 (defun mailbox-collect (mailbox)
+  (declare (stepper disable))
   (let (result)
-    (bt:with-lock-held ((mailbox-lock mailbox))
-      (bt:condition-wait (mailbox-condition mailbox) (mailbox-lock mailbox))
-      (setf result (mailbox-message mailbox)))
+    (bt:with-lock-held ((%mailbox-lock mailbox))
+      (unless (%mailbox-full mailbox)
+        (bt:condition-wait (%mailbox-condition mailbox) (%mailbox-lock mailbox)))
+      (setf result (%mailbox-message mailbox)))
     result))
 
 (defun mailbox-post (mailbox message)
-  (bt:with-lock-held ((mailbox-lock mailbox))
-    (setf (mailbox-message mailbox) message)
-    (bt:condition-notify (mailbox-condition mailbox))))
+  (declare (stepper disable))
+  (bt:with-lock-held ((%mailbox-lock mailbox))
+    (setf (%mailbox-message mailbox) message
+          (%mailbox-full mailbox) t)
+    (bt:condition-notify (%mailbox-condition mailbox))))
 
 (defun test/mailbox ()
   (let ((start (get-universal-time)))
-   (assert (equal (let ((mb (make-mailbox)))
-                    (bt:make-thread (lambda () (sleep 4) (mailbox-post mb 42)))
-                    (mailbox-collect mb))
-                  42))
+    (assert (equal (let ((mb (make-mailbox)))
+                     (bt:make-thread (lambda () (sleep 4) (mailbox-post mb 42)))
+                     (mailbox-collect mb))
+                   42))
     (let ((end (get-universal-time)))
-      (assert (< 3 (- end start) 5))))
+      (assert (<= 3 (- end start) 5))))
+  (let ((start (get-universal-time)))
+    (assert (equal (let ((mb (make-mailbox)))
+                     (bt:make-thread (lambda () (mailbox-post mb 42)))
+                     (mailbox-collect mb))
+                   42))
+    (let ((end (get-universal-time)))
+      (assert (<= 0 (- end start) 1))))
   :success)
 
+;;; --------------------------------------------------------------------
 
 
 (defvar *initial-process* nil)
@@ -109,8 +132,7 @@ RETURN: A form performing BODY on the main thread.
                    `(let ((,vmb (make-mailbox)))
                       (application-eval-enqueue *application*
                                                 (lambda ()
-                                                  (setf (mailbox-message ,vmb)
-                                                        (progn ,@body))))
+                                                  (mailbox-post ,vmb (ignore-errors ,@body))))
                       (mailbox-collect ,vmb)))
                  `(application-eval-enqueue *application* (lambda () ,@body)))))
       (if (= 1 (length body))
@@ -152,7 +174,7 @@ RETURN: A form performing BODY on the main thread.
 ;; (application-eval-enqueue *application* (lambda nil (print 1) (print 2)))
 ;; 
 ;; (generate-on-main-thread-form '((print 1) (print 2)) t)
-;; (let ((#1=#:g151003 (make-mailbox))) (application-eval-enqueue *application* (lambda nil (setf (mailbox-message #1#) (progn (print 1) (print 2))))) (mailbox-collect #1#))
+;; (let ((#1=#:g151003 (make-mailbox))) (application-eval-enqueue *application* (lambda nil (setf (%mailbox-message #1#) (progn (print 1) (print 2))))) (mailbox-collect #1#))
 ;; 
 ;; (generate-on-main-thread-form '([o m]) nil)
 ;; (progn (objc:send o :perform-selector-on-main-thread (com.informatimago.objective-c.lower:selector "m") :with-object *null* :wait-until-done nil))

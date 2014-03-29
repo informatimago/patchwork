@@ -369,7 +369,7 @@ VIEW:           A simple view.
     (declare (ignore view))
     nil)
   (:method ((screen null))
-    (nspoint-to-point (get-nspoint [NSEvent mouseLocation])))
+    (nsscreen-to-screen-point (get-nspoint [NSEvent mouseLocation])))
   (:method ((view simple-view))
     (if (handle view)
         ;; We don't use the *current-event* since it may not be an event
@@ -690,7 +690,7 @@ IDLE:           An argument representing whether the main Lisp process
 
 
 
-(defun get-next-event (event &optional (idle *idle*) sleep-ticks)
+(defun get-next-event (event &optional (idle *idle*) (mask every-event) sleep-ticks)
   "
 DESCRIPTION:    The GET-NEXT-EVENT function calls #_WaitNextEvent to
                 get an event.  It disables and reenables the clock
@@ -726,15 +726,15 @@ SLEEP-TICKS:    This is the Sleep argument to #_WaitNextEvent.  It
                 same as when Macintosh Common Lisp is running in the
                 foreground.
 "
-  (let ((queued-event (dequeue-event)))
-    (when queued-event
+  (let ((queued-event (dequeue-event))) 
+   (when queued-event
       (format-trace "get-next-event"
                     (event-what queued-event)
                     (point-h (event-where queued-event))
                     (point-v (event-where queued-event)))
       (return-from get-next-event (assign-event event queued-event))))
   (let ((nsevent [[NSApplication sharedApplication]
-                  nextEventMatchingMask: (mac-event-mask-to-ns-event-mask every-event)
+                  nextEventMatchingMask: (mac-event-mask-to-ns-event-mask mask)
                   untilDate: [NSDate dateWithTimeIntervalSinceNow:
                                      (nstimeinterval (* 60
                                                         (or sleep-ticks

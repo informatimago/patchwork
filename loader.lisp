@@ -17,7 +17,7 @@
 ;;;;LEGAL
 ;;;;    GPL3
 ;;;;    
-;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
+;;;;    Copyright Pascal J. Bourguignon 2012 - 2014
 ;;;;    
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
@@ -32,135 +32,159 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
+(in-package "COMMON-LISP-USER")
 
-(defpackage "PATCHWORK.LOADER"
-  (:use "COMMON-LISP"))
-(in-package "PATCHWORK.LOADER")
+;;; --------------------------------------------------------------------
+;;; Redirect swank streams.
+#+swank
+(let ((stream (make-synonym-stream '*terminal-io*)))
+  (setf swank::*current-standard-input*  stream
+        swank::*current-standard-output* stream
+        swank::*current-error-output*    stream
+        ;; swank::*current-trace-output*    stream
+        ;; swank::*current-terminal-io*     stream
+        swank::*current-query-io*        stream
+        swank::*current-debug-io*        stream))
 
-(declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
+;;; --------------------------------------------------------------------
+;;; remote debugging
+#-(and) 
+(progn
+  (ql:quickload :swank)
+  (eval (read-from-string
+         "(let ((swank::*loopback-interface* \"192.168.7.4\")) (swank:create-server))")))
 
-;; (pushnew 'cl-user::no-cocoa *features*)
-;; (pushnew 'cl-user::cocoa-midi-player *features*)
 
-#-cl-user::no-cocoa (require :cocoa)
-
+;;; --------------------------------------------------------------------
+;;; Configure quicklisp.
+;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
 #+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
 
-#||
 
-(progn (ql:quickload :swank) (eval (read-from-string
- "(let ((swank::*loopback-interface* \"192.168.7.4\")) (swank:create-server))")))
-
-(ql:quickload :swank)
-(let ((swank::*loopback-interface* "192.168.7.4")) (swank:create-server))
-
-||#
-
-#+ccl (setf ccl:*default-external-format*           :unix
-            ccl:*default-file-character-encoding*   :utf-8
-            ccl:*default-line-termination*          :unix
-            ccl:*default-socket-character-encoding* :utf-8)
-
-(setf *print-right-margin* 110)
-
-;; The logical host PATCHWORK should be set so that the .git/ subdirectory
-;; should be  at its root:
-;; #+ccl (probe-file #P"PATCHWORK:.git;") --> true
-
-;; We use load-logical-pathname-translations to load the logical host PATCHWORK.
-;; You must configure it for each implementation.
-
-;; Note: we only only use the PATCHWORK logical host in this file, the
-;;       rest of the sources are loaded with ql:quickload/asdf.
+;;; --------------------------------------------------------------------
+;;; Load builder stuff.
+(ql:quickload :cffi                                       :verbose t :explain t)
+(ql:quickload :com.informatimago.tools.pathname           :verbose t :explain t)
+(ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
+(load (merge-pathnames "builder.lisp" (or *load-pathname* #P"./")))
+(in-package "PATCHWORK.BUILDER")
 
 
-;; Other logical hosts used by patchwork or its dependencies include:
-;;   PW-USER
-;;   CLENI
+;;; --------------------------------------------------------------------
+;;; Load patches
+;; #+ccl-1.9
+;; (handler-bind ((simple-error (lambda (c)
+;;                                (princ c) (terpri)
+;;                                (invoke-restart 'continue))))
+;;   (load (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;CCL-1-9-PATCH")))
 
 
-;; Map ccl pathname translations to ~/LOGHOSTS/${logical_host}
-#+ccl (setf (logical-pathname-translations "CCL")
-            (cons  (list "CCL:*.pathname-translations.*"
-                         (merge-pathnames
-                          (make-pathname :defaults (user-homedir-pathname)
-                                         :directory '(:relative "LOGHOSTS")
-                                         :name :wild
-                                         :type :unspecific
-                                         :version :wild)
-                          (user-homedir-pathname)
-                          nil))
-                   (logical-pathname-translations "CCL")))
+;;; --------------------------------------------------------------------
+;;; configure *features*
+;; (pushnew 'patchwork.builder::no-cocoa *features*)
+;; (pushnew 'patchwork.builder::use-apple-events *features*)
+;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
 
-;; (translate-logical-pathname #P"ccl:PATCHWORK.pathname-translations.newest")
-;; (translate-logical-pathname #P"ccl:PW-USER.pathname-translations.newest")
-;; (translate-logical-pathname #P"PW-USER:A;B;C.D")#P"/home/pjb/works/patchwork/pw-user/A/B/C.D"
+
+;;; --------------------------------------------------------------------
+;;; Load cocoa
+#+(and ccl (not patchwork.builder::no-cocoa))
+(progn
+  (say "Loading :cocoa (takes some time to start…)")
+  (require :cocoa))
+(defparameter *cocoa-readtable* (copy-readtable *readtable*))
+
+(load (translate-logical-pathname #P"PATCHWORK:GESTALT"))
+(add-cocoa-version-features)
 
 
 
-(defun generate-logical-pathname-translation-file (logical-host base-pathname &key (force nil))
-  "Generate a default logical pathname translation mapping the logical-host to a given base directory."
-  (let ((translation-file (merge-pathnames (make-pathname :directory `(:relative "LOGHOSTS")
-                                                          :name (string-upcase logical-host)
-                                                          :type nil)
-                                           (user-homedir-pathname))))
-    (with-open-file (trans translation-file
-                           :if-does-not-exist :create
-                           :if-exists (if force :supersede nil)
-                           :direction :output
-                           :external-format :default)
-      (if trans
-        (let ((*print-pretty*       t)
-              (*print-right-margin* 60)
-              (*print-circle*       nil))
-          (format trans ";;;; -*- mode:lisp;coding:us-ascii; -*-~2%")
-          (format trans "~S~%" (list
-                                   (list (format nil "~A:**;*.*.*"   logical-host)
-                                         (merge-pathnames #P"**/*.*" base-pathname nil))
-                                   (list (format nil "~A:**;*.*"     logical-host)
-                                         (merge-pathnames #P"**/*.*" base-pathname nil))
-                                   (list (format nil "~A:**;*"       logical-host)
-                                         (merge-pathnames #P"**/*"   base-pathname nil)))))
-        (cerror "~A already exists; aborting." translation-file)))
-    translation-file))
-
-(defun install-patchwork (&key (force nil))
-  (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/patchwork/"                            :force force)
-  (generate-logical-pathname-translation-file "PW-USER"   #P"/home/pjb/works/patchwork/pw-user/"                    :force force)
-  (generate-logical-pathname-translation-file "CLENI"     #P"/home/pjb/works/patchwork/patchwork/src/pw-lib/cleni/" :force force))
-;; (install-patchwork :force t)
-
-(load-logical-pathname-translations "PATCHWORK")
-(load-logical-pathname-translations "PW-USER")
-(load-logical-pathname-translations "CLENI")
+;;; --------------------------------------------------------------------
+;;; AppleEvents are not used for now.
+#+(and patchwork.builder::use-apple-events ccl darwin (not patchwork.builder::no-cocoa))
+(progn
+  (say "Loading MacOSX Libraries")
+  (load (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;LOAD-LIBRARIES")))
 
 
-#+ccl       (ccl::cd (truename #P"PATCHWORK:"))
-#+lispworks (cd      (truename #P"PATCHWORK:"))
-#+clisp     (ext:cd  (truename #P"PATCHWORK:"))
-
-(pushnew #+(or ccl allegro) (truename #P"PATCHWORK:src;")
-         #-(or ccl allegro) (truename #P"PATCHWORK:SRC;")
-         asdf:*central-registry* :test (function equalp))
-
-(pushnew #+(or ccl allegro) (truename #P"PATCHWORK:src;mclgui;")
-         #-(or ccl allegro) (truename #P"PATCHWORK:SRC;MCLGUI;")
-         asdf:*central-registry* :test (function equalp))
-
-(load #+(or ccl allegro) #P"PATCHWORK:gestalt"
-      #-(or ccl allegro) #P"PATCHWORK:GESTALT")
-
-;; AppleEvents are not used for now.
-#+(and use-apple-events ccl darwin (not cl-user::no-cocoa))
-(load #P"PATCHWORK:src;macosx;load-libraries.lisp")
-
-(pushnew #P"~/src/public/lisp/" ql:*local-project-directories* :test (function equalp))
-(ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t)
+;;; --------------------------------------------------------------------
+;;; Loading dependencies
+(ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t) ; debug
 (ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
-(ql:quickload :com.informatimago.clext                    :verbose t :explain t)
+(ql:quickload :com.informatimago.clext                    :verbose t :explain t) ; closer-weak
+(ql:quickload :trivial-gray-streams                       :verbose t :explain t)
 (ql:quickload :mclgui                                     :verbose t :explain t)
-(mclgui:initialize)
+
+
+;;; --------------------------------------------------------------------
+;;; Loading patchwork
 (ql:quickload :patchwork                                  :verbose t :explain t)
+
+
+;;; --------------------------------------------------------------------
+;;; Initialization of patchwork
+(defun start-patchwork ()
+  (ui:on-main-thread/sync
+    (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
+    (pw::initialize-patchwork)))
+(import 'start-patchwork "COMMON-LISP-USER")
+
+
+;;; --------------------------------------------------------------------
+;;; Done
+;;; --------------------------------------------------------------------
+
+#-(and)
+(let* ((*standard-input*
+         (make-instance 'redirecting-stream:redirecting-character-input-stream
+                        :input-stream-function (function hemlock-ext:top-listener-input-stream)))
+       (*standard-output*
+         (make-instance 'redirecting-stream:redirecting-character-output-stream
+                        :output-stream-function (function hemlock-ext:top-listener-output-stream)))
+       (*error-output* *standard-output*)
+       (*trace-output* *standard-output*)
+       (*terminal-io*  (make-two-way-stream
+                        *standard-input*
+                        *standard-output*))
+       (*query-io*     *terminal-io*)
+       (*debug-io*     *terminal-io*))
+
+  (setf *listener-io* *terminal-io*)
+  #+swank
+  (setf swank::*current-error-output*    *error-output*
+        swank::*current-standard-output* *standard-output*
+        swank::*current-trace-output*    *trace-output*
+
+        swank::*current-standard-input*  *standard-input*
+
+        swank::*current-terminal-io*     *terminal-io*
+        swank::*current-debug-io*        *debug-io*
+        swank::*current-query-io*        *query-io*))
+
+
+#-(and)
+(let ((*standard-input*  *patchwork-io*)
+      (*standard-output* *patchwork-io*)
+      (*error-output*    *patchwork-io*)
+      (*trace-output*    *patchwork-io*)
+      ;; (*terminal-io*     *patchwork-io*)
+      (*query-io*        *patchwork-io*)
+      (*debug-io*        *patchwork-io*))
+  (ui:on-main-thread/sync
+    (ql:quickload :patchwork                                  :verbose t :explain t)))
+
+#-(and)
+(let ((*standard-input*  *patchwork-io*)
+      (*standard-output* *patchwork-io*)
+      (*error-output*    *patchwork-io*)
+      (*trace-output*    *patchwork-io*)
+      ;; (*terminal-io*     *patchwork-io*)
+      (*query-io*        *patchwork-io*)
+      (*debug-io*        *patchwork-io*))
+  (ui:on-main-thread/sync
+    (mclgui:on-main-thread (patchwork::initialize-menus))))
+
+
 
 
 
@@ -201,6 +225,39 @@
 ;;                               "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING"))
 
 ;; (map nil 'print (DUPLICATE-SYMBOLS :packages *pw-packages* :exported t))
+
+
+;; (print (list swank::*current-standard-input*  
+;;              swank::*current-standard-output* 
+;;              swank::*current-error-output*    
+;;              swank::*current-trace-output*    
+;;              swank::*current-terminal-io*  
+;;              swank::*current-query-io*        
+;;              swank::*current-debug-io*        ))
+;; (print (list *patchwork-io*))
+
+;; (eval-enqueue '(progn (setf *print-circle* nil
+;;                        *print-right-margin* 80)
+;;                 (pprint (list
+;;                          'swank::*current-standard-input*   swank::*current-standard-input*  
+;;                          'swank::*current-standard-output*  swank::*current-standard-output* 
+;;                          'swank::*current-error-output*     swank::*current-error-output*    
+;;                          'swank::*current-trace-output*     swank::*current-trace-output*    
+;;                          'swank::*current-terminal-io*      swank::*current-terminal-io*  
+;;                          'swank::*current-query-io*         swank::*current-query-io*        
+;;                          'swank::*current-debug-io*         swank::*current-debug-io*)
+;;                  patchwork.loader::*patchwork-io*)
+;;                 (pprint (list
+;;                          *standard-input*  
+;;                          *standard-output* 
+;;                          *error-output*    
+;;                          *trace-output*    
+;;                          *terminal-io*  
+;;                          *query-io*        
+;;                           *debug-io*)
+;;                  patchwork.loader::*patchwork-io*)
+;;                 (print patchwork.loader::*patchwork-io* patchwork.loader::*patchwork-io*)
+;;                 (print *terminal-io* patchwork.loader::*patchwork-io*)))
 
 
 

@@ -62,19 +62,19 @@
 
 (defmethod decompile ((self C-patch-midi))
   (append (call-next-method) 
-     (list nil 
-           `(list ,(active-mode self)
-              ,(if *decompile-chords-mode* 
-                 `(list (list ,@(get-chordline-form (chord-seq self)))
-                       ,(if (wptr (application-object self))
-                         `(list ,@(get-window-state self (application-object self)))
-                         `(list ,@(window-state self)))))))))
+          (list nil 
+                `(list ,(active-mode self)
+                       ,(if *decompile-chords-mode* 
+                            `(list (list ,@(get-chordline-form (chord-seq self)))
+                                   ,(if (wptr (application-object self))
+                                        `(list ,@(get-window-state self (application-object self)))
+                                        `(list ,@(window-state self)))))))))
 
 (defmethod complete-box ((self C-patch-midi) args)
   (make-pw-chord-line-box self (first args) (first (second args)))
   (if (second (second args))
-    (put-window-state self (application-object self) (second (second args)))))
-  
+      (put-window-state self (application-object self) (second (second args)))))
+
 (defgeneric get-chordline-form (self))
 (defmethod get-chordline-form ((self C-chord-line))
   (mapcar 
@@ -121,20 +121,18 @@
         )
     (when (and ch-l (chords ch-l))
       (setq notes (order-the-notes ch-l (chords ch-l) 0))
-      ;(setq begint (abs (cdr (car notes))))
+                                        ;(setq begint (abs (cdr (car notes))))
       (start (apdfuncall  10 2 15     ;beginT 2 (+ beginT 10)
                           'play-chosen-chords ch-l notes (cdr (car notes)))))))
 
-#|
-(defmethod play ((self C-patch-midi))
-  (let ((ch-l (chord-seq self))
-        notes begint)
-    (when (and ch-l (chords ch-l))
-      (setq notes (order-the-notes ch-l (chords ch-l) 0))
-      (setq beginT (abs (cdr (car notes))))
-      (start (apdfuncall  10 2 15;beginT 2 (+ beginT 10)
-                          'play-chosen-chords ch-l notes (cdr (car notes)))))))
-|#
+;; (defmethod play ((self C-patch-midi))
+;;   (let ((ch-l (chord-seq self))
+;;         notes begint)
+;;     (when (and ch-l (chords ch-l))
+;;       (setq notes (order-the-notes ch-l (chords ch-l) 0))
+;;       (setq beginT (abs (cdr (car notes))))
+;;       (start (apdfuncall  10 2 15;beginT 2 (+ beginT 10)
+;;                           'play-chosen-chords ch-l notes (cdr (car notes)))))))
 
 (defgeneric draw-clock (self))
 (defmethod draw-clock ((self C-patch-midi))
@@ -200,16 +198,15 @@
 (defgeneric rebuild-collector-win (self))
 (defmethod rebuild-collector-win ((self C-patch-midi))
   (setf (application-object self) (make-application-object self))
-  (set-pw-win+pw-obj (application-object self) *active-patch-window* self)
-  )
+  (set-pw-win+pw-obj (application-object self) *active-patch-window* self))
 
 (defmethod stop-process ((self C-patch-midi))
   (if (window-killed-p (application-object self))
-    (rebuild-collector-win self))
+      (rebuild-collector-win self))
   (let ((mus-not-panel (give-MN-editor self)))
     (remove-all-chords-from-chord-line mus-not-panel)
     (setf (chords (chord-seq self)) (nreverse (chord-line-list self)))
-    ;(setf (chords (chord-line mus-not-panel)) (nreverse (chord-line-list self)))
+                                        ;(setf (chords (chord-line mus-not-panel)) (nreverse (chord-line-list self)))
     (setf (chord-line mus-not-panel) (chord-seq self))
     (view-draw-contents (application-object self)))
   (with-focused-view self
@@ -225,16 +222,15 @@
     (setf (play-flag self) ())
     (fill-patch-outrect (out-put self))))
 
-#|
-(defmethod stop-play ((self C-patch-midi))
- (when (play-flag self)
-   (setf (play-flag self) ())
-   (fill-patch-outrect (out-put self))))
-|#
+
+;; (defmethod stop-play ((self C-patch-midi))
+;;   (when (play-flag self)
+;;     (setf (play-flag self) ())
+;;     (fill-patch-outrect (out-put self))))
 
 (defmethod patch-value ((self C-patch-midi) obj) (declare (ignore obj)) 
   (chord-seq self))
-  ;( give-MN-editor-chord-line self 0))
+                                        ;( give-MN-editor-chord-line self 0))
 
 (defgeneric give-MN-editor-chord-line (self i))
 (defmethod give-MN-editor-chord-line ((self C-patch-midi) i)
@@ -265,12 +261,12 @@
 
 (defmethod make-application-object ((self C-patch-midi-Mod))
   (setf (application-object self)
-         (make-music-notation-editor 'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
-                              (make-point 350 200) *g2-g-f-f2-staffs*
-                              (pw-function-string self)))
+        (make-music-notation-editor 'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
+                                    (make-point 350 200) *g2-g-f-f2-staffs*
+                                    (pw-function-string self)))
   (setf (chord-line (give-MN-editor self)) (chord-seq self))
   (application-object self))
-  
+
 
 (defmethod rebuild-collector-win ((self C-patch-midi-Mod))
   (setf (application-object self)
@@ -279,15 +275,14 @@
                                     (pw-function-string self)))
   (set-pw-win+pw-obj (application-object self) *active-patch-window* self))
 
-#|
-(defmethod open-patch-win ((self C-patch-midi-Mod))
-  (let ((win (application-object self)))
-    (unless (and win (wptr win))
-      (rebuild-collector-win self)
-      (setf (chord-line (give-MN-editor self)) (chord-seq self)))
-    (window-select (application-object self))
-    (draw-appl-label self #\*)))
-|#
+;; (defmethod open-patch-win ((self C-patch-midi-Mod))
+;;   (let ((win (application-object self)))
+;;     (unless (and win (wptr win))
+;;       (rebuild-collector-win self)
+;;       (setf (chord-line (give-MN-editor self)) (chord-seq self)))
+;;     (window-select (application-object self))
+;;     (draw-appl-label self #\*)))
+
 ;;(defmethod open-patch-win ((self C-patch-midi-Mod)) (call-next-method))
 
 (defmethod put-window-state ((self C-patch-midi-Mod) win state)
@@ -295,8 +290,8 @@
     (setf (chord-line (give-MN-editor self)) (chord-seq self))
     (set-view-size win (first state))
     (setf (MN-zoom-scaler mus-view) (second state))
-    ;(for (i 2 1 (third state))
-      ;(add-new-staff-to-MN-editor mus-view))
+                                        ;(for (i 2 1 (third state))
+                                        ;(add-new-staff-to-MN-editor mus-view))
     (set-staff-count mus-view (third state))
     (view-window-grown mus-view)))
 
@@ -307,10 +302,10 @@
 
 (defparameter *midicent-obj-pw-type*
   (make-instance 'C-pw-type
-    :control-form
-    `(make-instance 'C-numbox  :view-size (make-point 36 14)
-                    :value 6000 :min-val 0 :max-val 12700 
-                    :type-list '(fixnum list chord))))
+                 :control-form
+                 `(make-instance 'C-numbox  :view-size (make-point 36 14)
+                                            :value 6000 :min-val 0 :max-val 12700 
+                                            :type-list '(fixnum list chord))))
 
 (defgeneric polifonic? (self))
 (defmethod polifonic? ((self C-patch-midi-mod)) nil)
@@ -367,15 +362,15 @@
   (make-pw-Poly-chord-line-box self (first args) (second args) (third args))
   (set-window-title (application-object self) (pw-function-string self)))
 
-#|(defun make-pw-Poly-chord-line-box (box mode ch-line-forms state)
-  (setf (active-mode box) mode)
-  (mapc (lambda (ch-line chords-form editor)
-            (form-to-chord-line ch-line chords-form)
-            (setf (chord-line editor) ch-line))
-        (chord-line-list box) ch-line-forms 
-        (editor-objects (car (subviews (application-object box)))))
-  (if state (put-window-state box (application-object box) state))
-  box)|#
+;; (defun make-pw-Poly-chord-line-box (box mode ch-line-forms state)
+;;   (setf (active-mode box) mode)
+;;   (mapc (lambda (ch-line chords-form editor)
+;;           (form-to-chord-line ch-line chords-form)
+;;           (setf (chord-line editor) ch-line))
+;;         (chord-line-list box) ch-line-forms 
+;;         (editor-objects (car (subviews (application-object box)))))
+;;   (if state (put-window-state box (application-object box) state))
+;;   box)
 
 (defun make-pw-Poly-chord-line-box (box mode ch-line-forms state)
   (setf (active-mode box) mode)
@@ -387,8 +382,8 @@
       (window-close (application-object box))
       (rebuild-collector-win box))       
     (mapc (lambda (ch-line chords-form editor)
-              (form-to-chord-line ch-line chords-form)
-              (setf (chord-line editor) ch-line))
+            (form-to-chord-line ch-line chords-form)
+            (setf (chord-line editor) ch-line))
           (chord-line-list box) ch-line-forms 
           (editor-objects (car (subviews (application-object box)))))
     (if state (put-window-state box (application-object box) state))
@@ -406,86 +401,87 @@
   (let ((mus-view (car (subviews win))))
     (list (view-size win) (MN-zoom-scaler mus-view)
           (length (editor-objects mus-view)))))
- 
+
 (defmethod make-application-object ((self C-patch-polifMN-mod))
   (let ((editor
-         (make-n-music-notation-editors
-          (max (length (pw-controls self)) (length (chord-line-list self)))
-          self
-          'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
-          (make-point 350 200))))
+          (make-n-music-notation-editors
+           (max (length (pw-controls self)) (length (chord-line-list self)))
+           self
+           'C-mn-window-mod 'C-MN-view-mod 'C-MN-panel-Mod
+           (make-point 350 200))))
     (set-window-title editor (pw-function-string self))
     editor))
 
-#|(defmethod patch-value ((self C-patch-polifMN-mod) obj)
-  (if (value self)
-    (chord-line-list self)
-    (let* ((the-list (chord-line-list self))
-           (controls (pw-controls self))
-           (objects (input-objects self))
-           (dif-len (- (length controls) (length the-list)))
-           (new-list nil) (i 0) control)
-      (unless (zerop dif-len)
-        (dotimes (i dif-len)
-          (push (make-instance 'C-chord-line) new-list))
-        (setq the-list (nconc the-list new-list)))
-      (dolist (object objects)
-        (setq control (nth i controls))
-        (unless (eq control object)
-              (setf (nth i the-list) (patch-value object obj)))
-        (incf i))      
-      (setf (chord-line-list self) the-list))))
-
-(defmethod patch-value ((self C-patch-polifMN-mod) obj)
-  (if (value self)
-    (chord-line-list self)
-    (let* ((win (application-object self))
-           (objects (input-objects self))
-           (controls (pw-controls self))
-           (view-object (car (subviews win)))
-           res)
-      (setf (chord-line-list self)
-            (dolist (in-obj objects res)
-              (setq res
-                    (append  res (list! (if (eq in-obj (pop controls)) 
-                                          (make-instance 'C-chord-line)
-                                          (patch-value in-obj obj)))))))
-      (when (and win (wptr win)
-                 (/= (length (chord-line-list self))
-                     (length (editor-objects view-object))))
-        (window-close win))
-      (when (and win (wptr win)) (update-editor  view-object))
-      (chord-line-list self))))|#
+;; (defmethod patch-value ((self C-patch-polifMN-mod) obj)
+;;   (if (value self)
+;;       (chord-line-list self)
+;;       (let* ((the-list (chord-line-list self))
+;;              (controls (pw-controls self))
+;;              (objects (input-objects self))
+;;              (dif-len (- (length controls) (length the-list)))
+;;              (new-list nil) (i 0) control)
+;;         (unless (zerop dif-len)
+;;           (dotimes (i dif-len)
+;;             (push (make-instance 'C-chord-line) new-list))
+;;           (setq the-list (nconc the-list new-list)))
+;;         (dolist (object objects)
+;;           (setq control (nth i controls))
+;;           (unless (eq control object)
+;;             (setf (nth i the-list) (patch-value object obj)))
+;;           (incf i))      
+;;         (setf (chord-line-list self) the-list))))
+;; 
+;; (defmethod patch-value ((self C-patch-polifMN-mod) obj)
+;;   (if (value self)
+;;       (chord-line-list self)
+;;       (let* ((win (application-object self))
+;;              (objects (input-objects self))
+;;              (controls (pw-controls self))
+;;              (view-object (car (subviews win)))
+;;              res)
+;;         (setf (chord-line-list self)
+;;               (dolist (in-obj objects res)
+;;                 (setq res
+;;                       (append  res (list! (if (eq in-obj (pop controls)) 
+;;                                               (make-instance 'C-chord-line)
+;;                                               (patch-value in-obj obj)))))))
+;;         (when (and win (wptr win)
+;;                    (/= (length (chord-line-list self))
+;;                        (length (editor-objects view-object))))
+;;           (window-close win))
+;;         (when (and win (wptr win)) (update-editor  view-object))
+;;         (chord-line-list self))))
 
 ;;changed by aaa 2-10-95
 (defmethod patch-value ((self C-patch-polifMN-mod) obj)
   (if (value self)
-    (chord-line-list self)
-    (let* ((win (application-object self))
-           (objects (input-objects self))
-           (controls (pw-controls self))
-           (view-object (car (subviews win)))
-           res)
-      (setf (chord-line-list self)
-            (dolist (in-obj objects res)
-              (setq res
-                    (append  res (list! (if (eq in-obj (pop controls))
-                                          (make-instance 'C-chord-line)
-                                          (patch-value in-obj obj)))))))
-      (when (and win (wptr win)
-                 (/= (length (chord-line-list self))
-                     (length (editor-objects view-object))))
-        (window-close win))
-      (let ((editors (editor-objects (car (subviews (application-object self))))))
-        (for (i 0 1 (1- (length editors)))
-          (setf (chord-line (nth i editors)) (nth i (chord-line-list self)))))
-      (when (and win (wptr win)) (update-editor  view-object))
-      (chord-line-list self))))
+      (chord-line-list self)
+      (let* ((win (application-object self))
+             (objects (input-objects self))
+             (controls (pw-controls self))
+             (view-object (car (subviews win)))
+             res)
+        (setf (chord-line-list self)
+              (dolist (in-obj objects res)
+                (setq res
+                      (append  res (list! (if (eq in-obj (pop controls))
+                                              (make-instance 'C-chord-line)
+                                              (patch-value in-obj obj)))))))
+        (when (and win (wptr win)
+                   (/= (length (chord-line-list self))
+                       (length (editor-objects view-object))))
+          (window-close win))
+        (let ((editors (editor-objects (car (subviews (application-object self))))))
+          (for (i 0 1 (1- (length editors)))
+            (setf (chord-line (nth i editors)) (nth i (chord-line-list self)))))
+        (when (and win (wptr win)) (update-editor  view-object))
+        (chord-line-list self))))
+
 
 (defmethod correct-extension-box ((self C-patch-polifMN-mod) new-box values)
   (declare (ignore values))
   (let* ((new-editors-list 
-         (editor-objects (car (subviews (application-object new-box)))))
+           (editor-objects (car (subviews (application-object new-box)))))
          (last-ed (1- (length new-editors-list))))
     (setf (nthcdr last-ed (chord-line-list self))
           (list (chord-line (nth last-ed  new-editors-list))))
@@ -496,7 +492,7 @@
   (call-next-method)
   (let ((editor (application-object self)))
     (if (and editor (wptr editor))
-      (set-window-title editor (pw-function-string self)))))
+        (set-window-title editor (pw-function-string self)))))
 
 (defmethod give-new-extended-title ((self C-patch-polifMN-mod)) 
   (pw-function-string self))
@@ -504,7 +500,7 @@
 (defmethod open-patch-win ((self C-patch-polifMN-mod))
   (if (and (application-object self)
            (window-killed-p (application-object self)))
-    (rebuild-collector-win self))
+      (rebuild-collector-win self))
   (let ((editors (editor-objects (car (subviews (application-object self))))))
     (for (i 0 1 (1- (length editors)))
       (setf (chord-line (nth i editors)) (nth i (chord-line-list self)))))
@@ -520,7 +516,7 @@
 
 ;;add by aaa 28-08-95 from pw-modif
 (defmethod play ((self C-patch-polifMN-mod))
- (play-all-staffs (car (subviews (application-object self)))))
+  (play-all-staffs (car (subviews (application-object self)))))
 
 
 
@@ -536,8 +532,8 @@
                    (mid/ob (midic (:type-list (fixnum list chord))))
                    (vel (midic (:value 100))) (chan approx)
                    (ins (symbol (:type-list (midi-ins) :dialog-item-text "ins"))))
-        collector
-"A PW-box that is able to play in real-time (p - play)
+    collector
+    "A PW-box that is able to play in real-time (p - play)
 or to collect in non-real-time (c - collect) notes.
 When the user plays or records,the collector-box begins to 
 evaluate its inputs in a loop.
@@ -560,7 +556,7 @@ The collector-box can be stopped in real-time by pressing s.
 In non-real-time the process is stopped at a time-point
 that can be set with a stime-box (stop-time-box).
 This value is set by default to 1000 ticks (10 seconds)
-(the default value will be used if there is no stime-box in the 
+\(the default value will be used if there is no stime-box in the 
 current PW-window).
 The collector-box also owns a music-notation-editor (MN-editor) that can
 be opened by selecting the collector-box and pressing o.
@@ -569,13 +565,13 @@ all notes are collected inside this editor and each
 aspect of the notes can later be edited. 
 When requested for a value, collector-box returns a chord line object.
 "
-(declare (ignore del dur mid/ob vel chan ins)))
+  (declare (ignore del dur mid/ob vel chan ins)))
 ;;===================================
 
 (defunp poly-coll ((coll1 (symbol (:dialog-item-text "obj" :type-list (collector))))
-               &rest (colln (symbol (:dialog-item-text "obj" :type-list (collector)))))
-        list 
-"A pmnn (polifonic MN-editor) box is used to represent 
+                   &rest (colln (symbol (:dialog-item-text "obj" :type-list (collector)))))
+    list 
+    "A pmnn (polifonic MN-editor) box is used to represent 
 polifonic information.
 For example if you have recorded a process with three collectors,
 you can look at the result with three staffs by selecting 
@@ -586,13 +582,13 @@ Then you have to make a request by option-clicking the out-put-box
 of the Poly Collector box.
 This box can be both opened by selecting it and pressing o from
 the keyboard or extended by option-clicking bottom-right 
-(EA = extend+application)."
-(declare (ignore coll1 colln)))
+\(EA = extend+application)."
+  (declare (ignore coll1 colln)))
 
 (defunp multiseq ((coll1 (symbol (:dialog-item-text "obj" :type-list (collector list))))
-               &rest (colln (symbol (:dialog-item-text "obj" :type-list (collector list)))))
-        list 
-"A <multiseq> (polyphonic sequence) box represents polyphonic data. It takes 
+                  &rest (colln (symbol (:dialog-item-text "obj" :type-list (collector list)))))
+    list 
+    "A <multiseq> (polyphonic sequence) box represents polyphonic data. It takes 
 one or more chord sequence objects as input and returns them in a list. This 
 module works with the associated music notation editor, which displays as 
 many systems as chord sequence inputs have been defined for the module. 
@@ -605,7 +601,7 @@ changes are made by hand in the editor, of course). This box can be opened by
 selecting it and pressing 'o' from the keyboard or extended by option-clicking 
 bottom-right. Type 'h' with the music notation editor opened for more 
 information."
-(declare (ignore coll1 colln)))
+  (declare (ignore coll1 colln)))
 
 ;;======================================
 
@@ -620,8 +616,9 @@ information."
 (defmethod give-stop-time ((self C-pw-stop-time)) (patch-value self ()))
 
 (defunp stime ((stopt (fix (:value 1000)))) fix
-"This box sets the stop-time when collecting with collector-boxes
+    "This box sets the stop-time when collecting with collector-boxes
 - by default 1000 ticks (10 seconds)."
   stopt)
 
 
+;;;; THE END ;;;;

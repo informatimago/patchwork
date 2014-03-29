@@ -65,6 +65,12 @@ The function MAKE-RECT can be called with either:
     (t
      (%make-rect :topleft (make-point left top) :bottomright (make-point right bottom)))))
 
+(defun pt2rect (p1 p2)
+  (make-rect (min (point-h p1) (point-h p2))
+             (min (point-v p1) (point-v p2))
+             (max (point-h p1) (point-h p2))
+             (max (point-v p1) (point-v p2))))
+
 (defun rect-to-list (rect)
   "
 RETURN:         A list of two lists containing the coordinates of the
@@ -361,6 +367,6 @@ V:              Vertical position.  If V is NIL (the default), H is
       ))
   :success)
 
-(test/point-to-angle)
+#+test (test/point-to-angle)
 
 ;;;; THE END ;;;;

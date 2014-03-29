@@ -221,7 +221,7 @@
 (in-package :pw)
 
 (defunp Text-win ((list list) (fmat (fix>=0 (:value 4)))) list
-  " This module lets one create and communicate with a Lisp text window. The 
+    " This module lets one create and communicate with a Lisp text window. The 
 new window is created by choosing NEW in the front menu (click on A at right 
 to open the menu). The new window appears and makes PatchWork switch to 
 Lisp. To return to PatchWork click on the PatchWork window or type Ù-1. It is 
@@ -258,7 +258,7 @@ window, and in this case the option is Add .
 The second entry of the module  fmat ;(at the right) determines how many 
 elements will be written per line in the corresponding text window. For further 
 information; type h with the selected module open. "
-(declare (ignore list fmat)))
+  (declare (ignore list fmat)))
 
 (in-package "C-PATCH-FILE-BUFFER")
 
@@ -328,31 +328,29 @@ information; type h with the selected module open. "
           (buffer-insert mark (format nil "~%")))))))
 
 (defunp ascii-win ((list list) (fmat (fix>0 (:value 4)))) list
-  "A box linked with an ASCII file. outputs (as a list of LISP strings)
+    "A box linked with an ASCII file. outputs (as a list of LISP strings)
 either the whole file contents or the selected zone (if any). 
 Menu options are:
   New:  Links a new LISP editing window with the box.
   Open: Gets a user selected file and links it with the box"
-(declare (ignore list fmat)))
+  (declare (ignore list fmat)))
 
 
-#|
-(setq foo (make-instance 'fred-window))
-(setq fi (find-window "New"))
-(setq fa (fred-buffer foo))
-
-(buffer-current-sexp fa 20)
-(buffer-size fa)
-(in-package :pw)
-(add-patch-box *active-patch-window* 
-               (make-patch-box  'C-patch-file-buffer:C-patch-file-buffer 'f-buff  
-                               () '(list)))
-(setq fu (car (subviews pw::*active-patch-window* )))
-(setq fuwin (C-patch-file-buffer::fred-win fu))
-(setq fumark (fred-buffer fuwin))
-(setq fuexp (buffer-size fumark))
-(multiple-value-bind (a b) (buffer-current-sexp fumark 11789) (list a b))
-(buffer-current-sexp-bounds fumark)
-(buffer-skip-fwd-wsp&comments fumark 516 400)
-(selection-range fuwin)
-|#
+;; (setq foo (make-instance 'fred-window))
+;; (setq fi (find-window "New"))
+;; (setq fa (fred-buffer foo))
+;; 
+;; (buffer-current-sexp fa 20)
+;; (buffer-size fa)
+;; (in-package :pw)
+;; (add-patch-box *active-patch-window* 
+;;                (make-patch-box  'C-patch-file-buffer:C-patch-file-buffer 'f-buff  
+;;                                () '(list)))
+;; (setq fu (car (subviews pw::*active-patch-window* )))
+;; (setq fuwin (C-patch-file-buffer::fred-win fu))
+;; (setq fumark (fred-buffer fuwin))
+;; (setq fuexp (buffer-size fumark))
+;; (multiple-value-bind (a b) (buffer-current-sexp fumark 11789) (list a b))
+;; (buffer-current-sexp-bounds fumark)
+;; (buffer-skip-fwd-wsp&comments fumark 516 400)
+;; (selection-range fuwin)

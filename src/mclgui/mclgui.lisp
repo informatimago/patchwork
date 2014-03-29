@@ -37,18 +37,20 @@
 
 
 (defun initialize/screen ()
-  (multiple-value-bind (pos siz) (main-screen-frame)
-    (declare (ignore pos))
-    (setf *screen-width*       (point-h siz)
-          *screen-height*      (point-v siz)))
+  (multiple-value-bind (sx sy sw sh) (main-screen-frame)
+    (declare (ignore sx sy))
+    (setf *screen-width*   sw
+          *screen-height*  sh))
   (values))
 
 
 (defvar *initialized* nil)
 
 (defun initialize ()
-  "Initialize the MCL GUI."
+  "Initialize the MCL GUI.
+Must be called on the main thread."
   (unless *initialized*
+    (initialize/process)
     (initialize/application)
     (initialize/screen)
     (initialize/region)
@@ -65,6 +67,7 @@
     (initialize/file)
     (initialize/event)
     (initialize/eval)
+    (initialize/pop-up-menu-dialog-item)
     #+has-appleevent (initialize/apple-event)
     (setf *initialized* t))
   (values))

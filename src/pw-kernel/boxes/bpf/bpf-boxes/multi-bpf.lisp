@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
 ;;================================================================================================================
@@ -259,24 +257,6 @@
 
 (defmethod application-object ((self C-menubox-bpf)) (declare (ignore self)) nil)
 
-#|
-(defmethod view-draw-contents ((self C-mini-bpf-view))
-  (let* ((object (application-object (view-container self)))
-         (bpfs (and object (break-point-functions (editor-view-object object)))))
-    (with-focused-view self
-      (draw-rect* (point-h (view-scroll-position self)) (point-v (view-scroll-position self))(w self)(h self))
-      (if (open-state self)
-        (when (break-point-function self)
-          (draw-bpf-function 
-           (break-point-function self) self nil (h-view-scaler self)(v-view-scaler self))
-          (when bpfs
-            (set-pen-pattern self *light-gray-pattern*)
-            (while bpfs
-              (draw-bpf-function 
-               (pop bpfs) self nil (h-view-scaler self)(v-view-scaler self)))
-            (set-pen-pattern self *black-pattern*)))
-        (draw-string 3 9 (doc-string self))))))
-|#
 
 ;; reversed drawing 1st bpfs then bpf
 (defmethod view-draw-contents ((self C-mini-bpf-view))

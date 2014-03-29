@@ -36,23 +36,22 @@
  
 (defvar *global-current-value-patch* ())
 
-#|
-(defparameter *pw-debug-mode-menu*    
-  (new-leafmenu "show error box" 'activate-current-patch-value-patch))
-(defparameter *pw-remove-debug-mode-menu*    
-  (new-leafmenu "remove pw debug" 'remove-PW-mode-method))
+;; (defparameter *pw-debug-mode-menu*    
+;;   (new-leafmenu "show error box" 'activate-current-patch-value-patch))
+;; (defparameter *pw-remove-debug-mode-menu*    
+;;   (new-leafmenu "remove pw debug" 'remove-PW-mode-method))
+;; 
+;; (let ((rem-menu (find-menu-item *PWoper-menu* "remove pw debug"))
+;;       (show-menu (find-menu-item *PWoper-menu* "show error box")))
+;;   (if rem-menu (remove-menu-items *PWoper-menu* rem-menu))
+;;   (if show-menu (remove-menu-items *PWoper-menu* show-menu)))
+;; 
+;; (ui:add-menu-items  *PWoper-menu* *pw-debug-mode-menu*)
+;; (ui:add-menu-items  *PWoper-menu* *pw-remove-debug-mode-menu* )
+;; 
+;; ;;==========================================================================================
+;; (setf *break-on-errors* ())
 
-(let ((rem-menu (find-menu-item *PWoper-menu* "remove pw debug"))
-      (show-menu (find-menu-item *PWoper-menu* "show error box")))
-  (if rem-menu (remove-menu-items *PWoper-menu* rem-menu))
-  (if show-menu (remove-menu-items *PWoper-menu* show-menu)))
-
-(ui:add-menu-items  *PWoper-menu* *pw-debug-mode-menu*)
-(ui:add-menu-items  *PWoper-menu* *pw-remove-debug-mode-menu* )
-
-;;==========================================================================================
-(setf *break-on-errors* ())
-|#
 
 (defun flip-pw-debug ()
   (setf *global-current-value-patch* ())
@@ -98,3 +97,5 @@
                          (list (find-class 'C-patch)(find-class t)))))
      (remove-method generic-function method)
      (setf *global-current-value-patch* ())))
+
+;;;; THE END ;;;;

@@ -466,7 +466,6 @@ entries for them to this list.
 
 (defconstant default-appl-creator :|????|)
 
-
 (defvar *application* nil)
 
 (defvar *hide-windoids-on-suspend* t)

@@ -68,26 +68,28 @@
 (defvar *pw-menu-apps*        nil)
 
 (defvar *apps-lisp-menu-item* nil)
-(defvar *apps-PW-menu-item*   nil)
+(defvar *apps-pw-menu-item*   nil)
 
 ;;_________________
 
-(defvar *original-CCL-menubar* (copy-list ui:*default-menubar*))
-(defvar *default-CCL-menubar*  '())
-
+(defvar *original-menubar*  '())
+(defvar *lisp-menubar*      '())
+(defvar *patchwork-menubar* '())
 
 ;;___________
 
 (defun enable-all-apps-menu-items ()
+  (set-menubar *patchwork-menubar*)
+  (mapc #'menu-enable (cdr *patchwork-menubar*))
   (let ((menus (menu-list *pw-menu-apps*)))
-    (while menus (menu-item-enable (pop menus)))))
+    (while menus (menu-item-enable (pop menus))))
+  (menu-item-disable *apps-PW-menu-item*))
 
-(defun enable-Lisp-apps-menu-item? ()
-  (unless (member nil (mapcar #'menu-enabled-p (menu-list *pw-menu-apps*)))
-    (ui:set-menubar *default-CCL-menubar*)
-    ;;added 920818 [Camilo]
-    (mapc #'menu-enable (cdr *default-CCL-menubar*))
-    (menu-item-disable *apps-lisp-menu-item*)))
+(defun enable-Lisp-apps-menu-item ()
+  (set-menubar *lisp-menubar*)
+  ;;added 920818 [Camilo]
+  (mapc #'menu-enable (cdr *lisp-menubar*))
+  (menu-item-disable *apps-lisp-menu-item*))
 
 (defun add-apps-item-to-apps-menu (title action)
   (let ((menu (new-leafmenu title action)))
@@ -219,13 +221,6 @@
   (dis/enable-menu-item *pw-menu-file-only-Save-item* (and fl change-fl))
   (dis/enable-menu-item *pw-menu-file-only-SaveMN-item* (and fl change-fl)))
 
-;;============================================
-;;============================================
-;; menubar for PW
-
-(defvar *patch-work-menu-root* nil)
-
-
 
 ;;==================================================
 
@@ -260,8 +255,7 @@ DO:       Execute the BODY with a handler for CONDITION and
                            (windows))))
     (when listener
       (window-select listener)))
-  (menu-item-disable *apps-lisp-menu-item*)
-  (enable-Lisp-apps-menu-item?))
+  (enable-Lisp-apps-menu-item))
 
 
 (defun pw-menu-action ()
@@ -270,8 +264,7 @@ DO:       Execute the BODY with a handler for CONDITION and
           (window-select *active-patch-window*)
           (search-for-next-pw-window)) 
       (make-new-pw-window t))
-  (enable-all-apps-menu-items)
-  (menu-item-disable *apps-PW-menu-item*))
+  (enable-all-apps-menu-items))
 
 
 (defvar *c-major-scale*            nil)
@@ -283,16 +276,20 @@ DO:       Execute the BODY with a handler for CONDITION and
 (defvar *current-approx-scale*          *1/4-tone-chromatic-scale* "the scale for user selected appro")
 
 
+
+(defvar *pw-music-extern-menu*    nil)
+(defvar *pw-mn-edit-menu*         nil)
+(defvar *pw-conv-approx-menu*     nil)
+(defvar *pw-midi-menu*            nil)
+(defvar *pw-multidim-music-menu*  nil)
+(defvar *pw-menu-music*           nil)
+
+
 (defun initialize-menus ()
   ;;------------------------------
   (setf *pw-menu-apps*         (new-menu "Patchwork"))
-  (setf *default-CCL-menubar*  (list* (first *original-CCL-menubar*)
-                                      *pw-menu-apps*
-                                      (rest *original-CCL-menubar*)))
-  ;;------------------------------
   (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
-  ;;------------------------------
-  (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"    'pw-menu-action))
+  (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"   'pw-menu-action))
   ;;------------------------------
   (setf *pw-menu-file-close-item*       (item "Close"        #\W        (kill-patch-window *active-patch-window*)))
   (setf *pw-menu-file-only-Save-item*   (item "Save"         #\S        (PW-WINDOW-SAVE *active-patch-window*)))
@@ -342,6 +339,127 @@ DO:       Execute the BODY with a handler for CONDITION and
                   *pw-Extern-menu*
                   *pw-Multidim-menu*)
   ;;------------------------------
+  (setf *pw-menu-Music* (new-menu "Music"))
+
+  (setf *pw-MN-Edit-menu* (new-menu "Edit"))
+  (PW-addmenu-fun *pw-MN-Edit-menu* 'chord 'C-patch-chord-box-M)
+  ;;(PW-addmenu-fun *pw-MN-Edit-menu* 'collector 'C-patch-midi-Mod)
+  ;;(PW-addmenu-fun *pw-MN-Edit-menu* 'poly-coll 'C-patch-PolifMN-mod)
+  ;;(PW-addmenu-fun *pw-MN-Edit-menu* 'stime 'C-pw-stop-time)
+  (PW-addmenu-fun *pw-MN-Edit-menu* 'mk-note 'C-patch-make-note)
+  (PW-addmenu *pw-MN-Edit-menu* '(mk-chord))
+  ;;(PW-addmenu-fun *pw-MN-Edit-menu* 'ch-l-build 'C-patch-chord-line:C-patch-chord-line)
+  (pw::pw-addmenu-fun *pw-MN-Edit-menu* 'chordseq 'C-patch-chord-line:C-patch-chord-line)
+  ;;(PW-addmenu-fun *pw-MN-Edit-menu* 'epw::ascii-chord 'EPW::C-pw-ascii-chord-box)
+  (PW-addmenu-fun *pw-MN-Edit-menu* 'multiseq 'C-patch-PolifMN-mod)
+  
+  (setf *pw-Conv-approx-menu* (new-menu "Conv-Approx"))
+  (PW-addmenu *pw-Conv-approx-menu*
+              '(f->mc mc->f mc->n n->mc int->symb symb->int cents->coef coef->cents approx-m
+                lin->db epw::db->lin))
+  
+  (setf *pw-Music-Extern-menu* (new-menu "Extern"))
+  ;;(pw-addmenu-fun *pw-Music-Extern-menu* 'pw-clock 'C-pw-gclock)
+  ;;(pw-addmenu-fun *pw-Music-Extern-menu* 'str-dur 'C-structured-dur)
+  ;;(pw-addmenu-fun *pw-Music-Extern-menu* 'strout 'C-structured-outbox)
+  ;;(new-PW-sub-menu-item *pw-Music-Extern-menu* "struct-abstraction" 'C-make-structured-abstraction 'strabs 
+  ;;  '(*string-pw-type* "strcoll") '(midi-ins) '("Strcoll"))
+
+
+  
+  (setf *pw-Midi-menu* (new-menu "Midi"))
+  ;;(pw-addmenu *pw-Midi-menu* '(midi-o pgmout volume TXtune))
+  ;;(pw-addmenu *pw-Midi-menu* '(bendout))
+
+  (pw-addmenu-fun *pw-Midi-menu* 'C-pw-send-midi-note::play-chords
+                  'C-pw-send-midi-note:C-pw-send-midi-note)
+
+  (pw-addmenu-fun *pw-Midi-menu* 'C-PW-MIDI-IN::play/stop
+                  'C-PW-MIDI-IN::C-play/stop-list)
+
+  (pw-addmenu *pw-Midi-menu* '(play-object))
+
+  ;;(PW-addmenu-fun *pw-Midi-menu* 'c-pw-midi-in::play/stop 'c-pw-midi-in::C-jouer/eteindre)
+
+  #|(PW-addmenu-fun *pw-Midi-menu* 'c-pw-midi-in::play/st-list
+  'c-pw-midi-in::C-play/stop-list)|#
+
+  (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+  (pw-addmenu *pw-Midi-menu* '(midi-o pgmout bendout volume))
+  (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+  (pw-addmenu-fun *pw-Midi-menu* 'C-pw-midi-in:delay 'C-pw-midi-in:C-pw-delay-box)
+  (pw-addmenu *pw-Midi-menu* '(epw::microtone))
+  (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+
+  ;; (ui:add-menu-items *pw-Midi-menu* 
+  ;;                    (new-leafmenu "raw-in" 
+  ;;                                  (lambda () 
+  ;;                                    (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
+  ;;                                                                      'C-pw-midi-in:m-data))
+  ;;                                          (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-midi-in
+  ;;                                                                      'C-pw-midi-in::raw-in)))
+  ;;                                      (add-subviews *active-patch-window* enum loop)
+  ;;                                      (set-view-position loop (make-point (x loop) (+ (h loop) 24)))
+  ;;                                      (connect-ctrl loop (car (pw-controls loop)) enum)
+  ;;                                      (setf (open-state (car (pw-controls loop)) ) nil)
+  ;;                                      (tell (controls *active-patch-window*) 'draw-connections))))
+  ;;                    (new-leafmenu "note-in" 
+  ;;                                  (lambda () 
+  ;;                                    (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
+  ;;                                                                      'C-pw-midi-in:m-data))
+  ;;                                          (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-note-in
+  ;;                                                                      'C-pw-midi-in:note-in)))
+  ;;                                      (add-subviews *active-patch-window* enum loop)
+  ;;                                      (set-view-position loop (make-point (x loop) (+ (h loop) 24)))
+  ;;                                      (connect-ctrl loop (car (pw-controls loop)) enum)
+  ;;                                      (setf (open-state (car (pw-controls loop)) ) nil)
+  ;;                                      (tell (controls *active-patch-window*) 'draw-connections))))
+  ;;                    (new-leafmenu "note-in" 
+  ;;                                  (lambda () 
+  ;;                                    (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
+  ;;                                                                      'C-pw-midi-in:m-data))
+  ;;                                          (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-note-on-in
+  ;;                                                                      'C-pw-midi-in:note-in)))
+  ;;                                      (add-subviews *active-patch-window* enum loop)
+  ;;                                      (set-view-position loop (make-point (x loop) (+ (h loop) 24)))
+  ;;                                      (connect-ctrl loop (car (pw-controls loop)) enum)
+  ;;                                      (setf (open-state (car (pw-controls loop)) ) nil)
+  ;;                                      (tell (controls *active-patch-window*) 'draw-connections))))
+  ;;                    (new-leafmenu "chord-in" 
+  ;;                                  (lambda () 
+  ;;                                    (let ((enum (make-PW-standard-box 'C-pw-midi-in:C-PW-midi-in-top
+  ;;                                                                      'C-pw-midi-in:m-data))
+  ;;                                          (loop (make-PW-standard-box 'C-pw-midi-in:C-pw-chord-in
+  ;;                                                                      'C-pw-midi-in:chord-in)))
+  ;;                                      (add-subviews *active-patch-window* enum loop)
+  ;;                                      (set-view-position loop (make-point (x loop) (+ (h loop) 24)))
+  ;;                                      (connect-ctrl loop (car (pw-controls loop)) enum)
+  ;;                                      (setf (open-state (car (pw-controls loop)) ) nil)
+  ;;                                      (tell (controls *active-patch-window*) 'draw-connections)))))
+
+  ;;aaa (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+  ;;aaa  (PW-addmenu *pw-Midi-menu* '())
+  ;;(ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+  ;;(pw-addmenu *pw-Midi-menu* '(epw::microtone))
+
+
+  (setf *pw-Multidim-Music-menu* (new-menu "Multidim"))
+  (PW-addmenu *pw-Multidim-Music-menu* '(c-get-note-slots:get-note-slots))
+
+  (PW-addmenu *pw-Multidim-Music-menu* '(c-get-note-slots::set-note-slots))
+
+  (PW-addmenu-fun *pw-Multidim-Music-menu* 'c-get-selections:get-selections
+                  'c-get-selections::C-get-selections)
+
+
+  
+  (add-menu-items *pw-menu-Music*
+                  *pw-MN-Edit-menu*
+                  *pw-Conv-approx-menu*
+                  ;; *pw-Music-Extern-menu*
+                  *pw-Midi-menu*
+                  *pw-Multidim-Music-menu*)
+  ;;------------------------------
   (setf *pw-menu-patch*   (new-menu "UserLib"))
   (setf *pw-windows-menu* (new-menu "Wins"))
   (add-menu-items  *PWoper-menu* 
@@ -388,10 +506,12 @@ DO:       Execute the BODY with a handler for CONDITION and
   (setf *click-menu*           (new-leafmenu "Click"          (lambda () (set-eval-click nil))))
   (setf *option-click-menu*    (new-leafmenu "Option-Click"   (lambda () (set-eval-click t))))
   ;;------------------------------
-  (add-menu-items *PWoper-menu* 
+  (add-menu-items *PWoper-menu*
+                  
                   (new-leafmenu "-" nil)
                   (setf *pw-debug-menu* (new-leafmenu "PW-debug-ON" (lambda () (flip-pw-debug))))
                   (new-leafmenu "show error box" 'activate-current-patch-value-patch)
+                  
                   (new-leafmenu "-" nil)
                   (new-menu "Global options"
                             (new-menu "Scale" *g-option-c-major* *g-option-chromatic*)
@@ -405,30 +525,50 @@ DO:       Execute the BODY with a handler for CONDITION and
                             (new-menu "Evaluation"
                                       *option-click-menu*
                                       *click-menu*))
+                  
                   (new-leafmenu "-" nil)
-                  (new-leafmenu "Load Library…"       (lambda () (load-library-config)))
-                  (new-leafmenu "Load Abstracts…"     (lambda () (load-abstr-config)))
+                  (new-leafmenu "Load Library…"      (lambda () (load-library-config)))
+                  (new-leafmenu "Load Abstracts…"    (lambda () (load-abstr-config)))
                   (new-leafmenu "Save Current Config" (lambda () (remember-config)))
                   (new-leafmenu "Delete Config"       (lambda () (forget-all-config)))
+
+                  (new-leafmenu  "-" ())
+                  (new-leafmenu "MIDI Reset"          (lambda () (pw-reset-for-midi)))
+                  (new-leafmenu "MIDI all-notes-off"  (lambda () (all-off)))
+                  
                   (new-leafmenu "-" nil)
                   (new-leafmenu "Save Image"          (lambda () (save-special-pw-image))))
   ;;------------------------------
-  (setf *patch-work-menu-root* (list
-                                *pw-menu-apps*
-                                *pw-menu-file* *pw-menu-edit* 
-                                *PWoper-menu* *pw-kernel-menu* *pw-menu-patch*
-                                *pw-windows-menu*))
+  (setf *patchwork-menubar* 
+        (list *apple-menu*
+              *pw-menu-apps*
+              *pw-menu-file*
+              *pw-menu-edit* 
+              *PWoper-menu*
+              *pw-kernel-menu*
+              *pw-menu-Music*
+              *pw-menu-patch*
+              *pw-windows-menu*))
   ;;------------------------------
-  (set-menubar       *default-CCL-menubar*)
+  (setf *original-menubar* (copy-list ui:*default-menubar*))
+  (setf *lisp-menubar*     (list* *apple-menu*
+                                  *pw-menu-apps*
+                                  (rest *original-menubar*)))
+  ;;------------------------------
+  (set-menubar       *lisp-menubar*)
   (menu-item-disable *apps-lisp-menu-item*)
   (set-command-key   *apps-lisp-menu-item* #\L)
   (set-command-key   *apps-PW-menu-item*   #\1)
-  
+
+  ;;------------------------------
+  (initialize-kernel-menu)
+  (initialize-midi-menu)
+  (initialize-mn-menu)
+  (initialize-rtm-menu)
+  (initialize-bpf-menu)
+  (epw::initialize-epw-menus)
   ;;------------------------------
   (on-application-did-finish-launching pw-menu-action)
   (on-quit cleanup-PW-wins))
-
-
-(initialize-menus)
 
 ;;;; THE END ;;;;

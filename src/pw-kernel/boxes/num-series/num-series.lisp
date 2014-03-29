@@ -37,8 +37,8 @@
 
 (defunp arithm-ser ((begin fix/float) (step (fix/float (:value 1)))
                     (end (fix/float (:value 10)))) 
-        list
-  "Returns a list of numbers starting from begin to end with increment step. For 
+    list
+    "Returns a list of numbers starting from begin to end with increment step. For 
 example:   ? (epw::arithm-ser   0  1  12 ) 
 returns:
 PW->(0 1 2 3 4 5 6 7 8 9 10 11 12)"
@@ -48,23 +48,23 @@ PW->(0 1 2 3 4 5 6 7 8 9 10 11 12)"
 
 (defunp fibo-ser ((seed1 fix/float ) (seed2 fix/float (:value 1)) (limit fix>=0 (:value 10))
                   &optional (begin fix/float) (end (fix/float (:value most-positive-fixnum)))) list
-   "Returns a list of numbers in the  Fibonacci series ;where the first element is 
+    "Returns a list of numbers in the  Fibonacci series ;where the first element is 
 seed and the additive factor is seed2. The limit parameter is the limit of this list. 
 It is also possible to specify two parameters begin and end which delimit the 
 calculation of the series. For example: 
  
-(pw::fibo-ser  0 1 337)
+\(pw::fibo-ser  0 1 337)
 returns
 
 ? PW->(0 1 2 3 5 8 13 21 34 55 89 144 233),
 
  
-(pw::fibo-ser  0 4 337)
+\(pw::fibo-ser  0 4 337)
 returns
 ? PW->(0 4 8 12 20 32 52 84 136 220)
 and 
 
-(pw::fibo-ser  0 4 337 3  6)
+\(pw::fibo-ser  0 4 337 3  6)
 returns
 ? PW->(12 20 32 52)"
   (labels ((compute-fibo (a b m n)
@@ -72,28 +72,28 @@ returns
                    ((= m n) (values a b))
                    (t (compute-fibo b (+ a b) (1+ m) n)))))
     (let (res)
-     (multiple-value-bind (ac1 ac2) (compute-fibo seed1 seed2 0 begin)
-       (if (< begin 2)
-         (if (and ac1 (> limit ac1)) (push ac1 res) )
-         (if (> limit ac2) (push ac2 res)))
+      (multiple-value-bind (ac1 ac2) (compute-fibo seed1 seed2 0 begin)
+        (if (< begin 2)
+            (if (and ac1 (> limit ac1)) (push ac1 res) )
+            (if (> limit ac2) (push ac2 res)))
         (dotimes (k (- end begin) (nreverse res))
           (multiple-value-bind (a b) (compute-fibo ac1 ac2 (+ begin k) (+ begin k 1))
-                  (setq ac1 a ac2 b) (if (> limit b) (push b  res) (return (nreverse res)))))))))
+            (setq ac1 a ac2 b) (if (> limit b) (push b  res) (return (nreverse res)))))))))
 
 (defunp geometric-ser ((seed fix/float (:value 1)) (factor (fix/float (:value 2))) (limit fix>=0 (:value 10))
                        &optional(begin fix/float)(end (fix/float (:value most-positive-fixnum))))
-        list
-  " The geometric-ser module returns a  geometric series ;of numbers in which 
+    list
+    " The geometric-ser module returns a  geometric series ;of numbers in which 
 the first element is seed  and the multiplicative coefficient is factor. The limit  
 parameter is the limit of this list.  It is also possible to specify two parameters 
 begin and end which delimit the calculation of the series. For example: 
 
-(pw::geometric-ser  10  2   2000)
+\(pw::geometric-ser  10  2   2000)
 will return
 ? PW->(10 20 40 80 160 320 640 1280)
 and if one sets begin to 2 and end to 5 
 
-(pw::geometric-ser  10  2   2000  2   5)
+\(pw::geometric-ser  10  2   2000  2   5)
 one obtains:
 ? PW->(40 80 160 320)"
   (let ((test (if (< factor 1) #'< #'>)) res)
@@ -104,31 +104,31 @@ one obtains:
 
 (defunp sinus ((phase fix/float) (nb-osc fix/float (:value 1))
                (nb-samples fix/float (:value 8)) (amp numbers? (:value 1))) list
-"parameters: phase = where we start on the sine curve (xmin)  
+    "parameters: phase = where we start on the sine curve (xmin)  
 nb-osc = number of oscillations needed (-> determines xmax)
 nb-samples = how many steps on the fragment of curve thus defined  
 amplitude (ambitus normal -1 / 1)"
-(let* ((xmin (* phase (/ pi 180))) (xmax (+ xmin (* 2 pi nb-osc)))
-       (step (/ (- xmax xmin) (1- nb-samples))))
-  (g*  amp (sample-fun  'sin xmin step xmax))))
+  (let* ((xmin (* phase (/ pi 180))) (xmax (+ xmin (* 2 pi nb-osc)))
+         (step (/ (- xmax xmin) (1- nb-samples))))
+    (g*  amp (sample-fun  'sin xmin step xmax))))
 
 (defunp sample-fun ((fun symbol) (xmin fix/float (:value 1)) 
                     (step fix/float (:value 1)) (xmax fix/float (:value 10))) list
-  "Returns the list of values of <fun> from <xmin> to <xmax> with <step>.
+    "Returns the list of values of <fun> from <xmin> to <xmax> with <step>.
 For example:
-(pw::sample-fun  'sin  0 1 6.3)
+\(pw::sample-fun  'sin  0 1 6.3)
 will return
 ? PW->(0.0 0.8414709848078965    0.9092974268256817     0.1411200080598672 
--0.7568024953079282     -0.9589242746631385     -0.27941549819892586)
+          -0.7568024953079282   -0.9589242746631385    -0.27941549819892586)
 and
-(pw::sample-fun  (pw::make-num-fun '(f(x)= x + 1))  0 1 10)
+\(pw::sample-fun  (pw::make-num-fun '(f(x)= x + 1))  0 1 10)
 will return
 ? PW->(1 2 3 4 5 6 7 8 9 10 11)
 "
   (mapcar fun (arithm-ser xmin step xmax)))
 
 (defunp average ((xs list) (weights? list (:value 1))) float
-  "average value of <xs>, weighted by linear <weights> or 1."
+    "average value of <xs>, weighted by linear <weights> or 1."
   (let ((num 0) (den 0) ampl)
     (while xs
       (setq ampl (if (consp weights?) (nextl weights?) 1))
@@ -142,40 +142,40 @@ will return
 
 (defmethod less-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 number) &optional deep)
   (if (consp (first arg1))
-    (cons (less-tree-mapcar fun (car arg1) arg2 deep)
-          (less-tree-mapcar fun  (cdr arg1) arg2 deep))
-    (funcall fun arg1 (if deep arg2 (list arg2)))))
+      (cons (less-tree-mapcar fun (car arg1) arg2 deep)
+            (less-tree-mapcar fun  (cdr arg1) arg2 deep))
+      (funcall fun arg1 (if deep arg2 (list arg2)))))
 
 (defmethod less-tree-mapcar ((fun cl:function) (arg1 null) arg2 &optional deep)
   (declare (ignore arg1 arg2 deep)) nil)
 
 (defmethod less-tree-mapcar ((fun cl:function) (arg1 number) (arg2 cons) &optional deep)
   (if (consp (first arg2))
-    (cons (less-tree-mapcar fun arg1 (car arg2) deep)
-          (less-tree-mapcar fun  arg1 (cdr arg2) deep))
-    (funcall fun (list arg1) (car arg2))))
+      (cons (less-tree-mapcar fun arg1 (car arg2) deep)
+            (less-tree-mapcar fun  arg1 (cdr arg2) deep))
+      (funcall fun (list arg1) (car arg2))))
 
 (defmethod less-tree-mapcar ((fun cl:function) arg1 (arg2 null) &optional deep)
-   (declare (ignore arg1 arg2 deep)) nil)
+  (declare (ignore arg1 arg2 deep)) nil)
 
 (defmethod less-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 cons) &optional deep)
   (if (or deep (consp (first arg1)) (consp (first arg2)))
-    (cons (less-tree-mapcar fun (car arg1) (car arg2) deep)
-          (less-tree-mapcar fun  (cdr arg1) (cdr arg2) deep))
-    (funcall fun arg1 arg2)))
+      (cons (less-tree-mapcar fun (car arg1) (car arg2) deep)
+            (less-tree-mapcar fun  (cdr arg1) (cdr arg2) deep))
+      (funcall fun arg1 arg2)))
 
 (defunp g-average ((xs list) (weights? list (:value 1))) midics?
-  "average value of <xs>, weighted by linear <weights> or 1. <xs> and 
+    "average value of <xs>, weighted by linear <weights> or 1. <xs> and 
 <weights> may be trees. Trees must be well-formed. That is, the children of a 
 node must be either all leaves or all nonleaves. "
   (less-tree-mapcar (function average) xs weights?))
-  
+
 (defun list-min (l) (l-min l))
 (defun list-max (l) (l-max l))
 
 (defunp distor-ext1 ((val fix/float) (minin fix/float) (maxin fix/float)
                      (minout fix/float) (maxout fix/float)) number
-  "Replaces <val> considered between <minin> and <maxin> by the value proportionaly
+    "Replaces <val> considered between <minin> and <maxin> by the value proportionaly
 placed between <minout> and <maxout>."
   (if (= maxin minin) minout
       (+ minout (/ (* (- val minin) (- maxout minout)) (- maxin minin)))))
@@ -188,15 +188,15 @@ placed between <minout> and <maxout>."
 
 (defunp distor-ext ((vals? numbers?) (minin fix/float) (maxin fix/float)
                     (minout fix/float) (maxout fix/float)) numbers?
-  "Replaces all the <vals?> considered between <minin> and <maxin> by the values proportionaly
+    "Replaces all the <vals?> considered between <minin> and <maxin> by the values proportionaly
 placed between <minout> and <maxout>."
   (deep-mapcar 'distor-ext 'distor-ext1 vals? minin maxin minout maxout))
 
 (defunp g-scaling ((vals? numbers?)
-                  (minout fix/float) (maxout fix/float)
-                  &optional (minin fix/float (:value most-negative-fixnum)) 
-                  (maxin fix/float (:value most-positive-fixnum))) numbers?
-  "Replaces all the <vals?> considered between the minimum value of the list 
+                   (minout fix/float) (maxout fix/float)
+                   &optional (minin fix/float (:value most-negative-fixnum)) 
+                   (maxin fix/float (:value most-positive-fixnum))) numbers?
+    "Replaces all the <vals?> considered between the minimum value of the list 
 and the maximum value of the list,  by the values proportionally placed between 
 <minout> and <maxout>. If the list in question is a part of a larger list, or 
 <vals?> is a variable that takes a value within a known interval, one can specify 
@@ -206,7 +206,7 @@ clicking on ‘E’ at the right of the module. "
   (less-deep-mapcar 'distor-ext-less-1 vals? minin maxin minout maxout))
 
 (defunp distor ((vals? numbers?) (minout fix/float) (maxout fix/float)) numbers?
-  "Replaces all the <vals?> considered between the minimum and maximum of <vals?>
+    "Replaces all the <vals?> considered between the minimum and maximum of <vals?>
 by the values proportionaly placed between <minout> and <maxout>."
   (distor-ext vals? (list-min (list! vals?)) (list-max (list! vals?)) minout maxout))
 
@@ -214,26 +214,26 @@ by the values proportionaly placed between <minout> and <maxout>."
 (defun abc-interpolation (begin end samples curves)
   (mapc (lambda (curve) (when (<= curve 0) (error "non-positive curve:~S~%" curve)))
         curves )
-    (if (<= samples 1)
-        (list begin)
-        (let ((len (1- (min (length begin) (length end))))
-              (step (/ 1 (decf samples)))
-              (res ())
-              (temp ())
-              (lcurves (length curves)))
-             (for (j 0 1 samples)
-                (setq temp ())
-                (for (i 0 1 len)
-                   (newl temp
-                      ;;(round
-                         (-power-function
-                           (nth i begin)
-                           (nth i end)
-                           (* j step)
-                           (nth (mod i lcurves) curves) ) ;1
-                         ))
-                 (newl res (nreverse temp)) )
-             (nreverse res))))
+  (if (<= samples 1)
+      (list begin)
+      (let ((len (1- (min (length begin) (length end))))
+            (step (/ 1 (decf samples)))
+            (res ())
+            (temp ())
+            (lcurves (length curves)))
+        (for (j 0 1 samples)
+          (setq temp ())
+          (for (i 0 1 len)
+            (newl temp
+                  ;;(round
+                  (-power-function
+                   (nth i begin)
+                   (nth i end)
+                   (* j step)
+                   (nth (mod i lcurves) curves) ) ;1
+                  ))
+          (newl res (nreverse temp)) )
+        (nreverse res))))
 
 ;; ;;from Rhythms:Functions [magnus]
 ;; 
@@ -244,23 +244,23 @@ by the values proportionaly placed between <minout> and <maxout>."
 (defunp interpolation ((begin list) (end list) (samples fix>0 (:value 4))
                        (curves floats (:value 1)) 
                        &optional (format menu (:menu-box-list (("incl" . 1) ("excl". 2))) )) list
-"Interpolates two lists of the same length. (If the lists are not the same length, the 
+    "Interpolates two lists of the same length. (If the lists are not the same length, the 
 operation produces only the number of terms equal to the shorter list.) begin and end, in 
 samples steps (i.e., samples is the number of steps). curve is an optional value that 
 selects the type of interpolation:
 
-    	  1  =  straight line, 
-   	< 1  =  convex
-   	> 1  =  concave
+      1  =  straight line, 
+    < 1  =  convex
+    > 1  =  concave
 
 If format    is  'incl' the two extremes are included in the output. If  format   is 
 'excl' they are excluded."
-   ;(*Esquisse* *Pitch*)
+                                        ;(*Esquisse* *Pitch*)
   (let ((int (abc-interpolation (list! begin) (list! end) samples
                                 (cond 
-                                 ((consp curves) curves)
-                                 ((numberp curves) (list curves))
-                                 (t (error "bad curves:~S~%" curves)) ))))
+                                  ((consp curves) curves)
+                                  ((numberp curves) (list curves))
+                                  (t (error "bad curves:~S~%" curves)) ))))
     (if (eq format 2) (butlast (rest int)) int)))
 
 (defun dicho-iter (xmin xmax val fun &aux (x (* .5 (+ xmin xmax))) ymin ymax)
@@ -269,10 +269,10 @@ If format    is  'incl' the two extremes are included in the output. If  format 
   (unless (<= ymin val ymax)
     (error "~S is not between f(~S)=~S and f(~S)=~S." val xmin ymin xmax ymax))
   (until (or (= x xmax) (= x xmin))
-      (if (< (funcall fun x) val)
+    (if (< (funcall fun x) val)
         (setq xmin x)
         (setq xmax x))
-      (setq x (* .5 (+ xmin xmax))))
+    (setq x (* .5 (+ xmin xmax))))
   x)
 
 ;; ex : resolution de 2 ^ x + 3 ^ x = n
@@ -281,14 +281,14 @@ If format    is  'incl' the two extremes are included in the output. If  format 
 ;; limite possible de la recherche : +-(log most-positive-fixnum) = 19.4
 
 (defunp fun-bin-search ((xmin fix/float) (xmax fix/float (:value 100)) (value fix/float (:value 50))
-                         (fun list (:value "(lambda(x)(* 2 x))"))) number
-"binary searches x in the interval [xmin,xmax] , such that fun(x)=value. fun must be either increasing
+                        (fun list (:value "(lambda(x)(* 2 x))"))) number
+    "binary searches x in the interval [xmin,xmax] , such that fun(x)=value. fun must be either increasing
 or decreasing in the interval"
   (dicho-iter xmin xmax value fun))
 
 (defunp inverse ((xmin fix/float) (xmax fix/float (:value 100)) (value fix/float (:value 50))
-                         (fun list (:value "(lambda(x)(* 2 x))"))) number
-"binary searches x in the interval [xmin,xmax] , such that fun(x)=value. fun must 
+                 (fun list (:value "(lambda(x)(* 2 x))"))) number
+    "binary searches x in the interval [xmin,xmax] , such that fun(x)=value. fun must 
 be either increasing
 or decreasing in the interval"
   (dicho-iter xmin xmax value (make-fun-object fun)))
@@ -421,8 +421,8 @@ or decreasing in the interval"
 (defun prime-facts (x)
   (let ((ip 1) (r) (n 0))
     (while (and (> x 1) 
-		(<= (* (aref *prime-numbers* ip) 
-		       (aref *prime-numbers* ip))
+                (<= (* (aref *prime-numbers* ip) 
+                       (aref *prime-numbers* ip))
                     x))
       (when (= 0 (mod x (aref *prime-numbers* ip)))
         (setq n 1)
@@ -437,13 +437,13 @@ or decreasing in the interval"
 
 
 (defunp prime-ser ((max fix (:value 1000))) 
-        list
-  "Returns the set of prime-numbers ranging from 0 upto max" 
+    list
+    "Returns the set of prime-numbers ranging from 0 upto max" 
   (coerce (gen-prime max) 'list))
 
 (defunp prime-factors ((number fix (:value 1000))) 
-        list
-  "Returns the prime decomposition of  <number> in the form (... (prime exponent) ...)
+    list
+    "Returns the prime decomposition of  <number> in the form (... (prime exponent) ...)
 Primes known to the system are the 1230 primes ranging from 1 to 9973. They are
 in the global variable *prime-numbers*. You can change This variable by typing
 \(setf *prime-numbers* (epw::gen-prime <max>))
@@ -453,7 +453,8 @@ where <max is an upper bound."
 
 
 (defunp prime? ((n fix (:value 0))) bool
-        "Tests if n is a prime number. n must be smaller than 99460729."
+    "Tests if n is a prime number. n must be smaller than 99460729."
   (and (test-prime n (coerce  *prime-numbers* 'list)) t))
 
-        
+
+;;;; THE END ;;;;

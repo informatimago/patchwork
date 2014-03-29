@@ -1228,9 +1228,6 @@ default menu item.  Otherwise the value itself is displayed as if by
 
 (defparameter *chicago-font* 0)  ;; avoid some consing below
 
-(on-load-and-now load-chicago-font
-  (setf *chicago-font* (ash (font-codes '("chicago")) -16)))
-
 
 (defun set-pop-up-item-check-mark (item mark)  
   (let ((menu (menu-item-owner item)))
@@ -1314,5 +1311,8 @@ default menu item.  Otherwise the value itself is displayed as if by
       (:right nil)
       (t (call-next-method)))))
 
+
+(defun initialize/pop-up-menu-dialog-item ()
+  (setf *chicago-font* (ash (font-codes '("chicago")) -16)))
 
 ;;;; THE END ;;;;

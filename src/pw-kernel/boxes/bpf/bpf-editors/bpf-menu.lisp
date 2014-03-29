@@ -34,80 +34,59 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(provide 'BPF-menu)
-
-;;=========================================
 (defvar *active-BPF-window* ())
 (defvar *pw-BPF-library* ())
-;;=========================================
-;; file
-
-(defvar *BPF-menu-file* (new-menu "File"))
-
-(ui:add-menu-items *BPF-menu-file*
-  (new-leafmenu "Save BPF lib..."
-     (lambda () (save-BPF-lib *pw-BPF-library*))))
-
-(ui:add-menu-items *BPF-menu-file*
-  (new-leafmenu "Load BPF lib..."
-     (lambda () (load-BPF-lib))))
-
-;;;============================
-;;Hardcopy printing
-
-(defvar *BPF-print-setUp*
-  (new-leafmenu "Page Setup…" (lambda () (win-print-setUp *active-BPF-window*))))
-
-(defvar *print-BPF-menu* 
-  (new-leafmenu "Print…" (lambda () (window-hardcopy *active-BPF-window*))))
-
-(ui:add-menu-items *BPF-menu-file* *BPF-print-setUp* *print-BPF-menu*)
+(defvar *BPF-menu-file* nil)
+(defvar *BPF-print-setUp* nil)
+(defvar *print-BPF-menu* nil)
+(defvar *BPF-menu-edit* nil)
+(defvar *BPF-menu* nil)
+(defvar *BPF-menu-root* nil)
+(defvar *apps-BPF-menu-item* nil)
 
 
-;;=========================================
-;; edit
+(defun initialize-bpf-menu ()
+  (setf *BPF-print-setUp* (new-leafmenu "Page Setup…" (lambda () (win-print-setUp *active-BPF-window*))))
+  (setf *print-BPF-menu* (new-leafmenu "Print…" (lambda () (window-hardcopy *active-BPF-window*))))
+  (setf *BPF-menu-file* (new-menu "File"
+                                  (new-leafmenu "Save BPF lib..."
+                                                (lambda () (save-BPF-lib *pw-BPF-library*)))
+                                  (new-leafmenu "Load BPF lib..."
+                                                (lambda () (load-BPF-lib)))
+                                  *BPF-print-setUp*
+                                  *print-BPF-menu*))
+  (setf *BPF-menu-edit*
+        (new-menu "Edit"
+                  (item "Cut"   #\X (cut-bpf (editor-view-object *active-BPF-window*)))
+                  (item "Copy"  #\C (copy-bpf (editor-view-object *active-BPF-window*)))
+                  (item "Paste" #\V (paste-bpf (editor-view-object *active-BPF-window*)))
+                  (item "Select All" #\A (select-all-bpf (editor-view-object *active-BPF-window*)))))
 
-(defvar *BPF-menu-edit*
-  (new-menu "Edit"
-            (item "Cut"   #\X (cut-bpf (editor-view-object *active-BPF-window*)))
-            (item "Copy"  #\C (copy-bpf (editor-view-object *active-BPF-window*)))
-            (item "Paste" #\V (paste-bpf (editor-view-object *active-BPF-window*)))
-            (item "Select All" #\A (select-all-bpf (editor-view-object *active-BPF-window*)))))
+  (setf *BPF-menu*
+        (new-menu "BPF"
+                  (item "Add BPF to lib"     nil (add-BPF-to-lib *active-BPF-window* *pw-BPF-library*))
+                  (item "Next BPF from lib"  #\N (next-from-BPF-lib *active-BPF-window* *pw-BPF-library*))
+                  (item "Prev BPF from lib"  #\P (next-from-BPF-lib *active-BPF-window* *pw-BPF-library* -1))
+                  (item "Reset BPF lib"      nil (reset-BPF-lib *pw-BPF-library*))))
+  
+  (setf *BPF-menu-root*
+        (list *pw-menu-apps*
+              *BPF-menu-file* 
+              *BPF-menu-edit*
+              (fifth (ui:menubar))
+              (sixth (ui:menubar))
+              *BPF-menu*))
 
-;;============================================
-;; BPF
+  (setf  *apps-BPF-menu-item*
+         (add-apps-item-to-apps-menu  "BPF"
+                                      (lambda () 
+                                        (if *active-BPF-window* 
+                                            (progn 
+                                              (window-select *active-BPF-window*)
+                                              (enable-all-apps-menu-items)
+                                              (menu-item-disable *apps-BPF-menu-item*))
+                                            (ui:ed-beep)))))
+  (values))
 
-(defvar *BPF-menu*
-  (new-menu "BPF"
-            (item "Add BPF to lib"     nil (add-BPF-to-lib *active-BPF-window* *pw-BPF-library*))
-            (item "Next BPF from lib"  #\N (next-from-BPF-lib *active-BPF-window* *pw-BPF-library*))
-            (item "Prev BPF from lib"  #\P (next-from-BPF-lib *active-BPF-window* *pw-BPF-library* -1))
-            (item "Reset BPF lib"      nil (reset-BPF-lib *pw-BPF-library*))))
 
-;;============================================
-;; menubar for BPF
-
-(defvar *BPF-menu-root*
-  (list 
-     *pw-menu-apps*
-     *BPF-menu-file* 
-     *BPF-menu-edit*
-     (fifth (ui:menubar))
-     (sixth (ui:menubar))
-     *BPF-menu*))
-
-;;============================================
-;; application 
-
-(defparameter *apps-BPF-menu-item* 
-  (add-apps-item-to-apps-menu  "BPF"
-                               (lambda () 
-                                   (if *active-BPF-window* 
-                                     (if (wptr *active-BPF-window*)
-                                       (progn 
-                                         (window-select *active-BPF-window*)
-                                         (enable-all-apps-menu-items)
-                                         (menu-item-disable *apps-BPF-menu-item*))
-                                       (ui:ed-beep))
-                                     (ui:ed-beep)))))
 ;;;; THE END ;;;;

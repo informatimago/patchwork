@@ -34,8 +34,6 @@
 ;;;;**************************************************************************
 (in-package :pw)
 
-(provide 'MN-note-chord-chordline)
-
 ;;=================================================================================================
 (defclass C-scale ()
    ((alteration-vector :initform nil :initarg :alteration-vector :accessor alteration-vector)

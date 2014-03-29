@@ -109,6 +109,9 @@
 (defmethod object-slots append ((window window))
   (collect-slots window (:title (ignore-errors (window-title window)))))
 
+#+#.(cl:if (cl:find-package "PW") '(:and) '(:or))
+(defmethod object-slots append ((patch pw:c-patch))
+  (collect-slots patch (:active-mode (ignore-errors (active-mode patch)))))
 
 (defvar *object-slots-processed* '())
 
@@ -169,30 +172,28 @@
     (cons view (mapcar (function subview-tree)
                        (coerce (view-subviews view) 'list)))))
 
-#||
-(mapcar (lambda (v) [(ui::handle v) lockFocusIfCanDraw])
-        (rest (ui::collect-views (first (windows)))))
+#-(and)(progn
+         (mapcar (lambda (v) [(ui::handle v) lockFocusIfCanDraw])
+                 (rest (ui::collect-views (first (windows)))))
 
-(mapcar (lambda (v) [(ui::handle v) unlockFocus])
-        (reverse (rest (ui::collect-views (first (windows))))))
+         (mapcar (lambda (v) [(ui::handle v) unlockFocus])
+                 (reverse (rest (ui::collect-views (first (windows))))))
 
-(mapcar (lambda (w) (with-handle (h w) [h hasShadow])) (windows))
-(mapcar (lambda (w) (with-handle (h w) [h isReleasedWhenClosed])) (windows :include-invisibles t))
-
-
-
-(let ((wins [[NSApplication sharedApplication] windows]))
-      (dotimes (i [wins count] (terpri))
-        (print (objcl:lisp-string [[wins objectAtIndex:i]title]))))
+         (mapcar (lambda (w) (with-handle (h w) [h hasShadow])) (windows))
+         (mapcar (lambda (w) (with-handle (h w) [h isReleasedWhenClosed])) (windows :include-invisibles t))
 
 
 
-(mapcar (lambda (nsw) (objcl:lisp-string [nsw title])) (nswindow-list))
-("Test Window" "Test Window" "Test Window" "Test Window" "MN1" "start-swank.lisp" "Listener")
-(dolist (w (subseq (nswindow-list) 0 4))
-  [w close])
+         (let ((wins [[NSApplication sharedApplication] windows]))
+           (dotimes (i [wins count] (terpri))
+             (print (objcl:lisp-string [[wins objectAtIndex:i]title]))))
 
-||#
+
+
+         (mapcar (lambda (nsw) (objcl:lisp-string [nsw title])) (nswindow-list))
+         ("Test Window" "Test Window" "Test Window" "Test Window" "MN1" "start-swank.lisp" "Listener")
+         (dolist (w (subseq (nswindow-list) 0 4))
+           [w close]))
 
 (defun nswindow-subviews (nswindow)
   (let ((views [[nswindow contentView] subviews])

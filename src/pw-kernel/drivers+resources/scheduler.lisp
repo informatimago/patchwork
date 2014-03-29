@@ -608,8 +608,7 @@ time with the :STEP mode.")
   (setf *nbmax-ticks-per-event*
         (max 0 (ceiling (* internal-time-units-per-second ms) 1000))))
 
-(eval-when (eval load)
-  (set-tasks-duration 100))
+
 
 #|
 ;; Safe version (could be replaced by the fast one, if it's safe enough!)
@@ -710,23 +709,24 @@ time with the :STEP mode.")
    nil))
 
 ;; Initializes the scheduler (called only once).
-
 (defun init-scheduler ()
+  (set-tasks-duration 100)
   (setf *default-task* (make-task 0 0 5 1 #'no-op nil))
   (reset-scheduler)
   (set-scheduler-state *scheduler-initial-state*)
   (setf *eventhook* #'check-scheduler))
 
-(proclaim '(optimize (speed 1) (safety 1) (space 1)))
 
 (on-quit quit/scheduler (setq *eventhook* nil))
 (on-load-and-now init/scheduler (init-scheduler))
-(init-scheduler)
+
 
 #||
-(defun bar (n) (repeat n (print 'bar)))
-(start
- (setq s2 (dfuncall 100 'bar 100))
- (with-more-priority
-   (setq s1 (dfuncall 60 'princ 'foo))))
+    (defun bar (n) (repeat n (print 'bar)))
+    (start
+     (setq s2 (dfuncall 100 'bar 100))
+     (with-more-priority
+       (setq s1 (dfuncall 60 'princ 'foo))))
 ||#
+
+;;;; THE END ;;;;

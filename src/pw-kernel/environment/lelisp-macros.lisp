@@ -60,19 +60,17 @@
 ;;	(load-once "CLPF:LELISP-MACROS"))
 ;; It is not needed to import the macros since they are exported to common lisp
 ;;	(use-package "LELISP-MACROS") ;is not needed
-
 ;; =============================================================================-======
 
-#-:ccl
-(progn
-  ; From "MACL1.3.2:PCL:macros.lisp"
-  (defun memq (item list) (member item list :test #'eq))
-  (defun assq (item list) (assoc  item list :test #'eq))
-  (defun delq (item list) (delete item list :test #'eq))
-  (defun neq (x y) (not (eq x y)))
-  (declaim (inline memq assq delq neq))
-  (defmacro true  (&body body) `(progn ,@body t))
-  (defmacro false (&body body) `(progn ,@body nil)))
+#-ccl (progn
+        ;; From "MACL1.3.2:PCL:macros.lisp"
+        (defun memq (item list) (member item list :test #'eq))
+        (defun assq (item list) (assoc  item list :test #'eq))
+        (defun delq (item list) (delete item list :test #'eq))
+        (defun neq (x y) (not (eq x y)))
+        (declaim (inline memq assq delq neq))
+        (defmacro true  (&body body) `(progn ,@body t))
+        (defmacro false (&body body) `(progn ,@body nil)))
 
 (defun rassq (item list) (rassoc item list :test #'eq))
 (defun cassq (item list) (cdr (assq item list)))
@@ -81,7 +79,7 @@
 
 ;; [jack] 910821 ui::while is more efficient than Lee's with loop
 
-#-:ccl
+#-ccl
 (defmacro while (condition &body body)
   (let ((begin (gensym "WHILE-")) (end (gensym "WHILE-")))
     `(tagbody
@@ -92,7 +90,7 @@
        ,end
        nil)))
 
-#-:ccl
+#-ccl
 (defmacro until (condition &body body)
   `(while (not ,condition) ,@body))
 

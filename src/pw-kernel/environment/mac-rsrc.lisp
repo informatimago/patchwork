@@ -35,28 +35,6 @@
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
-
-(defun load-lisp-res ()
-  (niy load-lisp-res)
-  ;; (ui:with-pstrs ((name (mac-namestring "CL:PW-inits;Drivers+Resources;CLPF.rsrc")))
-  ;;   (when (= -1 (#_OpenResFile :ptr name :word))
-  ;;     (error "Cannot open resource file!")))
-  )
-
-;;BOX-CURSOR
-(defvar *not-box-cursor* t)
-(defvar *box-cursor* nil)
-
-(defun get-box-cursor ()
-  (niy get-box-cursor)
-  ;; (ui::with-pstrs ((name "box-cursor"))
-  ;; (setf *box-cursor* (#_getnamedresource :|CURS| name)))
-  )
-
-(load-lisp-res)
-
-;;(new-restore-lisp-function 'load-lisp-res)
-
 ;;=================================================================================================
 
 (defun nth? (elem lst)
@@ -103,9 +81,7 @@
                  #*0000000000000000
                  #*0000000000000000)))
 
-
-
-(defvar *grow-cursor* (make-grow-cursor))
+(defvar *grow-cursor* nil)
 
 ;;the cross-hair-cursor
 (defun make-cross-hair-cursor ()
@@ -144,11 +120,24 @@
                  #*0000000000000000
                  #*0000000000000000)))
 
-(defvar *cross-hair-cursor* (make-cross-hair-cursor))
+(defvar *cross-hair-cursor* nil)
+
+
+;;BOX-CURSOR
+(defvar *not-box-cursor* t)
+(defvar *box-cursor* nil)
+
+(defun get-box-cursor ()
+  (niy get-box-cursor)
+  ;; (ui::with-pstrs ((name "box-cursor"))
+  ;; (setf *box-cursor* (#_getnamedresource :|CURS| name)))
+  )
+
 
 (defun init-cursors ()
   (setq *grow-cursor* (make-grow-cursor))
-  (setq *cross-hair-cursor* (make-cross-hair-cursor)))
+  (setq *cross-hair-cursor* (make-cross-hair-cursor))
+  (get-box-cursor))
 
 ;;======================================
 (defun hex-to-bitarray (hexes)
@@ -160,3 +149,5 @@
                      do (setf (aref v j) (if (logbitp (- 15 j) b) 1 0)))
             collect v) 'vector))
 
+
+;;;; THE END ;;;;

@@ -371,8 +371,8 @@ A previous function called ~D will be redefined" file-name file-name)
            (list 'dotimes (list ',var-times ,times (list 'nreverse ',var-list))
                  (list 'push ,code ',var-list)))))
 
-#|
-(setq foo (subviews *active-patch-window*))
-(code (car (last foo)))
-(ask-all foo 'abstract (car foo))
-|#
+;; (setq foo (subviews *active-patch-window*))
+;; (code (car (last foo)))
+;; (ask-all foo 'abstract (car foo))
+
+;;;; THE END ;;;;

@@ -235,13 +235,15 @@ NOTE:           UNWRAPPING returns the handle or compute a new NS
   (mapcar (lambda (wrapper)
               (format *trace-output* "~&clearing a ~A~%" (class-name (class-of wrapper)))
             (setf (handle wrapper) nil))
-          (weak-list-list *wrapper-instances*)))
+          (weak-list-list *wrapper-instances*))
+  (force-output *trace-output*))
 
 #|on-restore|#
- (on-application-did-finish-launching reset-handles
+(on-application-did-finish-launching reset-handles
   (dolist (wrapper (weak-list-list *wrapper-instances*))
     (format *trace-output* "~&unwrapping a ~A~%" (class-name (class-of wrapper)))
-    (unwrap wrapper)))
+    (unwrap wrapper))
+  (force-output *trace-output*))
 
 
 #+ccl (defmethod ccl:terminate ((self wrapper))
@@ -338,11 +340,21 @@ RETURN:         NEW-HANDLE.
   self)
 
 (defmethod update-handle ((wrapper anonymous-wrapper))
-  (setf (handle wrapper) (funcall (anonymous-wrapper-thunk wrapper))))
+  (let ((thunk (anonymous-wrapper-thunk wrapper)))
+    (if (or (functionp thunk)
+            (and (symbolp thunk)
+                 (fboundp thunk)))
+        (setf (handle wrapper) (funcall thunk))   
+        (warn "Unwrapping an invalid anonymous wrapper ~S" wrapper))))
 
 (defmethod unwrap ((wrapper anonymous-wrapper))
   (unwrapping wrapper
-    (funcall (anonymous-wrapper-thunk wrapper))))
+    (let ((thunk (anonymous-wrapper-thunk wrapper)))
+      (if (or (functionp thunk)
+              (and (symbolp thunk)
+                   (fboundp thunk)))
+       (funcall thunk)   
+       (warn "Unwrapping an invalid anonymous wrapper ~S" wrapper)))))
 
 (defmacro awrap (&body body)
   (let ((thunk (gensym)))

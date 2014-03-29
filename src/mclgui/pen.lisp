@@ -42,7 +42,7 @@ RETURN:         The pen-state of the WINDOW of the VIEW.
 ")
   (:method ((view simple-view))
     ;; there's a method specialized on window.
-    (view-pen (view-window view))))
+    (and (view-window view) (view-pen (view-window view)))))
 
 
 (defgeneric pen-show (view)

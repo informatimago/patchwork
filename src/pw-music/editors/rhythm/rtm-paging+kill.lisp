@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
 ;;========================================================
@@ -112,17 +110,17 @@
                   (lambda () 
                       (play-measure-line+scroll (measure-line (car editors)) (view-window self) (get-play-speed self) 0 (calc-next-rtm-page (view-window self)))
                       (tell (ask-all (cdr editors) 'measure-line) 'play-measure-line (get-play-speed self)))))))
-#|
-(defun play-rtms+scroll (self)
-  (let ((editors (give-selected-editors self)))
-    (calc-next-rtm-page+scroll (view-window self) 1)
-    (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
-    (start 
-      (apdfuncall 100 (priority) 15
-                  (lambda () 
-                      (play-measure-line+scroll (measure-line (car editors)) (view-window self) (get-play-speed self) 0 (calc-next-rtm-page (view-window self)))
-                      (tell (ask-all (cdr editors) 'measure-line) 'play-measure-line (get-play-speed self)))))))
-|#
+
+;; (defun play-rtms+scroll (self)
+;;   (let ((editors (give-selected-editors self)))
+;;     (calc-next-rtm-page+scroll (view-window self) 1)
+;;     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
+;;     (start 
+;;       (apdfuncall 100 (priority) 15
+;;                   (lambda () 
+;;                       (play-measure-line+scroll (measure-line (car editors)) (view-window self) (get-play-speed self) 0 (calc-next-rtm-page (view-window self)))
+;;                       (tell (ask-all (cdr editors) 'measure-line) 'play-measure-line (get-play-speed self)))))))
+
  
 (defgeneric play-measure-line+scroll (self win t-scfactor beat-number next-page-beat-num)
   (:method ((self C-measure-line) win t-scfactor beat-number next-page-beat-num)
@@ -142,38 +140,36 @@
                     'play-measure-line-continue+scroll self win measures t-scfactor beat-number next-page-beat-num))))))
 
 
-#|
 ;;(ui:add-menu-items *RTM-menu* (new-leafmenu "Play-rtms+scroll" (lambda () (play-rtms+scroll (editor-collection-object *active-rtm-window*))))) 
 ;;; only polif
-(defun calc-next-rtm-page (self)  
-  (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
-         (all-measures (measures (measure-line (car (beat-editors (editor-collection-object self))))))
-         (measures (nthcdr beat-number all-measures))
-         (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
-         (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self)))))
-         (beat-number-temp (1+ beat-number)))
-    (incf beat-number)
-    (while (and measures (< new-beg-x end-x))
-      (setq new-beg-x (+ *rtm-editor-measure-x-offset* (calc-measure-pixel-x (car measures) beat-zoom new-beg-x)))
-      (when (< new-beg-x end-x) (incf beat-number))
-      (pop measures))
-    (if (> beat-number (length all-measures))
-         beat-number-temp beat-number)))             
+;; (defun calc-next-rtm-page (self)  
+;;   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
+;;          (all-measures (measures (measure-line (car (beat-editors (editor-collection-object self))))))
+;;          (measures (nthcdr beat-number all-measures))
+;;          (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
+;;          (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self)))))
+;;          (beat-number-temp (1+ beat-number)))
+;;     (incf beat-number)
+;;     (while (and measures (< new-beg-x end-x))
+;;       (setq new-beg-x (+ *rtm-editor-measure-x-offset* (calc-measure-pixel-x (car measures) beat-zoom new-beg-x)))
+;;       (when (< new-beg-x end-x) (incf beat-number))
+;;       (pop measures))
+;;     (if (> beat-number (length all-measures))
+;;          beat-number-temp beat-number)))             
+;; 
+;; 
+;; (defun calc-prev-rtm-page (self)  
+;;   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
+;;          (measures (reverse (subseq  (measures (measure-line (car (beat-editors (editor-collection-object self))))) 0 beat-number)))
+;;          (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
+;;          (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self))))))
+;;     (incf beat-number)
+;;     (while (and measures (< new-beg-x end-x))
+;;       (setq new-beg-x (+ *rtm-editor-measure-x-offset* (calc-measure-pixel-x (car measures) beat-zoom new-beg-x)))
+;;       (when (< new-beg-x end-x) (decf beat-number))
+;;       (pop measures))
+;;     (max 1 beat-number)))
 
-
-(defun calc-prev-rtm-page (self)  
-  (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
-         (measures (reverse (subseq  (measures (measure-line (car (beat-editors (editor-collection-object self))))) 0 beat-number)))
-         (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
-         (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self))))))
-    (incf beat-number)
-    (while (and measures (< new-beg-x end-x))
-      (setq new-beg-x (+ *rtm-editor-measure-x-offset* (calc-measure-pixel-x (car measures) beat-zoom new-beg-x)))
-      (when (< new-beg-x end-x) (decf beat-number))
-      (pop measures))
-    (max 1 beat-number)))
-
-|#
 
 ;;;KILL
 (defmethod remove-yourself-control ((self C-patch-PolifRTM)) 

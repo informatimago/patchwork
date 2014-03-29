@@ -78,29 +78,23 @@
 
 (defmethod view-click-event-handler ((self C-pw-window) where)
   (set-changes-to-file-flag self)
-  (when (eq  (call-next-method) self)  ; click inside window
-    (if *current-small-inBox* (kill-text-item) )          ;;(see pw-controls)
-    (unless (shift-key-p)(tell (controls self) #'deactivate-control))
-    (niy view-click-event-handler self where)
-    ;; (rlet ((user-rect :rect)
-    ;;        (scratch-rect :rect)
-    ;;        (i-rect :rect))
-    ;;       (#_pt2rect :long where
-    ;;                  :long (grow-gray-rect where 0 (wptr self) nil)
-    ;;                  :ptr user-rect)
-    ;;       (let (lista)
-    ;;         (dolist (item (controls self))
-    ;;           (setq where (view-position item))
-    ;;           (rset i-rect :rect.topleft where)
-    ;;           (rset i-rect :rect.bottomright (add-points where (view-size item)))
-    ;;           (#_SectRect :ptr user-rect :ptr i-rect :ptr scratch-rect)
-    ;;           (unless (#_EmptyRect :ptr scratch-rect :boolean)
-    ;;             (progn
-    ;;               (activate-control item)
-    ;;               (push (mkSO :|cbox| nil :|name| (pw-function-string item)) lista))))
-    ;;         (when lista
-    ;;           (record-select-list lista))))
-    ))
+  (when (eql (call-next-method) self)  ; click inside window
+    (when *current-small-inBox*
+      (kill-text-item))                ; (see pw-controls)
+    (unless (shift-key-p)
+      (tell (controls self) #'deactivate-control))
+    (let ((user-rect    (pt2rect where  (grow-gray-rect where 0 self nil)))
+          (scratch-rect (make-rect 0 0))
+          (lista        '()))
+      (dolist (item (controls self))
+        (setq where (view-position item))
+        (let ((i-rect (make-rect where (add-points where (view-size item)))))
+          (intersect-rect user-rect i-rect scratch-rect)
+          (unless (empty-rect-p scratch-rect)
+            (activate-control item)
+            (push (mkSO :|cbox| nil :|name| (pw-function-string item)) lista)))
+        (when lista
+          (record-select-list lista))))))
 
 ;;=================
 (defgeneric controls (self))
@@ -289,24 +283,22 @@
   (when (wins-menu-item self)
     (menu-item-disable (wins-menu-item self)))) 
 
-#||
-(defmethod view-activate-event-handler :after ((self C-pw-window))
-(when (abstract-box self)
-(draw-appl-label (abstract-box self) #\*))
-(ui:set-menubar *patch-work-menu-root*)
-(enable-all-apps-menu-items)
-(menu-item-disable *apps-PW-menu-item*)
-(update-PW-file-menu-items
-(top-level-patch-win? self) (save-changes-to-file-flag self))
-(update-wins-menu-items self)
-(setq *active-patch-window* self))
-||#
+;; (defmethod view-activate-event-handler :after ((self C-pw-window))
+;;   (when (abstract-box self)
+;;     (draw-appl-label (abstract-box self) #\*))
+;;   (ui:set-menubar *patchwork-menubar*)
+;;   (enable-all-apps-menu-items)
+;;   (menu-item-disable *apps-PW-menu-item*)
+;;   (update-PW-file-menu-items
+;;    (top-level-patch-win? self) (save-changes-to-file-flag self))
+;;   (update-wins-menu-items self)
+;;   (setq *active-patch-window* self))
 
 (defmethod view-activate-event-handler :after ((self C-pw-window))
   (when (abstract-box self)
     (draw-appl-label (abstract-box self) #\*))
-  (unless (equal (ui:menubar)  *patch-work-menu-root*)
-    (ui:set-menubar *patch-work-menu-root*)
+  (unless (equal (ui:menubar) *patchwork-menubar*)
+    (ui:set-menubar *patchwork-menubar*)
     (enable-all-apps-menu-items))
   (menu-item-disable *apps-PW-menu-item*)
   (update-PW-file-menu-items (top-level-patch-win? self)
@@ -317,20 +309,20 @@
   (setq *active-patch-window* self))
 
 (defmethod view-activate-event-handler :after ((self ui::fred-window))
-  (unless (equal (ui:menubar)  *default-CCL-menubar*)
-    (ui:set-menubar *default-CCL-menubar*)
+  (unless (equal (ui:menubar)  *lisp-menubar*)
+    (ui:set-menubar *lisp-menubar*)
     ;;added 920818 [Camilo]
-    (mapc #'menu-enable (cdr *default-CCL-menubar*))
+    (mapc #'menu-enable (cdr *lisp-menubar*))
     (menu-item-disable *apps-lisp-menu-item*)))
 
-#|(defmethod view-deactivate-event-handler :after ((self C-pw-window))
-(when (abstract-box self)
-(draw-appl-label (abstract-box self) #\A))
-(when (eq *active-patch-window* self) ; no PW window selected
-(menu-item-enable *apps-PW-menu-item*)
-(enable-Lisp-apps-menu-item?))
-(when (wins-menu-item self)
-(MENU-item-ENABLE (wins-menu-item self))))|#
+;; (defmethod view-deactivate-event-handler :after ((self C-pw-window))
+;;   (when (abstract-box self)
+;;     (draw-appl-label (abstract-box self) #\A))
+;;   (when (eq *active-patch-window* self) ; no PW window selected
+;;     (menu-item-enable *apps-PW-menu-item*)
+;;     (enable-Lisp-apps-menu-item))
+;;   (when (wins-menu-item self)
+;;     (MENU-item-ENABLE (wins-menu-item self))))
 
 (defmethod view-deactivate-event-handler :after ((self C-pw-window))
   (when (abstract-box self)

@@ -213,7 +213,7 @@ Handles correctly micro-intervals on different channels, so playing from PatchWo
 from your favorite sequencer is the same.
 
 Input may be any PatchWork object that could be played through play-object
-(chord, chord-line, measure-line (rtm) , or a list of such)"
+\(chord, chord-line, measure-line (rtm) , or a list of such)"
   (declare (ignore objs)))
 
 
@@ -432,11 +432,15 @@ Output is a chord-line object.
   (declare (ignore delta)))
 
 
+(defun initialize-midi-menu ()
+  (PW-addmenu-fun *pw-Midi-menu* 'midi-record 'C-patch-record)
+  (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+  (PW-addmenu-fun *pw-Midi-menu* 'midi-load 'C-patch-load-midi)
+  (PW-addmenu-fun *pw-Midi-menu* 'midi-save 'C-patch-save-midi))
 
-(PW-addmenu-fun *pw-Midi-menu* 'midi-record 'C-patch-record)
-(ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
-(PW-addmenu-fun *pw-Midi-menu* 'midi-load 'C-patch-load-midi)
-(PW-addmenu-fun *pw-Midi-menu* 'midi-save 'C-patch-save-midi)
+
+;;;; THE END ;;;;
+
 
 
 

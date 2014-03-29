@@ -166,7 +166,7 @@ are doing when changing object slot's values"
 
 (defunp get-slot ((object object (:value "()")) (slot (list (:value "slot" :type-list ())))) nil
  "An object slot inspection. The first input must be an object-instance 
-(such as chord objects or breakpoint functions), or a list of object-instances. 
+\(such as chord objects or breakpoint functions), or a list of object-instances. 
 The second input is a slot-name. Returns the corresponding value(s) of the 
 chosen slot.
 Evaluating the get-slot module with the string 'slot in the <slot> input, the 

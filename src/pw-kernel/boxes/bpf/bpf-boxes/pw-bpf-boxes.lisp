@@ -435,10 +435,10 @@ request at input."
 "Breakpoint functions can be stored in a library.  
 There is only one current  library, structured as 
 a circular list. The menu item add to lib 
-(in the bpf  menu, when the window of multiple-bpf  module is open)  
+\(in the bpf  menu, when the window of multiple-bpf  module is open)  
 adds the current BPF to the library and reset lib resets the library to one item: a ramp. 
 The menu items next BPF from lib   and prev BPF from lib   allow browsing in the library.
 "
   (declare (ignore bpflib)))
 
-(provide 'PW-BPF-library)
+;;;; THE END ;;;;

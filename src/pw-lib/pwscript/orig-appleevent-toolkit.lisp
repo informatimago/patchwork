@@ -607,5 +607,4 @@ Return value: the-desc
 
 |#
 
-(provide :appleevent-toolkit)
 ;;;; THE END ;;;;

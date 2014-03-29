@@ -49,7 +49,7 @@
 
 
 (defunp make-num-fun ((fexpr list (:value "(f(x)= x + 1)"))) nil
-        "Creates a lisp function object from the \"functional\" expr <fexpr> which is
+    "Creates a lisp function object from the \"functional\" expr <fexpr> which is
 basically an infixed expression (see prefix-expr and prefix-help).
 When <fexpr> begins with something like (f(x)= ...), the formal arguments are 
 taken from the given list, otherwise they are deduced from the body of <fexpr> 
@@ -62,19 +62,19 @@ between this notation and standard C notation is that spaces  must be put
 between operators. The variable name definition at the beginning of the 
 function (f(x)= ...) is optional. If it is not included by the user, the program 
 figures out which variables are involved."
-        ;; fexpr == <expr> || (<fun> <args> = . <expr>)
-        (multiple-value-bind (lambda name) (make-num-lambda fexpr)
-          (cond
-            (*compile-num-lambda*
-             (compile name lambda))
-            (name
-             (eval `(defun ,name ,@(rest lambda))))
-            (t
-             (coerce lambda 'function)))))
+  ;; fexpr == <expr> || (<fun> <args> = . <expr>)
+  (multiple-value-bind (lambda name) (make-num-lambda fexpr)
+    (cond
+      (*compile-num-lambda*
+       (compile name lambda))
+      (name
+       (eval `(defun ,name ,@(rest lambda))))
+      (t
+       (coerce lambda 'function)))))
 
 
 (defunp lagrange ((l-x-y list)) ()
-  "Returns a Lagrange polynomial defined by the points of list <l-x-y>."
+    "Returns a Lagrange polynomial defined by the points of list <l-x-y>."
   (let ((length (length l-x-y)) index cp)
     (unless (evenp length)
       (error "You must give as many ys as xs in ~S." l-x-y))
@@ -98,20 +98,20 @@ figures out which variables are involved."
       ;;(compile ()
       (eval `(function
               (lambda (x)
-                (let* ((length ,length) (vx ',vx) (Aitken ',Aitken) (z (aref Aitken length)))
-                  (for (i (1- length) -1 0)
-                    (setq z (+ (aref Aitken i) (* z (- x (aref vx i))))))
-                  z)))))))
+               (let* ((length ,length) (vx ',vx) (Aitken ',Aitken) (z (aref Aitken length)))
+                 (for (i (1- length) -1 0)
+                   (setq z (+ (aref Aitken i) (* z (- x (aref vx i))))))
+                 z)))))))
 
 (defunp lagrange-fun ((l-x-y list)) ()
-  "Retourne un polynome de Lagrange défini par les points de liste <l-x-y>."
+    "Retourne un polynome de Lagrange défini par les points de liste <l-x-y>."
   (lagrange l-x-y))
- 
+
 (defunp linear ((x0 float) (y0 float)
                 (x1 float (:value 1)) (y1 float (:value 1))
                 (sym list (:value "fline")) ) ()
-        "calcule les paramètres de l'équation  y=ax+b en fct de deux points 
-(x0,y0) (x1,y1)."
+    "calcule les paramètres de l'équation  y=ax+b en fct de deux points 
+\(x0,y0) (x1,y1)."
   (let* ((a (/ (- y1 y0) (- x1 x0)))
          (b (- y1 (* x1 a))))
     (if (not (eq sym ())) (format t "y = ~S x + ~S ~%" (lldecimals a 6) (lldecimals b 6) ))
@@ -119,35 +119,35 @@ figures out which variables are involved."
          ;;(compile ()
          (eval `(function
                  (lambda (x) (+ ,b (* x ,a)))) ))                      
-         ))
+    ))
 
 (defvar *weird-symb* nil)
 
 (defunp linear-fun ((x0 float) (y0 float)
                     (x1 float (:value 1)) (y1 float (:value 1))
                     &optional (print menu (:menu-box-list (("yes" . 1) ("no". 2))
-                                                          :type-list (no-connection)))
+                                           :type-list (no-connection)))
                     ) ()
-"Calculate the parameters of the equation y = a x + b as a function 
+    "Calculate the parameters of the equation y = a x + b as a function 
 of the two points (x0,y0) (x1,y1). The optional parameter print  
 lets one print the function. "
- (linear x0 y0 x1 y1 (if (= print 1) '*weird-symb* nil)))
+  (linear x0 y0 x1 y1 (if (= print 1) '*weird-symb* nil)))
 
 (defunp power/2 ((x0 float (:value 1)) (y0 float (:value 1))
                  (x1 float (:value 2)) (y1 float (:value 4))
                  (sym list (:value "fpuiss2")) ) ()
-"calcule les paramètres de l'équation  y=ax^b en fct de deux points 
-(x0,y0) (x1,y1)."
-(if (zerop (* x1 x0 y0 y1))
-  (progn (print "values of x and y must be different from zero") (pw::ed-beep))
-  (let* ((b (/ (log (/ y1 y0)) (log (/ x1 x0))))
-         (a (/ y1 (expt x1 b))))
-    (if (not (eq sym ())) (format t "y = ~S x ** ~S ~%" (lldecimals a 10) (lldecimals b 10) ))
-    (set  (if (null sym) 'fpuiss2 sym) 
-        ;;(compile ()
-          (eval `(function
-                  (lambda (x) (* ,a (expt x ,b)))) ))                      
-    )))
+    "calcule les paramètres de l'équation  y=ax^b en fct de deux points 
+\(x0,y0) (x1,y1)."
+  (if (zerop (* x1 x0 y0 y1))
+      (progn (print "values of x and y must be different from zero") (pw::ed-beep))
+      (let* ((b (/ (log (/ y1 y0)) (log (/ x1 x0))))
+             (a (/ y1 (expt x1 b))))
+        (if (not (eq sym ())) (format t "y = ~S x ** ~S ~%" (lldecimals a 10) (lldecimals b 10) ))
+        (set  (if (null sym) 'fpuiss2 sym) 
+              ;;(compile ()
+              (eval `(function
+                      (lambda (x) (* ,a (expt x ,b)))) ))                      
+        )))
 
 ;;Taken from (c) Copyright Gerald Roylance 1982
 (defun false-position-search (fcn s1 s2 eps)
@@ -161,17 +161,17 @@ lets one print the function. "
     (setq yn (funcall fcn xn))
     (cond ((< (abs yn) eps) (return xn)))
     (cond ((> (abs y1) (abs y2))
-	   (setq x1 xn) (setq y1 yn))
-	  (t
-	   (setq x2 xn) (setq y2 yn)))))
+           (setq x1 xn) (setq y1 yn))
+          (t
+           (setq x2 xn) (setq y2 yn)))))
 
 (pw::defunp power/3 ((x0 float) (y0 float)
                      (x1 float (:value 2)) (y1 float (:value 4))
                      (x2 float (:value 3)) (y2 float (:value 9))
                      (bmin float)(bmax float (:value 19))  ;;to be eliminated!!!!
                      (sym list (:value "fpuiss3")) ) ()
-            "calcule les paramètres de l'équation  y=ax^b+c en fct de trois points 
-(x0,y0) (x1,y1) (x2,y2) et crée la fonction correspondante .
+    "calcule les paramètres de l'équation  y=ax^b+c en fct de trois points 
+\(x0,y0) (x1,y1) (x2,y2) et crée la fonction correspondante .
 La fct doit être continûment croissante ou décroissante.
 bmin et bmax fixent les limites de la recherche du paramètre b par la 
 méthode dichotomique. Prendre un intervalle négatif pour une fct décroissante, 
@@ -182,19 +182,19 @@ Si sym = nil, la fct n'est pas affichée dans le listener"
   (setq x0 (float x0) x1 (float x1) x2 (float x2)
         y0 (float y0) y1 (float y1) y2 (float y2))
   (let* (a b c  (y/y #i((y2 - y1)/(y1 - y0))) res power
-           (growing (or (and (> x2 x1) (> y2 y1)) (and (< x2 x1) (< y2 y1))))
-           (bmin-min (if growing 1.0 -19))  ;0.1))
-           (incr (if growing 1 1))  ;0.1))
-           (bmax (if growing 19 -1))) ;;1.0)))
+          (growing (or (and (> x2 x1) (> y2 y1)) (and (< x2 x1) (< y2 y1))))
+          (bmin-min (if growing 1.0 -19))  ;0.1))
+          (incr (if growing 1 1))  ;0.1))
+          (bmax (if growing 19 -1))) ;;1.0)))
     (setq b
           (do ((bmin bmin-min (+ bmin incr))) 
               ((>= bmin bmax) (and res (apply 'max res)))
             (setq power
-             (false-position-search  
-              (lambda (b) #i(y/y * (x1 ** b - x0 ** b) - (x2 ** b - x1 ** b)))
-              bmin bmax 0.001))
-             (if power (push power res))))
-   (unless b 
+                  (false-position-search  
+                   (lambda (b) #i(y/y * (x1 ** b - x0 ** b) - (x2 ** b - x1 ** b)))
+                   bmin bmax 0.001))
+            (if power (push power res))))
+    (unless b 
       (pw::ed-beep) 
       (error "sorry... couldn't find an interpolation with this values")) 
     (setq a #i((y1 - y0)/(x1 ** b - x0 ** b)))
@@ -214,98 +214,91 @@ Si sym = nil, la fct n'est pas affichée dans le listener"
                    (x2 list (:value '() :type-list (float fixnum)))
                    (y2 float (:value 9))
                    (print menu (:menu-box-list (("yes" . 1) ("no". 2))
-                                                          :type-list (no-connection)))) ()
-        "Calculate the parameters of the equation y = a xb + c  or y = a xb   
+                                :type-list (no-connection)))) ()
+    "Calculate the parameters of the equation y = a xb + c  or y = a xb   
 as a function of the points (x0,y0)  (x1,y1) and (optional) (x2,y2) 
 and create the corresponding function, either y = axb 
-(for two pairs of points) or  y = a xb + c   (for three pairs of points).  "
- (if x2 
-   (power/3 x0 y0 x1 y1 x2 y2 () () (if (= print 1) '*weird-symb* nil))   ;;;note bmin bmax arguments are to be eliminated
-   (power/2 x0 y0 x1 y1 (if (= print 1) '*weird-symb* nil))))
+\(for two pairs of points) or  y = a xb + c   (for three pairs of points).  "
+  (if x2 
+      (power/3 x0 y0 x1 y1 x2 y2 () () (if (= print 1) '*weird-symb* nil))   ;;;note bmin bmax arguments are to be eliminated
+      (power/2 x0 y0 x1 y1 (if (= print 1) '*weird-symb* nil))))
 
-#|
-(defunp power-fun ((x0 float (:value 1)) (y0 float (:value 1))
-                   (x1 float (:value 2)) (y1 float (:value 4))
-                   &optional
-                   (x2 list (:value '() :type-list (float fixnum)))
-                   (y2 float (:value 9))) ()
-        "Calculate the parameters of the equation y = a xb + c  or y = a xb   
-as a function of the points (x0,y0)  (x1,y1) and (optional) (x2,y2) 
-and create the corresponding function, either y = axb 
-(for two pairs of points) or  y = a xb + c   (for three pairs of points).  "
- (if x2 
-   (power/3 x0 y0 x1 y1 x2 y2 () () '*weird-symb*)   ;;;note bmin bmax arguments are to be eliminated
-   (power/2 x0 y0 x1 y1 '*weird-symb*)))
-|#
+;; (defunp power-fun ((x0 float (:value 1)) (y0 float (:value 1))
+;;                    (x1 float (:value 2)) (y1 float (:value 4))
+;;                    &optional
+;;                    (x2 list (:value '() :type-list (float fixnum)))
+;;                    (y2 float (:value 9))) ()
+;;     "Calculate the parameters of the equation y = a xb + c  or y = a xb   
+;; as a function of the points (x0,y0)  (x1,y1) and (optional) (x2,y2) 
+;; and create the corresponding function, either y = axb 
+;; (for two pairs of points) or  y = a xb + c   (for three pairs of points).  "
+;;   (if x2 
+;;       (power/3 x0 y0 x1 y1 x2 y2 () () '*weird-symb*)   ;;;note bmin bmax arguments are to be eliminated
+;;       (power/2 x0 y0 x1 y1 '*weird-symb*)))
 
 ;;changed by aaa 28-08-95 from pw-modif
 (defunp parabole/2 ((x0 float) (y0 float)
                     (x1 float (:value 2)) (y1 float (:value 12))
                     (sym list (:value "fparab2")) ) ()
-"calcule les paramètres de l'équation  y = ax^2 + b  en fct de deux points 
-(x0,y0) (x1,y1)"
+    "calcule les paramètres de l'équation  y = ax^2 + b  en fct de deux points 
+\(x0,y0) (x1,y1)"
   
   (let* ((a #i((y1 - y0) / (x1 * x1 - x0 * x0)))
-    (b #i(y0 - a * x0 * x0)))
+         (b #i(y0 - a * x0 * x0)))
     (if (not (eq sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
     (set (if (null sym) 'fparab2 sym) 
-        ;;(compile ()
-          (eval `(function
-             (lambda (x) (+  (* ,a x x ) ,b )))))                      
+         ;;(compile ()
+         (eval `(function
+                 (lambda (x) (+  (* ,a x x ) ,b )))))                      
     ))
 
-#|
-(defunp parabole/2 ((x0 float) (y0 float)
-                    (x1 float (:value 2)) (y1 float (:value 12))
-                    (sym list (:value "fparab2")) ) ()
-"calcule les paramètres de l'équation  y = ax^2 + b  en fct de deux points 
-(x0,y0) (x1,y1)"
-  
-  (let* ((a #i((y1 - y0) / (x1 * x1 - x0 * x0)))
-    (b #i(y0 - a * x0 * x0)))
-    (if (not (eq sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
-    (set (if (null sym) 'fparab2 sym) 
-        (compile ()
-             `(lambda (x) (+  (* ,a x x ) ,b ))))                      
-    ))
-|#
+;; (defunp parabole/2 ((x0 float) (y0 float)
+;;                     (x1 float (:value 2)) (y1 float (:value 12))
+;;                     (sym list (:value "fparab2")) ) ()
+;;     "calcule les paramètres de l'équation  y = ax^2 + b  en fct de deux points 
+;; (x0,y0) (x1,y1)"
+;; 
+;;   (let* ((a #i((y1 - y0) / (x1 * x1 - x0 * x0)))
+;;          (b #i(y0 - a * x0 * x0)))
+;;     (if (not (eq sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
+;;     (set (if (null sym) 'fparab2 sym) 
+;;          (compile ()
+;;                   `(lambda (x) (+  (* ,a x x ) ,b ))))))
 
 ;;changed by aaa 28-08-95 from pw-modif
 (defunp parabole/3 ((x0 float) (y0 float)
                     (x1 float (:value 2)) (y1 float (:value 15))
                     (x2 float (:value 1)) (y2 float (:value 7))
                     (sym list (:value "fparab3")) ) ()
-"calcule les paramètres de l'équation  y = ax^2 + bx + c en fct de trois points 
-(x0,y0) (x1,y1) (x2,y2) ."
+    "calcule les paramètres de l'équation  y = ax^2 + bx + c en fct de trois points 
+\(x0,y0) (x1,y1) (x2,y2) ."
   
   (let* ((a #i((y0 * (x1 - x2) + y1 * (x2 - x0) + y2 * (x0 - x1))
-          /(x0 * x0 * (x1 - x2) + x1 * x1 * (x2 - x0) + x2 * x2 * (x0 - x1))))
-    (b #i((y1 - y2 + a * (x2 * x2 - x1 * x1)) / (x1 - x2)))
-    (c #i(y2 - a * x2 * x2 - b * x2)))
+               /(x0 * x0 * (x1 - x2) + x1 * x1 * (x2 - x0) + x2 * x2 * (x0 - x1))))
+         (b #i((y1 - y2 + a * (x2 * x2 - x1 * x1)) / (x1 - x2)))
+         (c #i(y2 - a * x2 * x2 - b * x2)))
     (if (not (eq sym ())) (format t "y = ~S x 2 + ~S x + ~S  ~%" 
-                                        (lldecimals a 6) (lldecimals b 6) (lldecimals c 6)))
+                                  (lldecimals a 6) (lldecimals b 6) (lldecimals c 6)))
     (set (if (null sym) 'fparab3 sym) 
-        ;;(compile ()
-          (eval `(function
-             (lambda (x) (+  (* ,a x x )  (* ,b x) ,c)))))                      
-    ))
+         ;;(compile ()
+         (eval `(function
+                 (lambda (x) (+  (* ,a x x )  (* ,b x) ,c)))))))
 
-#|
-(defunp parabole/3 ((x0 float) (y0 float)
-                    (x1 float (:value 2)) (y1 float (:value 15))
-                    (x2 float (:value 1)) (y2 float (:value 7))
-                    (sym list (:value "fparab3")) ) ()
-"calcule les paramètres de l'équation  y = ax^2 + bx + c en fct de trois points 
-(x0,y0) (x1,y1) (x2,y2) ."
-  
-  (let* ((a #i((y0 * (x1 - x2) + y1 * (x2 - x0) + y2 * (x0 - x1))
-          /(x0 * x0 * (x1 - x2) + x1 * x1 * (x2 - x0) + x2 * x2 * (x0 - x1))))
-    (b #i((y1 - y2 + a * (x2 * x2 - x1 * x1)) / (x1 - x2)))
-    (c #i(y2 - a * x2 * x2 - b * x2)))
-    (if (not (eq sym ())) (format t "y = ~S x 2 + ~S x + ~S  ~%" 
-                                        (lldecimals a 6) (lldecimals b 6) (lldecimals c 6)))
-    (set (if (null sym) 'fparab3 sym) 
-        (compile ()
-             `(lambda (x) (+  (* ,a x x )  (* ,b x) ,c))))                      
-    ))
-|#
+;; (defunp parabole/3 ((x0 float) (y0 float)
+;;                     (x1 float (:value 2)) (y1 float (:value 15))
+;;                     (x2 float (:value 1)) (y2 float (:value 7))
+;;                     (sym list (:value "fparab3")) ) ()
+;;     "calcule les paramètres de l'équation  y = ax^2 + bx + c en fct de trois points 
+;; (x0,y0) (x1,y1) (x2,y2) ."
+;; 
+;;   (let* ((a #i((y0 * (x1 - x2) + y1 * (x2 - x0) + y2 * (x0 - x1))
+;;                /(x0 * x0 * (x1 - x2) + x1 * x1 * (x2 - x0) + x2 * x2 * (x0 - x1))))
+;;          (b #i((y1 - y2 + a * (x2 * x2 - x1 * x1)) / (x1 - x2)))
+;;          (c #i(y2 - a * x2 * x2 - b * x2)))
+;;     (if (not (eq sym ())) (format t "y = ~S x 2 + ~S x + ~S  ~%" 
+;;                                   (lldecimals a 6) (lldecimals b 6) (lldecimals c 6)))
+;;     (set (if (null sym) 'fparab3 sym) 
+;;          (compile ()
+;;                   `(lambda (x) (+  (* ,a x x )  (* ,b x) ,c))))))
+
+;;;; THE END ;;;;

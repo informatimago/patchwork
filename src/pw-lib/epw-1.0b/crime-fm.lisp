@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package "EPW")
 
 
@@ -54,24 +52,24 @@
     (setq order (min order *maxorder*))
     (setq spec `((, c . 0 )))
     (for (i 1 1 order)
-         (newl spec (cons (- c (* i m)) (- i)))
-         (setq  spec (nconc spec (list (cons (+ c (* i m)) i))))
-         (when (and (null p) (< (caar spec) 0))
-           (setq p spec)))
+      (newl spec (cons (- c (* i m)) (- i)))
+      (setq  spec (nconc spec (list (cons (+ c (* i m)) i))))
+      (when (and (null p) (< (caar spec) 0))
+        (setq p spec)))
     (setq s spec)
     (while s
                                         ;(when (and (null p) (>= (caar s) 0))
                                         ;      (setq p q))
       (cond 
         ( (< (cdar s) 0)
-         (if (oddp (cdar s))
-             (rplacd (car s) (- (bessel MI (abs (cdar s)))))
-             (rplacd (car s) (bessel MI (abs (cdar s)))))
+          (if (oddp (cdar s))
+              (rplacd (car s) (- (bessel MI (abs (cdar s)))))
+              (rplacd (car s) (bessel MI (abs (cdar s)))))
           (when (< (caar s) 0)
             (rplaca (car s) (- (caar s)))
             (rplacd (car s) (- (cdar s)))))
         ( t
-         (rplacd (car s) (bessel MI (cdar s)))))
+          (rplacd (car s) (bessel MI (cdar s)))))
       (setq q s)
       (nextl s))
     (setq spec
@@ -164,35 +162,25 @@
           (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec))))
 
 
-
-
-
-
-
-
-
-
-
-
-(epw::defunp fm/p ((car fix>0 (:value 5)) (mod fix>0 (:value 7)) (ind fix/float (:value 4))) list
-             "Computes a FM spectrum. Outputs a list of partials and a list of dyns"
-             (let ((spec (fmspec car mod ind)))
-               (cons (mapcar #'car spec)
-                     (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec))))
+(defunp fm/p ((car fix>0 (:value 5)) (mod fix>0 (:value 7)) (ind fix/float (:value 4))) list
+    "Computes a FM spectrum. Outputs a list of partials and a list of dyns"
+  (let ((spec (fmspec car mod ind)))
+    (cons (mapcar #'car spec)
+          (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec))))
 
 
 (defunp fm-chord ((carrier midics?) (modul midics? (:value 6600)) (index fix/float (:value 1))
                   &optional 
                   (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) ch-ob
-                  "Computes a FM spectrum. Outputs a chord object"
-                  (when (= unit 1)
-                    (setf carrier (mc->f carrier) modul (mc->f modul)))
-                  (let* ((spec (fmspec carrier modul index)) (slength (length spec)))
-                    (pw::mk-chord 
-                     (f->mc (epw::band-filter (mapcar #'car spec) '((15.0 20000.0))))
-                     (make-list slength :initial-element 50)
-                     (make-list slength :initial-element 0)
-                     (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec) )))
+    "Computes a FM spectrum. Outputs a chord object"
+  (when (= unit 1)
+    (setf carrier (mc->f carrier) modul (mc->f modul)))
+  (let* ((spec (fmspec carrier modul index)) (slength (length spec)))
+    (pw::mk-chord 
+     (f->mc (epw::band-filter (mapcar #'car spec) '((15.0 20000.0))))
+     (make-list slength :initial-element 50)
+     (make-list slength :initial-element 0)
+     (mapcar (lambda (x) (round (* (/ 127 3.0) (log (cdr x) 10)))) spec) )))
 
 
 (defclass C-fm-box (pw::C-patch&popUp)
@@ -229,3 +217,4 @@ midics, or freqs, or velocities depending on the popup menu"
 
 ;;(pw::pw-addmenu-fun (pw::the-user-menu) 'fm-spec 'C-fm-box)
 
+;;;; THE END ;;;;

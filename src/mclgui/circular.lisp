@@ -224,8 +224,8 @@ EXAMPLE: (print-identified-conses '((a . b) #1=(c . d) (e . #1#)))
 
 
 
-(test/print-identified-conses/1)
-(test/print-identified-conses/2)
+#+test (test/print-identified-conses/1)
+#+test (test/print-identified-conses/2)
 
 ;;;; THE END ;;;;
 
