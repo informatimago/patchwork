@@ -87,30 +87,44 @@
 
 (defvar *mn-staff-line-width* 4)
 
-(defvar *g-clef* (make-instance 'C-clef  :delta-y (- (* *mn-staff-line-width* 1) 4)))
-(defvar *g-staff* (make-instance 'C-staff  :clef-obj  
-                                 *g-clef* :delta-y (- (* *mn-staff-line-width* 1) 1)))
-(defvar *g2-staff* (make-instance 'C-staff  :clef-obj  
-                                  *g-clef* :delta-y (- (* *mn-staff-line-width* 8) 1)))
-(defvar *f-clef* (make-instance 'C-clef :clef #\? :delta-y -1))
-(defvar *f-staff* (make-instance 'C-staff  
-                                 :clef-obj  *f-clef* :delta-y (- (* *mn-staff-line-width* -5) 1)))
-(defvar *f2-staff* (make-instance 'C-staff  :clef-obj  
-                                  *f-clef* :delta-y (- (* *mn-staff-line-width* -12) 1)))
 
-(defvar *empty-staff* (make-instance 'C-staff-empty))  
+(defvar *g-clef*)
+(defvar *g-staff*)
+(defvar *g2-staff*)
+(defvar *f-clef*)
+(defvar *f-staff*)
+(defvar *f2-staff*)
+(defvar *empty-staff*)
+(defvar *g2-g-staffs*)
+(defvar *g-plain-staffs*)
+(defvar *g-f-staffs*)
+(defvar *f-plain-staffs*)
+(defvar *g-f-f2-staffs*)
+(defvar *g2-g-f-f2-staffs*)
+(defvar *empty-staffs*)
 
-(defvar *g2-g-staffs* (list *g2-staff* *g-staff*))                            ;1
-(defvar *g-plain-staffs* (list *g-staff*))                                    ;2
-(defvar *g-f-staffs* (list *g-staff* *f-staff*))                              ;3
-(defvar *f-plain-staffs* (list *f-staff*))                                    ;4
-(defvar *g-f-f2-staffs* (list *g-staff* *f-staff* *f2-staff*))                ;5
-(defvar *g2-g-f-f2-staffs* (list *g2-staff* *g-staff* *f-staff* *f2-staff*))  ;6
-(defvar *empty-staffs* (list *empty-staff*))                                  ;7
+(defvar *global-staff-list*  '(*g2-g-staffs* *g-plain-staffs* *g-f-staffs*
+                               *f-plain-staffs* *g-f-f2-staffs* *g2-g-f-f2-staffs* *empty-staffs*))
 
-(defvar *global-staff-list* 
-  '(*g2-g-staffs* *g-plain-staffs* *g-f-staffs*
-    *f-plain-staffs* *g-f-f2-staffs* *g2-g-f-f2-staffs* *empty-staffs*))
+(defun initialize-mn-editor ()
+  (setf *g-clef*   (make-instance 'C-clef   :delta-y (- (* *mn-staff-line-width* 1) 4)))
+  (setf *g-staff*  (make-instance 'C-staff  :clef-obj *g-clef* :delta-y (- (* *mn-staff-line-width* 1) 1)))
+  (setf *g2-staff* (make-instance 'C-staff  :clef-obj *g-clef* :delta-y (- (* *mn-staff-line-width* 8) 1)))
+  (setf *f-clef*   (make-instance 'C-clef   :clef #\? :delta-y -1))
+  (setf *f-staff*  (make-instance 'C-staff  :clef-obj *f-clef* :delta-y (- (* *mn-staff-line-width* -5) 1)))
+  (setf *f2-staff* (make-instance 'C-staff  :clef-obj *f-clef* :delta-y (- (* *mn-staff-line-width* -12) 1)))
+
+  (setf *empty-staff* (make-instance 'C-staff-empty))  
+
+  (setf *g2-g-staffs*      (list *g2-staff* *g-staff*))          ;1
+  (setf *g-plain-staffs*   (list *g-staff*))                     ;2
+  (setf *g-f-staffs*       (list *g-staff* *f-staff*))           ;3
+  (setf *f-plain-staffs*   (list *f-staff*))                     ;4
+  (setf *g-f-f2-staffs*    (list *g-staff* *f-staff* *f2-staff*)) ;5
+  (setf *g2-g-f-f2-staffs* (list *g2-staff* *g-staff* *f-staff* *f2-staff*)) ;6
+  (setf *empty-staffs*     (list *empty-staff*)) ;7
+  (values))
+
 
 (defun get-staff-offsets (staff-num)
   (case staff-num 

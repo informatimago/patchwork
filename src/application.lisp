@@ -83,16 +83,31 @@ Must be called on the main thread."
   (initialize-streams)
   (initialize-menus)
   (initialize-beat-measure-line)
+  (initialize-mn-editor)
   #-(and)(installapple-event-handlers)
   ;; ---
   (terpri *patchwork-io*)
   (write-line "Welcome to Patchwork" *patchwork-io*)
   (values))
 
+(defun date (&optional (date (get-universal-time)))
+  "Prints the date."
+  (format t
+    "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~%~8*~}"
+    (multiple-value-list (decode-universal-time date)))
+  date)
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
-(on-restore patchwork-initialization
+(on-resume patchwork-trace
+           (setf *trace-output* (open #P"~/Desktop/patchwork-trace.txt"
+                                      :direction :output
+                                      :if-does-not-exist :create
+                                      :if-exists :append))
+           
+           (format *trace-output* "~A~%" (date)))
+
+(on-startup patchwork-initialization
   (eval-enqueue '(initialize-patchwork)))
 
 ;;;; THE END ;;;;
