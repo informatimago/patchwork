@@ -220,7 +220,7 @@
                ;; (principal-class $default-info-plist-principal-class)
                :|CFBundleDocumentTypes| *cf-bundle-document-types*
                :|NSAppleScriptEnabled| nil ; not yet.
-               :|LSMinimumSystemVersion| "10.3"
+               :|LSMinimumSystemVersion| (if (featurep :cocoa-10.6) "10.6" "10.3")
                :|CFBundleDevelopmentRegion| "English"
                :|UTExportedTypeDeclarations| *exported-type-utis*
                :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2014 Pascal Bourguignon~%License: GPL3")
