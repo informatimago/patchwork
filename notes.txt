@@ -1,0 +1,984 @@
+.. comment: -*- mode:rst; coding:utf-8 -*-
+
+rm application.log ; make clean ; make application 2>&1 | tee application.log
+
+
+Notes
+========================================
+
+
+(process-interrupt ccl::*initial-process* (lambda ()
+                                            (make-window)
+                                            (start-run-loop)))
+
+https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
+
+
+Classes used
+----------------------------------------
+
+Classes that need to be implemented satisfactorily:
+
+- dialog
+- dialog-item
+- table-dialog-item
+- button-dialog-item 
+- static-text-dialog-item 
+- editable-text-dialog-ietm
+- dialog
+- fred-window
+- window
+- vie
+
+
+Packages
+----------------------------------------
+
+
+ "NS" "NEXTSTEP-FUNCTIONS" "OBJC"
+"GUI" "HEMLOCK-INTERFACE" "HEMLOCK-EXT" "HI" "HEMLOCK"
+
+"CLOSER-MOP" "CLOSER-COMMON-LISP" "CLOSER-COMMON-LISP-USER"
+"BABEL-ENCODINGS" "BABEL" "CFFI-SYS" "CFFI-CALLBACKS" "CFFI" "CFFI-FEATURES" "IMPL-SPECIFIC-GRAY" "TRIVIAL-GRAY-STREAMS" "SPLIT-SEQUENCE"
+
+ "COM.INFORMATIMAGO.COMMON-LISP.LISP.STEPPER.INTERNAL" "COM.INFORMATIMAGO.COMMON-LISP.LISP.STEPPER"
+  "COM.INFORMATIMAGO.SIMPLE-TEST" "COM.INFORMATIMAGO.OBJECTIVE-C.LOWER" "COM.INFORMATIMAGO.OBJECTIVE-CL"
+ "COM.INFORMATIMAGO.CLEXT.ASSOCIATION" "COM.INFORMATIMAGO.CLEXT.CHARACTER-SETS" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK-USER"
+
+(defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" "MIDI-PLAYER" "MIDISHARE" "MIDI" "PATCH-WORK.SCHEDULER" "PATCH-WORK" "C-PATCH-BUFFER" "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN" "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE" "EPW" "C-LIST-ITEM-H" "C-LIST-ITEM" "C-TABLE-WINDOW-H" "C-TABLE-WINDOW" "C-PATCH-LIST-EDITOR" "C-GET-NOTE-SLOTS" "C-GET-SELECTIONS" "USER-ABSTRACTION" "C-PATCH-CHORD-LINE" "C-PW-SEND-MIDI-NOTE" "CLENI" "COMBINATORIAL-INTERV" "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING")) 
+
+
+Apple Events
+----------------------------------------
+
+::
+
+    ui::gestalt
+
+    record--ae                    pw-lib/pwscript/recordables.lisp
+
+    with-aedescs                  mclgui/apple-event.lisp
+
+    create-self-target            pw-lib/pwscript/appleevent-toolkit.lisp
+    create-appleevent             pw-lib/pwscript/appleevent-toolkit.lisp
+    put-appleevent-par            pw-lib/pwscript/pw-scripting.lisp
+
+    cl-user::getDescRecPtr        pw-lib/pwscript/pw-ae.lisp
+    cl-user::asAEDesc             pw-lib/pwscript/pw-ae.lisp
+    #_AEPutParamDesc
+ 
+
+
+pw-lib/pwscript/pw-scripting.lisp         pw
+
+    Apple Event Handlers --> action methods
+
+
+pw-lib/pwscript/recordables.lisp          pw
+
+    Creating and sending Apple Event records.
+
+
+pw-lib/pwscript/pw-ae.lisp                cl-user
+
+    AppleEvents <-> Clos Object layer  V 1.02 
+
+pw-lib/pwscript/appleevent-toolkit.lisp   appleevent-toolkit ae
+
+    Lowest level layer.
+
+
+mclgui/apple-event.lisp                   mclgui
+
+    MCL apple-event stuff.
+
+
+
+pw-ae.lisp stuff used:
+
+    cl-user::AppleEvent
+    cl-user::asAEDesc
+    cl-user::getDescRecPtr
+    cl-user::getparam
+
+appleevent-toolkit.lisp stuff used:
+
+  /Users/pjb/works/patchwork/patchwork/src/pw-lib/pwscript/pw-ae.lisp
+
+    create-Psn-Target
+    create-Named-Process-Target
+    create-Self-Target
+    choose-AppleEvent-Target
+    send-appleevent 
+
+  /Users/pjb/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
+
+    create-appleevent
+    create-self-target
+    send-appleevent
+
+apple-event.lisp stuff used:
+
+    install-appleevent-handler
+    appleevent-idle
+    ae-error 
+    with-aedescs
+
+
+
+Miscellaneous
+----------------------------------------
+
+Resource file:
+"CL:PW-inits;Drivers+Resources;CLPF.rsrc"
+./pw-kernel/environment/make-image                 To generate the image:
+
+
+patchwork/src/mclgui/notes.txt
+
+:: 
+
+    (let ((functions '())
+          (variables '()))
+     (old-old-map-sexps "/home/pjb/works/patchwork/patchwork/src/mclgui/graphics.lisp"
+                (lambda (form start end)
+                  (when (consp form)
+                    (case (first form)
+                      ((defun defmethod defgeneric) (push (second form) functions))
+                      ((defvar defparameter defconstant) (push (second form) variables))))))
+     (values variables functions))
+
+
+
+
+make application
+----------------
+
+- rassembler dans des fonctions d'initialisation toutes les
+  expressions créant ces pointeurs mac, et appeler ces fonctions au
+  lancement de l'image exécutable.  (Voir par exemple initialize-menus dans
+  ``#P"PATCHWORK:src;pw-kernel;pw-graphics;window+menu;pw-menu.lisp"``).
+
+      + simplicité.
+
+      + portabilité.
+
+      - ne résoud pas le problème de la commande/menu "Save Image".
+
+
+- utiliser ``ccl:*lisp-cleanup-functions*``.
+
+      - plus complexe: il faudrait ajouter des fonctions
+        d'hibernation/réveil pour tous les objets qui ont un NSObject
+        handle.
+
+      - pas portable.
+
+      + résoud le problème de la commande/menu "Save Image".
+
+      + facilite la génération de l'application en cours de développement.
+
+
+
+quitting
+----------------------------------------
+
+
+- Call \*lisp-cleanup-functions* in order.
+
+
+saving an image
+----------------------------------------
+
+Before saving the image:
+
+- Call \*save-exit-functions* in order.
+
+
+restore lisp pointers
+----------------------------------------
+
+- Revive system locks.
+- Refresh external entrypoints.
+- Restore pascal functions.
+- Initialize interactive streams.
+- Call \*lisp-system-pointer-functions* in reverse order.
+- Call \*restore-lisp-functions* in order.  (-> def-load-pointers)
+- Call \*lisp-user-pointer-functions* in reverse order.
+- Call \*lisp-startup-functions* in reverse order.
+
+The last three lists could be  modified by the previous functions (but
+not the first cons cells themselves).
+
+
+::
+    (dolist (v '(ccl::*lisp-system-pointer-functions*
+                 ccl::*restore-lisp-functions*
+                 ccl::*lisp-user-pointer-functions*
+                 ccl::*lisp-startup-functions*))
+      (format t "~2%Contents of ~S~%" v)
+      (map nil 'print (symbol-value v)))
+
+
+
+
+Cloning
+----------------------------------------
+
+git clone git@gitorious.org:patchwork/patchwork.git
+
+
+Common Lisp Implementation
+----------------------------------------
+
+On the MacMini, 
+
+uname -a
+Darwin galatea 11.4.2 Darwin Kernel Version 11.4.2: Thu Aug 23 16:26:45 PDT 2012; root:xnu-1699.32.7~1/RELEASE_I386 i386
+
+
+
+MacPort - /opt/local/bin/ccl 
+........................................
+
+/opt/local/bin/ccl  --version
+Version 1.8  (DarwinX8632)
+
+arch is i386 therefore /opt/local/bin/ccl loads in 32-bit.
+
+- This fails in %ff-call somewhere in the main event run loop.
+
+
+
+Personnalized - /data/languages/ccl/bin/ccl
+........................................
+
+/data/languages/ccl/bin/ccl
+Version 1.8  (DarwinX8664)
+
+forced 64-bit, with patches (with-standard-io-syntax (format …)) for selectors.
+
+- Success. 
+
+
+
+Clozure CL.app from the AppStore
+........................................
+
+/Applications/Clozure\ CL.app/Contents/MacOS/dx86cl64 
+Version 1.8.1 (15418)
+
+:cocoa is pre-loaded, no CLI.
+
+- Generation of the application to be tried.
+- Loading slime and the application works.
+
+
+Generating interface files.
+----------------------------------------
+
+(require :parse-ffi)
+(ccl::parse-standard-ffi-files :coreservices)
+
+
+(ccl:OPEN-SHARED-LIBRARY "/System/Library/Frameworks/CoreServices.framework/CoreServices")
+(ccl:use-interface-dir :coreservices)
+
+#$kAERemoteProcess
+
+
+http://stpetrus27.wordpress.com/2011/06/20/compile-objective-c-programs-on-linux/
+
+
+AppleEvents
+----------------------------------------
+
+
+pw-lib/pwscript/pw-scripting.lisp : pw-lib/pwscript/pw-ae.lisp
+pw-lib/pwscript/recordables.lisp  : pw-lib/pwscript/pw-ae.lisp pw-lib/pwscript/appleevent-toolkit.lisp
+pw-lib/pwscript/pw-ae.lisp        :                            pw-lib/pwscript/appleevent-toolkit.lisp
+
+
+Midi
+----------------------------------------
+
+https://github.com/chfin/cl-portmidi
++ libportmidi
+
+
+
+References
+========================================
+
+http://recherche.ircam.fr/equipes/repmus/Rapports/PeterHanappe95/
+
+
+Files
+========================================
+
+
+
+notes.txt                     This file.
+
+Makefile                      Makefile for the project.
+
+devis/                        The proposal.
+
+doc/                          Documentation and reference.
+
+This directory is used as prefix for installation of project specific
+programs and tools found in src/.  Therefore we have bin/, lib/ and
+share/ where things are installed.
+
+bin/                          Binaries (executables).
+
+lib/                          Libraries.
+
+share/                        Share files.
+
+src/                          Sources for various programs and tools.
+
+tools/                        Sources for tools written specifically
+                              for the Patchwork project.
+
+patches/                      Sample patch files.
+
+patchwork.fossil              The local fossil repository.
+
+patchwork/                    The patchwork sources (in an open fossil repository).
+
+PW-code.zip                   The original MCL files.
+
+pw-src-original/              The original lisp files.
+
+pw-src-utf-8-unix/            Converted into utf-8-unix encoding.
+
+pw-src/                       The Demo Patchwork version, before fossil.
+
+classes-hierarchy.txt         Class hierarchy as generated by tools/read-sources.
+
+classes-parents.txt           Class parents as generated by tools/read-sources.
+
+errors.txt                    Compilation errors so far.
+
+
+
+
+
+
+Fossil Info
+========================================
+
+
+fossil init patchwork.fossil
+project-id: 8da4fbae771061b0d45af1a298df4c4439092371
+server-id:  e22aca008c3639340f2081887a9f2ef462f054b8
+admin-user: pjb (initial password is "fe564e")
+
+
+sandboxing appstore
+========================================
+
+
+::
+
+    From: Michael Minerva <minerva@agentsheets.com>
+    Subject: Re: AgentCubes Lite: Sandboxed Lisp 3D authoring Application in Apple Mac Store
+    Newsgroups: gmane.lisp.openmcl.devel
+    To: Joshua Kordani <jkordani@lsa2.com>
+    Cc: openmcl-devel@clozure.com
+    Date: Tue, 30 Jul 2013 11:26:17 -0600 (1 hour, 45 minutes ago)
+    Message-ID: <38B3A83F-B2FF-4E0A-8723-0A6BAF21852A@agentsheets.com>
+
+    Hey Joshua,
+
+    Getting AgentCubes sandboxed actually was the easy party :P
+
+    Outside of Xcode you just had have to call the right sandbox command,
+    something like this:
+
+    codesign -s "3rd Party Mac Developer Application: AgentSheets, Inc."
+     -f --entitlements  "/Users/Mike/Desktop/AgentCubes-Lite/AgentCubes
+    Lite.app/Contents/AgentCubes Lite.entitlements"
+     "/Users/Mike/Desktop/AgentCubes-Lite/AgentCubes Lite.app"
+
+    The weird part is that the entitlements plist needs to be a binary
+    (which apparently can only me created in Xcode), so you need to create
+    a dummy Xcode project to create the entailments plist (after deciding
+    which entitlements you app will need). After that, your sandboxed app
+    will most likely have some new error/crashes because sandboxing the
+    app changes the inheritance hierarchy of some classes (such as file
+    dialogs) so some methods you are using may no longer be supported. 
+
+    --Mike
+
+
+    On Jul 30, 2013, at 10:29 AM, Joshua Kordani <jkordani@lsa2.com>
+    wrote:
+
+        Wow! Great work!
+
+        How did you get the sandboxed environment set up?
+
+        Josh
+
+        On 7/29/13 10:16 PM, Alexander Repenning wrote:
+
+
+            Dear All,
+
+
+            We are still keeping this at low profile but Apple just
+            accepted our fully sandboxed 3D Game and Simulation Design
+            AgentCubes application (built in CCL) into the Apple Mac App
+            store. Build a 3D simulation game and turn it into HTML5 (no
+            Flash, no Java) page that can run on many mobile browsers. 
+
+
+            Any feedback would be appreciated. It was quite a bit of work
+            to get this going with CCL outside of the Apple Xcode empire. 
+
+
+
+
+            https://itunes.apple.com/us/app/agentcubes-lite/id673363781?mt=12
+
+
+            In case you wonder what AgentCubes is here is a short
+            movie: http://www.youtube.com/watch?v=2GWcb3aG2w0
+
+
+
+
+            best,  Alex
+
+
+
+
+
+
+
+
+
+            Prof. Alexander Repenning
+
+
+            University of Colorado
+            Computer Science Department
+            Boulder, CO 80309-430
+
+
+            vCard:
+            http://www.cs.colorado.edu/~ralex/AlexanderRepenning.vcf
+
+
+
+
+
+
+            _______________________________________________
+    Openmcl-devel mailing list
+    Openmcl-devel@clozure.com
+    http://clozure.com/mailman/listinfo/openmcl-devel
+
+
+
+        _______________________________________________
+        Openmcl-devel mailing list
+        Openmcl-devel@clozure.com
+        http://clozure.com/mailman/listinfo/openmcl-devel
+
+
+    _______________________________________________
+    Openmcl-devel mailing list
+    Openmcl-devel@clozure.com
+    http://clozure.com/mailman/listinfo/openmcl-devel
+
+
+http://explanatorygap.net/2009/10/30/apple-have-documented-the-binary-plist-format/
+
+::
+
+    Apple have documented the binary plist format
+
+    Thanks to Dave Dribin for pointing this out.
+
+    In http://opensource.apple.com/source/CF/CF-550/CFBinaryPList.c
+
+    So really there’s no reason why we can’t have plistlib etc for Ruby/Python/whatever deal with binary plists on non-Mac platforms.
+
+    /*
+    HEADER
+        magic number ("bplist")
+        file format version
+
+    OBJECT TABLE
+        variable-sized objects
+
+        Object Formats (marker byte followed by additional info in some cases)
+        null    0000 0000
+        bool    0000 1000           // false
+        bool    0000 1001           // true
+        fill    0000 1111           // fill byte
+        int 0001 nnnn   …     // # of bytes is 2^nnnn, big-endian bytes
+        real    0010 nnnn   …     // # of bytes is 2^nnnn, big-endian bytes
+        date    0011 0011   …     // 8 byte float follows, big-endian bytes
+        data    0100 nnnn   [int]   … // nnnn is number of bytes unless 1111 then int count follows, followed by bytes
+        string  0101 nnnn   [int]   … // ASCII string, nnnn is # of chars, else 1111 then int count, then bytes
+        string  0110 nnnn   [int]   … // Unicode string, nnnn is # of chars, else 1111 then int count, then big-endian 2-byte uint16_t
+            0111 xxxx           // unused
+        uid 1000 nnnn   …     // nnnn+1 is # of bytes
+            1001 xxxx           // unused
+        array   1010 nnnn   [int]   objref* // nnnn is count, unless ’1111′, then int count follows
+            1011 xxxx           // unused
+        set 1100 nnnn   [int]   objref* // nnnn is count, unless ’1111′, then int count follows
+        dict    1101 nnnn   [int]   keyref* objref* // nnnn is count, unless ’1111′, then int count follows
+            1110 xxxx           // unused
+            1111 xxxx           // unused
+
+    OFFSET TABLE
+        list of ints, byte size of which is given in trailer
+        — these are the byte offsets into the file
+        — number of these is in the trailer
+
+    TRAILER
+        byte size of offset ints in offset table
+        byte size of object refs in arrays and dicts
+        number of offsets in offset table (also is number of objects)
+        element # in offset table which is top level object
+        offset table offset
+
+    */
+
+
+
+Scratch
+========================================
+
+::
+
+
+    diff --exclude \*.bak -r rmcl-unix/level-1/ mcl-unix/level-1/
+    diff --exclude '*TAGS' --exclude .git --exclude .svn --exclude CVS --exclude _darcs --exclude '*~' --exclude '*.x86f' --exclude '*.fasl' --exclude '*.fas' --exclude '*.lib' --exclude '*.[oa]' --exclude '*.so' --exclude '#*' --exclude '*.orig' --exclude '*.rej' --exclude '*.bak' -r rmcl-unix/level-1//l1-aprims.lisp mcl-unix/level-1//l1-aprims.lisp
+    diff rmcl-unix/level-1//l1-boot-1.lisp mcl-unix/level-1//l1-boot-1.lisp
+    diff rmcl-unix/level-1//l1-boot-3.lisp mcl-unix/level-1//l1-boot-3.lisp
+    diff rmcl-unix/level-1//l1-boot-lds.lisp mcl-unix/level-1//l1-boot-lds.lisp
+    diff rmcl-unix/level-1//l1-edbuf.lisp mcl-unix/level-1//l1-edbuf.lisp
+    diff rmcl-unix/level-1//l1-edcmd.lisp mcl-unix/level-1//l1-edcmd.lisp
+    diff rmcl-unix/level-1//l1-edfrec.lisp mcl-unix/level-1//l1-edfrec.lisp
+    diff rmcl-unix/level-1//l1-edwin.lisp mcl-unix/level-1//l1-edwin.lisp
+    diff rmcl-unix/level-1//l1-events.lisp mcl-unix/level-1//l1-events.lisp
+    diff rmcl-unix/level-1//l1-files.lisp mcl-unix/level-1//l1-files.lisp
+    diff rmcl-unix/level-1//l1-highlevel-events.lisp mcl-unix/level-1//l1-highlevel-events.lisp
+    diff rmcl-unix/level-1//l1-init.lisp mcl-unix/level-1//l1-init.lisp
+    diff rmcl-unix/level-1//l1-initmenus-lds.lisp mcl-unix/level-1//l1-initmenus-lds.lisp
+    diff rmcl-unix/level-1//l1-initmenus.lisp mcl-unix/level-1//l1-initmenus.lisp
+    diff rmcl-unix/level-1//l1-listener.lisp mcl-unix/level-1//l1-listener.lisp
+    diff rmcl-unix/level-1//l1-menus.lisp mcl-unix/level-1//l1-menus.lisp
+    diff rmcl-unix/level-1//l1-pathnames.lisp mcl-unix/level-1//l1-pathnames.lisp
+    diff rmcl-unix/level-1//l1-processes.lisp mcl-unix/level-1//l1-processes.lisp
+    diff rmcl-unix/level-1//l1-streams.lisp mcl-unix/level-1//l1-streams.lisp
+    diff rmcl-unix/level-1//l1-sysio.lisp mcl-unix/level-1//l1-sysio.lisp
+    diff rmcl-unix/level-1//l1-windows.lisp mcl-unix/level-1//l1-windows.lisp
+    diff rmcl-unix/level-1//new-fred-window.lisp mcl-unix/level-1//new-fred-window.lisp
+    diff rmcl-unix/level-1//script-manager.lisp mcl-unix/level-1//script-manager.lisp
+    diff rmcl-unix/level-1//sysutils.lisp mcl-unix/level-1//sysutils.lisp
+
+
+
+    find ~/works/patchwork/patchwork/src/mclgui -name \*.lisp -print0 | xargs -0  grep -niH -e '[^-a-z]\<\(copy-file\|*warn-if-redefine*\|*lisp-cleanup-functions*\|*eventhook*\|event-dispatch\|def-load-pointers\|prompt\|point\|point-p\|point-x\|point-y\|point-h\|point-v\|make-point\|copy-point\|add-points\|subtract-points\|*black-pattern*\|*dkgray-pattern*\|*gray-pattern*\|*ltgray-pattern*\|*white-pattern*\|with-cursor\|*watch-cursor*\|*i-beam-cursor*\|*arrow-cursor*\|command-key\|set-command-key\|menu-element\|menu-element-p\|menu-item\|menu-item-p\|menu-item-enable\|menu-item-disable\|menu-item-title\|menu-item-action\|menu-item-check-mark\|set-menu-item-check-mark\|set-menu-item-action-function\|menu-item-action-function\|menu-item-action\|menu\|menup\|menu-enabled-p\|menu-title\|menu-items\|add-menu-items\|find-menu-item\|menubar\|set-menubar\|find-menu\|mouse-down-p\|double-click-p\|shift-key-p\|control-key-p\|command-key-p\|option-key-p\|command-key\|enabled\|event-dispatch\|file-name\|font\|item-action\|item-text\|items\|maxwidth\|text\|title\|width\|simple-view\|view\|view-container\|view-font\|view-position\|view-size\|view-window\|subviews\|view-subviews\|track-thumb-p\|h-scrollp\|v-scrollp\|bottom-boarder\|check-mark\|set-view-position\|set-view-size\|set-view-font\|add-subview\|add-subviews\|remove-subview\|remove-subviews\|with-focused-view\|with-font-focused-view\|scroller\|scroller-mixin\|scroll-bar-correction\|h-scroller\|v-scroller\|control\|button-string\|window\|window-title\|set-window-title\|close-box-p\|fred-window\|window-select\|bring-to-front\|front-window\|window-show\|window-hide\|view-activate-event-handler\|view-deactivate-event-handler\|dialog-item\|dialog-item-action\|dialog-item-text\|set-dialog-item-text\|static-text-dialog-item\|editable-text-dialog-item\|table-dialog-item\|button-dialog-item\|radio-button-dialog-item\|check-box-dialog-item\|dialog\|message\|message-dialog\|choose-file-dialog\|choose-new-file-dialog\|y-or-n-dialog\|select-item-from-list\|make-popupbox\|key-equal\)\>[^-a-z]'
+
+
+Not Implemented Yet
+========================================
+
+::
+
+    [pjb@kuiper :0.0 patchwork]$ find . -name \*.lisp -exec grep  -Hi '^ *(niy ' {} \;
+
+    ./src/mclgui/apple-event.lisp:    (niy open-application-document application filename startup)))
+    ./src/mclgui/apple-event.lisp:    (niy print-application-document application filename startup)))
+    ./src/mclgui/apple-event.lisp:    (niy print-documents-handler)))
+    ./src/mclgui/apple-event.lisp:    (niy quit-application-handler)
+    ./src/mclgui/apple-event.lisp:  (niy appleevent-idle event sleeptime mousergn))
+    ./src/mclgui/application.lisp:    (niy application-about-view)))
+    ./src/mclgui/application.lisp:    (niy application-about-view)))
+    ./src/mclgui/application.lisp:    (niy application-error))
+    ./src/mclgui/application.lisp:    (niy application-overwrite-dialog)))
+    ./src/mclgui/application.lisp:    (niy application-resume-event-handler)))
+    ./src/mclgui/application.lisp:    (niy application-suspend-event-handler)))
+    ./src/mclgui/application.lisp:    (niy find-edit-menu)))
+    ./src/mclgui/button-dialog-item.lisp:                  (niy draw-default-button-outline item)
+    ./src/mclgui/button-dialog-item.lisp:              (niy set-default-button dialog new-button) #-(and)
+    ./src/mclgui/button-dialog-item.lisp:            (niy set-default-button dialog new-button) #-(and)
+    ./src/mclgui/button-dialog-item.lisp:        (niy view-draw-contents item) #-(and)
+    ./src/mclgui/button-dialog-item.lisp:      (niy  press-button button)
+    ./src/mclgui/button-dialog-item.lisp:    (niy view-draw-contents item)
+    ./src/mclgui/button-dialog-item.lisp:  (niy validate-control-dialog-item item)
+    ./src/mclgui/check-box-dialog-item.lisp:        (niy check-box-check item)
+    ./src/mclgui/check-box-dialog-item.lisp:        (niy check-box-uncheck item)
+    ./src/mclgui/control-dialog-item.lisp:            (niy set-view-position item h v)
+    ./src/mclgui/control-dialog-item.lisp:            (niy set-view-size item h v)
+    ./src/mclgui/control-dialog-item.lisp:        (niy install-view-in-window :after button w)
+    ./src/mclgui/control-dialog-item.lisp:      (niy dialog-item-disable item)
+    ./src/mclgui/control-dialog-item.lisp:      (niy dialog-item-enable item)
+    ./src/mclgui/control-dialog-item.lisp:      (niy set-dialog-item-text item text)
+    ./src/mclgui/control-dialog-item.lisp:      (niy view-draw-contents item)
+    ./src/mclgui/control-dialog-item.lisp:    (niy fix-osx-dialog-item-font button)
+    ./src/mclgui/control-dialog-item.lisp:    (niy view-activate-event-handler item)
+    ./src/mclgui/control-dialog-item.lisp:    (niy view-click-event-handler item where))
+    ./src/mclgui/control-dialog-item.lisp:  (niy font-codes-string-width-for-control string ff ms start end)
+    ./src/mclgui/control-dialog-item.lisp:  (niy install-view-in-window dialog-item dialog)
+    ./src/mclgui/control-dialog-item.lisp:  (niy remove-view-from-window item)
+    ./src/mclgui/control-dialog-item.lisp:  (niy set-view-font-codes :after button ff ms m1 m2)
+    ./src/mclgui/control-dialog-item.lisp:  (niy view-deactivate-event-handler item)
+    ./src/mclgui/default-button-mixin.lisp:    (niy button-props-to-window item window)
+    ./src/mclgui/default-button-mixin.lisp:  (niy remove-view-from-window item)
+    ./src/mclgui/dialog.lisp:              (niy process-event)
+    ./src/mclgui/dialog.lisp:        (niy clip-inside-view item h v)
+    ./src/mclgui/dialog.lisp:    (niy draw-theme-text-box text rect text-justification truncwhere active-p)
+    ./src/mclgui/dialog.lisp:    (niy modal-dialog dialog close-on-exit eventhook)
+    ./src/mclgui/dialog.lisp:  (niy %return-from-modal-dialog values)
+    ./src/mclgui/dialog.lisp:  (niy current-pixel-depth)
+    ./src/mclgui/dialog.lisp:  (niy current-port-color-p)
+    ./src/mclgui/dialog.lisp:  (niy process-multi-clicks event))
+    ./src/mclgui/editable-text-dialog-item.lisp:  (niy view-clip-region view)
+    ./src/mclgui/event.lisp:  (niy wait-mouse-up-or-moved)
+    ./src/mclgui/event.lisp:  (niy with-event-processing-enabled)
+    ./src/mclgui/event.lisp:  (niy with-timer)
+    ./src/mclgui/font.lisp:  (niy atsu-line-break-given-layout layout start width)
+    ./src/mclgui/font.lisp:  (niy color->ff-index color)
+    ./src/mclgui/font.lisp:  (niy draw-string-in-rect string rect truncation justification compress-p start end ff ms color)
+    ./src/mclgui/fred-window.lisp:    (niy buffer-char buffer position)
+    ./src/mclgui/fred-window.lisp:    (niy buffer-current-sexp buffer position)
+    ./src/mclgui/fred-window.lisp:    (niy buffer-insert buffer text)))
+    ./src/mclgui/fred-window.lisp:    (niy buffer-insert-file buffer file-pathname)))
+    ./src/mclgui/fred-window.lisp:    (niy buffer-size buffer)
+    ./src/mclgui/fred-window.lisp:    (niy buffer-skip-fwd-wsp&comments buffer length size)
+    ./src/mclgui/fred-window.lisp:    (niy buffer-write-file buffer file-pathname  if-exists if-does-not-exists)))
+    ./src/mclgui/fred-window.lisp:    (niy ed-kill-selection window)
+    ./src/mclgui/fred-window.lisp:    (niy fred-update dialog-item)
+    ./src/mclgui/fred-window.lisp:    (niy set-fred-display-start-mark dialog-item position)
+    ./src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-disable :before item)#-(and)
+    ./src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-enable :after item)#-(and)
+    ./src/mclgui/message-dialog.lisp:    (niy dialog-item-text-length item)
+    ./src/mclgui/pen.lisp:      (niy line view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
+    ./src/mclgui/pen.lisp:      (niy line-to view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:                (niy draw-menu-title menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:              (niy size-rectangles menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:              (niy title-hilite menu un)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:            (niy set-pop-up-menu-default-item menu num force)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:          (niy menu-select menu num)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-disable menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-enable menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-select)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy remove-view-from-window menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy size-rectangles menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-click-event-handler menu where)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-draw-contents menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy point-in-click-region-p menu where)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy remove-menu-items menu items)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy set-pop-up-item-check-mark item mark)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-activate-event-handler menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-deactivate-event-handler menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy menu-install menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy paint-menu-gray menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-position menu h v)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-size menu h v)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy view-draw-contents menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-height pop-up-menu height)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-items menu items)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy make-new-pop-up-control menu window) #-(and)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy remove-view-from-window menu)
+    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy view-corners item)
+    ./src/mclgui/quickdraw.lisp:  (niy clip-rect view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy clip-region view save-region)
+    ./src/mclgui/quickdraw.lisp:  (niy copy-bits source-bitmap dest-bitmap source-rect dest-rect mode mask-region)
+    ./src/mclgui/quickdraw.lisp:  (niy draw-picture view picture left top right bottom)
+    ./src/mclgui/quickdraw.lisp:  (niy erase-arc view start-angle arc-angle left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy erase-oval view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy erase-polygon view polygon)
+    ./src/mclgui/quickdraw.lisp:  (niy erase-rect view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy erase-region view region)
+    ./src/mclgui/quickdraw.lisp:  (niy erase-round-rect view oval-width oval-height left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy fill-arc view pattern start-angle arc-angle left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy fill-oval view pattern left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy fill-polygon view pattern polygon)
+    ./src/mclgui/quickdraw.lisp:  (niy fill-rect view  pattern left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy fill-region view pattern region)
+    ./src/mclgui/quickdraw.lisp:  (niy fill-round-rect view pattern oval-width oval-height left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy frame-arc view start-angle arc-angle left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy frame-oval view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy frame-polygon view polygon)
+    ./src/mclgui/quickdraw.lisp:  (niy frame-rect view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy frame-region view region)
+    ./src/mclgui/quickdraw.lisp:  (niy frame-region view region)
+    ./src/mclgui/quickdraw.lisp:  (niy frame-round-rect view oval-width oval-height left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy get-picture view)
+    ./src/mclgui/quickdraw.lisp:  (niy get-pixel view h v)
+    ./src/mclgui/quickdraw.lisp:  (niy get-polygon view)
+    ./src/mclgui/quickdraw.lisp:  (niy global-to-local view h v)
+    ./src/mclgui/quickdraw.lisp:  (niy invert-arc view start-angle arc-angle left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy invert-oval view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy invert-polygon view polygon)
+    ./src/mclgui/quickdraw.lisp:  (niy invert-rect view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy invert-region view region)
+    ./src/mclgui/quickdraw.lisp:  (niy invert-round-rect view oval-width oval-height left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy kill-picture picture)
+    ./src/mclgui/quickdraw.lisp:  (niy kill-polygon polygon)
+    ./src/mclgui/quickdraw.lisp:  (niy local-to-global view h v)
+    ./src/mclgui/quickdraw.lisp:  (niy make-bitmap left top right bottom)
+    ./src/mclgui/quickdraw.lisp:  (niy map-point source-rect dest-rect h v)
+    ./src/mclgui/quickdraw.lisp:  (niy map-polygon source-rect dest-rect polygon)
+    ./src/mclgui/quickdraw.lisp:  (niy map-rect source-rect dest-rect rect)
+    ./src/mclgui/quickdraw.lisp:  (niy map-region source-rect dest-rect region)
+    ./src/mclgui/quickdraw.lisp:  (niy offset-polygon polygon h v)
+    ./src/mclgui/quickdraw.lisp:  (niy paint-arc view start-angle arc-angle left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy paint-oval view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy paint-polygon view polygon)
+    ./src/mclgui/quickdraw.lisp:  (niy paint-rect view left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy paint-round-rect view oval-width oval-height left top right bot)
+    ./src/mclgui/quickdraw.lisp:  (niy scale-point source-rect dest-rect h v)
+    ./src/mclgui/quickdraw.lisp:  (niy scroll-rect view rect dh dv)
+    ./src/mclgui/quickdraw.lisp:  (niy set-clip-region view new-region)
+    ./src/mclgui/quickdraw.lisp:  (niy start-picture view left top right bottom)
+    ./src/mclgui/quickdraw.lisp:  (niy start-polygon view)
+    ./src/mclgui/radio-button-dialog-item.lisp:        (niy radio-button-push item)
+    ./src/mclgui/radio-button-dialog-item.lisp:    (niy radio-button-unpush item)
+    ./src/mclgui/region.lisp:     (niy with-hilite-mode ',body)
+    ./src/mclgui/region.lisp:    (niy close-region view dest-region)
+    ./src/mclgui/region.lisp:    (niy open-region view)
+    ./src/mclgui/region.lisp:  (niy inset-region region h v)
+    ./src/mclgui/region.lisp:  (niy point-in-region-p region h v))
+    ./src/mclgui/region.lisp:  (niy rect-in-region-p region left top right bot))
+    ./src/mclgui/region.lisp:  (niy with-hilite-mode body)
+    ./src/mclgui/scrap.lisp:    (niy get-internal-scrap handler)))
+    ./src/mclgui/scrap.lisp:    (niy internalize-scrap handler)))
+    ./src/mclgui/scrap.lisp:    (niy set-internal-scrap handler value)))
+    ./src/mclgui/scrap.lisp:  (niy get-scrap scrap-type))
+    ./src/mclgui/scrap.lisp:  (niy initialize/scrap))
+    ./src/mclgui/scrap.lisp:  (niy put-scrap scrap-type scrap-value overwrite-p))
+    ./src/mclgui/scratch/frec.lisp:      (niy call-with-frec frec thunk)
+    ./src/mclgui/scratch/frec.lisp:    (niy make-frec cursor owner size)
+    ./src/mclgui/scratch/frec.lisp:  (niy reinit-frec frec owner-or-wptr owner)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:      (niy install-view-in-window item view)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:      (niy track-scroll-bar-thumb item)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:    (niy dialog-item-action item)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:    (niy draw-pane-splitter-outline scrollee scroll-bar pos min max direction)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy %set-scroll-bar-setting item new-value only-if-new-value)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy outside-scroll-bar-setting scroll-bar handle)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy remove-view-from-window item)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy scroll-wheel-handler w delta direction wherep)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy track-and-draw container function pos direction delta min-pos max-pos)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy update-scroll-bar-max-min-setting item)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-activate-event-handler item)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-click-event-handler item where)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-deactivate-event-handler item)
+    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-draw-contents item)
+    ./src/mclgui/select-dialog.lisp:               (niy select-item-from-list)
+    ./src/mclgui/sequence-dialog-item.lisp:  (niy put-scraps value text)
+    ./src/mclgui/table-dialog-item.lisp:                                         (niy view-click-event-handler item where)
+    ./src/mclgui/table-dialog-item.lisp:                        (niy add-to-selection-region item selected-p h v dont-compute-outline-region)
+    ./src/mclgui/table-dialog-item.lisp:                  (niy %draw-table-cell-new item h v rect selectedp)
+    ./src/mclgui/table-dialog-item.lisp:              (niy default-cell-size item width)
+    ./src/mclgui/table-dialog-item.lisp:            (niy scroll-to-cell item h v)
+    ./src/mclgui/table-dialog-item.lisp:            (niy view-draw-contents item)
+    ./src/mclgui/table-dialog-item.lisp:          (niy scroll-to-cell item h v)
+    ./src/mclgui/table-dialog-item.lisp:        (niy invert-cell-selection item h v selected-p)
+    ./src/mclgui/table-dialog-item.lisp:        (niy toggle-cell-outlining)
+    ./src/mclgui/table-dialog-item.lisp:      (niy invalidate-cell h v)
+    ./src/mclgui/table-dialog-item.lisp:      (niy toggle-selection-region item)
+    ./src/mclgui/table-dialog-item.lisp:  (niy compute-selection-regions item min-row max-row min-column max-column)
+    ./src/mclgui/table-dialog-item.lisp:  (niy dispose-selection-regions item)
+    ./src/mclgui/table-dialog-item.lisp:  (niy get-local-mouse-position)
+    ./src/mclgui/table-dialog-item.lisp:  (niy highlight-rect-frame rect)
+    ./src/mclgui/table-dialog-item.lisp:  (niy string-width-for-focused-control string ff ms)
+    ./src/mclgui/table-dialog-item.lisp:  (niy two-byte-script-p script)
+    ./src/mclgui/table-dialog-item.lisp:  (niy view-click-event-handler item where)
+    ./src/mclgui/test/test-graphics.lisp:  (niy draw-char '(x y cn))
+    ./src/mclgui/test/test-graphics.lisp:  (niy draw-string x y str)
+    ./src/mclgui/view.lisp:        (niy view-is-invalid-p view visrgn cliprgn tl br)
+    ./src/mclgui/view.lisp:  (niy initialize/view))
+    ./src/mclgui/view.lisp:  (niy view erase-p right-and-bottom-only) #-(and)
+
+    ./src/objc-bridge/objc-classes.lisp:  (niy note-class-protocols class))
+    ./src/objc-bridge/objc-runtime.lisp:  (niy with-nsstr nsstr cstring len body))
+
+    ./src/pw-kernel/box-creation/pw-patch.lisp:    (niy inval-r-view-sides view top&left?)
+    ./src/pw-kernel/boxes/bpf/bpf-editors/break-point-function.lisp:  (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
+    ./src/pw-kernel/boxes/data/file-buffer.lisp:    (niy patch-value self obj)
+    ./src/pw-kernel/boxes/data/file-buffer.lisp:  (niy add-to-file self list format)
+    ./src/pw-kernel/boxes/data/file-buffer.lisp:  (niy get-selected-file self)
+    ./src/pw-kernel/boxes/data/file-buffer.lisp:  (niy save-win self)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-clear)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-close)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-free-filter f)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-modify-filter f accept chan port type)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-new-filter chan port type)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-notes-off)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-open)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-read)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-reset)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-write event)
+    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-write-time event time)
+    ./src/pw-kernel/environment/mac-rsrc.lisp:  (niy get-box-cursor)
+    ./src/pw-kernel/environment/mac-rsrc.lisp:  (niy load-lisp-res)
+    ./src/pw-kernel/environment/make-image.lisp:  (niy clear-patchwork)
+    ./src/pw-kernel/environment/midi-note.lisp:      (niy write-midicent-note dur chan key vel) #-(and)
+    ./src/pw-kernel/environment/midi-note.lisp:    (niy write-midi-note dur chan key vel) #-(and)
+    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-controller-value chan controller value) #-(and)
+    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-pitch-bend-value chan value ls) #-(and)
+    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-pressure-value chan key value) #-(and)
+    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-program-change-value chan program) #-(and)
+    ./src/pw-kernel/pw-graphics/controls/popupmenu.lisp:      (niy view-click-event-handler self mouse)
+    ./src/pw-kernel/pw-graphics/controls/pw-graphics.lisp:  (niy grow-gray-rect anchor float port limit)
+    ./src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy win-print-setUp self)
+    ./src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy window-hardcopy self show-fl)
+    ./src/pw-kernel/pw-graphics/window+menu/pw-menu.lisp:  (niy clear-patchwork)
+    ./src/pw-kernel/pw-graphics/window+menu/pw-menu.lisp:  (niy save-special-pw-image)
+    ./src/pw-kernel/pw-graphics/window+menu/pw-window.lisp:    (niy view-click-event-handler self where)
+
+    ./src/pw-lib/midishare/cocoa-midi-player.lisp:       (niy  ,fun ,@pars))))
+    ./src/pw-lib/midishare/cocoa-midi-player.lisp:  (niy bar e d d?) #-(and)
+    ./src/pw-lib/midishare/cocoa-midi-player.lisp:  (niy beat e d d?) #-(and)
+    ./src/pw-lib/midishare/cocoa-midi-player.lisp:  (niy unit e d d?) #-(and)
+    ./src/pw-lib/midishare/midiplay.lisp:  (niy  MidiPlayANy  object approx chanbase)
+    ./src/pw-lib/midishare/midirecord.lisp:  (niy MidiSaveAny object) #-(and)
+    ./src/pw-lib/midishare/midirecord.lisp:  (niy mievents2midilist seq units/sec) #-(and)
+    ./src/pw-lib/midishare/midirecord.lisp:  (niy patch-value self obj)
+    ./src/pw-lib/midishare/midirecord.lisp:  (niy patch-value self obj)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiAddField ev val)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiAddSeq seq ev)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiApplySeq seq proc)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiAvailEv refnum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCall proc date refNum arg1 arg2 arg3)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiClearSeq seq)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiClose refNum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiConnect src dst state)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCopyEv ev)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountAppls)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountDTasks refnum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountEvs refnum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountFields ev)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiDTask proc date refNum arg1 arg2 arg3)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiExec1DTask refnum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiExt2IntTime time)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFlushDTasks refnum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFlushEvs refnum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiForgetTask ev)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiForgetTaskHdl thdl)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFreeEv ev)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFreeSeq seq)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFreeSpace)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetApplAlarm refNum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetEv refnum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetExtTime format smpteLocation)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetField ev field)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetFilter refNum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetIndAppl index)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetInfo refNum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetName refNum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetNamedAppl name)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetPortState port)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetRcvAlarm refNum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetTime)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetVersion)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiInt2ExtTime time)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiIsConnected src dst)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiNewCell cell)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiNewEv typenum)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiNewSeq)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiOpen name)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiReadSync adrmem)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSend refnum ev)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSendAt refnum ev date)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSendIm refnum ev)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetApplAlarm refNum alarm)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetField ev field val)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetFilter refNum p)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetInfo refNum p)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetName refNum name)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetPortState port state)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetRcvAlarm refNum alarm)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetSyncMode mode)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiShare)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSmpte2Time smpteLocation)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiTask proc date refNum arg1 arg2 arg3)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiTotalSpace syncInfo)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiWriteSync adrmem val)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy acceptchan f p s) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy acceptport f p s) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy accepttype f p s) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy alteratio e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy bend e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy chan e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy clk e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy ctrl e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy date e d) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy dur e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy fcount e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy field e f v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy fieldlist e n) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy fields e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy filterbit p n val val?) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy firstev s e e?) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy fmsg e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy info e d) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy kpress e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy lastev s e e?) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy link e d d?) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy linkse e d d?) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy linkst e d d?) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy minor-scale e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy num e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy param e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy pgm e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy pitch e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy port e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy prefix e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy ref e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy seconds e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy song e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy subframes e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy tempo e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy text e s) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy tsclick e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy tsdenom e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy tsnum e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy tsquarter e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy type e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy val e v) #-(and)
+    ./src/pw-lib/midishare/midishare.lisp:  (niy vel e v) #-(and)
+
+    ./src/pw-lib/pwscript/closae.lisp:  (niy aesend the-appleevent the-reply mode priority timeout idleproc filterproc)
+    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfAttribute self keyword)
+    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfKeyDesc self keyword)
+    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfNthDesc self index)
+    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfParam self keyword)
+    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getNthDesc self index type)
+    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getSize self)
+    ./src/pw-lib/pwscript/recordables.lisp:  (niy *record-enable*)
+
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:    (niy play-chords midics vels chan durs offs at-time)#-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy format-midi self data) #-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy format-midi self data) #-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy midi-o bytes) #-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy play-object object chan approx)#-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-midi-filtered self data) #-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-midi-filtered self data) #-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-midi-filtered self data) #-(and)
+    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-schedule-midi-in self box patch delay) #-(and)
+    ./src/pw-music/editors/rhythm/print-rtm.lisp:  (niy window-hardcopy self show-fl)
+    ./src/pw-music/utilities/mn-hardcopy.lisp:  (niy window-hardcopy self show-fl)
+
+    [pjb@kuiper :0.0 patchwork]$ 
+
+
+
+
+Errors & Warnings
+========================================
+
+::
+
+.. comment: THE END 

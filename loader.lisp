@@ -50,7 +50,7 @@
 ;;; remote debugging
 #-(and) 
 (progn
-  (ql:quickload :swank)
+  (ql:quickload :swank                                     :verbose t :explain t)
   (eval (read-from-string
          "(let ((swank::*loopback-interface* \"192.168.7.4\")) (swank:create-server))")))
 
@@ -65,6 +65,7 @@
 ;;; Load builder stuff.
 (ql:quickload :cffi                                       :verbose t :explain t)
 (ql:quickload :com.informatimago.tools.pathname           :verbose t :explain t)
+(ql:quickload :com.informatimago.tools.manifest           :verbose t :explain t)
 (ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
 (load (merge-pathnames "builder.lisp" (or *load-pathname* #P"./")))
 (in-package "PATCHWORK.BUILDER")

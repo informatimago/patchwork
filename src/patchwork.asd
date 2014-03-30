@@ -78,8 +78,8 @@
                  ;; (:file "pw-lib/pwscript/pw-ae" 
                  ;;        :depends-on ("packages"
                  ;;                     "pw-lib/pwscript/appleevent-toolkit"))
-                 ;; (:file "pw-lib/pwscript/closae" 
-                 ;;  :depends-on ("packages"))
+                 (:file "pw-lib/pwscript/closae" 
+                  :depends-on ("packages"))
 
 
                  (:file "pw-lib/pwscript/pw-scripting-gf"

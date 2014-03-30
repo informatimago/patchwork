@@ -1,94 +1,107 @@
 ;; -*- mode:rst; coding:utf-8 -*-
 
-En cours de développement
-=========================
+Patchwork
+#########
 
-make application
-----------------
-
-`make application` ne donne pas un exécutable utilisable (des pointeurs
-mac sont enregistrés dans l'image qui ne peuvent pas être utilisés au
-chargement.  
-
-Deux solutions:
-
-- rassembler dans des fonctions d'initialisation toutes les
-  expressions créant ces pointeurs mac, et appeler ces fonctions au
-  lancement de l'image exécutable.  (Voir par exemple initialize-menus dans
-  #P"PATCHWORK:src;pw-kernel;pw-graphics;window+menu;pw-menu.lisp").
-
-      + simplicité.
-
-      + portabilité.
-
-      - ne résoud pas le problème de la commande/menu "Save Image".
+This directory contains the sources of the Patchwork application,
+ported from MacOS (MCL) to MacOSX (ccl).
 
 
-- utiliser ccl:*lisp-cleanup-functions*.
+License
+=======
 
-      - plus complexe: il faudrait ajouter des fonctions
-        d'hibernation/réveil pour tous les objets qui ont un NSObject
-        handle.
+See the file ``Patchwork_license.rtf`` or ``Patchwork_license.txt``.
 
-      - pas portable.
+Compiling Patchwork
+===================
 
-      + résoud le problème de la commande/menu "Save Image".
+Installing the sources of Patchwork
+-----------------------------------
 
-      + facilite la génération de l'application en cours de développement.
+0- Install quicklisp. cf. _`http://beta.quicklisp.org/`.
 
+1- Get the sources
 
-
-Chargement du programme
------------------------
-
-0- Installer quicklisp.
-
-1- Obtenir les sources.
-
-1.1- Obtenir les sources de Patchwork via git  ::
+1.1- Get the sources of Patchwork with git  ::
 
         git clone git@gitorious.org:patchwork/patchwork.git
 
-   (ancien dépôt: _`http://fossil.informatimago.com:8002/patchwork/home`)
-
-1.2- Obtenir une version à jour de informatimago via git:
+1.2- Get an up-to-date version of informatimago from git: ::
 
         cd ~/quicklisp/local-projects
         git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
 
-     Normalement ils sont obtenus automatiquement via quicklisp, mais
-     il y peut y avoir des modifications nécessaires pour Patchwork
-     dans le dépôt git, qui ne seront prises en compte par quicklisp
-     qu'à la prochaine itération mensuelle.  
+     
+     The informatimago library can be obtained from quicklisp, but
+     Patchwork may need the latest version of informatimago, before
+     it's integrated into the monthly release of quicklisp.
 
-2- Voir 'generate-application.lisp' ou 'loader.lisp'.  Editer
-   ~/LOGHOSTS/PATCHWORK pour indiquer où sont installés les sources de
-   Patchwork ; par exemple: ::
+     Note: with ccl-1.6 on MacOSX 10.5.8, symbolic links in
+     ``local-projects`` are not processed correctly by quicklisp.
+     Therefore you should put com-informatimago anywhere, eg.: ::
+
+        cd ~/src
+        git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
+        
+     and just add this path to the list ``ql:*local-project-directories*``: ::
+       
+        (push (merge-pathnames #P"./src/com-informatimago/" (user-homedir-pathname))
+              ql:*local-project-directories*)
+
+
+2- Edit ``~/LOGHOSTS/PATCHWORK`` to tell where the sources of
+   Patchwork are installed, eg.: ::
 
       ;; -*- mode:lisp; coding:utf-8; -*-
 
       #.(list
          (list "PATCHWORK:**;*.*.*"
                (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
-                                #P"/home/pjb/" nil))
+                                (user-homedir-pathname) nil))
          (list "PATCHWORK:**;*.*"
                (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
-                                #P"/home/pjb/" nil))
+                                (user-homedir-pathname) nil))
          (list "PATCHWORK:**;*"
                (merge-pathnames #P"works/patchwork/patchwork/**/*"
-                                #P"/home/pjb/" nil)))
+                                (user-homedir-pathname) nil)))
 
 
-3- Lancer Clozure.app (AppStore), ou une autre version de ccl >= 1.7.
 
-4- (cd #P"/repertoire/ou/sont/installes/les/sources/de/patchwork/")
+Loading and compiling for development
+-------------------------------------
 
-5- (shell "make -C /repertoire/ou/sont/installes/les/sources/de/patchwork/ clean")
+1- Launch Clozure.app (AppStore), or any other version of ccl >= 1.7
+   (or ccl-1.6 on MacOSX 10.5.8).   You may also launch ccl with slime
+   in emacs.
 
-6- (load "loader.lisp")
+2- (cd #P"/directory/where/are/installed/the/sources/of/patchwork/")
 
+3- (shell "make -C /directory/where/are/installed/the/sources/of/patchwork/ clean")
+
+4- (load "loader.lisp")
+
+
+Generate the Patchwork.app application
+--------------------------------------
+
+1- cd "/repertoire/ou/sont/installes/les/sources/de/patchwork/"
+
+2- make clean
+
+3- make application
+
+
+The application is stored in a directory on the Desktop whose name
+contains the version numbers of ccl and of the system,
+eg. ``~/Desktop/patchwork-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/``.
+
+A manifest file is written to containing the systems used and their licenses.
+
+The generated application is compatible with MacOSX 10.3 and up if
+compiled with ccl-1.6 on MacOSX 10.5.8, and with MacOSX 10.6 and more
+otherwise.
 
 -- 
 __Pascal Bourguignon__
-Sun Jun 24 04:49:50 CEST 2012
+Sun Mar 30 18:52:23 CEST 2014
 

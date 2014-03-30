@@ -81,9 +81,9 @@
 Must be called on the main thread."
   (ui:initialize)
   (initialize-streams)
+  (initialize-mn-editor)
   (initialize-menus)
   (initialize-beat-measure-line)
-  (initialize-mn-editor)
   #-(and)(installapple-event-handlers)
   ;; ---
   (terpri *patchwork-io*)
@@ -99,13 +99,13 @@ Must be called on the main thread."
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
-(on-resume patchwork-trace
-           (setf *trace-output* (open #P"~/Desktop/patchwork-trace.txt"
-                                      :direction :output
-                                      :if-does-not-exist :create
-                                      :if-exists :append))
-           
-           (format *trace-output* "~A~%" (date)))
+(on-restore patchwork-trace
+            (setf *trace-output* (open #P"~/Desktop/patchwork-trace.txt"
+                                       :direction :output
+                                       :if-does-not-exist :create
+                                       :if-exists :append))
+            
+            (format *trace-output* "~A~%" (date)))
 
 (on-startup patchwork-initialization
   (eval-enqueue '(initialize-patchwork)))
