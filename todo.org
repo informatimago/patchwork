@@ -17,9 +17,6 @@
 14. Divers              : 257/258 fonctions implémentées [ 99%]
 
 ** Bugs
-*** TODO editing text boxes doesn't work                                :bug:
-clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
-*** TODO key down events are not processed correctly                    :bug:
 *** TODO drawing links doesn't work                                     :bug:
 *** TODO drawing of outboxes doesn't work                               :bug:
 *** TODO dragging the top bar of a patch doesn't move it.               :bug:
@@ -27,6 +24,9 @@ clicking on editable text in box (eg value in a const box) doesn't select it, an
 with control click and drag.
 *** TODO resizing a box works only the first time.                      :bug:
 with click and drag on the grow box.
+*** TODO key down events are not processed correctly                    :bug:
+*** TODO editing text boxes doesn't work                                :bug:
+clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
 Note: option-click and command-click have specific meanings.
 *** DONE [#A] debug generated applications from recent changes          :bug:
