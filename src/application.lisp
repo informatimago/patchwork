@@ -103,8 +103,8 @@ Must be called on the main thread."
             (setf *trace-output* (open #P"~/Desktop/patchwork-trace.txt"
                                        :direction :output
                                        :if-does-not-exist :create
-                                       :if-exists :append))
-            
+                                       :if-exists :append
+                                       #+ccl :sharing #+ccl :lock))
             (format *trace-output* "~A~%" (date)))
 
 (on-startup patchwork-initialization

@@ -101,6 +101,18 @@ The generated application is compatible with MacOSX 10.3 and up if
 compiled with ccl-1.6 on MacOSX 10.5.8, and with MacOSX 10.6 and more
 otherwise.
 
+
+Development tips
+================
+
+- If when launching the application nothing happens, try to launch it
+  from the terminal: you may be dropped them in ccl debugger, or get
+  an error message that would disappear in the Finder.
+
+- The ``*trace-output*`` is configured for now to save to the file
+  ``~/Desktop/patchwork-trace.txt``.
+
+
 -- 
 __Pascal Bourguignon__
 Sun Mar 30 18:52:23 CEST 2014

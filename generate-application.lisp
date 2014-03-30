@@ -218,9 +218,10 @@
                  ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
                  ;; overriden by write-info-plist (bundle-package-type $default-info-plist-bundle-package-type)
                  ;; overriden by write-info-plist (bundle-signature $default-info-plist-bundle-signature)
-                 :|CFBundleShortVersionString|  (format nil "\"~A\"" (subseq *patchwork-version* 0 (or (position #\- *patchwork-version*)
-                                                                                                       (length *patchwork-version*))))
-                 :|CFBundleVersion| (format nil "\"~A\"" *patchwork-version*)
+                 :|CFBundleShortVersionString|  (format nil "~A" *patchwork-version*)
+                 :|CFBundleVersion| (format nil "Patchwork ~A, ~A ~A" *patchwork-version*
+                                            (lisp-implementation-type)
+                                            (lisp-implementation-version))
                  ;; (has-localized-display-name $default-info-plist-has-localized-display-name)
                  ;; (minimum-system-version $default-info-plist-minimum-system-version)
                  ;; (main-nib-file $default-info-plist-main-nib-file)
