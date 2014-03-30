@@ -41,7 +41,6 @@
 (load #P"~/quicklisp/setup.lisp")
 (setf quicklisp-client:*quickload-verbose* t)
 
-(trace asdf:run-shell-command)
 ;;; --------------------------------------------------------------------
 ;;; Configure quicklisp.
 ;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
@@ -105,13 +104,15 @@
 (defparameter *program-directory* (merge-pathnames
                                    (make-pathname :directory (list :relative "Desktop" (executable-name *program-name*)))
                                    (user-homedir-pathname)))
+
+(say "Generating manifest.")
 (ensure-directories-exist (merge-pathnames "TEST" *program-directory*))
-(say "~%Generating ~A~%" (executable-name *program-name*))
 (let ((*default-pathname-defaults* *program-directory*))
   (write-manifest *program-name* *program-system*))
 
 ;;; --------------------------------------------------------------------
 ;;; Save the application package.
+(say "Generating ~A" (executable-name *program-name*))
 
 ;; Let's reset the readtable to the implementation defined one.
 (setf *readtable* (copy-readtable *cocoa-readtable*))
@@ -246,8 +247,8 @@
    :toplevel-function nil
    :altconsole nil))
 
-
-(save-patchwork-application :name *program-name* :directory *program-directory*)
+(unless *load-pathname*
+  (save-patchwork-application :name *program-name* :directory *program-directory*))
 
 
 #+lispworks
