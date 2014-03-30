@@ -54,7 +54,7 @@
       *print-right-margin* 110)
 
 (defun say (fmt &rest args)
-  (format *trace-output* "~%;;; ~?~%" fmt args)
+  (format *trace-output* "~&;;; ~?~%" fmt args)
   (finish-output *trace-output*))
 
 
