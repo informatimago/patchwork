@@ -1,4 +1,4 @@
-;; -*- mode:rst; coding:utf-8 -*-
+.. comment:  -*- mode:rst; coding:utf-8 -*-
 
 Patchwork
 #########
@@ -113,7 +113,5 @@ Development tips
   ``~/Desktop/patchwork-trace.txt``.
 
 
--- 
-__Pascal Bourguignon__
-Sun Mar 30 18:52:23 CEST 2014
+.. comment:  THE END 
 
