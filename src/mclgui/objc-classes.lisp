@@ -475,11 +475,11 @@ RETURN:         DST.
     `(block ,vhandler
        (handler-bind ((error (lambda (err)
                                (declare (stepper disable))
-                               #+ccl (format *trace-output* "~{~A~%~}" (ccl::backtrace-as-list))
-                               (format *trace-output* "~%ERROR while ~S:~%~A~2%"
+                               #+ccl (format *error-output* "~{~A~%~}" (ccl::backtrace-as-list))
+                               (format *error-output* "~%ERROR while ~S:~%~A~2%"
                                        ',(if (= 1 (length body)) body `(progn ,@body))
                                        err)
-                               (finish-output *trace-output*)
+                               (finish-output *error-output*)
                                (return-from ,vhandler nil))))
          ,@body))))
 
