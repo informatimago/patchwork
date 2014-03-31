@@ -29,8 +29,13 @@ Note: option-click and command-click have specific meanings.
 find-grep :patxor
 (trace find-view-containing-point)
 make-PW-standard-box
-*** TODO cursors referenced by resource ID                              :port:
+*** TODO cursors referenced by resource ID                             :port:
 eg. (set-cursor *cross-line-cursor*)
+*** TODO the first menus must be renamed                               :port:
+The application menu should be Patchwork instead of Clozure CL
+The next menu should be Apps instead of Patchwork.
+*** TODO multi-bpf breaks                                               :bug:
+*** TODO bpf-lib breaks                                                 :bug:
 *** DONE dragging links doesn't work                                    :bug:
     CLOSED: [2014-03-31 Mon 10:51]
     - State "DONE"       from "IN-PROGRESS" [2014-03-31 Mon 10:51] \\
