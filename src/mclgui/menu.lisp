@@ -611,8 +611,8 @@ RETURN:         two values: the key equivalent NSString and the key
 "
   (values (cond
             ((null  command-key) (objcl:objcl-string ""))
-            ((consp command-key) (objcl:objcl-string (second command-key)))
-            (t                   (objcl:objcl-string command-key)))
+            ((consp command-key) (objcl:objcl-string (string-downcase (second command-key))))
+            (t                   (objcl:objcl-string (string-downcase command-key))))
           (encode-key-mask (if (atom command-key)
                                :command
                                (first command-key)))))
