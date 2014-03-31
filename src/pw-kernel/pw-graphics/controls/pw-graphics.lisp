@@ -52,8 +52,8 @@
 ;;======================================
 (defun grow-gray-rect (anchor float view limit)
   (let* ((float     (add-points float anchor))
-         (old-mouse (view-mouse-position nil))
-         (new-mouse old-mouse)
+         (old-mouse anchor)
+         (new-mouse (view-mouse-position view))
          (offset    (subtract-points float old-mouse))
          (delta     (add-points offset old-mouse))
          (limit     (and limit (add-points anchor (make-point limit limit))))
@@ -65,7 +65,7 @@
       (with-instance-drawing view
         (draw-gray-rect (pt2rect anchor delta))
         (loop :while (mouse-down-p) :do
-          (setf new-mouse (view-mouse-position nil))
+          (setf new-mouse (view-mouse-position view))
           (unless (eql old-mouse new-mouse)  ;has the mouse moved?
             (new-instance view)
             (setf delta (add-points offset new-mouse))
