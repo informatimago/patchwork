@@ -95,10 +95,10 @@
   (declare (stepper trace))
   (unless (and (slot-boundp view 'view-position)
                (slot-value view 'view-position))
-    (setf (slot-value view 'view-position) (view-default-position view)))
+    (setf (%view-position view) (view-default-position view)))
   (unless (and (slot-boundp view 'view-size)
                (slot-value view 'view-size))
-    (setf (slot-value view 'view-size) (view-default-size view)))
+    (setf (%view-size view) (view-default-size view)))
   (when (slot-boundp  view 'view-container)
     (set-view-container view (slot-value view 'view-container)))
   (call-next-method)
@@ -927,15 +927,22 @@ RETURN:         (make-point h v)
     (let ((pos (make-point h v)))
       (unless (eql pos (view-position view))
         (invalidate-view view t)         
-        (setf (slot-value view 'view-position) pos)
+        (setf (%view-position view) pos)
+        (format-trace 'set-view-position   (point-to-list (slot-value view 'view-position)) (point-to-list pos) view)
         (with-handle (viewh view)
+          (format-trace 'set-view-position '|setFrameOrigin:| (nspoint pos))
           [viewh setFrameOrigin: (nspoint pos)]
-          #-(and)
-          (on-main-thread [viewh setFrameOrigin: (nspoint pos)]))
+          #-(and) (on-main-thread [viewh setFrameOrigin: (nspoint pos)]))
         (invalidate-view view t))
       (refocus-view view)
       pos)))
 
+#+pjb-debug
+(defmethod (setf %view-position) :around (new-position view)
+  ;; (when (= 0 new-position) (break "set-view-position (0 0) !"))
+  (format-trace '(setf %view-position) (point-to-list new-position) view)
+  (prog1 (call-next-method)
+    (format-trace '(setf %view-position) (point-to-list (view-position view)) view)))
 
 (defgeneric set-view-size (view h &optional v)
   (:documentation "
@@ -1134,6 +1141,23 @@ SOURCE-VIEW:    A view in whose coordinate system point is given.
                     :destination destination-view)
       result)))
 
+#+pjb-debug
+(defmethod find-view-containing-point :around (view h &optional v direct-subviews-only)
+  (declare (ignorable view h v direct-subviews-only))
+  (let ((result (call-next-method)))
+    (format-trace 'find-view-containing-point result)
+    (with-focused-view result
+      (with-pen-state (:pattern *black-pattern* :mode :srcCopy)
+       (fill-rect* 0 0 (point-h (view-size result)) (point-v (view-size result)))))
+    result))
+
+(defmethod find-view-containing-point :around (view h &optional v direct-subviews-only)
+  (declare (ignorable view h v direct-subviews-only))
+  (let ((result (call-next-method)))
+    (format-trace 'find-view-containing-point result
+                  (subviews result))
+    result))
+
 
 (defgeneric find-view-containing-point (view h &optional v direct-subviews-only)
   (:documentation "
@@ -1181,14 +1205,14 @@ DIRECT-SUBVIEWS-ONLY:
 
   (:method ((view null) h &optional v (direct-subviews-only nil))
     (let ((point (make-point h v)))
-      (map-windows (lambda (w)
-                     (when (view-contains-point-p w point)
+      (map-windows (lambda (window)
+                     (when (view-contains-point-p window point)
                        (return-from find-view-containing-point
                          (if direct-subviews-only
-                             w
+                             window
                              (find-view-containing-point 
-                              w
-                              (subtract-points point (view-position w)))))))
+                              window
+                              (subtract-points point (view-position window)))))))
                    :include-windoids t)
       nil)))
 

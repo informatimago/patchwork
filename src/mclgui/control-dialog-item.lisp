@@ -147,7 +147,7 @@
     (unless (eql new-pos (view-position item))
       (without-interrupts
           (invalidate-view item t)
-        (setf (slot-value item 'view-position) new-pos)
+        (setf (%view-position item) new-pos)
         (when (installed-item-p item)
           (with-focused-view (view-container item)
             (niy set-view-position item h v)

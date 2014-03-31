@@ -396,10 +396,10 @@ DO:             Enable or disable the dialog ITEM depending on ENABLED-P.
   (:method ((view simple-view))
     (let ((old-pos  (view-position view))
           (old-size (view-size view)))
-      (unless old-pos  (setf (slot-value view 'view-position) 0))
-      (unless old-size (setf (slot-value view 'view-size) (view-default-size view)))
+      (unless old-pos  (setf (%view-position view) 0))
+      (unless old-size (setf (%view-size view) (view-default-size view)))
       (multiple-value-bind (tl br) (view-corners view)        
-        (setf (slot-value view 'view-position) old-pos)
+        (setf (%view-position view) old-pos)
         (subtract-points br tl)))))
 
 
@@ -486,12 +486,12 @@ dialog-item-width-correction.)
 
 (defgeneric set-default-size-and-position (view &optional container)
   (:method ((view simple-view) &optional container)
-    (when (view-size view)
+    (unless (view-size view)
       (setf (slot-value view 'view-size) (view-default-size view)))
-    (when (view-position view)
-      (let ((container (or container (view-container view)))) 
-        (when container
-          (setf (slot-value view 'view-position) (view-find-vacant-position container view)))))))
+    (or (view-position view)
+        (let ((container (or container (view-container view)))) 
+          (when container
+            (setf (%view-position view) (view-find-vacant-position container view)))))))
 
 
 

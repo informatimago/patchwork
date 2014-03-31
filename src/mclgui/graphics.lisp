@@ -123,7 +123,6 @@
       (when window
         (let* ((pen  (view-pen window))
                (size (pen-size pen)))
-          
           (if (and nil (= #@(1 1) size)
                    (eq *black-pattern* (pen-state-pattern pen)))
             (#_NSFrameRect (ns:make-ns-rect x y w h))

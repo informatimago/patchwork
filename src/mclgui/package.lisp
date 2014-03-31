@@ -354,6 +354,11 @@
    ;;  Extensions:
    "COLOR-PARTS"
 
+   "*BLACK-COLOR*" "*WHITE-COLOR*" "*PINK-COLOR*" "*RED-COLOR*"
+   "*ORANGE-COLOR*" "*YELLOW-COLOR*" "*GREEN-COLOR*" "*DARK-GREEN-COLOR*"
+   "*LIGHT-BLUE-COLOR*" "*BLUE-COLOR*" "*PURPLE-COLOR*" "*BROWN-COLOR*"
+   "*TAN-COLOR*" "*GRAY-COLOR*" "*LIGHT-GRAY-COLOR*"
+   "*LIGHTER-GRAY-COLOR*" "*DARK-GRAY-COLOR*" "*TOOL-BACK-COLOR*"
 
    ;; ----------------------------------------
    ;; Chapter 8: File System Interface

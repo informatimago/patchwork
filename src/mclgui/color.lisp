@@ -338,7 +338,9 @@ RETURN:         A list of key parts that can be colored in the THING.
         *light-gray-color*   (make-color 49152 49152 49152) 
         *lighter-gray-color* (make-color 56576 56576 56576) 
         *dark-gray-color*    (make-color 16384 16384 16384)
-        *background-color*   *white-color*))
+        *background-color*   *white-color*
+        *tool-back-color*    *yellow-color* ; what is this?
+        )) 
 
 (defgeneric color-or-gray-p (item)
   (:method (item)

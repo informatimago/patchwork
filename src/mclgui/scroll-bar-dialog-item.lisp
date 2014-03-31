@@ -1042,8 +1042,8 @@ NEW-VALUE:      The new width of item.
            initargs)))
 
 
-(defparameter *gray-color*      #x808080) ;; from color.lisp - boot prob
-(defparameter *dark-gray-color* #x404040) ;; ditto
+;; (defparameter *gray-color*      #x808080) ;; from color.lisp - boot prob
+;; (defparameter *dark-gray-color* #x404040) ;; ditto
 
 (defmethod view-draw-contents ((item pane-splitter))
   (let* ((active-p (window-active-p (view-window item)))

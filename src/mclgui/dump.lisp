@@ -31,7 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
 (in-package "MCLGUI")
 
 
@@ -54,9 +53,6 @@
 ;;   (:method append ((o e)) '(e)))
 ;; (m  (make-instance 'e))
 ;; --> (e d b c a)
-
-
-
 
 
 
@@ -246,5 +242,9 @@
            (find-tree item (cdr tree))))))
 
 
+(defun all-superclasses (object)
+  (map nil 'print (com.informatimago.common-lisp.cesarum.utility:compute-closure 
+                   (function class-direct-superclasses)
+                   (list (class-of object)))))
 
 ;;;; THE END ;;;;

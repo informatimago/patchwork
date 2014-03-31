@@ -154,7 +154,7 @@ to the styles listed here.")
 
 ;; Colors:
 
-(defvar *color-available* nil
+(defparameter *color-available* 32
   "
 The *COLOR-AVAILABLE* variable returns a value indicating whether the
 Macintosh computer on which Macintosh Common Lisp is running supports

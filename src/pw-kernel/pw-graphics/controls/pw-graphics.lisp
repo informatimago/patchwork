@@ -37,14 +37,6 @@
 (objcl:enable-objcl-reader-macros)
 
 
-;;(with-pen-saved   
-;;  (#_PenMode :word (position :patxor *pen-modes*))
-;;  (#_PenPat :ptr *gray-pattern*))
-
-;; let-window-pen,let-window-font
-;; with-font-codes  
-
-
 (defvar *r-view-temp-region* nil)
 (on-load-and-now init/r-view-temp-region
   (setq *r-view-temp-region* (new-region)))
@@ -53,7 +45,6 @@
 (defun grow-gray-rect (anchor float view limit)
   (let* ((float     (add-points float anchor))
          (old-mouse anchor)
-         (new-mouse (view-mouse-position view))
          (offset    (subtract-points float old-mouse))
          (delta     (add-points offset old-mouse))
          (limit     (and limit (add-points anchor (make-point limit limit))))
@@ -65,14 +56,14 @@
       (with-instance-drawing view
         (draw-gray-rect (pt2rect anchor delta))
         (loop :while (mouse-down-p) :do
-          (setf new-mouse (view-mouse-position view))
-          (unless (eql old-mouse new-mouse)  ;has the mouse moved?
-            (new-instance view)
-            (setf delta (add-points offset new-mouse))
-            (when limit (setq delta (point-max delta limit)))
-            (draw-gray-rect (pt2rect anchor delta))
-            (get-next-event event nil 0 1)
-            (setf old-mouse new-mouse)))      
+          (let ((new-mouse (view-mouse-position view)))
+           (unless (eql old-mouse new-mouse) ;has the mouse moved?
+             (new-instance view)
+             (setf delta (add-points offset new-mouse))
+             (when limit (setq delta (point-max delta limit)))
+             (draw-gray-rect (pt2rect anchor delta))
+             (get-next-event event nil 0 1)
+             (setf old-mouse new-mouse))))      
         (new-instance view)))
     delta))
 

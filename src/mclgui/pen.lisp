@@ -405,6 +405,7 @@ not normally called directly but instead by stream output functions.
                  (progn
                    [context saveGraphicsState]
                    (setf (slot-value window 'view-pen) pen)
+                   ;; cf. pattern.lisp (update-handle pattern).
                    (with-handle (color (pen-state-pattern pen))
                      [color setFill]
                      [color setStroke]

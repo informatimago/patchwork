@@ -17,20 +17,45 @@
 14. Divers              : 257/258 fonctions implémentées [ 99%]
 
 ** Bugs
-*** TODO drawing links doesn't work                                     :bug:
-*** TODO drawing of outboxes doesn't work                               :bug:
-*** TODO dragging the top bar of a patch doesn't move it.               :bug:
-*** TODO moving a box works only the first time.                        :bug:
-with control click and drag.
-*** TODO resizing a box works only the first time.                      :bug:
-with click and drag on the grow box.
+*** TODO on creation of new boxes they get a bad vacant position        :bug:
+view-find-vacant-position
 *** TODO key down events are not processed correctly                    :bug:
 *** TODO editing text boxes doesn't work                                :bug:
 clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
 Note: option-click and command-click have specific meanings.
+*** TODO spinwheel while drawing links                                  :bug:
+- while click-and-dragging, the spinwheel cursor activates.
+find-grep :patxor
+(trace find-view-containing-point)
+make-PW-standard-box
 *** TODO cursors referenced by resource ID                              :port:
 eg. (set-cursor *cross-line-cursor*)
+*** DONE drawing links doesn't work                                     :bug:
+    CLOSED: [2014-03-31 Mon 10:51]
+    - State "DONE"       from "IN-PROGRESS" [2014-03-31 Mon 10:51] \\
+      Completed.
+    - State "IN-PROGRESS" from "TODO"       [2014-03-31 Mon 04:45] \\
+      drag-out-line
+
+*** DONE drawing of outboxes doesn't work                               :bug:
+    CLOSED: [2014-03-31 Mon 10:52]
+    - State "DONE"       from "TODO"       [2014-03-31 Mon 10:52] \\
+      Corrected.
+*** DONE dragging the top bar of a patch doesn't move it.               :bug:
+    CLOSED: [2014-03-31 Mon 10:52]
+    - State "DONE"       from "TODO"       [2014-03-31 Mon 10:52] \\
+      Corrected.
+*** DONE moving a box works only the first time.                        :bug:
+    CLOSED: [2014-03-31 Mon 10:52]
+    - State "DONE"       from "TODO"       [2014-03-31 Mon 10:52] \\
+      Corrected.
+with control click and drag.
+*** DONE resizing a box works only the first time.                      :bug:
+    CLOSED: [2014-03-31 Mon 10:53]
+    - State "DONE"       from "TODO"       [2014-03-31 Mon 10:53] \\
+      Corrected.
+with click and drag on the grow box.
 *** DONE [#A] debug generated applications from recent changes          :bug:
     CLOSED: [2014-03-31 Mon 01:02]
     - State "DONE"       from "TODO"       [2014-03-31 Mon 01:02] \\

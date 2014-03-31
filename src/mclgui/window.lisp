@@ -44,7 +44,7 @@
 ;; (initialize/window)
 
 (defmethod update-handle ((window window))
-  (setf (slot-value window 'view-position) (center-window (view-size window) (view-position window)))
+  (setf (%view-position window) (center-window (view-size window) (view-position window)))
   (setf (view-valid window) (list nil))
   (view-allocate-clip-region window)
   (when (and (slot-value window 'erase-anonymous-invalidations)
@@ -385,7 +385,7 @@ V:              The vertical coordinate of the new position, or NIL if
   (if (numberp h)
       (let ((pos      (make-point h v))
             (mswindow (handle window)))
-        (setf (slot-value window 'view-position) pos)
+        (setf (%view-position window) pos)
         (when (and (not *window-moving*) mswindow)
           (format-trace "Before mswindow setFrameOrigin:")
           ;; (break)

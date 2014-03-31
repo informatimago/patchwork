@@ -3,6 +3,15 @@
 PATCHWORK RELEASE NOTES 
 ========================
 
+next release
+-----------------------
+
+- drawing links works.
+- drawing of outboxes works.
+- dragging the top bar of a patch moves it.
+- moving a box works also after the first time.
+- resizing a box works also after the first time.
+
 
 10.0-0.922, 10.0-0.919 
 ----------------------

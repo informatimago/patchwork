@@ -67,15 +67,23 @@
 (defvar *normal-connection-draw-mode* *black-pattern*) 
 
 
-(defclass C-pw-outrect (BUTTON-DIALOG-ITEM) ())
+(defclass C-pw-outrect (BUTTON-DIALOG-ITEM)
+  ((fill-state :initform nil :accessor %outrect-fill-state)))
 
 (defmethod view-draw-contents ((self C-pw-outrect))
-  (draw-rect* (x self) (y self) (w self) (h self)))
+  ;; (draw-rect* (x self) (y self) (w self) (h self))
+  (with-focused-view self
+    (draw-rect* 0 0 (w self) (h self))))
+
 
 (defgeneric fill-patch-outrect (self)
   (:method ((self C-pw-outrect))
     (with-focused-view self 
-      (with-pen-state (:mode :patxor)
+      (with-pen-state (:mode :patsrc
+                       :pattern (if (setf (%outrect-fill-state self)
+                                          (not (%outrect-fill-state self)))
+                                    *black-pattern*
+                                    *white-pattern*))
         (fill-rect* 1 1 8 3)))))      
 
 (defgeneric mid-x (self)
@@ -85,13 +93,6 @@
   (:method ((self C-pw-outrect))
     (+ (y (view-container self)) (h (view-container self)) -2)))
 
-;; (defmethod view-click-event-handler ((self C-pw-outrect) where)
-;;   (if (option-key-p)
-;;       (progn (incf (clock *global-clock*))
-;;              (eval-enqueue
-;;               `(format t "PW->~S~%"
-;;                        (patch-value ',(view-container self) ',(view-container self)))))
-;;       (drag-out-line self where)))
 
 (defvar *standard-click-eval* t)
 
@@ -106,37 +107,31 @@
 (defun get-evaluation-option () *standard-click-eval*)
 
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
-  (if *standard-click-eval* 
-      (if (option-key-p)
-          (progn (incf (clock *global-clock*))
-                 (eval-enqueue
-                  `(format t "PW->~S~%"
-                           (patch-value ',(view-container self) ',(view-container self))))
-                                        ;aaa
-                 (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))))))
-          (drag-out-line self where))
-      (if (option-key-p)
-          (drag-out-line self where)
-          (progn (incf (clock *global-clock*))
-                 (eval-enqueue
-                  `(format t "PW->~S~%"
-                           (patch-value ',(view-container self) ',(view-container self))))))))
+  (if (eq (not (get-evaluation-option)) (not (option-key-p)))
+      (progn
+        (incf (clock *global-clock*))
+        (eval-enqueue
+         `(format t "PW->~S~%" (patch-value ',(view-container self) ',(view-container self)))) ; aaa
+        (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))))))
+      (drag-out-line self where)))
 
 (defgeneric drag-out-line (view where)
   (:method ((view C-pw-outrect) where)
-    (let* ((win (view-window view))
-           (last-mp (view-mouse-position win)))
-      (setq where (view-mouse-position win)) 
-      (with-pen-state (:mode :patxor)
-        (with-focused-view (view-window view)
-          (loop
-            (unless (mouse-down-p) (return))
+    (let* ((win     (view-window view))
+           (last-mp (view-mouse-position win))
+           (where   (convert-coordinates where view win)))
+      (flet ((draw-the-line ()
+               (with-focused-view win
+                 (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp)))))
+        (with-instance-drawing win
+          (draw-the-line)
+          (loop :while (mouse-down-p) :do
             (let ((mp (view-mouse-position win)))
               (unless (eql mp last-mp)
-                (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp))
                 (setq last-mp mp)
-                (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp)))))
-          (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp))))
+                (new-instance win)
+                (draw-the-line))))
+          (new-instance win)))
       (connect-patch? view (find-view-containing-point win last-mp))
       (with-focused-view view
         (erase-view-inside-rect view)))))
@@ -351,15 +346,18 @@
     (view-draw-contents v)))
 
 (defmethod view-draw-contents ((self C-patch))
-  (with-pen-state (:pattern *white-pattern*) 
-    (fill-rect* 1 1 (- (w self) 2) (- (h self) 2)))
   (set-view-font self '("Monaco" 9 :SRCOR :PLAIN))
-  (with-font-focused-view self 
+  (with-font-focused-view self
+    (with-pen-state (:pattern *light-gray-pattern*)
+      (with-fore-color *light-gray-color*
+       (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
     (call-next-method)
     (draw-small-rects self)
     (draw-patch-view-outline self)
-    (draw-function-name self 2 (- (h self) 5))
-    (draw-rect* 0 0 (w self)(h self))))
+    (draw-function-name self 2 (- (h self) 7))
+    ;; (draw-rect* 0 0 (w self) (h self))
+    (with-fore-color ui::*blue-color*
+      (draw-rect* 0 0 (w self)(h self)))))
 
 (defgeneric print-connections (self &optional erase-mode)
   (:method ((self C-patch) &optional erase-mode)
@@ -403,7 +401,8 @@
   (:method ((self C-patch))
     (draw-line 0 3 (w self) 3) 
     (when (active-mode self) 
-      (with-pen-state (:pattern *black-pattern*) (fill-rect* 0 0 (w self) 3)))
+      (with-pen-state (:pattern *black-pattern*)
+        (fill-rect* 0 0 (w self) 3)))
     (draw-patch-extra self)))
 
 (defmethod draw-function-name ((self C-patch) x y)
@@ -566,7 +565,7 @@
   (:method ((self C-patch) dx dy)
     ;; (record-event :|core| :|move| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self)))
     ;;                                     (,:|insh| ,(cl-user::getDescRecPtr (cl-user::asAEDesc (list (+ (x self) dx) (+ (y self) dy)))))))
-    (set-view-position self (+ (x self) dx)(+ (y self) dy))))
+    (set-view-position self (+ (x self) dx) (+ (y self) dy))))
 
 (defmethod set-view-scroll-position ((view C-patch) h &optional v scroll-visibly?)
   (declare (ignore scroll-visibly?))
@@ -575,10 +574,9 @@
       (call-next-method)
       (let ((pos (view-position view)))
         (unwind-protect
-             (setf (slot-value view 'view-position)
-                   (add-points pos (subtract-points old-scroll (make-point h v))))
+             (setf (%view-position view) (add-points pos (subtract-points old-scroll (make-point h v))))
           (inval-r-view-sides view t))
-        (setf (slot-value view 'view-position) pos)))
+        (setf (%view-position view) pos)))
     (inval-r-view-sides view t)))
 
 (defgeneric handle-edit-events (self char)

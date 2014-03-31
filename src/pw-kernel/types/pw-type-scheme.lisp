@@ -534,6 +534,7 @@
         (input-boxes '())
         (module))
     (while input-boxes-types
+      (print (car input-boxes-types))
       (push (apply 'make-instance (pop input-boxes-types)) input-boxes)
       (setf (doc-string (car input-boxes)) (pop input-boxes-types)))
     (setq input-boxes (nreverse input-boxes))
@@ -541,24 +542,27 @@
     ;;;;;(if size (adjust-new-size input-boxes size))
     (dolist (box input-boxes)
       (if (zerop index)
-        (progn (set-view-position box (make-point 5 y-now))
-               (ui::format-trace "make-pw-standard-box" (point-to-list (make-point 5 y-now)) box))
-        (progn (set-view-position box (make-point (+ 7 (w box)) y-now))
-               (ui::format-trace "make-pw-standard-box" (point-to-list (make-point (+ 7 (w box)) y-now)) box)
-               (incf y-now (+ 2 (h box)))))
+          (progn (set-view-position box (make-point 5 y-now))
+                 (ui::format-trace "make-pw-standard-box" (point-to-list (make-point 5 y-now)) box))
+          (progn (set-view-position box (make-point (+ 7 (w box)) y-now))
+                 (ui::format-trace "make-pw-standard-box" (point-to-list (make-point (+ 7 (w box)) y-now)) box)
+                 (incf y-now (+ 2 (h box)))))
+      (print box)
       (setq index (mod (incf index) 2)))
     (if (not (zerop index)) (incf y-now (+ 2 (h (car (last input-boxes))))))
     (setq module (make-instance class-name
-                   :view-position position 
-                   :view-size  (make-point 
-                                (+ 5  (if input-boxes
-                                        (apply #'max (ask-all input-boxes 'x+w))
-                                        42))
-                                (+ 13 y-now))
-                   :pw-function pw-function
-                   :type-list (get-out-type-list pw-function)
-                   :VIEW-SUBVIEWS input-boxes))
+                                :view-position position 
+                                :view-size  (make-point 
+                                             (+ 5  (if input-boxes
+                                                       (apply #'max (ask-all input-boxes 'x+w))
+                                                       42))
+                                             (+ 13 y-now))
+                                :pw-function pw-function
+                                :type-list (get-out-type-list pw-function)
+                                :VIEW-SUBVIEWS input-boxes))
     (if size (resize-patch-box module size 0))
+    (dolist (box input-boxes)
+      (print box))
     module))
 
 (defun box (class-name pw-function pw-function-string

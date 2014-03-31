@@ -42,11 +42,13 @@
    (view-container       :initform nil                                         :reader view-container
                          :documentation "The view that contains this view.")
    (view-position        :initform #@(0 0)     :initarg  :view-position        :reader view-position
+                         :accessor %view-position
                          :documentation "
 The position of the view in its container, in the coordinate system of
 the container.
 ")
    (view-size            :initform #@(100 100) :initarg  :view-size            :reader view-size
+                         :accessor %view-size
                          :documentation "The size of the view.")
    (view-scroll-position :initform #@(0 0)
                          :initarg :view-scroll-position
