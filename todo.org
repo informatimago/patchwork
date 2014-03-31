@@ -17,11 +17,11 @@
 14. Divers              : 257/258 fonctions implémentées [ 99%]
 
 ** Bugs
-*** TODO on creation of new boxes they get a bad vacant position        :bug:
-view-find-vacant-position
 *** TODO key down events are not processed correctly                    :bug:
 *** TODO editing text boxes doesn't work                                :bug:
 clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
+*** TODO on creation of new boxes they get a bad vacant position        :bug:
+view-find-vacant-position
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
 Note: option-click and command-click have specific meanings.
 *** TODO spinwheel while drawing links                                  :bug:
@@ -31,7 +31,7 @@ find-grep :patxor
 make-PW-standard-box
 *** TODO cursors referenced by resource ID                              :port:
 eg. (set-cursor *cross-line-cursor*)
-*** DONE drawing links doesn't work                                     :bug:
+*** DONE dragging links doesn't work                                    :bug:
     CLOSED: [2014-03-31 Mon 10:51]
     - State "DONE"       from "IN-PROGRESS" [2014-03-31 Mon 10:51] \\
       Completed.
