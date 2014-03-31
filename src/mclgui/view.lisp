@@ -236,8 +236,8 @@ DO:             Evaluates the BODY in a lexical environment where
 (defgeneric call-with-focused-view (view function &optional font-view)
   (:method ((view simple-view) function &optional font-view)
     (with-view-handle (handle view)
-      (let ((unlock   nil))
-        (when handle
+      (when handle
+        (let ((unlock   nil))
           #-(and) (or (null font-view) (eq font-view old-font-view))
           (if  (or (eq view *current-view*) *view-draw-contents-from-drawRect*)
                (if (eq font-view *current-font-view*)

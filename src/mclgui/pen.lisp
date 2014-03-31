@@ -396,23 +396,24 @@ not normally called directly but instead by stream output functions.
 
 (defun call-with-pen-state (thunk pen)
   (when *current-view*
-    (let* ((window       (view-window *current-view*))
-           (original-pen (view-pen window)))
-      (with-handle (winh window)
-        (let ((context [winh graphicsContext]))
-          (unwind-protect
-              (progn
-                [context saveGraphicsState]
-                (setf (slot-value window 'view-pen) pen)
-                (with-handle (color (pen-state-pattern pen))
-                  [color setFill]
-                  [color setStroke]
-                  [color set])
-                [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))]
-                (funcall thunk))
-            [context restoreGraphicsState]
-            (unless (eq original-pen (view-pen window))
-              (setf (slot-value window 'view-pen) pen))))))))
+    (let ((window (view-window *current-view*)))
+      (when window
+        (with-handle (winh window)
+          (let ((context [winh graphicsContext])
+                (original-pen (view-pen window)))
+            (unwind-protect
+                 (progn
+                   [context saveGraphicsState]
+                   (setf (slot-value window 'view-pen) pen)
+                   (with-handle (color (pen-state-pattern pen))
+                     [color setFill]
+                     [color setStroke]
+                     [color set])
+                   [context setCompositingOperation:(mode-to-compositing-operation (pen-mode pen))]
+                   (funcall thunk))
+              [context restoreGraphicsState]
+              (unless (eq original-pen (view-pen window))
+                (setf (slot-value window 'view-pen) pen)))))))))
 
 
 (defmacro with-pen-state ((&key location size mode pattern) &body body)

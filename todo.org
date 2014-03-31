@@ -29,6 +29,8 @@ with click and drag on the grow box.
 clicking on editable text in box (eg value in a const box) doesn't select it, and typing doesn't modify it.
 *** TODO numbox click-and-drag with opt/cmd is aphazadical.
 Note: option-click and command-click have specific meanings.
+*** TODO cursors referenced by resource ID                              :port:
+eg. (set-cursor *cross-line-cursor*)
 *** DONE [#A] debug generated applications from recent changes          :bug:
     CLOSED: [2014-03-31 Mon 01:02]
     - State "DONE"       from "TODO"       [2014-03-31 Mon 01:02] \\
