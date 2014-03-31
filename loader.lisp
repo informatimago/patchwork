@@ -36,6 +36,16 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Redirect swank streams.
+;;; This is for the case where swank:*globally-redirect-io* is true.
+#+swank
+(progn
+  (defvar swank::*current-standard-input*)  
+  (defvar swank::*current-standard-output*) 
+  (defvar swank::*current-error-output*)    
+  (defvar swank::*current-trace-output*) 
+  (defvar swank::*current-terminal-io*)  
+  (defvar swank::*current-query-io*)        
+  (defvar swank::*current-debug-io*))
 #+swank
 (let ((stream (make-synonym-stream '*terminal-io*)))
   (setf swank::*current-standard-input*  stream
@@ -124,69 +134,22 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
+#+swank (progn
+          (defvar *slime-input*  *standard-input*)
+          (defvar *slime-output* *standard-output*))
 (defun start-patchwork ()
   (ui:on-main-thread/sync
+    #+swank (setf *trace-output* *slime-output*)
     (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
     (pw::initialize-patchwork)))
 (import 'start-patchwork "COMMON-LISP-USER")
+(let ((*print-circle* nil)) (format t "~&;; Use ~S to start Patchwork.~%~:*~S~%(in-package :pw)~%" '(start-patchwork)))
+
 
 
 ;;; --------------------------------------------------------------------
 ;;; Done
 ;;; --------------------------------------------------------------------
-
-#-(and)
-(let* ((*standard-input*
-         (make-instance 'redirecting-stream:redirecting-character-input-stream
-                        :input-stream-function (function hemlock-ext:top-listener-input-stream)))
-       (*standard-output*
-         (make-instance 'redirecting-stream:redirecting-character-output-stream
-                        :output-stream-function (function hemlock-ext:top-listener-output-stream)))
-       (*error-output* *standard-output*)
-       (*trace-output* *standard-output*)
-       (*terminal-io*  (make-two-way-stream
-                        *standard-input*
-                        *standard-output*))
-       (*query-io*     *terminal-io*)
-       (*debug-io*     *terminal-io*))
-
-  (setf *listener-io* *terminal-io*)
-  #+swank
-  (setf swank::*current-error-output*    *error-output*
-        swank::*current-standard-output* *standard-output*
-        swank::*current-trace-output*    *trace-output*
-
-        swank::*current-standard-input*  *standard-input*
-
-        swank::*current-terminal-io*     *terminal-io*
-        swank::*current-debug-io*        *debug-io*
-        swank::*current-query-io*        *query-io*))
-
-
-#-(and)
-(let ((*standard-input*  *patchwork-io*)
-      (*standard-output* *patchwork-io*)
-      (*error-output*    *patchwork-io*)
-      (*trace-output*    *patchwork-io*)
-      ;; (*terminal-io*     *patchwork-io*)
-      (*query-io*        *patchwork-io*)
-      (*debug-io*        *patchwork-io*))
-  (ui:on-main-thread/sync
-    (ql:quickload :patchwork                                  :verbose t :explain t)))
-
-#-(and)
-(let ((*standard-input*  *patchwork-io*)
-      (*standard-output* *patchwork-io*)
-      (*error-output*    *patchwork-io*)
-      (*trace-output*    *patchwork-io*)
-      ;; (*terminal-io*     *patchwork-io*)
-      (*query-io*        *patchwork-io*)
-      (*debug-io*        *patchwork-io*))
-  (ui:on-main-thread/sync
-    (mclgui:on-main-thread (patchwork::initialize-menus))))
-
-
-
 
 
 ;; (ql:quickload :com.informatimago.tools)
@@ -224,41 +187,6 @@
 ;;                               "C-GET-SELECTIONS" "USER-ABSTRACTION" "C-PATCH-CHORD-LINE"
 ;;                               "C-PW-SEND-MIDI-NOTE" "CLENI" "COMBINATORIAL-INTERV"
 ;;                               "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING"))
-
-;; (map nil 'print (DUPLICATE-SYMBOLS :packages *pw-packages* :exported t))
-
-
-;; (print (list swank::*current-standard-input*  
-;;              swank::*current-standard-output* 
-;;              swank::*current-error-output*    
-;;              swank::*current-trace-output*    
-;;              swank::*current-terminal-io*  
-;;              swank::*current-query-io*        
-;;              swank::*current-debug-io*        ))
-;; (print (list *patchwork-io*))
-
-;; (eval-enqueue '(progn (setf *print-circle* nil
-;;                        *print-right-margin* 80)
-;;                 (pprint (list
-;;                          'swank::*current-standard-input*   swank::*current-standard-input*  
-;;                          'swank::*current-standard-output*  swank::*current-standard-output* 
-;;                          'swank::*current-error-output*     swank::*current-error-output*    
-;;                          'swank::*current-trace-output*     swank::*current-trace-output*    
-;;                          'swank::*current-terminal-io*      swank::*current-terminal-io*  
-;;                          'swank::*current-query-io*         swank::*current-query-io*        
-;;                          'swank::*current-debug-io*         swank::*current-debug-io*)
-;;                  patchwork.loader::*patchwork-io*)
-;;                 (pprint (list
-;;                          *standard-input*  
-;;                          *standard-output* 
-;;                          *error-output*    
-;;                          *trace-output*    
-;;                          *terminal-io*  
-;;                          *query-io*        
-;;                           *debug-io*)
-;;                  patchwork.loader::*patchwork-io*)
-;;                 (print patchwork.loader::*patchwork-io* patchwork.loader::*patchwork-io*)
-;;                 (print *terminal-io* patchwork.loader::*patchwork-io*)))
 
 
 

@@ -59,6 +59,7 @@
 
 
 (defvar *patchwork-io* (make-synonym-stream '*terminal-io*))
+#+swank (defvar swank::*current-terminal-io*)
 
 (defun initialize-streams ()
   (setf *patchwork-io* (make-patchwork-io))
