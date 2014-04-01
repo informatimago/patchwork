@@ -883,7 +883,7 @@ RETURN: A NSPoint containing the origin of the nswindow.
   (when (nsview-view self)
     (let ((*current-event* (wrap theEvent))
           (*multi-click-count* [theEvent clickCount]))
-      (unfrequently 1/10 (format-trace '|mouseMoved:| *current-event*))
+      ;;(unfrequently 1/10 (format-trace '|mouseMoved:| *current-event*))
       (window-null-event-handler (view-window (nsview-view self)))))]
 
 

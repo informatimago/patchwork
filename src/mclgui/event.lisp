@@ -94,8 +94,8 @@ WHERE:          For a view, the mouse click position (the position when
                 container.
 ")
   (:method (view where)
-    ;; (declare (ignore view where))
-    (format-trace 'view-click-event-handler 't view (point-to-list where))
+    (declare (ignore view where))
+    ;; (format-trace 'view-click-event-handler 't view (point-to-list where))
     nil))
 
 

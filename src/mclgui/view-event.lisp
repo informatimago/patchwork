@@ -94,7 +94,6 @@
 
 
 
-
 (defmacro %get-current-key-handler (window)
   `(view-get ,window '%current-key-handler))
 
@@ -130,12 +129,12 @@
 
 (defmethod remove-key-handler ((item simple-view) &optional (dialog (view-window item)))
   (without-interrupts
-      (when dialog
-        (when (eq item (%get-current-key-handler dialog))
-          (change-key-handler dialog)
-          (when (eq item (%get-current-key-handler dialog)) ;still current, so only one
-            (set-current-key-handler dialog nil)))
-        (setf (%get-key-handler-list dialog) (delete item (%get-key-handler-list dialog))))))
+    (when dialog
+      (when (eq item (%get-current-key-handler dialog))
+        (change-key-handler dialog)
+        (when (eq item (%get-current-key-handler dialog)) ;still current, so only one
+          (set-current-key-handler dialog nil)))
+      (setf (%get-key-handler-list dialog) (delete item (%get-key-handler-list dialog))))))
 
 
 
@@ -143,7 +142,7 @@
   (call-next-method)
   (unless *view-draw-contents-from-drawRect*
     (dovector (subview (view-subviews view))
-              (view-focus-and-draw-contents subview))))
+      (view-focus-and-draw-contents subview))))
 
 
 ;;;; THE END ;;;;
