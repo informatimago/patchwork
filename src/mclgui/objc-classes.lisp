@@ -579,40 +579,6 @@ RETURN: A NSPoint containing the origin of the nswindow.
 
 #+ccl (ccl:def-foreign-type ns-rect-ptr (:* :<NSR>ect))
 
-;;;------------------------------------------------------------
-;;; MclguiWindowDelegate
-;;; Not anymore, MclguiWindow is its own delegate.
-
-;; @[NSObject subClass:MclguiWindowDelegate
-;;            slots:((window :initform nil
-;;                           :initarg :window
-;;                           :reader delegate-window))]
-;; 
-;; 
-;; @[MclguiWindowDelegate
-;;   method:(windowDidMove:(:id)nsnotification)
-;;   resultType:(:void)
-;;   body:
-;;   (declare (ignore nsnotification))
-;;   (report-errors
-;;       (let* ((window (delegate-window self)))
-;;         (format-trace "-[MclguiWindowDelegate windowDidMove:]" window)
-;;         (with-handle (handle  window)
-;;           (window-move-event-handler window
-;;                                      (rect-topleft (nswindow-to-window-rect (get-nsrect [handle frame])))))))]
-;; 
-;; 
-;; @[MclguiWindowDelegate
-;;   method:(windowDidResize:(:id)nsnotification)
-;;   resultType:(:void)
-;;   body:
-;;   (declare (ignore nsnotification))
-;;   (report-errors
-;;       (let ((window (delegate-window self)))
-;;         (format-trace "-[MclguiWindowDelegate windowDidResize:]" window)
-;;         (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
-
-
 
 ;;;------------------------------------------------------------
 ;;; NSWindow
@@ -632,6 +598,44 @@ RETURN: A NSPoint containing the origin of the nswindow.
   body:
   (format-trace "-[NSWindow orderBelow:]")
   [self orderWindow:#$NSWindowBelow relativeTo:[otherWindow windowNumber]]]
+
+
+;;;------------------------------------------------------------
+
+(defun objc-key-down (view event)
+  (let ((key (let ((chars (objcl:lisp-string [event characters])))
+               (if (zerop (length chars))
+                   nil
+                   (aref chars 0)))))
+    (format-trace "-keyDown:" view key)
+    (when (and view key)
+      (let ((*current-event* (wrap event)))
+        (format-trace '|keyDown:| *current-event*)
+        (view-key-event-handler view key)))))
+
+
+(defun objc-mouse-down (self event)
+  (when (nsview-view self)
+    (let* ((*multi-click-count* [event clickCount])
+           (*current-event*     (wrap event))
+           (view                (nsview-view self))
+           (where               (convert-coordinates
+                                 (event-where *current-event*)
+                                 (view-window view)
+                                 view)))
+      (format-trace '|mouseDown:| *multi-click-count* *current-event*)
+      (view-click-event-handler view where)
+      (when (= 2 *multi-click-count*)
+        (view-double-click-event-handler view where)))))
+
+
+(defun objc-mouse-up (self event)
+  (when (nsview-view self)
+    (let ((*multi-click-count* [event clickCount])
+          (*current-event*     (wrap event))
+          (view                (nsview-view self)))
+      (format-trace '|mouseUp:| *current-event*)
+      (window-mouse-up-event-handler (view-window view)))))
 
 
 
@@ -658,7 +662,7 @@ RETURN: A NSPoint containing the origin of the nswindow.
   (declare (ignore nsnotification))
   (report-errors
       (let* ((window (nswindow-window self)))
-        (format-trace "-[MclguiWindow windowDidMove:]" window)
+        ;; (format-trace "-[MclguiWindow windowDidMove:]" window)
         (with-handle (handle  window)
           (window-move-event-handler window (rect-topleft (nswindow-to-window-rect (get-nsrect [handle frame])))))))]
 
@@ -670,7 +674,7 @@ RETURN: A NSPoint containing the origin of the nswindow.
   (declare (ignore nsnotification))
   (report-errors
       (let ((window (nswindow-window self)))
-        (unfrequently 1/3 (format-trace "-[MclguiWindow windowDidResize:]" window))
+        ;; (unfrequently 1/3 (format-trace "-[MclguiWindow windowDidResize:]" window))
         (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
 
 
@@ -682,7 +686,7 @@ RETURN: A NSPoint containing the origin of the nswindow.
   (declare (ignore nsnotification))
   (report-errors
       (let* ((window (nswindow-window self)))
-        (format-trace "-[MclguiWindow windowShouldClose:]" window)
+        ;; (format-trace "-[MclguiWindow windowShouldClose:]" window)
         (window-close-event-handler window)))]
 
 
@@ -690,7 +694,7 @@ RETURN: A NSPoint containing the origin of the nswindow.
   method:(doClose)
   resultType:(:void)
   body:
-  (format-trace "-[MclguiWindow doClose]")
+  ;; (format-trace "-[MclguiWindow doClose]")
   [super close]]
 
 
@@ -701,22 +705,32 @@ RETURN: A NSPoint containing the origin of the nswindow.
   body:
   (report-errors
       (let ((window  (nswindow-window self)))
-        (format-trace "-[MclguiWindow close]" window)
+        ;; (format-trace "-[MclguiWindow close]" window)
         (catch :cancel (window-close window))))]
 
 
+(defconstant inZoomIn  0)
+(defconstant inZoomOut 1)
 
 @[MclguiWindow
   method:(windowShouldZoom:(:id)nswindow toFrame:(:<NSR>ect)newFrame)
   resultType:(:<BOOL>)
   body:
-  (declare (ignore nswindow newframe))
+  (declare (ignore nswindow))
   (let ((window (nswindow-window self)))
     (format-trace "-[MclguiWindow windowShouldZoom:toFrame:]" window)
-    ;; TODO: if newFrame is in frame, then :inZoomIn, if it's out frame, then :inZoomOut.
-    ;; (window-zoom-event-handler window :inZoomOut)
-    (eq (window-type window) :document-with-zoom))]
-
+    (when (eq (window-type window) :document-with-zoom)
+      (window-zoom-event-handler
+       window
+       (if (< (multiple-value-bind (x y w h) (frame [self frame])
+                (declare (ignore x y))
+                (* w h))
+              (let ((frame (wrap newFrame)))
+                (* (nsrect-width frame)
+                   (nsrect-height frame))))
+           inZoomOut
+           inZoomIn))
+      t))]
 
 ;; @[MclguiWindow
 ;;   method:(windowWillUseStandardFrame:(:id)window defaultFrame:(:<NSR>ect)newFrame)
@@ -735,9 +749,6 @@ RETURN: A NSPoint containing the origin of the nswindow.
     (format-trace "-[MclguiWindow zoom:]" window)
     (when window
      (report-errors (window-do-zoom window))))]
-
-
-
 
 
 @[MclguiWindow
@@ -759,7 +770,7 @@ RETURN: A NSPoint containing the origin of the nswindow.
                 (logior (event-modifiers *current-event*)
                         active-flag)
                 (event-message *current-event*) window)
-          (format-trace '|becomeMainWindow| *current-event*)
+          ;; (format-trace '|becomeMainWindow| *current-event*)
           (view-activate-event-handler window)))))]
 
 
@@ -779,43 +790,15 @@ RETURN: A NSPoint containing the origin of the nswindow.
                   (logandc2 (event-modifiers *current-event*)
                             active-flag)
                   (event-message *current-event*) window)
-            (format-trace '|resignMainWindow| *current-event*)
+            ;; (format-trace '|resignMainWindow| *current-event*)
             (view-deactivate-event-handler window)))))]
-
 
 
 @[MclguiWindow
   method:(keyDown:(:id)event)
   resultType:(:void)
-  body:
-  (let ((window (nswindow-window self))
-        (key (let ((chars (objcl:lisp-string [event characters])))
-               (if (zerop (length chars))
-                   nil
-                   (aref chars 0)))))
-    ;; (format-trace "-[MclguiWindow keyDown:]" window key)
-    (when (and window key)
-      (let ((*current-event* (wrap event)))
-        (format-trace '|keyDown:| *current-event*)
-        (view-key-event-handler window key))))]
+  body:(objc-key-down (nswindow-window self) event)]
 
-
-;;;------------------------------------------------------------
-;;; MclguiTextField
-
-@[NSTextField subClass:MclguiTextField
-              slots:((item :initform nil
-                           :initarg :item
-                           :reader nscontroller-dialog-item
-                           :documentation "An instance of DIALOG-ITEM or subclasses."))]
-
-@[MclguiTextField
-  method:(mclguiAction:(:id)sender)
-  resultType:(:void)
-  body:
-  (declare (ignore sender))
-  (when (nscontroller-dialog-item self)
-    (dialog-item-action (nscontroller-dialog-item self)))]
 
 ;;;------------------------------------------------------------
 ;;; MclguiView
@@ -825,12 +808,15 @@ RETURN: A NSPoint containing the origin of the nswindow.
                       :initarg :view
                       :reader nsview-view))]
 
+
 @[MclguiView
   method:(isFlipped)
   resultType:(:<bool>)
   body:YES]
 
-(defvar *view-draw-contents-from-drawRect* nil)
+(defvar *view-draw-contents-from-drawRect* nil
+  "Bound to the mclgui:view being drawn (mclgui:view-draw-contents called from [MclguiView drawRect:])
+or to NIL outside of drawRect:.")
 
 @[MclguiView
   method:(drawRect:(:<nsr>ect)rect)
@@ -838,65 +824,111 @@ RETURN: A NSPoint containing the origin of the nswindow.
   body:
   (declare (ignore rect))
   ;; (format-trace "-[MclguiView drawRect:]" self (nsview-view self))
-  (when (nsview-view self)
-    (let ((*view-draw-contents-from-drawRect* t))
-      (view-draw-contents (nsview-view self))))]
+  (let ((view (nsview-view self)))
+    (when view
+      (let ((*view-draw-contents-from-drawRect* view))
+        (view-draw-contents view))))]
 
 
 @[MclguiView
-  method: (mouseDown:(:id)theEvent)
+  method: (mouseDown:(:id)event)
   resultType: (:void)
-  body:
-  ;; (format-trace "-[MclguiView mouseDown:]" self (nsview-view self) theEvent)
-  (when (nsview-view self)
-    (let* ((*multi-click-count* [theEvent clickCount])
-           (*current-event*     (wrap theEvent))
-           (view                (nsview-view self))
-           (where               (convert-coordinates
-                                 (event-where *current-event*)
-                                 (view-window view)
-                                 view)))
-      (format-trace '|mouseDown:| *multi-click-count* *current-event*)
-      (view-click-event-handler view where)
-      (when (= 2 *multi-click-count*)
-        (view-double-click-event-handler view where))))]
+  body:(objc-mouse-down self event)]
+
+@[MclguiView
+  method: (mouseUp:(:id)event)
+  resultType: (:void)
+  body: (objc-mouse-up self event)]
 
 
 @[MclguiView
-  method: (mouseUp:(:id)theEvent)
+  method: (mouseMoved:(:id)event)
   resultType: (:void)
   body:
-  ;; (format-trace "-[MclguiView mouseUp:]" self (nsview-view self) theEvent)
+  ;; (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) event)
   (when (nsview-view self)
-    (let ((*multi-click-count* [theEvent clickCount])
-          (*current-event*     (wrap theEvent))
-          (view                (nsview-view self)))
-      (format-trace '|mouseUp:| *current-event*)
-      (window-mouse-up-event-handler (view-window view))))]
-
-
-@[MclguiView
-  method: (mouseMoved:(:id)theEvent)
-  resultType: (:void)
-  body:
-  ;; (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) theEvent)
-  (when (nsview-view self)
-    (let ((*current-event* (wrap theEvent))
-          (*multi-click-count* [theEvent clickCount]))
+    (let ((*current-event* (wrap event))
+          (*multi-click-count* [event clickCount]))
       ;;(unfrequently 1/10 (format-trace '|mouseMoved:| *current-event*))
       (window-null-event-handler (view-window (nsview-view self)))))]
 
 
 @[MclguiView
-  method: (mouseDragged:(:id)theEvent)
+  method: (mouseDragged:(:id)event)
   resultType: (:void)
   body:
-  ;; (format-trace "-[MclguiView mouseDragged]" self (nsview-view self) theEvent)
+  ;; (format-trace "-[MclguiView mouseDragged]" self (nsview-view self) event)
   (when (nsview-view self)
-    (let ((*current-event* (wrap theEvent))
-          (*multi-click-count* [theEvent clickCount]))
+    (let ((*current-event* (wrap event))
+          (*multi-click-count* [event clickCount]))
       (unfrequently 1/10 (format-trace '|mouseDragged:| *current-event*))
       (window-null-event-handler (view-window (nsview-view self)))))]
+
+
+
+;;;------------------------------------------------------------
+;;; MclguiTextField -- static-text-dialog-item
+
+@[NSTextField subClass:MclguiTextField
+              slots:((item :initform nil
+                       :initarg :item
+                       :reader nsview-view
+                       :reader nscontroller-dialog-item
+                       :documentation "An instance of DIALOG-ITEM or subclasses."))]
+
+@[MclguiTextField
+  method:(mclguiAction:(:id)sender)
+  resultType:(:void)
+  body:
+  (declare (ignore sender))
+  (when (nscontroller-dialog-item self)
+    (dialog-item-action (nscontroller-dialog-item self)))]
+
+@[MclguiTextField
+  method:(mouseDown:(:id)event)
+  resultType:(:void)
+  body:(objc-mouse-down self event)]
+
+@[MclguiTextField
+  method:(mouseUp:(:id)event)
+  resultType:(:void)
+  body:(objc-mouse-up self event)]
+
+@[MclguiTextField
+  method:(keyDown:(:id)event)
+  resultType:(:void)
+  body:(objc-key-down (nsview-view self) event)]
+
+;;;------------------------------------------------------------
+;;; MclguiTextField -- static-text-dialog-item
+
+;; @[MclguiTextField
+;;   method:(acceptsFirstResponder)
+;;   resultType:(:<bool>)
+;;   body:
+;;   (format-trace  "-[MclguiTextField acceptsFirstResponder]" self)
+;;   YES]
+;; 
+;; @[MclguiTextField
+;;   method:(becomeFirstResponder)
+;;   resultType:(:<bool>)
+;;   body:
+;;   (format-trace  "-[MclguiTextField becomeFirstResponder]" self
+;;                  [super becomeFirstResponder])]
+;; 
+;; @[MclguiTextField
+;;   method:(resignFirstResponder)
+;;   resultType:(:<bool>)
+;;   body:
+;;   (format-trace  "-[MclguiTextField resignFirstResponder]" self
+;;                  [super resignFirstResponder])]
+;; 
+;; @[MclguiTextField
+;;   method:(keyDown:(:id)event)
+;;   resultType:(:void)
+;;   body:
+;;   (format-trace "-[MclguiTextField keyDown:]" self event)
+;;   [super keyDown:event]]
 
 
 ;;;------------------------------------------------------------

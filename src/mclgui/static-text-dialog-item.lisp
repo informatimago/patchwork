@@ -31,8 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
-
 (in-package "MCLGUI")
 
 
@@ -77,9 +75,12 @@
                           (:natural   #$NSNaturalTextAlignment)
                           (otherwise  #$NSNaturalTextAlignment))]
     ;; -- NSTextField attributes:
-    (let ((editable (typep item 'editable-text-dialog-item)))
-      [texth setEditable:editable]
-      [texth setBordered:editable])
+    [texth setEditable:NO]
+    [texth setBordered:NO]
+    ;; TODO: editable-text-dialog-item is not a subclass of static-text-dialog-item yet.
+    ;; (let ((editable (typep item 'editable-text-dialog-item)))
+    ;;   [texth setEditable:editable]
+    ;;   [texth setBordered:editable])
     [texth setSelectable:YES]
     ;; [texth setTextColor:] ;; set above
     ;; [texth setBackgroundColor:]
@@ -103,10 +104,9 @@
 
 
 (defmethod view-default-size ((dialog-item static-text-dialog-item))
-  (multiple-value-bind (ff ms)(view-font-codes dialog-item)
-    (let* ((text (dialog-item-text dialog-item)))
-      (multiple-value-bind (string-width nlines)
-          (font-codes-string-width-with-eol text ff ms)
+  (let ((text (dialog-item-text dialog-item)))
+    (multiple-value-bind (ff ms) (view-font-codes dialog-item)
+      (multiple-value-bind (string-width nlines) (font-codes-string-width-with-eol text ff ms)
         (make-point (+ (dialog-item-width-correction dialog-item) string-width)
                     (* nlines (font-codes-line-height ff ms)))))))
 
@@ -146,6 +146,20 @@
   (invalidate-view item))
 
 
+(defmethod view-click-event-handler ((item static-text-dialog-item) where)
+  (declare (ignore where))
+  (format-trace 'view-click-event-handler item (point-to-list where))
+  item)
+
+(defmethod view-double-click-event-handler ((item static-text-dialog-item) where)
+  (declare (ignore where))
+  (format-trace 'view-double-click-event-handler item (point-to-list where))
+  item)
+
+(defmethod view-key-event-handler ((item static-text-dialog-item) key)
+  (declare (ignore where))
+  (format-trace 'view-key-event-handler item key)
+  item)
 
 (defmethod view-draw-contents ((item static-text-dialog-item))
   (with-handle (texth item)

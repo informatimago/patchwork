@@ -227,7 +227,7 @@ button is released, not when it is pressed.
 
 If an item is disabled, its action is not run. 
 
-Since dialog-item-action is usually called by view-click-eventhandler
+Since dialog-item-action is usually called by view-click-event-handler
 as a result of event processing, event processing is ordinarily
 disabled while the DIALOG-ITEM-ACTION function is running.  This means
 that other dialog items cannot be selected during the action.  To
