@@ -254,6 +254,7 @@ redisplays.
 
 (defun ed-beep (&optional (duration 3) &rest args)
   (declare (ignorable duration args))
+  (format-trace 'edbeep duration args)
   #+ccl (#_NSBeep)
   #-ccl (niy ed-beep duration args))
 

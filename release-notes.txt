@@ -7,11 +7,10 @@ next release
 -----------------------
 
 
-
 10.0-0.907
 -----------------------
 
-- drawing links works.
+- adding links works.
 - drawing of outboxes works.
 - dragging the top bar of a patch moves it.
 - moving a box works also after the first time.

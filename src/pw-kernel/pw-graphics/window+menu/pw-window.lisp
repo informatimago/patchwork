@@ -190,7 +190,7 @@
               (let ((*package* :pw))
                 (prin1 (decompile self) out)))
             (record-event :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat| ) (,:|mnpa| ,t))
-                                            `((,:|----| ,:|cpat|) )))
+                                              `((,:|----| ,:|cpat|) )))
             (when *save-compiled-file*
               (setf newfile (compile-file (patch-win-pathname self)))
               (delete-file (patch-win-pathname self))
@@ -225,8 +225,8 @@
               (let ((*package* :pw))
                 (prin1 (decompile self) out))))
           (record-event :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat|) 
-                                                                    (,:|asna| ,(namestring new-name)) (,:|mnpa| ,t))
-                                          `((,:|----| ,:|cpat|) (,:|asna| ,(namestring new-name)))))
+                                                                      (,:|asna| ,(namestring new-name)) (,:|mnpa| ,t))
+                                            `((,:|----| ,:|cpat|) (,:|asna| ,(namestring new-name)))))
           (when *save-compiled-file*
             (setf newfile (compile-file new-name))
             (delete-file new-name)
@@ -236,7 +236,7 @@
 (defun load-a-patch (name)
   (with-cursor *watch-cursor*
     (let ((*readtable* *readtable-patchwork*))
-     (load name :verbose t :external-format :mac-roman))
+      (load name :verbose t :external-format :mac-roman))
     (PW-update-wins-menu name)))
 
 (defun pw-load-patch ()
@@ -339,11 +339,11 @@
   (if (and  (top-level-patch-win? self) ;;
             (save-changes-to-file-flag self)
             (not *pw-nosave-mode*))
-    (if (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self)))
-      (PW-WINDOW-SAVE-MN self)))
+      (if (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self)))
+          (PW-WINDOW-SAVE-MN self)))
   (view-deactivate-event-handler self)
   (if (wins-menu-item self)
-    (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
+      (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
   (setq *pw-window-list* (remove self *pw-window-list* :test 'eq)) 
   (tell (controls self) 'remove-yourself-control)
   (call-next-method)
@@ -443,69 +443,84 @@
 ;; key handler
 (defvar *pw-default-stop-time* 1000)
 
+
 (defmethod view-key-event-handler ((self C-pw-window) char)
-  (cond (*current-small-inBox*
-         (handle-edit-events (view-container *current-small-inBox*) char))
-        ((remove nil (ask-all (controls self) 'are-you-handling-keys? char)) nil)
-        (t
-         (let (no-change-flag)
-           (case char
-             (:Newline 
-              (cond ((abstract-box self) (window-hide self) (window-select (view-window (abstract-box self))))
-                    ((super-win self) (window-hide self) (window-select (super-win self)))
-                    (t (ui:ed-beep) (setq no-change-flag t))))
-             (:Enter  
-              (cond ((abstract-box self) (window-select (view-window (abstract-box self))))
-                    ((super-win self) (window-select (super-win self)))
-                    (t (ui:ed-beep) (setq no-change-flag t))))
-                                        ;(#\b  (if (active-patches self) (browse (car (active-patches self)))))
-             (:Delete (cut-delete self))
-             (#\h 
-              (if *PW-help-window*
-                  (unless (wptr  *PW-help-window*) (make-PW-help-window))
-                  (make-PW-help-window))
-              (window-select *PW-help-window*))
-             (#\t     ;;tutorial patch
-              (if (active-patches self) (tell (active-patches self) #'get-tutorial-patch) (ui:ed-beep)))
-             (#\R 
-              (if (top-level-patch-win? self)
-                  (ui:ed-beep)
-                  (let ((title
-                          (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
-                                                 :initial-string (window-title self))))
-                    (when title
-                      (cond 
-                        ((abstract-box self)
-                         (set-dialog-item-text-from-dialog (car (pw-controls (out-obj (abstract-box self)))) title))
-                        ((super-win self)
-                         (set-window-title self title)(erase+view-draw-contents (super-win self))))))))
-             (#\r (if (active-patches self) (rename-boxes self) (ui:ed-beep)))
-             (#\X (if (active-patches self) 
-                      (allign-patches-to-x-y self) (setq no-change-flag t)))
-             (#\Y (if (active-patches self) 
-                      (allign-patches-to-y self) (setq no-change-flag t)))
-             (#\D  (view-draw-contents  self))
-             (#\i (tell (ask-all (active-patches self) 'pw-function) 'inspect))
-             (#\e (tell (ask-all (active-patches self) 'pw-function) 'edit-definition))
-             (#\d (tell (ask-all (active-patches self) 'pw-function) 'show-documentation))
-             (#\o (tell (active-patches self) 'open-patch-win)) 
-             (#\A  (make-abstraction-M self))
-             (#\p (tell (active-patches self) 'init-patch) (tell (active-patches self) 'play))
-             (#\c 
-              (let ((stop-time (ask (controls self) 'give-stop-time))) 
-                (if stop-time
-                    (record-midi-out-boxes- self stop-time)
-                    (record-midi-out-boxes- self *pw-default-stop-time*))))
-             (#\C 
-              (if (super-note self)
-                  (record-midi-out-boxes- self (give-structured-duration1 self 1))
+  (format-trace 'view-key-event-handler char self)
+  (cond
+    ;; editing a field:
+    (*current-small-inBox*
+     (handle-edit-events (view-container *current-small-inBox*) char))
+    ;; some control processes it:
+    ((remove nil (ask-all (controls self) 'are-you-handling-keys? char))
+     nil)
+    (t
+     (let ((no-change-flag nil))
+       (case char
+         (#\Return ;; Return
+          (cond ((abstract-box self) (window-hide self) (window-select (view-window (abstract-box self))))
+                ((super-win self) (window-hide self) (window-select (super-win self)))
+                (t (ui:ed-beep) (setq no-change-flag t))))
+         (#\Newline ;; C-j
+          (cond ((abstract-box self) (window-select (view-window (abstract-box self))))
+                ((super-win self) (window-select (super-win self)))
+                (t (ui:ed-beep) (setq no-change-flag t))))
+#|*|#    (#\b  (when (active-patches self)
+                 (browse (car (active-patches self)))))
+         (#\Rubout
+          (cut-delete self))
+#|*|#    (#\h 
+          (if *PW-help-window*
+              (unless (wptr *PW-help-window*)
+                (make-PW-help-window))
+              (make-PW-help-window))
+          (window-select *PW-help-window*))
+         (#\t     ;;tutorial patch
+          (if (active-patches self)
+              (tell (active-patches self) #'get-tutorial-patch)
+              (ui:ed-beep)))
+#|*|#    (#\R 
+          (if (top-level-patch-win? self)
+              (ui:ed-beep)
+              (let ((title
+                        (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
+                                                          :initial-string (window-title self))))
+                (when title
+                  (cond 
+                    ((abstract-box self)
+                     (set-dialog-item-text-from-dialog (car (pw-controls (out-obj (abstract-box self)))) title))
+                    ((super-win self)
+                     (set-window-title self title)(erase+view-draw-contents (super-win self))))))))
+         (#\r (if (active-patches self)
+                  (rename-boxes self)
                   (ui:ed-beep)))
-             (#\s (tell (controls self) 'stop-play))
-             (#\v (run-boxes self))
-             (otherwise (ED-BEEP)(setq no-change-flag t)))
-           (when (and (not (member char '(#\h #\i #\I #\R #\s #\p #\b #\D)))
-                      (not no-change-flag))
-             (set-changes-to-file-flag self))))))
+         (#\X (if (active-patches self) 
+                  (allign-patches-to-x-y self)
+                  (setq no-change-flag t)))
+         (#\Y (if (active-patches self) 
+                  (allign-patches-to-y self)
+                  (setq no-change-flag t)))
+#|*|#    (#\D (view-draw-contents  self))
+#|*|#    (#\i (tell (ask-all (active-patches self) 'pw-function) 'inspect))
+         (#\e (tell (ask-all (active-patches self) 'pw-function) 'edit-definition))
+         (#\d (tell (ask-all (active-patches self) 'pw-function) 'show-documentation))
+         (#\o (tell (active-patches self) 'open-patch-win)) 
+         (#\A (make-abstraction-M self))
+#|*|#    (#\p (tell (active-patches self) 'init-patch) (tell (active-patches self) 'play))
+         (#\c 
+          (let ((stop-time (ask (controls self) 'give-stop-time))) 
+            (if stop-time
+                (record-midi-out-boxes- self stop-time)
+                (record-midi-out-boxes- self *pw-default-stop-time*))))
+         (#\C 
+          (if (super-note self)
+              (record-midi-out-boxes- self (give-structured-duration1 self 1))
+              (ui:ed-beep)))
+#|*|#    (#\s (tell (controls self) 'stop-play))
+         (#\v (run-boxes self))
+         (otherwise (ed-beep) (setq no-change-flag t)))
+       (when (and (not (member char '(#\h #\i #\I #\R #\s #\p #\b #\D)))
+                  (not no-change-flag))
+         (set-changes-to-file-flag self))))))
 
 (defgeneric rename-boxes (self))
 (defmethod rename-boxes ((self C-pw-window))
@@ -513,6 +528,7 @@
 
 (defgeneric run-boxes (self))
 (defmethod run-boxes ((self C-pw-window))
+  (format-trace 'run-boxes self)
   (let ((boxes (active-patches self)))
     (dolist (box boxes)
       (eval-enqueue `(print (patch-value ,box ,box)))

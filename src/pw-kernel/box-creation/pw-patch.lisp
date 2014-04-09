@@ -828,8 +828,9 @@
 (defclass C-key-handler-box (C-pw-functional) ())
 
 (defmethod are-you-handling-keys? ((self C-key-handler-box) char)
-  (if (char= char (car (coerce (format () "~A" (patch-value (first (input-objects self)) ()))
-                               'list)))
+  (when (char= (aref (format nil "~A" (patch-value (first (input-objects self)) nil))
+                     0)
+               char)
       (or (patch-value self ()) t)))
 
 (defunp key-trigger ((char list (:type-list (no-connection) :value "a"))
