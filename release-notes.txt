@@ -6,11 +6,17 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+
+
+10.0-0.907
+-----------------------
+
 - drawing links works.
 - drawing of outboxes works.
 - dragging the top bar of a patch moves it.
 - moving a box works also after the first time.
 - resizing a box works also after the first time.
+- patchwork-trace.txt is written in the user's Desktop instead of pjb's.
 
 
 10.0-0.922, 10.0-0.919 

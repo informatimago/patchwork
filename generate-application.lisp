@@ -101,18 +101,29 @@
 ;;; Save the manifest.
 (defparameter *program-name*      "Patchwork")
 (defparameter *program-system*    :patchwork)
-(defparameter *program-directory* (merge-pathnames
-                                   (make-pathname :directory (list :relative "Desktop" (executable-name *program-name*)))
+(defparameter *name-and-version*  (format nil "~A-~A" *program-name* *patchwork-version*))
+(defparameter *release-directory* (merge-pathnames
+                                   (make-pathname :directory (list :relative "Desktop"
+                                                                   (executable-name *name-and-version*)))
                                    (user-homedir-pathname)))
 
+(ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
+(setf (logical-pathname-translations "RELEASE") nil
+      (logical-pathname-translations "RELEASE") 
+      (make-logical-pathname-translations "RELEASE" *release-directory*))
+
+
 (say "Generating manifest.")
-(ensure-directories-exist (merge-pathnames "TEST" *program-directory*))
-(let ((*default-pathname-defaults* *program-directory*))
-  (write-manifest *program-name* *program-system*))
+(let ((*default-pathname-defaults* *release-directory*))
+  (write-manifest *name-and-version* *program-system*))
+
+(say "Copying release notes.")
+(copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")
+           (translate-logical-pathname #P"RELEASE:RELEASE-NOTES.TXT"))
+
 
 ;;; --------------------------------------------------------------------
 ;;; Save the application package.
-(say "Generating ~A" (executable-name *program-name*))
 
 ;; Let's reset the readtable to the implementation defined one.
 (setf *readtable* (copy-readtable *cocoa-readtable*))
@@ -133,7 +144,7 @@
 
 (say "Generating ~A" (merge-pathnames (make-pathname :name *program-name*
                                                      :type "app")
-                                      *program-directory*))
+                                      *release-directory*))
 
 (defun exported-type-utis ()
   (vector
@@ -248,7 +259,7 @@
    :altconsole nil))
 
 (unless *load-pathname*
-  (save-patchwork-application :name *program-name* :directory *program-directory*))
+  (save-patchwork-application :name *program-name* :directory *release-directory*))
 
 
 #+lispworks

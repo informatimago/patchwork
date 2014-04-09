@@ -101,7 +101,8 @@ Must be called on the main thread."
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
 (on-restore patchwork-trace
-            (setf *trace-output* (open #P"~/Desktop/patchwork-trace.txt"
+            (setf *trace-output* (open (merge-pathnames #P"Desktop/patchwork-trace.txt"
+                                                        (user-homedir-pathname))
                                        :direction :output
                                        :if-does-not-exist :create
                                        :if-exists :append

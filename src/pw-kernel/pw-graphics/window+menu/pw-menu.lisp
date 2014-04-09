@@ -189,8 +189,7 @@
                 :directory (make-pathname :name nil :type nil :version nil :defaults file)
                 :copy-ide-resources t
                 ;; :init-file #P"HOME:patchwork-init.lisp"
-                ;; '(pathname "~/application-init.lisp")
-                ;;  (lambda ()
+                ;;            (lambda ()
                 ;;              (make-pathname :name  "patchwork-init" :type "lisp"
                 ;;                             :defaults (user-homedir-pathname)))
                 )
