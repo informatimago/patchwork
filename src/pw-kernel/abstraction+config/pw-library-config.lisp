@@ -36,7 +36,9 @@
 
 (defvar *config-default-libr-path*  "PW-USER:library-autoload;")
 (defvar *config-default-abst-path*  "PW-USER:abstract-autoload;")
-(defvar *config-init-file*          "CL:PW-inits;config.init")
+(defvar *config-init-file*          "PW-USER:PW-inits;config.init")
+
+(defvar *compiled-abstr-extension* ".comp")
 
 (defparameter *user-library-folder-path*  (merge-pathnames "**;*.lib" *config-default-libr-path*))
 
@@ -109,7 +111,6 @@
         (ui:add-menu-items current-sub-menu (new-leafmenu (trim-extension (car sub-dir-list)) 
                                                           (eval `(function (lambda () ,code))))))))
 
-(defvar *compiled-abstr-extension* ".comp")
 
 (defun not-compiled-abstr (name files)
   (let ((name (namestring name))
@@ -244,27 +245,29 @@ GA 17/5/94
       (load-once path :verbose t :if-does-not-exist nil))))
 
 (defun remember-config ()
-  (let ()
-    (with-open-file (file *config-init-file* :direction :output :if-exists :supersede
-                          :if-does-not-exist :create)
-      (prin1 `(,*user-libs-config*
-               ,*user-abstracts-config*
-               ,(get-global-options-marks)
-               ,(get-evaluation-option)) file))))
+  (with-open-file (file *config-init-file* :direction :output :if-exists :supersede
+                                           :if-does-not-exist :create)
+    (prin1 `(,*user-libs-config*
+             ,*user-abstracts-config*
+             ,(get-global-options-marks)
+             ,(get-evaluation-option)) file)))
 
 
 (defun forget-all-config ()
-                                        ;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
-                                        ;(dolist (lib *user-libs-config*)
-                                        ;  (setf module::*loaded-modules*
-                                        ;        (remove  (print (pathname-name lib)) module::*loaded-modules*  :test #'string-equal)))
+  ;;(apply #'remove-menu-items *pw-menu-patch* (menu-items *pw-menu-patch*))
+  ;;(dolist (lib *user-libs-config*)
+  ;;  (setf module::*loaded-modules*
+  ;;        (remove  (print (pathname-name lib)) module::*loaded-modules*  :test #'string-equal)))
   (setf *user-libs-config* ())
   (setf *user-abstracts-config* ())
   (ignore-errors (delete-file *config-init-file*))
   (with-open-file (file *config-init-file* :direction :output :if-exists :supersede
-                        :if-does-not-exist :create)
+                                           :if-does-not-exist :create)
     (prin1 `(nil nil (nil t t nil nil :mc) t) file))
-  (format t "configuration erased"))
+  (format t "~&configuration erased~%"))
+
+
+;;;; THE END ;;;;
 
 
 

@@ -12,6 +12,7 @@
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
+;;;;    2014-04-10 <PJB> Removed useless declare special.
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
 ;;;;BUGS
 ;;;;LEGAL
@@ -40,6 +41,8 @@
 
 (defpackage "USER-ABSTRACTION")
 
+(defvar *active-config-object* ())  ;the patch holding the current configuration
+
 (defvar *abstract-popUpMenu*
   (new-menu " "
             (new-leafmenu "Open" (lambda () (open-patch-win *target-action-object*)))
@@ -48,7 +51,7 @@
             (new-leafmenu "Redraw" (lambda () (redraw-patch *target-action-object*)))
             (new-leafmenu "Save" (lambda () (save *target-action-object*)))
             (new-leafmenu "Compile" (lambda () (compile-me *target-action-object*
-                                                            *target-action-object*)))))
+                                                           *target-action-object*)))))
 
 (defclass C-abstract-M (C-abstract)
   ((popUpBox :accessor popUpBox))) 
@@ -67,7 +70,6 @@
 (defvar *abs-code* ())
 (defgeneric user-menu-include (self)
   (:method ((self C-abstract-M))
-    (declare (special *abs-code*))
     (let* ((box-title (window-title (patch-win self)))
            (menu (find-menu-item *pw-menu-patch* box-title)))
       (unless menu
@@ -93,12 +95,10 @@
 (defvar *current-user-configuration* ())
 
 (defun add-to-configuration(title)
-    (declare (special *current-user-configuration*))
-    (setf *current-user-configuration* (cons title *current-user-configuration*)) )
+  (setf *current-user-configuration* (cons title *current-user-configuration*)) )
 
 (defun remove-from-configuration(title)
-    (declare (special *current-user-configuration*))
-    (setf *current-user-configuration* (remove title *current-user-configuration* :test #'string=)) )
+  (setf *current-user-configuration* (remove title *current-user-configuration* :test #'string=)) )
 
 (defgeneric rename-yourself (self str)
   (:method ((self C-abstract-M) str)
@@ -208,7 +208,7 @@
 
 (defun make-std-patch-box (class fun-string type-specs new-win in-boxes)
   (multiple-value-bind (fun-name exists?)
-    (intern (string fun-string) "USER-ABSTRACTION")
+      (intern (string fun-string) "USER-ABSTRACTION")
     (when exists?
       (ui:uiwarn "the name ~D already exists for an abstraction.
 A unique name will be chosen (if not a 'redraw')" fun-name)
@@ -220,21 +220,21 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
           ;; (thename (read-from-string (concatenate 'string "USER-ABSTRACTION::" (string fun-name))))
           )
       (if (all-absins-different arg-names)
-        (progn
-          (set-PW-symbolic-type-data fun-name
-               (list (cons '&required 
-                           (mapcar (lambda (name type) (cons name type)) arg-names
-                                   (setq type-specs (quote-value type-specs))))
-                     '(&optional) '(&rest)) 'nil)  ;output type is nil, for the moment...
-          (setf (fdefinition fun-name)
-                (eval `(function (lambda ,arg-names (declare (ignore ,@arg-names)) nil))))
-          ;;(eval `(defun ,thename ,arg-names (declare (ignore ,@arg-names)) nil))
-          (make-PW-standard-box class fun-name (make-point 15 15)
-                                (get-current-inbox-vals type-specs)))
-        (progn
-          (ui:message-dialog
-           "Absin names and Absin numbers should be unique. Please correct this") nil)))))
-      
+          (progn
+            (set-PW-symbolic-type-data fun-name
+                                       (list (cons '&required 
+                                                   (mapcar (lambda (name type) (cons name type)) arg-names
+                                                           (setq type-specs (quote-value type-specs))))
+                                             '(&optional) '(&rest)) 'nil)  ;output type is nil, for the moment...
+            (setf (fdefinition fun-name)
+                  (eval `(function (lambda ,arg-names (declare (ignore ,@arg-names)) nil))))
+            ;;(eval `(defun ,thename ,arg-names (declare (ignore ,@arg-names)) nil))
+            (make-PW-standard-box class fun-name (make-point 15 15)
+                                  (get-current-inbox-vals type-specs)))
+          (progn
+            (ui:message-dialog
+             "Absin names and Absin numbers should be unique. Please correct this") nil)))))
+
 
 (defun quote-value (type-specs)
   (mapcar (lambda (type) (list (car type) (replace-value-keyword (cadr type))))
@@ -242,15 +242,15 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 
 (defun replace-value-keyword (key-list)
   (let* ((value (member :value key-list))
-          (where (length value))
-          (size (length key-list)))
-     (if (or (zerop where) (numberp (second value)))
-       key-list
-       (append (subseq key-list 0 (- size where -1)) (cons `',(cadr value) (cddr value))))))
+         (where (length value))
+         (size (length key-list)))
+    (if (or (zerop where) (numberp (second value)))
+        key-list
+        (append (subseq key-list 0 (- size where -1)) (cons `',(cadr value) (cddr value))))))
 
 (defun get-current-inbox-vals (type-specs)
   (mapcar (lambda (type) 
-              (if (member :value (cadr type))
+            (if (member :value (cadr type))
                 (eval (cadr (member :value (cadr type))))
                 (or (get-type-default (car type))
                     (cadr (member :dialog-item-text (cadr type))))))
@@ -275,9 +275,9 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
     (dolist (in-box absins)
       (dolist (patch useful-patches)
         (push (the-type-of-n patch in-box) absin-types))
-       (push  (coerce-PW-types-in-list (remove nil absin-types))  all-types)
+      (push  (coerce-PW-types-in-list (remove nil absin-types))  all-types)
       (setq absin-types nil))
-     (nreverse all-types)))
+    (nreverse all-types)))
 
 (defun the-type-of-n (patch in-box)
   (let* ((the-in-objects (input-objects patch))
@@ -318,7 +318,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 (defun coerce-PW-types-in-list (list-of-types)
   (and list-of-types
        (let ((current-intersect 
-              (get-the-type-list (car list-of-types))))
+               (get-the-type-list (car list-of-types))))
          (dolist (type-spec (cdr list-of-types))
            (setq current-intersect 
                  (type-intersection current-intersect (get-the-type-list type-spec))))
@@ -334,29 +334,29 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 
 ;;Camilo [922010]
 #|(defun set-current-value (type-spec value)
-  (set-type-default (car type-spec)
-   value))|#
+(set-type-default (car type-spec)
+value))|#
 
 (defun set-current-value (type-spec value) 
-    (set-type-default 
-     (copy-tree  (if (consp (car type-spec)) (car type-spec) type-spec))
+  (set-type-default 
+   (copy-tree  (if (consp (car type-spec)) (car type-spec) type-spec))
    ;;(car type-spec)
-                      value))
+   value))
 
 (defun get-the-type-list (type-spec)
   (let ((the-type-list 
-         (member :type-list
-                (if (cdr type-spec)
-                  (do-merge-specs (get-PW-type-specs (car type-spec))
-                                  (cadr type-spec))
-                  (get-PW-type-specs (car type-spec))))))
+          (member :type-list
+                  (if (cdr type-spec)
+                      (do-merge-specs (get-PW-type-specs (car type-spec))
+                        (cadr type-spec))
+                      (get-PW-type-specs (car type-spec))))))
     (and the-type-list
-      (if (cadr the-type-list) (cadr the-type-list) 'all-types))))
+         (if (cadr the-type-list) (cadr the-type-list) 'all-types))))
 
 (defun set-the-type-list (type-spec type-list)
   (list (car type-spec)
         (do-merge-specs (get-PW-type-specs (car type-spec))
-                        (list* :type-list type-list (cadr type-spec)))))
+          (list* :type-list type-list (cadr type-spec)))))
 
 ;;;=======================================================================
 ;;; The save user-patch-configuration function
@@ -372,7 +372,6 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
   (:documentation "the class of patch-configuration patches"))
 
 (defmethod decompile ((self C-patch-configurer))
-  (declare (special *active-config-object*))
   (when (eq self *active-config-object*) 
     (setf *active-config-object*())
     (reset-fill-control self))
@@ -385,9 +384,9 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
   (setf (file-path self) files) self)
 
 (defunp config ((files list (:value "()"))) list
- "configures PW menus according to user defined library loadings"
+    "configures PW menus according to user defined library loadings"
   (declare (ignore files)))
- 
+
 (defvar *Config-popUpMenu*
   (new-menu " "
             (new-leafmenu "New" (lambda () (change-config *target-action-object*)))
@@ -397,16 +396,16 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 
 (defmethod initialize-instance :after((self C-patch-configurer) &key file-path)
   (declare (ignore file-path))
-    (set-view-size self (w self) (+ (h self) 15))
-    (set-view-position (out-put self) 
-                       (make-point (x (out-put self)) (+ (y (out-put self)) 15)))
-  ;(move-control (out-put self) (x (out-put self)) (+ (y (out-put self)) 15))
+  (set-view-size self (w self) (+ (h self) 15))
+  (set-view-position (out-put self) 
+                     (make-point (x (out-put self)) (+ (y (out-put self)) 15)))
+                                        ;(move-control (out-put self) (x (out-put self)) (+ (y (out-put self)) 15))
   (let ((popUpBox (make-popUpbox "M" self
-                       *Config-popUpMenu*
-                       :view-position (make-point (- (w self) 10)
-                                                  (- (h self) 14))
-                       :view-container self
-                       :view-font '("monaco"  9  :srcor))))
+                                 *Config-popUpMenu*
+                                 :view-position (make-point (- (w self) 10)
+                                                            (- (h self) 14))
+                                 :view-container self
+                                 :view-font '("monaco"  9  :srcor))))
     (setf (action-box self) (make-actionControl-box self))
     (setf (menubox self) popUpBox)))
 
@@ -426,7 +425,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 (defgeneric set-fill-control (self)
   (:method ((self C-patch-configurer))
     (set-dialog-item-text (action-box self) "C")))
- 
+
 (defgeneric reset-fill-control (self)
   (:method ((self C-patch-configurer))
     (set-dialog-item-text (action-box self) "D")))
@@ -434,8 +433,8 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 
 (defun make-user-patch-configurer(&key ((:file file) ()))
   (let ((patch
-         (make-patch-box 'C-patch-configurer "config" 
-                         '(*symbol-eval-pw-files-type* "FileList") '(list))))
+          (make-patch-box 'C-patch-configurer "config" 
+                          '(*symbol-eval-pw-files-type* "FileList") '(list))))
     (setf (file-path patch) file)
     patch))
 
@@ -445,9 +444,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
         (or (and (not arg) (file-path self))
             (config-union arg (file-path self) ))
         arg)) )
-  
-(defvar *active-config-object* ())  ;the patch holding the current configuration
-;;(setf *active-config-object* ())
+
 
 (defvar *added-box-object* ())
 (defun no-add-patch-box (win box)
@@ -476,12 +473,12 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
         (and *active-config-object* 
              (reset-fill-control *active-config-object*))
         (setf *active-config-object* self)))))
-       
+
 (defgeneric change-config (self)
   (:method ((self C-patch-configurer))
     (SAVE-PATCH-CONFIG)
     (setf (file-path self) (get-user-patch-config))))
-    
+
 (defgeneric add-to-config (self)
   (:method ((self C-patch-configurer))
     (SAVE-PATCH-CONFIG)
@@ -504,24 +501,24 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 ;;; the config functions
 ;;;==========================================================================    
 (defun SAVE-PATCH-CONFIG()                              
-    (SHOW-PATCH-LIB nil nil))
+  (SHOW-PATCH-LIB nil nil))
 
 (defun SHOW-PATCH-LIB(conf-list obj)   ;useless parameters. Present for "connection-style".
-  (declare (ignore conf-list obj) (special *PW-user-library-pathName*  *PW-user-abstract-pathName*))
+  (declare (ignore conf-list obj))
   (let* ((patches (with-cursor *watch-cursor*
                     (append (directory *PW-user-library-pathName*)
                             (directory *PW-user-abstract-pathName*))))  ; all Libs!!
-        (items (catch-cancel (select-item-from-list
-                        (mapcar (lambda (path) (file-namestring path)) patches)
-                        :window-title "Please Select Abstract and Library Files"
-                        :selection-type :disjoint))))
+         (items (catch-cancel (select-item-from-list
+                               (mapcar (lambda (path) (file-namestring path)) patches)
+                               :window-title "Please Select Abstract and Library Files"
+                               :selection-type :disjoint))))
     (when (and items (not (eq items :cancel)))
       (ADD-CELLS items patches))))
-                                          
-    
+
+
 (defun ADD-CELLS(selection all-list) 
   (set-user-patch-config  (get-path-names selection all-list)))
-                               
+
 (defun get-path-names(files path-list)
   (mapcar (lambda (f) (form-lib-selection (find-file f path-list))) files))
 
@@ -534,18 +531,18 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 (defun form-lib-selection (file-name)
   (let*((lib-a-list)
         (sel
-         (when (library-p file-name)
-           (setq lib-a-list (with-cursor *watch-cursor*
-                              (WITH-OPEN-FILE (lib file-name :direction :input )
-                                (read lib))))
-           (if (and (consp lib-a-list) (consp (car lib-a-list))
-                    (atom (caar lib-a-list)))
-             (ui:catch-cancel
-              (ui:select-item-from-list 
-               (eval lib-a-list) 
-               :window-title (format nil "please select ~A functions" (file-namestring file-name))
-               :table-print-function (lambda (it &optional strm)(princ (cdr it) strm))
-               :selection-type :disjoint))))))
+          (when (library-p file-name)
+            (setq lib-a-list (with-cursor *watch-cursor*
+                               (WITH-OPEN-FILE (lib file-name :direction :input )
+                                 (read lib))))
+            (if (and (consp lib-a-list) (consp (car lib-a-list))
+                     (atom (caar lib-a-list)))
+                (ui:catch-cancel
+                  (ui:select-item-from-list 
+                   (eval lib-a-list) 
+                   :window-title (format nil "please select ~A functions" (file-namestring file-name))
+                   :table-print-function (lambda (it &optional strm)(princ (cdr it) strm))
+                   :selection-type :disjoint))))))
     (cons file-name (and (not (eq sel :cancel)) sel))))
 
 ;;;
@@ -553,21 +550,21 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 ;;;and builds the user Lib Menu.
 
 (defun form-patch-subMenu (patch-file-name code)
-    (let ((sub-dir-list 
-           (cdr (member "PW-user-patches" (parse-file-name patch-file-name) :test #'string=)))
-          (current-sub-menu *pw-menu-patch*)
-          (menu))
-      (dotimes (x (1- (length sub-dir-list)))
-        (unless 
+  (let ((sub-dir-list 
+          (cdr (member "PW-user-patches" (parse-file-name patch-file-name) :test #'string=)))
+        (current-sub-menu *pw-menu-patch*)
+        (menu))
+    (dotimes (x (1- (length sub-dir-list)))
+      (unless 
           (setq menu (find-menu-item current-sub-menu (car sub-dir-list)))
-          (ui:add-menu-items current-sub-menu
-                     (setq menu (new-menu (car sub-dir-list)))))                            
-        (setq current-sub-menu menu)
-        (pop sub-dir-list))
-      (or (find-menu-item current-sub-menu (car sub-dir-list))
-          (ui:add-menu-items current-sub-menu (new-leafmenu (car sub-dir-list) 
-                                                    (eval `(function (lambda () ,code))))))))
-    
+        (ui:add-menu-items current-sub-menu
+                           (setq menu (new-menu (car sub-dir-list)))))                            
+      (setq current-sub-menu menu)
+      (pop sub-dir-list))
+    (or (find-menu-item current-sub-menu (car sub-dir-list))
+        (ui:add-menu-items current-sub-menu (new-leafmenu (car sub-dir-list) 
+                                                          (eval `(function (lambda () ,code))))))))
+
 (defun parse-file-name (name)
   (let ((dir (directory-namestring name))
         (name-list (list (file-namestring name))))
@@ -575,61 +572,59 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
       (setq subdir (string-right-trim ":" subdir))
       (push (file-namestring subdir) name-list))
     name-list))
-    
+
 (defun handle-library-load (lib-file-name key-a-list)
-  (declare (special *library-selection*))
-    (setq *library-selection* 
-          (mapcar #'cdr key-a-list))
-    (load lib-file-name))
+  (setq *library-selection* 
+        (mapcar #'cdr key-a-list))
+  (load lib-file-name))
 
 (defun config-union (cf1 cf2)
   (let ((result cf2))
     (dolist (file-pair1 cf1)
       (if (library-p (car file-pair1))
-        (setq result (merge-lib-select file-pair1 result))
-        (setq result (adjoin file-pair1 result :test #'string=  
-                             :key (lambda (item) (car item))))))
+          (setq result (merge-lib-select file-pair1 result))
+          (setq result (adjoin file-pair1 result :test #'string=  
+                                                 :key (lambda (item) (car item))))))
     result))
 
 (defun config-difference(from-list take-list)
-   (let ((result from-list))
+  (let ((result from-list))
     (dolist (file-pair1 take-list)
       (if (library-p (car file-pair1))
-        (setq result (delete-lib-select file-pair1 result))
-        (setq result (remove (car file-pair1) result :test #'string=  
-                             :key (lambda (item) (car item))))))
+          (setq result (delete-lib-select file-pair1 result))
+          (setq result (remove (car file-pair1) result :test #'string=  
+                                                       :key (lambda (item) (car item))))))
     result))
 
 (defun library-p (file-name)
-  (declare (special *PW-user-library-extension*))
   (string-equal *PW-user-library-extension* (pathname-type  file-name)))
 
 (defun merge-lib-select (file-pair file-list)
   (let ((found (member (car file-pair) file-list :test #'string= :key (lambda (it)(car it)))))
     (if found
-      (substitute (merge-lib-keys file-pair (car found))
-                  (config-lib-name found)
-                  file-list
-                  :test #'string=
-                  :key (lambda (it)(car it))
-                  :count 1)
-      (cons file-pair file-list))))
+        (substitute (merge-lib-keys file-pair (car found))
+                    (config-lib-name found)
+                    file-list
+                    :test #'string=
+                    :key (lambda (it)(car it))
+                    :count 1)
+        (cons file-pair file-list))))
 
 (defun config-lib-name (pair) (caar pair))
 
 (defun delete-lib-select(pair file-list)
   (let ((found (member (car pair) file-list :test #'string= :key (lambda (it)(car it)))))
     (if found
-      (let ((item (delete-lib-keys pair (car found))))
-        (if (not item)
-          (remove (car pair) file-list :test #'string= :key (lambda (it) (car it)))
-          (substitute item
-                      (config-lib-name found)
-                      file-list
-                      :test #'string=
-                      :key (lambda (it)(car it))
-                      :count 1)))
-      file-list)))
+        (let ((item (delete-lib-keys pair (car found))))
+          (if (not item)
+              (remove (car pair) file-list :test #'string= :key (lambda (it) (car it)))
+              (substitute item
+                          (config-lib-name found)
+                          file-list
+                          :test #'string=
+                          :key (lambda (it)(car it))
+                          :count 1)))
+        file-list)))
 
 (defun merge-lib-keys(f-p1 f-p2) 
   (cons (car f-p1) (union (cdr f-p1)(cdr f-p2) :test #'equal :key #'car)))
@@ -637,4 +632,5 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 (defun delete-lib-keys(f-p1 f-p2)
   (let ((selections (set-difference (cdr f-p2) (cdr f-p1) :test #'equal :key #'car)))
     (and selections (cons (car f-p1) selections))))
-  
+
+;;;; THE END ;;;;

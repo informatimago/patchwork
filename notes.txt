@@ -14,6 +14,28 @@ Notes
 https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
 
 
+Configuration & Logical pathnames
+----------------------------------------
+
+(defvar *PW-user-library-extension* "lib")
+(defvar *library-selection* ())
+
+;;The path-names for user patches and user libraries. Folders "PW-user-patches" and 
+;;"PW-user-library" should exist somewhere within the "PW;" path.
+(defvar *PW-user-abstract-pathName* "PW-USER:PW-user-patches;**;*.*")
+(defvar *PW-user-library-pathName*  "PW-USER:PW-user-library;**;*.*")
+
+
+(defvar *config-default-libr-path*  "PW-USER:library-autoload;")
+(defvar *config-default-abst-path*  "PW-USER:abstract-autoload;")
+(defvar *config-init-file*          "CL:PW-inits;config.init")
+
+(defvar *compiled-abstr-extension* ".comp")
+
+(defparameter *user-library-folder-path*  (merge-pathnames "**;*.lib" *config-default-libr-path*))
+
+
+
 Classes used
 ----------------------------------------
 

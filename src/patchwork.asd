@@ -562,6 +562,8 @@
                                      "gf"
                                      "pw-lib/pwscript/record"
                                      "pw-kernel/types/pw-type-scheme"
+                                     "pw-kernel/abstraction+config/config-setup"
+                                     "pw-kernel/abstraction+config/pw-library-config"
                                      "pw-kernel/pw-graphics/window+menu/pw-window"))
                  
                  (:file "pw-kernel/abstraction+config/config-setup" 
@@ -569,7 +571,7 @@
                  
                  (:file "pw-kernel/abstraction+config/pw-library-config" 
                         :depends-on ("packages"
-                                     "pw-kernel/abstraction+config/abstraction-m"
+                                     ;; "pw-kernel/abstraction+config/abstraction-m"
                                      "pw-lib/pwscript/record"))
 
 

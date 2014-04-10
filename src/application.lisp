@@ -75,6 +75,22 @@
           *package*           (find-package "PATCHWORK"))))
 
 
+(defun initialize-directories ()
+  (handler-case
+      (load-logical-pathname-translations "PW-USER")
+    (error ()
+      (setf (logical-pathname-translations "PW-USER")
+            '(("**;*.*.*" #.(merge-pathnames #P"Desktop/pw-user/**/*.*" (user-homedir-pathname)))
+              ("**;*.*"   #.(merge-pathnames #P"Desktop/pw-user/**/*.*" (user-homedir-pathname)))
+              ("**;*"     #.(merge-pathnames #P"Desktop/pw-user/**/*"   (user-homedir-pathname)))))))
+  (dolist (path (list *PW-user-abstract-pathName* *PW-user-library-pathName*
+                      *config-default-libr-path* *config-default-abst-path*
+                      *config-init-file*))
+    (ensure-directories-exist
+     (make-pathname :name "TEST" :type "TEST" :version nil
+                    :directory (remove-if (lambda (item) (member item '(:wild-inferiors :wild)))
+                                          (pathname-directory path))
+                    :defaults path))))
 
 
 (defun initialize-patchwork ()
@@ -85,6 +101,7 @@ Must be called on the main thread."
   (initialize-mn-editor)
   (initialize-menus)
   (initialize-beat-measure-line)
+  (initialize-directories)
   #-(and)(installapple-event-handlers)
   ;; ---
   (terpri *patchwork-io*)
