@@ -93,6 +93,62 @@
                     :defaults path))))
 
 
+
+
+(defun repl (&key
+               ((:input-stream  *standard-input*)  *standard-input*)
+               ((:output-stream *standard-output*) *standard-output*)
+               (break-level #+ccl ccl::*break-level* #-ccl 0)
+		       (prompt-function #+ccl (lambda (stream)
+                                        (when (and ccl::*show-available-restarts* ccl::*break-condition*)
+                                          (ccl::list-restarts)
+                                          (setf ccl::*show-available-restarts* nil))
+                                        (ccl::print-listener-prompt stream t))
+                                #-ccl (lambda (stream)
+                                        (declare (special *hist*))
+                                        (format t "~%~A[~D~[~;/~:*~A~]]> " (package-name *package*) *hist* break-level))))
+  "
+DO:        Implements a minimalist CL REPL.
+"
+  (declare (special *hist*))
+  (format *standard-output* "~&Patchwork REPL ~S~%" break-level)
+  (catch 'repl
+    (do ((+eof+ (gensym))
+         (*hist* 1 (1+ *hist*)))
+        (nil)
+      (restart-case
+          (progn
+            (funcall prompt-function *standard-output*)
+            (finish-output *standard-output*)
+            (handler-bind ((error #'invoke-debugger))
+              (setf - (read *standard-input* nil +eof+))
+              (when (or (eq - +eof+)
+                        (and (listp -)
+                             (null (rest -))
+                             (member (first -) '(quit  exit continue)
+                                     :test (function string-equal))))
+                (return-from repl))
+              (let ((results (multiple-value-list (eval -))))
+                (setf +++ ++   ++ +   + -
+                      /// //   // /   / results
+                      *** **   ** *   * (first /)))
+              (format t "~& --> ~{~S~^ ;~%     ~}~%" /)
+              (finish-output)))          
+        (abort ()
+          :report (lambda (stream)
+                    (if (= break-level 0)
+                        (format stream "Return to REPL toplevel.")
+                        (format stream "Return to REPL break level ~D." break-level))))
+        ;; (abort-break () 
+        ;;   (unless (= break-level 0)
+        ;;     (abort)))
+        ))))
+
+
+;; (defmethod ccl:repl-function-name ((self ui:application))
+;;   'repl)
+
+
 (defun initialize-patchwork ()
   "Initialize the Patchwork application.
 Must be called on the main thread."
@@ -108,23 +164,27 @@ Must be called on the main thread."
   (write-line "Welcome to Patchwork" *patchwork-io*)
   (values))
 
+
 (defun date (&optional (date (get-universal-time)))
-  "Prints the date."
-  (format t
-    "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~%~8*~}"
-    (multiple-value-list (decode-universal-time date)))
-  date)
+  (format nil "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~%~8*~}"
+          (multiple-value-list (decode-universal-time date))))
+
+(defun safe-repl (&rest arguments &key &allow-other-keys)
+  (loop
+    (handler-bind ((error (function invoke-debugger)))
+      (apply (function ccl::read-loop) arguments))))
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
 (on-restore patchwork-trace
-            (setf *trace-output* (open (merge-pathnames #P"Desktop/patchwork-trace.txt"
-                                                        (user-homedir-pathname))
-                                       :direction :output
-                                       :if-does-not-exist :create
-                                       :if-exists :append
-                                       #+ccl :sharing #+ccl :lock))
-            (format *trace-output* "~A~%" (date)))
+  #+ccl (setf ccl::*read-loop-function* 'safe-repl)
+  (setf *trace-output* (open (merge-pathnames #P"Desktop/patchwork-trace.txt"
+                                              (user-homedir-pathname))
+                             :direction :output
+                             :if-does-not-exist :create
+                             :if-exists :append
+                             #+ccl :sharing #+ccl :lock))
+  (format *trace-output* "~%~A~%" (date)))
 
 (on-startup patchwork-initialization
   (eval-enqueue '(initialize-patchwork)))

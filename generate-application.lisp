@@ -77,6 +77,10 @@
 (add-cocoa-version-features)
 
 ;;; --------------------------------------------------------------------
+;; #+(and ccl (not patchwork.builder::no-cocoa))
+;; (load (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;CCL-1-9-PATCH.LISP"))
+
+;;; --------------------------------------------------------------------
 ;;; AppleEvents are not used for now.
 #+(and patchwork.builder::use-apple-events ccl darwin (not patchwork.builder::no-cocoa))
 (progn
@@ -208,7 +212,7 @@
   ;;  calls ccl::%save-application-interal
   ;;  calls ccl::save-image
   #+ (and ccl (not patchwork.builder::no-cocoa))
-  (ccl::build-application
+  (ccl::build-application ;; This doesn't return.
    :name name
    :directory directory
    :type-string "APPL"
@@ -224,7 +228,7 @@
                  ;; (help-book-name $default-info-plist-help-book-name)
                  ;; (icon-file $default-info-plist-icon-file)
                  :|CFBundleIconFile| (file-namestring (translate-logical-pathname
-                                                       #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.PNG"))
+                                                       #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS"))
                  :|CFBundleIdentifier| "com.informatimago.patchwork"
                  ;; (dictionary-version $default-info-dictionary-version)
                  ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
@@ -259,6 +263,12 @@
    :altconsole nil))
 
 (unless *load-pathname*
+  (let ((destination (merge-pathnames #P"Patchwork.app/Contents/Resources/patchwork-icon.icns"
+                                      *release-directory*)))
+    (ensure-directories-exist destination)
+    (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
+               destination :element-type '(unsigned-byte 8) :if-exists :supersede))
+  ;; this quits ccl:
   (save-patchwork-application :name *program-name* :directory *release-directory*))
 
 

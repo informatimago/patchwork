@@ -906,6 +906,7 @@ This is the menu-item-update-function for the items in the Edit menu.
 
 (defun reset-application-in-menubar (menu)
     (let ((title (menu-title menu)))
+      (format-trace 'reset-application-in-menubar title)
       (set-menu-title menu "Application") ; we need to reset it so it's updated in the menubar.
       (set-menu-title menu title)))
 

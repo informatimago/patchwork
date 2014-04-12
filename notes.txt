@@ -1003,4 +1003,32 @@ Errors & Warnings
 
 ::
 
+    [pjb@larissa :0.0 patchwork]$ ~/Desktop/patchwork-10.0-0.889-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/Patchwork.app/Contents/MacOS/Patchwork 
+    MidiShare not present. PatchWork won't play Midi.
+    (-[MclguiWindow close]                    (c-chord-boxmn-window-rtm :title "MN1" :view-position (10 28) :view-size (230 222) "#x30200192E70D"))
+    (-[MclguiWindow doClose]                  )
+    2014-04-12 16:41:33.249 Patchwork[43978:507] *** Assertion failure in -[NSMenu removeItem:], /SourceCache/AppKit/AppKit-1265.19/Menus.subproj/NSMenu.m:752
+    (BACKTRACE-AS-LIST :CONTEXT NIL :PROCESS NIL :ORIGIN NIL :COUNT 1152921504606846975 :START-FRAME-NUMBER 0 :PRINT-LEVEL 2 :PRINT-LENGTH 5 :SHOW-INTERNAL-FRAMES NIL)
+    (FUNCALL (:INTERNAL MCLGUI::|-[MclguiWindow close]|) #<CCL::NS-EXCEPTION #x302001ADAE0D>)
+    (SIGNAL #<CCL::NS-EXCEPTION #x302001ADAE0D>)
+    (%ERROR #<CCL::NS-EXCEPTION #x302001ADAE0D> NIL 1005440)
+    (FUNCALL #<COMMON-LISP:STANDARD-METHOD REMOVE-MENU-ITEMS (MENU)> (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...) (MCLGUI::ORIGINAL-MENU-ITEM :TITLE "" :ENABLEDP T ...))
+    (UPDATE-WINDOWS-MENU (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...))
+    (FUNCALL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER (WINDOW)> (C-CHORD-BOXMN-WINDOW-RTM :TITLE "MN1" :VIEW-POSITION # ...))
+    (%%BEFORE-AND-AFTER-COMBINED-METHOD-DCODE (NIL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER #> . 1005490))
+    (%%STANDARD-COMBINED-METHOD-DCODE ((#<#>) (#<#>) #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #> #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #>) 1005490)
+    (FUNCALL MCLGUI::|-[MclguiWindow close]| 17591849974728)
+    (%PASCAL-FUNCTIONS% 350 17591849974728)
+    (FUNCALL #<Anonymous Function #x300001D788FF> #<LISP-APPLICATION <LispApplication: 0x4624f0> (#x4624F0)> #S(CCL::OBJC-SELECTOR :NAME "run" :%SEL #<A Foreign Pointer #x7FFF8C6F3066>))
+    (FUNCALL (:OBJC-DISPATCH NEXTSTEP-FUNCTIONS:|run|) ???)
+    (EVENT-LOOP NIL)
+    (RUN-EVENT-LOOP)
+    (FUNCALL (:INTERNAL GUI::COCOA-STARTUP GUI::START-COCOA-IDE))
+
+    ERROR while ((LET ((WINDOW (MCLGUI::NSWINDOW-WINDOW MCLGUI::SELF))) (FORMAT-TRACE "-[MclguiWindow close]" WINDOW) (CATCH :CANCEL (WINDOW-CLOSE WINDOW)))):
+    Objective-C runtime exception: 
+    Item to be removed is not in the menu in the first place
+
+
+
 .. comment: THE END 
