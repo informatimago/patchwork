@@ -129,7 +129,7 @@
            ((member (car ,sym) *library-selection* )
             (eval-list (cdr ,sym)))))))
 
-(defvar *PW-user-library-extension* "Lib")
+(defvar *PW-user-library-extension* "lib")
 (defvar *library-selection* ())
 
 ;;The path-names for user patches and user libraries. Folders "PW-user-patches" and 

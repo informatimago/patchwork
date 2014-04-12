@@ -75,6 +75,23 @@
           *package*           (find-package "PATCHWORK"))))
 
 
+(defun initialize-directories ()
+  (handler-case
+      (load-logical-pathname-translations "PW-USER")
+    (error ()
+      (setf (logical-pathname-translations "PW-USER")
+            '(("**;*.*.*" #.(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
+              ("**;*.*"   #.(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
+              ("**;*"     #.(merge-pathnames #P"Documents/Patchwork/**/*"   (user-homedir-pathname)))))))
+  (dolist (path (list *PW-user-abstract-pathName* *PW-user-library-pathName*
+                      *config-default-libr-path* *config-default-abst-path*
+                      *config-init-file*))
+    (ensure-directories-exist
+     (make-pathname :name "TEST" :type "TEST" :version nil
+                    :directory (remove-if (lambda (item) (member item '(:wild-inferiors :wild)))
+                                          (pathname-directory path))
+                    :defaults path))))
+
 
 
 (defun initialize-patchwork ()
@@ -85,28 +102,38 @@ Must be called on the main thread."
   (initialize-mn-editor)
   (initialize-menus)
   (initialize-beat-measure-line)
+  (initialize-directories)
   #-(and)(installapple-event-handlers)
   ;; ---
-  (terpri *patchwork-io*)
-  (write-line "Welcome to Patchwork" *patchwork-io*)
+  (format *patchwork-io* "~&Welcome to Patchwork!~%")
+  (finish-output *patchwork-io*)
   (values))
 
+
 (defun date (&optional (date (get-universal-time)))
-  "Prints the date."
-  (format t
-    "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~%~8*~}"
-    (multiple-value-list (decode-universal-time date)))
-  date)
+  (format nil "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~%~8*~}"
+          (multiple-value-list (decode-universal-time date))))
+
+(defun safe-repl (&rest arguments &key &allow-other-keys)
+  (loop
+    (handler-bind ((error (function invoke-debugger)))
+      (apply (function ccl::read-loop) arguments))))
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
+
+#+ccl (on-restore patchwork-ccl-repl
+        (setf ccl::*read-loop-function* 'safe-repl
+              ccl::*inhibit-greeting*    t))
+
 (on-restore patchwork-trace
-            (setf *trace-output* (open #P"~/Desktop/patchwork-trace.txt"
-                                       :direction :output
-                                       :if-does-not-exist :create
-                                       :if-exists :append
-                                       #+ccl :sharing #+ccl :lock))
-            (format *trace-output* "~A~%" (date)))
+  (setf *trace-output* (open (merge-pathnames #P"Desktop/patchwork-trace.txt"
+                                              (user-homedir-pathname))
+                             :direction :output
+                             :if-does-not-exist :create
+                             :if-exists :append
+                             #+ccl :sharing #+ccl :lock))
+  (format *trace-output* "~%~A~%" (date)))
 
 (on-startup patchwork-initialization
   (eval-enqueue '(initialize-patchwork)))

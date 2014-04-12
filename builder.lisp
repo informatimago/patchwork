@@ -73,7 +73,7 @@
 
 
 ;; Other logical hosts used by patchwork or its dependencies include:
-;;   PW-USER
+;;   PW-USER  -- See src/application.lisp  initialize-directories
 ;;   CLENI
 
 
@@ -95,6 +95,14 @@
 ;; (translate-logical-pathname #P"PW-USER:A;B;C.D")#P"/home/pjb/works/patchwork/pw-user/A/B/C.D"
 
 
+(defun make-logical-pathname-translations (logical-host base-pathname)
+  (list
+   (list (format nil "~A:**;*.*.*"   logical-host)
+         (merge-pathnames #P"**/*.*" base-pathname nil))
+   (list (format nil "~A:**;*.*"     logical-host)
+         (merge-pathnames #P"**/*.*" base-pathname nil))
+   (list (format nil "~A:**;*"       logical-host)
+         (merge-pathnames #P"**/*"   base-pathname nil))))
 
 (defun generate-logical-pathname-translation-file (logical-host base-pathname &key (force nil))
   "Generate a default logical pathname translation mapping the logical-host to a given base directory."
@@ -112,15 +120,10 @@
               (*print-right-margin* 60)
               (*print-circle*       nil))
           (format trans ";;;; -*- mode:lisp;coding:us-ascii; -*-~2%")
-          (format trans "~S~%" (list
-                                   (list (format nil "~A:**;*.*.*"   logical-host)
-                                         (merge-pathnames #P"**/*.*" base-pathname nil))
-                                   (list (format nil "~A:**;*.*"     logical-host)
-                                         (merge-pathnames #P"**/*.*" base-pathname nil))
-                                   (list (format nil "~A:**;*"       logical-host)
-                                         (merge-pathnames #P"**/*"   base-pathname nil)))))
+          (format trans "~S~%" (make-logical-pathname-translations logical-host base-pathname)))
         (cerror "~A already exists; aborting." translation-file)))
     translation-file))
+
 
 (defun install-patchwork (&key (force nil))
   (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/patchwork/"                  :force force)
@@ -129,12 +132,17 @@
 ;; (install-patchwork :force t)
 
 
-
-(load-logical-pathname-translations "PATCHWORK")
 (load-logical-pathname-translations "PW-USER")
 (load-logical-pathname-translations "CLENI")
 
+;; (load-logical-pathname-translations "PATCHWORK")
 
+(setf (logical-pathname-translations "PATCHWORK") nil
+      (logical-pathname-translations "PATCHWORK")
+      (make-logical-pathname-translations "PATCHWORK"
+                                          (make-pathname :name nil :type nil :version nil
+                                                         :defaults #.(or *compile-file-truename* *load-truename*
+                                                                         #P"~/works/patchwork/patchwork/"))))
 
 (defun cd (path)
   #+ccl       (ccl::cd      path)

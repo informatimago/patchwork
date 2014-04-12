@@ -77,6 +77,10 @@
 (add-cocoa-version-features)
 
 ;;; --------------------------------------------------------------------
+;; #+(and ccl (not patchwork.builder::no-cocoa))
+;; (load (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;CCL-1-9-PATCH.LISP"))
+
+;;; --------------------------------------------------------------------
 ;;; AppleEvents are not used for now.
 #+(and patchwork.builder::use-apple-events ccl darwin (not patchwork.builder::no-cocoa))
 (progn
@@ -97,22 +101,37 @@
 (ql:quickload :patchwork                                  :verbose t :explain t)
 
 
+(mapc (lambda (package) (unuse-package package "COMMON-LISP-USER"))
+      (remove (find-package "COMMON-LISP") (package-use-list "COMMON-LISP-USER")))
+(use-package '("MCLGUI" "PATCHWORK") "COMMON-LISP-USER")
+
 ;;; --------------------------------------------------------------------
 ;;; Save the manifest.
 (defparameter *program-name*      "Patchwork")
 (defparameter *program-system*    :patchwork)
-(defparameter *program-directory* (merge-pathnames
-                                   (make-pathname :directory (list :relative "Desktop" (executable-name *program-name*)))
+(defparameter *name-and-version*  (format nil "~A-~A" *program-name* *patchwork-version*))
+(defparameter *release-directory* (merge-pathnames
+                                   (make-pathname :directory (list :relative "Desktop"
+                                                                   (executable-name *name-and-version*)))
                                    (user-homedir-pathname)))
 
+(ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
+(setf (logical-pathname-translations "RELEASE") nil
+      (logical-pathname-translations "RELEASE") 
+      (make-logical-pathname-translations "RELEASE" *release-directory*))
+
+
 (say "Generating manifest.")
-(ensure-directories-exist (merge-pathnames "TEST" *program-directory*))
-(let ((*default-pathname-defaults* *program-directory*))
-  (write-manifest *program-name* *program-system*))
+(let ((*default-pathname-defaults* *release-directory*))
+  (write-manifest *name-and-version* *program-system*))
+
+(say "Copying release notes.")
+(copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")
+           (translate-logical-pathname #P"RELEASE:RELEASE-NOTES.TXT"))
+
 
 ;;; --------------------------------------------------------------------
 ;;; Save the application package.
-(say "Generating ~A" (executable-name *program-name*))
 
 ;; Let's reset the readtable to the implementation defined one.
 (setf *readtable* (copy-readtable *cocoa-readtable*))
@@ -123,8 +142,9 @@
 #+(and ccl (not patchwork.builder::no-cocoa))
 (defmethod  ccl:application-init-file :around (app)
   (declare (ignorable app))
-  (make-pathname :name  "patchwork-init" :type "lisp"
-                 :defaults (user-homedir-pathname)))
+  #-(and) (make-pathname :name  "patchwork-init" :type "lisp"
+                         :defaults (user-homedir-pathname))
+  #P"PW-USER:PW-inits;init.lisp")
 
 
 #+ccl
@@ -133,7 +153,7 @@
 
 (say "Generating ~A" (merge-pathnames (make-pathname :name *program-name*
                                                      :type "app")
-                                      *program-directory*))
+                                      *release-directory*))
 
 (defun exported-type-utis ()
   (vector
@@ -197,7 +217,7 @@
   ;;  calls ccl::%save-application-interal
   ;;  calls ccl::save-image
   #+ (and ccl (not patchwork.builder::no-cocoa))
-  (ccl::build-application
+  (ccl::build-application ;; This doesn't return.
    :name name
    :directory directory
    :type-string "APPL"
@@ -213,7 +233,7 @@
                  ;; (help-book-name $default-info-plist-help-book-name)
                  ;; (icon-file $default-info-plist-icon-file)
                  :|CFBundleIconFile| (file-namestring (translate-logical-pathname
-                                                       #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.PNG"))
+                                                       #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS"))
                  :|CFBundleIdentifier| "com.informatimago.patchwork"
                  ;; (dictionary-version $default-info-dictionary-version)
                  ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
@@ -248,7 +268,13 @@
    :altconsole nil))
 
 (unless *load-pathname*
-  (save-patchwork-application :name *program-name* :directory *program-directory*))
+  (let ((destination (merge-pathnames #P"Patchwork.app/Contents/Resources/patchwork-icon.icns"
+                                      *release-directory*)))
+    (ensure-directories-exist destination)
+    (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
+               destination :element-type '(unsigned-byte 8) :if-exists :supersede))
+  ;; this quits ccl:
+  (save-patchwork-application :name *program-name* :directory *release-directory*))
 
 
 #+lispworks
