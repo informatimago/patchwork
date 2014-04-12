@@ -67,8 +67,12 @@
 (defun format-trace (method &rest arguments)
   (declare (stepper disable))
   (let ((*print-case* :downcase))
-    (format *trace-output* "~&(~40A ~{~S~^ ~})~%" method arguments)
-    (force-output *trace-output*)
+    (flet ((out (stream)
+             (format stream "~&(~40A ~{~S~^ ~})~%" method arguments)
+             (force-output stream)
+             t))
+      (or (ignore-errors (out *trace-output*))
+          (ignore-errors (out *standard-output*))))
     (first arguments)))
 
 
