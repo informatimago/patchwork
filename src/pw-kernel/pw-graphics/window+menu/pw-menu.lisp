@@ -286,7 +286,7 @@ DO:       Execute the BODY with a handler for CONDITION and
 
 (defun initialize-menus ()
   ;;------------------------------
-  (setf *pw-menu-apps*         (new-menu "Patchwork"))
+  (setf *pw-menu-apps*         (new-menu "Apps"))
   (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
   (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"   'pw-menu-action))
   ;;------------------------------
@@ -538,6 +538,8 @@ DO:       Execute the BODY with a handler for CONDITION and
                   (new-leafmenu "-" nil)
                   (new-leafmenu "Save Image"          (lambda () (save-special-pw-image))))
   ;;------------------------------
+  (set-menu-title *apple-menu* "Patchwork")
+  (set-menu-item-title (first (menu-items *apple-menu*)) "About Patchwork…")
   (setf *patchwork-menubar* 
         (list *apple-menu*
               *pw-menu-apps*

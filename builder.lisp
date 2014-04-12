@@ -73,7 +73,7 @@
 
 
 ;; Other logical hosts used by patchwork or its dependencies include:
-;;   PW-USER
+;;   PW-USER  -- See src/application.lisp  initialize-directories
 ;;   CLENI
 
 

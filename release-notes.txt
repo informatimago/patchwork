@@ -6,6 +6,30 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+- PW-USER configured by default as ~/Documents/Patchwork/
+  This can be changed by adding editing the file ~/LOGHOSTS/PW-USER 
+  with a sexp such as: ::
+
+      #.(let ((pw-user (merge-pathnames #P"Documents/Patchwork/" (user-homedir-pathname))))
+          `(("**;*.*.*" ,(merge-pathnames "**/*.*" pw-user))
+            ("**;*.*"   ,(merge-pathnames "**/*.*" pw-user))
+            ("**;*"     ,(merge-pathnames "**/*"   pw-user))))
+
+   The PW-USER directory contains the following directories and files: ::
+
+        abstract-autoload/
+        library-autoload/
+        PW-inits/
+        PW-inits/init.lisp
+        PW-inits/config.init
+        PW-user-library/
+        PW-user-patches/
+
+- when an error occurs in a listener window, the debugger is invoked
+  in the same listener window, instead of closing the listener window.
+- corrected the menu titles: Patchwork, Apps, … instead of Clozure CL, Patchwork, …
+- set the icon of the application.
+
 
 10.0-0.907
 -----------------------

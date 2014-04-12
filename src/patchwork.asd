@@ -62,6 +62,8 @@
                         :depends-on ("packages"
                                      "stream/redirecting-stream"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
+                                     "pw-kernel/abstraction+config/config-setup"
+                                     "pw-kernel/abstraction+config/pw-library-config"
                                      "pw-music/editors/mn/mn-editor"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"))
 

@@ -80,9 +80,9 @@
       (load-logical-pathname-translations "PW-USER")
     (error ()
       (setf (logical-pathname-translations "PW-USER")
-            '(("**;*.*.*" #.(merge-pathnames #P"Desktop/pw-user/**/*.*" (user-homedir-pathname)))
-              ("**;*.*"   #.(merge-pathnames #P"Desktop/pw-user/**/*.*" (user-homedir-pathname)))
-              ("**;*"     #.(merge-pathnames #P"Desktop/pw-user/**/*"   (user-homedir-pathname)))))))
+            '(("**;*.*.*" #.(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
+              ("**;*.*"   #.(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
+              ("**;*"     #.(merge-pathnames #P"Documents/Patchwork/**/*"   (user-homedir-pathname)))))))
   (dolist (path (list *PW-user-abstract-pathName* *PW-user-library-pathName*
                       *config-default-libr-path* *config-default-abst-path*
                       *config-init-file*))
@@ -92,61 +92,6 @@
                                           (pathname-directory path))
                     :defaults path))))
 
-
-
-
-(defun repl (&key
-               ((:input-stream  *standard-input*)  *standard-input*)
-               ((:output-stream *standard-output*) *standard-output*)
-               (break-level #+ccl ccl::*break-level* #-ccl 0)
-		       (prompt-function #+ccl (lambda (stream)
-                                        (when (and ccl::*show-available-restarts* ccl::*break-condition*)
-                                          (ccl::list-restarts)
-                                          (setf ccl::*show-available-restarts* nil))
-                                        (ccl::print-listener-prompt stream t))
-                                #-ccl (lambda (stream)
-                                        (declare (special *hist*))
-                                        (format t "~%~A[~D~[~;/~:*~A~]]> " (package-name *package*) *hist* break-level))))
-  "
-DO:        Implements a minimalist CL REPL.
-"
-  (declare (special *hist*))
-  (format *standard-output* "~&Patchwork REPL ~S~%" break-level)
-  (catch 'repl
-    (do ((+eof+ (gensym))
-         (*hist* 1 (1+ *hist*)))
-        (nil)
-      (restart-case
-          (progn
-            (funcall prompt-function *standard-output*)
-            (finish-output *standard-output*)
-            (handler-bind ((error #'invoke-debugger))
-              (setf - (read *standard-input* nil +eof+))
-              (when (or (eq - +eof+)
-                        (and (listp -)
-                             (null (rest -))
-                             (member (first -) '(quit  exit continue)
-                                     :test (function string-equal))))
-                (return-from repl))
-              (let ((results (multiple-value-list (eval -))))
-                (setf +++ ++   ++ +   + -
-                      /// //   // /   / results
-                      *** **   ** *   * (first /)))
-              (format t "~& --> ~{~S~^ ;~%     ~}~%" /)
-              (finish-output)))          
-        (abort ()
-          :report (lambda (stream)
-                    (if (= break-level 0)
-                        (format stream "Return to REPL toplevel.")
-                        (format stream "Return to REPL break level ~D." break-level))))
-        ;; (abort-break () 
-        ;;   (unless (= break-level 0)
-        ;;     (abort)))
-        ))))
-
-
-;; (defmethod ccl:repl-function-name ((self ui:application))
-;;   'repl)
 
 
 (defun initialize-patchwork ()
@@ -160,8 +105,8 @@ Must be called on the main thread."
   (initialize-directories)
   #-(and)(installapple-event-handlers)
   ;; ---
-  (terpri *patchwork-io*)
-  (write-line "Welcome to Patchwork" *patchwork-io*)
+  (format *patchwork-io* "~&Welcome to Patchwork!~%")
+  (finish-output *patchwork-io*)
   (values))
 
 
@@ -176,8 +121,12 @@ Must be called on the main thread."
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
+
+#+ccl (on-restore patchwork-ccl-repl
+        (setf ccl::*read-loop-function* 'safe-repl
+              ccl::*inhibit-greeting*    t))
+
 (on-restore patchwork-trace
-  #+ccl (setf ccl::*read-loop-function* 'safe-repl)
   (setf *trace-output* (open (merge-pathnames #P"Desktop/patchwork-trace.txt"
                                               (user-homedir-pathname))
                              :direction :output

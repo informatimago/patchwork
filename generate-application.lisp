@@ -101,6 +101,10 @@
 (ql:quickload :patchwork                                  :verbose t :explain t)
 
 
+(mapc (lambda (package) (unuse-package package "COMMON-LISP-USER"))
+      (remove (find-package "COMMON-LISP") (package-use-list "COMMON-LISP-USER")))
+(use-package '("MCLGUI" "PATCHWORK") "COMMON-LISP-USER")
+
 ;;; --------------------------------------------------------------------
 ;;; Save the manifest.
 (defparameter *program-name*      "Patchwork")
@@ -138,8 +142,9 @@
 #+(and ccl (not patchwork.builder::no-cocoa))
 (defmethod  ccl:application-init-file :around (app)
   (declare (ignorable app))
-  (make-pathname :name  "patchwork-init" :type "lisp"
-                 :defaults (user-homedir-pathname)))
+  #-(and) (make-pathname :name  "patchwork-init" :type "lisp"
+                         :defaults (user-homedir-pathname))
+  #P"PW-USER:PW-inits;init.lisp")
 
 
 #+ccl
