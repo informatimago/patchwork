@@ -1,583 +1,8 @@
-.. comment: -*- mode:rst; coding:utf-8 -*-
+# -*- mode:org; coding:utf-8 -*-
 
-rm application.log ; make clean ; make application 2>&1 | tee application.log
+* Scratch
 
-
-Notes
-========================================
-
-
-(process-interrupt ccl::*initial-process* (lambda ()
-                                            (make-window)
-                                            (start-run-loop)))
-
-https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
-
-
-Configuration & Logical pathnames
-----------------------------------------
-
-(defvar *PW-user-library-extension* "lib")
-(defvar *library-selection* ())
-
-;;The path-names for user patches and user libraries. Folders "PW-user-patches" and 
-;;"PW-user-library" should exist somewhere within the "PW;" path.
-(defvar *PW-user-abstract-pathName* "PW-USER:PW-user-patches;**;*.*")
-(defvar *PW-user-library-pathName*  "PW-USER:PW-user-library;**;*.*")
-
-
-(defvar *config-default-libr-path*  "PW-USER:library-autoload;")
-(defvar *config-default-abst-path*  "PW-USER:abstract-autoload;")
-(defvar *config-init-file*          "CL:PW-inits;config.init")
-
-(defvar *compiled-abstr-extension* ".comp")
-
-(defparameter *user-library-folder-path*  (merge-pathnames "**;*.lib" *config-default-libr-path*))
-
-
-
-Classes used
-----------------------------------------
-
-Classes that need to be implemented satisfactorily:
-
-- dialog
-- dialog-item
-- table-dialog-item
-- button-dialog-item 
-- static-text-dialog-item 
-- editable-text-dialog-ietm
-- dialog
-- fred-window
-- window
-- vie
-
-
-Packages
-----------------------------------------
-
-
- "NS" "NEXTSTEP-FUNCTIONS" "OBJC"
-"GUI" "HEMLOCK-INTERFACE" "HEMLOCK-EXT" "HI" "HEMLOCK"
-
-"CLOSER-MOP" "CLOSER-COMMON-LISP" "CLOSER-COMMON-LISP-USER"
-"BABEL-ENCODINGS" "BABEL" "CFFI-SYS" "CFFI-CALLBACKS" "CFFI" "CFFI-FEATURES" "IMPL-SPECIFIC-GRAY" "TRIVIAL-GRAY-STREAMS" "SPLIT-SEQUENCE"
-
- "COM.INFORMATIMAGO.COMMON-LISP.LISP.STEPPER.INTERNAL" "COM.INFORMATIMAGO.COMMON-LISP.LISP.STEPPER"
-  "COM.INFORMATIMAGO.SIMPLE-TEST" "COM.INFORMATIMAGO.OBJECTIVE-C.LOWER" "COM.INFORMATIMAGO.OBJECTIVE-CL"
- "COM.INFORMATIMAGO.CLEXT.ASSOCIATION" "COM.INFORMATIMAGO.CLEXT.CHARACTER-SETS" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK-USER"
-
-(defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" "MIDI-PLAYER" "MIDISHARE" "MIDI" "PATCH-WORK.SCHEDULER" "PATCH-WORK" "C-PATCH-BUFFER" "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN" "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE" "EPW" "C-LIST-ITEM-H" "C-LIST-ITEM" "C-TABLE-WINDOW-H" "C-TABLE-WINDOW" "C-PATCH-LIST-EDITOR" "C-GET-NOTE-SLOTS" "C-GET-SELECTIONS" "USER-ABSTRACTION" "C-PATCH-CHORD-LINE" "C-PW-SEND-MIDI-NOTE" "CLENI" "COMBINATORIAL-INTERV" "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING")) 
-
-
-Apple Events
-----------------------------------------
-
-::
-
-    ui::gestalt
-
-    record--ae                    pw-lib/pwscript/recordables.lisp
-
-    with-aedescs                  mclgui/apple-event.lisp
-
-    create-self-target            pw-lib/pwscript/appleevent-toolkit.lisp
-    create-appleevent             pw-lib/pwscript/appleevent-toolkit.lisp
-    put-appleevent-par            pw-lib/pwscript/pw-scripting.lisp
-
-    cl-user::getDescRecPtr        pw-lib/pwscript/pw-ae.lisp
-    cl-user::asAEDesc             pw-lib/pwscript/pw-ae.lisp
-    #_AEPutParamDesc
- 
-
-
-pw-lib/pwscript/pw-scripting.lisp         pw
-
-    Apple Event Handlers --> action methods
-
-
-pw-lib/pwscript/recordables.lisp          pw
-
-    Creating and sending Apple Event records.
-
-
-pw-lib/pwscript/pw-ae.lisp                cl-user
-
-    AppleEvents <-> Clos Object layer  V 1.02 
-
-pw-lib/pwscript/appleevent-toolkit.lisp   appleevent-toolkit ae
-
-    Lowest level layer.
-
-
-mclgui/apple-event.lisp                   mclgui
-
-    MCL apple-event stuff.
-
-
-
-pw-ae.lisp stuff used:
-
-    cl-user::AppleEvent
-    cl-user::asAEDesc
-    cl-user::getDescRecPtr
-    cl-user::getparam
-
-appleevent-toolkit.lisp stuff used:
-
-  /Users/pjb/works/patchwork/patchwork/src/pw-lib/pwscript/pw-ae.lisp
-
-    create-Psn-Target
-    create-Named-Process-Target
-    create-Self-Target
-    choose-AppleEvent-Target
-    send-appleevent 
-
-  /Users/pjb/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
-
-    create-appleevent
-    create-self-target
-    send-appleevent
-
-apple-event.lisp stuff used:
-
-    install-appleevent-handler
-    appleevent-idle
-    ae-error 
-    with-aedescs
-
-
-
-Miscellaneous
-----------------------------------------
-
-Resource file:
-"CL:PW-inits;Drivers+Resources;CLPF.rsrc"
-./pw-kernel/environment/make-image                 To generate the image:
-
-
-patchwork/src/mclgui/notes.txt
-
-:: 
-
-    (let ((functions '())
-          (variables '()))
-     (old-old-map-sexps "/home/pjb/works/patchwork/patchwork/src/mclgui/graphics.lisp"
-                (lambda (form start end)
-                  (when (consp form)
-                    (case (first form)
-                      ((defun defmethod defgeneric) (push (second form) functions))
-                      ((defvar defparameter defconstant) (push (second form) variables))))))
-     (values variables functions))
-
-
-
-
-make application
-----------------
-
-- rassembler dans des fonctions d'initialisation toutes les
-  expressions créant ces pointeurs mac, et appeler ces fonctions au
-  lancement de l'image exécutable.  (Voir par exemple initialize-menus dans
-  ``#P"PATCHWORK:src;pw-kernel;pw-graphics;window+menu;pw-menu.lisp"``).
-
-      + simplicité.
-
-      + portabilité.
-
-      - ne résoud pas le problème de la commande/menu "Save Image".
-
-
-- utiliser ``ccl:*lisp-cleanup-functions*``.
-
-      - plus complexe: il faudrait ajouter des fonctions
-        d'hibernation/réveil pour tous les objets qui ont un NSObject
-        handle.
-
-      - pas portable.
-
-      + résoud le problème de la commande/menu "Save Image".
-
-      + facilite la génération de l'application en cours de développement.
-
-
-
-quitting
-----------------------------------------
-
-
-- Call \*lisp-cleanup-functions* in order.
-
-
-saving an image
-----------------------------------------
-
-Before saving the image:
-
-- Call \*save-exit-functions* in order.
-
-
-restore lisp pointers
-----------------------------------------
-
-- Revive system locks.
-- Refresh external entrypoints.
-- Restore pascal functions.
-- Initialize interactive streams.
-- Call \*lisp-system-pointer-functions* in reverse order.
-- Call \*restore-lisp-functions* in order.  (-> def-load-pointers)
-- Call \*lisp-user-pointer-functions* in reverse order.
-- Call \*lisp-startup-functions* in reverse order.
-
-The last three lists could be  modified by the previous functions (but
-not the first cons cells themselves).
-
-
-::
-    (dolist (v '(ccl::*lisp-system-pointer-functions*
-                 ccl::*restore-lisp-functions*
-                 ccl::*lisp-user-pointer-functions*
-                 ccl::*lisp-startup-functions*))
-      (format t "~2%Contents of ~S~%" v)
-      (map nil 'print (symbol-value v)))
-
-
-
-
-Cloning
-----------------------------------------
-
-git clone git@gitorious.org:patchwork/patchwork.git
-
-
-Common Lisp Implementation
-----------------------------------------
-
-On the MacMini, 
-
-uname -a
-Darwin galatea 11.4.2 Darwin Kernel Version 11.4.2: Thu Aug 23 16:26:45 PDT 2012; root:xnu-1699.32.7~1/RELEASE_I386 i386
-
-
-
-MacPort - /opt/local/bin/ccl 
-........................................
-
-/opt/local/bin/ccl  --version
-Version 1.8  (DarwinX8632)
-
-arch is i386 therefore /opt/local/bin/ccl loads in 32-bit.
-
-- This fails in %ff-call somewhere in the main event run loop.
-
-
-
-Personnalized - /data/languages/ccl/bin/ccl
-........................................
-
-/data/languages/ccl/bin/ccl
-Version 1.8  (DarwinX8664)
-
-forced 64-bit, with patches (with-standard-io-syntax (format …)) for selectors.
-
-- Success. 
-
-
-
-Clozure CL.app from the AppStore
-........................................
-
-/Applications/Clozure\ CL.app/Contents/MacOS/dx86cl64 
-Version 1.8.1 (15418)
-
-:cocoa is pre-loaded, no CLI.
-
-- Generation of the application to be tried.
-- Loading slime and the application works.
-
-
-Generating interface files.
-----------------------------------------
-
-(require :parse-ffi)
-(ccl::parse-standard-ffi-files :coreservices)
-
-
-(ccl:OPEN-SHARED-LIBRARY "/System/Library/Frameworks/CoreServices.framework/CoreServices")
-(ccl:use-interface-dir :coreservices)
-
-#$kAERemoteProcess
-
-
-http://stpetrus27.wordpress.com/2011/06/20/compile-objective-c-programs-on-linux/
-
-
-AppleEvents
-----------------------------------------
-
-
-pw-lib/pwscript/pw-scripting.lisp : pw-lib/pwscript/pw-ae.lisp
-pw-lib/pwscript/recordables.lisp  : pw-lib/pwscript/pw-ae.lisp pw-lib/pwscript/appleevent-toolkit.lisp
-pw-lib/pwscript/pw-ae.lisp        :                            pw-lib/pwscript/appleevent-toolkit.lisp
-
-
-Midi
-----------------------------------------
-
-https://github.com/chfin/cl-portmidi
-+ libportmidi
-
-
-
-References
-========================================
-
-http://recherche.ircam.fr/equipes/repmus/Rapports/PeterHanappe95/
-
-
-Files
-========================================
-
-
-
-notes.txt                     This file.
-
-Makefile                      Makefile for the project.
-
-devis/                        The proposal.
-
-doc/                          Documentation and reference.
-
-This directory is used as prefix for installation of project specific
-programs and tools found in src/.  Therefore we have bin/, lib/ and
-share/ where things are installed.
-
-bin/                          Binaries (executables).
-
-lib/                          Libraries.
-
-share/                        Share files.
-
-src/                          Sources for various programs and tools.
-
-tools/                        Sources for tools written specifically
-                              for the Patchwork project.
-
-patches/                      Sample patch files.
-
-patchwork.fossil              The local fossil repository.
-
-patchwork/                    The patchwork sources (in an open fossil repository).
-
-PW-code.zip                   The original MCL files.
-
-pw-src-original/              The original lisp files.
-
-pw-src-utf-8-unix/            Converted into utf-8-unix encoding.
-
-pw-src/                       The Demo Patchwork version, before fossil.
-
-classes-hierarchy.txt         Class hierarchy as generated by tools/read-sources.
-
-classes-parents.txt           Class parents as generated by tools/read-sources.
-
-errors.txt                    Compilation errors so far.
-
-
-
-
-
-
-Fossil Info
-========================================
-
-
-fossil init patchwork.fossil
-project-id: 8da4fbae771061b0d45af1a298df4c4439092371
-server-id:  e22aca008c3639340f2081887a9f2ef462f054b8
-admin-user: pjb (initial password is "fe564e")
-
-
-sandboxing appstore
-========================================
-
-
-::
-
-    From: Michael Minerva <minerva@agentsheets.com>
-    Subject: Re: AgentCubes Lite: Sandboxed Lisp 3D authoring Application in Apple Mac Store
-    Newsgroups: gmane.lisp.openmcl.devel
-    To: Joshua Kordani <jkordani@lsa2.com>
-    Cc: openmcl-devel@clozure.com
-    Date: Tue, 30 Jul 2013 11:26:17 -0600 (1 hour, 45 minutes ago)
-    Message-ID: <38B3A83F-B2FF-4E0A-8723-0A6BAF21852A@agentsheets.com>
-
-    Hey Joshua,
-
-    Getting AgentCubes sandboxed actually was the easy party :P
-
-    Outside of Xcode you just had have to call the right sandbox command,
-    something like this:
-
-    codesign -s "3rd Party Mac Developer Application: AgentSheets, Inc."
-     -f --entitlements  "/Users/Mike/Desktop/AgentCubes-Lite/AgentCubes
-    Lite.app/Contents/AgentCubes Lite.entitlements"
-     "/Users/Mike/Desktop/AgentCubes-Lite/AgentCubes Lite.app"
-
-    The weird part is that the entitlements plist needs to be a binary
-    (which apparently can only me created in Xcode), so you need to create
-    a dummy Xcode project to create the entailments plist (after deciding
-    which entitlements you app will need). After that, your sandboxed app
-    will most likely have some new error/crashes because sandboxing the
-    app changes the inheritance hierarchy of some classes (such as file
-    dialogs) so some methods you are using may no longer be supported. 
-
-    --Mike
-
-
-    On Jul 30, 2013, at 10:29 AM, Joshua Kordani <jkordani@lsa2.com>
-    wrote:
-
-        Wow! Great work!
-
-        How did you get the sandboxed environment set up?
-
-        Josh
-
-        On 7/29/13 10:16 PM, Alexander Repenning wrote:
-
-
-            Dear All,
-
-
-            We are still keeping this at low profile but Apple just
-            accepted our fully sandboxed 3D Game and Simulation Design
-            AgentCubes application (built in CCL) into the Apple Mac App
-            store. Build a 3D simulation game and turn it into HTML5 (no
-            Flash, no Java) page that can run on many mobile browsers. 
-
-
-            Any feedback would be appreciated. It was quite a bit of work
-            to get this going with CCL outside of the Apple Xcode empire. 
-
-
-
-
-            https://itunes.apple.com/us/app/agentcubes-lite/id673363781?mt=12
-
-
-            In case you wonder what AgentCubes is here is a short
-            movie: http://www.youtube.com/watch?v=2GWcb3aG2w0
-
-
-
-
-            best,  Alex
-
-
-
-
-
-
-
-
-
-            Prof. Alexander Repenning
-
-
-            University of Colorado
-            Computer Science Department
-            Boulder, CO 80309-430
-
-
-            vCard:
-            http://www.cs.colorado.edu/~ralex/AlexanderRepenning.vcf
-
-
-
-
-
-
-            _______________________________________________
-    Openmcl-devel mailing list
-    Openmcl-devel@clozure.com
-    http://clozure.com/mailman/listinfo/openmcl-devel
-
-
-
-        _______________________________________________
-        Openmcl-devel mailing list
-        Openmcl-devel@clozure.com
-        http://clozure.com/mailman/listinfo/openmcl-devel
-
-
-    _______________________________________________
-    Openmcl-devel mailing list
-    Openmcl-devel@clozure.com
-    http://clozure.com/mailman/listinfo/openmcl-devel
-
-
-http://explanatorygap.net/2009/10/30/apple-have-documented-the-binary-plist-format/
-
-::
-
-    Apple have documented the binary plist format
-
-    Thanks to Dave Dribin for pointing this out.
-
-    In http://opensource.apple.com/source/CF/CF-550/CFBinaryPList.c
-
-    So really there’s no reason why we can’t have plistlib etc for Ruby/Python/whatever deal with binary plists on non-Mac platforms.
-
-    /*
-    HEADER
-        magic number ("bplist")
-        file format version
-
-    OBJECT TABLE
-        variable-sized objects
-
-        Object Formats (marker byte followed by additional info in some cases)
-        null    0000 0000
-        bool    0000 1000           // false
-        bool    0000 1001           // true
-        fill    0000 1111           // fill byte
-        int 0001 nnnn   …     // # of bytes is 2^nnnn, big-endian bytes
-        real    0010 nnnn   …     // # of bytes is 2^nnnn, big-endian bytes
-        date    0011 0011   …     // 8 byte float follows, big-endian bytes
-        data    0100 nnnn   [int]   … // nnnn is number of bytes unless 1111 then int count follows, followed by bytes
-        string  0101 nnnn   [int]   … // ASCII string, nnnn is # of chars, else 1111 then int count, then bytes
-        string  0110 nnnn   [int]   … // Unicode string, nnnn is # of chars, else 1111 then int count, then big-endian 2-byte uint16_t
-            0111 xxxx           // unused
-        uid 1000 nnnn   …     // nnnn+1 is # of bytes
-            1001 xxxx           // unused
-        array   1010 nnnn   [int]   objref* // nnnn is count, unless ’1111′, then int count follows
-            1011 xxxx           // unused
-        set 1100 nnnn   [int]   objref* // nnnn is count, unless ’1111′, then int count follows
-        dict    1101 nnnn   [int]   keyref* objref* // nnnn is count, unless ’1111′, then int count follows
-            1110 xxxx           // unused
-            1111 xxxx           // unused
-
-    OFFSET TABLE
-        list of ints, byte size of which is given in trailer
-        — these are the byte offsets into the file
-        — number of these is in the trailer
-
-    TRAILER
-        byte size of offset ints in offset table
-        byte size of object refs in arrays and dicts
-        number of offsets in offset table (also is number of objects)
-        element # in offset table which is top level object
-        offset table offset
-
-    */
-
-
-
-Scratch
-========================================
-
-::
+#+BEGIN_QUOTE
 
 
     diff --exclude \*.bak -r rmcl-unix/level-1/ mcl-unix/level-1/
@@ -608,13 +33,31 @@ Scratch
 
 
 
-    find ~/works/patchwork/patchwork/src/mclgui -name \*.lisp -print0 | xargs -0  grep -niH -e '[^-a-z]\<\(copy-file\|*warn-if-redefine*\|*lisp-cleanup-functions*\|*eventhook*\|event-dispatch\|def-load-pointers\|prompt\|point\|point-p\|point-x\|point-y\|point-h\|point-v\|make-point\|copy-point\|add-points\|subtract-points\|*black-pattern*\|*dkgray-pattern*\|*gray-pattern*\|*ltgray-pattern*\|*white-pattern*\|with-cursor\|*watch-cursor*\|*i-beam-cursor*\|*arrow-cursor*\|command-key\|set-command-key\|menu-element\|menu-element-p\|menu-item\|menu-item-p\|menu-item-enable\|menu-item-disable\|menu-item-title\|menu-item-action\|menu-item-check-mark\|set-menu-item-check-mark\|set-menu-item-action-function\|menu-item-action-function\|menu-item-action\|menu\|menup\|menu-enabled-p\|menu-title\|menu-items\|add-menu-items\|find-menu-item\|menubar\|set-menubar\|find-menu\|mouse-down-p\|double-click-p\|shift-key-p\|control-key-p\|command-key-p\|option-key-p\|command-key\|enabled\|event-dispatch\|file-name\|font\|item-action\|item-text\|items\|maxwidth\|text\|title\|width\|simple-view\|view\|view-container\|view-font\|view-position\|view-size\|view-window\|subviews\|view-subviews\|track-thumb-p\|h-scrollp\|v-scrollp\|bottom-boarder\|check-mark\|set-view-position\|set-view-size\|set-view-font\|add-subview\|add-subviews\|remove-subview\|remove-subviews\|with-focused-view\|with-font-focused-view\|scroller\|scroller-mixin\|scroll-bar-correction\|h-scroller\|v-scroller\|control\|button-string\|window\|window-title\|set-window-title\|close-box-p\|fred-window\|window-select\|bring-to-front\|front-window\|window-show\|window-hide\|view-activate-event-handler\|view-deactivate-event-handler\|dialog-item\|dialog-item-action\|dialog-item-text\|set-dialog-item-text\|static-text-dialog-item\|editable-text-dialog-item\|table-dialog-item\|button-dialog-item\|radio-button-dialog-item\|check-box-dialog-item\|dialog\|message\|message-dialog\|choose-file-dialog\|choose-new-file-dialog\|y-or-n-dialog\|select-item-from-list\|make-popupbox\|key-equal\)\>[^-a-z]'
+    find ~/works/patchwork/patchwork/src/mclgui -name \*.lisp -print0 | xargs -0  grep -niH -e '[^-a-z]\<\(copy-file\|*warn-if-redefine*\|*lisp-cleanup-functions*\|*eventhook*\|event-dispatch\|def-load-pointers\|prompt\|point\|point-p\|point-x\|point-y\|point-h\|point-v\|make-point\|copy-point\|add-points\|subtract-points\|*black-pattern*\|*dkgray-pattern*\|*gray-pattern*\|*ltgray-pattern*\|*white-pattern*\|with-cursor\|*watch-cursor*\|*i-beam-cursor*\|*arrow-cursor*\|command-key\|set-command-key\|menu-element\|menu-element-p\|menu-item\|menu-item-p\|menu-item-enable\|menu-item-disable\|menu-item-title\|menu-item-action\|menu-item-check-mark\|set-menu-item-check-mark\|set-menu-item-action-function\|menu-item-action-function\|menu-item-action\|menu\|menup\|menu-enabled-p\|menu-title\|menu-items\|add-menu-items\|find-menu-item\|menubar\|set-menubar\|find-menu\|mouse-down-p\|double-click-p\|shift-key-p\|control-key-p\|command-key-p\|option-key-p\|command-key\|enabled\|event-dispatch\|file-name\|font\|item-action\|item-text\|items\|maxwidth\|text\|title\|width\|simple-view\|view\|view-container\|view-font\|view-position\|view-size\|view-window\|subviews\|view-subviews\|track-thumb-p\|h-scrollp\|v-scrollp\|bottom-boarder\|check-mark\|set-view-position\|set-view-size\|set-view-font\|add-subview\|add-subviews\|remove-subview\|remove-subviews\|with-focused-view\|with-font-focused-view\|scroller\|scroller-mixin\|scroll-bar-correction\|h-scroller\|v-scroller\|control\|button-string\|window\|window-title\|set-window-title\|close-box-p\|fred-window\|window-select\|bring-to-front\|front-window\|window-show\|window-hide\|view-activate-event-handler\|view-deactivate-event-handler\|dialog-item\|dialog-item-action\|dialog-item-text\|set-dialog-item-text\|static-text-dialog-item\|editable-text-dialog-item\|table-dialog-item\|button-dialog-item\|radio-button-dialog-item\|check-box-dialog-item\|dialog\|message\|message-dialog\|choose-file-dialog\|choose-new-file-dialog\|y-or-n-dialog\|select-item-from-list\|make-popupbox\|key-equal\)\>[^-a-z]
+
+#+END_QUOTE
+
+#+BEGIN_SRC sh
+rm application.log ; make clean ; make application 2>&1 | tee application.log
+#+END_SRC
+
+#+BEGIN_SRC lisp
+(push #P"/home/pjb/works/patchwork/tools/" asdf:*central-registry*) 
+(ql:quickload :com.informatimago.check-asdf)
+(com.informatimago.check-asdf:check-asdf-system-file #P"~/works/patchwork/patchwork/src/patchwork.asd")
 
 
-Not Implemented Yet
-========================================
+(process-interrupt ccl::*initial-process* (lambda ()
+                                            (make-window)
+                                            (start-run-loop)))
+#+END_SRC
 
-::
+
+https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
+
+* Not Implemented Yet
+
+#+BEGIN_QUOTE
 
     [pjb@kuiper :0.0 patchwork]$ find . -name \*.lisp -exec grep  -Hi '^ *(niy ' {} \;
 
@@ -995,13 +438,11 @@ Not Implemented Yet
 
     [pjb@kuiper :0.0 patchwork]$ 
 
+#+END_QUOTE
 
+* Errors & Warnings
 
-
-Errors & Warnings
-========================================
-
-::
+#+BEGIN_QUOTE
 
     [pjb@larissa :0.0 patchwork]$ ~/Desktop/patchwork-10.0-0.889-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/Patchwork.app/Contents/MacOS/Patchwork 
     MidiShare not present. PatchWork won't play Midi.
@@ -1029,6 +470,611 @@ Errors & Warnings
     Objective-C runtime exception: 
     Item to be removed is not in the menu in the first place
 
+#+END_QUOTE
+
+* Patchwork Development Notes
+** ffigen4
+
+`http://trac.clozure.com/ccl/wiki/BuildFFIGEN`_
+
+ffigen4 is needed to build the ccl interface databases of Midishare.
+
+** Midishare
+
+The current distribution of Midishare (.dmg) is compiled only for ppc and 32-bit i386 processors. ::
+
+    $ file /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare
+    /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare: Mach-O universal binary with 2 architectures
+    /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare (for architecture i386):	Mach-O dynamically linked shared library i386
+    /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare (for architecture ppc):	Mach-O dynamically linked shared library ppc
+
+Therefore we must compile midishare ourselves.
+
+** Configuration & Logical pathnames
+
+#+BEGIN_SRC lisp
+(defvar *PW-user-library-extension* "lib")
+(defvar *library-selection* ())
+
+;;The path-names for user patches and user libraries. Folders "PW-user-patches" and 
+;;"PW-user-library" should exist somewhere within the "PW;" path.
+(defvar *PW-user-abstract-pathName* "PW-USER:PW-user-patches;**;*.*")
+(defvar *PW-user-library-pathName*  "PW-USER:PW-user-library;**;*.*")
 
 
-.. comment: THE END 
+(defvar *config-default-libr-path*  "PW-USER:library-autoload;")
+(defvar *config-default-abst-path*  "PW-USER:abstract-autoload;")
+(defvar *config-init-file*          "CL:PW-inits;config.init")
+
+(defvar *compiled-abstr-extension* ".comp")
+
+(defparameter *user-library-folder-path*  (merge-pathnames "**;*.lib" *config-default-libr-path*))
+#+END_SRC
+
+** Classes used
+
+Classes that need to be implemented satisfactorily:
+
+- dialog
+- dialog-item
+- table-dialog-item
+- button-dialog-item 
+- static-text-dialog-item 
+- editable-text-dialog-ietm
+- dialog
+- fred-window
+- window
+- vie
+
+** Packages
+
+#+BEGIN_SRC lisp
+
+"NS" "NEXTSTEP-FUNCTIONS" "OBJC"
+"GUI" "HEMLOCK-INTERFACE" "HEMLOCK-EXT" "HI" "HEMLOCK"
+
+"CLOSER-MOP" "CLOSER-COMMON-LISP" "CLOSER-COMMON-LISP-USER"
+"BABEL-ENCODINGS" "BABEL" "CFFI-SYS" "CFFI-CALLBACKS" "CFFI" "CFFI-FEATURES" "IMPL-SPECIFIC-GRAY" "TRIVIAL-GRAY-STREAMS" "SPLIT-SEQUENCE"
+
+ "COM.INFORMATIMAGO.COMMON-LISP.LISP.STEPPER.INTERNAL" "COM.INFORMATIMAGO.COMMON-LISP.LISP.STEPPER"
+  "COM.INFORMATIMAGO.SIMPLE-TEST" "COM.INFORMATIMAGO.OBJECTIVE-C.LOWER" "COM.INFORMATIMAGO.OBJECTIVE-CL"
+ "COM.INFORMATIMAGO.CLEXT.ASSOCIATION" "COM.INFORMATIMAGO.CLEXT.CHARACTER-SETS" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK-USER"
+
+(defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" "MIDI-PLAYER" "MIDISHARE" "MIDI" "PATCH-WORK.SCHEDULER" "PATCH-WORK" "C-PATCH-BUFFER" "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN" "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE" "EPW" "C-LIST-ITEM-H" "C-LIST-ITEM" "C-TABLE-WINDOW-H" "C-TABLE-WINDOW" "C-PATCH-LIST-EDITOR" "C-GET-NOTE-SLOTS" "C-GET-SELECTIONS" "USER-ABSTRACTION" "C-PATCH-CHORD-LINE" "C-PW-SEND-MIDI-NOTE" "CLENI" "COMBINATORIAL-INTERV" "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING")) 
+
+#+END_SRC
+
+** Apple Events
+
+
+-   ui::gestalt
+
+-   record--ae                    pw-lib/pwscript/recordables.lisp
+
+-   with-aedescs                  mclgui/apple-event.lisp
+
+-   create-self-target            pw-lib/pwscript/appleevent-toolkit.lisp
+-   create-appleevent             pw-lib/pwscript/appleevent-toolkit.lisp
+-   put-appleevent-par            pw-lib/pwscript/pw-scripting.lisp
+
+-   cl-user::getDescRecPtr        pw-lib/pwscript/pw-ae.lisp
+-   cl-user::asAEDesc             pw-lib/pwscript/pw-ae.lisp
+-   #_AEPutParamDesc
+ 
+
+
+pw-lib/pwscript/pw-scripting.lisp         pw
+
+    Apple Event Handlers --> action methods
+
+
+pw-lib/pwscript/recordables.lisp          pw
+
+    Creating and sending Apple Event records.
+
+
+pw-lib/pwscript/pw-ae.lisp                cl-user
+
+    AppleEvents <-> Clos Object layer  V 1.02 
+
+pw-lib/pwscript/appleevent-toolkit.lisp   appleevent-toolkit ae
+
+    Lowest level layer.
+
+
+mclgui/apple-event.lisp                   mclgui
+
+    MCL apple-event stuff.
+
+
+
+pw-ae.lisp stuff used:
+
+    cl-user::AppleEvent
+    cl-user::asAEDesc
+    cl-user::getDescRecPtr
+    cl-user::getparam
+
+appleevent-toolkit.lisp stuff used:
+
+  /Users/pjb/works/patchwork/patchwork/src/pw-lib/pwscript/pw-ae.lisp
+
+    create-Psn-Target
+    create-Named-Process-Target
+    create-Self-Target
+    choose-AppleEvent-Target
+    send-appleevent 
+
+  /Users/pjb/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
+
+    create-appleevent
+    create-self-target
+    send-appleevent
+
+apple-event.lisp stuff used:
+
+    install-appleevent-handler
+    appleevent-idle
+    ae-error 
+    with-aedescs
+
+** Miscellaneous
+
+Resource file:
+"CL:PW-inits;Drivers+Resources;CLPF.rsrc"
+./pw-kernel/environment/make-image                 To generate the image:
+
+
+patchwork/src/mclgui/notes.txt
+
+#+BEGIN_SRC lisp
+
+    (let ((functions '())
+          (variables '()))
+     (old-old-map-sexps "/home/pjb/works/patchwork/patchwork/src/mclgui/graphics.lisp"
+                (lambda (form start end)
+                  (when (consp form)
+                    (case (first form)
+                      ((defun defmethod defgeneric) (push (second form) functions))
+                      ((defvar defparameter defconstant) (push (second form) variables))))))
+     (values variables functions))
+
+#+END_SRC
+
+** make application
+
+- rassembler dans des fonctions d'initialisation toutes les
+  expressions créant ces pointeurs mac, et appeler ces fonctions au
+  lancement de l'image exécutable.  (Voir par exemple initialize-menus dans
+  ``#P"PATCHWORK:src;pw-kernel;pw-graphics;window+menu;pw-menu.lisp"``).
+
+      + simplicité.
+
+      + portabilité.
+
+      - ne résoud pas le problème de la commande/menu "Save Image".
+
+
+- utiliser ``ccl:*lisp-cleanup-functions*``.
+
+      - plus complexe: il faudrait ajouter des fonctions
+        d'hibernation/réveil pour tous les objets qui ont un NSObject
+        handle.
+
+      - pas portable.
+
+      + résoud le problème de la commande/menu "Save Image".
+
+      + facilite la génération de l'application en cours de développement.
+
+** quitting
+
+- Call \*lisp-cleanup-functions* in order.
+
+** saving an image
+
+Before saving the image:
+
+- Call \*save-exit-functions* in order.
+
+** restore lisp pointers
+
+- Revive system locks.
+- Refresh external entrypoints.
+- Restore pascal functions.
+- Initialize interactive streams.
+- Call \*lisp-system-pointer-functions* in reverse order.
+- Call \*restore-lisp-functions* in order.  (-> def-load-pointers)
+- Call \*lisp-user-pointer-functions* in reverse order.
+- Call \*lisp-startup-functions* in reverse order.
+
+The last three lists could be  modified by the previous functions (but
+not the first cons cells themselves).
+
+
+#+BEGIN_SRC lisp
+
+    (dolist (v '(ccl::*lisp-system-pointer-functions*
+                 ccl::*restore-lisp-functions*
+                 ccl::*lisp-user-pointer-functions*
+                 ccl::*lisp-startup-functions*))
+      (format t "~2%Contents of ~S~%" v)
+      (map nil 'print (symbol-value v)))
+
+#+END_SRC
+
+** Cloning
+
+git clone git@gitorious.org:patchwork/patchwork.git
+
+** Common Lisp Implementation
+
+On the MacMini, 
+
+uname -a
+Darwin galatea 11.4.2 Darwin Kernel Version 11.4.2: Thu Aug 23 16:26:45 PDT 2012; root:xnu-1699.32.7~1/RELEASE_I386 i386
+
+
+
+*** MacPort - /opt/local/bin/ccl 
+
+/opt/local/bin/ccl  --version
+Version 1.8  (DarwinX8632)
+
+arch is i386 therefore /opt/local/bin/ccl loads in 32-bit.
+
+- This fails in %ff-call somewhere in the main event run loop.
+
+
+
+*** Personnalized - /data/languages/ccl/bin/ccl
+
+
+/data/languages/ccl/bin/ccl
+Version 1.8  (DarwinX8664)
+
+forced 64-bit, with patches (with-standard-io-syntax (format …)) for selectors.
+
+- Success. 
+
+
+
+*** Clozure CL.app from the AppStore
+
+
+/Applications/Clozure\ CL.app/Contents/MacOS/dx86cl64 
+Version 1.8.1 (15418)
+
+:cocoa is pre-loaded, no CLI.
+
+- Generation of the application to be tried.
+- Loading slime and the application works.
+
+** Generating interface files.
+
+(require :parse-ffi)
+(ccl::parse-standard-ffi-files :coreservices)
+
+
+(ccl:OPEN-SHARED-LIBRARY "/System/Library/Frameworks/CoreServices.framework/CoreServices")
+(ccl:use-interface-dir :coreservices)
+
+#$kAERemoteProcess
+
+
+http://stpetrus27.wordpress.com/2011/06/20/compile-objective-c-programs-on-linux/
+
+** AppleEvents
+
+
+pw-lib/pwscript/pw-scripting.lisp : pw-lib/pwscript/pw-ae.lisp
+pw-lib/pwscript/recordables.lisp  : pw-lib/pwscript/pw-ae.lisp pw-lib/pwscript/appleevent-toolkit.lisp
+pw-lib/pwscript/pw-ae.lisp        :                            pw-lib/pwscript/appleevent-toolkit.lisp
+
+** Midi
+
+https://github.com/chfin/cl-portmidi
++ libportmidi
+
+** Init/Exit/Save hooks
+
+MCL / CCL
+- launch image:
+
+   - `load-pointer` functions are called.
+   - `*lisp-startup-functions*` are called.
+
+- save image:
+   - `*lisp-cleanup-functions*` are called.
+   - `*save-exit-functions*` are called.
+   
+- exit image:
+   - `*lisp-cleanup-functions*` are called.
+
+#+BEGIN_SRC lisp
+
+    ;;     def-load-pointers
+    ;; ccl:def-load-pointers, Def: MACRO function
+    ;;      lisp-startup-functions
+    ;; ccl:*lisp-startup-functions*,  Value: nil
+    ;;      lisp-cleanup-functions
+    ;; ccl:*lisp-cleanup-functions*,  Value: nil
+    ;;      save-exit-functions
+    ;; ccl:*save-exit-functions*,  Value: (#<ccl:compiled-lexical-closure ccl::%clear-objc-class-maps #x302001ADA6FF>)
+
+
+    (defvar *lisp-startup-functions* '()
+      "
+    The *LISP-STARTUP-FUNCTIONS* variable contains a list of functions of
+    no arguments on which funcall is run after Macintosh Common Lisp
+    starts, just before it enters the top-level function (usually the
+    Listener’s read loop).  The functions contained in
+    *LISP-STARTUP-FUNCTIONS* are run after the functions specified by
+    DEF-LOAD-POINTERS and before the init file is loaded.  The functions
+    are called in reverse order from the order in which they appear in the
+    list. 
+    ")
+
+
+    (defvar *lisp-cleanup-functions* '()
+      "
+    The *LISP-CLEANUP-FUNCTIONS* variable contains a list of functions of
+    no arguments on which funcall is run just before Macintosh Common Lisp
+    exits (via QUIT or SAVE-APPLICATION).  These functions are called just
+    after the windows are closed.
+
+    When saving an application, the functions in *LISP-CLEANUP-FUNCTIONS*
+    are run, then the functions in *SAVE-EXIT-FUNCTIONS* are run.
+    ")
+
+
+
+    (defmacro def-load-pointers (name lambda-list &body body)
+    "
+
+    Save a function (lambda ,lambda-list ,@body) under the ,name
+    to be called when the image is loaded again.
+
+    Since the functions are called with no arguments, lambda-list should
+    be () or specify only optional parameters.
+
+    ")
+
+    (defvar *save-exit-functions* '()
+      "
+    The *SAVE-EXIT-FUNCTIONS* variable contains a list of functions to be
+    called when an image is saved.  These functions should perform any
+    preparation necessary for the image saving.  The functions are called
+    in the order in which they appear in the list.
+
+    When saving an application, the functions in *LISP-CLEANUP-FUNCTIONS*
+    are run, then the functions in *SAVE-EXIT-FUNCTIONS* are run.
+    ")
+
+#+END_SRC
+
+* Files
+
+notes.txt                     This file.
+
+Makefile                      Makefile for the project.
+
+devis/                        The proposal.
+
+doc/                          Documentation and reference.
+
+This directory is used as prefix for installation of project specific
+programs and tools found in src/.  Therefore we have bin/, lib/ and
+share/ where things are installed.
+
+bin/                          Binaries (executables).
+
+lib/                          Libraries.
+
+share/                        Share files.
+
+src/                          Sources for various programs and tools.
+
+tools/                        Sources for tools written specifically
+                              for the Patchwork project.
+
+patches/                      Sample patch files.
+
+patchwork.fossil              The local fossil repository.
+
+patchwork/                    The patchwork sources (in an open fossil repository).
+
+PW-code.zip                   The original MCL files.
+
+pw-src-original/              The original lisp files.
+
+pw-src-utf-8-unix/            Converted into utf-8-unix encoding.
+
+pw-src/                       The Demo Patchwork version, before fossil.
+
+classes-hierarchy.txt         Class hierarchy as generated by tools/read-sources.
+
+classes-parents.txt           Class parents as generated by tools/read-sources.
+
+errors.txt                    Compilation errors so far.
+
+* References
+
+http://recherche.ircam.fr/equipes/repmus/Rapports/PeterHanappe95/
+
+* sandboxing appstore
+
+#+BEGIN_QUOTE 
+
+
+    From: Michael Minerva <minerva@agentsheets.com>
+    Subject: Re: AgentCubes Lite: Sandboxed Lisp 3D authoring Application in Apple Mac Store
+    Newsgroups: gmane.lisp.openmcl.devel
+    To: Joshua Kordani <jkordani@lsa2.com>
+    Cc: openmcl-devel@clozure.com
+    Date: Tue, 30 Jul 2013 11:26:17 -0600 (1 hour, 45 minutes ago)
+    Message-ID: <38B3A83F-B2FF-4E0A-8723-0A6BAF21852A@agentsheets.com>
+
+    Hey Joshua,
+
+    Getting AgentCubes sandboxed actually was the easy party :P
+
+    Outside of Xcode you just had have to call the right sandbox command,
+    something like this:
+
+    codesign -s "3rd Party Mac Developer Application: AgentSheets, Inc."
+     -f --entitlements  "/Users/Mike/Desktop/AgentCubes-Lite/AgentCubes
+    Lite.app/Contents/AgentCubes Lite.entitlements"
+     "/Users/Mike/Desktop/AgentCubes-Lite/AgentCubes Lite.app"
+
+    The weird part is that the entitlements plist needs to be a binary
+    (which apparently can only me created in Xcode), so you need to create
+    a dummy Xcode project to create the entailments plist (after deciding
+    which entitlements you app will need). After that, your sandboxed app
+    will most likely have some new error/crashes because sandboxing the
+    app changes the inheritance hierarchy of some classes (such as file
+    dialogs) so some methods you are using may no longer be supported. 
+
+    --Mike
+
+
+    On Jul 30, 2013, at 10:29 AM, Joshua Kordani <jkordani@lsa2.com>
+    wrote:
+
+        Wow! Great work!
+
+        How did you get the sandboxed environment set up?
+
+        Josh
+
+        On 7/29/13 10:16 PM, Alexander Repenning wrote:
+
+
+            Dear All,
+
+
+            We are still keeping this at low profile but Apple just
+            accepted our fully sandboxed 3D Game and Simulation Design
+            AgentCubes application (built in CCL) into the Apple Mac App
+            store. Build a 3D simulation game and turn it into HTML5 (no
+            Flash, no Java) page that can run on many mobile browsers. 
+
+
+            Any feedback would be appreciated. It was quite a bit of work
+            to get this going with CCL outside of the Apple Xcode empire. 
+
+
+
+
+            https://itunes.apple.com/us/app/agentcubes-lite/id673363781?mt=12
+
+
+            In case you wonder what AgentCubes is here is a short
+            movie: http://www.youtube.com/watch?v=2GWcb3aG2w0
+
+
+
+
+            best,  Alex
+
+
+
+
+
+
+
+
+
+            Prof. Alexander Repenning
+
+
+            University of Colorado
+            Computer Science Department
+            Boulder, CO 80309-430
+
+
+            vCard:
+            http://www.cs.colorado.edu/~ralex/AlexanderRepenning.vcf
+
+
+
+            _______________________________________________
+    Openmcl-devel mailing list
+    Openmcl-devel@clozure.com
+    http://clozure.com/mailman/listinfo/openmcl-devel
+
+
+
+        _______________________________________________
+        Openmcl-devel mailing list
+        Openmcl-devel@clozure.com
+        http://clozure.com/mailman/listinfo/openmcl-devel
+
+
+    _______________________________________________
+    Openmcl-devel mailing list
+    Openmcl-devel@clozure.com
+    http://clozure.com/mailman/listinfo/openmcl-devel
+
+#+END_QUOTE
+
+http://explanatorygap.net/2009/10/30/apple-have-documented-the-binary-plist-format/
+
+
+#+BEGIN_QUOTE 
+
+    Apple have documented the binary plist format
+
+    Thanks to Dave Dribin for pointing this out.
+
+    In http://opensource.apple.com/source/CF/CF-550/CFBinaryPList.c
+
+    So really there’s no reason why we can’t have plistlib etc for Ruby/Python/whatever deal with binary plists on non-Mac platforms.
+
+    /*
+    HEADER
+        magic number ("bplist")
+        file format version
+
+    OBJECT TABLE
+        variable-sized objects
+
+        Object Formats (marker byte followed by additional info in some cases)
+        null    0000 0000
+        bool    0000 1000           // false
+        bool    0000 1001           // true
+        fill    0000 1111           // fill byte
+        int 0001 nnnn   …     // # of bytes is 2^nnnn, big-endian bytes
+        real    0010 nnnn   …     // # of bytes is 2^nnnn, big-endian bytes
+        date    0011 0011   …     // 8 byte float follows, big-endian bytes
+        data    0100 nnnn   [int]   … // nnnn is number of bytes unless 1111 then int count follows, followed by bytes
+        string  0101 nnnn   [int]   … // ASCII string, nnnn is # of chars, else 1111 then int count, then bytes
+        string  0110 nnnn   [int]   … // Unicode string, nnnn is # of chars, else 1111 then int count, then big-endian 2-byte uint16_t
+            0111 xxxx           // unused
+        uid 1000 nnnn   …     // nnnn+1 is # of bytes
+            1001 xxxx           // unused
+        array   1010 nnnn   [int]   objref* // nnnn is count, unless ’1111′, then int count follows
+            1011 xxxx           // unused
+        set 1100 nnnn   [int]   objref* // nnnn is count, unless ’1111′, then int count follows
+        dict    1101 nnnn   [int]   keyref* objref* // nnnn is count, unless ’1111′, then int count follows
+            1110 xxxx           // unused
+            1111 xxxx           // unused
+
+    OFFSET TABLE
+        list of ints, byte size of which is given in trailer
+        — these are the byte offsets into the file
+        — number of these is in the trailer
+
+    TRAILER
+        byte size of offset ints in offset table
+        byte size of object refs in arrays and dicts
+        number of offsets in offset table (also is number of objects)
+        element # in offset table which is top level object
+        offset table offset
+
+    */
+
+#+END_QUOTE
+
+
+# THE END 

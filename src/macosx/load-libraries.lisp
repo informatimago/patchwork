@@ -31,61 +31,28 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
 (in-package "COMMON-LISP-USER")
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  
+  (defun load-coreservices-library ()
+    (add-headers-logical-pathname-translations "coreservices")
+    (ccl:open-shared-library "/System/Library/Frameworks/CoreServices.framework/CoreServices")
+    (ccl:use-interface-dir :coreservices)
+    (pushnew :has-appleevent *features*))
 
-(defparameter *additionnal-headers-directory*
-  (make-pathname :name nil :type nil :version nil
-                 :defaults *load-pathname*))
+  (defun load-midishare-library ()
+    (add-headers-logical-pathname-translations "midishare")
+    (ccl:open-shared-library "/Library/Frameworks/MidiShare.framework/MidiShare")
+    (ccl:use-interface-dir :midishare)
+    (pushnew :has-midishare *features*))
 
-
-(defun headers-wild-pathname (name bits)
-  (merge-pathnames (make-pathname
-                    :case :local
-                    :directory (list :relative
-                                     (format nil "headers~A" bits)
-                                     name
-                                     :wild-inferiors)
-                    :name :wild :type :wild
-                    :defaults *additionnal-headers-directory*)
-                   *additionnal-headers-directory*
-                   nil))
+  );;eval-when
 
 
-(defun add-headers-logical-pathname-translations (name)
-  (setf (logical-pathname-translations "CCL")
-        (list* (list (make-pathname :host "CCL"
-                                    :case :local
-                                    :name :wild
-                                    :type :wild
-                                    :directory (list :absolute
-                                                     "darwin-x86-headers"
-                                                     name
-                                                     :wild-inferiors))
-                     (headers-wild-pathname name 32))
-               (list (make-pathname :host "CCL"
-                                    :case :local
-                                    :name :wild
-                                    :type :wild
-                                    :directory (list :absolute
-                                                     "darwin-x86-headers64"
-                                                     name
-                                                     :wild-inferiors))
-                     (headers-wild-pathname name 64))
-               (logical-pathname-translations "CCL"))))
-
-;; (setf *additionnal-headers-directory* #P"~/works/patchwork/patchwork/src/pw-lib/pwscript/")
-
-
-(defun load-coreservices-library ()
-  (ccl:open-shared-library "/System/Library/Frameworks/CoreServices.framework/CoreServices")
-  (ccl:use-interface-dir :coreservices))
-
-
-(add-headers-logical-pathname-translations "coreservices")
-(load-coreservices-library)
-(pushnew :has-appleevent *features*)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (load-coreservices-library)
+  (load-midishare-library))
 
 
 #||

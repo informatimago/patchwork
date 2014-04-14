@@ -129,6 +129,17 @@
 (copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")
            (translate-logical-pathname #P"RELEASE:RELEASE-NOTES.TXT"))
 
+(say "Copying tutorials.")
+(copy-directory (translate-logical-pathname #P"PATCHWORK:TUTORIALS;")
+                (translate-logical-pathname #P"RELEASE:TUTORIALS;")
+                :if-exists :supersede
+                :on-error :continue)
+
+(say "Copying MidiShare.framework.")
+(copy-directory #P"/Library/Frameworks/MidiShare.framework/"
+                #P"RELEASE:MidiShare.framework;"
+                :if-exists :supersede
+                :on-error :continue)
 
 ;;; --------------------------------------------------------------------
 ;;; Save the application package.
@@ -138,13 +149,6 @@
 
 #+(and ccl (not patchwork.builder::no-cocoa))
 (require :build-application)
-
-#+(and ccl (not patchwork.builder::no-cocoa))
-(defmethod  ccl:application-init-file :around (app)
-  (declare (ignorable app))
-  #-(and) (make-pathname :name  "patchwork-init" :type "lisp"
-                         :defaults (user-homedir-pathname))
-  #P"PW-USER:PW-inits;init.lisp")
 
 
 #+ccl

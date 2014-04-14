@@ -75,6 +75,10 @@
                                      "pw-kernel/environment/clpf-utils"))
                  
 
+
+                 ;;; -----------
+                 ;;; AppleEvents
+                 
                  ;; (:file "pw-lib/pwscript/appleevent-toolkit" 
                  ;;        :depends-on ("packages"))
                  ;; (:file "pw-lib/pwscript/pw-ae" 
@@ -134,16 +138,27 @@
                                      "pw-music/editors/mn/mn-window"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"
                                      "pw-music/editors/rhythm/rtm-window"))
-
                  
-                 #-(and)
-                 (:file "pw-lib/midishare/midishare" 
-                        :depends-on (#+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
+                 ;;; -----------
+                 ;;; Midi
+                 
+                 (:file "pw-lib/midishare/midishare-interface" 
+                  :depends-on ("macosx/load-libraries"))
 
-                 #-(and)
+                 (:file "macosx/load-libraries" 
+                  :depends-on ("macosx/headers"))
+
+                 (:file "macosx/headers" 
+                  :depends-on ())
+
+                                     
+                 (:file "pw-lib/midishare/player-interface" 
+                        :depends-on ("pw-lib/midishare/midishare-interface" ))
+                 
                  (:file "pw-lib/midishare/midiplay" 
                         :depends-on ("packages"
-                                     #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
+                                     "pw-lib/midishare/midishare-interface" 
+                                     "pw-lib/midishare/player-interface"
                                      "pw-kernel/box-creation/pw-patch"
                                      "pw-kernel/drivers+resources/midi"
                                      "pw-kernel/types/pw-type-scheme"
@@ -161,25 +176,18 @@
                  
                  (:file "pw-lib/midishare/midirecord" 
                         :depends-on ("packages"
+                                     "pw-lib/midishare/midishare-interface" 
+                                     "pw-lib/midishare/player-interface"
+                                     "pw-lib/midishare/midiplay"
                                      "pw-kernel/drivers+resources/midi"
                                      "pw-kernel/boxes/bpf/bpf-editors/bpf-mn-pw-interface"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/types/pw-box-to-menu"
                                      "pw-kernel/types/pw-type-scheme"
-                                     ;; "pw-lib/midishare/midiplay"
-                                     ;; #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      "pw-music/boxes/edit/pw-mn-collector"
-                                     "pw-music/editors/mn/mn-note-chord-chordline"
-                                     ))
+                                     "pw-music/editors/mn/mn-note-chord-chordline"))
 
-                 #+patchwork.builder::cocoa-midi-player
-                 (:file "pw-lib/midishare/cocoa-midi-player" 
-                        :depends-on ())
-                 
-                 #-(and)
-                 (:file "pw-lib/midishare/playerppc" 
-                        :depends-on ("packages"))
-
+                 ;;; -----------
                  
                  (:file "pw-lib/cleni/cleni" 
                         :depends-on ("packages"))
@@ -226,8 +234,9 @@
                  
                  (:file "pw-kernel/drivers+resources/midi" 
                         :depends-on (
-                                     ;; "pw-lib/midishare/midishare"
-                                     #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"))
+                                     "pw-lib/midishare/midishare-interface"
+                                     ;; #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
+                                     ))
                  
                  
                  (:file "pw-kernel/drivers+resources/scheduler" 
@@ -603,6 +612,7 @@
                                      "pw-kernel/environment/lelisp-macros"
                                      "pw-kernel/pw-graphics/window+menu/pw-menu"
                                      "pw-kernel/types/pw-type-scheme"
+                                     "pw-lib/midishare/player-interface"
                                      ;; "pw-lib/midishare/midiplay"
                                      "pw-music/editors/mn/mn-note-chord-chordline"
                                      "pw-music/editors/rhythm/beat-measure-measure-line"))

@@ -75,6 +75,15 @@
           *package*           (find-package "PATCHWORK"))))
 
 
+
+#+(and ccl (not patchwork.builder::no-cocoa))
+(defmethod  ccl:application-init-file :around (app)
+  (declare (ignorable app))
+  #-(and) (make-pathname :name  "patchwork-init" :type "lisp"
+                         :defaults (user-homedir-pathname))
+  #P"PW-USER:PW-inits;init.lisp")
+
+
 (defun initialize-directories ()
   (handler-case
       (load-logical-pathname-translations "PW-USER")
