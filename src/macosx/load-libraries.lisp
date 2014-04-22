@@ -47,12 +47,19 @@
     (ccl:use-interface-dir :midishare)
     (pushnew :has-midishare *features*))
 
+    (defun load-midiplayer-library ()
+    (add-headers-logical-pathname-translations "player")
+    (ccl:open-shared-library "/Library/Frameworks/Player.framework/Player")
+    (ccl:use-interface-dir :player)
+    (pushnew :has-midiplayer *features*))
+
   );;eval-when
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (load-coreservices-library)
-  (load-midishare-library))
+  (load-midishare-library)
+  (load-midiplayer-library))
 
 
 #||

@@ -41,9 +41,18 @@
 (load (merge-pathnames "headers.lisp" *additionnal-headers-directory*))
 
 (add-headers-logical-pathname-translations "midishare")
+(ensure-directories-exist #P"CCL:darwin-x86-headers;midishare;test.file")
+(ensure-directories-exist #P"CCL:darwin-x86-headers64;midishare;test.file")
 (ccl::parse-standard-ffi-files :midishare)
 
+(add-headers-logical-pathname-translations "player")
+(ensure-directories-exist #P"CCL:darwin-x86-headers;player;test.file")
+(ensure-directories-exist #P"CCL:darwin-x86-headers64;player;test.file")
+(ccl::parse-standard-ffi-files :player)
+
 (add-headers-logical-pathname-translations "coreservices")
+(ensure-directories-exist #P"CCL:darwin-x86-headers;coreservices;test.file")
+(ensure-directories-exist #P"CCL:darwin-x86-headers64;coreservices;test.file")
 (ccl::parse-standard-ffi-files :coreservices)
 
 ;;;; THE END ;;;;
