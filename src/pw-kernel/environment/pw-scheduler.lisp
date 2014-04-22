@@ -62,7 +62,8 @@
           (append  (nreverse new-wait-list) (list form) wait-list))))
 
 (defgeneric stop-clock (self))
-(defmethod  stop-clock ((self C-clock)) (setf (stop-time self) (clock self)))
+(defmethod  stop-clock ((self C-clock))
+  (setf (stop-time self) (clock self)))
 
 (defgeneric continue-clock (self))
 (defmethod  continue-clock ((self C-clock))

@@ -53,9 +53,9 @@
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
   (when (and  midi::*pw-refnum* midi::*player* )
     (let ((playerIdle))
-      (rlet ((myState :PlayerState))  
+      (ccl:rlet ((myState :<P>layer<S>tate))  
         (midi-player:getStatePlayer midi::*player* myState) 
-        (when (= (midi-player:s-state myState) cl-user::kIdle) (setf playerIdle t)))
+        (when (= (midi-player:s-state myState) kIdle) (setf playerIdle t)))
       (unless playerIdle (print "Wait end of previous play!"))
       (when playerIdle
         (let ((seq (midishare::midinewseq)))
@@ -69,27 +69,25 @@
 
 (defgeneric MidiPlayANy (object &optional approx chanbase))
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
-  (niy  MidiPlayANy  object approx chanbase)
-  ;; (when (and  midi::*pw-refnum* midi::*player* )
-  ;;   (let ((playerIdle))
-  ;;     (rlet ((myState :PlayerState))  
-  ;;           (midi-player:getStatePlayer midi::*player* myState) 
-  ;;           (when (= (midi-player:s-state myState) cl-user::kIdle) (setf playerIdle t)))
-  ;;     (unless playerIdle (print "Wait end of previous play!"))
-  ;;     (when playerIdle
-  ;;       (let ((seq (midishare::midinewseq)))
-  ;;         (setf *MidiShare-start-time* 0)
-  ;;         (MidiPlay object 0 approx chanbase seq 1000)
-  ;;         (midi-player:setalltrackplayer midi::*player* seq 500)
-  ;;         (midi-player:startplayer midi::*player*)
-  ;;         seq))))
-  )
+  (when (and  midi::*pw-refnum* midi::*player* )
+    (let ((playerIdle))
+      (ccl:rlet ((myState :<P>layer<S>tate))  
+        (midi-player:getStatePlayer midi::*player* myState) 
+        (when (= (midi-player:s-state myState) kIdle) (setf playerIdle t)))
+      (unless playerIdle (print "Wait end of previous play!"))
+      (when playerIdle
+        (let ((seq (midishare::midinewseq)))
+          (setf *MidiShare-start-time* 0)
+          (MidiPlay object 0 approx chanbase seq 1000)
+          (midi-player:setalltrackplayer midi::*player* seq 500)
+          (midi-player:startplayer midi::*player*)
+          seq)))))
 
 #|
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
   (let ((event (midishare:MidiNewEv midishare::typeNote)))	; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (midishare:null-event-p event)	; if the allocation was succesfull
+    (unless (midishare:nullptrp event)	; if the allocation was succesfull
       (midishare::chan event    ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (epw::approx-m  (midic note) approx))))))
@@ -107,7 +105,7 @@
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
   (let ((event (midishare:MidiNewEv midishare::typeNote))) ; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (midishare:null-event-p event) ; if the allocation was succesfull
+    (unless (midishare:nullptrp event) ; if the allocation was succesfull
       (midishare::chan event ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (epw::approx-m  (midic note) approx))))))
@@ -116,8 +114,7 @@
       (midishare::field event 1 (round (vel note))) ; set the velocity field
       (midishare::field event 2 (round (convert-time-1 (dur note) unit/sec))) ; set the duration field to 1 second
       (midishare::date event (+  *MidiShare-start-time* at))
-      (midishare::MidiAddSeq seq event)
-      )))
+      (midishare::MidiAddSeq seq event))))
 
 
 (defmethod MidiPlay ((list list) at approx chanbase seq unit/sec)
@@ -261,3 +258,5 @@
 
 (defmethod stop-measure-line ((self C-measure-line)) 
   (when midi::*player* (midi-player:stopplayer midi::*player*)))
+
+;;;; THE END ;;;;

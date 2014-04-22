@@ -131,7 +131,7 @@
           "MIDIGETINDSLOT" "MIDIGETSLOTINFOS" "MIDICONNECTSLOT"
           "MIDIISSLOTCONNECTED"
           "MIDINEWSMPTELOCATION" "MIDIFREESMPTELOCATION"
-          "MIDINEWSYNCINFO" "MIDIFREESYNCINFO"  
+          "MIDINEWSYNCINFO" "MIDIFREESYNCINFO"
           "NULLPTRP" "NULLPTR" "LOAD-FRAMEWORK-BUNDLE" "GET-FUN-ADDR"
           "ADD-STARTUP-ACTION" "ADD-QUIT-ACTION"
            ))
@@ -1221,7 +1221,8 @@
   "Forget a previously scheduled typeProcess or typeDProcess event created by MidiTask or MidiDTask"
   (without-interrupts 
     (%stack-block ((taskptr 4))
-      (%put-ptr taskptr ev) (midiforgetTaskHdl taskptr))))
+      (%put-ptr taskptr ev) 
+      (midiforgetTaskHdl taskptr))))
 
 ;;;..................................................: MidiCountDTasks
 (defun MidiCountDTasks (refNum)
@@ -2453,7 +2454,7 @@
   "Forget a previously scheduled typeProcess or typeDProcess event created by MidiTask or MidiDTask"
   (ccl:without-interrupts 
    (ccl:%stack-block ((taskptr 4))
-     (ccl:%put-ptr taskptr ev) 
+     (setf (ccl:%get-ptr taskptr) ev) 
      (MidiForgetTask taskptr))))
 
 (defun MidiCountDTasks (refNum)

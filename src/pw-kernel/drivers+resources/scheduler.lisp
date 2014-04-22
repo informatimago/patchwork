@@ -39,8 +39,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
-
 (in-package "PATCHWORK.SCHEDULER")
 
 
@@ -91,13 +89,13 @@ It cannot be changed, except in the source code.")
 ;;; Task objects (structure)
 
 (defstruct
-  (task
-   (:constructor
-    make-task (exectime logtime advance priority function arguments))
-   (:print-function
-    (lambda (task stream depth)
-      (declare (ignore depth))
-      (format stream "#<task @ time ~a>" (task-exectime task)))))
+    (task
+     (:constructor
+         make-task (exectime logtime advance priority function arguments))
+     (:print-function
+      (lambda (task stream depth)
+        (declare (ignore depth))
+        (format stream "#<task @ time ~a>" (task-exectime task)))))
   link
   exectime
   logtime
@@ -125,10 +123,8 @@ It cannot be changed, except in the source code.")
   `(task-logtime *current-task*))
 
 
-(in-package "PATCHWORK.SCHEDULER")
 
- ;; TODO:
-#-(and)
+;; TODO:
 (defun midi:midi-write (event)
   "New version"
   (midi-write-time event
@@ -148,10 +144,10 @@ value of its body."
            (*current-task* *default-task*)
            (*current-priority* *highest-priority*))
        (if ,start?-var
-         (setf (logtime) (if *scheduler-RT?* (real-time) *scheduler-time*))
-         (when *error-when-extra-start?*
-           (error "~S should not be called from within a scheduler task, with body~%~S"
-                  'start '(start ,@body))))
+           (setf (logtime) (if *scheduler-RT?* (real-time) *scheduler-time*))
+           (when *error-when-extra-start?*
+             (error "~S should not be called from within a scheduler task, with body~%~S"
+                    'start '(start ,@body))))
        ,@body)))
 
 (defmacro apdfuncall (advance priority delay function . arguments)
@@ -204,20 +200,20 @@ is (1- (priority)) unless 0 is achieved."
   "Changes the state of the scheduler to <state> which must be one of the
 keywords: :RT :STEP :OOT :OOT1."
   (if (eq state :RT)
-    (unless *scheduler-RT?*
-      (setf *schedulertime--clocktime* (- *scheduler-time* (clock-time))
-            *scheduler-RT?* t))
-    (progn
-      (setf *scheduler-RT?* nil)
-      (ecase state
-             (:OOT1 (unless (eq *scheduler-state* :OOT1)
-                      (setf *scheduler-old-state* *scheduler-state*)))
-             (:STEP
+      (unless *scheduler-RT?*
+        (setf *schedulertime--clocktime* (- *scheduler-time* (clock-time))
+              *scheduler-RT?* t))
+      (progn
+        (setf *scheduler-RT?* nil)
+        (ecase state
+          (:OOT1 (unless (eq *scheduler-state* :OOT1)
+                   (setf *scheduler-old-state* *scheduler-state*)))
+          (:STEP
               (format *error-output*
-                  ";Warning: The scheduler is stopped. To restart it, try:~%~S"
-                  '(set-scheduler-state :rt))
+                      ";Warning: The scheduler is stopped. To restart it, try:~%~S"
+                      '(set-scheduler-state :rt))
               (setf *scheduler-steps* 0))
-             (:OOT))))
+          (:OOT))))
   (setf *internal-error?* nil *scheduler-state* state))
 
 (defmacro with-scheduler-OOT1 (&body body)
@@ -243,15 +239,15 @@ than the current scheduler time) or the clock will jump to the next waiting task
 
 (defun check-start (form)
   (or *current-task*
-    (error "The form ~S must be called from within a call to the macro ~S."
-           form 'start)))
+      (error "The form ~S must be called from within a call to the macro ~S."
+             form 'start)))
 
 (defmacro tcdr (task) `(task-link ,task))
 
 ;; Remakes a task from the free pool.
 
 (defun remake-task (exectime logtime advance priority function arguments
-                             &aux (task *free-tasks*))
+                    &aux (task *free-tasks*))
   (setf *free-tasks* (tcdr task)
         (task-exectime task) exectime
         (task-logtime task) logtime
@@ -269,11 +265,11 @@ than the current scheduler time) or the clock will jump to the next waiting task
    (or (typep fun 'function) (and (typep fun 'symbol) (fboundp fun)))
    (fun) "Cannot delay the undefined function ~S." fun)
   (without-interrupts
-   (incf logtime delay)
-   (wait-task
-    (if *free-tasks*
-      (remake-task (- logtime adv) logtime adv pri fun args)
-      (make-task (- logtime adv) logtime adv pri fun args)))))
+    (incf logtime delay)
+    (wait-task
+     (if *free-tasks*
+         (remake-task (- logtime adv) logtime adv pri fun args)
+         (make-task (- logtime adv) logtime adv pri fun args)))))
 
 ;; Aborts a scheduled task by replacing its function with a null one.
 
@@ -343,49 +339,49 @@ is stopped in the :STEP mode)."
 
 (defun wait-task (task &aux (exectime (task-exectime task)))
   (if (< exectime *scheduler-time*)
-    (ready-task task)
-    (let* ((index (mod exectime *wait-queue-size*))
-           (head (svref *wait-queue-heads* index))
-           tail)
-      (incf *nb-waiting-tasks*)
-      (cond
-       ((null head)
-        (setf (svref *wait-queue-heads* index) task
-              (svref *wait-queue-tails* index) task
-              (tcdr task) nil))
-       ((<= (task-exectime (setq tail (svref *wait-queue-tails* index))) exectime)
-        (setf (tcdr task) nil
-              (tcdr tail) task
-              (svref *wait-queue-tails* index) task))
-       ((> (task-exectime head) exectime)
-        (setf (tcdr task) head
-              (svref *wait-queue-heads* index) task))
-       (t (insert-by-time head exectime task)))))
+      (ready-task task)
+      (let* ((index (mod exectime *wait-queue-size*))
+             (head (svref *wait-queue-heads* index))
+             tail)
+        (incf *nb-waiting-tasks*)
+        (cond
+          ((null head)
+           (setf (svref *wait-queue-heads* index) task
+                 (svref *wait-queue-tails* index) task
+                 (tcdr task) nil))
+          ((<= (task-exectime (setq tail (svref *wait-queue-tails* index))) exectime)
+           (setf (tcdr task) nil
+                 (tcdr tail) task
+                 (svref *wait-queue-tails* index) task))
+          ((> (task-exectime head) exectime)
+           (setf (tcdr task) head
+                 (svref *wait-queue-heads* index) task))
+          (t (insert-by-time head exectime task)))))
   task)
 
 ;; [in :RT mode] Finds the tasks which exectimes are between
 ;; the current *scheduler-time* and the new *scheduler-time*.
 #|
 (defun ready-tasks ()
-  (without-interrupts
-   (let* ((real-time (real-time))
-          (lateness (- real-time *scheduler-time*))
-          index task)
-     (when (> lateness 0)
-       (if (and (> lateness *wait-queue-size*)
-                (> lateness (max (* 1.5 *wait-queue-size*) *highest-latency*)))
-         (progn
-           (reset-scheduler) ; This is not the right place - should be at execute-task
-           (format t "Scheduler late.~%"))
-         (if (<= *nb-waiting-tasks* 0)
-           (setf *scheduler-time* real-time)
-           (do ((the-time *scheduler-time* (1+ the-time)))
-               ((> the-time real-time)
-                (setq *scheduler-time* real-time))
-             (setq index (mod the-time *wait-queue-size*))
-             (when (and (setq task (svref *wait-queue-heads* index))
-                        (<= (task-exectime task) the-time))
-               (ready-tasks-time the-time index task)))))))))
+(without-interrupts
+(let* ((real-time (real-time))
+(lateness (- real-time *scheduler-time*))
+index task)
+(when (> lateness 0)
+(if (and (> lateness *wait-queue-size*)
+(> lateness (max (* 1.5 *wait-queue-size*) *highest-latency*)))
+(progn
+(reset-scheduler) ; This is not the right place - should be at execute-task
+(format t "Scheduler late.~%"))
+(if (<= *nb-waiting-tasks* 0)
+(setf *scheduler-time* real-time)
+(do ((the-time *scheduler-time* (1+ the-time)))
+((> the-time real-time)
+(setq *scheduler-time* real-time))
+(setq index (mod the-time *wait-queue-size*))
+(when (and (setq task (svref *wait-queue-heads* index))
+(<= (task-exectime task) the-time))
+(ready-tasks-time the-time index task)))))))))
 |#
 
 ;; [in :RT mode] Finds the tasks which exectimes are between
@@ -393,43 +389,43 @@ is stopped in the :STEP mode)."
 
 (defun ready-tasks (&aux (real-time (real-time)))
   (without-interrupts
-   (when (> *nb-waiting-tasks* 0)
-     (let ((lateness (- real-time *scheduler-time*)) index task tmax)
-       (unless (>= lateness 0)
-         (error "The real time ~S is smaller than the scheduler time ~S."
-                real-time *scheduler-time*))
-       (setq tmax (if (<= lateness *wait-queue-size*) real-time
-                      (+ *scheduler-time* *wait-queue-size*)))
-       (do ((the-time *scheduler-time* (1+ the-time)))
-           ((> the-time tmax))
-         (setq index (mod the-time *wait-queue-size*))
-         (when (and (setq task (svref *wait-queue-heads* index))
-                    (<= (task-exectime task) real-time))
-           (ready-tasks-time real-time index task)))))
-   (setq *scheduler-time* real-time)))
+    (when (> *nb-waiting-tasks* 0)
+      (let ((lateness (- real-time *scheduler-time*)) index task tmax)
+        (unless (>= lateness 0)
+          (error "The real time ~S is smaller than the scheduler time ~S."
+                 real-time *scheduler-time*))
+        (setq tmax (if (<= lateness *wait-queue-size*) real-time
+                       (+ *scheduler-time* *wait-queue-size*)))
+        (do ((the-time *scheduler-time* (1+ the-time)))
+            ((> the-time tmax))
+          (setq index (mod the-time *wait-queue-size*))
+          (when (and (setq task (svref *wait-queue-heads* index))
+                     (<= (task-exectime task) real-time))
+            (ready-tasks-time real-time index task)))))
+    (setq *scheduler-time* real-time)))
 
 ;; [in :STEP mode] Increments the scheduler-time until the next ready tasks if any
 ;; and returns a non-nil value.
 
 (defun ready-tasks? ()
   (without-interrupts
-   (when (> *nb-waiting-tasks* 0)
-     (let ((tmin nil)
-           (tmax (+ *scheduler-time* *wait-queue-size*))
-           index task exectime)
-       (or
-        (do ((the-time *scheduler-time* (1+ the-time)))
-            ((>= the-time tmax) nil)
-          (setq index (mod the-time *wait-queue-size*))
-          (when (setq task (svref *wait-queue-heads* index))
-            (if (= (setq exectime (task-exectime task)) the-time)
-              (return (ready-tasks-time the-time index task))
-              (when (or (null tmin) (< exectime tmin))
-                (setq tmin exectime)))))
-        (when tmin
-          (ready-tasks-time
-           tmin (setq index (mod tmin *wait-queue-size*))
-           (svref *wait-queue-heads* index))))))))
+    (when (> *nb-waiting-tasks* 0)
+      (let ((tmin nil)
+            (tmax (+ *scheduler-time* *wait-queue-size*))
+            index task exectime)
+        (or
+         (do ((the-time *scheduler-time* (1+ the-time)))
+             ((>= the-time tmax) nil)
+           (setq index (mod the-time *wait-queue-size*))
+           (when (setq task (svref *wait-queue-heads* index))
+             (if (= (setq exectime (task-exectime task)) the-time)
+                 (return (ready-tasks-time the-time index task))
+                 (when (or (null tmin) (< exectime tmin))
+                   (setq tmin exectime)))))
+         (when tmin
+           (ready-tasks-time
+            tmin (setq index (mod tmin *wait-queue-size*))
+            (svref *wait-queue-heads* index))))))))
 
 ;; Extracts the chain of waiting tasks and puts them into the ready queue.
 
@@ -439,8 +435,8 @@ is stopped in the :STEP mode)."
     (decf *nb-waiting-tasks*)
     (ready-task task)
     (if (not (and next-task (<= (task-exectime next-task) the-time)))
-      (return)
-      (setq task next-task)))
+        (return)
+        (setq task next-task)))
   (unless (setf (svref *wait-queue-heads* index) next-task)
     (setf (svref *wait-queue-tails* index) nil))
   (setq *scheduler-time* the-time))
@@ -453,18 +449,18 @@ is stopped in the :STEP mode)."
          (head (svref *ready-queue-heads* index))
          (tail (svref *ready-queue-tails* index)))
     (cond
-     ((null head)
-      (setf (svref *ready-queue-heads* index) task
-            (svref *ready-queue-tails* index) task
-            (tcdr task) nil))
-     ((<= (task-exectime tail) exectime)
-      (setf (tcdr task) nil
-            (tcdr tail) task
-            (svref *ready-queue-tails* index) task))
-     ((> (task-exectime head) exectime)
-      (setf (tcdr task) head
-            (svref *ready-queue-heads* index) task))
-     (t (insert-by-time head exectime task))))
+      ((null head)
+       (setf (svref *ready-queue-heads* index) task
+             (svref *ready-queue-tails* index) task
+             (tcdr task) nil))
+      ((<= (task-exectime tail) exectime)
+       (setf (tcdr task) nil
+             (tcdr tail) task
+             (svref *ready-queue-tails* index) task))
+      ((> (task-exectime head) exectime)
+       (setf (tcdr task) head
+             (svref *ready-queue-heads* index) task))
+      (t (insert-by-time head exectime task))))
   task)
 
 ;; Extracts the next task that is ready with respect to the given priority level.
@@ -510,15 +506,15 @@ time with the :STEP mode.")
 
 (defun execute-task (task)
   (if (< (- (real-time) (task-exectime task)) *highest-latency*)
-    (eval-task task)
-    (progn
-      (setf *late-task* task)
-      ;;(when *print-on-late?* (format *error-output* "Late ~S" task))
-      ;;Camilo [090593] late tasks printed only once
-      (when *print-on-late?* (format *error-output* "Late ~S" task) (setf *print-on-late?* nil))
-      (when *step-on-late?* (set-scheduler-state :STEP))
-      (when *reset-on-late?* (reset-scheduler))
-      (when *eval-on-late?* (eval-task task))))
+      (eval-task task)
+      (progn
+        (setf *late-task* task)
+        ;;(when *print-on-late?* (format *error-output* "Late ~S" task))
+        ;;Camilo [090593] late tasks printed only once
+        (when *print-on-late?* (format *error-output* "Late ~S" task) (setf *print-on-late?* nil))
+        (when *step-on-late?* (set-scheduler-state :STEP))
+        (when *reset-on-late?* (reset-scheduler))
+        (when *eval-on-late?* (eval-task task))))
   nil)
 
 ;; Evaluates a task in its dynamic context,
@@ -538,63 +534,63 @@ time with the :STEP mode.")
         logtime)
     (apply (task-function task) (task-arguments task))
     (cond
-     ((eq (task-link task) :re-dfuncall)
-      (setf (task-logtime task)
-            ;; hack! the delay is stored in (task-exectime task) (see re-dfuncall)
-            (setq logtime (+ (task-logtime task) (task-exectime task)))
-            (task-exectime task) (- logtime (task-advance task)))
-      (wait-task task))
-     (t
+      ((eq (task-link task) :re-dfuncall)
+       (setf (task-logtime task)
+             ;; hack! the delay is stored in (task-exectime task) (see re-dfuncall)
+             (setq logtime (+ (task-logtime task) (task-exectime task)))
+             (task-exectime task) (- logtime (task-advance task)))
+       (wait-task task))
+      (t
       ;;; (freelist% (task-arguments task)) ;GARBAGE
-      (setf (tcdr task) *free-tasks*
-            *free-tasks* task
-            (task-arguments task) nil)))))
+       (setf (tcdr task) *free-tasks*
+             *free-tasks* task
+             (task-arguments task) nil)))))
 
 #|
 (defun eval-task (task)
-  (let ((*current-task* task)
-        (*current-priority* (task-priority task))
-        logtime (error nil))
-    (apply (task-function task) (task-arguments task))
-    #|
-    (handler-case (apply (task-function task) (task-arguments task))
-      (serious-condition (condition)
-        (setf *error-task* task *condition* condition error t)
-        (when *print-on-error?*
-          (format *error-output*
-                  ";Warning: the serious-condition ~A occured while executing:~%"
-                  condition)
-          (pretty-print-task task *error-output*))
-        (when *step-on-error?* (set-scheduler-state :STEP))
-        (when *reset-on-error?* (reset-scheduler)))
-      ;(:no-error ...); BUG MCL2.0 ?
-      ;=> Error: Can't spread atoms on stack. While executing: handler-case)
-      )|#
-    (cond
-     (error)
-     ((eq (task-link task) :re-dfuncall)
-      (setf (task-logtime task)
-            ;; hack! the delay is stored in (task-exectime task) (see re-dfuncall)
-            (setq logtime (+ (task-logtime task) (task-exectime task)))
-            (task-exectime task) (- logtime (task-advance task)))
-      (wait-task task))
-     (t
+(let ((*current-task* task)
+(*current-priority* (task-priority task))
+logtime (error nil))
+(apply (task-function task) (task-arguments task))
+#|
+(handler-case (apply (task-function task) (task-arguments task))
+(serious-condition (condition)
+(setf *error-task* task *condition* condition error t)
+(when *print-on-error?*
+(format *error-output*
+";Warning: the serious-condition ~A occured while executing:~%"
+condition)
+(pretty-print-task task *error-output*))
+(when *step-on-error?* (set-scheduler-state :STEP))
+(when *reset-on-error?* (reset-scheduler)))
+      ;(:no-error ...); BUG MCL2.0 ?    ;
+      ;=> Error: Can't spread atoms on stack. While executing: handler-case) ;
+)|#
+(cond
+(error)
+((eq (task-link task) :re-dfuncall)
+(setf (task-logtime task)
+;; hack! the delay is stored in (task-exectime task) (see re-dfuncall)
+(setq logtime (+ (task-logtime task) (task-exectime task)))
+(task-exectime task) (- logtime (task-advance task)))
+(wait-task task))
+(t
       ;;; (freelist% (task-arguments task)) ;GARBAGE
-      (setf (tcdr task) *free-tasks*
-            *free-tasks* task
-            (task-arguments task) nil)))))
+(setf (tcdr task) *free-tasks*
+*free-tasks* task
+(task-arguments task) nil)))))
 |#
 ;; Inserts a task in a chain according to its exectime.
 
 (defun insert-by-time (queue exectime task &aux (next-task (tcdr queue)))
   (cond
-   ((null next-task)
-    (setf (tcdr queue) task
-          (tcdr task) nil))
-   ((> (task-exectime next-task) exectime)
-    (setf (tcdr task) next-task
-          (tcdr queue) task))
-   (t (insert-by-time next-task exectime task))))
+    ((null next-task)
+     (setf (tcdr queue) task
+           (tcdr task) nil))
+    ((> (task-exectime next-task) exectime)
+     (setf (tcdr task) next-task
+           (tcdr queue) task))
+    (t (insert-by-time next-task exectime task))))
 
 ;; =============================================================================-======
 
@@ -614,78 +610,78 @@ time with the :STEP mode.")
 ;; Safe version (could be replaced by the fast one, if it's safe enough!)
 
 (defun check-scheduler (&aux task tmax nb-tasks)
-  (unless *internal-error?*
-    (handler-case
-      (cond
-       (*scheduler-RT?*
-        (setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
-              nb-tasks *nbmax-tasks-per-event*)
-        (loop
-          (ready-tasks)
-          (when (setq task (next-ready-task *current-priority*))
-            (execute-task task))
-          (when (or (null task)
-                    (<= (decf nb-tasks) 0)
-                    (>= (get-internal-real-time) tmax))
-            (return))))
-       ((eq *scheduler-state* :STEP)
-        (when (and (> *scheduler-steps* 0)
-                   (setq task (next-ready-task *current-priority*)))
-          (decf *scheduler-steps*)
-          (execute-task task)))
-       (t
-        (setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
-              nb-tasks *nbmax-tasks-per-event*)
-        (loop
-          (when (setq task (next-ready-task *current-priority*))
-            (execute-task task))
-          (unless (ready-tasks?)
-            (return
-             (when (eq *scheduler-state* :OOT1)
-               (set-scheduler-state *scheduler-old-state*))))
-          (when (or (<= (decf nb-tasks) 0)
-                    (>= (get-internal-real-time) tmax))
-            (return)))))
-      (condition (condition)
-        (set-scheduler-state :STEP)
-        (setf *internal-error?* condition)
-        (format *error-output* "Internal condition ~S~%" condition))))
-  nil)
+(unless *internal-error?*
+(handler-case
+(cond
+(*scheduler-RT?*
+(setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
+nb-tasks *nbmax-tasks-per-event*)
+(loop
+(ready-tasks)
+(when (setq task (next-ready-task *current-priority*))
+(execute-task task))
+(when (or (null task)
+(<= (decf nb-tasks) 0)
+(>= (get-internal-real-time) tmax))
+(return))))
+((eq *scheduler-state* :STEP)
+(when (and (> *scheduler-steps* 0)
+(setq task (next-ready-task *current-priority*)))
+(decf *scheduler-steps*)
+(execute-task task)))
+(t
+(setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
+nb-tasks *nbmax-tasks-per-event*)
+(loop
+(when (setq task (next-ready-task *current-priority*))
+(execute-task task))
+(unless (ready-tasks?)
+(return
+(when (eq *scheduler-state* :OOT1)
+(set-scheduler-state *scheduler-old-state*))))
+(when (or (<= (decf nb-tasks) 0)
+(>= (get-internal-real-time) tmax))
+(return)))))
+(condition (condition)
+(set-scheduler-state :STEP)
+(setf *internal-error?* condition)
+(format *error-output* "Internal condition ~S~%" condition))))
+nil)
 |#
 
 ;; Fast version (should replace the safe one, if it's safe enough!)
 
 (defun check-scheduler (&aux task tmax nb-tasks)
   (cond
-   (*scheduler-RT?*
-    (setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
-          nb-tasks *nbmax-tasks-per-event*)
-    (loop
-      (ready-tasks)
-      (when (setq task (next-ready-task *current-priority*))
-        (execute-task task))
-      (when (or (null task)
-                (<= (decf nb-tasks) 0)
-                (>= (get-internal-real-time) tmax))
-        (return))))
-   ((eq *scheduler-state* :STEP)
-    (when (and (> *scheduler-steps* 0)
-               (setq task (next-ready-task *current-priority*)))
-      (decf *scheduler-steps*)
-      (execute-task task)))
-   (t
-    (setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
-          nb-tasks *nbmax-tasks-per-event*)
-    (loop
-      (when (setq task (next-ready-task *current-priority*))
-        (execute-task task))
-      (unless (ready-tasks?)
-        (return
-         (when (eq *scheduler-state* :OOT1)
-           (set-scheduler-state *scheduler-old-state*))))
-      (when (or (<= (decf nb-tasks) 0)
-                (>= (get-internal-real-time) tmax))
-        (return)))))
+    (*scheduler-RT?*
+     (setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
+           nb-tasks *nbmax-tasks-per-event*)
+     (loop
+       (ready-tasks)
+       (when (setq task (next-ready-task *current-priority*))
+         (execute-task task))
+       (when (or (null task)
+                 (<= (decf nb-tasks) 0)
+                 (>= (get-internal-real-time) tmax))
+         (return))))
+    ((eq *scheduler-state* :STEP)
+     (when (and (> *scheduler-steps* 0)
+                (setq task (next-ready-task *current-priority*)))
+       (decf *scheduler-steps*)
+       (execute-task task)))
+    (t
+     (setq tmax (+ (get-internal-real-time) *nbmax-ticks-per-event*)
+           nb-tasks *nbmax-tasks-per-event*)
+     (loop
+       (when (setq task (next-ready-task *current-priority*))
+         (execute-task task))
+       (unless (ready-tasks?)
+         (return
+           (when (eq *scheduler-state* :OOT1)
+             (set-scheduler-state *scheduler-old-state*))))
+       (when (or (<= (decf nb-tasks) 0)
+                 (>= (get-internal-real-time) tmax))
+         (return)))))
   nil)
 
 ;; (setq *eventhook* #'check-scheduler)
@@ -696,17 +692,17 @@ time with the :STEP mode.")
 (defun reset-scheduler ()
   "Erases the scheduler queues.  All the ready and waiting tasks are forgotten."
   (without-interrupts
-   (setf *nb-waiting-tasks* 0)
-   (dotimes (i *ready-queue-size*)
-     (setf (svref *ready-queue-heads* i) nil
-           (svref *ready-queue-tails* i) nil))
-   (dotimes (i *wait-queue-size*)
-     (setf (svref *wait-queue-heads* i) nil
-           (svref *wait-queue-tails* i) nil))
-   (setf *free-tasks* (make-task 0 0 0 0 #'no-op nil)
-         *schedulertime--clocktime* 0
-         *scheduler-time* (clock-time))
-   nil))
+    (setf *nb-waiting-tasks* 0)
+    (dotimes (i *ready-queue-size*)
+      (setf (svref *ready-queue-heads* i) nil
+            (svref *ready-queue-tails* i) nil))
+    (dotimes (i *wait-queue-size*)
+      (setf (svref *wait-queue-heads* i) nil
+            (svref *wait-queue-tails* i) nil))
+    (setf *free-tasks* (make-task 0 0 0 0 #'no-op nil)
+          *schedulertime--clocktime* 0
+          *scheduler-time* (clock-time))
+    nil))
 
 ;; Initializes the scheduler (called only once).
 (defun init-scheduler ()
@@ -722,11 +718,11 @@ time with the :STEP mode.")
 
 
 #||
-    (defun bar (n) (repeat n (print 'bar)))
-    (start
-     (setq s2 (dfuncall 100 'bar 100))
-     (with-more-priority
-       (setq s1 (dfuncall 60 'princ 'foo))))
+(defun bar (n) (repeat n (print 'bar)))
+(start
+(setq s2 (dfuncall 100 'bar 100))
+(with-more-priority
+(setq s1 (dfuncall 60 'princ 'foo))))
 ||#
 
 ;;;; THE END ;;;;

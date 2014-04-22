@@ -80,35 +80,32 @@
       (:c-l (midiseq2cl (outseq self) delta)))))
 
 (defmethod play ((self C-patch-record))
-  (niy play self)
-  ;; (unless *pw-recording-midi*
-  ;;   (when (and  midi::*pw-refnum* midi::*player* )
-  ;;     (print "Recording...")
-  ;;     (setf *pw-recorder* (midi-player:open-player "PatchWorkRecorder"))
-  ;;     (setf *pw-recording-midi* nil)
-  ;;     (when (> *pw-recorder* 0)
-  ;;       (setf *pw-recording-midi* t)
-  ;;       (midi-player:recordplayer *pw-recorder* 1)
-  ;;       (midi-player:startplayer *pw-recorder*))))
-  )
+  (unless *pw-recording-midi*
+    (when (and  midi::*pw-refnum* midi::*player* )
+      (print "Recording...")
+      (setf *pw-recorder* (midi-player:open-player "PatchWorkRecorder"))
+      (setf *pw-recording-midi* nil)
+      (when (> *pw-recorder* 0)
+        (setf *pw-recording-midi* t)
+        (midi-player:recordplayer *pw-recorder* 1)
+        (midi-player:startplayer *pw-recorder*)))))
 
 
 ;; (midi-player:closeplayer midi::*player*)
 ;; (setf midi::*player* (midi-player:open-player "PatchWorkPlayer"))
 
 (defmethod stop-play ((self c-patch-record))
-  (niy stop-play self)
-  ;; (when *pw-recording-midi*
-  ;;   (print "Recording Off...")
-  ;;   (midi-player:stopplayer *pw-recorder*)
-  ;;   (let (recording-seq )
-  ;;     (setf recording-seq (midi-player:getAllTrackplayer *pw-recorder*))
-  ;;     (when recording-seq
-  ;;       (setf *midi-tempo* 1000000)
-  ;;       (setf (outseq self) (mievents2midilist recording-seq 1000))))
-  ;;   (midi-player:closeplayer *pw-recorder*))
+  (when *pw-recording-midi*
+    (print "Recording Off...")
+    (midi-player:stopplayer *pw-recorder*)
+    (let (recording-seq )
+      (setf recording-seq (midi-player:getAllTrackplayer *pw-recorder*))
+      (when recording-seq
+        (setf *midi-tempo* 1000000)
+        (setf (outseq self) (mievents2midilist recording-seq 1000))))
+    (midi-player:closeplayer *pw-recorder*))
   (setf *pw-recording-midi* nil))
-      
+
 
 
 (defunp Midi-Record ((delta fix/fl/list (:value 0 :min-val 0 :max-val 1000)))  nil
@@ -145,16 +142,16 @@ delta and output mode."
               recording-seq)
           (midishare::date tempo-evnt 0)
           (midishare::field tempo-evnt 0 1000000)
-          (rlet ((myInfo :MidiFileInfos))  
-            (rset myInfo :MidiFileInfos.format 1)
-            (rset myInfo :MidiFileInfos.timedef 0)
-            (rset myInfo :MidiFileInfos.clicks 480)
-            (rset myInfo :MidiFileInfos.tracks 2)
+          (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))  
+            (midi-player:mf-format myInfo  1)
+            (midi-player:mf-timedef myInfo 0)
+            (midi-player:mf-clicks myInfo 480)
+            (midi-player:mf-tracks myInfo 2)
             (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
             (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
             (midishare::firstEv recording-seq tempo-evnt)
-            (midi-player:midi-file-save (mac-namestring name) recording-seq  myInfo)
-            (set-mac-file-type (mac-namestring name) :|Midi|)
+            (midi-player:midi-file-save (namestring name) recording-seq  myInfo)
+            (set-mac-file-type (namestring name) :|Midi|)
             (midishare::midifreeseq recording-seq)))))))
 
 (defmethod MidiSaveAny ((object t))
@@ -170,31 +167,29 @@ delta and output mode."
 |#
 
 (defmethod patch-value ((self C-patch-save-midi) obj)
-  (niy patch-value self obj)
-  ;; (when (and  midi::*pw-refnum* midi::*player* )
-  ;;   (let ((name (CHOOSE-NEW-FILE-DIALOG)))
-  ;;     (when name
-  ;;       (let ((tempo-evnt (midishare::MidiNewEv midishare::typetempo))
-  ;;             recording-seq)
-  ;;         (midishare::date tempo-evnt 0)
-  ;;         (midishare::field tempo-evnt 0 1000000)
-  ;;         (rlet ((myInfo :MidiFileInfos))  
-  ;;           (rset myInfo :MidiFileInfos.format 1)
-  ;;           (rset myInfo :MidiFileInfos.timedef 0)
-  ;;           (rset myInfo :MidiFileInfos.clicks 500)
-  ;;           (rset myInfo :MidiFileInfos.tracks 2)
-  ;;           (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
-  ;;           (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
-  ;;           (midishare::firstEv recording-seq tempo-evnt)
-  ;;           (midi-player:midi-file-save (mac-namestring name) recording-seq  myInfo)
-  ;;           (set-mac-file-type (mac-namestring name) :|Midi|)
-  ;;           (midishare::midifreeseq recording-seq))))))
-  )
+  (declare (ignore obj))
+  (when (and  midi::*pw-refnum* midi::*player* )
+    (let ((name (CHOOSE-NEW-FILE-DIALOG)))
+      (when name
+        (let ((tempo-evnt (midishare::MidiNewEv midishare::typetempo))
+              recording-seq)
+          (midishare::date tempo-evnt 0)
+          (midishare::field tempo-evnt 0 1000000)
+          (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))  
+            (midi-player:mf-format myInfo  1)
+            (midi-player:mf-timedef myInfo 0)
+            (midi-player:mf-clicks myInfo 500)
+            (midi-player:mf-tracks myInfo 2)
+            (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
+            (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
+            (midishare::firstEv recording-seq tempo-evnt)
+            (midi-player:midi-file-save (namestring name) recording-seq  myInfo)
+            (set-mac-file-type (namestring name) :|Midi|)
+            (midishare::midifreeseq recording-seq)))))))
 
 
 (defgeneric MidiSaveAny (object))
 (defmethod MidiSaveAny ((object t))
-  (niy MidiSaveAny object) #-(and)
   (when (and  midi::*pw-refnum* midi::*player* )
     (setf *play-chseq-w/offset* t)
     (let ((seq (midishare::midinewseq)))
@@ -224,22 +219,20 @@ Input may be any PatchWork object that could be played through play-object
 
 
 (defmethod patch-value ((self C-patch-load-midi) obj)
-  (niy patch-value self obj)
-  ;; (when (and  midi::*pw-refnum* midi::*player* )
-  ;;   (let ((name (CHOOSE-FILE-DIALOG)))
-  ;;     (when name
-  ;;       (let ((recording-seq (midishare::midiNewSeq))
-  ;;             (delta (patch-value (first (input-objects self)) (first (input-objects self))))
-  ;;             rep)
-  ;;         (rlet ((myInfo :MidiFileInfos))  
-  ;;           (midi-player:midi-file-load (mac-namestring name) recording-seq  myInfo)
-  ;;           (when recording-seq
-  ;;             (print (list  "clicks" (midi-player:mf-clicks myInfo) "tracks" (midi-player:mf-tracks myInfo) "MidiFormat" (midi-player:mf-format myInfo)))
-  ;;             (let ((*midi-tempo* 1000000))
-  ;;               (setf rep (mievents2midilist recording-seq (midi-player:mf-clicks myInfo) )))
-  ;;             (midiseq2cl rep delta)
-  ;;             ))))))
-  )
+  (declare (ignore obj))
+  (when (and  midi::*pw-refnum* midi::*player* )
+    (let ((name (CHOOSE-FILE-DIALOG)))
+      (when name
+        (let ((recording-seq (midishare::midiNewSeq))
+              (delta (patch-value (first (input-objects self)) (first (input-objects self))))
+              rep)
+          (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))  
+            (midi-player:midi-file-load (namestring name) recording-seq  myInfo)
+            (when recording-seq
+              (print (list  "clicks" (midi-player:mf-clicks myInfo) "tracks" (midi-player:mf-tracks myInfo) "MidiFormat" (midi-player:mf-format myInfo)))
+              (let ((*midi-tempo* 1000000))
+                (setf rep (mievents2midilist recording-seq (midi-player:mf-clicks myInfo) )))
+              (midiseq2cl rep delta))))))))
 
 #|
 (defun logical-time (abstract-time cur-tempo tempo-change-abst-time tempo-change-log-time unit/sec)
