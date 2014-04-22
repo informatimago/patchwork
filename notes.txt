@@ -715,7 +715,6 @@ uname -a
 Darwin galatea 11.4.2 Darwin Kernel Version 11.4.2: Thu Aug 23 16:26:45 PDT 2012; root:xnu-1699.32.7~1/RELEASE_I386 i386
 
 
-
 *** MacPort - /opt/local/bin/ccl 
 
 /opt/local/bin/ccl  --version
@@ -724,7 +723,6 @@ Version 1.8  (DarwinX8632)
 arch is i386 therefore /opt/local/bin/ccl loads in 32-bit.
 
 - This fails in %ff-call somewhere in the main event run loop.
-
 
 
 *** Personnalized - /data/languages/ccl/bin/ccl
@@ -736,7 +734,6 @@ Version 1.8  (DarwinX8664)
 forced 64-bit, with patches (with-standard-io-syntax (format …)) for selectors.
 
 - Success. 
-
 
 
 *** Clozure CL.app from the AppStore
@@ -763,18 +760,6 @@ Version 1.8.1 (15418)
 
 
 http://stpetrus27.wordpress.com/2011/06/20/compile-objective-c-programs-on-linux/
-
-** AppleEvents
-
-
-pw-lib/pwscript/pw-scripting.lisp : pw-lib/pwscript/pw-ae.lisp
-pw-lib/pwscript/recordables.lisp  : pw-lib/pwscript/pw-ae.lisp pw-lib/pwscript/appleevent-toolkit.lisp
-pw-lib/pwscript/pw-ae.lisp        :                            pw-lib/pwscript/appleevent-toolkit.lisp
-
-** Midi
-
-https://github.com/chfin/cl-portmidi
-+ libportmidi
 
 ** Init/Exit/Save hooks
 
@@ -852,6 +837,40 @@ MCL / CCL
     ")
 
 #+END_SRC
+
+** AppleEvents
+
+
+pw-lib/pwscript/pw-scripting.lisp : pw-lib/pwscript/pw-ae.lisp
+pw-lib/pwscript/recordables.lisp  : pw-lib/pwscript/pw-ae.lisp pw-lib/pwscript/appleevent-toolkit.lisp
+pw-lib/pwscript/pw-ae.lisp        :                            pw-lib/pwscript/appleevent-toolkit.lisp
+
+** Midi
+
+https://github.com/chfin/cl-portmidi
++ libportmidi
+
+** key-handler-mixin
+
+"key-handler-mixin shuold be mixed into any class that handles key events."
+
+- how a random class gets key events?
+- view have a MclguiView or a MclguiWindow as backend which are NSView -> NSResponder or  NSWindow -> NSResponder.
+
+exit-key-handler   -[NSResponder resignFirstResponder]
+enter-key-handler  -[NSResponder acceptFirstResponder] -[NSResponder becomeFirstResponder]
+
+allow-returns-p    multi-line?
+
+allow-tabs-p       insert tab allowed?
+set-allow-tabs
+
+
+cut copy paste clear
+undo undo-more     -[[NSResponder undoManager] undo]
+select-all         -[NSResponder selectAll:]
+
+
 
 * Files
 

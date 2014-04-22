@@ -532,7 +532,13 @@ of MENU-ITEM.
   (:method ((menu-item menu-item))
     (let ((action (menu-item-action-function menu-item)))
       (when action
-        (funcall action)))))
+        (catch-cancel
+          (handler-bind ((error
+                           (lambda (condition)
+                             (invoke-debugger condition)
+                             (throw-cancel))))
+            (funcall action)))))))
+
 
 
 (defgeneric set-menu-item-action-function (menu-item new-function)

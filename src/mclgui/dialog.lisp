@@ -49,26 +49,6 @@
 
 
 
-;; The specifications of catch-cancel and throw-cancel in 3.0/4.0 are
-;; contradictory.  We just use the implementation in mcl 5.1
-
-(defmacro catch-cancel (&body body)
-  "
-The catch-cancel macro sets up a cancel catch and evaluates form. It
-returns the value of the last form if there was no cancel throw. Otherwise,
-it returns the symbol :cancel.
-"
-  `(catch :cancel ,@body))
-
-
-(defmacro throw-cancel (&optional value)
-  "
-The throw-cancel macro throws the value of value-form to the most
-recent outstanding catch-cancel.
-"
-  `(throw :cancel ,value))
-
-
 
 (defgeneric cancel-button (window)
   (:documentation "
@@ -440,6 +420,9 @@ STRING:         A string against which to compare the text of the
                 t)
               t))
      (progn
+       (with-handle (winh dialog)
+         (with-handle (viewh item)
+           [winh makeFirstResponder:viewh]))
        (setf (%get-current-key-handler dialog) item)
        (when item
          (when select-all

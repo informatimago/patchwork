@@ -48,50 +48,7 @@
 
 
 (defmethod update-handle ((item static-text-dialog-item))
-  (let* ((pos (or (slot-value item 'view-position) #@(0   0)))
-         (siz (or (slot-value item 'view-size)     #@(10 10)))
-         (texth [[MclguiTextField alloc]
-                 initWithFrame:(ns:make-ns-rect (point-h pos) (point-v pos)
-                                                (point-h siz) (point-v siz))])) 
-    ;; -- NSControl attributes:
-    [texth setTarget:texth]
-    [texth setAction:(objc:@selector "mclguiAction:")]
-    [texth setStringValue:(objcl:objcl-string (dialog-item-text item))]
-    [texth setEnabled:(if (dialog-item-enabled-p item)
-                          YES
-                          NO)]
-    (multiple-value-bind (ff ms) (view-font-codes item)
-      (multiple-value-bind (font mode color other) (nsfont-from-codes ff ms)
-        (declare (ignore mode other))
-        (declare (ignore color))
-        ;;[texth setTextColor:color]
-        (format-trace "static-text" font)
-        [texth setFont:font]))
-    [texth setAlignment:(case (slot-value item 'text-justification)
-                          (:left      #$NSLeftTextAlignment)
-                          (:right     #$NSRightTextAlignment)
-                          (:center    #$NSCenterTextAlignment)
-                          (:justified #$NSJustifiedTextAlignment)
-                          (:natural   #$NSNaturalTextAlignment)
-                          (otherwise  #$NSNaturalTextAlignment))]
-    ;; -- NSTextField attributes:
-    [texth setEditable:NO]
-    [texth setBordered:NO]
-    ;; TODO: editable-text-dialog-item is not a subclass of static-text-dialog-item yet.
-    ;; (let ((editable (typep item 'editable-text-dialog-item)))
-    ;;   [texth setEditable:editable]
-    ;;   [texth setBordered:editable])
-    [texth setSelectable:YES]
-    ;; [texth setTextColor:] ;; set above
-    ;; [texth setBackgroundColor:]
-    ;; [texth setDrawBackground:]
-    [texth setBezeled:NO]
-    [texth setBezelStyle:#$NSTextFieldSquareBezel]
-    ;; #$NSTextFieldSquareBezel  = 0
-    ;; #$NSTextFieldRoundedBezel = 1
-    ;; --
-    (setf (handle item) texth)))
-
+  (setf (handle item) (make-text-item item :selectable nil :editable nil :bordered nil)))
 
 (defmethod unwrap ((item static-text-dialog-item))
   (unwrapping item
@@ -149,6 +106,8 @@
 (defmethod view-click-event-handler ((item static-text-dialog-item) where)
   (declare (ignore where))
   (format-trace 'view-click-event-handler item (point-to-list where))
+  (with-handle (texth item)
+    [texth superMouseDown])
   item)
 
 (defmethod view-double-click-event-handler ((item static-text-dialog-item) where)
@@ -159,6 +118,8 @@
 (defmethod view-key-event-handler ((item static-text-dialog-item) key)
   (declare (ignore where))
   (format-trace 'view-key-event-handler item key)
+  (with-handle (texth item)
+    [texth superKeyDown])
   item)
 
 (defmethod view-draw-contents ((item static-text-dialog-item))

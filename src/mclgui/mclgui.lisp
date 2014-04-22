@@ -68,7 +68,7 @@ Must be called on the main thread."
     (initialize/event)
     (initialize/eval)
     (initialize/pop-up-menu-dialog-item)
-    #+has-appleevent (initialize/apple-event)
+    #+has-appleevent (when (fboundp 'initialize/apple-event) (initialize/apple-event))
     (setf *initialized* t))
   (values))
 

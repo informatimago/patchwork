@@ -31,7 +31,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-
 (in-package "MCLGUI")
 
 
@@ -267,10 +266,6 @@ the editable-text dialog item.
       *arrow-cursor*)))
 
 	  
-
-
-
-
 
 (defmethod install-view-in-window :after ((item key-handler-mixin) dialog)
   (add-key-handler item dialog))

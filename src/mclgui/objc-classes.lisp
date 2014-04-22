@@ -62,7 +62,7 @@
 
 
 (defstruct (nspoint
-             (:constructor %make-nspoint))
+            (:constructor %make-nspoint))
   (x      0.0d0 :type ns:cgfloat)
   (y      0.0d0 :type ns:cgfloat))
 
@@ -71,7 +71,7 @@
 
 
 (defstruct (nssize
-             (:constructor %make-nssize))
+            (:constructor %make-nssize))
   (width  0.0d0 :type ns:cgfloat)
   (height 0.0d0 :type ns:cgfloat))
 
@@ -80,7 +80,7 @@
 
 
 (defstruct (nsrect
-             (:constructor %make-nsrect))
+            (:constructor %make-nsrect))
   (x      0.0d0 :type ns:cgfloat)
   (y      0.0d0 :type ns:cgfloat)
   (width  0.0d0 :type ns:cgfloat)
@@ -88,7 +88,7 @@
 
 
 (defun make-nsrect (&key (x 0.0d0 xp) (y 0.0d0 yp) (width 0.0d0 widthp) (height 0.0d0 heightp)
-                        origin size)
+                      origin size)
   (assert (xor (or xp yp) origin))
   (assert (xor (or widthp heightp) size))
   (let ((origin (typecase origin
@@ -96,20 +96,20 @@
                   (integer (make-nspoint :x (point-h origin) :y (point-v origin)))
                   (t       origin)))
         (size (typecase size
-                  (null    nil)
-                  (integer (make-nssize :width (point-h size) :height (point-v size)))
-                  (t       size))))
-   (if origin
-       (if size
-           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
-                         :width (nssize-width size) :height (nssize-height size))
-           (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
-                         :width (cgfloat width)     :height (cgfloat height)))
-       (if size
-           (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
-                         :width (nssize-width size) :height (nssize-height size))
-           (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
-                         :width (cgfloat width)     :height (cgfloat height))))))
+                (null    nil)
+                (integer (make-nssize :width (point-h size) :height (point-v size)))
+                (t       size))))
+    (if origin
+        (if size
+            (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
+                          :width (nssize-width size) :height (nssize-height size))
+            (%make-nsrect :x     (nspoint-x origin)  :y      (nspoint-y origin)
+                          :width (cgfloat width)     :height (cgfloat height)))
+        (if size
+            (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
+                          :width (nssize-width size) :height (nssize-height size))
+            (%make-nsrect :x     (cgfloat x)         :y      (cgfloat y)
+                          :width (cgfloat width)     :height (cgfloat height))))))
 
 
 (defun point-to-nspoint (point)
@@ -176,16 +176,16 @@
 
 (defmethod unwrap ((nspoint nspoint))
   (unwrapping nspoint
-              (ns:make-ns-point (nspoint-x nspoint) (nspoint-y nspoint))))
+    (ns:make-ns-point (nspoint-x nspoint) (nspoint-y nspoint))))
 
 (defmethod unwrap ((nssize nssize))
   (unwrapping nssize
-              (ns:make-ns-size (nssize-width nssize) (nssize-height nssize))))
+    (ns:make-ns-size (nssize-width nssize) (nssize-height nssize))))
 
 (defmethod unwrap ((nsrect nsrect))
   (unwrapping nsrect
-              (ns:make-ns-rect (nsrect-x nsrect) (nsrect-y nsrect)
-                               (nsrect-width nsrect) (nsrect-height nsrect))))
+    (ns:make-ns-rect (nsrect-x nsrect) (nsrect-y nsrect)
+                     (nsrect-width nsrect) (nsrect-height nsrect))))
 
 ;; Shortcuts:
 
@@ -326,7 +326,7 @@
     :sum (if (zerop (logand macmod macmodifier))
              0
              nsmod)))
- 
+
 
 
 (defstruct event
@@ -459,11 +459,11 @@ RETURN:         DST.
               :where (nspoint-to-point
                       (let ((win (front-window)))
                         (if win
-                          (let ((winh (handle win)))
-                            (if winh
-                              (get-nspoint [winh mouseLocationOutsideOfEventStream])
-                              (get-nspoint [NSEvent mouseLocation])))
-                          (get-nspoint [NSEvent mouseLocation]))))
+                            (let ((winh (handle win)))
+                              (if winh
+                                  (get-nspoint [winh mouseLocationOutsideOfEventStream])
+                                  (get-nspoint [NSEvent mouseLocation])))
+                            (get-nspoint [NSEvent mouseLocation]))))
               :modifiers  (nsmodifier-to-macmodifier (modifier-flags))))
 
 
@@ -475,7 +475,7 @@ RETURN:         DST.
     `(block ,vhandler
        (handler-bind ((error (lambda (err)
                                (declare (stepper disable))
-                               #+ccl (format *error-output* "~{~A~%~}" (ccl::backtrace-as-list))
+                               #+ccl (format *error-output* "~&~80,,,'-<~>~&~{~A~%~}~80,,,'-<~>~&" (ccl::backtrace-as-list))
                                (format *error-output* "~%ERROR while ~S:~%~A~2%"
                                        ',(if (= 1 (length body)) body `(progn ,@body))
                                        err)
@@ -490,11 +490,11 @@ RETURN:         DST.
 (defmacro frame (call)
   (let ((vframe (gensym)))
     `(oclo:slet ((,vframe ,call)) 
-                (values
-                 (ns:ns-rect-x ,vframe)
-                 (ns:ns-rect-y ,vframe)
-                 (ns:ns-rect-width  ,vframe)
-                 (ns:ns-rect-height ,vframe)))))
+       (values
+        (ns:ns-rect-x ,vframe)
+        (ns:ns-rect-y ,vframe)
+        (ns:ns-rect-width  ,vframe)
+        (ns:ns-rect-height ,vframe)))))
 
 
 
@@ -661,10 +661,10 @@ RETURN: A NSPoint containing the origin of the nswindow.
   body:
   (declare (ignore nsnotification))
   (report-errors
-      (let* ((window (nswindow-window self)))
-        ;; (format-trace "-[MclguiWindow windowDidMove:]" window)
-        (with-handle (handle  window)
-          (window-move-event-handler window (rect-topleft (nswindow-to-window-rect (get-nsrect [handle frame])))))))]
+    (let* ((window (nswindow-window self)))
+      ;; (format-trace "-[MclguiWindow windowDidMove:]" window)
+      (with-handle (handle  window)
+        (window-move-event-handler window (rect-topleft (nswindow-to-window-rect (get-nsrect [handle frame])))))))]
 
 
 @[MclguiWindow
@@ -673,9 +673,9 @@ RETURN: A NSPoint containing the origin of the nswindow.
   body:
   (declare (ignore nsnotification))
   (report-errors
-      (let ((window (nswindow-window self)))
-        ;; (unfrequently 1/3 (format-trace "-[MclguiWindow windowDidResize:]" window))
-        (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
+    (let ((window (nswindow-window self)))
+      ;; (unfrequently 1/3 (format-trace "-[MclguiWindow windowDidResize:]" window))
+      (window-grow-event-handler window (add-points (view-position window) (view-size window)))))]
 
 
 
@@ -685,9 +685,9 @@ RETURN: A NSPoint containing the origin of the nswindow.
   body:
   (declare (ignore nsnotification))
   (report-errors
-      (let* ((window (nswindow-window self)))
-        ;; (format-trace "-[MclguiWindow windowShouldClose:]" window)
-        (window-close-event-handler window)))]
+    (let* ((window (nswindow-window self)))
+      ;; (format-trace "-[MclguiWindow windowShouldClose:]" window)
+      (window-close-event-handler window)))]
 
 
 @[MclguiWindow
@@ -704,9 +704,9 @@ RETURN: A NSPoint containing the origin of the nswindow.
   resultType:(:void)
   body:
   (report-errors
-      (let ((window  (nswindow-window self)))
-        ;; (format-trace "-[MclguiWindow close]" window)
-        (catch :cancel (window-close window))))]
+    (let ((window  (nswindow-window self)))
+      ;; (format-trace "-[MclguiWindow close]" window)
+      (catch :cancel (window-close window))))]
 
 
 (defconstant inZoomIn  0)
@@ -748,7 +748,7 @@ RETURN: A NSPoint containing the origin of the nswindow.
   (let ((window (nswindow-window self)))
     (format-trace "-[MclguiWindow zoom:]" window)
     (when window
-     (report-errors (window-do-zoom window))))]
+      (report-errors (window-do-zoom window))))]
 
 
 @[MclguiWindow
@@ -780,18 +780,18 @@ RETURN: A NSPoint containing the origin of the nswindow.
   body:
   [super resignMainWindow]
   (report-errors
-      (let ((window (nswindow-window self)))
-        ;; (format-trace "-[MclguiWindow resignMainWindow]" window)
-        (when window
-          (let ((*current-event* (get-null-event))
-                (*multi-click-count* 0))
-            (setf (event-what *current-event*) activate-evt
-                  (event-modifiers *current-event*)
-                  (logandc2 (event-modifiers *current-event*)
-                            active-flag)
-                  (event-message *current-event*) window)
-            ;; (format-trace '|resignMainWindow| *current-event*)
-            (view-deactivate-event-handler window)))))]
+    (let ((window (nswindow-window self)))
+      ;; (format-trace "-[MclguiWindow resignMainWindow]" window)
+      (when window
+        (let ((*current-event* (get-null-event))
+              (*multi-click-count* 0))
+          (setf (event-what *current-event*) activate-evt
+                (event-modifiers *current-event*)
+                (logandc2 (event-modifiers *current-event*)
+                          active-flag)
+                (event-message *current-event*) window)
+          ;; (format-trace '|resignMainWindow| *current-event*)
+          (view-deactivate-event-handler window)))))]
 
 
 @[MclguiWindow
@@ -831,19 +831,19 @@ or to NIL outside of drawRect:.")
 
 
 @[MclguiView
-  method: (mouseDown:(:id)event)
-  resultType: (:void)
+  method:(mouseDown:(:id)event)
+  resultType:(:void)
   body:(objc-mouse-down self event)]
 
 @[MclguiView
-  method: (mouseUp:(:id)event)
-  resultType: (:void)
-  body: (objc-mouse-up self event)]
+  method:(mouseUp:(:id)event)
+  resultType:(:void)
+  body:(objc-mouse-up self event)]
 
 
 @[MclguiView
-  method: (mouseMoved:(:id)event)
-  resultType: (:void)
+  method:(mouseMoved:(:id)event)
+  resultType:(:void)
   body:
   ;; (format-trace "-[MclguiView mouseMoved:]" self (nsview-view self) event)
   (when (nsview-view self)
@@ -854,8 +854,8 @@ or to NIL outside of drawRect:.")
 
 
 @[MclguiView
-  method: (mouseDragged:(:id)event)
-  resultType: (:void)
+  method:(mouseDragged:(:id)event)
+  resultType:(:void)
   body:
   ;; (format-trace "-[MclguiView mouseDragged]" self (nsview-view self) event)
   (when (nsview-view self)
@@ -872,9 +872,11 @@ or to NIL outside of drawRect:.")
 @[NSTextField subClass:MclguiTextField
               slots:((item :initform nil
                        :initarg :item
-                       :reader nsview-view
-                       :reader nscontroller-dialog-item
-                       :documentation "An instance of DIALOG-ITEM or subclasses."))]
+                       :accessor nsview-view
+                       :accessor nscontroller-dialog-item
+                       :documentation "An instance of DIALOG-ITEM or subclasses.")
+                     (event :initform nil
+                            :accessor nscontroller-current-event))]
 
 @[MclguiTextField
   method:(mclguiAction:(:id)sender)
@@ -884,20 +886,74 @@ or to NIL outside of drawRect:.")
   (when (nscontroller-dialog-item self)
     (dialog-item-action (nscontroller-dialog-item self)))]
 
+(defvar *calling-super* nil)
+
 @[MclguiTextField
   method:(mouseDown:(:id)event)
   resultType:(:void)
-  body:(objc-mouse-down self event)]
+  body:
+  (format t "~&mouseDown: 1 *calling-super* ~S event ~S~%" *calling-super* event)
+  (unless *calling-super*
+    (format t "~&mouseDown: 2 *calling-super* ~S event ~S~%" *calling-super* event)
+    (setf (slot-value self 'event) event)
+    (objc-mouse-down self event)
+    (setf (slot-value self 'event) nil))]
 
 @[MclguiTextField
   method:(mouseUp:(:id)event)
   resultType:(:void)
-  body:(objc-mouse-up self event)]
+  body:
+  (unless *calling-super*
+    (setf (slot-value self 'event) event)
+    (objc-mouse-up self event)
+    (setf (slot-value self 'event) nil))]
 
 @[MclguiTextField
   method:(keyDown:(:id)event)
   resultType:(:void)
-  body:(objc-key-down (nsview-view self) event)]
+  body:
+  (unless *calling-super*
+    (setf (slot-value self 'event) event)
+    (objc-key-down (nsview-view self) event)
+    (setf (slot-value self 'event) nil))]
+
+@[MclguiTextField
+  method:(superMouseDown)
+  resultType:(:void)
+  body:
+  (format t "~&superMouseDown: 1 *calling-super* ~S~%" *calling-super* )
+  (if *calling-super*
+      (progn
+        #+ccl (format *error-output* "~&~80,,,'-<~>~&~{~A~%~}~80,,,'-<~>~%" (ccl::backtrace-as-list)))
+      (let ((event (slot-value self 'event))
+            (*calling-super* t))
+        (format t "~&superMouseDown: 2 *calling-super* ~S event ~S~%" *calling-super* event)
+        (when event
+          [super mouseDown:event])))]
+
+@[MclguiTextField
+  method:(superMouseUp)
+  resultType:(:void)
+  body:
+  (if *calling-super*
+      (progn
+        #+ccl (format *error-output* "~&~80,,,'-<~>~&~{~A~%~}~80,,,'-<~>~%" (ccl::backtrace-as-list)))
+      (let ((event (slot-value self 'event))
+            (*calling-super* t))
+        (when event
+          [super mouseUp:event])))]
+
+@[MclguiTextField
+  method:(superKeyDown)
+  resultType:(:void)
+  body:
+  (if *calling-super*
+      (progn
+        #+ccl (format *error-output* "~&~80,,,'-<~>~&~{~A~%~}~80,,,'-<~>~%" (ccl::backtrace-as-list)))
+      (let ((event (slot-value self 'event))
+            (*calling-super* t))
+        (when event
+          [super keyDown:event])))]
 
 ;;;------------------------------------------------------------
 ;;; MclguiTextField -- static-text-dialog-item
@@ -953,22 +1009,22 @@ or to NIL outside of drawRect:.")
 
 (defun class-get-subclasses (class)
   (if (symbolp class)
-    (class-get-subclasses (find-class class))
-    (let ((num-classes (#_objc_getClassList *null* 0)))
-      (cffi:with-foreign-object (classes :pointer num-classes)
-        (#_objc_getClassList classes num-classes)
-        (loop
-          :for i :below num-classes 
-          :for subclass = (cffi:mem-aref classes :pointer i)
-          :when (loop
-                  :for superclass = (#_class_getSuperclass subclass)
-                  :then (#_class_getSuperclass superclass)
-                  :while (and (not (nullp superclass))
-                              (eq superclass class))
-                  :finally (return (if (nullp superclass)
-                                     nil
-                                     superclass)))
-          :collect subclass)))))
+      (class-get-subclasses (find-class class))
+      (let ((num-classes (#_objc_getClassList *null* 0)))
+        (cffi:with-foreign-object (classes :pointer num-classes)
+          (#_objc_getClassList classes num-classes)
+          (loop
+            :for i :below num-classes 
+            :for subclass = (cffi:mem-aref classes :pointer i)
+            :when (loop
+                    :for superclass = (#_class_getSuperclass subclass)
+                      :then (#_class_getSuperclass superclass)
+                    :while (and (not (nullp superclass))
+                                (eq superclass class))
+                    :finally (return (if (nullp superclass)
+                                         nil
+                                         superclass)))
+              :collect subclass)))))
 
 ;; (class-get-subclasses 'ns:ns-object)
 

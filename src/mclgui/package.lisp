@@ -36,7 +36,7 @@
 
 (defpackage "MCLGUI"
   (:use
-   ;; "CL-STEPPER"
+   ;; "COMMON-LISP-STEPPER"
    "COMMON-LISP"
    "TRIVIAL-GRAY-STREAMS"
    "CLOSER-MOP")
@@ -588,10 +588,6 @@ LEGAL:
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 "))
-
-
-
-
 
 
 

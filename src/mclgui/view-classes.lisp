@@ -68,7 +68,10 @@ the opposite of view-origin.)
    (view-nick-name       :initform nil         :initarg  :view-nick-name       :reader view-nick-name
                          :documentation "The nickname of the view.")
    (view-alist           :initform nil                                         :accessor view-alist)
-   (view-instance        :initform nil :accessor view-instance)))
+   (view-instance        :initform nil :accessor view-instance
+                         :documentation "
+Stack of instance screen shots. Cf. new-instance and with-instance-drawing.
+")))
 
 
 (defmethod print-object ((view simple-view) stream)

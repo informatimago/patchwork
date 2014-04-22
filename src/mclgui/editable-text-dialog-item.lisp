@@ -40,6 +40,13 @@
   ((width-correction   :allocation :class :initform 4)
    (text-justification :allocation :class :initform 0)))
 
+(defmethod update-handle ((item basic-editable-text-dialog-item))
+  (setf (handle item) (make-text-item item :selectable t :editable t :bordered t)))
+
+(defmethod unwrap ((item basic-editable-text-dialog-item))
+  (unwrapping item
+    (or (handle item) (update-handle item))))
+
 
 (defmethod view-default-size ((item basic-editable-text-dialog-item))
   (let* ((pt    (call-next-method))
@@ -56,6 +63,19 @@
         (set-selection-range item 0 0)
         (setf (%get-current-key-handler window) nil)))))
 
+(defmethod view-click-event-handler ((item basic-editable-text-dialog-item) where)
+  (declare (ignorable where))
+  (format-trace 'view-click-event-handler item (point-to-list where))
+  (with-handle (texth item)
+    [texth superMouseDown])
+  item)
+
+(defmethod view-key-event-handler ((item basic-editable-text-dialog-item) key)
+  (declare (ignorable key))
+  (format-trace 'view-key-event-handler item key)
+  (with-handle (texth item)
+    [texth superKeyDown])
+  item)
 
 ;;;---------------------------------------------------------------------
 ;;;
@@ -88,9 +108,6 @@
 
 (defmethod view-default-font ((view editable-text-dialog-item))
   (sys-font-spec))
-
-
-
 
 
 ;;;; THE END ;;;;

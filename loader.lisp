@@ -143,8 +143,18 @@
     (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
     (pw::initialize-patchwork)))
 (import 'start-patchwork "COMMON-LISP-USER")
-(let ((*print-circle* nil)) (format t "~&;; Use ~S to start Patchwork.~%~:*~S~%(in-package :pw)~%" '(start-patchwork)))
+(let ((*print-circle* nil))
+  (format t "~&;; Use ~S to start Patchwork.~%~:*~S~%~S~%(in-package :pw)~%" '(start-patchwork) '(with-streams (pw::initialize-patchwork))))
 
+(defmacro with-streams (&body body)
+  `(let ((*terminal-io* *terminal-io*)
+         (*standard-input* *standard-input*)
+         (*standard-output* *standard-output*)
+         (*error-output* *error-output*)
+         (*trace-output* *trace-output*)
+         (*query-io* *query-io*)
+         (*debug-io* *debug-io*))
+     ,@body))
 
 
 ;;; --------------------------------------------------------------------
