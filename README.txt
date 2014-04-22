@@ -22,9 +22,10 @@ Installing the sources of Patchwork
 
 1- Get the sources
 
-1.1- Get the sources of Patchwork with git  ::
+1.1- Get the sources of Patchwork & MCLGUI with git  ::
 
         git clone git@gitorious.org:patchwork/patchwork.git
+        git clone git@gitorious.org:patchwork/mclgui.git
 
 1.2- Get an up-to-date version of informatimago from git: ::
 
@@ -49,21 +50,23 @@ Installing the sources of Patchwork
               ql:*local-project-directories*)
 
 
-2- Edit ``~/LOGHOSTS/PATCHWORK`` to tell where the sources of
-   Patchwork are installed, eg.: ::
+.. comment: this is not needed anymore, the patchwork/builder.lisp script determines the logical pathname automatically.
 
-      ;; -*- mode:lisp; coding:utf-8; -*-
+    2- Edit ``~/LOGHOSTS/PATCHWORK`` to tell where the sources of
+       Patchwork are installed, eg.: ::
 
-      #.(list
-         (list "PATCHWORK:**;*.*.*"
-               (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
-                                (user-homedir-pathname) nil))
-         (list "PATCHWORK:**;*.*"
-               (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
-                                (user-homedir-pathname) nil))
-         (list "PATCHWORK:**;*"
-               (merge-pathnames #P"works/patchwork/patchwork/**/*"
-                                (user-homedir-pathname) nil)))
+          ;; -*- mode:lisp; coding:utf-8; -*-
+
+          #.(list
+             (list "PATCHWORK:**;*.*.*"
+                   (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
+                                    (user-homedir-pathname) nil))
+             (list "PATCHWORK:**;*.*"
+                   (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
+                                    (user-homedir-pathname) nil))
+             (list "PATCHWORK:**;*"
+                   (merge-pathnames #P"works/patchwork/patchwork/**/*"
+                                    (user-homedir-pathname) nil)))
 
 
 

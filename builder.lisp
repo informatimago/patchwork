@@ -95,14 +95,18 @@
 ;; (translate-logical-pathname #P"PW-USER:A;B;C.D")#P"/home/pjb/works/patchwork/pw-user/A/B/C.D"
 
 
-(defun make-logical-pathname-translations (logical-host base-pathname)
+(defun make-logical-pathname-translations (logical-base physical-base)
   (list
-   (list (format nil "~A:**;*.*.*"   logical-host)
-         (merge-pathnames #P"**/*.*" base-pathname nil))
-   (list (format nil "~A:**;*.*"     logical-host)
-         (merge-pathnames #P"**/*.*" base-pathname nil))
-   (list (format nil "~A:**;*"       logical-host)
-         (merge-pathnames #P"**/*"   base-pathname nil))))
+   (list (format nil "~A**;*.*.*"    logical-base)
+         (merge-pathnames #P"**/*.*" physical-base nil))
+   (list (format nil "~A**;*.*"      logical-base)
+         (merge-pathnames #P"**/*.*" physical-base  nil))
+   (list (format nil "~A**;*"        logical-base)
+         (merge-pathnames #P"**/*"   physical-base  nil))
+   (list (format nil "~A**;"         logical-base)
+         (merge-pathnames #P"**/"    physical-base  nil))))
+
+
 
 (defun generate-logical-pathname-translation-file (logical-host base-pathname &key (force nil))
   "Generate a default logical pathname translation mapping the logical-host to a given base directory."
@@ -136,13 +140,17 @@
 (load-logical-pathname-translations "CLENI")
 
 ;; (load-logical-pathname-translations "PATCHWORK")
+(let* ((this-file #.(or *compile-file-truename* *load-truename*))
+       (base     (if this-file
+                     (merge-pathnames #P "../"
+                                      (make-pathname :name nil :type nil :version nil :defaults this-file)
+                                      nil)
+                     #P"~/works/patchwork/src/")))
+  (setf (logical-pathname-translations "PATCHWORK")
+        (make-logical-pathname-translations ""            (merge-pathnames "patchwork/" base))
+        (logical-pathname-translations "MCLGUI")
+        (make-logical-pathname-translations ""            (merge-pathnames "mclgui/" base))))
 
-(setf (logical-pathname-translations "PATCHWORK") nil
-      (logical-pathname-translations "PATCHWORK")
-      (make-logical-pathname-translations "PATCHWORK"
-                                          (make-pathname :name nil :type nil :version nil
-                                                         :defaults #.(or *compile-file-truename* *load-truename*
-                                                                         #P"~/works/patchwork/patchwork/"))))
 
 (defun cd (path)
   #+ccl       (ccl::cd      path)
@@ -154,10 +162,26 @@
 (pushnew (translate-logical-pathname #P"PATCHWORK:SRC;")
          asdf:*central-registry* :test (function equalp))
 
-(pushnew (translate-logical-pathname #P"PATCHWORK:SRC;MCLGUI;")
+(pushnew (translate-logical-pathname #P"MCLGUI:")
          asdf:*central-registry* :test (function equalp))
 
+#-(and) (progn
+          (logical-pathname-translations "PATCHWORK")
+          ((#P"PATCHWORK:**;*.*.*" #P"/Users/pjb/works/patchwork/src/patchwork/**/*.*")
+           (#P"PATCHWORK:**;*.*" #P"/Users/pjb/works/patchwork/src/patchwork/**/*.*")
+           (#P"PATCHWORK:**;*" #P"/Users/pjb/works/patchwork/src/patchwork/**/*")
+           (#P"PATCHWORK:**;" #P"/Users/pjb/works/patchwork/src/patchwork/**/"))
+          (logical-pathname-translations "MCLGUI")
+          ((#P"MCLGUI:**;*.*.*" #P"/Users/pjb/works/patchwork/src/mclgui/**/*.*")
+           (#P"MCLGUI:**;*.*" #P"/Users/pjb/works/patchwork/src/mclgui/**/*.*")
+           (#P"MCLGUI:**;*" #P"/Users/pjb/works/patchwork/src/mclgui/**/*")
+           (#P"MCLGUI:**;" #P"/Users/pjb/works/patchwork/src/mclgui/**/"))
 
+          (list (translate-logical-pathname #P"PATCHWORK:")
+                (translate-logical-pathname #P"MCLGUI:"))
+          (#P"/Users/pjb/works/patchwork/src/patchwork/"
+           #P"/Users/pjb/works/patchwork/src/mclgui/")
+          )
 
 (defparameter *patchwork-version*
   #.(destructuring-bind (major minor compile)
