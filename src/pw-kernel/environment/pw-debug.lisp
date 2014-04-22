@@ -56,46 +56,46 @@
 (defun flip-pw-debug ()
   (setf *global-current-value-patch* ())
   (if (menu-item-check-mark *pw-debug-menu*)
-    (remove-PW-mode-method)
-    (set-patch-value-methods)))
+      (remove-PW-mode-method)
+      (set-patch-value-methods)))
 
 (defun set-patch-value-methods ()
   (set-menu-item-check-mark *pw-debug-menu* t)
   (defmethod patch-value :before ((self C-patch) obj) 
     (declare (ignore obj))
-    ;  (activate-control self)
+                                        ;  (activate-control self)
     (setf *global-current-value-patch* (adjoin self *global-current-value-patch*)))
   
   (defmethod patch-value :after ((self C-patch) obj) 
     (declare (ignore obj))
-    ;   (print 'after)
-    ;  (deactivate-control self)
+                                        ;   (print 'after)
+                                        ;  (deactivate-control self)
     (setf *global-current-value-patch* (delete self *global-current-value-patch* :test #'eq))))
 
 (defun activate-current-patch-value-patch ()
   (if (menu-item-check-mark *pw-debug-menu*)
-    (when *global-current-value-patch*
-      (window-select (view-window (car *global-current-value-patch*)))
-      (tell (controls (view-window (car *global-current-value-patch*)))
-            #'deactivate-control)
-      (activate-control (car *global-current-value-patch*))
-      (setf *global-current-value-patch* ()))
-    (ui:ed-beep)))
+      (when *global-current-value-patch*
+        (window-select (view-window (car *global-current-value-patch*)))
+        (tell (controls (view-window (car *global-current-value-patch*)))
+              #'deactivate-control)
+        (activate-control (car *global-current-value-patch*))
+        (setf *global-current-value-patch* ()))
+      (ui:ed-beep)))
 
 
 (defun remove-PW-mode-method ()
   (set-menu-item-check-mark *pw-debug-menu* ())    
-   ;(setf *break-on-errors* t)
-   (let* ((generic-function (symbol-function 'patch-value))
-          (method (find-method generic-function
-                        '(:before)
-                         (list (find-class 'C-patch)(find-class t)))))
-     (remove-method generic-function method))
-   (let* ((generic-function (symbol-function 'patch-value))
-          (method (find-method generic-function
-                        '(:after)
-                         (list (find-class 'C-patch)(find-class t)))))
-     (remove-method generic-function method)
-     (setf *global-current-value-patch* ())))
+                                        ;(setf *break-on-errors* t)
+  (let* ((generic-function (symbol-function 'patch-value))
+         (method (find-method generic-function
+                              '(:before)
+                              (list (find-class 'C-patch)(find-class t)))))
+    (remove-method generic-function method))
+  (let* ((generic-function (symbol-function 'patch-value))
+         (method (find-method generic-function
+                              '(:after)
+                              (list (find-class 'C-patch)(find-class t)))))
+    (remove-method generic-function method)
+    (setf *global-current-value-patch* ())))
 
 ;;;; THE END ;;;;

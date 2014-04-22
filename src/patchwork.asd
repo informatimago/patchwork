@@ -142,16 +142,15 @@
                  ;;; -----------
                  ;;; Midi
                  
-                 (:file "pw-lib/midishare/midishare-interface" 
-                  :depends-on ("macosx/load-libraries"))
+                 (:file "macosx/headers" 
+                  :depends-on ())
 
                  (:file "macosx/load-libraries" 
                   :depends-on ("macosx/headers"))
 
-                 (:file "macosx/headers" 
-                  :depends-on ())
+                 (:file "pw-lib/midishare/midishare-interface" 
+                  :depends-on ("macosx/load-libraries"))
 
-                                     
                  (:file "pw-lib/midishare/player-interface" 
                         :depends-on ("pw-lib/midishare/midishare-interface" ))
                  
@@ -235,6 +234,7 @@
                  (:file "pw-kernel/drivers+resources/midi" 
                         :depends-on (
                                      "pw-lib/midishare/midishare-interface"
+                                     "pw-lib/midishare/player-interface"
                                      ;; #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                                      ))
                  

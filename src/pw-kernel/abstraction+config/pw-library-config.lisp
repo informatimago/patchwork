@@ -169,7 +169,7 @@ GA 17/5/94
       (load-one-user-library lib))
     (dolist (abstr-path (second file-config-list))
       (load&form-abstr-menu abstr-path))
-    (load&form-abstr-menu (mac-namestring *config-default-abst-path*) 1)
+    (load&form-abstr-menu (namestring *config-default-abst-path*) 1)
     (and (third file-config-list)
          (restore-global-options (third file-config-list) 
                                  (fourth file-config-list)))))

@@ -43,7 +43,8 @@
   self)
 
 (defmethod collect ((self C-patch-chord-line)) (declare (ignore self)) )
-(defmethod pw::clock ((self C-patch-chord-line)) (pw::clock pw::*global-clock*))
+(defmethod pw::clock ((self C-patch-chord-line))
+  (pw::clock pw::*global-clock*))
 
 (defmethod  begin-process ((self C-patch-chord-line)) (declare (ignore self)) )
 

@@ -247,7 +247,9 @@ This box can be extended by option-clicking bottom-right
 ;;===================================
 (defclass C-pw-gclock (C-patch)())  
 
-(defmethod patch-value ((self  C-pw-gclock) obj) (declare (ignore obj)) (clock *global-clock*))
+(defmethod patch-value ((self  C-pw-gclock) obj)
+  (declare (ignore obj))
+  (clock *global-clock*))
 
 (defunp pw-clock () nil
 "Returns the value of the global clock in ticks.")

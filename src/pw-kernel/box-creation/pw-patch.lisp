@@ -574,9 +574,9 @@
       (call-next-method)
       (let ((pos (view-position view)))
         (unwind-protect
-             (setf (%view-position view) (add-points pos (subtract-points old-scroll (make-point h v))))
+             (setf (ui::%view-position view) (add-points pos (subtract-points old-scroll (make-point h v))))
           (inval-r-view-sides view t))
-        (setf (%view-position view) pos)))
+        (setf (ui::%view-position view) pos)))
     (inval-r-view-sides view t)))
 
 (defgeneric handle-edit-events (self char)
@@ -804,7 +804,8 @@
   (declare (ignorable patch window))
   (values))
 
-(defmethod clock ((self C-patch)) (clock (clock-obj self)))
+(defmethod clock ((self C-patch))
+  (clock (clock-obj self)))
 
 ;; (defmethod browse ((self C-patch)) (print "no browse boxes"))
 

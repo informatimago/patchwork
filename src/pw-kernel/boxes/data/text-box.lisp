@@ -72,7 +72,7 @@
 (defmethod view-draw-contents ((self C-pw-text-box))
   (pw::with-pen-state (:pattern *white-pattern*) 
     (pw::fill-rect* 1 1 (- (w self) 2) (- (h self) 2)))
-  (set-view-font self  '("Chicago" 9 :SRCOR :PLAIN))
+  (set-view-font self '("Chicago" 9 :SRCOR :PLAIN))
   (with-font-focused-view self 
     (pw::tell (subviews self) 'view-draw-contents)
     (when (pw::active-mode self) 

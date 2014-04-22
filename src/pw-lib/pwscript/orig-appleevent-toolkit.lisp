@@ -356,7 +356,7 @@ Return value: the-desc
   (ae-error (#_AECreateList (%null-ptr) 0 nil the-desc))
   (rlet ((alias :aliashandle))
     (dolist (path paths)
-      (let ((namestring (mac-namestring path)))
+      (let ((namestring (namestring path)))
         (with-cstrs ((cname namestring))
           (#_NewAliasMinimalFromFullPath (length namestring) cname (%null-ptr) (%null-ptr)
            alias)))
