@@ -509,7 +509,9 @@ DO:       Execute the BODY with a handler for CONDITION and
                   
                   (new-leafmenu "-" nil)
                   (setf *pw-debug-menu* (new-leafmenu "PW-debug-ON" (lambda () (flip-pw-debug))))
-                  (new-leafmenu "show error box" 'activate-current-patch-value-patch)
+                  *pw-debug-menu*
+                  (new-leafmenu "Show Scheduler Queue" (lambda () (patchwork.scheduler:print-scheduler-queue)))
+                  (new-leafmenu "Show Error Box" 'activate-current-patch-value-patch)
                   
                   (new-leafmenu "-" nil)
                   (new-menu "Global options"
@@ -571,5 +573,7 @@ DO:       Execute the BODY with a handler for CONDITION and
   ;;------------------------------
   (on-application-did-finish-launching pw-menu-action)
   (on-quit cleanup-PW-wins))
+
+;; (initialize-menus)
 
 ;;;; THE END ;;;;
