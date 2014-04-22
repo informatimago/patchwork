@@ -116,10 +116,8 @@
                                    (user-homedir-pathname)))
 
 (ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
-(setf (logical-pathname-translations "RELEASE") nil
-      (logical-pathname-translations "RELEASE") 
-      (make-logical-pathname-translations "RELEASE" *release-directory*))
-
+(setf (logical-pathname-translations "RELEASE") 
+      (make-logical-pathname-translations "" *release-directory*))
 
 (say "Generating manifest.")
 (let ((*default-pathname-defaults* *release-directory*))
