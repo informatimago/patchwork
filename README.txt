@@ -18,33 +18,59 @@ Compiling Patchwork
 Installing the sources of Patchwork
 -----------------------------------
 
-0- Install quicklisp. cf. _`http://beta.quicklisp.org/`.
+0- Install Clozure CL
 
-1- Get the sources
+1- Install quicklisp. cf. _`http://beta.quicklisp.org/`.
 
-1.1- Get the sources of Patchwork & MCLGUI with git  ::
+2- Obtain the sources and dependencies
 
-        git clone git@gitorious.org:patchwork/patchwork.git
-        git clone git@gitorious.org:patchwork/mclgui.git
+   cd "${SRC}"
+   git clone git@gitorious.org:patchwork/scripts.gitn
+   scripts/get-sources
 
-1.2- Get an up-to-date version of informatimago from git: ::
+3- Compile the dependencies and Patchwork
+
+   cd "${SRC}"
+   scripts/compile-all
+
+
+Sources and dependencies
+----------------------------------------
+
+The sources of patchwork and dependencies are in the following git
+repositories (cf `scripts/get-sources`): ::
+
+    git clone git@gitorious.org:patchwork/scripts.git
+
+    git clone git@gitorious.org:patchwork/midishare.git
+    git clone git@gitorious.org:patchwork/mclgui.git
+    git clone git@gitorious.org:patchwork/patchwork.git
+
+    svn co http://svn.clozure.com/publicsvn/ffigen4/branches/ffigen-apple-gcc-5646/ffigen4
+    svn co https://subversion.assembla.com/svn/portaudio/portaudio/trunk portaudio
+
+
+Informatimago Library
+----------------------------------------
+
+The informatimago library can be obtained from quicklisp, but
+Patchwork may need the latest version of informatimago, before it's
+integrated into the monthly release of quicklisp.
+
+You can get an up-to-date version of informatimago from git: ::
 
         cd ~/quicklisp/local-projects
         git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
 
-     
-     The informatimago library can be obtained from quicklisp, but
-     Patchwork may need the latest version of informatimago, before
-     it's integrated into the monthly release of quicklisp.
 
-     Note: with ccl-1.6 on MacOSX 10.5.8, symbolic links in
-     ``local-projects`` are not processed correctly by quicklisp.
-     Therefore you should put com-informatimago anywhere, eg.: ::
+Note: with ccl-1.6 on MacOSX 10.5.8, symbolic links in
+``local-projects`` are not processed correctly by quicklisp.
+Therefore you should put com-informatimago anywhere, eg.: ::
 
         cd ~/src
         git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
         
-     and just add this path to the list ``ql:*local-project-directories*``: ::
+and just add this path to the list ``ql:*local-project-directories*``: ::
        
         (push (merge-pathnames #P"./src/com-informatimago/" (user-homedir-pathname))
               ql:*local-project-directories*)
@@ -69,7 +95,6 @@ Installing the sources of Patchwork
                                     (user-homedir-pathname) nil)))
 
 
-
 Loading and compiling for development
 -------------------------------------
 
@@ -79,9 +104,7 @@ Loading and compiling for development
 
 2- (cd #P"/directory/where/are/installed/the/sources/of/patchwork/")
 
-3- (shell "make -C /directory/where/are/installed/the/sources/of/patchwork/ clean")
-
-4- (load "loader.lisp")
+3- (load "loader.lisp")
 
 
 Generate the Patchwork.app application
@@ -96,7 +119,7 @@ Generate the Patchwork.app application
 
 The application is stored in a directory on the Desktop whose name
 contains the version numbers of ccl and of the system,
-eg. ``~/Desktop/patchwork-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/``.
+eg. ``~/Desktop/patchwork-10.0-0.000-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/``.
 
 A manifest file is written to containing the systems used and their licenses.
 
