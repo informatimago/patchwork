@@ -714,7 +714,6 @@ On the MacMini,
 uname -a
 Darwin galatea 11.4.2 Darwin Kernel Version 11.4.2: Thu Aug 23 16:26:45 PDT 2012; root:xnu-1699.32.7~1/RELEASE_I386 i386
 
-
 *** MacPort - /opt/local/bin/ccl 
 
 /opt/local/bin/ccl  --version
@@ -723,7 +722,6 @@ Version 1.8  (DarwinX8632)
 arch is i386 therefore /opt/local/bin/ccl loads in 32-bit.
 
 - This fails in %ff-call somewhere in the main event run loop.
-
 
 *** Personnalized - /data/languages/ccl/bin/ccl
 
@@ -734,7 +732,6 @@ Version 1.8  (DarwinX8664)
 forced 64-bit, with patches (with-standard-io-syntax (format …)) for selectors.
 
 - Success. 
-
 
 *** Clozure CL.app from the AppStore
 
@@ -869,7 +866,6 @@ set-allow-tabs
 cut copy paste clear
 undo undo-more     -[[NSResponder undoManager] undo]
 select-all         -[NSResponder selectAll:]
-
 
 
 * Files
