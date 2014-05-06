@@ -148,10 +148,5 @@ generate-new-ccl:
 		$(LISP_EVAL) '(ccl:quit)'
 
 
-touch:
-	touch ~/quicklisp/local-projects/com/informatimago/common-lisp/lisp/stepper-packages.lisp
-	touch src/mclgui/package.lisp
-	touch src/patchwork-package.lisp
-
 #### THE END ####
 

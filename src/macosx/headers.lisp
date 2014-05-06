@@ -74,4 +74,29 @@
                      (headers-wild-pathname name 64))
                (logical-pathname-translations "CCL"))))
 
+(defun generate-populate.sh (name)
+  (loop :for options :in '("-m32 -msse2" "-m64")
+        :for dir :in '("darwin-x86-headers" "darwin-x86-headers64")
+        :do (let ((path (pathname (format nil "CCL:~A;~(~A~);C;populate.sh" dir name))))
+              (print path)
+              (ensure-directories-exist path)
+              (with-open-file (stream path :direction :output :if-does-not-exist :create :if-exists :supersede)
+                (let ((*print-circle* nil) (*print-escape* nil) (*print-case* :upcase))
+                  (format stream "
+if [ \"$(basename \"$(pwd)\")\" = C -a \"$(basename \"$(dirname \"$(pwd)\")\")\" = ~(~A~) ] ; then
+    rm -rf System Developer usr
+    if [ -x /Developer/SDKs/MacOSX10.6.sdk ] ; then
+        SDK=/Developer/SDKs/MacOSX10.6.sdk
+    else
+        SDK=
+    fi
+    CFLAGS=\"~A -fobjc-abi-version=2 -isysroot ${SDK} -mmacosx-version-min=10.6\"
+    export CFLAGS
+    h-to-ffi.sh ${SDK}/System/Library/Frameworks/~0@*~A.framework/Headers/~0@*~A.h
+else
+    echo \"Please   cd ~(~:*~A~)/C   before running   sh ./populate.sh\"
+fi
+" name options))))))
+
+
 ;;;; THE END ;;;;

@@ -1,3 +1,4 @@
+
 if [ "$(basename "$(pwd)")" = C -a "$(basename "$(dirname "$(pwd)")")" = coreservices ] ; then
     rm -rf System Developer usr
     SDK=/Developer/SDKs/MacOSX10.6.sdk

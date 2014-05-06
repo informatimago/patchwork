@@ -41,18 +41,19 @@
 (load (merge-pathnames "headers.lisp" *additionnal-headers-directory*))
 
 (add-headers-logical-pathname-translations "midishare")
-(ensure-directories-exist #P"CCL:darwin-x86-headers;midishare;test.file")
-(ensure-directories-exist #P"CCL:darwin-x86-headers64;midishare;test.file")
+(generate-populate.sh "MidiShare")
 (ccl::parse-standard-ffi-files :midishare)
 
 (add-headers-logical-pathname-translations "player")
-(ensure-directories-exist #P"CCL:darwin-x86-headers;player;test.file")
-(ensure-directories-exist #P"CCL:darwin-x86-headers64;player;test.file")
+(generate-populate.sh "Player")
 (ccl::parse-standard-ffi-files :player)
 
 (add-headers-logical-pathname-translations "coreservices")
-(ensure-directories-exist #P"CCL:darwin-x86-headers;coreservices;test.file")
-(ensure-directories-exist #P"CCL:darwin-x86-headers64;coreservices;test.file")
+(generate-populate.sh "CoreServices")
 (ccl::parse-standard-ffi-files :coreservices)
+
+(add-headers-logical-pathname-translations "coregraphics")
+(generate-populate.sh "CoreGraphics")
+(ccl::parse-standard-ffi-files :coregraphics)
 
 ;;;; THE END ;;;;
