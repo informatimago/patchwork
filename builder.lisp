@@ -147,9 +147,10 @@
                                       nil)
                      #P"~/works/patchwork/src/")))
   (setf (logical-pathname-translations "PATCHWORK")
-        (make-logical-pathname-translations ""            (merge-pathnames "patchwork/" base))
-        (logical-pathname-translations "MCLGUI")
+        (make-logical-pathname-translations ""            (merge-pathnames "patchwork/" base)))
+  (setf (logical-pathname-translations "MCLGUI")
         (make-logical-pathname-translations ""            (merge-pathnames "mclgui/" base))))
+
 
 
 (defun cd (path)
