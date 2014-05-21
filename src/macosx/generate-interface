@@ -1,0 +1,2 @@
+#!/bin/bash
+ccl -norc -l generate-interfaces.lisp -e '(quit)'
