@@ -31,7 +31,9 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
+
 (in-package :cl-user)
+(require :asdf)
 (require :parse-ffi)
 
 (defparameter *additionnal-headers-directory*
@@ -40,20 +42,18 @@
 
 (load (merge-pathnames "headers.lisp" *additionnal-headers-directory*))
 
-(add-headers-logical-pathname-translations "midishare")
-(generate-populate.sh "MidiShare")
-(ccl::parse-standard-ffi-files :midishare)
+(defun generate-interface (interface dependencies)
+  (let* ((lc-interface (string-downcase interface))
+         (kw-interface (intern (string-upcase interface) :keyword)))
+    (add-headers-logical-pathname-translations lc-interface)
+    (generate-populate.sh interface dependencies)
+    (populate interface)
+    (ccl::parse-standard-ffi-files kw-interface)
+    (force-output)))
 
-(add-headers-logical-pathname-translations "player")
-(generate-populate.sh "Player")
-(ccl::parse-standard-ffi-files :player)
-
-(add-headers-logical-pathname-translations "coreservices")
-(generate-populate.sh "CoreServices")
-(ccl::parse-standard-ffi-files :coreservices)
-
-(add-headers-logical-pathname-translations "coregraphics")
-(generate-populate.sh "CoreGraphics")
-(ccl::parse-standard-ffi-files :coregraphics)
+(generate-interface "CoreGraphics")
+(generate-interface "CoreServices")
+(generate-interface "MidiShare")
+(generate-interface "Player" '("MidiShare"))
 
 ;;;; THE END ;;;;

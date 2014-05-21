@@ -74,22 +74,30 @@
                      (headers-wild-pathname name 64))
                (logical-pathname-translations "CCL"))))
 
-(defun generate-populate.sh (name)
+(defun populate-path (name bits)
+  (pathname (format nil "CCL:~A;~(~A~);C;populate.sh"
+                    (ecase bits
+                      (32 "darwin-x86-headers")
+                      (64 "darwin-x86-headers64"))
+                    name)))
+
+(defun generate-populate.sh (name &optional dependencies)
   (loop :for options :in '("-m32 -msse2" "-m64")
-        :for dir :in '("darwin-x86-headers" "darwin-x86-headers64")
-        :do (let ((path (pathname (format nil "CCL:~A;~(~A~);C;populate.sh" dir name))))
-              (print path)
+        :for bits :in '(32 64)
+        :do (let ((path (populate-path name bits)))
               (ensure-directories-exist path)
               (with-open-file (stream path :direction :output :if-does-not-exist :create :if-exists :supersede)
+                (print (truename (pathname stream)))
                 (let ((*print-circle* nil) (*print-escape* nil) (*print-case* :upcase))
                   (format stream "
 if [ \"$(basename \"$(pwd)\")\" = C -a \"$(basename \"$(dirname \"$(pwd)\")\")\" = ~(~A~) ] ; then
     rm -rf System Developer usr
-    if [ -x /Developer/SDKs/MacOSX10.6.sdk ] ; then
-        SDK=/Developer/SDKs/MacOSX10.6.sdk
-    else
-        SDK=
-    fi
+    # if [ -x /Developer/SDKs/MacOSX10.6.sdk ] ; then
+    #     SDK=/Developer/SDKs/MacOSX10.6.sdk
+    # else
+    #     SDK=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
+    # fi
+    SDK=''
     CFLAGS=\"~A -fobjc-abi-version=2 -isysroot ${SDK} -mmacosx-version-min=10.6\"
     export CFLAGS
     h-to-ffi.sh ${SDK}/System/Library/Frameworks/~0@*~A.framework/Headers/~0@*~A.h
@@ -97,6 +105,12 @@ else
     echo \"Please   cd ~(~:*~A~)/C   before running   sh ./populate.sh\"
 fi
 " name options))))))
+
+(defun populate (name)
+  (loop :for  bits :in '(32 64)
+        :do (asdf:run-shell-command (print (format nil "cd ~S ; chmod a+x ./populate.sh ; ./populate.sh"
+                                                   (namestring (truename (make-pathname :name nil :type nil :version nil
+                                                                                        :defaults (populate-path name bits)))))))))
 
 
 ;;;; THE END ;;;;
