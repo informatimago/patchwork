@@ -42,18 +42,18 @@
 
 (load (merge-pathnames "headers.lisp" *additionnal-headers-directory*))
 
-(defun generate-interface (interface dependencies)
+(defun generate-interface (interface &key dependencies defines)
   (let* ((lc-interface (string-downcase interface))
          (kw-interface (intern (string-upcase interface) :keyword)))
     (add-headers-logical-pathname-translations lc-interface)
-    (generate-populate.sh interface dependencies)
+    (generate-populate.sh interface dependencies defines)
     (populate interface)
     (ccl::parse-standard-ffi-files kw-interface)
     (force-output)))
 
 (generate-interface "CoreGraphics")
 (generate-interface "CoreServices")
-(generate-interface "MidiShare")
-(generate-interface "Player" '("MidiShare"))
+(generate-interface "MidiShare"  :defines '(("__Types__" 1)))
+(generate-interface "Player"     :defines '(("__Types__" 1)) :dependencies '("MidiShare"))
 
 ;;;; THE END ;;;;
