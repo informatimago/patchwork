@@ -74,29 +74,62 @@
                      (headers-wild-pathname name 64))
                (logical-pathname-translations "CCL"))))
 
-(defun generate-populate.sh (name)
+(defun populate-path (name bits)
+  (pathname (format nil "CCL:~A;~(~A~);C;populate.sh"
+                    (ecase bits
+                      (32 "darwin-x86-headers")
+                      (64 "darwin-x86-headers64"))
+                    name)))
+
+
+(defun directory-exists-p (path)
+  (directory path))
+
+(defun make-framework-headers-directory (framework-directory framework-name)
+  (format nil "~A/~A.framework/Headers/" framework-directory framework-name))
+
+(defun find-framework-headers-directory (framework-name)
+  (dolist (framework-directory '("/System/Library/Frameworks" "/Library/Frameworks") nil)
+    (let ((path (make-framework-headers-directory framework-directory framework-name)))
+      (when (directory-exists-p path)
+        (return path)))))
+
+;; /Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/
+;; /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/
+;; /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/
+
+
+(defun generate-populate.sh (name &optional dependencies defines)
   (loop :for options :in '("-m32 -msse2" "-m64")
-        :for dir :in '("darwin-x86-headers" "darwin-x86-headers64")
-        :do (let ((path (pathname (format nil "CCL:~A;~(~A~);C;populate.sh" dir name))))
-              (print path)
+        :for bits :in '(32 64)
+        :do (let ((path (populate-path name bits)))
               (ensure-directories-exist path)
               (with-open-file (stream path :direction :output :if-does-not-exist :create :if-exists :supersede)
                 (let ((*print-circle* nil) (*print-escape* nil) (*print-case* :upcase))
-                  (format stream "
+                  (format stream "#!/bin/sh
 if [ \"$(basename \"$(pwd)\")\" = C -a \"$(basename \"$(dirname \"$(pwd)\")\")\" = ~(~A~) ] ; then
     rm -rf System Developer usr
-    if [ -x /Developer/SDKs/MacOSX10.6.sdk ] ; then
-        SDK=/Developer/SDKs/MacOSX10.6.sdk
-    else
-        SDK=
-    fi
-    CFLAGS=\"~A -fobjc-abi-version=2 -isysroot ${SDK} -mmacosx-version-min=10.6\"
+    CFLAGS=\"~A -fobjc-abi-version=2 -isysroot / -mmacosx-version-min=10.6 ~:{-D~A=~A~^ ~}\"
     export CFLAGS
-    h-to-ffi.sh ${SDK}/System/Library/Frameworks/~0@*~A.framework/Headers/~0@*~A.h
+    h-to-ffi.sh  ~{-I~A~^ ~}  ~A~0@*~A.h
 else
     echo \"Please   cd ~(~:*~A~)/C   before running   sh ./populate.sh\"
 fi
-" name options))))))
+"
+                          name
+                          options
+                          defines
+                          (mapcar (function find-framework-headers-directory) dependencies)
+                          (find-framework-headers-directory name)))))))
+
+
+
+
+(defun populate (name)
+  (loop :for  bits :in '(32 64)
+        :do (asdf:run-shell-command (format nil "cd ~S ; chmod a+x ./populate.sh ; ./populate.sh"
+                                                   (namestring (truename (make-pathname :name nil :type nil :version nil
+                                                                                        :defaults (populate-path name bits))))))))
 
 
 ;;;; THE END ;;;;

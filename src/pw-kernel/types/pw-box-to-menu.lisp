@@ -40,24 +40,24 @@
 
 (defun PW-addmenu-fun (menu fun &optional box-class)
   "append to the menu <menu> the PW module generator <fun>"
-  (assert
-   (or (null fun)
-       (typep fun 'menu-element)
-       (and (symbolp fun) (fboundp fun)))
-   (fun) "~S is not a function or nil or a menu." fun)
+  (assert (or (null fun)
+              (typep fun 'menu-element)
+              (and (symbolp fun) (fboundp fun)))
+          (fun) "~S is not a function or nil or a menu." fun)
   (cond
-   ((null fun)
-    (ui:add-menu-items menu
-          (make-instance 'ui:menu-item :menu-item-title "-" :menu-item-action ())))
-   ((typep fun 'menu-element)
-    (ui:add-menu-items menu fun))
-   (t (if (defunp-function? fun)
-        (new-PW-box-menu-item menu (string-downcase fun) fun box-class)
-        (ui:add-menu-items menu
-                            (make-instance 'ui:menu-item 
-                              :menu-item-title (string-downcase fun)
-                                           :menu-item-action
-                                           (lambda () 
+    ((null fun)
+     (ui:add-menu-items menu (make-instance 'ui:menu-item
+                                            :menu-item-title "-"
+                                            :menu-item-action nil)))
+    ((typep fun 'menu-element)
+     (ui:add-menu-items menu fun))
+    (t (if (defunp-function? fun)
+           (new-PW-box-menu-item menu (string-downcase fun) fun box-class)
+           (ui:add-menu-items menu
+                              (make-instance 'ui:menu-item 
+                                             :menu-item-title (string-downcase fun)
+                                             :menu-item-action
+                                             (lambda () 
                                                (make-lisp-pw-boxes
                                                 fun *active-patch-window*))))))))
 

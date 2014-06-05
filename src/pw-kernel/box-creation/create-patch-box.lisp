@@ -217,8 +217,10 @@
           (multiple-value-bind (args extensible?) (get-lisp-function-arg-list function)
             (add-patch-box win 
                            (make-patch-box
-                            (if extensible? 'C-pw-lispfun
-                                (if (<= (length args) 2) 'C-pw-resize-x 'C-patch))
+                            (cond
+                              (extensible?           'C-pw-lispfun)
+                              ((= (length args) 2)   'C-pw-resize-x)
+                              (t                     'C-patch))
                             function args))))))
 
 ;; =============================================================================-======

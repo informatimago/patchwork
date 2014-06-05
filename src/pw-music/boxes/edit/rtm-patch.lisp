@@ -157,7 +157,8 @@
       (when (nth-connected-p self 0)
         ;(init-patch (car (input-objects self)))
         (setf (measures measure-line) measures)
-        (with-focused-view (application-object self) (erase+view-draw-contents (application-object self))))
+        (with-focused-view (application-object self)
+          (erase+view-draw-contents (application-object self))))
       measure-line)))
 
 ;;==================

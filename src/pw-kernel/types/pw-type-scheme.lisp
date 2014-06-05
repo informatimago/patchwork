@@ -600,13 +600,15 @@
 
 (defun make-functional-pw-boxes (function win) 
   (if (not (fboundp function))
-     (format t "~15A~25A" function "no such function !" )
-     (multiple-value-bind (args extensible?) (make-defunp-function-arg-list function)
-       (add-patch-box win 
-                      (make-PW-standard-box
-                       (if extensible? 'C-pw-functional
-                           (if (= (length args) 2) 'C-pw-resize-x 'C-patch))
-                       function)))))
+      (format t "~15A~25A" function "no such function !" )
+      (multiple-value-bind (args extensible?) (make-defunp-function-arg-list function)
+        (add-patch-box win 
+                       (make-PW-standard-box
+                        (cond
+                          (extensible?           'C-pw-functional)
+                          ((= (length args) 2)   'C-pw-resize-x)
+                          (t                     'C-patch))
+                        function)))))
 
 
 ;; (progn

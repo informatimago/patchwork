@@ -586,10 +586,8 @@
   (progn
     (setf *list-pw-script-objects* nil)
     (setf *contador-pw-script-object* 0)
-    (if (not *active-patch-window*) 
-        (make-new-pw-window t) 
-        (if (not *active-patch-window*) 
-            (search-for-next-pw-window))) 
+    (unless *active-patch-window* 
+      (make-new-pw-window t)) 
     (enable-all-apps-menu-items)
     (menu-item-disable *apps-PW-menu-item*)
     (window-select  *active-patch-window*)))
