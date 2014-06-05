@@ -333,21 +333,24 @@
 
 (defgeneric kill-patch-window (self))
 (defmethod kill-patch-window ((self C-pw-window))
-  (if (top-level-patch-win? self) (window-close self)))
+  (when (top-level-patch-win? self)
+    (window-close self)
+    (when (eq *active-patch-window* self)
+      (search-for-next-pw-window))))
 
 (defmethod window-close ((self C-pw-window))
-  (if (and  (top-level-patch-win? self) ;;
-            (save-changes-to-file-flag self)
-            (not *pw-nosave-mode*))
-      (if (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self)))
-          (PW-WINDOW-SAVE-MN self)))
+  (when (and (top-level-patch-win? self) 
+             (save-changes-to-file-flag self)
+             (not *pw-nosave-mode*)
+             (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self))))
+    (PW-WINDOW-SAVE-MN self))
   (view-deactivate-event-handler self)
-  (if (wins-menu-item self)
-      (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
+  (when (wins-menu-item self)
+    (remove-menu-items *pw-windows-menu* (wins-menu-item self)))
   (setq *pw-window-list* (remove self *pw-window-list* :test 'eq)) 
   (tell (controls self) 'remove-yourself-control)
   (call-next-method)
-  (record-event :|core| :|clos| `((,:|----| , :|cpat| ))))
+  (record-event :|core| :|clos| `((:|----| :|cpat|))))
 
 ;;=============================
 

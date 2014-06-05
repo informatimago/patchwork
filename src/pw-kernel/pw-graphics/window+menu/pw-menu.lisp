@@ -100,9 +100,8 @@
 
 (defun search-for-next-pw-window ()
   (setf *active-patch-window* (ask *pw-window-list* 'top-level-patch-win?))
-  (if *active-patch-window*
-      (window-select *active-patch-window*)
-      (make-new-pw-window t)))
+  (when *active-patch-window*
+    (window-select *active-patch-window*)))
 
 ;;=========================================
 ;; file

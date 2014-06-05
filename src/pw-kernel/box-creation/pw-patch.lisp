@@ -71,9 +71,10 @@
   ((fill-state :initform nil :accessor %outrect-fill-state)))
 
 (defmethod view-draw-contents ((self C-pw-outrect))
-  ;; (draw-rect* (x self) (y self) (w self) (h self))
-  (with-focused-view self
-    (draw-rect* 0 0 (w self) (h self))))
+  (draw-rect* (x self) (y self) (w self) (h self))
+  ;; (with-focused-view self
+  ;;   (draw-rect* 0 0 (w self) (h self)))
+  )
 
 
 (defgeneric fill-patch-outrect (self)
@@ -340,10 +341,11 @@
 ;;======================================================
 ;;draw
 
-(defmethod view-focus-and-draw-contents ((v C-patch) &optional visrgn cliprgn)
-  (declare (ignore visrgn cliprgn))
-  (with-focused-view v
-    (view-draw-contents v)))
+
+#-(and) (defmethod view-focus-and-draw-contents ((v C-patch) &optional visrgn cliprgn)
+          (declare (ignore visrgn cliprgn))
+          (with-focused-view v
+            (view-draw-contents v)))
 
 (defmethod view-draw-contents ((self C-patch))
   (set-view-font self '("Monaco" 9 :SRCOR :PLAIN))
@@ -938,7 +940,7 @@ tutorial file only if the names differ"
     (push win *pw-window-list*) 
     (update-wins-menu-items win)
     (record-event :|core| :|crel| `((,:|kocl| ,:|cpat| )))
-    win))
+    (setf *active-patch-window* win)))
 
 
 ;;;; THE END ;;;;

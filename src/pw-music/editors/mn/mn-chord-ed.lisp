@@ -68,13 +68,15 @@
           (*mn-view-time-flag*
            (draw-offset-chord self (car (visible-chords self))
                               zoom-scale scroll-pos MN-offset MN-C5))
-          (t (draw-chord  (car (visible-chords self)) 1 
-                          MN-offset (t-time (car (visible-chords self))) MN-C5)
-             (if *mn-view-channel-flag*
-                 (draw-all-channels self (car (visible-chords self)) MN-offset
-                                    (t-time (car (visible-chords self))) MN-C5)))) ))
+          ((not (visible-chords self)))
+          (t
+           (draw-chord (car (visible-chords self)) 1 
+                       MN-offset (t-time (car (visible-chords self))) MN-C5)
+           (if *mn-view-channel-flag*
+               (draw-all-channels self (car (visible-chords self)) MN-offset
+                                  (t-time (car (visible-chords self))) MN-C5)))) ))
 
-(defconstant *arp-note-offset* 18)
+(defparameter *arp-note-offset* 18)
 
 ;; (defmethod draw-arpeggiated-chord ((self C-MN-panel-ChordBox) chord 
 ;;                                    zoom-scale scroll-pos MN-offset MN-C5)
