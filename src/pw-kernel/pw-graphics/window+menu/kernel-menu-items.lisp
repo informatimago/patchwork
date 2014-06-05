@@ -36,19 +36,20 @@
 
 
 (defun init-patch-pos (win patch)
-  (unless *position-new-box*
-    (setf *position-new-box*
-          (if win
-              (add-points (view-position win)
-                          (make-point (random (point-h (view-size win)))
-                                      (random (point-v (view-size win)))))
-              (make-point 10 10))))
-  (let* ((x (point-h *position-new-box*))
-         (y (point-v *position-new-box*)))
-    (when win
-      (setf x (min x (point-h (view-size win)))
-            y (min y (point-v (view-size win)))))
-    (set-view-position patch (make-point x y))))
+  (let* ((wsize (if win
+                    (subtract-points (view-size win)
+                                     (view-size patch))
+                    (make-point 10 10)))
+         (ww (point-h wsize))
+         (wh (point-v wsize)))
+    (unless *position-new-box*
+      (setf *position-new-box* (make-point (random ww) (random wh))))
+    (let* ((x (point-h *position-new-box*))
+           (y (point-v *position-new-box*)))
+      (when win
+        (setf x (min x ww)
+              y (min y wh)))
+      (set-view-position patch (make-point x y)))))
 
 (defun new-PW-sub-menu-item (main-menu mtitle patch-type box-title type-forms
                              &optional type-list defaults-list)
