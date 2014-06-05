@@ -97,14 +97,10 @@
 
 (defun make-logical-pathname-translations (logical-base physical-base)
   (list
-   (list (format nil "~A**;*.*.*"    logical-base)
-         (merge-pathnames #P"**/*.*" physical-base nil))
-   (list (format nil "~A**;*.*"      logical-base)
-         (merge-pathnames #P"**/*.*" physical-base  nil))
-   (list (format nil "~A**;*"        logical-base)
-         (merge-pathnames #P"**/*"   physical-base  nil))
-   (list (format nil "~A**;"         logical-base)
-         (merge-pathnames #P"**/"    physical-base  nil))))
+   (list (format nil "~A**;*.*.*"    logical-base) (merge-pathnames #P"**/*.*" physical-base nil))
+   (list (format nil "~A**;*.*"      logical-base) (merge-pathnames #P"**/*.*" physical-base  nil))
+   (list (format nil "~A**;*"        logical-base) (merge-pathnames #P"**/*"   physical-base  nil))
+   (list (format nil "~A**;"         logical-base) (merge-pathnames #P"**/"    physical-base  nil))))
 
 
 
