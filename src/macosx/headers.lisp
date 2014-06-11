@@ -34,6 +34,42 @@
 ;;;;**************************************************************************
 (in-package :cl-user)
 
+
+;;; MacOSX Framework directories:
+
+(defun directory-exists-p (path)
+  (directory path))
+
+(defun make-framework-directory (framework-directory framework-name)
+  (format nil "~A/~A.framework/" framework-directory framework-name))
+
+(defun make-framework-headers-directory (framework-directory framework-name)
+  (format nil "~AHeaders/"
+          (make-framework-directory framework-directory framework-name)))
+
+(defun make-framework-library-file (framework-directory framework-name)
+  (format nil "~A~A"
+          (make-framework-directory framework-directory framework-name)
+          framework-name))
+
+
+(defun find-framework-path (item framework-name)
+  (check-type item (member :framework :headers :library))
+  (dolist (framework-directory '("/System/Library/Frameworks" "/Library/Frameworks") nil)
+    (let ((path (funcall (ecase item
+                           (:framework (function make-framework-directory))
+                           (:headers   (function make-framework-headers-directory))
+                           (:library   (function make-framework-library-file)))
+                         framework-directory framework-name)))
+      (when (directory-exists-p path)
+        (return path)))))
+
+(defun find-framework-headers-directory (framework-name)
+  (find-framework-path :headers framework-name))
+
+
+;;; CCL Header directories:
+
 (defparameter *additionnal-headers-directory*
   (make-pathname :name nil :type nil :version nil
                  :defaults (truename #.(or *compile-file-pathname* *load-pathname* #P"./"))))
@@ -82,17 +118,8 @@
                     name)))
 
 
-(defun directory-exists-p (path)
-  (directory path))
 
-(defun make-framework-headers-directory (framework-directory framework-name)
-  (format nil "~A/~A.framework/Headers/" framework-directory framework-name))
-
-(defun find-framework-headers-directory (framework-name)
-  (dolist (framework-directory '("/System/Library/Frameworks" "/Library/Frameworks") nil)
-    (let ((path (make-framework-headers-directory framework-directory framework-name)))
-      (when (directory-exists-p path)
-        (return path)))))
+;;; CCL interface generation from headers:
 
 ;; /Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/
 ;; /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/

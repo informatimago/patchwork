@@ -34,33 +34,19 @@
 (in-package "COMMON-LISP-USER")
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  
-  (defun load-coreservices-library ()
-    (add-headers-logical-pathname-translations "coreservices")
-    (ccl:open-shared-library "/System/Library/Frameworks/CoreServices.framework/CoreServices")
-    (ccl:use-interface-dir :coreservices)
-    (pushnew :has-appleevent *features*))
-
-  (defun load-midishare-library ()
-    (add-headers-logical-pathname-translations "midishare")
-    (ccl:open-shared-library "/Library/Frameworks/MidiShare.framework/MidiShare")
-    (ccl:use-interface-dir :midishare)
-    (pushnew :has-midishare *features*))
-
-    (defun load-midiplayer-library ()
-    (add-headers-logical-pathname-translations "player")
-    (ccl:open-shared-library "/Library/Frameworks/Player.framework/Player")
-    (ccl:use-interface-dir :player)
-    (pushnew :has-midiplayer *features*))
-
-  );;eval-when
-
+  (defun load-framework (name)
+    (add-headers-logical-pathname-translations (string-downcase name))
+    (ccl:open-shared-library (find-framework-path :library name))
+    (ccl:use-interface-dir (intern (string-upcase name) (load-time-value (find-package "KEYWORD"))))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (load-coreservices-library)
-  (load-midishare-library)
-  (load-midiplayer-library))
-
+  (load-framework "CoreServices")
+  (pushnew :has-appleevent *features*)
+  (load-framework "CoreGraphics")
+  (load-framework "MidiShare")
+  (pushnew :has-midishare *features*)
+  (load-framework "Player")
+  (pushnew :has-midiplayer *features*))
 
 #||
 
