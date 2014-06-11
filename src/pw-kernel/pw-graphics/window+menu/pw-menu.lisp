@@ -571,7 +571,9 @@ DO:       Execute the BODY with a handler for CONDITION and
   (epw::initialize-epw-menus)
   ;;------------------------------
   (on-application-did-finish-launching pw-menu-action)
-  (on-quit cleanup-PW-wins))
+  (on-application-should-terminate cleanup-PW-wins)
+  ;; (on-quit cleanup-PW-wins)
+  )
 
 ;; (initialize-menus)
 
