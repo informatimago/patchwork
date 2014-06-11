@@ -328,14 +328,15 @@
                   (format-trace 'view-click-event-handler "toggle patch active" (list (point-h where) (point-v where)) self)
                   (toggle-patch-active-mode self))))
           ((option-key-p)                ;inside controls
-           (format-trace 'view-click-event-handler 'bad-call-next-method)
+           (format-trace 'view-click-event-handler `(bad with option-key-p (call-next-method) -> ,res))
            (let ((ctrl (ask (pw-controls self) #'view-contains-point-p+self where)))
              (when ctrl 
                (disconnect-ctrl self ctrl)
                (record-event :|PWst| :|unco|
                              `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string self)) 
                                                 :|indx| (+ (position ctrl (input-objects self)) 1))))))))
-          (t          (format-trace 'view-click-event-handler 'bad-call-next-method))))) 
+          (t
+           (format-trace 'view-click-event-handler `(bad (call-next-method) -> ,res)))))) 
 
 
 ;;======================================================

@@ -134,17 +134,7 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
-#+swank (progn
-          (defvar *slime-input*  *standard-input*)
-          (defvar *slime-output* *standard-output*))
-(defun start-patchwork ()
-  (ui:on-main-thread/sync
-    #+swank (setf *trace-output* *slime-output*)
-    (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
-    (pw::initialize-patchwork)))
-(import 'start-patchwork "COMMON-LISP-USER")
-(let ((*print-circle* nil))
-  (format t "~&;; Use ~S to start Patchwork.~%~:*~S~%~S~%(in-package :pw)~%" '(start-patchwork) '(with-streams (pw::initialize-patchwork))))
+
 
 (defmacro with-streams (&body body)
   `(let ((*terminal-io* *terminal-io*)
@@ -155,6 +145,26 @@
          (*query-io* *query-io*)
          (*debug-io* *debug-io*))
      ,@body))
+
+#+swank (progn
+          (defvar *slime-input*  *standard-input*)
+          (defvar *slime-output* *standard-output*))
+
+(defun start-patchwork ()
+  (ui:on-main-thread/sync
+    #+swank (setf *trace-output* *slime-output*)
+    (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
+    (pw::initialize-patchwork)))
+
+(import 'start-patchwork "COMMON-LISP-USER")
+(import 'with-streams    "COMMON-LISP-USER")
+
+(in-package "COMMON-LISP-USER")
+(let ((*print-circle* nil))
+  (format t "~&;; Use ~S to start Patchwork.~%~:*~S~%~S~%(in-package :pw)~%"
+          '(start-patchwork)
+          '(with-streams (pw::initialize-patchwork))))
+
 
 
 ;;; --------------------------------------------------------------------
