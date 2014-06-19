@@ -71,10 +71,8 @@
   ((fill-state :initform nil :accessor %outrect-fill-state)))
 
 (defmethod view-draw-contents ((self C-pw-outrect))
-  (draw-rect* (x self) (y self) (w self) (h self))
-  ;; (with-focused-view self
-  ;;   (draw-rect* 0 0 (w self) (h self)))
-  )
+  (with-focused-view self
+    (draw-rect* 0 0 (w self) (h self))))
 
 
 (defgeneric fill-patch-outrect (self)
@@ -449,7 +447,8 @@
               (while ctrl
                 (unless (eq erase-mode *white-pattern*) 
                   (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
-                                       *object-connection-draw-mode* *normal-connection-draw-mode*)))
+                                       *object-connection-draw-mode*
+                                       *normal-connection-draw-mode*)))
                 (with-pen-state (:pattern erase-mode)
                   (setq x1 (mid-x (out-put (car ctrl))))
                   (setq y1 (mid-y (out-put (pop ctrl))))

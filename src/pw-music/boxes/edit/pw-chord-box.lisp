@@ -152,10 +152,12 @@
             (draw-connections patch ))))
     ))
 
-(defmethod draw-patch-extra ((self C-patch-chord-box-M )) )
+(defmethod draw-patch-extra ((self C-patch-chord-box-M ))
+  (values))
 
 (defmethod draw-appl-label ((self C-patch-chord-box-M ) label)
-                            (declare (ignore label)))
+  (declare (ignore label))
+  (values))
   
 (defmethod open-patch-win ((self C-patch-chord-box-M ))
   (if (or (not (mus-not-editor self)) 

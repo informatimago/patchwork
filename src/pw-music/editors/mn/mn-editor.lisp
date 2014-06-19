@@ -395,7 +395,7 @@
       (erase-yourself panel)
       (set-origin panel (make-point new-value (point-v (view-scroll-position panel))))
       (view-draw-contents panel)
-                                        ;(update-all-selections panel)
+      ;;(update-all-selections panel)
       )))
 
 (defmethod ui::normal-scroll-bar-limits ((view C-mus-not-view) max-h &optional max-v)
@@ -674,8 +674,7 @@
 (defmethod scroll-bar-changed ((view C-music-notation-panel) scroll-bar)
   (let ((h-pos (point-h (view-scroll-position view))))
     (erase-yourself view)
-    (set-origin view 
-                (make-point h-pos (scroll-bar-setting scroll-bar)))
+    (set-origin view (make-point h-pos (scroll-bar-setting scroll-bar)))
     (view-draw-contents view)
     (update-all-selections view)))
 ;;==============
@@ -708,8 +707,8 @@
   (setf (active-chord self) ()) 
   (setf (active-note self) ()) 
   (with-focused-view self
-    (erase-draw-contents self))
-  (view-draw-contents self))
+    (erase-draw-contents self)
+    (view-draw-contents self)))
 
 ;;==============
 ;;events

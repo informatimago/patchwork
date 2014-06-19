@@ -133,8 +133,8 @@
 (defgeneric erase+view-draw-contents (self)
   (:method ((self simple-view))
     (with-focused-view self
-      (erase-view-inside-rect self))
-    (view-draw-contents self)))
+      (erase-view-inside-rect self)
+      (view-draw-contents self))))
 
 (defgeneric view-draw-out-line (self)
   (:method ((self simple-view))

@@ -218,10 +218,11 @@
   (:method ((self C-mini-bpf-view))
     (with-focused-view self
       (with-pen-state (:pattern *white-pattern*)
+        ;; TODO: this is view-bounds
         (fill-rect*  (point-h (view-scroll-position self)) 
-                     (point-v (view-scroll-position self)) (w self)(h self))))
-    (scale-to-fit-in-rect self)
-    (view-draw-contents self)))
+                     (point-v (view-scroll-position self)) (w self)(h self)))
+      (scale-to-fit-in-rect self)
+      (view-draw-contents self))))
 
 
 

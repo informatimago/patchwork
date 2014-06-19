@@ -244,8 +244,8 @@
   (:method ((self C-ttybox) fl)
     (setf (open-state self) fl)
     (with-focused-view self
-      (erase-view-inside-rect self))
-    (view-draw-contents self)))
+      (erase-view-inside-rect self)
+      (view-draw-contents self))))
 
 ;;=========================
 ;;events
@@ -443,8 +443,8 @@
                                           (max (min-val self) (min (max-val self)
                                                                    (+ last-value 
                                                                       (* (map-mouse-increment self) (- first-v (point-v last-mp))))))))
-              (view-draw-contents self)
               (with-focused-view self
+                (view-draw-contents self)
                 (draw-rect* 1 1 (- (w self) 2)(- (h self) 2)))
               (item-action-while-drag self))))))
     (item-action-after-drag self)

@@ -470,9 +470,10 @@
                                    (points-state (pw-object (view-container self))))))
       (with-focused-view self 
         (with-pen-state (:pattern *white-pattern*)
+          ;; TODO: this is view-bounds
           (fill-rect*  (point-h (view-scroll-position self)) 
-                       (point-v (view-scroll-position self)) (w self)(h self))))
-      (view-draw-contents self)
+                       (point-v (view-scroll-position self)) (w self)(h self)))
+        (view-draw-contents self))
       (update-bpf-origo-ctrls self)
       (unless mini-draw-lock
         (when (mini-view self) (update-mini-view (mini-view self)))))))
