@@ -1,4 +1,4 @@
-;;;; -*- mode:lisp;coding:utf-8 -*-
+;; -*- mode:lisp;coding:utf-8 -*-
 ;;;;**************************************************************************
 ;;;;FILE:               loader.lisp
 ;;;;LANGUAGE:           Common-Lisp
@@ -39,6 +39,12 @@
 ;;; This is for the case where swank:*globally-redirect-io* is true.
 #+swank
 (progn
+
+  (defun new-swank (&optional (port 4010) (interface #+ccl (ccl::primary-ip-interface-address)
+                                                     #-ccl "localhost"))
+    (let ((swank::*loopback-interface* interface)) 
+      (swank:create-server :port port)))
+  
   (defvar swank::*current-standard-input*)  
   (defvar swank::*current-standard-output*) 
   (defvar swank::*current-error-output*)    
@@ -46,6 +52,7 @@
   (defvar swank::*current-terminal-io*)  
   (defvar swank::*current-query-io*)        
   (defvar swank::*current-debug-io*))
+
 #+swank
 (let ((stream (make-synonym-stream '*terminal-io*)))
   (setf swank::*current-standard-input*  stream
