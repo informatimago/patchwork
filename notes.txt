@@ -1,6 +1,9 @@
 # -*- mode:org; coding:utf-8 -*-
 * Errors & Warnings
-** TODO 00001 view-origin / compute-view-origin / view-valid-p problem
+** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
+   CLOSED: [2014-07-24 Thu 02:55]
+   - State "DONE"       from "TODO"       [2014-07-24 Thu 02:55] \\
+     Temporary hack.
 ** TODO 00002 Objective-C runtime exception: Item to be removed is not in the menu in the first place
 
 #+BEGIN_QUOTE
