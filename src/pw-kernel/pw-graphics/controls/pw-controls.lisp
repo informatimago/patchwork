@@ -259,8 +259,8 @@
     (set-dialog-item-text self text)))
 
 (defmethod view-click-event-handler ((self C-ttybox) where)
-  (if (and (open-state self) (double-click-p))
-      (view-double-click-event-handler self where)))
+  (when (and (open-state self) (double-click-p))
+    (view-double-click-event-handler self where)))
 
 ;;=========================
 ;;PW
@@ -425,9 +425,9 @@
 (defmethod view-click-event-handler ((self C-numbox) where)
   (declare (ignore where))
   (when (open-state self)
-    (unless (call-next-method)
+    (unless (call-next-method) ; processes the double-click in the c-ttybox
       (with-focused-view self
-        (draw-rect* 1 1 (- (w self) 2)(- (h self) 2)))
+        (draw-rect* 1 1 (- (w self) 2) (- (h self) 2)))
       (let* ((win (view-window self))
              (first-v (point-v (view-mouse-position win)))
              (last-mp (view-mouse-position win))

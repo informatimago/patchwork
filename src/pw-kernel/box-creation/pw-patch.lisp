@@ -287,8 +287,10 @@
     (setf *draw-dragging-mode* (not *draw-dragging-mode*))))
 
 (defmethod view-click-event-handler ((self C-patch) where)
-  (let ((res  (call-next-method)))
-    (format-trace 'view-click-event-handler (point-to-list where) (list (h self) (w self))
+  (let ((res (call-next-method)))
+    (format-trace 'view-click-event-handler
+                  :where (point-to-list where)
+                  :view-size (list (h self) (w self))
                   :dbl (double-click-p)
                   :c-o (and (control-key-p) (option-key-p))
                   :c (control-key-p)

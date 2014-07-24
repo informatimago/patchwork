@@ -1,59 +1,37 @@
 # -*- mode:org; coding:utf-8 -*-
-
-* Scratch
+* Errors & Warnings
+** TODO 00001 view-origin / compute-view-origin / view-valid-p problem
+** TODO 00002 Objective-C runtime exception: Item to be removed is not in the menu in the first place
 
 #+BEGIN_QUOTE
 
+    [pjb@larissa :0.0 patchwork]$ ~/Desktop/patchwork-10.0-0.889-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/Patchwork.app/Contents/MacOS/Patchwork 
+    MidiShare not present. PatchWork won't play Midi.
+    (-[MclguiWindow close]                    (c-chord-boxmn-window-rtm :title "MN1" :view-position (10 28) :view-size (230 222) "#x30200192E70D"))
+    (-[MclguiWindow doClose]                  )
+    2014-04-12 16:41:33.249 Patchwork[43978:507] *** Assertion failure in -[NSMenu removeItem:], /SourceCache/AppKit/AppKit-1265.19/Menus.subproj/NSMenu.m:752
+    (BACKTRACE-AS-LIST :CONTEXT NIL :PROCESS NIL :ORIGIN NIL :COUNT 1152921504606846975 :START-FRAME-NUMBER 0 :PRINT-LEVEL 2 :PRINT-LENGTH 5 :SHOW-INTERNAL-FRAMES NIL)
+    (FUNCALL (:INTERNAL MCLGUI::|-[MclguiWindow close]|) #<CCL::NS-EXCEPTION #x302001ADAE0D>)
+    (SIGNAL #<CCL::NS-EXCEPTION #x302001ADAE0D>)
+    (%ERROR #<CCL::NS-EXCEPTION #x302001ADAE0D> NIL 1005440)
+    (FUNCALL #<COMMON-LISP:STANDARD-METHOD REMOVE-MENU-ITEMS (MENU)> (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...) (MCLGUI::ORIGINAL-MENU-ITEM :TITLE "" :ENABLEDP T ...))
+    (UPDATE-WINDOWS-MENU (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...))
+    (FUNCALL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER (WINDOW)> (C-CHORD-BOXMN-WINDOW-RTM :TITLE "MN1" :VIEW-POSITION # ...))
+    (%%BEFORE-AND-AFTER-COMBINED-METHOD-DCODE (NIL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER #> . 1005490))
+    (%%STANDARD-COMBINED-METHOD-DCODE ((#<#>) (#<#>) #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #> #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #>) 1005490)
+    (FUNCALL MCLGUI::|-[MclguiWindow close]| 17591849974728)
+    (%PASCAL-FUNCTIONS% 350 17591849974728)
+    (FUNCALL #<Anonymous Function #x300001D788FF> #<LISP-APPLICATION <LispApplication: 0x4624f0> (#x4624F0)> #S(CCL::OBJC-SELECTOR :NAME "run" :%SEL #<A Foreign Pointer #x7FFF8C6F3066>))
+    (FUNCALL (:OBJC-DISPATCH NEXTSTEP-FUNCTIONS:|run|) ???)
+    (EVENT-LOOP NIL)
+    (RUN-EVENT-LOOP)
+    (FUNCALL (:INTERNAL GUI::COCOA-STARTUP GUI::START-COCOA-IDE))
 
-    diff --exclude \*.bak -r rmcl-unix/level-1/ mcl-unix/level-1/
-    diff --exclude '*TAGS' --exclude .git --exclude .svn --exclude CVS --exclude _darcs --exclude '*~' --exclude '*.x86f' --exclude '*.fasl' --exclude '*.fas' --exclude '*.lib' --exclude '*.[oa]' --exclude '*.so' --exclude '#*' --exclude '*.orig' --exclude '*.rej' --exclude '*.bak' -r rmcl-unix/level-1//l1-aprims.lisp mcl-unix/level-1//l1-aprims.lisp
-    diff rmcl-unix/level-1//l1-boot-1.lisp mcl-unix/level-1//l1-boot-1.lisp
-    diff rmcl-unix/level-1//l1-boot-3.lisp mcl-unix/level-1//l1-boot-3.lisp
-    diff rmcl-unix/level-1//l1-boot-lds.lisp mcl-unix/level-1//l1-boot-lds.lisp
-    diff rmcl-unix/level-1//l1-edbuf.lisp mcl-unix/level-1//l1-edbuf.lisp
-    diff rmcl-unix/level-1//l1-edcmd.lisp mcl-unix/level-1//l1-edcmd.lisp
-    diff rmcl-unix/level-1//l1-edfrec.lisp mcl-unix/level-1//l1-edfrec.lisp
-    diff rmcl-unix/level-1//l1-edwin.lisp mcl-unix/level-1//l1-edwin.lisp
-    diff rmcl-unix/level-1//l1-events.lisp mcl-unix/level-1//l1-events.lisp
-    diff rmcl-unix/level-1//l1-files.lisp mcl-unix/level-1//l1-files.lisp
-    diff rmcl-unix/level-1//l1-highlevel-events.lisp mcl-unix/level-1//l1-highlevel-events.lisp
-    diff rmcl-unix/level-1//l1-init.lisp mcl-unix/level-1//l1-init.lisp
-    diff rmcl-unix/level-1//l1-initmenus-lds.lisp mcl-unix/level-1//l1-initmenus-lds.lisp
-    diff rmcl-unix/level-1//l1-initmenus.lisp mcl-unix/level-1//l1-initmenus.lisp
-    diff rmcl-unix/level-1//l1-listener.lisp mcl-unix/level-1//l1-listener.lisp
-    diff rmcl-unix/level-1//l1-menus.lisp mcl-unix/level-1//l1-menus.lisp
-    diff rmcl-unix/level-1//l1-pathnames.lisp mcl-unix/level-1//l1-pathnames.lisp
-    diff rmcl-unix/level-1//l1-processes.lisp mcl-unix/level-1//l1-processes.lisp
-    diff rmcl-unix/level-1//l1-streams.lisp mcl-unix/level-1//l1-streams.lisp
-    diff rmcl-unix/level-1//l1-sysio.lisp mcl-unix/level-1//l1-sysio.lisp
-    diff rmcl-unix/level-1//l1-windows.lisp mcl-unix/level-1//l1-windows.lisp
-    diff rmcl-unix/level-1//new-fred-window.lisp mcl-unix/level-1//new-fred-window.lisp
-    diff rmcl-unix/level-1//script-manager.lisp mcl-unix/level-1//script-manager.lisp
-    diff rmcl-unix/level-1//sysutils.lisp mcl-unix/level-1//sysutils.lisp
-
-
-
-    find ~/works/patchwork/patchwork/src/mclgui -name \*.lisp -print0 | xargs -0  grep -niH -e '[^-a-z]\<\(copy-file\|*warn-if-redefine*\|*lisp-cleanup-functions*\|*eventhook*\|event-dispatch\|def-load-pointers\|prompt\|point\|point-p\|point-x\|point-y\|point-h\|point-v\|make-point\|copy-point\|add-points\|subtract-points\|*black-pattern*\|*dkgray-pattern*\|*gray-pattern*\|*ltgray-pattern*\|*white-pattern*\|with-cursor\|*watch-cursor*\|*i-beam-cursor*\|*arrow-cursor*\|command-key\|set-command-key\|menu-element\|menu-element-p\|menu-item\|menu-item-p\|menu-item-enable\|menu-item-disable\|menu-item-title\|menu-item-action\|menu-item-check-mark\|set-menu-item-check-mark\|set-menu-item-action-function\|menu-item-action-function\|menu-item-action\|menu\|menup\|menu-enabled-p\|menu-title\|menu-items\|add-menu-items\|find-menu-item\|menubar\|set-menubar\|find-menu\|mouse-down-p\|double-click-p\|shift-key-p\|control-key-p\|command-key-p\|option-key-p\|command-key\|enabled\|event-dispatch\|file-name\|font\|item-action\|item-text\|items\|maxwidth\|text\|title\|width\|simple-view\|view\|view-container\|view-font\|view-position\|view-size\|view-window\|subviews\|view-subviews\|track-thumb-p\|h-scrollp\|v-scrollp\|bottom-boarder\|check-mark\|set-view-position\|set-view-size\|set-view-font\|add-subview\|add-subviews\|remove-subview\|remove-subviews\|with-focused-view\|with-font-focused-view\|scroller\|scroller-mixin\|scroll-bar-correction\|h-scroller\|v-scroller\|control\|button-string\|window\|window-title\|set-window-title\|close-box-p\|fred-window\|window-select\|bring-to-front\|front-window\|window-show\|window-hide\|view-activate-event-handler\|view-deactivate-event-handler\|dialog-item\|dialog-item-action\|dialog-item-text\|set-dialog-item-text\|static-text-dialog-item\|editable-text-dialog-item\|table-dialog-item\|button-dialog-item\|radio-button-dialog-item\|check-box-dialog-item\|dialog\|message\|message-dialog\|choose-file-dialog\|choose-new-file-dialog\|y-or-n-dialog\|select-item-from-list\|make-popupbox\|key-equal\)\>[^-a-z]
+    ERROR while ((LET ((WINDOW (MCLGUI::NSWINDOW-WINDOW MCLGUI::SELF))) (FORMAT-TRACE "-[MclguiWindow close]" WINDOW) (CATCH :CANCEL (WINDOW-CLOSE WINDOW)))):
+    Objective-C runtime exception: 
+    Item to be removed is not in the menu in the first place
 
 #+END_QUOTE
-
-#+BEGIN_SRC sh
-rm application.log ; make clean ; make application 2>&1 | tee application.log
-#+END_SRC
-
-#+BEGIN_SRC lisp
-(push #P"/home/pjb/works/patchwork/tools/" asdf:*central-registry*) 
-(ql:quickload :com.informatimago.check-asdf)
-(com.informatimago.check-asdf:check-asdf-system-file #P"~/works/patchwork/patchwork/src/patchwork.asd")
-
-
-(process-interrupt ccl::*initial-process* (lambda ()
-                                            (make-window)
-                                            (start-run-loop)))
-#+END_SRC
-
-
-https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
 
 * Not Implemented Yet
 
@@ -440,37 +418,60 @@ https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithre
 
 #+END_QUOTE
 
-* Errors & Warnings
+* Scratch
 
 #+BEGIN_QUOTE
 
-    [pjb@larissa :0.0 patchwork]$ ~/Desktop/patchwork-10.0-0.889-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/Patchwork.app/Contents/MacOS/Patchwork 
-    MidiShare not present. PatchWork won't play Midi.
-    (-[MclguiWindow close]                    (c-chord-boxmn-window-rtm :title "MN1" :view-position (10 28) :view-size (230 222) "#x30200192E70D"))
-    (-[MclguiWindow doClose]                  )
-    2014-04-12 16:41:33.249 Patchwork[43978:507] *** Assertion failure in -[NSMenu removeItem:], /SourceCache/AppKit/AppKit-1265.19/Menus.subproj/NSMenu.m:752
-    (BACKTRACE-AS-LIST :CONTEXT NIL :PROCESS NIL :ORIGIN NIL :COUNT 1152921504606846975 :START-FRAME-NUMBER 0 :PRINT-LEVEL 2 :PRINT-LENGTH 5 :SHOW-INTERNAL-FRAMES NIL)
-    (FUNCALL (:INTERNAL MCLGUI::|-[MclguiWindow close]|) #<CCL::NS-EXCEPTION #x302001ADAE0D>)
-    (SIGNAL #<CCL::NS-EXCEPTION #x302001ADAE0D>)
-    (%ERROR #<CCL::NS-EXCEPTION #x302001ADAE0D> NIL 1005440)
-    (FUNCALL #<COMMON-LISP:STANDARD-METHOD REMOVE-MENU-ITEMS (MENU)> (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...) (MCLGUI::ORIGINAL-MENU-ITEM :TITLE "" :ENABLEDP T ...))
-    (UPDATE-WINDOWS-MENU (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...))
-    (FUNCALL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER (WINDOW)> (C-CHORD-BOXMN-WINDOW-RTM :TITLE "MN1" :VIEW-POSITION # ...))
-    (%%BEFORE-AND-AFTER-COMBINED-METHOD-DCODE (NIL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER #> . 1005490))
-    (%%STANDARD-COMBINED-METHOD-DCODE ((#<#>) (#<#>) #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #> #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #>) 1005490)
-    (FUNCALL MCLGUI::|-[MclguiWindow close]| 17591849974728)
-    (%PASCAL-FUNCTIONS% 350 17591849974728)
-    (FUNCALL #<Anonymous Function #x300001D788FF> #<LISP-APPLICATION <LispApplication: 0x4624f0> (#x4624F0)> #S(CCL::OBJC-SELECTOR :NAME "run" :%SEL #<A Foreign Pointer #x7FFF8C6F3066>))
-    (FUNCALL (:OBJC-DISPATCH NEXTSTEP-FUNCTIONS:|run|) ???)
-    (EVENT-LOOP NIL)
-    (RUN-EVENT-LOOP)
-    (FUNCALL (:INTERNAL GUI::COCOA-STARTUP GUI::START-COCOA-IDE))
 
-    ERROR while ((LET ((WINDOW (MCLGUI::NSWINDOW-WINDOW MCLGUI::SELF))) (FORMAT-TRACE "-[MclguiWindow close]" WINDOW) (CATCH :CANCEL (WINDOW-CLOSE WINDOW)))):
-    Objective-C runtime exception: 
-    Item to be removed is not in the menu in the first place
+    diff --exclude \*.bak -r rmcl-unix/level-1/ mcl-unix/level-1/
+    diff --exclude '*TAGS' --exclude .git --exclude .svn --exclude CVS --exclude _darcs --exclude '*~' --exclude '*.x86f' --exclude '*.fasl' --exclude '*.fas' --exclude '*.lib' --exclude '*.[oa]' --exclude '*.so' --exclude '#*' --exclude '*.orig' --exclude '*.rej' --exclude '*.bak' -r rmcl-unix/level-1//l1-aprims.lisp mcl-unix/level-1//l1-aprims.lisp
+    diff rmcl-unix/level-1//l1-boot-1.lisp mcl-unix/level-1//l1-boot-1.lisp
+    diff rmcl-unix/level-1//l1-boot-3.lisp mcl-unix/level-1//l1-boot-3.lisp
+    diff rmcl-unix/level-1//l1-boot-lds.lisp mcl-unix/level-1//l1-boot-lds.lisp
+    diff rmcl-unix/level-1//l1-edbuf.lisp mcl-unix/level-1//l1-edbuf.lisp
+    diff rmcl-unix/level-1//l1-edcmd.lisp mcl-unix/level-1//l1-edcmd.lisp
+    diff rmcl-unix/level-1//l1-edfrec.lisp mcl-unix/level-1//l1-edfrec.lisp
+    diff rmcl-unix/level-1//l1-edwin.lisp mcl-unix/level-1//l1-edwin.lisp
+    diff rmcl-unix/level-1//l1-events.lisp mcl-unix/level-1//l1-events.lisp
+    diff rmcl-unix/level-1//l1-files.lisp mcl-unix/level-1//l1-files.lisp
+    diff rmcl-unix/level-1//l1-highlevel-events.lisp mcl-unix/level-1//l1-highlevel-events.lisp
+    diff rmcl-unix/level-1//l1-init.lisp mcl-unix/level-1//l1-init.lisp
+    diff rmcl-unix/level-1//l1-initmenus-lds.lisp mcl-unix/level-1//l1-initmenus-lds.lisp
+    diff rmcl-unix/level-1//l1-initmenus.lisp mcl-unix/level-1//l1-initmenus.lisp
+    diff rmcl-unix/level-1//l1-listener.lisp mcl-unix/level-1//l1-listener.lisp
+    diff rmcl-unix/level-1//l1-menus.lisp mcl-unix/level-1//l1-menus.lisp
+    diff rmcl-unix/level-1//l1-pathnames.lisp mcl-unix/level-1//l1-pathnames.lisp
+    diff rmcl-unix/level-1//l1-processes.lisp mcl-unix/level-1//l1-processes.lisp
+    diff rmcl-unix/level-1//l1-streams.lisp mcl-unix/level-1//l1-streams.lisp
+    diff rmcl-unix/level-1//l1-sysio.lisp mcl-unix/level-1//l1-sysio.lisp
+    diff rmcl-unix/level-1//l1-windows.lisp mcl-unix/level-1//l1-windows.lisp
+    diff rmcl-unix/level-1//new-fred-window.lisp mcl-unix/level-1//new-fred-window.lisp
+    diff rmcl-unix/level-1//script-manager.lisp mcl-unix/level-1//script-manager.lisp
+    diff rmcl-unix/level-1//sysutils.lisp mcl-unix/level-1//sysutils.lisp
+
+
+
+    find ~/works/patchwork/patchwork/src/mclgui -name \*.lisp -print0 | xargs -0  grep -niH -e '[^-a-z]\<\(copy-file\|*warn-if-redefine*\|*lisp-cleanup-functions*\|*eventhook*\|event-dispatch\|def-load-pointers\|prompt\|point\|point-p\|point-x\|point-y\|point-h\|point-v\|make-point\|copy-point\|add-points\|subtract-points\|*black-pattern*\|*dkgray-pattern*\|*gray-pattern*\|*ltgray-pattern*\|*white-pattern*\|with-cursor\|*watch-cursor*\|*i-beam-cursor*\|*arrow-cursor*\|command-key\|set-command-key\|menu-element\|menu-element-p\|menu-item\|menu-item-p\|menu-item-enable\|menu-item-disable\|menu-item-title\|menu-item-action\|menu-item-check-mark\|set-menu-item-check-mark\|set-menu-item-action-function\|menu-item-action-function\|menu-item-action\|menu\|menup\|menu-enabled-p\|menu-title\|menu-items\|add-menu-items\|find-menu-item\|menubar\|set-menubar\|find-menu\|mouse-down-p\|double-click-p\|shift-key-p\|control-key-p\|command-key-p\|option-key-p\|command-key\|enabled\|event-dispatch\|file-name\|font\|item-action\|item-text\|items\|maxwidth\|text\|title\|width\|simple-view\|view\|view-container\|view-font\|view-position\|view-size\|view-window\|subviews\|view-subviews\|track-thumb-p\|h-scrollp\|v-scrollp\|bottom-boarder\|check-mark\|set-view-position\|set-view-size\|set-view-font\|add-subview\|add-subviews\|remove-subview\|remove-subviews\|with-focused-view\|with-font-focused-view\|scroller\|scroller-mixin\|scroll-bar-correction\|h-scroller\|v-scroller\|control\|button-string\|window\|window-title\|set-window-title\|close-box-p\|fred-window\|window-select\|bring-to-front\|front-window\|window-show\|window-hide\|view-activate-event-handler\|view-deactivate-event-handler\|dialog-item\|dialog-item-action\|dialog-item-text\|set-dialog-item-text\|static-text-dialog-item\|editable-text-dialog-item\|table-dialog-item\|button-dialog-item\|radio-button-dialog-item\|check-box-dialog-item\|dialog\|message\|message-dialog\|choose-file-dialog\|choose-new-file-dialog\|y-or-n-dialog\|select-item-from-list\|make-popupbox\|key-equal\)\>[^-a-z]
 
 #+END_QUOTE
+
+#+BEGIN_SRC sh
+rm application.log ; make clean ; make application 2>&1 | tee application.log
+#+END_SRC
+
+#+BEGIN_SRC lisp
+(push #P"/home/pjb/works/patchwork/tools/" asdf:*central-registry*) 
+(ql:quickload :com.informatimago.check-asdf)
+(com.informatimago.check-asdf:check-asdf-system-file #P"~/works/patchwork/patchwork/src/patchwork.asd")
+
+
+(process-interrupt ccl::*initial-process* (lambda ()
+                                            (make-window)
+                                            (start-run-loop)))
+#+END_SRC
+
+
+https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
 
 * Patchwork Development Notes
 ** ffigen4
@@ -866,7 +867,6 @@ set-allow-tabs
 cut copy paste clear
 undo undo-more     -[[NSResponder undoManager] undo]
 select-all         -[NSResponder selectAll:]
-
 
 * Files
 
