@@ -51,70 +51,72 @@
 
 #|
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((playerIdle))
       (ccl:rlet ((myState :<P>layer<S>tate))  
-        (midi-player:getStatePlayer midi::*player* myState) 
-        (when (= (midi-player:s-state myState) kIdle) (setf playerIdle t)))
+        (patchwork.midi:getStatePlayer patchwork.midi:*player* myState) 
+        (when (= (patchwork.midi:s-state myState) kIdle) (setf playerIdle t)))
       (unless playerIdle (print "Wait end of previous play!"))
       (when playerIdle
-        (let ((seq (midishare::midinewseq)))
+        (let ((seq (patchwork.midi:midinewseq)))
           (setf *MidiShare-start-time* 0)
           (MidiPlay object 0 approx chanbase seq 1000)
-          (midi-player:setalltrackplayer midi::*player* seq 480)
-          (midi-player:startplayer midi::*player*)
+          (patchwork.midi:setalltrackplayer patchwork.midi:*player* seq 480)
+          (patchwork.midi:startplayer patchwork.midi:*player*)
           seq)))))
 ;;changed from paw-modifs 140397 aaa
 |#
 
 (defgeneric MidiPlayANy (object &optional approx chanbase))
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((playerIdle))
-      (ccl:rlet ((myState :<P>layer<S>tate))  
-        (midi-player:getStatePlayer midi::*player* myState) 
-        (when (= (midi-player:s-state myState) kIdle) (setf playerIdle t)))
-      (unless playerIdle (print "Wait end of previous play!"))
-      (when playerIdle
-        (let ((seq (midishare::midinewseq)))
-          (setf *MidiShare-start-time* 0)
-          (MidiPlay object 0 approx chanbase seq 1000)
-          (midi-player:setalltrackplayer midi::*player* seq 500)
-          (midi-player:startplayer midi::*player*)
-          seq)))))
+      (patchwork.midi:with-temporary-player-state (mystate)
+        (patchwork.midi:getStatePlayer patchwork.midi:*player* myState) 
+        (when (= (patchwork.midi:s-state myState) patchwork.midi:kIdle)
+          (setf playerIdle t))
+        (unless playerIdle
+          (print "Wait end of previous play!"))
+        (when playerIdle
+          (let ((seq (patchwork.midi:midinewseq)))
+            (setf *MidiShare-start-time* 0)
+            (MidiPlay object 0 approx chanbase seq 1000)
+            (patchwork.midi:setalltrackplayer patchwork.midi:*player* seq 500)
+            (patchwork.midi:startplayer patchwork.midi:*player*)
+            seq))))))
 
 #|
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
-  (let ((event (midishare:MidiNewEv midishare::typeNote)))	; ask for a new note event
+  (let ((event (patchwork.midi:MidiNewEv patchwork.midi:typeNote)))	; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (midishare:nullptrp event)	; if the allocation was succesfull
-      (midishare::chan event    ; set the midi channel to 0 (means channel 1)
+    (unless (patchwork.midi:nullptrp event)	; if the allocation was succesfull
+      (patchwork.midi:chan event    ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (epw::approx-m  (midic note) approx))))))
-      (midishare::port event 0)			; set the destination port to Modem
-      (midishare::field event 0 (truncate (midic note) 100))		; set the pitch field
-      (midishare::field event 1 (round (vel note)))		        ; set the velocity field
-      (midishare::field event 2 (round (convert-time-1 (dur note) unit/sec)))		; set the duration field to 1 second
-      (midishare::date event (+  *MidiShare-start-time* at))
-      (midishare::MidiAddSeq seq event)
+      (patchwork.midi:port event 0)			; set the destination port to Modem
+      (patchwork.midi:field event 0 (truncate (midic note) 100))		; set the pitch field
+      (patchwork.midi:field event 1 (round (vel note)))		        ; set the velocity field
+      (patchwork.midi:field event 2 (round (convert-time-1 (dur note) unit/sec)))		; set the duration field to 1 second
+      (patchwork.midi:date event (+  *MidiShare-start-time* at))
+      (patchwork.midi:MidiAddSeq seq event)
       )))
 ;;changed from paw-modifs 140397 aaa
 |#
 
 (defgeneric MidiPlay (note at approx chanbase seq unit/sec))
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
-  (let ((event (midishare:MidiNewEv midishare::typeNote))) ; ask for a new note event
+  (let ((event (patchwork.midi:MidiNewEv patchwork.midi:typeNote))) ; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (midishare:nullptrp event) ; if the allocation was succesfull
-      (midishare::chan event ; set the midi channel to 0 (means channel 1)
+    (unless (patchwork.midi:nullptrp event) ; if the allocation was succesfull
+      (patchwork.midi:chan event ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (epw::approx-m  (midic note) approx))))))
-      (midishare::port event 0)    ; set the destination port to Modem
-      (midishare::field event 0 (truncate (epw::approx-m (midic note) approx) 100)) ; set the pitch field
-      (midishare::field event 1 (round (vel note))) ; set the velocity field
-      (midishare::field event 2 (round (convert-time-1 (dur note) unit/sec))) ; set the duration field to 1 second
-      (midishare::date event (+  *MidiShare-start-time* at))
-      (midishare::MidiAddSeq seq event))))
+      (patchwork.midi:port event 0)    ; set the destination port to Modem
+      (patchwork.midi:field event 0 (truncate (epw::approx-m (midic note) approx) 100)) ; set the pitch field
+      (patchwork.midi:field event 1 (round (vel note))) ; set the velocity field
+      (patchwork.midi:field event 2 (round (convert-time-1 (dur note) unit/sec))) ; set the duration field to 1 second
+      (patchwork.midi:date event (+  *MidiShare-start-time* at))
+      (patchwork.midi:MidiAddSeq seq event))))
 
 
 (defmethod MidiPlay ((list list) at approx chanbase seq unit/sec)
@@ -238,25 +240,25 @@
   (play-rtm-with-options self))
 
 
-
 ;;===stop-play
 
 (defmethod stop-play ((self c-patch))
-  (when midi::*player* (midi-player:stopplayer midi::*player*)))
+  (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
 (defmethod stop-play ((self c-patch-polifrtm))
-  (when midi::*player* (midi-player:stopplayer midi::*player*)))
+  (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
 (defmethod stop-play ((self C-patch-score-voice)) 
-  (when midi::*player* (midi-player:stopplayer midi::*player*)))
+  (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
 (defmethod stop-play ((self C-patch-midi)) 
-  (when midi::*player* (midi-player:stopplayer midi::*player*)))
+  (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
 (defmethod stop-all-staffs ((self C-mus-not-view))
-  (when midi::*player* (midi-player:stopplayer midi::*player*)))
+  (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
 (defmethod stop-measure-line ((self C-measure-line)) 
-  (when midi::*player* (midi-player:stopplayer midi::*player*)))
+  (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
+
 
 ;;;; THE END ;;;;

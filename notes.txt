@@ -4,6 +4,7 @@
    CLOSED: [2014-07-24 Thu 02:55]
    - State "DONE"       from "TODO"       [2014-07-24 Thu 02:55] \\
      Temporary hack.
+** TODO 00003 When we click on the output box, the view is displayed zoomed in.
 ** TODO 00002 Objective-C runtime exception: Item to be removed is not in the menu in the first place
 
 #+BEGIN_QUOTE

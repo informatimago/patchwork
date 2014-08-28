@@ -81,34 +81,34 @@
 
 (defmethod play ((self C-patch-record))
   (unless *pw-recording-midi*
-    (when (and  midi::*pw-refnum* midi::*player* )
+    (when (and patchwork.midi:*pw-refnum* patchwork.midi:*player* )
       (print "Recording...")
-      (setf *pw-recorder* (midi-player:open-player "PatchWorkRecorder"))
+      (setf *pw-recorder* (patchwork.midi:open-player "PatchWorkRecorder"))
       (setf *pw-recording-midi* nil)
       (when (> *pw-recorder* 0)
         (setf *pw-recording-midi* t)
-        (midi-player:recordplayer *pw-recorder* 1)
-        (midi-player:startplayer *pw-recorder*)))))
+        (patchwork.midi:recordplayer *pw-recorder* 1)
+        (patchwork.midi:startplayer *pw-recorder*)))))
 
 
-;; (midi-player:closeplayer midi::*player*)
-;; (setf midi::*player* (midi-player:open-player "PatchWorkPlayer"))
+;; (patchwork.midi:closeplayer patchwork.midi:*player*)
+;; (setf patchwork.midi:*player* (patchwork.midi:open-player "PatchWorkPlayer"))
 
 (defmethod stop-play ((self c-patch-record))
   (when *pw-recording-midi*
     (print "Recording Off...")
-    (midi-player:stopplayer *pw-recorder*)
+    (patchwork.midi:stopplayer *pw-recorder*)
     (let (recording-seq )
-      (setf recording-seq (midi-player:getAllTrackplayer *pw-recorder*))
+      (setf recording-seq (patchwork.midi:getAllTrackplayer *pw-recorder*))
       (when recording-seq
         (setf *midi-tempo* 1000000)
         (setf (outseq self) (mievents2midilist recording-seq 1000))))
-    (midi-player:closeplayer *pw-recorder*))
+    (patchwork.midi:closeplayer *pw-recorder*))
   (setf *pw-recording-midi* nil))
 
 
 
-(defunp Midi-Record ((delta fix/fl/list (:value 0 :min-val 0 :max-val 1000)))  nil
+(defunp patchwork.midi:Midi-Record ((delta fix/fl/list (:value 0 :min-val 0 :max-val 1000)))  nil
  "Midi sequences recorder.
 
 Select the box and type 'p' to enter the record mode.
@@ -135,29 +135,29 @@ delta and output mode."
 #|
 (defmethod patch-value ((self C-patch-save-midi) obj)
   (declare (ignore obj))
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((name (CHOOSE-NEW-FILE-DIALOG)))
       (when name
-        (let ((tempo-evnt (midishare::MidiNewEv midishare::typetempo))
+        (let ((tempo-evnt (patchwork.midi:MidiNewEv patchwork.midi:typetempo))
               recording-seq)
-          (midishare::date tempo-evnt 0)
-          (midishare::field tempo-evnt 0 1000000)
+          (patchwork.midi:date tempo-evnt 0)
+          (patchwork.midi:field tempo-evnt 0 1000000)
           (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))  
-            (midi-player:mf-format myInfo  1)
-            (midi-player:mf-timedef myInfo 0)
-            (midi-player:mf-clicks myInfo 480)
-            (midi-player:mf-tracks myInfo 2)
+            (patchwork.midi:mf-format myInfo  1)
+            (patchwork.midi:mf-timedef myInfo 0)
+            (patchwork.midi:mf-clicks myInfo 480)
+            (patchwork.midi:mf-tracks myInfo 2)
             (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
-            (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
-            (midishare::firstEv recording-seq tempo-evnt)
-            (midi-player:midi-file-save (namestring name) recording-seq  myInfo)
+            (patchwork.midi:link tempo-evnt (patchwork.midi:firstEv recording-seq) )
+            (patchwork.midi:firstEv recording-seq tempo-evnt)
+            (patchwork.midi:midi-file-save (namestring name) recording-seq  myInfo)
             (set-mac-file-type (namestring name) :|Midi|)
-            (midishare::midifreeseq recording-seq)))))))
+            (patchwork.midi:midifreeseq recording-seq)))))))
 
 (defmethod MidiSaveAny ((object t))
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (setf *play-chseq-w/offset* t)
-    (let ((seq (midishare::midinewseq)))
+    (let ((seq (patchwork.midi:midinewseq)))
       (setf *MidiShare-start-time* 0)
       (setf *play-chseq-w/offset* t)
       (MidiPlay object 0 (compute-approx) 0 seq 480)
@@ -166,40 +166,44 @@ delta and output mode."
 ;;changed from paw-modifs 140397 aaa
 |#
 
+
+(defmethod save-midi ((self c-patch-save-midi) name)
+  (let ((tempo-evnt (patchwork.midi:MidiNewEv patchwork.midi:typetempo))
+        recording-seq)
+    (patchwork.midi:date tempo-evnt 0)
+    (patchwork.midi:field tempo-evnt 0 1000000)
+    (patchwork.midi:with-temporary-midi-file-infos (myInfo)  
+      (patchwork.midi:mf-format myInfo  1)
+      (patchwork.midi:mf-timedef myInfo 0)
+      (patchwork.midi:mf-clicks myInfo 500)
+      (patchwork.midi:mf-tracks myInfo 2)
+      (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
+      (patchwork.midi:link tempo-evnt (patchwork.midi:firstEv recording-seq) )
+      (patchwork.midi:firstEv recording-seq tempo-evnt)
+      (patchwork.midi:midi-file-save (namestring name) recording-seq  myInfo)
+      (set-mac-file-type (namestring name) :|Midi|)
+      (patchwork.midi:midifreeseq recording-seq))))
+
 (defmethod patch-value ((self C-patch-save-midi) obj)
   (declare (ignore obj))
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
     (let ((name (CHOOSE-NEW-FILE-DIALOG)))
       (when name
-        (let ((tempo-evnt (midishare::MidiNewEv midishare::typetempo))
-              recording-seq)
-          (midishare::date tempo-evnt 0)
-          (midishare::field tempo-evnt 0 1000000)
-          (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))  
-            (midi-player:mf-format myInfo  1)
-            (midi-player:mf-timedef myInfo 0)
-            (midi-player:mf-clicks myInfo 500)
-            (midi-player:mf-tracks myInfo 2)
-            (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
-            (midishare::link tempo-evnt (midishare::firstEv recording-seq) )
-            (midishare::firstEv recording-seq tempo-evnt)
-            (midi-player:midi-file-save (namestring name) recording-seq  myInfo)
-            (set-mac-file-type (namestring name) :|Midi|)
-            (midishare::midifreeseq recording-seq)))))))
+        (save-midi self name)))))
 
 
 (defgeneric MidiSaveAny (object))
 (defmethod MidiSaveAny ((object t))
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
     (setf *play-chseq-w/offset* t)
-    (let ((seq (midishare::midinewseq)))
+    (let ((seq (patchwork.midi:midinewseq)))
       (setf *MidiShare-start-time* 0)
       (setf *play-chseq-w/offset* t)
       (MidiPlay object 0 (compute-approx) 0 seq 500)
       seq)))
           
 
-(defunp Midi-Save ((objs list (:value '() :type-list ())))  nil 
+(defunp patchwork.midi:Midi-Save ((objs list (:value '() :type-list ())))  nil 
         "MidiFile saver.
 
 Once evaluated, issues a choose-file-dialog that lets you name a MidiFile.
@@ -220,18 +224,20 @@ Input may be any PatchWork object that could be played through play-object
 
 (defmethod patch-value ((self C-patch-load-midi) obj)
   (declare (ignore obj))
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((name (CHOOSE-FILE-DIALOG)))
       (when name
-        (let ((recording-seq (midishare::midiNewSeq))
+        (let ((recording-seq (patchwork.midi:midiNewSeq))
               (delta (patch-value (first (input-objects self)) (first (input-objects self))))
               rep)
-          (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))  
-            (midi-player:midi-file-load (namestring name) recording-seq  myInfo)
+          (patchwork.midi:with-temporary-midi-file-infos (myInfo)   
+            (patchwork.midi:midi-file-load (namestring name) recording-seq  myInfo)
             (when recording-seq
-              (print (list  "clicks" (midi-player:mf-clicks myInfo) "tracks" (midi-player:mf-tracks myInfo) "MidiFormat" (midi-player:mf-format myInfo)))
+              (print (list  "clicks" (patchwork.midi:mf-clicks myInfo)
+                            "tracks" (patchwork.midi:mf-tracks myInfo)
+                            "MidiFormat" (patchwork.midi:mf-format myInfo)))
               (let ((*midi-tempo* 1000000))
-                (setf rep (mievents2midilist recording-seq (midi-player:mf-clicks myInfo) )))
+                (setf rep (mievents2midilist recording-seq (patchwork.midi:mf-clicks myInfo) )))
               (midiseq2cl rep delta))))))))
 
 #|
@@ -243,53 +249,53 @@ Input may be any PatchWork object that could be played through play-object
 
 
 (defun mievents2midilist (seq units/sec)
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let (event date initdate rep
                 (cur-tempo *midi-tempo*)
                 (tempo-change-abst-time 0)
                 (tempo-change-log-time 0))
-      (setf event (midishare::firstEv seq))
-      (setf initdate (midishare::date event))
-      (while (not (midishare:null-event-p event))
-        (setf date (- (midishare::date event) initdate))
-        (case (midishare::type event)
+      (setf event (patchwork.midi:firstEv seq))
+      (setf initdate (patchwork.midi:date event))
+      (while (not (patchwork.midi:null-event-p event))
+        (setf date (- (patchwork.midi:date event) initdate))
+        (case (patchwork.midi:evtype event)
           (144  (unless *pw-recording-midi* 
                   (setf 
                    tempo-change-log-time (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
-                   cur-tempo (midishare::tempo event)
+                   cur-tempo (patchwork.midi:tempo event)
                    tempo-change-abst-time date ) )
            )
           
           (0 
-           (push (list (* 100 (midishare::pitch event))
-                       (convert-time (midishare::dur event) units/sec) 
-                       (midishare::vel event)
-                       (1+ (midishare::chan event))
+           (push (list (* 100 (patchwork.midi:pitch event))
+                       (convert-time (patchwork.midi:dur event) units/sec) 
+                       (patchwork.midi:vel event)
+                       (1+ (patchwork.midi:chan event))
                        (convert-time date units/sec))
                  rep)
            )
           (1 
-           (if (= (midishare::vel event) 0)
+           (if (= (patchwork.midi:vel event) 0)
              (close-notes-on rep 
-                             (* 100 (midishare::pitch event)) 
-                             (1+ (midishare::chan event))
+                             (* 100 (patchwork.midi:pitch event)) 
+                             (1+ (patchwork.midi:chan event))
                              (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
-             (push (list  (* 100 (midishare::pitch event)) 
+             (push (list  (* 100 (patchwork.midi:pitch event)) 
                           (logical-time date   cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
-                          (midishare::vel event) 
-                          (1+ (midishare::chan event))
+                          (patchwork.midi:vel event) 
+                          (1+ (patchwork.midi:chan event))
                           (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
                    rep))
            )
           (2 
            (close-notes-on rep 
-                           (* 100 (midishare::pitch event)) 
-                           (1+ (midishare::chan event))
+                           (* 100 (patchwork.midi:pitch event)) 
+                           (1+ (patchwork.midi:chan event))
                            (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
                            )
            ))
-        (setf event (midishare::link event)))
-      (midishare::MidiFreeSeq seq)
+        (setf event (patchwork.midi:link event)))
+      (patchwork.midi:MidiFreeSeq seq)
       (reverse rep))))
             
 
@@ -309,54 +315,53 @@ Input may be any PatchWork object that could be played through play-object
 
 
 (defun mievents2midilist (seq units/sec)
-  (niy mievents2midilist seq units/sec) #-(and)
-  (when (and  midi::*pw-refnum* midi::*player* )
+  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let (event date initdate rep
                 (cur-tempo *midi-tempo*)
                 (tempo-change-abst-time 0)
                 (tempo-change-log-time 0))
-      (setf event (midishare::firstEv seq))
-      (setf initdate (midishare::date event))
-      (while (not (midishare:null-event-p event))
-        (setf date (- (midishare::date event) initdate))
-        (case (midishare::type event)
+      (setf event (patchwork.midi:firstEv seq))
+      (setf initdate (patchwork.midi:date event))
+      (while (not (patchwork.midi:null-event-p event))
+        (setf date (- (patchwork.midi:date event) initdate))
+        (case (patchwork.midi:evtype event)
           (144  (unless *pw-recording-midi* 
                   (setf 
                    tempo-change-log-time (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
-                   cur-tempo (midishare::tempo event)
+                   cur-tempo (patchwork.midi:tempo event)
                    tempo-change-abst-time date ) )
            )
           
           (0 
-           (push (list (* 100 (midishare::pitch event))
-                       (convert-time (midishare::dur event) units/sec) 
-                       (midishare::vel event)
-                       (1+ (midishare::chan event))
+           (push (list (* 100 (patchwork.midi:pitch event))
+                       (convert-time (patchwork.midi:dur event) units/sec) 
+                       (patchwork.midi:vel event)
+                       (1+ (patchwork.midi:chan event))
                        (convert-time date units/sec))
                  rep)
            )
           (1 
-           (if (= (midishare::vel event) 0)
+           (if (= (patchwork.midi:vel event) 0)
              (close-notes-on rep 
-                             (* 100 (midishare::pitch event)) 
-                             (1+ (midishare::chan event))
+                             (* 100 (patchwork.midi:pitch event)) 
+                             (1+ (patchwork.midi:chan event))
                              (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
-             (push (list  (* 100 (midishare::pitch event)) 
+             (push (list  (* 100 (patchwork.midi:pitch event)) 
                           (logical-time date   cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
-                          (midishare::vel event) 
-                          (1+ (midishare::chan event))
+                          (patchwork.midi:vel event) 
+                          (1+ (patchwork.midi:chan event))
                           (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
                    rep))
            )
           (2 
            (close-notes-on rep 
-                           (* 100 (midishare::pitch event)) 
-                           (1+ (midishare::chan event))
+                           (* 100 (patchwork.midi:pitch event)) 
+                           (1+ (patchwork.midi:chan event))
                            (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
                            )
            ))
-        (setf event (midishare::link event)))
-      (midishare::MidiFreeSeq seq)
+        (setf event (patchwork.midi:link event)))
+      (patchwork.midi:MidiFreeSeq seq)
       (reverse rep))))
             
 
@@ -410,7 +415,7 @@ Input may be any PatchWork object that could be played through play-object
 
 
    
-(defunp Midi-Load ((delta fix/fl/list (:value 0 :min-val 0 :max-val 1000)))  nil
+(defunp patchwork.midi:Midi-Load ((delta fix/fl/list (:value 0 :min-val 0 :max-val 1000)))  nil
  "MidiFile loader.
 
 Once evaluated, issues a choose-file-dialog that lets you select a MidiFile.
@@ -424,12 +429,6 @@ Output is a chord-line object.
 "
   (declare (ignore delta)))
 
-
-(defun initialize-midi-menu ()
-  (PW-addmenu-fun *pw-Midi-menu* 'midi-record 'C-patch-record)
-  (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
-  (PW-addmenu-fun *pw-Midi-menu* 'midi-load 'C-patch-load-midi)
-  (PW-addmenu-fun *pw-Midi-menu* 'midi-save 'C-patch-save-midi))
 
 
 ;;;; THE END ;;;;

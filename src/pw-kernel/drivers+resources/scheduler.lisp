@@ -124,13 +124,14 @@ It cannot be changed, except in the source code.")
 
 
 
-;; TODO:
-(defun midi:midi-write (event)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (fmakunbound 'patchwork.midi:midi-write))
+(defun patchwork.midi:midi-write (event)
   "New version"
-  (midi-write-time event
-                   (if (null *current-task*)
-                       (midishare::MidiGetTime)
-                       (* 10 (- (logtime) *schedulertime--clocktime*)))))
+  (patchwork.midi:midi-write-time event
+                                  (if (null *current-task*)
+                                      (patchwork.midi:midi-get-time)
+                                      (* 10 (- (logtime) *schedulertime--clocktime*)))))
 
 (defvar *error-when-extra-start?* t
   "Calling \"start\" from within a scheduler task signals an error when this variable

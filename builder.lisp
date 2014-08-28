@@ -145,7 +145,9 @@
   (setf (logical-pathname-translations "PATCHWORK")
         (make-logical-pathname-translations ""            (merge-pathnames "patchwork/" base)))
   (setf (logical-pathname-translations "MCLGUI")
-        (make-logical-pathname-translations ""            (merge-pathnames "mclgui/" base))))
+        (make-logical-pathname-translations ""            (merge-pathnames "mclgui/" base)))
+  (setf (logical-pathname-translations "MIDI")
+        (make-logical-pathname-translations ""            (merge-pathnames "midi/" base))))
 
 
 
@@ -160,6 +162,9 @@
          asdf:*central-registry* :test (function equalp))
 
 (pushnew (translate-logical-pathname #P"MCLGUI:")
+         asdf:*central-registry* :test (function equalp))
+
+(pushnew (translate-logical-pathname #P"MIDI:")
          asdf:*central-registry* :test (function equalp))
 
 #-(and) (progn

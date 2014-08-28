@@ -5,3 +5,5 @@
 *.cdb
 .DS_Store
 ._.DS_Store
+src/macosx/headers64
+src/macosx/headers32

@@ -114,8 +114,7 @@
 
 
 (defun clear-patchwork ()
-  (niy clear-patchwork)
-  #-(and) (midi::midi-close))
+  (patchwork.midi:midi-close))
 
 (defun save-dump-image (image-name &optional heap-size no-compiler)
   "Save an image"

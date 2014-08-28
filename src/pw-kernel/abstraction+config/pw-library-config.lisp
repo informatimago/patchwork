@@ -74,7 +74,7 @@
     (load&form-abstr-menu thestring)
     (record-event :|PWst| :|ploa| `((,:|----| ,(mkSO :|obab| nil :|name| (namestring (truename thestring))))))))
 
-
+(defvar *added-box-object* nil)
 (defun load&form-abstr-menu (path &optional index)
   (if path
     (with-cursor *watch-cursor* 

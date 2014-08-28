@@ -46,7 +46,6 @@
 
 ;;==================================
 
-(defvar *active-MN-window* nil)
 
 (defvar *MN-menu-file* nil)
 

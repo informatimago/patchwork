@@ -102,6 +102,8 @@
 ;; (pushnew 'patchwork.builder::no-cocoa *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events *features*)
 ;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
+;; (pushnew 'patchwork.builder::use-midishare *features*)
+(pushnew 'patchwork.builder::use-cl-midi   *features*)
 
 
 ;;; --------------------------------------------------------------------
@@ -159,9 +161,13 @@
 
 (defun start-patchwork ()
   (ui:on-main-thread/sync
-    #+swank (setf *trace-output* *slime-output*)
-    (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
-    (pw::initialize-patchwork)))
+    (handler-case
+        (progn
+          #+swank (setf *trace-output* *slime-output*)
+          (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
+          (pw::initialize-patchwork))
+      (error (err)
+        (format *error-output* "~A~%" err)))))
 
 (import 'start-patchwork "COMMON-LISP-USER")
 (import 'with-streams    "COMMON-LISP-USER")
@@ -205,8 +211,8 @@
 ;;                        duplicates)
 ;;         duplicates)))
 ;; 
-;; (defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" "MIDI-PLAYER" "MIDISHARE"
-;;                               "MIDI" "PATCHWORK.SCHEDULER" "PATCHWORK" "C-PATCH-BUFFER"
+;; (defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" 
+;;                               "PATCHWORK.MIDI" "PATCHWORK.SCHEDULER" "PATCHWORK" "C-PATCH-BUFFER"
 ;;                               "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN"
 ;;                               "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE"
 ;;                               "EPW" "C-LIST-ITEM-H" "C-LIST-ITEM" "C-TABLE-WINDOW-H"

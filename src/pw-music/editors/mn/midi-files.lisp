@@ -39,48 +39,48 @@
         (mod-ticks (mod ticks #x80)))
     (cond 
       ((> ticks #x1FFFFF)
-        (setq high-byte3 (+ #x80 (truncate (/ ticks #x200000))))
-        (setq high-byte2 (+ #x80 mod-ticks))
-        (setq high-byte1 (+ #x80 mod-ticks))
-        (setq ticks mod-ticks)
-        (list high-byte3 high-byte2 high-byte1 ticks))  
+       (setq high-byte3 (+ #x80 (truncate (/ ticks #x200000))))
+       (setq high-byte2 (+ #x80 mod-ticks))
+       (setq high-byte1 (+ #x80 mod-ticks))
+       (setq ticks mod-ticks)
+       (list high-byte3 high-byte2 high-byte1 ticks))  
       ((> ticks #x3FFF)
-        (setq high-byte2 (+ #x80 (truncate (/ ticks #x4000))))
-        (setq high-byte1 (+ #x80 mod-ticks))
-        (setq ticks mod-ticks)
-        (list high-byte2 high-byte1 ticks))  
+       (setq high-byte2 (+ #x80 (truncate (/ ticks #x4000))))
+       (setq high-byte1 (+ #x80 mod-ticks))
+       (setq ticks mod-ticks)
+       (list high-byte2 high-byte1 ticks))  
       ((> ticks #x7F)
-        (setq high-byte1 (+ #x80 (truncate (/ ticks #x80))))
-        (setq ticks mod-ticks)
-        (list high-byte1 ticks))  
+       (setq high-byte1 (+ #x80 (truncate (/ ticks #x80))))
+       (setq ticks mod-ticks)
+       (list high-byte1 ticks))  
       (t (list ticks)))
-;;    (setq *print-base* 16)
-;;    (print (list high-byte3 high-byte2 high-byte1 ticks))  
-;;    (setq *print-base* 10) 
- ))
+    ;;    (setq *print-base* 16)
+    ;;    (print (list high-byte3 high-byte2 high-byte1 ticks))  
+    ;;    (setq *print-base* 10) 
+    ))
 
 ;;(variable-length-midi-time #x64)
 
 (defun covert-length-to-4-byte-list (len)
   (let ((byte1 0)(byte2 0)(byte3 0)(byte4 0))
     (cond 
-       ((> len #xFFFFFF)
-         (setq byte4 (truncate (/ len #x1000000)))
-         (setq byte3 (mod len #x1000000))
-         (setq byte3 (mod len #x10000))
-         (setq byte2 (mod len #x10000))
-         (setq byte1 (mod len #x100)))
-       ((> len #xFFFF)
-         (setq byte3 (truncate (/ len #x10000)))
-         (setq byte2 (mod len #x10000))
-         (setq byte1 (mod len #x100)))
-       ((> len #xFF)
-         (setq byte2 (truncate (/ len #x100)))
-         (setq byte1 (mod len #x100)))
-       (t  (setq byte1 len)))
+      ((> len #xFFFFFF)
+       (setq byte4 (truncate (/ len #x1000000)))
+       (setq byte3 (mod len #x1000000))
+       (setq byte3 (mod len #x10000))
+       (setq byte2 (mod len #x10000))
+       (setq byte1 (mod len #x100)))
+      ((> len #xFFFF)
+       (setq byte3 (truncate (/ len #x10000)))
+       (setq byte2 (mod len #x10000))
+       (setq byte1 (mod len #x100)))
+      ((> len #xFF)
+       (setq byte2 (truncate (/ len #x100)))
+       (setq byte1 (mod len #x100)))
+      (t  (setq byte1 len)))
     (list byte4 byte3 byte2 byte1)))
 
-  
+
 
 ;;(covert-length-to-4-byte-list 700)
 
@@ -97,29 +97,29 @@
 
 #|
 (defun  make-midi-file-list  (chords &optional rtm-fl)
-  (let ((t-time)(notes)(midi-list))
-    (while chords
-      (setq t-time (t-time (car chords)))
-      (setq notes (notes (car chords)))
-      (while notes
-         (push (list 
-                 t-time
-                 (+ #x8f (chan (car notes)))
-                 (truncate (/ (midic (car notes)) 100))
-                 (vel (car notes)))
-              midi-list)
-         (push (list 
-                 (+ t-time (dur (car notes)))
-                 (+ #x8f (chan (car notes)))
-                 (truncate (/ (midic (car notes)) 100))
-                 0)
-            midi-list)
-         (pop notes))
-      (pop chords))
-    (if rtm-fl 
-      (nreverse midi-list)
-      (make-variable-length-midi-delta-times
-        (sort (nreverse midi-list) '< :key (lambda (a) (car a)))))))
+(let ((t-time)(notes)(midi-list))
+(while chords
+(setq t-time (t-time (car chords)))
+(setq notes (notes (car chords)))
+(while notes
+(push (list 
+t-time
+(+ #x8f (chan (car notes)))
+(truncate (/ (midic (car notes)) 100))
+(vel (car notes)))
+midi-list)
+(push (list 
+(+ t-time (dur (car notes)))
+(+ #x8f (chan (car notes)))
+(truncate (/ (midic (car notes)) 100))
+0)
+midi-list)
+(pop notes))
+(pop chords))
+(if rtm-fl 
+(nreverse midi-list)
+(make-variable-length-midi-delta-times
+(sort (nreverse midi-list) '< :key (lambda (a) (car a)))))))
 |#
 
 (defun  make-midi-file-list  (chords &optional rtm-fl)
@@ -128,24 +128,24 @@
       (setq t-time (t-time (car chords)))
       (setq notes (notes (car chords)))
       (while notes
-         (push (list 
-                 (round t-time (/ 100 96)) ;;; GA 2/10/95
-                 (+ #x8f (chan (car notes)))
-                 (truncate (/ (epw::approx-m (midic (car notes)) 2) 100)) ;;;  GA 2/10/95
-                 (vel (car notes)))
+        (push (list 
+               (round t-time (/ 100 96)) ;;; GA 2/10/95
+               (+ #x8f (chan (car notes)))
+               (truncate (/ (epw::approx-m (midic (car notes)) 2) 100)) ;;;  GA 2/10/95
+               (vel (car notes)))
               midi-list)
-         (push (list 
-                 (round (+ t-time (dur (car notes))) (/ 100 96))  ;;; GA 2/10/95
-                 (+ #x8f (chan (car notes)))
-                 (truncate (/ (epw::approx-m (midic (car notes)) 2) 100))  ;;; GA 2/10/95
-                 0)
-            midi-list)
-         (pop notes))
+        (push (list 
+               (round (+ t-time (dur (car notes))) (/ 100 96))  ;;; GA 2/10/95
+               (+ #x8f (chan (car notes)))
+               (truncate (/ (epw::approx-m (midic (car notes)) 2) 100))  ;;; GA 2/10/95
+               0)
+              midi-list)
+        (pop notes))
       (pop chords))
     (if rtm-fl 
-      (nreverse midi-list)
-      (make-variable-length-midi-delta-times
-        (sort (nreverse midi-list) '< :key (lambda (a) (car a)))))))
+        (nreverse midi-list)
+        (make-variable-length-midi-delta-times
+         (sort (nreverse midi-list) '< :key (lambda (a) (car a)))))))
 
 
 (defun make-midi-file-0 (chords)
@@ -160,12 +160,12 @@
        #x00 #x00   
        #x00 #x01
        #x00 #x60
- 
-      #x4D #x54 #x72 #x6B) 
-      (covert-length-to-4-byte-list (+ (length track-info)(length data)(length track-end)))
-      track-info
-      data
-      track-end))) 
+       
+       #x4D #x54 #x72 #x6B) 
+     (covert-length-to-4-byte-list (+ (length track-info)(length data)(length track-end)))
+     track-info
+     data
+     track-end))) 
 
 (defun make-midi-file-1 (chords-list)
   (let ((data-list (mapcar #'make-midi-file-list chords-list))
@@ -174,25 +174,25 @@
             #x00 #xff #x51 #x03 #x07 #xa1 #x20))
         (track-end '(#x0 #xff #x2f #x0))
         (tracks)(track-count (length chords-list)))
-   (while data-list
+    (while data-list
       (push
-        (append     
-          '(#x4D #x54 #x72 #x6B) 
-           (covert-length-to-4-byte-list 
-             (+ (length track-info)(length (car data-list))(length track-end)))
-           track-info
-           (pop data-list)
-           track-end)
-        tracks)) 
-   (setq tracks (nreverse tracks))
-   (append     
-      '(#x4D #x54 #x68 #x64 
-        #x00 #x00 #x00 #x06  
-        #x00 #x01   
-        #x00)
-       (list track-count)
-      '(#x00 #x60)
-       (apply 'append tracks))))
+       (append     
+        '(#x4D #x54 #x72 #x6B) 
+        (covert-length-to-4-byte-list 
+         (+ (length track-info)(length (car data-list))(length track-end)))
+        track-info
+        (pop data-list)
+        track-end)
+       tracks)) 
+    (setq tracks (nreverse tracks))
+    (append     
+     '(#x4D #x54 #x68 #x64 
+       #x00 #x00 #x00 #x06  
+       #x00 #x01   
+       #x00)
+     (list track-count)
+     '(#x00 #x60)
+     (apply 'append tracks))))
 
 ;; (progn
 ;;   (setq *print-base* 16)
@@ -205,23 +205,23 @@
 
 
 (defun PW-midi-file-SAVE ()
- (let ((editor-view (editor-view-object *active-MN-window*))
-         midi-data-list new-name)
-   (setq midi-data-list
-     (if (monofonic-mn? editor-view)
-      (make-midi-file-0
-         (chords (chord-line (car (editor-objects editor-view)))))
-      (make-midi-file-1
-         (ask-all (ask-all (editor-objects editor-view) 'chord-line) 'chords))))
-   (setq new-name (choose-new-file-dialog :directory "MIDI FILE" :prompt "Save Midi file As…"))
-;;   (setq new-file (CREATE-FILE  new-name))
-   (delete-file new-name)  
-   (WITH-OPEN-FILE  
-       (out new-name :direction :output  :if-does-not-exist :create :if-exists :supersede
-         :element-type 'unsigned-byte)
-     (while midi-data-list
-       (write-byte  (pop midi-data-list) out)))
-   (set-mac-file-type new-name "Midi")))
+  (let ((editor-view (editor-view-object *active-MN-window*))
+        midi-data-list new-name)
+    (setq midi-data-list
+          (if (monofonic-mn? editor-view)
+              (make-midi-file-0
+               (chords (chord-line (car (editor-objects editor-view)))))
+              (make-midi-file-1
+               (ask-all (ask-all (editor-objects editor-view) 'chord-line) 'chords))))
+    (setq new-name (choose-new-file-dialog :directory "MIDI FILE" :prompt "Save Midi file As…"))
+    ;;   (setq new-file (CREATE-FILE  new-name))
+    (delete-file new-name)  
+    (WITH-OPEN-FILE  
+        (out new-name :direction :output  :if-does-not-exist :create :if-exists :supersede
+                      :element-type 'unsigned-byte)
+      (while midi-data-list
+        (write-byte  (pop midi-data-list) out)))
+    (set-mac-file-type new-name "Midi")))
 ;;=======================================================
 
 ;; (setq m1
@@ -252,5 +252,3 @@
 ;;         ))
 
 ;;;; THE END ;;;;
-
-  

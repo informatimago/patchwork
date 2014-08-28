@@ -33,6 +33,7 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
+(defvar *active-MN-window* nil)
 
 ;;====================================================================================================
 (defclass C-MN-help-window (C-pw-help-window)())
@@ -90,5 +91,4 @@
 "))))
 
 
-
-
+;;;; THE END ;;;;

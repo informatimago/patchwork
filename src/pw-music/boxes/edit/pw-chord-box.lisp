@@ -52,6 +52,9 @@
 ;;; get-output-dimension  ; produces the appropriate output according to Menu selection
 
 
+(defvar *g2-g-f-f2-staffs*)
+;; (defgeneric editor-objects (object))
+
 (defclass C-patch-chord-box-M (C-patch-application) 
  ((mus-not-editor :initform nil  :accessor mus-not-editor)
   (out-type :initform :midic :initarg :out-type :accessor out-type)

@@ -322,7 +322,7 @@
                                                                           (ask-all (pw-controls self) 'type-list))))) 
                         (t (flip-controls self (setf (flip-flag self) (not (flip-flag self))))))) 
                  ((option-key-p)
-                  (format-trace 'view-click-event-handler "no active extra" (list (point-h where) (point-v where)) self)
+                 (format-trace 'view-click-event-handler "no active extra" (list (point-h where) (point-v where)) self)
                   (mouse-pressed-no-active-extra self (point-h where) (point-v where)))
                  (t
                   (format-trace 'view-click-event-handler "toggle patch active" (list (point-h where) (point-v where)) self)
@@ -943,6 +943,7 @@ tutorial file only if the names differ"
     (update-wins-menu-items win)
     (record-event :|core| :|crel| `((,:|kocl| ,:|cpat| )))
     (setf *active-patch-window* win)))
+
 
 
 ;;;; THE END ;;;;

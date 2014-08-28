@@ -40,15 +40,14 @@
     if we give the list (144 60 64) for bytes, our MIDI synthesizer (assuming it is 
     connected) play middle-C on channel 1 with a velocity of 64.  To turn off the 
     note, we would have to give bytes the argument (144 60 0)."
-  (niy midi-o bytes) #-(and)
   (when bytes
-    (let ((event (midishare::MidiNewEv midishare::typeStream)))
-      (unless (midishare:null-event-p event)	
-        (midishare::chan event 0)			
-        (midishare::port event 0)
+    (let ((event (patchwork.midi:MidiNewEv patchwork.midi:typeStream)))
+      (unless (patchwork.midi:null-event-p event)	
+        (patchwork.midi:chan event 0)			
+        (patchwork.midi:port event 0)
         (dolist (byte (list! bytes))
-          (midishare::midiaddfield event byte))
-        (midishare::MidiSendIm midi::*pw-refnum* event)))))
+          (patchwork.midi:midiaddfield event byte))
+        (patchwork.midi:MidiSendIm patchwork.midi:*pw-refnum* event)))))
 
 (defunp pgmout1 ((son fix (:value 1 :min-val 1  :max-val 128))
                  (canal approx )) list
@@ -142,9 +141,8 @@ Notes with microtonal accidentals are sent to different output channels accordin
 to the following mapping: chan (semitones), chan + 1 (eighth-tones), 
 chan + 2 (quartertones),  chan + 3 (three-eighths tones).
 "
-  (niy play-object object chan approx)#-(and)
   (let ((*play-chseq-w/offset* t))
-    (MidiPlayAny object approx chan)))
+    (pw::MidiPlayAny object approx chan)))
 
 
 
@@ -310,8 +308,7 @@ remaining notes."
     (setq notes-form (sort notes-form '< :key #'car))
     (start (apdfuncall 80 (priority) 82
                        'keep-playing-fun-forms notes-form (caar notes-form)))
-    nil
-    ))
+    nil))
 
 
 (in-package "C-PW-SEND-MIDI-NOTE")
@@ -337,27 +334,25 @@ given parameters to MIDI"
                       (list! at-time)
                       (list 0))))
     (while (or midics vels channel durs offs t-times)
-      (push 
-       (pw::mk-chord-at
-        (setq acum-t 
-              (if t-times (pop t-times) (+ acum-t 50)))
-        (cond ((null midics) (list 6000))
-              ((consp (car midics))  (pop midics))
-              (t (prog1 midics (setq midics nil))))
-        (cond ((null durs) (list def-dur))
-              ((consp (car durs)) (pop durs))
-              (t (prog1 durs (setq durs nil))))
-        (cond ((null offs) (list 0))
-              ((consp (car offs)) (pop offs))
-              (t (prog1 offs (setq offs nil))))
-        (cond ((null vels) (list def-vels))
-              ((consp (car vels)) (pop vels))
-              (t (prog1 vels (setq vels nil))))
-        (cond ((null channel) (list def-chan))
-              ((consp (car channel)) (pop channel))
-              (t (prog1 channel (setq channel nil)))))
-       chord-list))
-    (niy play-chords midics vels chan durs offs at-time)#-(and)
+      (push (pw::mk-chord-at
+             (setq acum-t 
+                   (if t-times (pop t-times) (+ acum-t 50)))
+             (cond ((null midics) (list 6000))
+                   ((consp (car midics))  (pop midics))
+                   (t (prog1 midics (setq midics nil))))
+             (cond ((null durs) (list def-dur))
+                   ((consp (car durs)) (pop durs))
+                   (t (prog1 durs (setq durs nil))))
+             (cond ((null offs) (list 0))
+                   ((consp (car offs)) (pop offs))
+                   (t (prog1 offs (setq offs nil))))
+             (cond ((null vels) (list def-vels))
+                   ((consp (car vels)) (pop vels))
+                   (t (prog1 vels (setq vels nil))))
+             (cond ((null channel) (list def-chan))
+                   ((consp (car channel)) (pop channel))
+                   (t (prog1 channel (setq channel nil)))))
+            chord-list))
     (let ((pw::*play-chseq-w/offset* t)) 
       (pw::MidiPlayAny (make-instance 'pw::c-chord-line :chords (reverse chord-list))
                        (pw::compute-approx)
@@ -396,7 +391,7 @@ given parameters to MIDI"
          (:off (setf (state self) t) (set-box-title (popUpbox self) "D"))))
 
 (defmethod patch-value ((self C-pw-midi-in) obj)
-  (midi::midi-reset)
+  (patchwork.midi:midi-reset)
   (if (state self)
       (set-output self :on))
   (let ((box (first (input-objects self))))
@@ -409,9 +404,8 @@ given parameters to MIDI"
     "active"))
 
 (defmethod pw-schedule-midi-in ((self C-pw-midi-in) box patch delay)
-  (niy pw-schedule-midi-in self box patch delay) #-(and)
   (let ((data (midi-read)))
-    (if (and (not (midishare:null-event-p data)) (pw-midi-filtered self data))
+    (if (and (not (patchwork.midi:null-event-p data)) (pw-midi-filtered self data))
         (progn
           (setf (value box) (format-midi self data))
           (patch-value patch self)
@@ -421,8 +415,7 @@ given parameters to MIDI"
 (defmethod format-midi ((self C-pw-midi-in) data) data)
 
 (defmethod pw-midi-filtered ((self C-pw-midi-in) data)
-  (niy pw-midi-filtered self data) #-(and)
-  (not (equal (midishare::type data) midishare::typeClock)))
+  (not (equal (patchwork.midi:evtype data) patchwork.midi:typeClock)))
 
 (defunp pw-midi-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
                     (patch (list (:type-list ())))
@@ -482,22 +475,19 @@ midi-data1;, midi- data2;, and midi-status;.
 (defclass C-pw-note-in (C-pw-midi-in) ())
 
 (defmethod format-midi ((self C-pw-note-in) data)
-  (niy format-midi self data) #-(and)
-  (list (midishare::pitch data) (midishare::vel data) 
-        (1+ (midishare::chan data))))
+  (list (patchwork.midi:pitch data) (patchwork.midi:vel data) 
+        (1+ (patchwork.midi:chan data))))
 
 
 (defmethod pw-midi-filtered ((self C-pw-note-in) data)
-  (niy pw-midi-filtered self data) #-(and)
-  (member (midishare::type data) (list 0 1 2)))
+  (member (patchwork.midi:evtype data) (list 0 1 2)))
 
 
 
 (defclass C-pw-note-on-in (C-pw-note-in) ())
 
 (defmethod pw-midi-filtered ((self C-pw-note-on-in) data)
-  (niy pw-midi-filtered self data) #-(and)
-  (and (call-next-method) (not (zerop (midishare::vel data)))))
+  (and (call-next-method) (not (zerop (patchwork.midi:vel data)))))
 
 (defunp note-on-in ((in-box (list (:value "()" :type-list (midi-in-obj))))
                     (patch (list (:type-list ())))
@@ -536,25 +526,24 @@ endlessly: 'late Task'.
   ((the-chord :initform (make-instance 'pw::C-chord :notes ()) :accessor the-chord)))
 
 (defmethod format-midi ((self C-pw-chord-in) data)
-  (niy format-midi self data) #-(and)
   (let* ((the-chord (the-chord self))
          (the-notes (pw::notes the-chord))
          (a-note (pw::make-C-note   
-                  (* 100 (midishare::pitch data)) nil nil 100 
-                  (midishare::vel data) (1+ (midishare::chan data))
+                  (* 100 (patchwork.midi:pitch data)) nil nil 100 
+                  (patchwork.midi:vel data) (1+ (patchwork.midi:chan data))
                   nil 0 0)))
     (setf (pw::order a-note) (length the-notes))
     (setf (pw::notes the-chord)
           (push (pw::make-C-note   
-                 (* 100 (midishare::pitch data)) nil nil 100 
-                 (midishare::vel data) (1+ (midishare::chan data))
+                 (* 100 (patchwork.midi:pitch data)) nil nil 100 
+                 (patchwork.midi:vel data) (1+ (patchwork.midi:chan data))
                  nil 0 0) the-notes))
     (pw::update-chord the-chord)
     the-chord))
 
 (defmethod patch-value ((self C-pw-chord-in) obj)
   (declare (ignore obj))
-                                        ;(midi::midi-reset)
+                                        ;(patchwork.midi:midi-reset)
   (setf (the-chord self) (make-instance 'pw::C-chord :notes ()))
                                         ;(setf (pw::notes (the-chord self)) nil)
   (call-next-method))
@@ -608,9 +597,9 @@ endlessly: 'late Task'."
 
 (defun pw::pw-reset-for-midi()
   ;;(patchwork.scheduler:set-scheduler-state :oot)
-  (midi:midi-close)
+  (patchwork.midi:midi-close)
   (patchwork.scheduler::init-scheduler)
-  (midi:midi-open)  
+  (patchwork.midi:midi-open)  
   ;;(patchwork.scheduler:set-scheduler-state :rt)
   )
 

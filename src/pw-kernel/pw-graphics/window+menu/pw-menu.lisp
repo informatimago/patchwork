@@ -166,8 +166,7 @@
 
 
 (defun clear-patchwork ()
-  (niy clear-patchwork)
-  #-(and) (midi::midi-close))
+  (patchwork.midi:midi-close))
 
 (defun save-special-pw-image ()
   (niy save-special-pw-image)
@@ -282,6 +281,15 @@ DO:       Execute the BODY with a handler for CONDITION and
 (defvar *pw-multidim-music-menu*  nil)
 (defvar *pw-menu-music*           nil)
 
+(declaim (ftype function patchwork.midi:midi-record
+                patchwork.midi:midi-load
+                patchwork.midi:midi-save))
+
+(defun initialize-midi-menu ()
+  (PW-addmenu-fun *pw-Midi-menu* 'patchwork.midi:midi-record 'C-patch-record)
+  (ui:add-menu-items *pw-Midi-menu*  (new-leafmenu "-" ()))
+  (PW-addmenu-fun *pw-Midi-menu* 'patchwork.midi:midi-load 'C-patch-load-midi)
+  (PW-addmenu-fun *pw-Midi-menu* 'patchwork.midi:midi-save 'C-patch-save-midi))
 
 (defun initialize-menus ()
   ;;------------------------------
