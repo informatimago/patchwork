@@ -222,23 +222,27 @@ Input may be any PatchWork object that could be played through play-object
   ())
 
 
+(defun load-midi (name)
+  (let ((recording-seq (patchwork.midi:midiNewSeq))
+        (delta (patch-value (first (input-objects self)) (first (input-objects self))))
+        rep)
+    (patchwork.midi:with-temporary-midi-file-infos (myInfo)   
+      (patchwork.midi:midi-file-load (namestring name) recording-seq  myInfo)
+      (when recording-seq
+        (print (list  "clicks" (patchwork.midi:mf-clicks myInfo)
+                      "tracks" (patchwork.midi:mf-tracks myInfo)
+                      "MidiFormat" (patchwork.midi:mf-format myInfo)))
+        (let ((*midi-tempo* 1000000))
+          (setf rep (mievents2midilist recording-seq (patchwork.midi:mf-clicks myInfo) )))
+        (midiseq2cl rep delta)))))
+
+
 (defmethod patch-value ((self C-patch-load-midi) obj)
   (declare (ignore obj))
   (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((name (CHOOSE-FILE-DIALOG)))
       (when name
-        (let ((recording-seq (patchwork.midi:midiNewSeq))
-              (delta (patch-value (first (input-objects self)) (first (input-objects self))))
-              rep)
-          (patchwork.midi:with-temporary-midi-file-infos (myInfo)   
-            (patchwork.midi:midi-file-load (namestring name) recording-seq  myInfo)
-            (when recording-seq
-              (print (list  "clicks" (patchwork.midi:mf-clicks myInfo)
-                            "tracks" (patchwork.midi:mf-tracks myInfo)
-                            "MidiFormat" (patchwork.midi:mf-format myInfo)))
-              (let ((*midi-tempo* 1000000))
-                (setf rep (mievents2midilist recording-seq (patchwork.midi:mf-clicks myInfo) )))
-              (midiseq2cl rep delta))))))))
+        (load-midi name)))))
 
 #|
 (defun logical-time (abstract-time cur-tempo tempo-change-abst-time tempo-change-log-time unit/sec)
