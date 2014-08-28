@@ -132,3 +132,20 @@
     (set-view-font  view-now '("monaco" 9 :srcor))))
 
 
+;;====================================================================================================
+
+(defun show-documentation (fname)
+  (let ((title (format nil "Documentation of ~S" fname)))
+    (format t "~A~%~V,,,'-<~>~2%" title (length title))
+    (format t "Arguments:~2%    ~A~2%" (ccl:arglist fname))
+    (format t "~A~2%" (documentation fname 'function))))
+
+(defun edit-definition (thing)
+  (when ccl:*resident-editor-hook*
+    (funcall ccl:*resident-editor-hook* thing))
+  (format t "WARNING: EDIT-DEFINITION is not implemented yet."))
+
+
+
+;;;; THE END ;;;;
+
