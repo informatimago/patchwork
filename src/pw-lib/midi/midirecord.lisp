@@ -150,8 +150,8 @@ delta and output mode."
             (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
             (patchwork.midi:link tempo-evnt (patchwork.midi:firstEv recording-seq) )
             (patchwork.midi:firstEv recording-seq tempo-evnt)
-            (patchwork.midi:midi-file-save (namestring name) recording-seq  myInfo)
-            (set-mac-file-type (namestring name) :|Midi|)
+            (patchwork.midi:midi-file-save name recording-seq  myInfo)
+            (set-mac-file-type name :|Midi|)
             (patchwork.midi:midifreeseq recording-seq)))))))
 
 (defmethod MidiSaveAny ((object t))
@@ -180,8 +180,8 @@ delta and output mode."
       (setf recording-seq (MidiSaveAny (patch-value (first (input-objects self)) (first (input-objects self)))))
       (patchwork.midi:link tempo-evnt (patchwork.midi:firstEv recording-seq) )
       (patchwork.midi:firstEv recording-seq tempo-evnt)
-      (patchwork.midi:midi-file-save (namestring name) recording-seq  myInfo)
-      (set-mac-file-type (namestring name) :|Midi|)
+      (patchwork.midi:midi-file-save name recording-seq  myInfo)
+      (set-mac-file-type name :|Midi|)
       (patchwork.midi:midifreeseq recording-seq))))
 
 (defmethod patch-value ((self C-patch-save-midi) obj)
@@ -222,12 +222,12 @@ Input may be any PatchWork object that could be played through play-object
   ())
 
 
-(defun load-midi (name)
+(defmethod load-midi ((self C-patch-load-midi) name)
   (let ((recording-seq (patchwork.midi:midiNewSeq))
         (delta (patch-value (first (input-objects self)) (first (input-objects self))))
         rep)
     (patchwork.midi:with-temporary-midi-file-infos (myInfo)   
-      (patchwork.midi:midi-file-load (namestring name) recording-seq  myInfo)
+      (patchwork.midi:midi-file-load name recording-seq  myInfo)
       (when recording-seq
         (print (list  "clicks" (patchwork.midi:mf-clicks myInfo)
                       "tracks" (patchwork.midi:mf-tracks myInfo)
@@ -242,7 +242,7 @@ Input may be any PatchWork object that could be played through play-object
   (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((name (CHOOSE-FILE-DIALOG)))
       (when name
-        (load-midi name)))))
+        (load-midi self name)))))
 
 #|
 (defun logical-time (abstract-time cur-tempo tempo-change-abst-time tempo-change-log-time unit/sec)

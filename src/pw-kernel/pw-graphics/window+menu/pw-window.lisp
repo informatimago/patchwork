@@ -116,12 +116,11 @@
 
 (defvar *pw-connections-drawing-mode* ())
 
-(defmethod view-draw-contents :before ((self C-pw-window))
+(defmethod view-draw-contents :after ((self C-pw-window))
+  (format-trace '(view-draw-contents :after c-pw-window))
+  (draw-super-win-title self)
   (unless *pw-connections-drawing-mode*
     (tell (controls self) 'draw-connections)))
-
-(defmethod view-draw-contents :after ((self C-pw-window))
-  (draw-super-win-title self))
 
 (defgeneric draw-super-win-title (self))
 (defmethod draw-super-win-title ((self C-pw-window))
@@ -460,7 +459,9 @@
      (let ((no-change-flag nil))
        (case char
          (#\Return ;; Return
-          (cond ((abstract-box self) (window-hide self) (window-select (view-window (abstract-box self))))
+          (cond ((abstract-box self)
+                 (window-hide self)
+                 (window-select (view-window (abstract-box self))))
                 ((super-win self) (window-hide self) (window-select (super-win self)))
                 (t (ui:ed-beep) (setq no-change-flag t))))
          (#\Newline ;; C-j

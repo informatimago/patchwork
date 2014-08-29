@@ -351,6 +351,7 @@
 (defmethod view-draw-contents ((self C-patch))
   (set-view-font self '("Monaco" 9 :SRCOR :PLAIN))
   (with-font-focused-view self
+    #+debug-view-colors
     (with-pen-state (:pattern *light-gray-pattern*)
       (with-fore-color *light-gray-color*
        (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
@@ -358,7 +359,8 @@
     (draw-small-rects self)
     (draw-patch-view-outline self)
     (draw-function-name self 2 (- (h self) 7))
-    ;; (draw-rect* 0 0 (w self) (h self))
+    (draw-rect* 0 0 (w self)(h self))
+    #+debug-view-colors
     (with-fore-color ui::*blue-color*
       (draw-rect* 0 0 (w self)(h self)))))
 

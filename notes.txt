@@ -1,4 +1,26 @@
 # -*- mode:org; coding:utf-8 -*-
+* Documentation
+
+** Window Key Commands
+
+When *current-small-inbox* is non nil thensend the keys to it.
+Ask any (controls window) if they handle the keys.
+otherwise:
+
+- #\Return (C-m)
+  + If there's an abstract-box, then hide the window, and show the abstract-box window.
+  + If there's a super window, then hide the window, and show the super window.
+  + otherwise beep.
+- #\Newline (C-j)
+  + If there's an abstract-box, then show the abstract-box window.
+  + If there's a super window, then show the super window.
+  + otherwise beep.
+- #\b
+  + browse the active patches.
+- #\Rubout (DEL)
+  + cut-delete
+- #\h
+           
 * Errors & Warnings
 ** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
    CLOSED: [2014-07-24 Thu 02:55]

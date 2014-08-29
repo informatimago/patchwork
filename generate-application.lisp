@@ -62,8 +62,9 @@
 ;;; configure *features*
 ;; (pushnew 'patchwork.builder::no-cocoa *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events *features*)
-(pushnew 'patchwork.builder::cocoa-midi-player *features*)
-
+;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
+;; (pushnew 'patchwork.builder::use-midishare *features*)
+(pushnew 'patchwork.builder::use-cl-midi   *features*)
 
 ;;; --------------------------------------------------------------------
 ;;; Load cocoa

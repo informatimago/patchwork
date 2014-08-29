@@ -40,18 +40,26 @@
 ;;(defun cancel-pop ())
 
 (defun init-PW-box-instance-list ()
-  (for (i 0 1 (1- (length *PW-box-instance-list*)))
-    (when (eq (type-of (nth i *PW-box-instance-list*)) 'cons)
-      (setf (nth i *PW-box-instance-list*) (funcall (nth i *PW-box-instance-list*))))))
+  (map-into *PW-box-instance-list*
+            (lambda (item)
+              (if (functionp item)
+                  (funcall item)
+                  item))
+            *PW-box-instance-list*))
 
 
 (defun make-typed-box-list (patch)
   (cond 
-    ((eq (car (type-list patch)) 'no-connection) (print "no output connections allowed"))  
-    ((not (type-list patch))(print "no output typing"))
+    ((eq (car (type-list patch)) 'no-connection)
+     (print "no output connections allowed"))  
+    ((not (type-list patch))
+     (print "no output typing"))
     (t 
-     (let ((box-list)(forms)(labels)(all-pw-boxes *PW-box-instance-list*))
-       (init-PW-box-instance-list)
+     (init-PW-box-instance-list)
+     (let ((box-list)
+           (forms)
+           (labels)
+           (all-pw-boxes *PW-box-instance-list*))
        (while all-pw-boxes
          (when (intersection  
                 (type-list patch) 
@@ -60,9 +68,8 @@
          (pop all-pw-boxes))
        (setq labels (ask-all box-list 'pw-function-string))
        (while box-list
-         (push   
-          `(browse-typed-boxes  *active-patch-window* ,patch
-                                ,(decompile (pop box-list))) forms))
+         (push `(browse-typed-boxes  *active-patch-window* ,patch
+                                     ,(decompile (pop box-list))) forms))
        (if forms
            (make-pw-pop-up (pairlis (nreverse labels) forms))
            (print "no output typing?"))))))

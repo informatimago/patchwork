@@ -340,14 +340,6 @@ and the FINALIZATION is the clean-up form."
       (minor-scale% e (if v 1 0))
       (= 1 (minor-scale% e 1))))
 
-(defstruct* (seq (:copier nil))
-    (firstev lastev) ())
-
-(defun seq-to-list (seq)
-  (loop
-    :for ev = (firstev seq) :then (link ev)
-    :while ev
-    :collect ev))
 
 (defun field (e &optional f v)
   "give the number of fields or read or set a particular field of an event"
@@ -377,6 +369,32 @@ and the FINALIZATION is the clean-up form."
   (if s
       (fields e (map 'list #'char-code s))
       (map 'string #'character (fields e)) ))
+
+
+
+
+(defstruct* (seq (:copier nil))
+    (firstev lastev) ())
+
+(defun seq-to-list (seq)
+  (loop
+    :for ev = (firstev seq) :then (link ev)
+    :while ev
+    :collect ev))
+
+(defun seq-add-event (seq ev)
+  (if (lastev seq)
+      (link (lastev seq) ev)
+      (firstev seq ev))
+  (lastev seq ev))
+
+#-(and) (
+         (let ((seq (make-seq)))
+            (seq-add-event seq (make-midi-event :evtype 1))
+            (seq-add-event seq (make-midi-event :evtype 2))
+            (seq-add-event seq (make-midi-event :evtype 3))
+            (seq-to-list seq))
+         )
 
 
 ;;;
@@ -590,7 +608,7 @@ and the FINALIZATION is the clean-up form."
       (t
        0))))
 
-(defun MidiAddField (ev val)
+(defun MidiAddField (ev v)
   "Append a field to a MidiEvent (only for sysex and stream)"
   (cond
     ((null (midi-event-additionnal-fields ev))
@@ -983,6 +1001,7 @@ and the FINALIZATION is the clean-up form."
 (defstruct* (midi-file-infos (:conc-name mf-))
     (format timedef clicks tracks))
 
+
 (define-with-temporary-macro with-temporary-midi-file-infos (make-midi-file-infos))
 
 
@@ -1183,7 +1202,7 @@ and the FINALIZATION is the clean-up form."
                               :velocity (vel event)))))
       
       ((#.typeKeyPress) #| key pressure with pitch and pressure value |#
-       (list (let ((class 'midi::note-off-message))
+       (list (let ((class 'midi::polyphonic-key-pressure-message))
                (make-instance class
                               :time date
                               :status (+ (midi:status-min class) chan)
@@ -1246,7 +1265,7 @@ and the FINALIZATION is the clean-up form."
        (list (make-instance 'midi:active-sensing-message :time date)))
       
       ((#.typeReset) #| reset request (no argument) |#
-       (list (let ((class 'reset-all-controllers-message))
+       (list (let ((class 'midi:reset-all-controllers-message))
                (make-instance class
                               :time date
                               :status (+ (midi:status-min class) chan)
@@ -1344,6 +1363,134 @@ and the FINALIZATION is the clean-up form."
        ))))
 
 
+(defun convert-text (message eventType)
+  (let ((ev (make-midi-event :evtype typeSeqNum
+                             :date (midi:message-time message))))
+    (text ev (midi:message-text message))
+    ev))
+
+
+(defgeneric convert-midi-message-to-midishare-event (message)
+  
+  (:method (message)
+    nil)
+
+  (:method ((message midi::note-on-message))
+    (let ((ev (make-midi-event :evtype typeKeyOn
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (pitch ev (midi:message-key message))
+      (vel   ev (midi:message-velocity message))
+      ev))
+
+  (:method ((message midi::note-off-message))
+    (let ((ev (make-midi-event :evtype typeKeyOff
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (pitch ev (midi:message-key message))
+      (vel   ev (midi:message-velocity message))
+      ev))
+
+  (:method ((message midi::polyphonic-key-pressure-message))
+    (let ((ev (make-midi-event :evtype typeKeyPress
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (pitch  ev (midi:message-key message))
+      (kpress ev (midi:message-pressure message))
+      ev))
+
+  (:method ((message midi:control-change-message))
+    (let ((ev (make-midi-event :evtype typeCtrlChange
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (ctrl   ev (midi:message-controller message))
+      (valint ev (midi:message-value message))
+      ev))
+
+  (:method ((message midi:program-change-message))
+    (let ((ev (make-midi-event :evtype typeProgChange
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (pgm ev (midi:message-program message))
+      ev))
+
+  (:method ((message midi:channel-pressure-message))
+    (let ((ev (make-midi-event :evtype typeChanPress
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (kpress ev (midi:message-pressure message))
+      ev))
+
+  (:method ((message midi:pitch-bend-message))
+    (let ((ev (make-midi-event :evtype typePitchBend
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (valing ev (midi:message-value message))
+      ev))
+
+  (:method ((message midi:timing-clock-message))
+    (make-midi-event :evtype typeClock :date (midi:message-time message) :port 0))
+
+  (:method ((message midi:start-sequence-message))
+    (make-midi-event :evtype typeStart :date (midi:message-time message) :port 0))
+
+  (:method ((message midi:continue-sequence-message))
+    (make-midi-event :evtype typeContinue :date (midi:message-time message) :port 0))
+
+  (:method ((message midi:stop-sequence-message))
+    (make-midi-event :evtype typeStop :date (midi:message-time message) :port 0))
+
+  (:method ((message midi:tune-request-message))
+    (make-midi-event :evtype typeTune :date (midi:message-time message) :port 0))
+
+  (:method ((message midi:active-sensing-message))
+    (make-midi-event :evtype typeActiveSens :date (midi:message-time message) :port 0))
+
+  (:method ((message midi:reset-all-controllers-message))
+    (make-midi-event :evtype typeReset
+                     :date (midi:message-time message)
+                     :port 0
+                     :chan (midi:message-channel message)))
+  
+  (:method ((message midi:sequence-number-message))
+    (let ((ev (make-midi-event :evtype typeSeqNum
+                               :date (midi:message-time message)
+                               :port 0
+                               :chan (midi:message-channel message))))
+      (num ev (midi:message-sequence message))
+      ev))
+
+  (:method ((message midi:general-text-message))        (convert-text message typeTextual))
+  (:method ((message midi:copyright-message))           (convert-text message typeCopyright))
+  (:method ((message midi:sequence/track-name-message)) (convert-text message typeSeqName))
+  (:method ((message midi:instrument-message))          (convert-text message typeInstrName))
+  (:method ((message midi:lyric-message))               (convert-text message typeLyric))
+  (:method ((message midi:marker-message))              (convert-text message typeMarker))
+  (:method ((message midi:cue-point-message))           (convert-text message typeCuePoint))
+
+  (:method ((message midi:channel-prefix-message))
+    (make-midi-event :evtype typeChanPrefix
+                     :date (midi:message-time message)
+                     :port 0
+                     :chan (midi:message-channel message)))
+
+  (:method ((message midi:end-of-track-message))
+    (make-midi-event :evtype typeEndTrack :date (midi:message-time message)))
+
+  (:method ((message midi:tempo-message))
+    (let ((ev (make-midi-event :evtype typeTempo
+                               :date (midi:message-time message))))
+      (tempo ev (midi:message-tempo message))
+      ev)))
+
+
 (defun MidiFileSave (name seq info)
   (midi:write-midi-file
    (make-instance 'midi:midifile
@@ -1358,7 +1505,31 @@ and the FINALIZATION is the clean-up form."
    name))
 
 (defun MidiFileLoad (name seq info)
-  )
+  (let* ((mf (midi:read-midi-file name))
+         (track (first (if (zerop (midi:midifile-format mf))
+                           (midi:midifile-tracks mf)
+                           (midi::format1-tracks-to-format0-tracks (midi:midifile-tracks mf))))))
+    (mf-format info (midi:midifile-format mf))
+    ;; (mf-timedef info ?)
+    (mf-clicks info (midi:midifile-division mf))
+    (mf-tracks info 1)
+    (format t "Read ~D MIDI events.~%" (length track))
+    (dolist (mev track)
+      (let ((ev (convert-midi-message-to-midishare-event mev)))
+        (when ev
+          (seq-add-event seq ev))))
+    seq))
+
+
+#-(and) (
+         (let ((seq (make-seq))
+               (info (make-midi-file-infos)))
+           (midifileload #P"~/Documents/Patchwork/PW-user-patches/B/ afrik midi/167"
+                         seq info)
+           seq)
+
+         (inspect (midi:read-midi-file #P"~/Documents/Patchwork/PW-user-patches/B/ afrik midi/167"))
+         )
 
 (defun midi-file-save (name seq info)
   (MidiFileSave  name seq info))

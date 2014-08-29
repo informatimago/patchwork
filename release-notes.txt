@@ -6,6 +6,20 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+
+10.0-0.737
+-----------------------
+
+This release let you load an generate MIDI files, using the Common
+Lisp MIDI library (from Robert Strandh at Bordeaux), instead of
+MidiShare, which is not entirely ported to MacOSX 64-bit yet.
+
+This release uses the new graphic model where MCL view classes don't
+have a matching Cocoa NSView class.  
+
+The text fields, controls and dialogs are not completed yet.
+
+
 - PW-USER configured by default as ~/Documents/Patchwork/
   This can be changed by adding editing the file ~/LOGHOSTS/PW-USER 
   with a sexp such as: ::
@@ -29,6 +43,9 @@ next release
   in the same listener window, instead of closing the listener window.
 - corrected the menu titles: Patchwork, Apps, … instead of Clozure CL, Patchwork, …
 - set the icon of the application.
+- Added "Show Scheduler Queue" menu item.
+- Replaced Midishare by CL-MIDI.
+- implemented show-documentation and partially edit-definition.
 
 
 10.0-0.907

@@ -105,6 +105,11 @@
 ;; (pushnew 'patchwork.builder::use-midishare *features*)
 (pushnew 'patchwork.builder::use-cl-midi   *features*)
 
+;; (pushnew :debug               *features*)
+;; (pushnew :debug-view          *features*)
+;; (pushnew :debug-view-colors   *features*)
+
+
 
 ;;; --------------------------------------------------------------------
 ;;; Load cocoa
@@ -154,6 +159,36 @@
          (*query-io* *query-io*)
          (*debug-io* *debug-io*))
      ,@body))
+
+
+(defmacro show (&body expressions)
+  "
+DO:         Prints each expression and their values.
+"
+  (let ((width (reduce (function max)
+                       (mapcar (lambda (expr) (length (format nil "~S" expr)))
+                               expressions)
+                       :initial-value 0)))
+    `(progn
+       ,@(mapcar
+          (lambda (expr) 
+            `(let ((vals  (multiple-value-list ,expr)))
+               (format *trace-output* 
+                 ,(format nil "~~~DS = ~~{~~S~~^ ; ~~%~:*~VA   ~~}~~%" width "")
+                 (quote ,expr) vals)
+               (values-list vals)))
+          expressions))))
+
+(defun print-streams ()
+  (show
+    *terminal-io*
+    *standard-input*
+    *standard-output*
+    *error-output*
+    *trace-output*
+    *query-io*
+    *debug-io*)
+  (values))
 
 #+swank (progn
           (defvar *slime-input*  *standard-input*)

@@ -80,7 +80,7 @@ It cannot be changed, except in the source code.")
 ;; Returns the current real-time.
 ;; Any task with an exectime smaller than the current real-time is ready to execute.
 
-(defmacro real-time () '(+ (clock-time) *schedulertime--clocktime*))
+(defmacro real-time () '(+ (patchwork.midi:clock-time) *schedulertime--clocktime*))
 
 ;; The current scheduler time.
 (defvar *scheduler-time*)
@@ -202,7 +202,7 @@ is (1- (priority)) unless 0 is achieved."
 keywords: :RT :STEP :OOT :OOT1."
   (if (eq state :RT)
       (unless *scheduler-RT?*
-        (setf *schedulertime--clocktime* (- *scheduler-time* (clock-time))
+        (setf *schedulertime--clocktime* (- *scheduler-time* (patchwork.midi:clock-time))
               *scheduler-RT?* t))
       (progn
         (setf *scheduler-RT?* nil)
@@ -304,7 +304,7 @@ by replacing its function with a null one."
 is stopped in the :STEP mode)."
   (let (task (tmax (+ *scheduler-time* *wait-queue-size*)))
     (format stream "; At current exec-time ~D (clock=~D) [~S mode]~%"
-            *scheduler-time* (clock-time) (scheduler-state))
+            *scheduler-time* (patchwork.midi:clock-time) (scheduler-state))
     (format stream "; Ready   |  lat |  exec  |   log  | adv | pri| form~%")
     (do ((index (1- *ready-queue-size*) (1- index)))
         ((<= index 0))
@@ -702,7 +702,7 @@ nil)
             (svref *wait-queue-tails* i) nil))
     (setf *free-tasks* (make-task 0 0 0 0 #'no-op nil)
           *schedulertime--clocktime* 0
-          *scheduler-time* (clock-time))
+          *scheduler-time* (patchwork.midi:clock-time))
     nil))
 
 ;; Initializes the scheduler (called only once).
