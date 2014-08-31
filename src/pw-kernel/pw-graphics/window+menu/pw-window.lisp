@@ -117,7 +117,7 @@
 (defvar *pw-connections-drawing-mode* ())
 
 (defmethod view-draw-contents :after ((self C-pw-window))
-  (format-trace '(view-draw-contents :after c-pw-window))
+  #+debug-view (format-trace '(view-draw-contents :after c-pw-window))
   (draw-super-win-title self)
   (unless *pw-connections-drawing-mode*
     (tell (controls self) 'draw-connections)))

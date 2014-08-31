@@ -108,7 +108,7 @@
 ;; (pushnew :debug               *features*)
 ;; (pushnew :debug-view          *features*)
 ;; (pushnew :debug-view-colors   *features*)
-
+;; (pushnew :debug-event         *features*)
 
 
 ;;; --------------------------------------------------------------------

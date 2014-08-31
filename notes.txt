@@ -1,6 +1,6 @@
 # -*- mode:org; coding:utf-8 -*-
-* Documentation
 
+* Documentation
 ** Window Key Commands
 
 When *current-small-inbox* is non nil thensend the keys to it.
@@ -21,12 +21,28 @@ otherwise:
   + cut-delete
 - #\h
            
-* Errors & Warnings
+* Errors, Warnings, TODOs
 ** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
    CLOSED: [2014-07-24 Thu 02:55]
    - State "DONE"       from "TODO"       [2014-07-24 Thu 02:55] \\
      Temporary hack.
-** TODO 00003 When we click on the output box, the view is displayed zoomed in.
+** DONE 00003 When we click on the output box, the view is displayed zoomed in.
+   CLOSED: [2014-08-31 Sun 08:42]
+   - State "DONE"       from "TODO"       [2014-08-31 Sun 08:42] \\
+     new-instance & coordinate system corrected.
+** TODO 00000 Classes that need to be implemented satisfactorily:
+
+- dialog
+- dialog-item
+- table-dialog-item
+- button-dialog-item 
+- static-text-dialog-item 
+- editable-text-dialog-ietm
+- dialog
+- fred-window
+- window
+- view
+
 ** TODO 00002 Objective-C runtime exception: Item to be removed is not in the menu in the first place
 
 #+BEGIN_QUOTE
@@ -58,6 +74,64 @@ otherwise:
     Item to be removed is not in the menu in the first place
 
 #+END_QUOTE
+
+** TODO 00004 Les patchs les plus complexes sont lents à charger.
+Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
+<d:s:R x 5>
+** TODO 00005 Effacements partiels et provisoires des objets 
+(réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
+** TODO 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
+** TODO 00007 Text Edit
+- Impossibilité d’inscrire une liste dans un objet.
+- Window Comment ne fonctionne pas.
+** TODO 00008 Le résultat numérique dans le Listener est pris dans un flot de données, ce résultat ne peux pas se copier et c’est une fonction nécessaire (également impossibilité d’écrire dans le Listener).
+** TODO 00009 Impossibilité de supprimer des objets dans un patch.
+** TODO 00010 Quelquefois il y a eu impossibilité d’évaluation.
+En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
+crois plutôt que - pour une raison inconnue - la fenêtre du Listener
+en fonction devient inactive, en activant une nouvelle fenêtre de
+Listener l’évaluation est à nouveau possible…
+
+** TODO 00011 Le buffer est incomplet : il doit avoir une fonction de conservation des données obtenue par un clic sur un petit rond au centre de l’objet, ce petit rond doit alors se transformer en croix pour signifier cette conservation des données.
+
+L’objet accum doit se verrouiller, comme l’objet buffer et l’objet
+list-ed, ceci pour conserver les données qui y ont entrées
+précédemment.
+
+On doit verrouiller en cliquant sur un petit rond au centre de l’objet
+qui se transforme alors en croix, pour dévérouiller on clique sur
+cette croix qui redevient alors un petit rond.
+
+** TODO 00012 Détail inimportant (mais peut-être significatif pour votre travail) : quand on active le lien entre deux objets (en cliquant sur le petit rectangle au bas de l’objet) l’origine de ce lien apparaît plus bas à gauche plutôt que dans le petit rectangle...
+** TODO 00013 Abstract (patch contenu dans un nouvel objet) ne peut pas se créer pour le moment.
+
+Pour créer un nouvel objet Abstract (contenant des objets provenant
+des menus ou/et d’autres Abstracts) il faut connecter un ou plusieurs
+« absbin » à l’entrée ou aux entrées et un « absout » à la sortie (en
+nommant l’Abstract dans la fenêtre « absout »), puis sélectionner le
+tout et aller dans le menu PWoper —> Abstract. Le nouvel objet doit
+alors apparaître.
+
+** TODO 00014 On génère une entrée supplémentaire pour certains objets avec alt-clic
+
+trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
+band-filter, x-union, x-intersect, x-xor, x-diff, inclued ?,
+sort-list, permut-circ, mk-note, mk-chord, chordseq, multiseq,
+quantify, rtm, poly-rtm, get-note-slots.
+
+Lors de cette opération les objets se déplacent sur la fenêtre. Pour
+l’objet test, alt-clic génère deux entrées supplémentaires plutôt
+qu’une seule. 
+
+** TODO 00015 Dans le menu Kernel —> List, il manque les objets suivants : interlock, subs-posn, group-list, first-n, last-n.
+** TODO 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer. 
+** TODO 00017 Grow box
+
+Les objets avec un petit carré en bas à droite devraient pouvoir
+s’allonger en cliquant sur ce petit carré et en étirant l’objet avec
+la souris.
+
+** TODO 00018 closing a modified patch asks twice to save it.
 
 * Not Implemented Yet
 
@@ -508,6 +582,8 @@ ffigen4 is needed to build the ccl interface databases of Midishare.
 
 ** Midishare
 
+midishare is not 64-bit clean.  It needs more work.
+
 The current distribution of Midishare (.dmg) is compiled only for ppc and 32-bit i386 processors. ::
 
     $ file /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare
@@ -538,20 +614,6 @@ Therefore we must compile midishare ourselves.
 (defparameter *user-library-folder-path*  (merge-pathnames "**;*.lib" *config-default-libr-path*))
 #+END_SRC
 
-** Classes used
-
-Classes that need to be implemented satisfactorily:
-
-- dialog
-- dialog-item
-- table-dialog-item
-- button-dialog-item 
-- static-text-dialog-item 
-- editable-text-dialog-ietm
-- dialog
-- fred-window
-- window
-- vie
 
 ** Packages
 

@@ -1373,6 +1373,7 @@ and the FINALIZATION is the clean-up form."
 (defgeneric convert-midi-message-to-midishare-event (message)
   
   (:method (message)
+    (declare (ignorable message))
     nil)
 
   (:method ((message midi::note-on-message))
@@ -1432,7 +1433,7 @@ and the FINALIZATION is the clean-up form."
                                :date (midi:message-time message)
                                :port 0
                                :chan (midi:message-channel message))))
-      (valing ev (midi:message-value message))
+      (valint ev (midi:message-value message))
       ev))
 
   (:method ((message midi:timing-clock-message))
