@@ -6,6 +6,14 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+10.0-0.730
+-----------------------
+
+- Optimized a little loading and display time.
+- Added .pwpatch extension to saved file names.
+- Corrected double window close bug (asked twice whether to save a modified patch window on close).
+- Corrected a few internal bugs.
+
 
 10.0-0.737
 -----------------------
