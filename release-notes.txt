@@ -6,13 +6,13 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
-10.0-0.730
+10.0-0.717
 -----------------------
 
 - Optimized a little loading and display time.
-- Added .pwpatch extension to saved file names.
+- Added .pwpatch or .midi extensions to saved file names.
 - Corrected double window close bug (asked twice whether to save a modified patch window on close).
-- Corrected a few internal bugs.
+- Corrected a few internal bugs (all make-array should have a :initial-element, etc).
 
 
 10.0-0.737
@@ -29,7 +29,7 @@ The text fields, controls and dialogs are not completed yet.
 
 
 - PW-USER configured by default as ~/Documents/Patchwork/
-  This can be changed by adding editing the file ~/LOGHOSTS/PW-USER 
+  This can be changed by adding or editing the file ~/LOGHOSTS/PW-USER 
   with a sexp such as: ::
 
       #.(let ((pw-user (merge-pathnames #P"Documents/Patchwork/" (user-homedir-pathname))))

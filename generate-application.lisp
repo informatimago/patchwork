@@ -270,6 +270,9 @@
    :toplevel-function nil
    :altconsole nil))
 
+
+(say "*lisp-startup-functions* = ~S~%" ccl::*lisp-startup-functions*)
+
 (unless *load-pathname*
   (let ((destination (merge-pathnames #P"Patchwork.app/Contents/Resources/patchwork-icon.icns"
                                       *release-directory*)))

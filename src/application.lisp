@@ -106,13 +106,14 @@
 (defun initialize-patchwork ()
   "Initialize the Patchwork application.
 Must be called on the main thread."
-  (ui:initialize)
-  (initialize-streams)
-  (initialize-mn-editor)
-  (initialize-menus)
-  (initialize-beat-measure-line)
-  (initialize-directories)
-  #-(and)(installapple-event-handlers)
+  (ui::reporting-errors
+    (ui:initialize)
+    (initialize-streams)
+    (initialize-mn-editor)
+    (initialize-menus)
+    (initialize-beat-measure-line)
+    (initialize-directories)
+    #-(and)(installapple-event-handlers))
   ;; ---
   (format *patchwork-io* "~&Welcome to Patchwork!~%")
   (finish-output *patchwork-io*)

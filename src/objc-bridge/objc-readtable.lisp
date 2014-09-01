@@ -104,7 +104,7 @@ that returns a structure (by reference) via the pointer x.
 
 (defun sharp-slash-reader-macro (stream subchar numarg)
   (declare (ignorable subchar numarg))
-  (let* ((token (make-array 16 :element-type 'character :fill-pointer 0 :adjustable t)))
+  (let* ((token (make-array 16 :element-type 'character :initial-element #\space :fill-pointer 0 :adjustable t)))
     (loop
       (let* ((char (read-char stream nil nil)))
         (if (or (eql char #\:)

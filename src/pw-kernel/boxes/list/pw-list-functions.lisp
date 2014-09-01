@@ -520,9 +520,10 @@ filter> returns (3 5). The argument list  can be a list of lists. In this case t
 described behaviour applies to each sublist."
   (band-select list posn delete))
 
+
 (defunp list-part ((list list) (ncol fix>0 (:value 2))) list 
     "partitions <list> in <ncol> lists containing the elements modulo <ncol>"
-  (let ((vector (make-array  ncol )) res)
+  (let ((vector (make-array ncol :initial-element nil)) res)
     (while list 
       (for (i 0 1 (1- ncol))
         (and list (vset vector i (push (pop list) (vref vector i))))))

@@ -54,7 +54,7 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
 
-  (defvar *cents-vector* (make-array '(100)))
+  (defvar *cents-vector* (make-array '(100) :initial-element nil))
 
   (defun update-cents-vector (pitch-bend-range)
     (let ((steps (truncate (/  8192 pitch-bend-range))) ; 8192 = high (64) * low (128) -> 1 octave

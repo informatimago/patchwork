@@ -48,7 +48,7 @@
   (update-size (first (subviews self)) (view-size self)))
 
 (defclass C-array-item (table-dialog-item)
-  ((my-array :initform (make-array '(2 2)) :initarg :my-array :accessor my-array)))
+  ((my-array :initform (make-array '(2 2) :initial-element nil) :initarg :my-array :accessor my-array)))
 
 (defmethod update-size ((self C-array-item) size)
   (set-view-size self (subtract-points  size (make-point 20 20))))
@@ -69,8 +69,7 @@
     (add-subviews dialog self)))
     
 (defclass C-table-displayer (C-patch-application)
-  ((table :initform 
-          (make-array '(11 7) :initial-element #\Space :adjustable t)
+  ((table :initform (make-array '(11 7) :initial-element #\Space :adjustable t)
           :initarg :table :accessor table)
    (current-layout :initform 'l )
    (MenuBox :initform () :initarg :MenuBox :accessor menubox)
@@ -133,7 +132,7 @@
 (defmethod fill-table-disp ((self C-table-displayer) maxlength data increm)
   (let ((init-pos 0) (index 0))
     (setf (table self)
-          (make-array  (list  (* maxlength increm)(length data))
+          (make-array (list  (* maxlength increm) (length data))
                        :initial-element #\Space))
     (dolist (row data)
       (setq init-pos (- maxlength (length (list! row)) increm))

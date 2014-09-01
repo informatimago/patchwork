@@ -290,12 +290,12 @@ by replacing its function with a null one."
 ;;; The ready queue is indexed by the priority of the tasks.
 
 (defconstant *wait-queue-size* 2000)
-(defvar *wait-queue-heads* (make-array (list *wait-queue-size*)))
-(defvar *wait-queue-tails* (make-array (list *wait-queue-size*)))
+(defvar *wait-queue-heads* (make-array (list *wait-queue-size*) :initial-element nil))
+(defvar *wait-queue-tails* (make-array (list *wait-queue-size*) :initial-element nil))
 
 (defconstant *ready-queue-size* (+ *highest-priority* 1))
-(defvar *ready-queue-heads* (make-array (list *ready-queue-size*)))
-(defvar *ready-queue-tails* (make-array (list *ready-queue-size*)))
+(defvar *ready-queue-heads* (make-array (list *ready-queue-size*) :initial-element nil))
+(defvar *ready-queue-tails* (make-array (list *ready-queue-size*) :initial-element nil))
 
 (defvar *nb-waiting-tasks* 0)
 

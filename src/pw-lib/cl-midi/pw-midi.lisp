@@ -262,7 +262,7 @@ returned; called with two arguments, the value of the field is set.
          ,@(when documentation (list documentation))
          ,@compulsory-fields
          ,@(when variable-fields
-             `((info (make-array ,(length variable-fields)))
+             `((info (make-array ,(length variable-fields) :initial-element nil))
                additionnal-fields)))
        ,@(mapcar (lambda (field)
                    (let* ((fname (conc-symbol conc-name (first-element field)))
@@ -587,7 +587,7 @@ and the FINALIZATION is the clean-up form."
       ((< f base)
        (setf (aref (midi-event-info ev) f) v))
       ((null (midi-event-additionnal-fields ev))
-       (setf (midi-event-additionnal-fields ev) (make-array (1+ f) :adjustable t)
+       (setf (midi-event-additionnal-fields ev) (make-array (1+ f) :initial-element nil :adjustable t)
              (aref (midi-event-additionnal-fields ev) f) v))
       ((< (- f base) (length (midi-event-additionnal-fields ev)))
        (setf (aref (midi-event-additionnal-fields ev) (- f base)) v))
@@ -612,7 +612,7 @@ and the FINALIZATION is the clean-up form."
   "Append a field to a MidiEvent (only for sysex and stream)"
   (cond
     ((null (midi-event-additionnal-fields ev))
-     (setf (midi-event-additionnal-fields ev) (make-array 1 :adjustable t)
+     (setf (midi-event-additionnal-fields ev) (make-array 1 :initial-element nil :adjustable t)
            (aref (midi-event-additionnal-fields ev) 0) v))
     (t
      (setf (midi-event-additionnal-fields ev) (adjust-array (midi-event-additionnal-fields ev) (1+ (length (midi-event-additionnal-fields ev))))
@@ -1635,7 +1635,6 @@ and the FINALIZATION is the clean-up form."
 (defun midi-write-time (event time)
   (when *pw-refnum*
     (MidiSendAt *pw-refnum* event time)))
-
 
 (defun midi-write (event)
   (midi-write-time event (MidiGetTime)))

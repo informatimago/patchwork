@@ -144,7 +144,7 @@
   (coerce (loop
             for i from 0 below (length hexes) by 4
             for b = (parse-integer hexes :radix 16 :start i :end (+ i 4))
-            for v = (make-array 16 :element-type 'bit)
+            for v = (make-array 16 :element-type 'bit :initial-element 0)
             do (loop for j from 0 to 15
                      do (setf (aref v j) (if (logbitp (- 15 j) b) 1 0)))
             collect v) 'vector))

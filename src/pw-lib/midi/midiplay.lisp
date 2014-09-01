@@ -35,6 +35,43 @@
 
 (in-package :pw)
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (fmakunbound 'PLAY-FROM-PW)
+
+  ;; (dolist (x '((:METHOD PLAY-ALL-STAFFS (C-CHORD-MUS-NOT-VIEW))
+  ;;              (:METHOD PLAY-ARPEGGIATED (C-CHORD-MUS-NOT-VIEW))
+  ;;              (:METHOD PLAY (C-PATCH-MIDI))
+  ;;              (:METHOD PLAY-ALL-STAFFS (C-MN-VIEW-MOD))
+  ;;              (:METHOD PLAY-ALL-STAFFS (C-MUS-NOT-VIEW))
+  ;;              (:METHOD PLAY (C-PATCH-APPLICATION-RTM-EDITOR))
+  ;;              (:METHOD PLAY (C-PATCH-POLIFRTM))
+  ;;              (:METHOD STOP-PLAY (C-PATCH-POLIFRTM))
+  ;;              (:METHOD STOP-PLAY (C-PATCH-SCORE-VOICE))
+  ;;              (:METHOD STOP-PLAY (C-PATCH-MIDI))
+  ;;              (:METHOD STOP-ALL-STAFFS (C-MUS-NOT-VIEW))
+  ;;              (:METHOD STOP-MEASURE-LINE (C-MEASURE-LINE))
+  ;;              ))
+  ;;   (insert (format "%S\n" `(remove-method (function ,(second x))
+  ;;                                          (find-method (function ,(second x))
+  ;;                                                       '()
+  ;;                                                       ',(third x)
+  ;;                                                       nil)))))
+  (ignore-errors (remove-method (function PLAY-ALL-STAFFS) (find-method (function PLAY-ALL-STAFFS) (quote nil) (quote (C-CHORD-MUS-NOT-VIEW)) nil)))
+  (ignore-errors (remove-method (function PLAY-ARPEGGIATED) (find-method (function PLAY-ARPEGGIATED) (quote nil) (quote (C-CHORD-MUS-NOT-VIEW)) nil)))
+  (ignore-errors (remove-method (function PLAY) (find-method (function PLAY) (quote nil) (quote (C-PATCH-MIDI)) nil)))
+  (ignore-errors (remove-method (function PLAY-ALL-STAFFS) (find-method (function PLAY-ALL-STAFFS) (quote nil) (quote (C-MN-VIEW-MOD)) nil)))
+  (ignore-errors (remove-method (function PLAY-ALL-STAFFS) (find-method (function PLAY-ALL-STAFFS) (quote nil) (quote (C-MUS-NOT-VIEW)) nil)))
+  (ignore-errors (remove-method (function PLAY) (find-method (function PLAY) (quote nil) (quote (C-PATCH-APPLICATION-RTM-EDITOR)) nil)))
+  (ignore-errors (remove-method (function PLAY) (find-method (function PLAY) (quote nil) (quote (C-PATCH-POLIFRTM)) nil)))
+  (ignore-errors (remove-method (function STOP-PLAY) (find-method (function STOP-PLAY) (quote nil) (quote (C-PATCH-POLIFRTM)) nil)))
+  (ignore-errors (remove-method (function STOP-PLAY) (find-method (function STOP-PLAY) (quote nil) (quote (C-PATCH-SCORE-VOICE)) nil)))
+  (ignore-errors (remove-method (function STOP-PLAY) (find-method (function STOP-PLAY) (quote nil) (quote (C-PATCH-MIDI)) nil)))
+  (ignore-errors (remove-method (function STOP-ALL-STAFFS) (find-method (function STOP-ALL-STAFFS) (quote nil) (quote (C-MUS-NOT-VIEW)) nil)))
+  (ignore-errors (remove-method (function STOP-MEASURE-LINE) (find-method (function STOP-MEASURE-LINE) (quote nil) (quote (C-MEASURE-LINE)) nil)))
+  );;eval-when
+
+
+
 (defmacro convert-time (time unit/sec)
   `(* (/  *midi-tempo* 1000000) (/ ,time ,unit/sec) 100))
 
@@ -69,14 +106,15 @@
 
 (defgeneric MidiPlayANy (object &optional approx chanbase))
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
-  (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
+  (when (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
     (let ((playerIdle))
       (patchwork.midi:with-temporary-player-state (mystate)
         (patchwork.midi:getStatePlayer patchwork.midi:*player* myState) 
         (when (= (patchwork.midi:s-state myState) patchwork.midi:kIdle)
           (setf playerIdle t))
         (unless playerIdle
-          (print "Wait end of previous play!"))
+          (format t "~&Wait end of previous play!~%")
+          (finish-output))
         (when playerIdle
           (let ((seq (patchwork.midi:midinewseq)))
             (setf *MidiShare-start-time* 0)

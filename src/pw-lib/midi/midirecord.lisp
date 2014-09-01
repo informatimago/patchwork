@@ -166,7 +166,7 @@ delta and output mode."
 ;;changed from paw-modifs 140397 aaa
 |#
 
-
+(defgeneric save-midi (patch name))
 (defmethod save-midi ((self c-patch-save-midi) name)
   (let ((tempo-evnt (patchwork.midi:MidiNewEv patchwork.midi:typetempo))
         recording-seq)
@@ -189,7 +189,7 @@ delta and output mode."
   (when (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
     (let ((name (CHOOSE-NEW-FILE-DIALOG)))
       (when name
-        (save-midi self name)))))
+        (save-midi self (make-pathname :type "midi" :defaults name))))))
 
 
 (defgeneric MidiSaveAny (object))
@@ -221,7 +221,7 @@ Input may be any PatchWork object that could be played through play-object
 (defclass C-patch-load-midi (C-pw-resize-x)
   ())
 
-
+(defgeneric load-midi (patch name))
 (defmethod load-midi ((self C-patch-load-midi) name)
   (let ((recording-seq (patchwork.midi:midiNewSeq))
         (delta (patch-value (first (input-objects self)) (first (input-objects self))))

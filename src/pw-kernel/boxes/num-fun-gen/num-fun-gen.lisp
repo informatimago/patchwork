@@ -81,9 +81,9 @@ figures out which variables are involved."
     (unless (every #'numberp l-x-y)
       (error "l-x-y must contain only numbers ~S." l-x-y))
     (let* ((length (/ length 2))
-           (vx (make-array length))
-           (vy (make-array length))
-           (Aitken (make-array length)))
+           (vx (make-array length :initial-element 0))
+           (vy (make-array length :initial-element 0))
+           (Aitken (make-array length :initial-element 0)))
       (setq length (1- length) index -1)
       (while l-x-y
         (incf index)

@@ -165,15 +165,15 @@
        (next-objc-class-id 0)
        (next-objc-metaclass-id 0)
        (class-table-size 1024)
-       (c (make-array class-table-size))
-       (m (make-array class-table-size))
+       (c (make-array class-table-size :initial-element nil))
+       (m (make-array class-table-size :initial-element nil))
        (cw (make-array class-table-size :initial-element nil))
        (mw (make-array class-table-size :initial-element nil))
-       (csv (make-array class-table-size))
-       (msv (make-array class-table-size))
+       (csv (make-array class-table-size :initial-element nil))
+       (msv (make-array class-table-size :initial-element nil))
        (class-id->metaclass-id (make-array class-table-size :initial-element nil))
-       (class-foreign-names (make-array class-table-size))
-       (metaclass-foreign-names (make-array class-table-size))
+       (class-foreign-names (make-array class-table-size :initial-element nil))
+       (metaclass-foreign-names (make-array class-table-size :initial-element nil))
        (class-id->ordinal (make-array class-table-size :initial-element nil))
        (metaclass-id->ordinal (make-array class-table-size :initial-element nil)))
 
@@ -2237,7 +2237,7 @@ argument lisp string."
 
 
 
-(let* ((objc-gen-message-args (make-array 10 :fill-pointer 0 :adjustable t)))
+(let* ((objc-gen-message-args (make-array 10 :initial-element nil :fill-pointer 0 :adjustable t)))
   (defun %objc-gen-message-arg (n)
     (let* ((len (length objc-gen-message-args)))
       (do* ((i len (1+ i)))

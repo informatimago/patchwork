@@ -300,7 +300,7 @@
 
   (defun ns::ns-decimal-mantissa (decimal)
     (if (typep decimal 'ns::ns-decimal)
-        (let* ((dest (make-array 8 :element-type '(unsigned-byte 16))))
+        (let* ((dest (make-array 8 :element-type '(unsigned-byte 16) :initial-element 0)))
           (ccl:with-macptrs ((m (ccl:pref decimal :<NSD>ecimal._mantissa)))
             (dotimes (i 8 dest)
               (setf (aref dest i) (ccl:paref m (:* (:unsigned 16)) i)))))
