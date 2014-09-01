@@ -220,7 +220,7 @@
     (when (and (instrument self) *mn-view-ins-flag* t-scfactor) 
       (draw-char x-now y-now #\Ω)
       (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
-    (if (and alt (not (eq *staff-num* 7) )) ; empty staff
+    (if (and alt (not (eql *staff-num* 7) )) ; empty staff
         (draw-char (+ x (alt-delta-x self)) y-now alt))))
 
 (defgeneric draw-note-duration-line (self x1 y-now t-scfactor))
@@ -280,7 +280,7 @@
 
 (defgeneric inside-note\?-3 (self mouse-x chord-x y-val))
 (defmethod inside-note?-3 ((self C-note) mouse-x chord-x y-val)
-  (when (and (eq y-val (diatone self)) 
+  (when (and (eql y-val (diatone self)) 
              (< (- (+ chord-x (delta-x self)) 3) mouse-x 
                 (+ (+ chord-x (delta-x self)) 5)))
     self))
@@ -306,7 +306,7 @@
 ;;============================================
 
 (defun make-chord-object (midics t-time &optional chord-object)
-  (if  (eq (type-of (car midics))  chord-object)
+  (if  (eql (type-of (car midics))  chord-object)
     (progn (setf (t-time (car midics)) t-time) (car midics))
     (let ((order -1) notes)
       (dolist (pitch midics)
@@ -344,8 +344,8 @@
 
 (defgeneric play-chord (self))
 (defmethod play-chord ((self C-chord))
-  (cond ((eq *playing-option* :pb) (tell (notes self) 'play-note))
-        ((eq *playing-option* :mc)
+  (cond ((eql *playing-option* :pb) (tell (notes self) 'play-note))
+        ((eql *playing-option* :mc)
          (let ((notes (notes self))
                approx-m)
            (dolist (note notes)
@@ -491,7 +491,7 @@
 
 (defun ledger-zone1-a (note)
   (let ((midic (round-midic (midic note))))
-    (or (and (eq *current-music-notation-scale* *c-major-scale*) (= midic 8000))
+    (or (and (eql *current-music-notation-scale* *c-major-scale*) (= midic 8000))
         (and (>= midic 8075) (< midic 8575)))))
     ;(or (= midic 8000) (and (>= midic 8075) (< midic 8575)))))
 
@@ -512,7 +512,7 @@
   (draw-ledger-for-notes (notes self) x y-min y-max C5))
 
 (defun draw-ledger-for-notes (notes x y-min y-max C5)
- (unless (eq *staff-num* 7)   ; empty staff
+ (unless (eql *staff-num* 7)   ; empty staff
    (multiple-value-bind (high low) (get-staff-offsets *staff-num*)
      (let ((high-y-off-set (- C5 high))
            (low-y-off-set  (- C5 low)))

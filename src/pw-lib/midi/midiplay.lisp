@@ -156,8 +156,8 @@
 ;;=========
 
 (defun scale2approx (scale)
-  (cond ((eq scale *1/4-tone-chromatic-scale*) 4)
-                  ((eq scale *1/8-tone-chromatic-scale*) 8)
+  (cond ((eql scale *1/4-tone-chromatic-scale*) 4)
+                  ((eql scale *1/8-tone-chromatic-scale*) 8)
                   (t 2)))
 
 ;;====play Chord

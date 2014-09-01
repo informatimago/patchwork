@@ -89,12 +89,12 @@
                 (erase+view-draw-contents *current-rtm-editor*)))
             (item "Copy"  #\C
               (when (get-current-rtm-selection) 
-                (cond ((eq 'C-measure (class-name (class-of (get-current-rtm-selection))))
+                (cond ((eql 'C-measure (class-name (class-of (get-current-rtm-selection))))
                        (setf *measure-selection-scrap* (decompile (get-current-rtm-selection))))
-                      ((and (eq 'C-beat (class-name (class-of (get-current-rtm-selection))))
+                      ((and (eql 'C-beat (class-name (class-of (get-current-rtm-selection))))
                             (beat-chord (get-current-rtm-selection)))
                        (setf *beat-chord-scrap* (decompile (beat-chord (get-current-rtm-selection)))))
-                      ((eq 'C-beat (class-name (class-of (get-current-rtm-selection))))
+                      ((eql 'C-beat (class-name (class-of (get-current-rtm-selection))))
                        (setf *rtm-struct-selection-scrap* (decompile (get-current-rtm-selection))))
                       (t   
                        (setf *measure-line-selection-scrap* (decompile (get-current-rtm-selection)))))))

@@ -53,14 +53,16 @@
 
 ;;========================
 (defmethod window-close ((self C-rtm-editor-window))
-    (if (wptr *the-chord-rtm-editor*) (window-close *the-chord-rtm-editor*))
+    (if (wptr *the-chord-rtm-editor*)
+        (window-close *the-chord-rtm-editor*))
     (call-next-method))
 
 (defmethod open-application-help-window ((self C-rtm-editor-window))
-   (if *rtm-help-window*
-         (unless (wptr  *rtm-help-window*) (make-rtm-help-window))
-         (make-rtm-help-window))
-   (window-select *rtm-help-window*))
+  (if *rtm-help-window*
+      (unless (wptr *rtm-help-window*)
+        (make-rtm-help-window))
+      (make-rtm-help-window))
+  (window-select *rtm-help-window*))
 
 
 ;; (defmethod window-grow-event-handler ((self C-rtm-editor-window) where)
@@ -148,14 +150,14 @@
                 (apdfuncall  100 (priority) 15 
                              (lambda ()
                                  (tell measures #'play-measure (get-play-speed (editor-collection-object self))))))))))
-    (#\P (when (eq 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
+    (#\P (when (eql 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
            (start
             (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls (editor-collection-object self)))))
             (apdfuncall 100 (priority) 15 
                         (lambda ()
                             (play-measure (rtm-selection-1 (editor-collection-object self)) (get-play-speed (editor-collection-object self))))))))
     (#\a (when (rtm-selection-1 (editor-collection-object self))
-           (if (eq 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
+           (if (eql 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
                (if (measures (measure-line (current-rtm-editor (editor-collection-object self))))
                    (add-beat-after (car (last (measures (measure-line (current-rtm-editor (editor-collection-object self)))))))
                    (add-beat-after-myself (rtm-selection-1 (editor-collection-object self)) ()))
@@ -163,7 +165,7 @@
            (update-all-beat-groupings)
            (erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))))
     (#\b (when (rtm-selection-1 (editor-collection-object self)) 
-           (unless (eq 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
+           (unless (eql 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
              (add-beat-before (rtm-selection-1 (editor-collection-object self)))
              (update-all-beat-groupings)
              (erase+view-draw-contents (current-rtm-editor (editor-collection-object self))))))
@@ -176,7 +178,7 @@
      (erase+view-draw-contents self))
     ((:Backspace) 
      (let (m-line?)
-       (if (eq 'C-measure-line
+       (if (eql 'C-measure-line
                (class-name
                 (class-of
                  (setq m-line? (rtm-selection-1
@@ -210,7 +212,7 @@
 (defmethod view-deactivate-event-handler :after ((self C-rtm-editor-window))
   (when (pw-object self)
     (draw-appl-label (pw-object self) #\A))
-  (when (eq *active-RTM-window* self)  ; no RTM window selected
+  (when (eql *active-RTM-window* self)  ; no RTM window selected
     (menu-item-enable *apps-RTM-menu-item*)
     (enable-Lisp-apps-menu-item)))
 

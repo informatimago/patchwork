@@ -117,7 +117,7 @@
 #|
 (defun scale-to-fit-in-rect (view)
   (let* ((bpfs 
-           (if (eq (type-of view) 'C-mini-bpf-view) 
+           (if (eql (type-of view) 'C-mini-bpf-view) 
              (cons (break-point-function view)
                (break-point-functions 
                  (editor-view-object (application-object (view-container view)))))

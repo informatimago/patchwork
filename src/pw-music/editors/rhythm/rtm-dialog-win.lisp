@@ -201,11 +201,11 @@
 (defgeneric edit-rtm-editor-Metronome (self unit metronome))
 (defmethod edit-rtm-editor-Metronome ((self C-rtm-editor-window) unit metronome)
   (with-cursor *watch-cursor* 
-    (let ((measure-line? (eq 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))))
+    (let ((measure-line? (eql 'C-measure-line (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))))
       (when (or measure-line?
-                (and (eq 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
-                     (eq 'C-measure (class-name (class-of (rtm-selection-2 (editor-collection-object self))))))
-                (eq 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self))))))
+                (and (eql 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self)))))
+                     (eql 'C-measure (class-name (class-of (rtm-selection-2 (editor-collection-object self))))))
+                (eql 'C-measure (class-name (class-of (rtm-selection-1 (editor-collection-object self))))))
         (let* ((measures (measures (measure-line (current-rtm-editor (editor-collection-object self)))))
                (pos1 (position (rtm-selection-1 (editor-collection-object self)) measures)) 
                (pos2 (position (rtm-selection-2 (editor-collection-object self)) measures) ))

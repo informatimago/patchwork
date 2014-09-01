@@ -380,7 +380,7 @@
 "returns a standard lambda list from the a-list of type-specs"
    (let* ((keys (cons  '&required *valid-defp-keywords*))
           (lambda-list (mapcan (lambda (key) (get-arg-names key collected-a-list)) keys)))
-     (if (eq (car lambda-list) '&required)
+     (if (eql (car lambda-list) '&required)
        (cdr lambda-list)
        lambda-list)))
 
@@ -478,7 +478,7 @@
           (not (null (intersection arg-list *keywords-for-extension*))))
     (while (> nb-arg 0)
       (while (and arg-list
-                  (not (eq keyword '&rest))
+                  (not (eql keyword '&rest))
                   (memq (car arg-list) lambda-list-keywords))
         (setq keyword (pop arg-list)))
       (case keyword
@@ -519,7 +519,7 @@
   (labels ((search-arg (args num)
            (if (member (car args) *keywords-for-extension* :test #'string=)
              (search-arg (cdr args) num)
-             (if (eq (car args) var) num (search-arg (cdr args) (1+ num))))))
+             (if (eql (car args) var) num (search-arg (cdr args) (1+ num))))))
     (search-arg args 0)))
   
 ;;=================================
@@ -580,7 +580,7 @@
 
 (defun set-new-values (boxes values)
   (mapc (lambda (box val) 
-            (unless (eq val :default)
+            (unless (eql val :default)
               (setf (value box) val)
               (set-dialog-item-text box 
                    (if (or (numberp val) (listp val))

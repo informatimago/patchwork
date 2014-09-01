@@ -92,7 +92,7 @@
       (cond
        ((and (consp p1) (not (consp (cdr p1)))
              (consp p2) (not (consp (cdr p2)))
-             (eq (first p1) (first p2)))
+             (eql (first p1) (first p2)))
         (setf *package* (first p1))
         (print `(in-package ,(package-name (first p1))) output-stream))
        (t (ui:uiwarn "~S has packages ~S, while~%~S has packages ~S." file1 p1 file2 p2)))
@@ -101,15 +101,15 @@
 (defun read-lists-from (infile)
   (with-open-file (input-stream infile :direction :input)
     (let ((*package* *package*) (lists ()) (packages ()) read)
-      (until (eq :eof (setq read (read input-stream nil :eof)))
-        (when (and (listp read) (eq (first read) 'in-package))
+      (until (eql :eof (setq read (read input-stream nil :eof)))
+        (when (and (listp read) (eql (first read) 'in-package))
           (newl packages (eval read)))
         (newl lists read))
       (values (nreverse lists) (nreverse packages)))))
 
 (defun similar-exprs? (l1 l2)
-  (and (listp l1) (listp l2) (eq (first l1) (first l2))
-       (listp (cdr l1)) (listp (cdr l2)) (eq (second l1) (second l2))))
+  (and (listp l1) (listp l2) (eql (first l1) (first l2))
+       (listp (cdr l1)) (listp (cdr l2)) (eql (second l1) (second l2))))
 
 (defun list-compare (l1 l2 &optional (out *standard-output*))
   (let (pl1 expr1 pl2)
@@ -198,7 +198,7 @@ and the associativity."
     ;; (mapc
     ;;  (lambda (op)
     ;;      (check-type op symbol)
-    ;;      (unless (eq (symbol-package op) (load-time-value (find-package "KEYWORD")))
+    ;;      (unless (eql (symbol-package op) (load-time-value (find-package "KEYWORD")))
     ;;        (import op "COMMON-LISP")
     ;;        (export op "COMMON-LISP")))
     ;;  ops)
@@ -307,7 +307,7 @@ Help on available operations can be obtained with (prefix-help)."
        (if operation?
          (if (operation? elt) (nextl expr) *default-operation*)
          (if (operation? elt)
-           (if (eq orig-expr expr)
+           (if (eql orig-expr expr)
              (error
               "Syntax: the infixed expression should not begin with an operation:~%~S"
               orig-expr)
@@ -362,7 +362,7 @@ The resulting function is a lambda list not compiled."
   (let ((=? (and (consp fexpr) (consp (cdr fexpr)) (consp (cddr fexpr))
                  (symbolp (first fexpr))
                  (listp (second fexpr))
-                 (eq '= (third fexpr))))
+                 (eql '= (third fexpr))))
         (name ()) args expr rvars wvars)
     (when =?
       (setq name (nextl fexpr) args (nextl fexpr))
@@ -395,7 +395,7 @@ The resulting function is a lambda list not compiled."
     (unless (or (memq expr *rvars*) (memq expr *wvars*))
       (newl *rvars* expr)))
    ((not (consp expr)))
-   ((eq 'setq (car expr))
+   ((eql 'setq (car expr))
     (mapc #'rw-vars-expr (cddr expr))
     (unless (or (memq (second expr) *rvars*) (memq (second expr) *wvars*))
       (newl *wvars* (second expr))))

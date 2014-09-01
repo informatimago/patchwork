@@ -119,22 +119,22 @@
    (push level *global-rtm-level-list*) 
    (push notehead-type *notehead-type-list*) 
    (list (case level
-           (4 (if (eq notehead-type 'rest) #\R #\q))   ;1/64
-           (3 (if (eq notehead-type 'rest) #\R #\q))   ;1/32
-           (2 (if (eq notehead-type 'rest) #\r #\q))   ;1/16
-           (1 (if (eq notehead-type 'rest) #\‰ #\q))   ;1/8
-           (0  (if (eq notehead-type 'rest) #\Œ #\q))  ;1/4
-           (-1  (if (eq notehead-type 'rest) #\W #\h)) ;1/2
-           (t (if (eq notehead-type 'rest) #\W #\w)))  ;1/1
+           (4 (if (eql notehead-type 'rest) #\R #\q))   ;1/64
+           (3 (if (eql notehead-type 'rest) #\R #\q))   ;1/32
+           (2 (if (eql notehead-type 'rest) #\r #\q))   ;1/16
+           (1 (if (eql notehead-type 'rest) #\‰ #\q))   ;1/8
+           (0  (if (eql notehead-type 'rest) #\Œ #\q))  ;1/4
+           (-1  (if (eql notehead-type 'rest) #\W #\h)) ;1/2
+           (t (if (eql notehead-type 'rest) #\W #\w)))  ;1/1
            note-head-info))) 
 ;; (case level
-;;            (4 (if (eq notehead-type 'rest) #\R #\…))   ;1/64
-;;            (3 (if (eq notehead-type 'rest) #\R #\≈))   ;1/32
-;;            (2 (if (eq notehead-type 'rest) #\r #\x))   ;1/16
-;;            (1 (if (eq notehead-type 'rest) #\‰ #\e))   ;1/8
-;;            (0  (if (eq notehead-type 'rest) #\Œ #\q))  ;1/4
-;;            (-1  (if (eq notehead-type 'rest) #\W #\h)) ;1/2
-;;            (t (if (eq notehead-type 'rest) #\W #\w)))  ;1/1
+;;            (4 (if (eql notehead-type 'rest) #\R #\…))   ;1/64
+;;            (3 (if (eql notehead-type 'rest) #\R #\≈))   ;1/32
+;;            (2 (if (eql notehead-type 'rest) #\r #\x))   ;1/16
+;;            (1 (if (eql notehead-type 'rest) #\‰ #\e))   ;1/8
+;;            (0  (if (eql notehead-type 'rest) #\Œ #\q))  ;1/4
+;;            (-1  (if (eql notehead-type 'rest) #\W #\h)) ;1/2
+;;            (t (if (eql notehead-type 'rest) #\W #\w)))  ;1/1
 
 ;;rtm-sum > unit-count
 ;;(calc-next-note-head 2 5 1 0)
@@ -312,7 +312,7 @@
     (let ((edit-data (decompile-to-dialog self)) str) ;;;
       (setq str  
             (delete  "'" (PRIN1-TO-STRING (list (abs (second edit-data))(third edit-data))) :test #'string=)) ;to avoid "'"
-      (when (eq (type-of (eval (third edit-data))) 'null)
+      (when (eql (type-of (eval (third edit-data))) 'null)
         (setq str (substitute-nil-to-paren str))) ;to avoid "nil" ??? 
       (set-value-from-global-tty self 
                                  (get-string-from-user  "rtm" :size (make-point 300 85) :position :centered
@@ -342,7 +342,7 @@
 (defmethod view-deactivate-event-handler ((self C-chord-boxMN-window-rtm))
   (let ((chord (car (chords (chord-line (car (editor-objects (car (subviews self))))))))
         (beat-chord (beat-chord (pw-object self))))
-    (unless (eq chord beat-chord)
+    (unless (eql chord beat-chord)
       (setf (beat-chord (pw-object self)) chord))
     (call-next-method)))
 
@@ -449,7 +449,7 @@
          (end-pixel (+ real-pixel-beat-unit beg-x))
          (tuplet-flag (draw-tuplets? rtm-sum (unit-length self))) 
          rtm-now rtm-obj note-head-info)
-    (when (eq (class-name  (class-of  super-beat)) 'C-measure)
+    (when (eql (class-name  (class-of  super-beat)) 'C-measure)
       (setf *global-rtm-level-x-list* nil)
       (setf *notehead-type-list* nil)
       (setf *global-rtm-level-list* nil))
@@ -475,7 +475,7 @@
               (setf (super-beat rtm-obj) self))
             (draw-extra-note-info self note-head-info rtm-now pixel-now y2 pixel-incr)  
             (when rtm-list (setq pixel-now (round (+ pixel-now (* (abs rtm-now) pixel-incr))))))))
-    (when (eq (class-name  (class-of  super-beat)) 'C-measure)
+    (when (eql (class-name  (class-of  super-beat)) 'C-measure)
       (draw-beam-info- self (- y2 6) (nreverse *global-rtm-level-x-list*)(nreverse *global-rtm-level-list*)
                        (nreverse *notehead-type-list*)))
     (when (edit-mode obj)
@@ -515,7 +515,7 @@
 
 (defgeneric draw-beam-info- (self y x-lst level-lst note-types))
 (defmethod draw-beam-info-  ((self C-beat) y x-lst level-lst note-types)
-  (unless (and (eq (car note-types) 'rest)(= (length note-types) 1))
+  (unless (and (eql (car note-types) 'rest)(= (length note-types) 1))
     (let ((1s-list (make-1+2-groupings-list (substitute-list* '(1 1 1) '(4 3 2) level-lst))) ;->  1s,2s,3s.4s
           (2s-list (make-1+2-groupings-list (substitute-list* '(2 2 0) '(4 3 1) level-lst))) ;->  2s,3s,4s
           (3s-list (make-1+2-groupings-list (substitute-list* '(3 0 0) '(4 2 1) level-lst))) ;->  3s,4s
@@ -545,7 +545,7 @@
             (incf first-x (abs (nth i list-now))))
           (incf y 3)))
       (while (and x-lst note-types)
-        (when (eq (car note-types) 'rest)
+        (when (eql (car note-types) 'rest)
           (draw-line (car x-lst) y-start  (car x-lst) (+ 11 y-start)))
         (pop x-lst)(pop note-types)))))
 
@@ -764,7 +764,7 @@
 
 (defmethod set-value-from-global-tty ((self C-measure) beat-string) 
  (let ((num-or-list (read-from-string beat-string)))
-     (if (eq *measure-edit-mode* 'metr)
+     (if (eql *measure-edit-mode* 'metr)
         (if (not (listp num-or-list))  
           (ui:ed-beep)
           (progn 
@@ -928,7 +928,7 @@
 (defmethod draw-beat-stem-4 ((self C-chord) x C5 y-beat note-head)
   (let ((y-min (1- (give-pixel-y (car (notes self)) C5)))
         (y-max (give-pixel-y (car (last (notes self))) C5)))
-    (unless (eq note-head #\w) 
+    (unless (eql note-head #\w) 
       (draw-line x y-min x y-beat))
     (draw-ledger-lines self x y-min y-max C5)))
 
@@ -944,7 +944,7 @@
 ;;   (let ((y-now (give-pixel-y self C5))
 ;;         (x-now (+ x (delta-x self)))
 ;;         (alt (alteration self)))
-;;     (if (or *rtm-only-white-heads* (eq note-head #\w)(eq note-head #\h))
+;;     (if (or *rtm-only-white-heads* (eql note-head #\w)(eql note-head #\h))
 ;;         (draw-char x-now y-now #\w) 
 ;;         (draw-char (1+ x-now) y-now #\Ω))
 ;;     (when t-scfactor
@@ -957,7 +957,7 @@
 ;;     (when (and (instrument self) *mn-view-ins-flag* t-scfactor) 
 ;;                                         ;(draw-char x-now y-now #\Ω)
 ;;       (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
-;;     (if (and alt (not (eq *staff-num* 7) ))  ; empty staff
+;;     (if (and alt (not (eql *staff-num* 7) ))  ; empty staff
 ;;         (draw-char (+ x (alt-delta-x self)) y-now alt))
 ;;     (draw-note-extra-stuff self  x C5 t-scfactor note-head)))
 
@@ -970,7 +970,7 @@
                     (+ (round (* t-scfactor (offset-time self)))  -6 x)  
                     (+ x (delta-x self))))
          (alt (alteration self)))
-    (if (or *rtm-only-white-heads* (eq note-head #\w)(eq note-head #\h))
+    (if (or *rtm-only-white-heads* (eql note-head #\w)(eql note-head #\h))
         (draw-char x-now y-now (if (and (not (zerop (offset-time self))) offs-fl) (code-char 201) #\w))
         (draw-char (1+ x-now) y-now (if (and (not (zerop (offset-time self))) offs-fl) (code-char 201) #\Ω) ))
     (when t-scfactor
@@ -983,7 +983,7 @@
       )
     (when (and (instrument self) *mn-view-ins-flag* t-scfactor) 
       (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
-    (if (and alt (not (eq *staff-num* 7) )) ; empty staff
+    (if (and alt (not (eql *staff-num* 7) )) ; empty staff
         (draw-char 
          (if offs-fl
              (+ x-now -5)
@@ -1055,7 +1055,7 @@
 ;;      (draw-char x-now y-now #\w)
 ;; ;;    (draw-char x-now y-now #\w)
 ;;     (when alt
-;;       (unless (eq *staff-num* 7)   ; empty staff
+;;       (unless (eql *staff-num* 7)   ; empty staff
 ;;         (draw-char (+ x (alt-delta-x self)) (1- y-now) alt)))))
 
 ;;=====================

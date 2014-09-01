@@ -187,7 +187,7 @@ This box can be extended by option-clicking bottom-right
     (mapc (lambda (ctrl val) 
               (setf (value ctrl) val)
               (set-dialog-item-text ctrl (format () "~D" val))) ctrls values)
-    (when (not (eq (car (last (input-objects self))) (car (last (pw-controls self)))))
+    (when (not (eql (car (last (input-objects self))) (car (last (pw-controls self)))))
       (setf (nth (1- (length values)) (input-objects new-box))
             (nth (1- (length values)) (pw-controls new-box)))
       (setf (open-state (nth (1- (length values)) (pw-controls new-box))) t)

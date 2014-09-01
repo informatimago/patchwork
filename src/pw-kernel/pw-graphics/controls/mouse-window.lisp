@@ -74,7 +74,7 @@
 
 (defmethod window-null-event-handler ((self C-mouse-window))
  (call-next-method)
- (when (and (subviews self) (not (eq *last-mouse* (view-mouse-position self))))
+ (when (and (subviews self) (not (eql *last-mouse* (view-mouse-position self))))
   (let* ((mouse (view-mouse-position self))
         (active-subview (ask (subviews self) #'view-contains-point-p+self mouse)))
     (setq *last-mouse* mouse)
@@ -108,7 +108,7 @@
 (defobfun (window-null-event-handler *CCL-internal-window*) ()
    (declare (ccl::object-variable clpf-object clicked))
    (let ((mouse (ui:window-mouse-position)))
-     (unless (eq *last-mouse* mouse)
+     (unless (eql *last-mouse* mouse)
        (setq *last-mouse* mouse)
        (if clicked
          (mouse-dragged clpf-object (ui:point-h mouse) (ui:point-v mouse))

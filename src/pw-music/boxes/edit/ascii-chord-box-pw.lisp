@@ -51,7 +51,7 @@
 (defmethod compile-me ((self C-pw-ascii-chord-box) obj)
   (let ((ctrl (car (pw-controls self)))
         (in (car (input-objects self))))
-    (if (eq ctrl in)
+    (if (eql ctrl in)
         `',(epw::n->mc (let ((*readtable* *no-sharp-read-table*))
                          (read-from-string (patch-value ctrl obj))))
         `(epw::n->mc (let ((*readtable* *no-sharp-read-table*))

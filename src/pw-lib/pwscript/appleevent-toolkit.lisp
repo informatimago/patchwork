@@ -445,10 +445,10 @@ you know it will be very fast.
      (let ((*inside-aesend* t)
            (res (#_AESend the-appleevent the-reply mode priority 
                           timeout idleproc (or filterproc (%null-ptr)))))
-       (if (eq res #$errAEWaitCanceled)        ;; be silent about aborts
+       (if (eql res #$errAEWaitCanceled)        ;; be silent about aborts
            #$NoErr
            res)))
-    (when (eq reply-mode :wait-reply)
+    (when (eql reply-mode :wait-reply)
       (check-reply-error the-reply)
       the-reply)))
 

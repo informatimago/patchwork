@@ -102,7 +102,7 @@
   (unless (> from-column *the-matrix-columns*) 
     (let ((from-row 0) temp-chord temp-int new-fixed)
       (if (and (plusp from-column) 
-               (eq (nth from-column *the-yes-intervals*) 
+               (eql (nth from-column *the-yes-intervals*) 
                    (nth (1- from-column) *the-yes-intervals*)))
           (setq from-row (1+ current-row)))
       (for (i from-row 1 (1- amb))

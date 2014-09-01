@@ -160,7 +160,7 @@ name)
 
 (defmethod draw-patch-extra ((self C-abstract))
   (draw-appl-label self
-    (if (eq (front-window) (patch-win self)) #\* #\A))) 
+    (if (eql (front-window) (patch-win self)) #\* #\A))) 
 
 (defmethod remove-yourself-control ((self C-abstract)) 
   (when (patch-win self)
@@ -190,7 +190,7 @@ name)
   (:method ((self C-pw-window) patches)
     (let ((out-box))
       (while patches
-        (when (eq (pw-function (car patches)) 'absout)
+        (when (eql (pw-function (car patches)) 'absout)
           (push (car patches) out-box))
         (pop patches))
       out-box)))
@@ -200,7 +200,7 @@ name)
     (let ((in-boxes))
       (while patches
         (when 
-            (eq (pw-function (car patches)) 'absin)
+            (eql (pw-function (car patches)) 'absin)
           (push (car patches) in-boxes))
         (pop patches))
       (sort in-boxes '< :key (lambda (a) (patch-value (second (pw-controls a)) ()))))))

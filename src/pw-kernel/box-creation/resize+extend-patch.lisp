@@ -61,7 +61,7 @@
 ;;Added 920412
 (defmethod resize-patch-box :after ((self C-pw-resize-x) mp delta)
   (declare (ignore mp delta))
-  (if (and *current-small-inBox* (eq (view-container *current-small-inBox*) self))
+  (if (and *current-small-inBox* (eql (view-container *current-small-inBox*) self))
     (resize-text-item *current-small-inBox*)))      ;this function is in pw-controls
 
 ;;=========================================================================================================
@@ -108,7 +108,7 @@
                                 (if (numberp (nth i values))
                                     (format () "~D" (nth i values))
                                     (string (nth i values)))) 
-          (when (not (eq (nth i (input-objects self)) (nth i (pw-controls self))))
+          (when (not (eql (nth i (input-objects self)) (nth i (pw-controls self))))
             (setf (nth i (input-objects box-now)) (nth i (input-objects self)))
             (setf (open-state (nth i (pw-controls box-now))) nil)))
         (correct-extension-box self box-now values)

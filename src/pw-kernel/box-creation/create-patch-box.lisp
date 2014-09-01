@@ -173,8 +173,8 @@
     (setq extensible? (not (null (intersection arg-list *lisp-keywords-for-extension*))))
     (while (> nb-arg 0)
       (while (and arg-list
-                  (not (eq keyword '&rest))
-                  (not (eq keyword '&allow-other-keys))
+                  (not (eql keyword '&rest))
+                  (not (eql keyword '&allow-other-keys))
                   (memq (car arg-list) lambda-list-keywords))
         (setq keyword (pop arg-list)))
       (case keyword

@@ -176,15 +176,17 @@
 (defmethod PW-WINDOW-SAVE  ((self C-pw-window))
   (if *pw-nosave-mode*
       (ui::message-dialog "Sorry this version cannot save files.")
-      (if (not (patch-win-pathname self))
-          (PW-WINDOW-SAVE-as self)
-          (let ((*print-pretty* ()) newfile)
-            (set-window-title  self (save-window-title self))
+      (if (patch-win-pathname self)
+          (let ((*print-pretty* ())
+                newfile)
+            (set-window-title self (save-window-title self))
             (when (wins-menu-item self)
               (set-menu-item-title (wins-menu-item self) (window-title self)))
             ;; (delete-file (patch-win-pathname self))
-            (with-open-file (out (patch-win-pathname self) :direction :output 
-                                                           :if-does-not-exist :create :if-exists :supersede) 
+            (with-open-file (out (patch-win-pathname self)
+                                 :direction :output 
+                                 :if-does-not-exist :create
+                                 :if-exists :supersede) 
               (prin1 '(in-package :pw) out)
               (let ((*package* :pw))
                 (prin1 (decompile self) out)))
@@ -194,7 +196,8 @@
               (setf newfile (compile-file (patch-win-pathname self)))
               (delete-file (patch-win-pathname self))
               (rename-file newfile (patch-win-pathname self)))
-            (reset-changes-to-file-flag self)))))
+            (reset-changes-to-file-flag self))
+          (PW-WINDOW-SAVE-as self))))
 
 (defgeneric PW-WINDOW-SAVE-MN-as (self))
 (defmethod PW-WINDOW-SAVE-MN-as ((self C-pw-window))
@@ -212,25 +215,26 @@
             newfile
             (*print-pretty* ()))
         (when new-name
-          (setf (patch-win-pathname self) new-name)
-          (set-window-title self (pathname-name new-name))
-          (when (wins-menu-item self)
-            (set-menu-item-title (wins-menu-item self) (window-title self)))
-          ;; (delete-file new-name)   ;ML
-          (ui:with-cursor *watch-cursor* 
-            (WITH-OPEN-FILE  (out new-name :direction :output 
-                                           :if-does-not-exist :create :if-exists :supersede) 
-              (prin1 '(in-package :pw) out)
-              (let ((*package* :pw))
-                (prin1 (decompile self) out))))
-          (record-event :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat|) 
-                                                                      (,:|asna| ,(namestring new-name)) (,:|mnpa| ,t))
-                                            `((,:|----| ,:|cpat|) (,:|asna| ,(namestring new-name)))))
-          (when *save-compiled-file*
-            (setf newfile (compile-file new-name))
-            (delete-file new-name)
-            (rename-file newfile new-name))
-          (reset-changes-to-file-flag self)))))
+          (let ((new-name (make-pathname :type "pwpatch" :defaults new-name)))
+            (setf (patch-win-pathname self) new-name)
+            (set-window-title self (pathname-name new-name))
+            (when (wins-menu-item self)
+              (set-menu-item-title (wins-menu-item self) (window-title self)))
+            ;; (delete-file new-name)   ;ML
+            (ui:with-cursor *watch-cursor* 
+              (WITH-OPEN-FILE  (out new-name :direction :output 
+                                             :if-does-not-exist :create :if-exists :supersede) 
+                (prin1 '(in-package :pw) out)
+                (let ((*package* :pw))
+                  (prin1 (decompile self) out))))
+            (record-event :|core| :|save| (if *decompile-chords-mode* `((,:|----| ,:|cpat|) 
+                                                                        (,:|asna| ,(namestring new-name)) (,:|mnpa| ,t))
+                                              `((,:|----| ,:|cpat|) (,:|asna| ,(namestring new-name)))))
+            (when *save-compiled-file*
+              (setf newfile (compile-file new-name))
+              (delete-file new-name)
+              (rename-file newfile new-name))
+            (reset-changes-to-file-flag self))))))
 
 (defun load-a-patch (name)
   (with-cursor *watch-cursor*
@@ -249,13 +253,15 @@
       (assert *pw-window-list*)
       (assert *active-patch-window*)
       (with-cursor *watch-cursor*
-        (let ((*readtable* *readtable-patchwork*))
-          (handler-case
-              (load name :verbose t :external-format :mac-roman)
-            (error (err)
-              (format t "~&Error: ~A~%" err)
-              (return-from pw-load-patch :error))))
-        (format t "~&File ~S loaded.~%" name) (finish-output)
+        (flet ((load-patch (name)
+                 (let ((*readtable* *readtable-patchwork*))
+                   (handler-case
+                       (load name :verbose t :external-format :mac-roman)
+                     (error (err)
+                       (format t "~&Error: ~A~%" err)
+                       (return-from pw-load-patch :error))))
+                 (format t "~&File ~S loaded.~%" name) (finish-output)))
+          (ui::time/stdout (load-patch name)))
         (record-event :|aevt| :|odoc| `((,:|----| ,(mkso :|cpat| nil :|name| (namestring name))))) 
         (pw-update-wins-menu name)))))
 
@@ -271,7 +277,7 @@
                           (setf (wins-menu-item window-now)
                                 (new-leafmenu  (window-title window-now) 
                                                (lambda ()(window-select window-now))))))
-    (when (eq (front-window)  window-now)
+    (when (eql (front-window)  window-now)
       (update-wins-menu-items window-now)))) 
 
 ;;___________
@@ -317,7 +323,7 @@
 ;; (defmethod view-deactivate-event-handler :after ((self C-pw-window))
 ;;   (when (abstract-box self)
 ;;     (draw-appl-label (abstract-box self) #\A))
-;;   (when (eq *active-patch-window* self) ; no PW window selected
+;;   (when (eql *active-patch-window* self) ; no PW window selected
 ;;     (menu-item-enable *apps-PW-menu-item*)
 ;;     (enable-Lisp-apps-menu-item))
 ;;   (when (wins-menu-item self)
@@ -334,14 +340,17 @@
 (defmethod kill-patch-window ((self C-pw-window))
   (when (top-level-patch-win? self)
     (window-close self)
-    (when (eq *active-patch-window* self)
+    (when (eql *active-patch-window* self)
       (search-for-next-pw-window))))
 
 (defmethod window-close ((self C-pw-window))
+  ;; (format-trace '(window-close c-pw-window) self)
   (when (and (top-level-patch-win? self) 
              (save-changes-to-file-flag self)
              (not *pw-nosave-mode*)
-             (y-or-n-dialog (format nil "Save changes to file~%~A" (save-window-title self))))
+             (y-or-n-dialog (format nil "Save changes of window ~S to file~%~A"
+                                    (window-title self)
+                                    (save-window-title self))))
     (PW-WINDOW-SAVE-MN self))
   (view-deactivate-event-handler self)
   (when (wins-menu-item self)

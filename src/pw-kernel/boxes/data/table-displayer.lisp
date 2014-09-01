@@ -125,9 +125,9 @@
                            (mapcar (lambda (row) (length (list! row))) data)))
          )
     
-    (cond ((eq option 'cc)
+    (cond ((eql option 'cc)
            (fill-table-disp self  maxlength data 2))
-          ((eq option 'r) 
+          ((eql option 'r) 
            (fill-table-disp self maxlength data 1)))))
 
 (defmethod fill-table-disp ((self C-table-displayer) maxlength data increm)

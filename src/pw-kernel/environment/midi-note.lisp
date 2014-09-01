@@ -162,7 +162,7 @@
       (while (car (setq temp (multiple-value-list (patchwork.midi:midi-read))))
         (push (list (car temp) (- (cadr temp) start-time)) res)))
     (while res
-      (unless (eq (car (first res)) 254)
+      (unless (eql (car (first res)) 254)
         (push (first res) res2))
       (pop res))
     (parse-midi-stream  res2)))

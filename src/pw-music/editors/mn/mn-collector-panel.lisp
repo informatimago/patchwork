@@ -344,7 +344,7 @@
   (let* ((editor (car (subviews self)))
          (ctrl (param-ctrl editor)))
     (if (member ctrl (subviews editor))
-        (if (eq char #\Newline) 
+        (if (eql char #\Newline) 
             (exit-from-param-ctrl ctrl)
             (view-key-event-handler ctrl char))
         (call-next-method))))
@@ -381,7 +381,7 @@
     (or (dolist (win *the-chord-editors*)
           (if (window-killed-p win)
               (setq dead-win-index win-index)
-              (if (eq (car (chords (chord-line 
+              (if (eql (car (chords (chord-line 
                                     (car (editor-objects (car (subviews win)))))))
                       chord)
                   (return win)))
@@ -521,9 +521,9 @@
 (defmethod handle-key-event ((self C-MN-panel-Mod) char)
   (declare (special *global-music-notation-panel*))
   (cond  
-    ((eq char #\K) (remove-all-chords-from-chord-line self))
-    ((eq char #\p) (play-chords (chord-line self)))
-    ((eq char #\P) 
+    ((eql char #\K) (remove-all-chords-from-chord-line self))
+    ((eql char #\p) (play-chords (chord-line self)))
+    ((eql char #\P) 
      (if (selected-chords self)
          (play-selected-chords (chord-line self) 
                                (selected-chords self)
@@ -532,8 +532,8 @@
                               (truncate
                                (scaled-mouse-h self 
                                                (point-h (view-scroll-position self)))))))
-    ((eq char #\s) (stop-play (chord-line self)))
-    ((eq char #\r) 
+    ((eql char #\s) (stop-play (chord-line self)))
+    ((eql char #\r) 
      (when (and (active-note self) (instrument (active-note self))) 
        (setf *global-music-notation-panel* self)
        (remove-instrument-item (active-note self) 0 0)

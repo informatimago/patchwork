@@ -63,7 +63,7 @@
                              (fboundp toplevel))))
                (message-dialog "Toplevel function must be a defined function or NIL"))
               ((not (and (stringp sig)
-                         (eq (length sig) 4)))
+                         (eql (length sig) 4)))
                (message-dialog "Application signature must be 4 characters long"))                           
               (t
                (setq sig (intern sig (find-package :keyword)))                 

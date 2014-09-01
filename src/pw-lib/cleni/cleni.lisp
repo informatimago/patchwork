@@ -331,11 +331,11 @@
            ((null measure)) 
         (when event-list
           (setf event1 (car event-list))
-          (when (and (eq (event-voice event1) voice)
-                     (eq (event-measure event1) measure))
+          (when (and (eql (event-voice event1) voice)
+                     (eql (event-measure event1) measure))
             (do () ((or (null event-list)
-                        (not (eq  (event-measure (car event-list)) measure))
-                        (not (eq  (event-voice (car event-list)) voice))))
+                        (not (eql  (event-measure (car event-list)) measure))
+                        (not (eql  (event-voice (car event-list)) voice))))
               (setf event2 (pop event-list)))
             (push  (list nv nm (incf measure-nb) (rank-left event1) (rank-left event2))
                    map) ))  ))))
@@ -665,10 +665,10 @@
             (setf errcount t)))
          (t
           (if (keywordp type)
-            (unless  (eq type (car tok-list))
+            (unless  (eql type (car tok-list))
               (setf errcount t))
             (unless  (and (subtypep (type-of (car tok-list)) type)
-                          (not (and (eq type 'symbol) (keywordp (car tok-list)))))
+                          (not (and (eql type 'symbol) (keywordp (car tok-list)))))
               (setf errcount t)))))
         (or (not errcount)
             (and want-err
@@ -734,7 +734,7 @@
              (case token2
                (:tie
                 (setf tie t)
-                (when (eq token :chord)
+                (when (eql token :chord)
                   (setf tie (pop-token event-list 'list t))))
                (:follow  (setf follow t))))
            (push-event score

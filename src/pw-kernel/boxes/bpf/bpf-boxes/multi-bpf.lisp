@@ -130,10 +130,10 @@
       self)))
 
 (defmethod set-output ((self C-patch-multi-function) o-type)
-  (cond ((and (eq o-type :bpf) (not (eq (out-type self) :bpf)))
+  (cond ((and (eql o-type :bpf) (not (eql (out-type self) :bpf)))
          (setf (type-list self) '(bpf list))
          (erase-my-connections self))
-        ((and (eq (out-type self) :bpf) (not (eq o-type :bpf)))
+        ((and (eql (out-type self) :bpf) (not (eql o-type :bpf)))
          (setf (type-list self) '(list))
          (erase-my-connections self)))
   (setf (out-type self) o-type)
@@ -166,7 +166,7 @@
     (let ((ts (g-round (patch-value (first (input-objects self)) obj)))
           (vs (g-round (patch-value (second (input-objects self)) obj) ))
           bpf bpfs)
-      (if (and (listp vs) (print (eq (type-of (car vs)) 'C-break-point-function)))
+      (if (and (listp vs) (print (eql (type-of (car vs)) 'C-break-point-function)))
         (progn
           (setq bpfs (mapcar #'eval (mapcar #'decompile vs)))
           (setq bpf (pop bpfs))

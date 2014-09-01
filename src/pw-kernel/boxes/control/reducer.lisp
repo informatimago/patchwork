@@ -56,7 +56,7 @@
   (patch-value (first (input-objects self)) obj))
 
 (defmethod disconnect-ctrl ((self C-reducer) ctrl)
-  (if (or (eq ctrl (car (pw-controls self)))(eq ctrl (nth 2 (pw-controls self))))
+  (if (or (eql ctrl (car (pw-controls self)))(eql ctrl (nth 2 (pw-controls self))))
      (progn (ui:ed-beep)(format t "Disconnection of the first or third input is not allowed !"))
      (call-next-method)))
 

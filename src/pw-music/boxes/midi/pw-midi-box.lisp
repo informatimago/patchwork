@@ -395,7 +395,7 @@ given parameters to MIDI"
   (if (state self)
       (set-output self :on))
   (let ((box (first (input-objects self))))
-    (unless (eq (first (pw-controls self)) box)
+    (unless (eql (first (pw-controls self)) box)
       (start (apdfuncall 5 (priority) 10 'pw-schedule-midi-in 
                          self box (second (input-objects self))
                          (if (third (input-objects self))

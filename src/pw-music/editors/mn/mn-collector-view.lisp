@@ -543,9 +543,9 @@
                     (+ field-value
                        (if perc (truncate (* field-value value) 100) value)))))
     (setf (slot-value self field)
-          (cond ((eq field 'vel)
+          (cond ((eql field 'vel)
                  (if (> value 127) 127 (max 0 value)))
-                ((eq field 'dur) (max 1 value))
+                ((eql field 'dur) (max 1 value))
                 (t value)))))
 
 (defgeneric update-editor (self))
@@ -647,11 +647,11 @@
 (defgeneric keep-playing-notes (self notes start-time &optional approx))
 (defmethod keep-playing-notes ((self C-chord-line) notes start-time &optional approx)
   (when *MN-play-flag*
-    (cond ((eq *playing-option* :pb)
+    (cond ((eql *playing-option* :pb)
            (play-note (car (pop notes)) approx)
            (while (and notes (= start-time (cdr (car notes))))
              (play-note (car (pop notes)) approx)))
-          ((eq *playing-option* :mc)
+          ((eql *playing-option* :mc)
            (let ((approx-m (approx-for-playing (midic (caar notes)) approx)))
              (write-midi-note (dur (caar notes)) (+ (chan (caar notes)) (micro-channel approx-m) -1) 
                               (truncate approx-m 100) (vel (car (pop notes))))

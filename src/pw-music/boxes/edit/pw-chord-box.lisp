@@ -123,10 +123,10 @@
 
 
 (defmethod set-output ((self C-patch-chord-box-M) o-type)
-  (cond ((and (eq o-type :object) (not (eq (out-type self) :object)))
+  (cond ((and (eql o-type :object) (not (eql (out-type self) :object)))
          (setf (type-list self) '(chord))
          (erase-my-connections self))
-        ((and (eq (out-type self) :object) (not (eq o-type :object)))
+        ((and (eql (out-type self) :object) (not (eql o-type :object)))
          (setf (type-list self) '(list))
          (erase-my-connections self)))
   (setf (out-type self) o-type)
@@ -196,7 +196,7 @@
 (defmethod patch-value ((self C-patch-chord-box-M ) obj)
   (let ((my-in (car (pw-controls self)))
         (my-connect (car (input-objects self))))
-    (unless (or (value self) (eq my-in my-connect))
+    (unless (or (value self) (eql my-in my-connect))
       (PV-from-input self (list! (patch-value my-connect obj)))))
     (get-output-dimension self))
 
@@ -316,7 +316,7 @@ notation editor opened for more information.
   (let* ((editor (car (subviews self)))
          (ctrl (param-ctrl editor)))
     (if (member ctrl (subviews editor))
-      (if (eq char #\Newline) 
+      (if (eql char #\Newline) 
         (exit-from-param-ctrl ctrl)
         (view-key-event-handler ctrl char))
       (call-next-method))))

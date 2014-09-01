@@ -1056,7 +1056,7 @@ the function approx-m prior to the entries."
                 (rplacd l-inter (cddr l-inter))
                                         ;(print pivot " " (cadr l-inter) " " direction " " octaves " " replace)
               (rplaca (cdr l-inter)
-                      (funcall (if (eq direction 'up) #'+ #'-)
+                      (funcall (if (eql direction 'up) #'+ #'-)
                                pivot (funcall (if (plusp replace) #'+ #'-)
                                               replace (* 1200 octaves))))
               (nextl l-inter)) 
@@ -1081,14 +1081,14 @@ the function approx-m prior to the entries."
               tem (abs tem) )
         (when oct-flag2
           (while (> tem (max 1200 forbid)) (setq tem (- tem 1200)) (incf octaves)))
-        (if (eq tem forbid)
+        (if (eql tem forbid)
             (ifnot replace
                 (progn 
                                         ;(print "XX")
                   (rplacd l-inter (cddr l-inter)))
                                         ;(print pivot " " (cadr l-inter) " " direction " " octaves " " replace)
               (rplaca (cdr l-inter)
-                      (funcall (if (eq direction 'up) #'+ #'-)
+                      (funcall (if (eql direction 'up) #'+ #'-)
                                pivot (funcall (if (plusp replace) #'+ #'-)
                                               replace (if oct-flag (* 1200 octaves) 0)
                                               )))

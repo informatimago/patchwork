@@ -50,7 +50,7 @@
 
 (defun make-typed-box-list (patch)
   (cond 
-    ((eq (car (type-list patch)) 'no-connection)
+    ((eql (car (type-list patch)) 'no-connection)
      (print "no output connections allowed"))  
     ((not (type-list patch))
      (print "no output typing"))
@@ -79,8 +79,8 @@
   (add-subviews  win new-patch)  
   (set-view-position new-patch (make-point (x patch) (+ (y patch)(h patch) 8)))
   (view-draw-contents new-patch)
-  (when (or (eq  (class-name (class-of patch)) 'C-patch-midi)
-            (eq  (class-name (class-of patch)) 'C-patch-function))
+  (when (or (eql  (class-name (class-of patch)) 'C-patch-midi)
+            (eql  (class-name (class-of patch)) 'C-patch-function))
     (connect-ctrl new-patch (car (pw-controls new-patch)) patch) 
     (setf (open-state (car (pw-controls new-patch)) ) nil)
     ;;  (draw-control-open-state (car (pw-controls new-patch)) win)

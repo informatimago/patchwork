@@ -151,14 +151,14 @@
 
 ;;(defmethod give-mini-view-class-name ((self C-BPF-window))
 ;;  (class-name (class-of (mini-view (car (editor-objects (car (controls self))))))))
-;;  (when (eq (give-mini-view-class-name self) 'patchwork::c-mini-bpf-view-chant)
+;;  (when (eql (give-mini-view-class-name self) 'patchwork::c-mini-bpf-view-chant)
 ;;    (setf (window-visible-p self) nil))
 
 (defmethod view-deactivate-event-handler :after ((self C-BPF-window))
   (when (pw-object self)
     (erase-BPF-label? (pw-object self))
     (draw-appl-label (pw-object self) #\A))
-  (when (eq *active-BPF-window* self)  ; no BPF window selected
+  (when (eql *active-BPF-window* self)  ; no BPF window selected
      (menu-item-enable *apps-BPF-menu-item*)
      (enable-Lisp-apps-menu-item)))
 

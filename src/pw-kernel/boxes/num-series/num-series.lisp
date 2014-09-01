@@ -261,7 +261,7 @@ If format    is  'incl' the two extremes are included in the output. If  format 
                                   ((consp curves) curves)
                                   ((numberp curves) (list curves))
                                   (t (error "bad curves:~S~%" curves)) ))))
-    (if (eq format 2) (butlast (rest int)) int)))
+    (if (eql format 2) (butlast (rest int)) int)))
 
 (defun dicho-iter (xmin xmax val fun &aux (x (* .5 (+ xmin xmax))) ymin ymax)
   (when (< (setq ymax (funcall fun xmax)) (setq ymin (funcall fun xmin)))

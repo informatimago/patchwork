@@ -79,7 +79,7 @@
           (get-list (first (input-objects self)) obj)))
 
 (defmethod disconnect-ctrl ((self C-enum-collect-sink) ctrl)
-  (if (eq ctrl (car (pw-controls self)))
+  (if (eql ctrl (car (pw-controls self)))
       (progn (ui:ed-beep)(format t "Disconnection of the first input is not allowed !"))
       (call-next-method)))
 
@@ -154,7 +154,7 @@ module enum. In the case of lists ofvarious sizes, pwmap will select the shortes
     (tell (controls *active-patch-window*) 'draw-connections)))
 
 (defmethod disconnect-ctrl ((self C-map-first) ctrl)
-  (if (eq ctrl (second (pw-controls self)))
+  (if (eql ctrl (second (pw-controls self)))
       (call-next-method)
       (progn (ui:ed-beep)
              (format t "Disconnection of the enum input is not allowed !"))))

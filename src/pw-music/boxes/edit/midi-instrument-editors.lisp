@@ -103,7 +103,7 @@
            :dialog-item-text "Play"))))
 
 (defmethod view-key-event-handler ((self C-fix-window) char)  
-  (if (not (eq char #\Newline))
+  (if (not (eql char #\Newline))
       (call-next-method)
       (progn (when (pw-win self) 
                  (window-select (pw-win self)))
@@ -201,18 +201,18 @@
 #|
 (defmethod play-instrument ((self C-midi-ins-fix) chan dur)
   (declare (ignore dur))
-  (cond ((eq (status self) #xA0)) 
-        ((eq (status self) #xB0) (write-controller-value chan (controller self) (value self)))
-        ((eq (status self) #xC0) (write-program-change-value chan (value self)))
-        ((eq (status self) #xD0)) 
-        ((eq (status self) #xE0) (write-pitch-bend-value chan  (value self)))))
+  (cond ((eql (status self) #xA0)) 
+        ((eql (status self) #xB0) (write-controller-value chan (controller self) (value self)))
+        ((eql (status self) #xC0) (write-program-change-value chan (value self)))
+        ((eql (status self) #xD0)) 
+        ((eql (status self) #xE0) (write-pitch-bend-value chan  (value self)))))
 |#
 (defmethod play-instrument ((self C-midi-ins-fix) note)
-  (cond ((eq (status self) #xA0)) 
-        ((eq (status self) #xB0) (write-controller-value (chan note) (controller self) (value self)))
-        ((eq (status self) #xC0) (write-program-change-value (chan note) (value self)))
-        ((eq (status self) #xD0)) 
-        ((eq (status self) #xE0) (write-pitch-bend-value (chan note)  (value self)))))
+  (cond ((eql (status self) #xA0)) 
+        ((eql (status self) #xB0) (write-controller-value (chan note) (controller self) (value self)))
+        ((eql (status self) #xC0) (write-program-change-value (chan note) (value self)))
+        ((eql (status self) #xD0)) 
+        ((eql (status self) #xE0) (write-pitch-bend-value (chan note)  (value self)))))
 ;;==============================================================================
 ;; bpf
 
@@ -436,13 +436,13 @@
          (mapcar #'- y-points (cirlist min-val))))))
    (setq points (break-point-fun  (truncate (/ dur (sample-rate self))) x-points y-points))
    (when points 
-     (cond ((eq (status self) #xA0)) 
-           ((eq (status self) #xB0) 
+     (cond ((eql (status self) #xA0)) 
+           ((eql (status self) #xB0) 
              (start 
                (continue-play-contr self (sample-rate self) chan (controller self) points)))  
-           ((eq (status self) #xC0)) 
-           ((eq (status self) #xD0)) 
-           ((eq (status self) #xE0)
+           ((eql (status self) #xC0)) 
+           ((eql (status self) #xD0)) 
+           ((eql (status self) #xE0)
             (start (continue-play-pitchb self (sample-rate self) chan points)))))))
 |#
 
@@ -460,13 +460,13 @@
          (mapcar #'- y-points (cirlist min-val))))))
    (setq points (break-point-fun  (truncate (/ (dur note) (sample-rate self))) x-points y-points))
    (when points 
-     (cond ((eq (status self) #xA0)) 
-           ((eq (status self) #xB0) 
+     (cond ((eql (status self) #xA0)) 
+           ((eql (status self) #xB0) 
              (start 
                (continue-play-contr self (sample-rate self) (chan note) (controller self) points)))  
-           ((eq (status self) #xC0)) 
-           ((eq (status self) #xD0)) 
-           ((eq (status self) #xE0)
+           ((eql (status self) #xC0)) 
+           ((eql (status self) #xD0)) 
+           ((eql (status self) #xE0)
             (start (continue-play-pitchb self (sample-rate self) (chan note) points)))))))
 ;;==============================================================================
 ;; data types collector used by mid-ins and C-note instrument field

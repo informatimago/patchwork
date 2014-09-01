@@ -113,11 +113,11 @@ Label is used for browsing inside the MN-editor.
 (defclass C-patch-midi-ins (C-patch)())
 
 (defmethod init-patch ((self C-patch-midi-ins))
-  (when (not (eq (nth 1 (input-objects self)) (nth 1 (pw-controls self))))
+  (when (not (eql (nth 1 (input-objects self)) (nth 1 (pw-controls self))))
     (tell (nth 1 (input-objects self)) 'init-patch)))
 
 (defmethod patch-value ((self C-patch-midi-ins) obj)
-  (when (not (eq (nth 1 (input-objects self)) (nth 1 (pw-controls self))))
+  (when (not (eql (nth 1 (input-objects self)) (nth 1 (pw-controls self))))
     (make-instance 'C-midi-ins-collection  
         :ins-name (dialog-item-text (car (pw-controls self)))
         :ins-objects (ask-all (nth 1 (input-objects self)) 'patch-value obj))))
@@ -125,16 +125,16 @@ Label is used for browsing inside the MN-editor.
 ;;______________________
 
 (defmethod connect-ctrl ((self C-patch-midi-ins) ctrl ctrl-panel)
-   (if (eq ctrl (car (pw-controls self)))
+   (if (eql ctrl (car (pw-controls self)))
      (setf (nth (find-nth-ctrl self ctrl) (input-objects self)) ctrl-panel)
-     (if (eq (nth 1 (pw-controls self)) (nth 1 (input-objects self)))
+     (if (eql (nth 1 (pw-controls self)) (nth 1 (input-objects self)))
        (setf (nth 1 (input-objects self)) (list ctrl-panel))
        (push ctrl-panel (nth 1 (input-objects self))))))
 
 (defmethod connect-nth-control ((self C-patch-midi-ins) nth-ctrl ctrl-panel)
-  (if (eq nth-ctrl 0)
+  (if (eql nth-ctrl 0)
      (setf (nth nth-ctrl (input-objects self)) ctrl-panel)
-     (if (eq (nth 1 (pw-controls self)) (nth 1 (input-objects self)))
+     (if (eql (nth 1 (pw-controls self)) (nth 1 (input-objects self)))
          (setf (nth nth-ctrl (input-objects self)) (list ctrl-panel))
          (push ctrl-panel (nth nth-ctrl (input-objects self)))))
   (setf (open-state (nth nth-ctrl (pw-controls self))) ()))

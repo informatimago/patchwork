@@ -147,7 +147,7 @@
 (defmethod draw-patch-extra ((self C-patch-application))
   (when (application-object self)
     (draw-appl-label self
-                     (if (eq (front-window) (application-object self)) #\* #\A)))) 
+                     (if (eql (front-window) (application-object self)) #\* #\A)))) 
  
 (defmethod draw-appl-label ((self C-patch-application) label)
   (when (view-container  self)

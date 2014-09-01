@@ -333,7 +333,7 @@ If two or more adjacent min or max have the same value, they are collected in a 
 ;;(defun list-sub (l1 l2) (car l1))
 
 (defun list-sub (l1 l2)
-  (if (eq l2 (cdr l1)) (car l1)
+  (if (eql l2 (cdr l1)) (car l1)
       (let ((l ()))
         (while (neq l1 l2)
           (when (null l1) (error "~S is not a sublist~%" l2))

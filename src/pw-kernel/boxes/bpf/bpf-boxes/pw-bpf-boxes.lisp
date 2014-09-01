@@ -124,10 +124,10 @@
 (defmethod get-initial-button-text ((self C-patch-function)) "o")
 
 (defmethod set-output ((self C-patch-function) o-type)
-  (cond ((and (eq o-type :bpf) (not (eq (out-type self) :bpf)))
+  (cond ((and (eql o-type :bpf) (not (eql (out-type self) :bpf)))
          (setf (type-list self) '(bpf))
          (erase-my-connections self))
-        ((and (eq (out-type self) :bpf) (not (eq o-type :bpf)))
+        ((and (eql (out-type self) :bpf) (not (eql o-type :bpf)))
          (setf (type-list self) '(list))
          (erase-my-connections self)))
   (setf (out-type self) o-type)
@@ -155,7 +155,7 @@
 (defmethod draw-patch-extra ((self C-patch-function))
   (when (application-object self)
     (draw-appl-label self
-      (if (eq (front-window) (application-object self)) #\* (current-str self)))))
+      (if (eql (front-window) (application-object self)) #\* (current-str self)))))
 
 
 (defmethod erase-my-connections ((self C-patch-function))
@@ -208,8 +208,8 @@
 
 (defmethod patch-value ((self C-patch-function) obj)
   (unless (or (value self)
-              (and  (eq (first (pw-controls self)) (first (input-objects self)))
-                    (eq (second (pw-controls self)) (second (input-objects self)))))
+              (and  (eql (first (pw-controls self)) (first (input-objects self)))
+                    (eql (second (pw-controls self)) (second (input-objects self)))))
     (let* ((in-1 (patch-value (first (input-objects self)) obj))
            (in-2 (patch-value (second (input-objects self)) obj))
            (bpf 

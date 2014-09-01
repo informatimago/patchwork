@@ -223,7 +223,7 @@ extended."
 ;;   (cond
 ;;     ((not (consp lst)) lst)
 ;;     ((every 'listp lst)
-;;      (if (eq depth 2)
+;;      (if (eql depth 2)
 ;;          (mapcar (lambda (x) (rem-dups x test)) lst)
 ;;          (unique-1 lst test)))
 ;;     (t (unique-1 lst test))))
@@ -243,7 +243,7 @@ occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3
   (cond
     ((not (consp lst)) lst)
     ((every 'listp lst)
-     (if (eq depth 2)
+     (if (eql depth 2)
          (mapcar (lambda (x) (rem-dups x test)) lst)
          (unique-1 lst test)))
     (t (unique-1 lst test))))

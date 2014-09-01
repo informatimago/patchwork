@@ -114,7 +114,7 @@ figures out which variables are involved."
 \(x0,y0) (x1,y1)."
   (let* ((a (/ (- y1 y0) (- x1 x0)))
          (b (- y1 (* x1 a))))
-    (if (not (eq sym ())) (format t "y = ~S x + ~S ~%" (lldecimals a 6) (lldecimals b 6) ))
+    (if (not (eql sym ())) (format t "y = ~S x + ~S ~%" (lldecimals a 6) (lldecimals b 6) ))
     (set (if (null sym) 'fline sym)
          ;;(compile ()
          (eval `(function
@@ -142,7 +142,7 @@ lets one print the function. "
       (progn (print "values of x and y must be different from zero") (pw::ed-beep))
       (let* ((b (/ (log (/ y1 y0)) (log (/ x1 x0))))
              (a (/ y1 (expt x1 b))))
-        (if (not (eq sym ())) (format t "y = ~S x ** ~S ~%" (lldecimals a 10) (lldecimals b 10) ))
+        (if (not (eql sym ())) (format t "y = ~S x ** ~S ~%" (lldecimals a 10) (lldecimals b 10) ))
         (set  (if (null sym) 'fpuiss2 sym) 
               ;;(compile ()
               (eval `(function
@@ -199,7 +199,7 @@ Si sym = nil, la fct n'est pas affichée dans le listener"
       (error "sorry... couldn't find an interpolation with this values")) 
     (setq a #i((y1 - y0)/(x1 ** b - x0 ** b)))
     (setq c #i(y0 - a x0 ** b))
-    (if (not (eq sym ())) (format t "y = ~S x ** ~S + ~S  ~%" 
+    (if (not (eql sym ())) (format t "y = ~S x ** ~S + ~S  ~%" 
                                   (lldecimals a 10) (lldecimals b 10) (lldecimals c 10)))
     (set  (if (null sym) 'fpuiss3 sym)
           ;;(compile ()
@@ -245,7 +245,7 @@ and create the corresponding function, either y = axb
   
   (let* ((a #i((y1 - y0) / (x1 * x1 - x0 * x0)))
          (b #i(y0 - a * x0 * x0)))
-    (if (not (eq sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
+    (if (not (eql sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
     (set (if (null sym) 'fparab2 sym) 
          ;;(compile ()
          (eval `(function
@@ -260,7 +260,7 @@ and create the corresponding function, either y = axb
 ;; 
 ;;   (let* ((a #i((y1 - y0) / (x1 * x1 - x0 * x0)))
 ;;          (b #i(y0 - a * x0 * x0)))
-;;     (if (not (eq sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
+;;     (if (not (eql sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
 ;;     (set (if (null sym) 'fparab2 sym) 
 ;;          (compile ()
 ;;                   `(lambda (x) (+  (* ,a x x ) ,b ))))))
@@ -277,7 +277,7 @@ and create the corresponding function, either y = axb
                /(x0 * x0 * (x1 - x2) + x1 * x1 * (x2 - x0) + x2 * x2 * (x0 - x1))))
          (b #i((y1 - y2 + a * (x2 * x2 - x1 * x1)) / (x1 - x2)))
          (c #i(y2 - a * x2 * x2 - b * x2)))
-    (if (not (eq sym ())) (format t "y = ~S x 2 + ~S x + ~S  ~%" 
+    (if (not (eql sym ())) (format t "y = ~S x 2 + ~S x + ~S  ~%" 
                                   (lldecimals a 6) (lldecimals b 6) (lldecimals c 6)))
     (set (if (null sym) 'fparab3 sym) 
          ;;(compile ()
@@ -295,7 +295,7 @@ and create the corresponding function, either y = axb
 ;;                /(x0 * x0 * (x1 - x2) + x1 * x1 * (x2 - x0) + x2 * x2 * (x0 - x1))))
 ;;          (b #i((y1 - y2 + a * (x2 * x2 - x1 * x1)) / (x1 - x2)))
 ;;          (c #i(y2 - a * x2 * x2 - b * x2)))
-;;     (if (not (eq sym ())) (format t "y = ~S x 2 + ~S x + ~S  ~%" 
+;;     (if (not (eql sym ())) (format t "y = ~S x 2 + ~S x + ~S  ~%" 
 ;;                                   (lldecimals a 6) (lldecimals b 6) (lldecimals c 6)))
 ;;     (set (if (null sym) 'fparab3 sym) 
 ;;          (compile ()

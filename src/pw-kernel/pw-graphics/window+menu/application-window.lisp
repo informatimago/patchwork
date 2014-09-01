@@ -94,6 +94,7 @@
 
 
 (defmethod window-close ((self C-application-window))
-  (if (and (pw-object self) (wptr self)) (save-window-state (pw-object self) self))
+  (if (and (pw-object self) (wptr self))
+      (save-window-state (pw-object self) self))
   (call-next-method))
 

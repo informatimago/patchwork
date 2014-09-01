@@ -133,7 +133,7 @@ the slot corresponding to an exhausted list."
 
 (defun class-instance-slots (class)
   (remove-if-not (lambda (slot)
-                   (eq :instance (slot-definition-allocation slot)))
+                   (eql :instance (slot-definition-allocation slot)))
                  (class-slots class)))
 
 (defun class-slot-names (obj)
@@ -221,7 +221,7 @@ module returns the list of the valid slots of the object in the first input <obj
           (chan    (patch-value (nth 3 (input-objects self)) self))
          instrument)
    (if 
-    ;;;;(not (eq (class-name (class-of obj)) 'C-patch-midi-Mod))
+    ;;;;(not (eql (class-name (class-of obj)) 'C-patch-midi-Mod))
        (not (yourself-if-collecting obj))
       (make-instrument-note midic dur chan vel instrument ())
       (progn 

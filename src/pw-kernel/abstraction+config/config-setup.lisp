@@ -121,7 +121,7 @@
   `(dolist (,sym ',key-code-pairlist)
      (cond ((null *library-selection*)
             (eval-list (cdr ,sym)))
-           ((eq (car ,sym) :allways)
+           ((eql (car ,sym) :allways)
             (eval-list (cdr ,sym)))
            ((consp (car ,sym))
             (if (intersection (car ,sym) *library-selection* )

@@ -325,11 +325,11 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
          (and current-intersect 
               (set-the-type-list 
                (car list-of-types)
-               (if (eq current-intersect 'all-types) nil current-intersect))))))
+               (if (eql current-intersect 'all-types) nil current-intersect))))))
 
 (defun type-intersection (list1 list2)
-  (cond ((eq list1 'all-types) list2)
-        ((eq list2 'all-types) list1)
+  (cond ((eql list1 'all-types) list2)
+        ((eql list2 'all-types) list1)
         (t (intersection list1 list2))))
 
 ;;Camilo [922010]
@@ -372,7 +372,7 @@ value))|#
   (:documentation "the class of patch-configuration patches"))
 
 (defmethod decompile ((self C-patch-configurer))
-  (when (eq self *active-config-object*) 
+  (when (eql self *active-config-object*) 
     (setf *active-config-object*())
     (reset-fill-control self))
   `(sbox ',(type-of self) ',(pw-function self) ,(pw-function-string self)
@@ -468,7 +468,7 @@ value))|#
                                     `(add-patch-box *active-patch-window*
                                                     ,(decompile *added-box-object*)))))))
       (set-user-patch-config Lib&patch-files)
-      (unless (eq self *active-config-object*)
+      (unless (eql self *active-config-object*)
         (set-fill-control self)
         (and *active-config-object* 
              (reset-fill-control *active-config-object*))
@@ -492,7 +492,7 @@ value))|#
                                (mapcar (lambda (path) (file-namestring path)) lib&patches)
                                :window-title "Please Select Abstract and Library Files"
                                :selection-type :disjoint))))
-      (when (and items (not (eq items :cancel)))
+      (when (and items (not (eql items :cancel)))
         (ADD-CELLS items lib&patches)
         (setf (file-path self)
               (config-difference (file-path self) (get-user-patch-config)))))))
@@ -512,7 +512,7 @@ value))|#
                                (mapcar (lambda (path) (file-namestring path)) patches)
                                :window-title "Please Select Abstract and Library Files"
                                :selection-type :disjoint))))
-    (when (and items (not (eq items :cancel)))
+    (when (and items (not (eql items :cancel)))
       (ADD-CELLS items patches))))
 
 
@@ -543,7 +543,7 @@ value))|#
                    :window-title (format nil "please select ~A functions" (file-namestring file-name))
                    :table-print-function (lambda (it &optional strm)(princ (cdr it) strm))
                    :selection-type :disjoint))))))
-    (cons file-name (and (not (eq sel :cancel)) sel))))
+    (cons file-name (and (not (eql sel :cancel)) sel))))
 
 ;;;
 ;;;takes an abstract-box  and  the decompiled code (abstract-box)

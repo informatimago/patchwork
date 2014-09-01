@@ -56,7 +56,7 @@
 
 (defgeneric inside-rtm-selection-buttons- (self where view)
   (:method ((self C-beat-selection-button) where view)
-    (when (eq (rtm-view-obj self) view)
+    (when (eql (rtm-view-obj self) view)
       (when (inside-rectangle? (point-h where) (point-v where) (x self) (y self) (w self) (h self))
         (setq *selection-buttons-x* (+ (x view)(x *active-rtm-window*) (point-h where)))
         (setq *selection-buttons-y* (+ (y view)(y *active-rtm-window*) (point-v where)))
@@ -66,7 +66,7 @@
           (setf (rtm-selection-2 (view-container view)) 
                 (if  (and 
                       (shift-key-p) 
-                      (eq (class-name (class-of rtm-sel1))
+                      (eql (class-name (class-of rtm-sel1))
                           (class-name (class-of (cdr (selection-button-function self)))))) 
                      rtm-sel1     ()))
           (setf (rtm-selection-1 (view-container view)) (cdr (selection-button-function self)))
@@ -80,7 +80,7 @@
 
 (defgeneric selected-rtm-button\? (self obj)
   (:method ((self C-beat-selection-button) obj) 
-    (when (eq obj (cdr (selection-button-function self))) self)))
+    (when (eql obj (cdr (selection-button-function self))) self)))
 
 (defgeneric fill-xor-view-contents** (self)
   (:method ((self C-beat-selection-button))
@@ -91,8 +91,8 @@
   (:method ((self C-beat-selection-button) view)
     (with-pen-state  (:mode :srccopy :pattern *gray-pattern*)
       (draw-rect* (x self) (y self)(w self) (h self)))
-    (when (or (eq (cdr (selection-button-function self)) (rtm-selection-1 view))
-              (eq (cdr (selection-button-function self)) (rtm-selection-2 view)))
+    (when (or (eql (cdr (selection-button-function self)) (rtm-selection-1 view))
+              (eql (cdr (selection-button-function self)) (rtm-selection-2 view)))
       (with-pen-state (:mode :patXOR :pattern *black-pattern*)
         (fill-rect* (x self) (y self) (w self) (h self))))))
 ;;================================================================

@@ -115,7 +115,7 @@
          (rtm-sum (round (apply #'+ (mapcar #'abs (ask-all (rtm-list self) 'unit-length)))))
          (tuplet-flag (draw-tuplets? rtm-sum (unit-length self))) 
          rtm-now rtm-obj note-head-info tuplet-num cleni-tuplet-unit)
-     (when (eq (class-name  (class-of  super-beat)) 'C-measure)
+     (when (eql (class-name  (class-of  super-beat)) 'C-measure)
          (setf *global-rtm-level-list* nil)
          (setf *notehead-type-list* nil))
      (when tuplet-flag
@@ -142,7 +142,7 @@
                            ',(mapcar #'convert-note-to-cleani-symbol (notes (beat-chord rtm-obj)))))
                            ;;(ask-all (notes (beat-chord rtm-obj)) 'midic)
                  *cleni-notehead-list*))
-              ((eq (car *notehead-type-list*) 'rest)
+              ((eql (car *notehead-type-list*) 'rest)
                 (push  
                   `(:rest ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info)))
                   *cleni-notehead-list*))
@@ -154,7 +154,7 @@
                           ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                           ,(third *cleni-previous-chord-info-list*))
                        *cleni-notehead-list*)) )
-              (when (eq (second note-head-info) 'slur)
+              (when (eql (second note-head-info) 'slur)
                  (setq *cleni-notehead-list*
                    (cons 
                      (append (car *cleni-notehead-list*)
@@ -178,7 +178,7 @@
          (tuplet-flag (draw-tuplets? rtm-sum (unit-length self))) 
          rtm-now rtm-obj note-head-info tuplet-num cleni-tuplet-unit
          )
-    (when (eq (class-name  (class-of  super-beat)) 'C-measure)
+    (when (eql (class-name  (class-of  super-beat)) 'C-measure)
       (setf *global-rtm-level-list* nil)
       (setf *notehead-type-list* nil))
     (when tuplet-flag
@@ -205,7 +205,7 @@
                          `(:chord ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                                   ,(ask-all (notes (beat-chord rtm-obj)) 'midic))))
              *cleni-notehead-list*))
-           ((eq (car *notehead-type-list*) 'rest)
+           ((eql (car *notehead-type-list*) 'rest)
             (push  
              `(:rest ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info)))
              *cleni-notehead-list*)
@@ -220,7 +220,7 @@
                       ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                       ,(third *cleni-previous-chord-info-list*)))
              *cleni-notehead-list*)) )
-          (when (eq (second note-head-info) 'slur) (print 'slur)
+          (when (eql (second note-head-info) 'slur) (print 'slur)
                 (setq *cleni-notehead-list*
                       (cons 
                        (append (car *cleni-notehead-list*)
@@ -247,7 +247,7 @@
            (tuplet-flag (draw-tuplets? rtm-sum (unit-length self))) 
            rtm-now rtm-obj note-head-info tuplet-num cleni-tuplet-unit
            )
-      (when (eq (class-name  (class-of  super-beat)) 'C-measure)
+      (when (eql (class-name  (class-of  super-beat)) 'C-measure)
         (setf *global-rtm-level-list* nil)
         (setf *notehead-type-list* nil))
       (when tuplet-flag
@@ -276,7 +276,7 @@
                                        ,(epw::approx-m (ask-all (notes (beat-chord rtm-obj)) 'midic)
                                                        *cleni-temperament-mode*))))
                   *cleni-notehead-list*))
-                ((eq (car *notehead-type-list*) 'rest)
+                ((eql (car *notehead-type-list*) 'rest)
                  (push  
                   `(:rest ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info)))
                   *cleni-notehead-list*)
@@ -291,8 +291,8 @@
                            ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                            ,(third *cleni-previous-chord-info-list*)))
                   *cleni-notehead-list*)) )
-              (when (eq (second note-head-info) 'slur) 
-                (cond ((eq (caar *cleni-notehead-list*) :rest)
+              (when (eql (second note-head-info) 'slur) 
+                (cond ((eql (caar *cleni-notehead-list*) :rest)
                        (push 
                         `(:rest  ,(convert-rtm-unit-to-cleni (+ (car *global-rtm-level-list*) 2) nil))
                         *cleni-notehead-list*))

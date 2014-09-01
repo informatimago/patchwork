@@ -158,7 +158,7 @@
                    (setq key   (patch-value (nth 2 (input-objects self)) self))
                    (setq vel   (patch-value (nth 3 (input-objects self)) self))
                    (setq chan  (patch-value (nth 4 (input-objects self)) self))
-                   (unless (eq (nth 5 (input-objects self))(nth 5 (pw-controls self)))
+                   (unless (eql (nth 5 (input-objects self))(nth 5 (pw-controls self)))
                      (setq instrument (patch-value (nth 5 (input-objects self)) self)))
                    (if (listp key)
                        (while key
@@ -426,7 +426,7 @@
 ;;           (setq the-list (nconc the-list new-list)))
 ;;         (dolist (object objects)
 ;;           (setq control (nth i controls))
-;;           (unless (eq control object)
+;;           (unless (eql control object)
 ;;             (setf (nth i the-list) (patch-value object obj)))
 ;;           (incf i))      
 ;;         (setf (chord-line-list self) the-list))))
@@ -442,7 +442,7 @@
 ;;         (setf (chord-line-list self)
 ;;               (dolist (in-obj objects res)
 ;;                 (setq res
-;;                       (append  res (list! (if (eq in-obj (pop controls)) 
+;;                       (append  res (list! (if (eql in-obj (pop controls)) 
 ;;                                               (make-instance 'C-chord-line)
 ;;                                               (patch-value in-obj obj)))))))
 ;;         (when (and win (wptr win)
@@ -464,7 +464,7 @@
         (setf (chord-line-list self)
               (dolist (in-obj objects res)
                 (setq res
-                      (append  res (list! (if (eq in-obj (pop controls))
+                      (append  res (list! (if (eql in-obj (pop controls))
                                               (make-instance 'C-chord-line)
                                               (patch-value in-obj obj)))))))
         (when (and win (wptr win)

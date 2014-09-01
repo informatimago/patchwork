@@ -175,7 +175,7 @@
       (let ((inside-sel-butt? (inside-rectangle? (point-h (view-mouse-position self))(point-v (view-mouse-position self))
                                                  (x (selection-button self))(y (selection-button self))(w (selection-button self))(h (selection-button self)))))
         (unless inside-sel-butt? 
-          (unless  (eq (current-rtm-editor (view-container self)) self)
+          (unless  (eql (current-rtm-editor (view-container self)) self)
              (fill-xor-view-selections (current-rtm-editor (view-container self)))
              (setf (current-rtm-editor (view-container self)) self))))
       (unless (ask (selection-buttons self) #'inside-rtm-selection-buttons- (view-mouse-position self) self)
@@ -290,7 +290,7 @@
 
 #|(defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
-    (if (eq *rtm-playing-option* :pb) 
+    (if (eql *rtm-playing-option* :pb) 
       (progn
         (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
         (start 
@@ -300,8 +300,8 @@
                                 'play-measure-line (get-play-speed self))))))       
       (play-sequence (make-instance 'C-chord-line 
                        :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line))))) 
-                     (cond ((eq *current-approx-scale* *1/4-tone-chromatic-scale*) 4)
-                           ((eq *current-approx-scale* *1/8-tone-chromatic-scale*) 8)
+                     (cond ((eql *current-approx-scale* *1/4-tone-chromatic-scale*) 4)
+                           ((eql *current-approx-scale* *1/8-tone-chromatic-scale*) 8)
                            (t 2))))))|#
 
 
@@ -309,7 +309,7 @@
 (defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
-    (if (eq *playing-option* :pb) 
+    (if (eql *playing-option* :pb) 
       (progn
         (setf patchwork.scheduler::*print-on-late?* t)
         (start 
@@ -332,7 +332,7 @@
 (defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
-    (if (eq *playing-option* :pb) 
+    (if (eql *playing-option* :pb) 
       (progn
         (setf patchwork.scheduler::*print-on-late?* t)
         (start 
@@ -555,9 +555,9 @@
     (when (and (rtm-selection-1 self) (current-rtm-editor self))
       (setf *beat-leaf-objs* ())
       (let (pos1 pos2 measures beats res beats1 beats2)
-        (cond ((eq 'C-measure-line (class-name (class-of (rtm-selection-1 self)))) ; measure-line
+        (cond ((eql 'C-measure-line (class-name (class-of (rtm-selection-1 self)))) ; measure-line
                (setq res (collect-all-chord-beat-leafs (rtm-selection-1 self))))
-              ((eq 'C-measure (class-name (class-of (rtm-selection-1 self)))) ; measure
+              ((eql 'C-measure (class-name (class-of (rtm-selection-1 self)))) ; measure
                (setq measures (measures (measure-line (current-rtm-editor self))))
                (setq pos1 (position (rtm-selection-1 self) measures)) 
                (setq pos2 (position (rtm-selection-2 self) measures))
@@ -565,7 +565,7 @@
                (tell (subseq measures (min pos1 pos2)(1+ (max pos1 pos2))) #'collect-all-chord-beat-leafs)
                (setq res *beat-leaf-objs*))
               ((and (not (beat-chord (rtm-selection-1 self))) ; beat
-                    (eq 'C-beat (class-name (class-of (rtm-selection-1 self))))
+                    (eql 'C-beat (class-name (class-of (rtm-selection-1 self))))
                     (setq beats (collect-all-chord-beat-leafs (measure-line (current-rtm-editor self)))))
                (setf *beat-leaf-objs* ())
                (setq beats1 (collect-all-chord-beat-leafs (rtm-selection-1 self)))
@@ -593,9 +593,9 @@
   (when (and (rtm-selection-1 self) (current-rtm-editor self))
     (setf *beat-leaf-objs* ())
     (let (pos1 pos2 measures beats res)
-      (cond ((eq 'C-measure-line (class-name (class-of (rtm-selection-1 self))))
+      (cond ((eql 'C-measure-line (class-name (class-of (rtm-selection-1 self))))
              (setq res (collect-all-chord-beat-leafs (rtm-selection-1 self))))
-            ((eq 'C-measure (class-name (class-of (rtm-selection-1 self))))
+            ((eql 'C-measure (class-name (class-of (rtm-selection-1 self))))
              (setq measures (measures (measure-line (current-rtm-editor self))))
              (setq pos1 (position (rtm-selection-1 self) measures)) 
              (setq pos2 (position (rtm-selection-2 self) measures))
@@ -603,7 +603,7 @@
              (tell (subseq measures (min pos1 pos2)(1+ (max pos1 pos2))) #'collect-all-chord-beat-leafs)
              (setq res *beat-leaf-objs*))
             ((and (not (beat-chord (rtm-selection-1 self)))
-                  (eq 'C-beat (class-name (class-of (rtm-selection-1 self))))
+                  (eql 'C-beat (class-name (class-of (rtm-selection-1 self))))
              (setq beats (apply #'append (ask-all (measures (measure-line (current-rtm-editor self))) #'beat-objects))))
              (setq pos1 (position (rtm-selection-1 self) beats)) 
              (setq pos2 (position (rtm-selection-2 self) beats))

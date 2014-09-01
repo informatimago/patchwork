@@ -513,8 +513,8 @@
             (set-pitch&value self the-note)
             (update-note the-note)
             (set-cursor (setf *default-MN-cursor*
-                              (cond ((eq (alteration the-note) #\Y) 107)
-                                    ((eq (alteration the-note) #\I) 103)
+                              (cond ((eql (alteration the-note) #\Y) 107)
+                                    ((eql (alteration the-note) #\I) 103)
                                     (t 110))))
             (dolist (note selections)
               (setf (midic note) (+ (midic note) diff))
@@ -652,31 +652,31 @@
              (#\n (change-arp-view (view-container self) 'chord) t)
              ((:Tab) (circ-edit-dim self) t)))
           ((and (or active-note (selected-notes self))
-                (or (eq char :UpArrow)
-                    (eq char :DownArrow)))
+                (or (eql char :UpArrow)
+                    (eql char :DownArrow)))
            (transpose-selections self char)
            (if active-note (set-pitch&value self active-note))
            (update-chord (active-chord self))
            (erase+view-draw-contents self))
-          ((and (or active-note (selected-notes self)) (eq char #\Backspace))
+          ((and (or active-note (selected-notes self)) (eql char #\Backspace))
            (remove-chord-or-note self))
-          ((eq char #\r) (when active-note 
+          ((eql char #\r) (when active-note 
                            (setf *global-music-notation-panel* self)
                            (remove-instrument-item active-note 0 0)))
-          ((eq char #\B) (when active-note 
+          ((eql char #\B) (when active-note 
                            (setf *global-music-notation-panel* self)
                            ;;(add-bpf-to-note (active-note self) 0 0)
                            ))
-          ((eq char #\F) (when active-note 
+          ((eql char #\F) (when active-note 
                            (setf *global-music-notation-panel* self)
                            ;;(add-fix-to-note (active-note self) 0 0)
                            ))
-          ((eq char #\M) (when active-note 
+          ((eql char #\M) (when active-note 
                            (setf *global-music-notation-panel* self)
                            (add-MN-to-note active-note (view-window self) 0 0)))
-          ((and (eq char #\e) (or active-note (selected-notes self)))
+          ((and (eql char #\e) (or active-note (selected-notes self)))
            (open-param-ctrl (view-container self)))
-          ((eq char #\S) (reset-order self))
+          ((eql char #\S) (reset-order self))
           (t (ui:ed-beep)))))
 
 (defgeneric reset-order (self))
@@ -694,14 +694,14 @@
                           (* (cond ((shift-key-p) 2)
                                    ((control-key-p) 24)  
                                    (t 1))
-                             (if (eq char :UpArrow) 
+                             (if (eql char :UpArrow) 
                                  (approx-factor *current-approx-scale*)
                                  (- 0 (approx-factor *current-approx-scale*))))))
         (transpose-note (active-note self)
                         (* (cond ((shift-key-p) 2)
                                  ((control-key-p) 24)  
                                  (t 1))
-                           (if (eq char :UpArrow) 
+                           (if (eql char :UpArrow) 
                                (approx-factor *current-approx-scale*)
                                (- 0 (approx-factor *current-approx-scale*))))))))
 
@@ -897,7 +897,7 @@
 
 (defgeneric setting-of (self ctrl))
 (defmethod setting-of ((self C-chord-mus-not-view) ctrl)
-  (if (eq ctrl :arp)
+  (if (eql ctrl :arp)
       (arp-ctrl self)
       (time-ctrl self)))
 
@@ -967,10 +967,10 @@
 (defmethod change-arp-view ((self C-chord-mus-not-view ) view-type)
   (setf (arp-ctrl self) ())
   (setf (time-ctrl self) ())
-  (cond ((eq view-type 'arp)
+  (cond ((eql view-type 'arp)
          (setf (arp-ctrl self) t)
          (set-box-title (popUpBox self) "A"))
-        ((eq view-type 'time)
+        ((eql view-type 'time)
          (setf (time-ctrl self) t)
          (set-box-title (popUpBox self) "T"))
         (t  (set-box-title (popUpBox self) "V"))) ;for now.......
@@ -979,7 +979,7 @@
 (defmethod set-value-ctrl ((self C-chord-mus-not-view) item kind)
   (declare (ignore item))
   (call-next-method)
-  (if (and (eq :order kind) (not (arp-ctrl self)) (get-ctrl-setting self :order))
+  (if (and (eql :order kind) (not (arp-ctrl self)) (get-ctrl-setting self :order))
       (change-arp-view self 'arp)))
 
 (defmethod use-staff ((self C-chord-mus-not-view ) num staff)
@@ -1026,11 +1026,11 @@
          (pitch-notes (copy-list (notes chord)))
          (notes (sort pitch-notes #'< :key #'order)))
     (setf *MN-play-flag* t)
-    (cond ((eq *playing-option* :mc)
+    (cond ((eql *playing-option* :mc)
            (setf patchwork.scheduler::*print-on-late?* t)
            (start (apdfuncall 10 (priority) 10
                               'keep-playing-arps-mc self notes)))
-          ((eq *playing-option* :pb)
+          ((eql *playing-option* :pb)
            (setf patchwork.scheduler::*print-on-late?* t)
            (start (apdfuncall 10 (priority) 10
                               'keep-playing-arps self notes))))))

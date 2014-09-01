@@ -103,7 +103,7 @@ close the module immediately after evaluation to avoid recalculating the input."
 (defvar *accum-buffer-limit* 400)
 
 ;;changed by aaa 29-08-95 from pw-modifs
-(defclass C-patch-accum (C-patch-buffer pw::C-pw-functional )
+(defclass C-patch-accum (C-patch-buffer pw::C-pw-functional)
   ((my-buffer-limit :initform 400 :accessor my-buffer-limit)
    (the-buffer :initform (make-list 400 :initial-element 0)
                :accessor the-buffer)
@@ -111,24 +111,16 @@ close the module immediately after evaluation to avoid recalculating the input."
    (end-limit :initform 0 :accessor end-limit)
    (accum-buffer-limit :initform 400 :accessor accum-buffer-limit)))
 
-#|
-(defclass C-patch-accum (C-patch-buffer)
-  ((my-buffer-limit :initform 400 :accessor my-buffer-limit)
-   (the-buffer :initform (make-list 400 :initial-element 0)
-               :accessor the-buffer)
-   (end-ptr :initform 0 :accessor end-ptr)
-   (end-limit :initform 0 :accessor end-limit)
-   (accum-buffer-limit :initform 400 :accessor accum-buffer-limit)))
-|#
 
 
 (defmethod get-lock-button-fun ((self C-patch-accum))
-  (eval `(function (lambda (item)
-                     (if (value (view-container item))
-                       (progn (set-dialog-item-text item "o") (init-buffer ,self))
-                       (set-dialog-item-text item "x"))
-                     (setf (value (view-container item))
-                           (not (value (view-container item))))))))
+  (lambda (item)
+    (if (value (view-container item))
+        (progn (set-dialog-item-text item "o")
+               (init-buffer self))
+        (set-dialog-item-text item "x"))
+    (setf (value (view-container item))
+          (not (value (view-container item))))))
 
 (defmethod init-buffer ((self C-patch-accum))
   (setf (end-ptr self) 0)
@@ -169,3 +161,4 @@ on the right. When the list reaches its maximum value the resulting list begins 
 wraparound in a circular fashion, writing over old values. "
   (declare (ignore data nb-elems)))
 
+;;;; THE END ;;;;

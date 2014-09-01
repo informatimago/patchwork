@@ -68,7 +68,7 @@
                      )
                    )
                  (#_PrCloseDoc  :ptr hardcopy-ptr)))
-             (when (print (eq (%hget-byte pRec $prJob.bjDocLoop)
+             (when (print (eql (%hget-byte pRec $prJob.bjDocLoop)
                               $bSpoolLoop))
                (prchk)
                (%stack-block ((StRec $iPrStatSize))

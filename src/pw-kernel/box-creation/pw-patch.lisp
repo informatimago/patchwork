@@ -106,7 +106,7 @@
 (defun get-evaluation-option () *standard-click-eval*)
 
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
-  (if (eq (not (get-evaluation-option)) (not (option-key-p)))
+  (if (eql (not (get-evaluation-option)) (not (option-key-p)))
       (progn
         (incf (clock *global-clock*))
         (eval-enqueue
@@ -137,12 +137,12 @@
 
 (defgeneric connect-patch? (self ctrl)
   (:method ((self C-pw-outrect) ctrl)
-    (unless (eq ctrl self)
+    (unless (eql ctrl self)
       (let* ((patch (view-container ctrl)))
         (when patch
           (let ((inde (if (patch-type-p patch) (find-nth-ctrl patch ctrl))))
             (when (and (patch-type-p (view-container ctrl)) 
-                       (not (eq (class-name (class-of ctrl)) 'C-pw-outrect)))
+                       (not (eql (class-name (class-of ctrl)) 'C-pw-outrect)))
               (if (and (and (not (equal (type-list ctrl) '(no-connection)))  
                             (not (equal (type-list (view-container self)) '(no-connection))))  
                        (or (intersection  (type-list ctrl) (type-list (view-container self)) :test 'eq)
@@ -158,8 +158,8 @@
                           (print "Recursive connections not allowed !")
                           (set-open-state ctrl t)) 
                         (progn 
-                          (when (or (eq (pw-function (view-container self)) 'absin)
-                                    (eq (pw-function (view-container self)) 'absin2))
+                          (when (or (eql (pw-function (view-container self)) 'absin)
+                                    (eql (pw-function (view-container self)) 'absin2))
                             (set-dialog-item-text (car (pw-controls (view-container self))) (doc-string ctrl)))
                           (set-view-font (view-window self) '("Monaco" 9 :SRCOR :PLAIN)) ;??
                           (set-open-state ctrl nil)))
@@ -195,7 +195,7 @@
           (nth-control-self (nth? self patch-controls))
           nth-control)
       (for (i 0 1 (1- (length input-objects))) 
-        (when (not (eq (nth i input-objects) (nth i (pw-controls self))))
+        (when (not (eql (nth i input-objects) (nth i (pw-controls self))))
           (setq input-objects-now
                 (if (atom (nth i input-objects))
                     (list (nth i input-objects))
@@ -301,7 +301,7 @@
                   :methods (compute-applicable-methods (function view-click-event-handler) (list self where))
                   :res res
                   :self self)
-    (cond ((eq self res) ;inside patch,no active controls
+    (cond ((eql self res) ;inside patch,no active controls
            (cond ((double-click-p)
                   (open-patch-win self))
                  ((and (control-key-p) (option-key-p))
@@ -379,10 +379,10 @@
           (setq x-off (if (setq right? (> (car in-xs) 0)) 6 -4))
           (setq x-off2 (if right? (* (truncate i 2) 2) (* (truncate i 2) -2)))
           (when (and (setq ctrl (pop input-objects))
-                     (not (eq ctrl (pop pw-controls))))
+                     (not (eql ctrl (pop pw-controls))))
             (when (atom ctrl)(setq ctrl (list ctrl))) ; for nargs  
             (while ctrl
-              (unless (eq erase-mode *white-pattern*) 
+              (unless (eql erase-mode *white-pattern*) 
                 (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
                                      *object-connection-draw-mode* *normal-connection-draw-mode*)))
               (with-pen-state (:pattern erase-mode)
@@ -445,11 +445,11 @@
             (setq x-off (if (setq right? (> (car in-xs) 0)) 6 -4))
             (setq x-off2 (if right? (* (truncate i 2) 2) (* (truncate i 2) -2)))
             (when (and (setq ctrl (pop input-objects))
-                       (not (eq ctrl (pop pw-controls)))
+                       (not (eql ctrl (pop pw-controls)))
                        (or (null from-patches) (member ctrl from-patches :test #'eq)))
               (if (atom ctrl) (setq ctrl (list ctrl))) ; for nargs  
               (while ctrl
-                (unless (eq erase-mode *white-pattern*) 
+                (unless (eql erase-mode *white-pattern*) 
                   (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
                                        *object-connection-draw-mode*
                                        *normal-connection-draw-mode*)))
@@ -504,7 +504,7 @@
     (let ((ctrls (pw-controls self))
           (nth-count))
       (for (i 0 1 (1- (length ctrls)))
-        (when (eq (nth i ctrls) ctrl)
+        (when (eql (nth i ctrls) ctrl)
           (setq nth-count i) (setq i 1000)))
       nth-count)))
 
@@ -515,7 +515,7 @@
 (defgeneric disconnect-my-self (self patch)
   (:method ((self C-patch) patch)
     (for (i 0 1 (1- (length (input-objects self))))
-      (when (eq (nth i (input-objects self)) patch)
+      (when (eql (nth i (input-objects self)) patch)
         (setf (nth i (input-objects self))(nth i (pw-controls self)))
         (setf (open-state (nth i (pw-controls self))) t)))))
 
@@ -527,7 +527,7 @@
 (defgeneric disconnect-ctrl (self ctrl))
 (defmethod  disconnect-ctrl ((self C-patch) ctrl)
   (let ((nth-count (find-nth-ctrl self ctrl)))
-    (when (not (eq ctrl (nth nth-count (input-objects self))))
+    (when (not (eql ctrl (nth nth-count (input-objects self))))
       (tell (controls (view-window self)) 'draw-connections t)
       (setf (nth nth-count (input-objects self)) ctrl)
       (tell (controls (view-window self)) 'draw-connections)
@@ -614,7 +614,7 @@
   (:method ((view C-patch))
     (let* ((modules (slot-value (view-container view) 'view-subviews))
            (length (1- (length modules)))
-           (index (for (i 0 1 length) (if (eq view (aref modules i)) (return i)))))
+           (index (for (i 0 1 length) (if (eql view (aref modules i)) (return i)))))
       (if (> index 2)
           (psetf (aref modules 0) (aref modules index) 
                  (aref modules index) (aref modules 0))))))
@@ -746,7 +746,7 @@
 (defgeneric connect-new-patch? (self old-patch new-patch)
   (:method ((self C-patch) old-patch new-patch)
     (for (i 0 1 (1- (length (input-objects self))))
-      (when (eq (nth i (input-objects self)) old-patch)
+      (when (eql (nth i (input-objects self)) old-patch)
         (setf (nth i (input-objects self)) new-patch)))))
 
 (defgeneric draw-active-mode (self)
@@ -783,7 +783,7 @@
 (defgeneric flip-controls (self flag)
   (:method ((self C-patch) flag)
     (for (i 0 1 (1- (length (pw-controls self)))) 
-      (when (eq (nth i (pw-controls self))(nth i (input-objects self)))
+      (when (eql (nth i (pw-controls self))(nth i (input-objects self)))
         (set-open-state (nth i (pw-controls self)) flag)))))
 
 (defmethod patch-value ((self C-patch) obj)
@@ -803,7 +803,7 @@
 ;;______________
 (defgeneric nth-connected-p (self nth-input)
   (:method ((self C-patch) nth-input)
-    (not (eq (nth nth-input (input-objects self))(nth nth-input (pw-controls self))))))
+    (not (eql (nth nth-input (input-objects self))(nth nth-input (pw-controls self))))))
 
 ;;;(defmethod mouse-released-control-after ((self C-patch) ctrl win))
 (defmethod  update-win-pointers (patch window)

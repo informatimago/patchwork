@@ -415,7 +415,7 @@
 
 
 (defmethod patch-value ((self C-patch-list-editor) obj)
-  (if (or (value self) (eq (first (pw-controls self)) (first (input-objects self))))
+  (if (or (value self) (eql (first (pw-controls self)) (first (input-objects self))))
       (the-list self)
       (let ((entry (patch-value (first (input-objects self)) obj)))
         (cond ((null entry)

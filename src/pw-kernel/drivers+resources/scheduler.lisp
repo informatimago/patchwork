@@ -200,14 +200,14 @@ is (1- (priority)) unless 0 is achieved."
 (defun set-scheduler-state (state)
   "Changes the state of the scheduler to <state> which must be one of the
 keywords: :RT :STEP :OOT :OOT1."
-  (if (eq state :RT)
+  (if (eql state :RT)
       (unless *scheduler-RT?*
         (setf *schedulertime--clocktime* (- *scheduler-time* (patchwork.midi:clock-time))
               *scheduler-RT?* t))
       (progn
         (setf *scheduler-RT?* nil)
         (ecase state
-          (:OOT1 (unless (eq *scheduler-state* :OOT1)
+          (:OOT1 (unless (eql *scheduler-state* :OOT1)
                    (setf *scheduler-old-state* *scheduler-state*)))
           (:STEP
               (format *error-output*
@@ -229,7 +229,7 @@ was currently stopped and when the next interrupt comes (probably just after the
 evaluation of the current form), the scheduler will execute the <nb-step> (1, by default)
 next tasks.  It will first execute the ready ones if any (those which exectime is smaller
 than the current scheduler time) or the clock will jump to the next waiting task."
-  (unless (eq *scheduler-state* :STEP)
+  (unless (eql *scheduler-state* :STEP)
     (error "The scheduler must be in the :STEP mode. Use the function ~S to stop it."
            'set-scheduler-state))
   (setf *scheduler-steps* nb-step))
@@ -535,7 +535,7 @@ time with the :STEP mode.")
         logtime)
     (apply (task-function task) (task-arguments task))
     (cond
-      ((eq (task-link task) :re-dfuncall)
+      ((eql (task-link task) :re-dfuncall)
        (setf (task-logtime task)
              ;; hack! the delay is stored in (task-exectime task) (see re-dfuncall)
              (setq logtime (+ (task-logtime task) (task-exectime task)))
@@ -569,7 +569,7 @@ condition)
 )|#
 (cond
 (error)
-((eq (task-link task) :re-dfuncall)
+((eql (task-link task) :re-dfuncall)
 (setf (task-logtime task)
 ;; hack! the delay is stored in (task-exectime task) (see re-dfuncall)
 (setq logtime (+ (task-logtime task) (task-exectime task)))
@@ -625,7 +625,7 @@ nb-tasks *nbmax-tasks-per-event*)
 (<= (decf nb-tasks) 0)
 (>= (get-internal-real-time) tmax))
 (return))))
-((eq *scheduler-state* :STEP)
+((eql *scheduler-state* :STEP)
 (when (and (> *scheduler-steps* 0)
 (setq task (next-ready-task *current-priority*)))
 (decf *scheduler-steps*)
@@ -638,7 +638,7 @@ nb-tasks *nbmax-tasks-per-event*)
 (execute-task task))
 (unless (ready-tasks?)
 (return
-(when (eq *scheduler-state* :OOT1)
+(when (eql *scheduler-state* :OOT1)
 (set-scheduler-state *scheduler-old-state*))))
 (when (or (<= (decf nb-tasks) 0)
 (>= (get-internal-real-time) tmax))
@@ -665,7 +665,7 @@ nil)
                  (<= (decf nb-tasks) 0)
                  (>= (get-internal-real-time) tmax))
          (return))))
-    ((eq *scheduler-state* :STEP)
+    ((eql *scheduler-state* :STEP)
      (when (and (> *scheduler-steps* 0)
                 (setq task (next-ready-task *current-priority*)))
        (decf *scheduler-steps*)
@@ -678,7 +678,7 @@ nil)
          (execute-task task))
        (unless (ready-tasks?)
          (return
-           (when (eq *scheduler-state* :OOT1)
+           (when (eql *scheduler-state* :OOT1)
              (set-scheduler-state *scheduler-old-state*))))
        (when (or (<= (decf nb-tasks) 0)
                  (>= (get-internal-real-time) tmax))

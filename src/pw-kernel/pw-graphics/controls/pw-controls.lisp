@@ -135,7 +135,7 @@
     (window-select *pw-controls-dialog*)))
 
 (defun open-pw-controls-dialog (item &optional point size class)
-  (if (not (eq (type-of (front-window)) 'c-pw-window))
+  (if (not (eql (type-of (front-window)) 'c-pw-window))
       (open-pw-controls-dialog-old item point size)
       (progn
         (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog class))

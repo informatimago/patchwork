@@ -85,7 +85,7 @@
   (declare (ignore obj))
   (let ((editors (editor-objects (car (subviews (application-object self))))))
     (for (i 0 1 (1- (length editors)))
-      (when (not (eq (nth i (pw-controls self))(nth i (input-objects self))))
+      (when (not (eql (nth i (pw-controls self))(nth i (input-objects self))))
         (setf (chord-line (nth i editors))
           (give-MN-editor-chord-line (nth i (input-objects self)) i))
         (view-draw-contents (nth i editors)))))

@@ -90,7 +90,7 @@
                        :view-font '("monaco"  9  :srcor)))   )
 
 (defmethod patch-value ((self C-patch-file-buffer) obj)
-  (when (not (eq (car (pw-controls self)) (car (input-objects self))))
+  (when (not (eql (car (pw-controls self)) (car (input-objects self))))
     (unless (and (fred-win self) (wptr (fred-win self)))
       (get-new self))
     (let ((fmat (patch-value (second (input-objects self)) obj)))
@@ -269,7 +269,7 @@ information; type h with the selected module open. "
     (call-next-method)
     (niy patch-value self obj)
     ;; (when (and (fred-win self) (wptr (fred-win self)))
-    ;;   (if (not (eq (car (pw-controls self)) (car (input-objects self))))
+    ;;   (if (not (eql (car (pw-controls self)) (car (input-objects self))))
     ;;     (add-to-file self 
     ;;                  (patch-value (first (input-objects self)) obj)
     ;;                  (patch-value (second (input-objects self)) obj)))
