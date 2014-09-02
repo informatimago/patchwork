@@ -77,21 +77,37 @@
 
 
 #+(and ccl (not patchwork.builder::no-cocoa))
-(defmethod  ccl:application-init-file :around (app)
+(defmethod  ccl:application-init-file (app)
   (declare (ignorable app))
-  #-(and) (make-pathname :name  "patchwork-init" :type "lisp"
-                         :defaults (user-homedir-pathname))
   #P"PW-USER:PW-inits;init.lisp")
 
 
+(defun logical-pathname-translations-directory ()
+  (merge-pathnames #P"LOGHOSTS/" (user-homedir-pathname)))
+
+(defun canonicalize-logical-host (host)
+  (check-type host string)
+  (assert (every (lambda (ch) (find ch "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-"))
+                 host) (host) "Invalid logical host name ~S" host)
+  (string-upcase host))
+
+(defun really-load-logical-pathname-translations (host)
+  (let ((host      (canonicalize-logical-host host)))
+    (setf (logical-pathname-translations host)
+          (with-open-file (trans
+                           (make-pathname :name host :defaults (logical-pathname-translations-directory))
+                           :direction :input
+                           :if-does-not-exist :error)
+            (read trans)))))
+
 (defun initialize-directories ()
   (handler-case
-      (load-logical-pathname-translations "PW-USER")
+      (really-load-logical-pathname-translations "PW-USER")
     (error ()
       (setf (logical-pathname-translations "PW-USER")
-            '(("**;*.*.*" #.(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
-              ("**;*.*"   #.(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
-              ("**;*"     #.(merge-pathnames #P"Documents/Patchwork/**/*"   (user-homedir-pathname)))))))
+            `(("**;*.*.*" ,(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
+              ("**;*.*"   ,(merge-pathnames #P"Documents/Patchwork/**/*.*" (user-homedir-pathname)))
+              ("**;*"     ,(merge-pathnames #P"Documents/Patchwork/**/*"   (user-homedir-pathname)))))))
   (dolist (path (list *PW-user-abstract-pathName* *PW-user-library-pathName*
                       *config-default-libr-path* *config-default-abst-path*
                       *config-init-file*))
@@ -100,7 +116,6 @@
                     :directory (remove-if (lambda (item) (member item '(:wild-inferiors :wild)))
                                           (pathname-directory path))
                     :defaults path))))
-
 
 
 (defun initialize-patchwork ()

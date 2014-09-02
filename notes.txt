@@ -30,6 +30,53 @@ otherwise:
    CLOSED: [2014-08-31 Sun 08:42]
    - State "DONE"       from "TODO"       [2014-08-31 Sun 08:42] \\
      new-instance & coordinate system corrected.
+** DONE 00017 Grow box
+   CLOSED: [2014-09-01 Mon 12:25]
+   - State "DONE"       from "TODO"       [2014-09-01 Mon 12:25] \\
+     done 10.0-0.717
+   - State "TODO"       from "TODO"       [2014-09-01 Mon 12:25] \\
+     done 10.0-0717
+
+Les objets avec un petit carré en bas à droite devraient pouvoir
+s’allonger en cliquant sur ce petit carré et en étirant l’objet avec
+la souris.
+
+** DONE 00018 closing a modified patch asks twice to save it.
+   CLOSED: [2014-09-01 Mon 12:25]
+   - State "DONE"       from "TODO"       [2014-09-01 Mon 12:25] \\
+     Done 10.0-0.717
+** DONE 00019 Bad default for PW-User directory.
+   CLOSED: [2014-09-02 Tue 05:18]
+   - State "DONE"       from "IN-PROGRESS" [2014-09-02 Tue 05:18] \\
+     Done: Corrected the PW-USER logical host translations loading.
+   - State "IN-PROGRESS" from "TODO"       [2014-09-01 Mon 12:25] \\
+     Corrected, to be tested.
+#+BEGIN_QUOTE
+--------------------------------------------------------------------------------
+(BACKTRACE-AS-LIST :CONTEXT NIL :PROCESS NIL :ORIGIN NIL :COUNT 1152921504606846975 :START-FRAME-NUMBER 0 :PRINT-LEVEL 2 :PRINT-LENGTH 5 :SHOW-INTERNAL-FRAMES NIL)
+(PRINT-BACKTRACE #<SYNONYM-STREAM to *TERMINAL-IO* #x3020019879DD>)
+(FUNCALL (:INTERNAL INITIALIZE-PATCHWORK) #<FILE-ERROR #x302001B6944D>)
+(SIGNAL #<FILE-ERROR #x302001B6944D>)
+(%ERROR #<FILE-ERROR #x302001B6944D> (:PATHNAME "/Users/pjb/" :ERROR-TYPE "Can't create directory ~S.") 612227)
+(ENSURE-DIRECTORIES-EXIST #P"PW-USER:PW-user-patches;TEST.TEST" :VERBOSE NIL :MODE 511)
+(INITIALIZE-DIRECTORIES)
+(INITIALIZE-PATCHWORK)
+(CALL-CHECK-REGS INITIALIZE-PATCHWORK)
+(CHEAP-EVAL (INITIALIZE-PATCHWORK))
+(FUNCALL (:INTERNAL (APPLICATION-EVAL-ENQUEUE (T T))))
+(FUNCALL MCLGUI::|-[MclguiEvaluator evaluate]| 17591849974640)
+(%PASCAL-FUNCTIONS% 370 17591849974640)
+(FUNCALL #<Anonymous Function #x300001DC796F> #<LISP-APPLICATION <LispApplication: 0x608000137200> (#x608000137200)> #S(CCL::OBJC-SELECTOR :NAME "run" :%SEL #<A Foreign Pointer #x7FFF8CB70066>))
+(FUNCALL (:OBJC-DISPATCH NEXTSTEP-FUNCTIONS:|run|) ???)
+(EVENT-LOOP NIL)
+(RUN-EVENT-LOOP)
+(FUNCALL (:INTERNAL GUI::COCOA-STARTUP GUI::START-COCOA-IDE))
+--------------------------------------------------------------------------------
+
+ERROR while (PROGN (INITIALIZE) (INITIALIZE-STREAMS) (INITIALIZE-MN-EDITOR) (INITIALIZE-MENUS) (INITIALIZE-BEAT-MEASURE-LINE) (INITIALIZE-DIRECTORIES)):
+Can't create directory "/Users/pjb/".
+#+END_QUOTE
+
 ** TODO 00000 Classes that need to be implemented satisfactorily:
 
 - dialog
@@ -125,13 +172,6 @@ qu’une seule.
 
 ** TODO 00015 Dans le menu Kernel —> List, il manque les objets suivants : interlock, subs-posn, group-list, first-n, last-n.
 ** TODO 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer. 
-** TODO 00017 Grow box
-
-Les objets avec un petit carré en bas à droite devraient pouvoir
-s’allonger en cliquant sur ce petit carré et en étirant l’objet avec
-la souris.
-
-** TODO 00018 closing a modified patch asks twice to save it.
 
 * Not Implemented Yet
 
