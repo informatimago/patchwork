@@ -226,8 +226,10 @@
 (defmethod save ((self C-patch))
   (if *pw-nosave-mode* 
       (ui::message-dialog "Sorry this version cannot save files.")
-      (actual-save self (choose-new-file-dialog :directory (string (pw-function self)) 
-                                                :button-string "Save patch as"))))
+      (let ((path (choose-new-file-dialog :directory (string (pw-function self)) 
+                                                :button-string "Save patch as")))
+        (when path
+          (actual-save self pat)))))
 
 (defmethod yourself-if-collecting ((self C-patch)) nil)
 ;;======================================================

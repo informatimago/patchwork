@@ -144,6 +144,10 @@ Must be called on the main thread."
     (handler-bind ((error (function invoke-debugger)))
       (apply (function ccl::read-loop) arguments))))
 
+(defun short-package-name (package)
+  (first (sort (copy-list (cons (package-name package) (package-nicknames package)))
+               (function <) :key (function length))))
+
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
 

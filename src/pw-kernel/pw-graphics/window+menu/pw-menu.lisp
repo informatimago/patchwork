@@ -75,21 +75,26 @@
 (defvar *original-menubar*  '())
 (defvar *lisp-menubar*      '())
 (defvar *patchwork-menubar* '())
+(defvar *active-application* nil)
 
 ;;___________
+(defun active-application ()
+  *active-application*)
 
 (defun enable-all-apps-menu-items ()
   (set-menubar *patchwork-menubar*)
   (mapc #'menu-enable (cdr *patchwork-menubar*))
   (let ((menus (menu-list *pw-menu-apps*)))
     (while menus (menu-item-enable (pop menus))))
-  (menu-item-disable *apps-PW-menu-item*))
+  (menu-item-disable *apps-PW-menu-item*)
+  (setf *active-application* :patchwork))
 
 (defun enable-Lisp-apps-menu-item ()
   (set-menubar *lisp-menubar*)
   ;;added 920818 [Camilo]
   (mapc #'menu-enable (cdr *lisp-menubar*))
-  (menu-item-disable *apps-lisp-menu-item*))
+  (menu-item-disable *apps-lisp-menu-item*)
+    (setf *active-application* :lisp))
 
 (defun add-apps-item-to-apps-menu (title action)
   (let ((menu (new-leafmenu title action)))

@@ -35,7 +35,7 @@
 (in-package :pw)
 
 ;;============================================================================================
-(defclass  C-menubox-bpf (;; ui:view
+(defclass  C-menubox-bpf (ui:view ; needed to add subviews to it.
                           C-menubox)  
   ((BPF-mini-view :initform (make-instance 'C-mini-bpf-view) :accessor BPF-mini-view)))
 

@@ -362,9 +362,6 @@
 ;;;  open-patch-win              ;opens the editor window
 ;;;======================================
 
-(defpackage "C-PATCH-LIST-EDITOR"
-  (:use "COMMON-LISP" "UI" "PATCHWORK"  "C-TABLE-WINDOW" "C-LIST-ITEM")
-  (:export "C-PATCH-LIST-EDITOR" "THE-LIST"))
 
 (in-package "C-PATCH-LIST-EDITOR")
 

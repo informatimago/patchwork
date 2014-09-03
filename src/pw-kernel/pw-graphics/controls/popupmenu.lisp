@@ -33,6 +33,7 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
+(objcl:enable-objcl-reader-macros)
 
 ;;;=============================================================
 ;;;
@@ -63,33 +64,17 @@ located in the x,y position specified by the &rest key arguments"
                         :menu menu
                         initargs)))    
     (setf (patch-box the-Box) object)
-    the-Box) )
+    the-Box))
 
 (defmethod view-click-event-handler ((self C-PopUpbox) mouse)
-  (unwind-protect
-    (progn
-      (ui:add-menu-items *pw-menu-apps* (menu self))    ;adds the PUMenu in the menu-bar
-      (niy view-click-event-handler self mouse)
-      ;; (let ((hdl (menu-handle (menu self)))
-      ;;       (selection) (ID) (item) (menu-object)
-      ;;       (global (local-to-global self (view-mouse-position  self))))
-      ;;   (when hdl                                  ; just in case of weird menu deallocation
-      ;;     (#_insertmenu  :ptr hdl :word -1)        ;this actually inserts the popUpMenu     
-      ;;     (setq selection 
-      ;;           (#_popUpMenuSelect 
-      ;;             :ptr hdl 
-      ;;             :word (point-v global)
-      ;;             :word (point-h global)
-      ;;             :word 1 :long))           ;selection is an encoding of ID plus ITEM chosen
-      ;;     (setq ID (ldb (byte 16 16) selection) item (ldb (byte 16 0) selection))
-      ;;     (unless (zerop ID)                                    ;0=no selection
-      ;;       (setq menu-object  (gethash ID *menu-id-object-table*))
-      ;;       (setf *target-action-object* (patch-box self))  ;necessary for proper funcalling of menu's methods
-      ;;       (if (leafmenu-p menu-object)
-      ;;         (menu-item-action menu-object)
-      ;;         (menu-item-action (nth (1- item) (menu-items menu-object)) )))))
-      )
-    (remove-menu-items *pw-menu-apps*  (menu self))))
+  (format-trace 'view-click-event-handler
+                :view self
+                :where (point-to-list mouse)
+                :event *current-event*)
+  (let ((*target-action-object* (patch-box self)))
+    (pop-up-context-menu self (menu self) *current-event*)))
+
+
     
 (defun leafmenu-p (menu)
   (string= (type-of menu) 'MENU-ITEM))
@@ -98,10 +83,21 @@ located in the x,y position specified by the &rest key arguments"
   (:method ((self C-PopUpbox) title)
     (set-dialog-item-text self title)))
 
+#-(and)
+(
 
-;; (setq fi (make-instance 'window :window-title "fi"))
-;; (setq foo (make-popupbox "A" fi *MN-popUpMenu* :view-position (make-point 100 100)
-;;                                                :view-container fi))
+ (progn
+   (defparameter *fi*  (make-instance 'window :window-title "fi"))
+   (defparameter *pop* (make-popupbox "A" *fi* *MN-popUpMenu*
+                                      :view-position (make-point 0 0)
+                                      :view-container *fi*)))
 
+ (find *fi* (list *pop*) :test (function view-contains-p))
 
+ (ui::handle *MN-popUpMenu*)
+ (add-subviews *fi* *pop*)
+ (view-subviews *fi*)
+ (add-subviews *fi* *pop*)
+
+ )
 ;;;; THE END ;;;;

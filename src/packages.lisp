@@ -290,7 +290,13 @@
   ;; (:use "COMMON-LISP-STEPPER")
   (:use "LELISP-MACROS" "UI" "PATCHWORK")
   (:intern "ASCII-WIN" "C-PATCH-ASCII-BUFFER")
+  (:import-from "PATCHWORK" "POPUPBOX")
   (:export "C-PATCH-FILE-BUFFER"))
+
+(cl:defpackage "C-PATCH-LIST-EDITOR"
+  (:use "COMMON-LISP" "UI" "PATCHWORK"  "C-TABLE-WINDOW" "C-LIST-ITEM")
+  (:import-from "PATCHWORK" "POPUPBOX")
+  (:export "C-PATCH-LIST-EDITOR" "THE-LIST"))
 
 (cl:defpackage "C-PATCH-CHORD-LINE"
   (:use "COMMON-LISP")
@@ -307,7 +313,8 @@
 (cl:defpackage "C-PW-MIDI-IN"
   (:use "COMMON-LISP" "LELISP-MACROS" "PATCHWORK")
   (:import-from "PATCHWORK.SCHEDULER" "APDFUNCALL" "START" "PRIORITY" "RE-DFUNCALL" )
-  (:import-from "PATCHWORK.MIDI" "MIDI-READ")
+  (:import-from "PATCHWORK.MIDI"      "MIDI-READ")
+  (:import-from "PATCHWORK"           "POPUPBOX")
   (:import-from "UI" "NIY")
   (:export "PW-MIDI-IN" "M-DATA" "C-PW-MIDI-IN" "DELAY" "STATUS" "MIDI-CHAN" "DATA1"
            "DATA2" "MIDI-OPCODE" "C-PW-MIDI-IN-TOP" "C-PW-DELAY-BOX" "C-PW-NOTE-IN"

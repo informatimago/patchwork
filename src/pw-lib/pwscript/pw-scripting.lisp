@@ -629,17 +629,6 @@
 
 ;;COMMAND
 
-(defmethod pw::popUpbox ((self c-patch-file-buffer::c-patch-ascii-buffer))
-  (c-patch-file-buffer::popUpBox self))
-
-(defmethod pw::popUpbox ((self C-PATCH-LIST-EDITOR::C-patch-list-editor))
-  (C-PATCH-LIST-EDITOR::popUpBox self))
-
-
-(defmethod pw::popUpbox ((self C-PW-MIDI-IN::C-pw-midi-in))
-  (C-PW-MIDI-IN::popUpBox self))
-
-
 (defmethod even-command ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
   (let* ((AE-clos-Ob (make-instance 'closae:AppleEvent :descRecPtr theAppleEvent ))

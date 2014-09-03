@@ -12,7 +12,6 @@ next release
 - Corrected the PW-USER logical host translations loading.  See PW-USER
   in note 10.0-0.737 below.
 
--
 
 
 10.0-0.717
