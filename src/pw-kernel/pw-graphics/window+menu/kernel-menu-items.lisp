@@ -192,20 +192,15 @@
   (PW-addmenu *pw-usual-lisp-menu* '(first rest butlast reverse length mapcar list 
                                      apply funcall remove))
 
-  (PW-addmenu *pw-List-menu*
-              '(posn-match last-elem x-append))
-
-  (ui:add-menu-items *pw-List-menu* 
-                     (new-leafmenu "-" ()))
-
+  (PW-addmenu *pw-List-menu* '(posn-match last-elem x-append))
+  (ui:add-menu-items *pw-List-menu* (new-leafmenu "-" ()))
   (PW-addmenu *pw-List-menu* '(flat flat-once flat-low ))
-
-  (ui:add-menu-items *pw-List-menu* 
-                     (new-leafmenu "-" ()))
-
+  (ui:add-menu-items *pw-List-menu* (new-leafmenu "-" ()))
   (PW-addmenu *pw-List-menu* '(create-list expand-lst rem-dups list-modulo list-explode 
                                mat-trans list-filter table-filter range-filter band-filter))
-
+  (ui:add-menu-items *pw-List-menu* (new-leafmenu "-" ()))
+  (PW-addmenu *pw-List-menu* '(interlock subs-posn group-list first-n last-n))
+  
   #|(ui:add-menu-items *pw-List-menu* 
   (new-leafmenu "-" ())
   *pw-set-menu* *pw-list-gen-menu* *pw-list-trans-menu*
