@@ -272,7 +272,7 @@
   (declare (ignore y t-scfactor))
   (set-view-font  (view-window *current-MN-editor*) '("Monaco"  9 :srcor))
   (draw-string x *MN-note-ins-y* (window-title self))
-  (set-view-font  (view-window *current-MN-editor*) '("MusNot-j" 18 :srcor))
+  (set-view-font  (view-window *current-MN-editor*) *music-font-spec*)
   ;;   (set-view-font  self '("Monaco"  9 :srcor))
   (incf *MN-note-ins-y* 12))
 

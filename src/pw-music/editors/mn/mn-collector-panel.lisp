@@ -226,7 +226,7 @@
   (let ( (notes (notes self))
          (y-min) (alt) (dx))
     (with-focused-view view
-      (set-view-font   (view-container (view-container view)) '("MusNot-j"  18  :PatXor))
+      (set-view-font   (view-container (view-container view)) *music-font-spec*); TODO: PATXOR -> INSTANCE
       (dolist (one-note notes)
         (setq y-min (1- (give-pixel-y one-note C5)))
         (setq alt (alt-delta-x one-note) dx (delta-x one-note))

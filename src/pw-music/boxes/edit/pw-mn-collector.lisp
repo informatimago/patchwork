@@ -137,9 +137,9 @@
 (defgeneric draw-clock (self))
 (defmethod draw-clock ((self C-patch-midi))
   (with-focused-view self
-    (set-view-font  (view-container  self) '(:srccopy))
+    (set-view-font (view-container self) '(:srccopy))
     (draw-string  52 (- (h self) 4) (format nil "~5D" (clock (clock-obj self))))
-    (set-view-font  (view-container  self) '(:srcor))))
+    (set-view-font (view-container self) '(:srcor))))
 
 (defgeneric continue-record (self))
 (defmethod continue-record ((self C-patch-midi))

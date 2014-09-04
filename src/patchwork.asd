@@ -37,7 +37,7 @@
   :name "Patch Work Application"
   :description "Patch Work: IRCAM Computer Assisted Composition"
   :author "IRCAM"
-  :version "10.0.2"
+  :version "10.0.3"
   :license "GPL3"
   :properties ((#:author-email                   . "pjb@informatimago.com")
                (#:date                           . "Summer 2014")
@@ -651,10 +651,13 @@
                              "pw-kernel/boxes/multidim/multidim"
                              "pw-music/boxes/edit/pw-mn-collector"
                              "pw-music/editors/mn/mn-note-chord-chordline"))
+
+               (:file "pw-music/global")
                
                (:file "pw-music/boxes/extern+multidim/structured-time" 
                 :depends-on ("packages"
                              "gf"
+                             "pw-music/global"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/pw-graphics/window+menu/pw-window"
                              "pw-music/boxes/edit/pw-mn-collector"
@@ -684,12 +687,14 @@
                
                (:file "pw-music/boxes/edit/chord-box" 
                 :depends-on ("packages"
+                             "pw-music/global"
                              "pw-kernel/pw-graphics/controls/pw-graphics"
                              "pw-music/editors/mn/mn-note-chord-chordline"))
                
                (:file "pw-music/boxes/edit/midi-instrument-editors" 
                 :depends-on ("packages"
                              "gf"
+                             "pw-music/global"
                              ;; "pw-kernel/environment/reader-macros"
                              "pw-kernel/drivers+resources/scheduler" 
                              "pw-kernel/pw-graphics/controls/pw-controls"
@@ -774,6 +779,7 @@
                
                (:file "pw-music/editors/rhythm/beat-measure-measure-line" 
                 :depends-on ("packages"
+                             "pw-music/global"
                              "pw-kernel/box-creation/application-box"
                              "pw-music/editors/mn/mn-chord-ed"
                              "pw-music/editors/mn/mn-collector-panel"
@@ -795,6 +801,7 @@
                
                (:file "pw-music/editors/rhythm/rtm-dialog-win" 
                 :depends-on ("packages"
+                             "pw-music/global"
                              "pw-kernel/pw-graphics/controls/pw-controls"
                              "pw-music/menu/rtm-menu"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -803,6 +810,7 @@
                
                (:file "pw-music/editors/rhythm/rtm-editor" 
                 :depends-on ("packages"
+                             "pw-music/global"
                              "pw-kernel/drivers+resources/scheduler"
                              "pw-music/editors/rhythm/global-vars"
                              "pw-kernel/pw-graphics/controls/pw-controls"
@@ -846,6 +854,7 @@
                
                (:file "pw-music/editors/mn/mn-chord-ed" 
                 :depends-on ("packages"
+                             "pw-music/global"
                              "pw-music/menu/mn-menu"
                              "pw-music/editors/mn/mn-editor"
                              "pw-music/editors/mn/mn-note-chord-chordline"
@@ -858,6 +867,7 @@
                (:file "pw-music/editors/mn/mn-collector-panel" 
                 :depends-on ("packages"
                              "gf"
+                             "pw-music/global"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/pw-graphics/controls/pw-graphics"
                              "pw-kernel/types/pw-type-scheme"
@@ -871,6 +881,7 @@
                (:file "pw-music/editors/mn/mn-collector-view" 
                 :depends-on ("packages"
                              "gf"
+                             "pw-music/global"
                              ;; "pw-kernel/environment/reader-macros"
                              "pw-kernel/pw-graphics/controls/popupmenu"
                              "pw-kernel/drivers+resources/scheduler"
@@ -883,6 +894,7 @@
                (:file "pw-music/editors/mn/mn-editor" 
                 :depends-on ("packages"
                              "gf"
+                             "pw-music/global"
                              "pw-kernel/drivers+resources/scheduler"
                              "pw-kernel/environment/epw-package"
                              "pw-kernel/pw-graphics/controls/pw-controls"

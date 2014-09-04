@@ -57,7 +57,7 @@
                                      :view-position (make-point 5 20)
                                      :view-size (make-point 36 22)
                                      :value val1
-                                     :view-font '("MusNot-j"  18  :srcor)
+                                     :view-font *music-font-spec*
                                      :menu-box-list '(("  w ." . 2/3)("  w" . 1)
                                                       ("  h ." . 4/3)("  h" . 2)
                                                       ("  q ." . 8/3)("  q" . 4)
@@ -84,7 +84,7 @@
                                         :min-val min2 :max-val max2  :value val2)))))
   
   (when (string=  "Unit   Metronome" text-text)
-     (set-view-font  *rtm-win-1st-numbox* '("MusNot-j"  13  :srcor)))
+     (set-view-font  *rtm-win-1st-numbox* *tiny-music-font-spec*))
   (modal-dialog *rtm-editor-dialog-window*))
 
 ;;================================================================================================

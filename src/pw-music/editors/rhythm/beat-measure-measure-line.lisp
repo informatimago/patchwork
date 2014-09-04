@@ -597,7 +597,7 @@
         (when (> unit-length 1)
           (draw-char (+ 5 middle-pixel) (- typlet-y 6) #\:)
           (draw-string (+ 10 middle-pixel) (- typlet-y 6) (format () "~D" tuplet-num))))
-      (set-view-font  win '("MusNot-j"  18  :srcor)))))
+      (set-view-font  win *music-font-spec*))))
 
 ;; 9 2  -> 9:8
 ;; 9 1  -> 9
@@ -714,7 +714,7 @@
       (draw-string (- beg-x (if (= (length (low self)) 1) 1 6)) (+ -16 y1) (low self))) 
     (unless (and (third previous-info) (=  (third previous-info) (metronome  self))
                  (=  (fourth previous-info) (metronome-unit  self)))
-      (set-view-font  (view-container (view-container  obj)) '("MusNot-j"  15  :srcor)) ;;;("MusNot-j"  18  :srcor)
+      (set-view-font  (view-container (view-container  obj)) *small-music-font-spec*) 
       (draw-char (+ beg-x 26) (+ -20 y1) 
                  (case (metronome-unit self)
                    (2/3 #\w)(1 #\w)
@@ -729,7 +729,7 @@
       (set-view-font  (view-container (view-container  obj)) '("Courier" 10 :srcor)) ;;("times"  12  :srcor)
       (draw-string (+ beg-x 38) (+ -22 y1) "=") 
       (draw-string (+ beg-x 45) (+ -22 y1) (format () "~D"(metronome self)))) ;;(+ beg-x 50) 
-    (set-view-font  (view-container (view-container obj)) '("MusNot-j"  18  :srcor))
+    (set-view-font  (view-container (view-container obj)) *music-font-spec*)
     (if (= *staff-num* 7)
         (draw-line (+ *rtm-editor-measure-x-offset* new-beg-x) (- y1 10) (+ *rtm-editor-measure-x-offset* new-beg-x) (+ y1 25)) 
         (draw-rtm-measure-line-ys (+ *rtm-editor-measure-x-offset* new-beg-x) C5))

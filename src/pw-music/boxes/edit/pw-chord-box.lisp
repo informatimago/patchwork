@@ -85,7 +85,7 @@
             (new-leafmenu "Chord Object" (lambda () (set-output *target-action-object* :object)))
             (new-leafmenu "Save Chord" (lambda () (save *target-action-object* )))))
 
-(defmethod initialize-instance :after ((self C-patch-chord-box-M ) &key controls)
+(defmethod initialize-instance :after ((self C-patch-chord-box-M) &key controls)
   (declare (ignore controls))
   (setf (popUpBox self) 
         (make-popUpbox  "M" self
@@ -140,9 +140,9 @@
 
 (defmethod draw-function-name ((self C-patch-chord-box-M) x y)
   (with-focused-view self
-    (set-view-font  (view-container self) '("monaco"  9 :srccopy))
+    (set-view-font (view-container self) '("monaco"  9 :srccopy))
     (draw-string x (- y 2) (string-downcase (pw-function-string self)))
-    (set-view-font   (view-container self) '("monaco"  9 :srcor))))
+    (set-view-font (view-container self) '("monaco"  9 :srcor))))
 
 
 (defmethod erase-my-connections ((self C-patch-chord-box-M))

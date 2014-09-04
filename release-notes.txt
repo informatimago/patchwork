@@ -6,12 +6,17 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+- Corrected multi-bpf and bpf-lib crashes.
+- Implemented pop-up menus.
+- Made use of the Maestro font instead of Mus-Not-j, corrected chord-box displaying.
+- Added (interlock subs-posn group-list first-n last-n) to Kernel/List menu.
+
+
 10.0-0.714
 -----------------------
 
 - Corrected the PW-USER logical host translations loading.  See PW-USER
   in note 10.0-0.737 below.
-
 
 
 10.0-0.717

@@ -124,7 +124,7 @@
     (with-focused-view self
       (view-draw-contents (selection-button self))
       (draw-string 2 40 (format () "~A" (1+ (position  self (beat-editors (view-container self))))))
-      (set-view-font  (view-container (view-container  self)) '("MusNot-j"  18  :srcor))
+      (set-view-font  (view-container (view-container  self)) *music-font-spec*)
       (init-rtm-draw self)
       (for (i 0 1 (1- staff-count))
         (tell (symbol-value (nth (1- (staff-number self)) *global-staff-list*)) 'draw-staff 

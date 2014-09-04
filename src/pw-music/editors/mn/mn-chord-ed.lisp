@@ -222,7 +222,7 @@
 
 (defgeneric draw-single-symbolic-dynamic-2 (self chord note))
 (defmethod draw-single-symbolic-dynamic-2  ((self C-MN-panel-ChordBox) chord note)
-  (set-view-font  (view-container (view-container  self)) '("MusNot-j"  18  :srcxor))
+  (set-view-font  (view-container (view-container  self)) *music-font-spec*);  TODO: SRCXOR -> INSTANCE
   (cond ((setting-of (view-container self) :arp) 
          (draw-single-symbolic-dynamic chord note
                                        0 *MN-draw-offset* 
@@ -239,7 +239,7 @@
 
 (defgeneric draw-single-channel (self chord note))
 (defmethod draw-single-channel  ((self C-MN-panel-ChordBox) chord note)
-  (set-view-font  (view-container (view-container  self)) '("MusNot-j"  18  :srcxor))
+  (set-view-font  (view-container (view-container  self)) *music-font-spec*); TODO: SRCXOR -> INSTANCE
   (cond ((setting-of (view-container self) :arp) 
          (draw-channel self note (- (order note) 6) (+ (give-pixel-y note *MN-C5*) 8)))
         ((setting-of (view-container self) :time))

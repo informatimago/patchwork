@@ -22,6 +22,96 @@ otherwise:
 - #\h
            
 * Errors, Warnings, TODOs
+** TODO [#A] 00011 Le buffer est incomplet : il doit avoir une fonction de conservation des données obtenue par un clic sur un petit rond au centre de l’objet, ce petit rond doit alors se transformer en croix pour signifier cette conservation des données.
+
+L’objet accum doit se verrouiller, comme l’objet buffer et l’objet
+list-ed, ceci pour conserver les données qui y ont entrées
+précédemment.
+
+On doit verrouiller en cliquant sur un petit rond au centre de l’objet
+qui se transforme alors en croix, pour dévérouiller on clique sur
+cette croix qui redevient alors un petit rond.
+
+** TODO [#A] 00012 graphic offset in output box link drawing
+
+quand on active le lien entre deux objets (en cliquant sur le petit
+rectangle au bas de l’objet) l’origine de ce lien apparaît plus bas à
+gauche plutôt que dans le petit rectangle...
+
+** TODO [#A] 00014 On génère une entrée supplémentaire pour certains objets avec alt-clic
+
+trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
+band-filter, x-union, x-intersect, x-xor, x-diff, inclued ?,
+sort-list, permut-circ, mk-note, mk-chord, chordseq, multiseq,
+quantify, rtm, poly-rtm, get-note-slots.
+
+Lors de cette opération les objets se déplacent sur la fenêtre. Pour
+l’objet test, alt-clic génère deux entrées supplémentaires plutôt
+qu’une seule. 
+
+** TODO [#A] 00005 Effacements partiels et provisoires des objets 
+(réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
+** TODO [#B] 00007 Text Edit
+- Impossibilité d’inscrire une liste dans un objet.
+- Window Comment ne fonctionne pas.
+** TODO 00000 Classes that need to be implemented satisfactorily:
+
+- dialog
+- dialog-item
+- table-dialog-item
+- button-dialog-item 
+- static-text-dialog-item 
+- editable-text-dialog-ietm
+- dialog
+- fred-window
+- window
+- view
+
+** TODO 00002 Objective-C runtime exception: Item to be removed is not in the menu in the first place
+
+#+BEGIN_QUOTE
+
+    [pjb@larissa :0.0 patchwork]$ ~/Desktop/patchwork-10.0-0.889-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/Patchwork.app/Contents/MacOS/Patchwork 
+    MidiShare not present. PatchWork won't play Midi.
+    (-[MclguiWindow close]                    (c-chord-boxmn-window-rtm :title "MN1" :view-position (10 28) :view-size (230 222) "#x30200192E70D"))
+    (-[MclguiWindow doClose]                  )
+    2014-04-12 16:41:33.249 Patchwork[43978:507] *** Assertion failure in -[NSMenu removeItem:], /SourceCache/AppKit/AppKit-1265.19/Menus.subproj/NSMenu.m:752
+    (BACKTRACE-AS-LIST :CONTEXT NIL :PROCESS NIL :ORIGIN NIL :COUNT 1152921504606846975 :START-FRAME-NUMBER 0 :PRINT-LEVEL 2 :PRINT-LENGTH 5 :SHOW-INTERNAL-FRAMES NIL)
+    (FUNCALL (:INTERNAL MCLGUI::|-[MclguiWindow close]|) #<CCL::NS-EXCEPTION #x302001ADAE0D>)
+    (SIGNAL #<CCL::NS-EXCEPTION #x302001ADAE0D>)
+    (%ERROR #<CCL::NS-EXCEPTION #x302001ADAE0D> NIL 1005440)
+    (FUNCALL #<COMMON-LISP:STANDARD-METHOD REMOVE-MENU-ITEMS (MENU)> (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...) (MCLGUI::ORIGINAL-MENU-ITEM :TITLE "" :ENABLEDP T ...))
+    (UPDATE-WINDOWS-MENU (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...))
+    (FUNCALL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER (WINDOW)> (C-CHORD-BOXMN-WINDOW-RTM :TITLE "MN1" :VIEW-POSITION # ...))
+    (%%BEFORE-AND-AFTER-COMBINED-METHOD-DCODE (NIL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER #> . 1005490))
+    (%%STANDARD-COMBINED-METHOD-DCODE ((#<#>) (#<#>) #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #> #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #>) 1005490)
+    (FUNCALL MCLGUI::|-[MclguiWindow close]| 17591849974728)
+    (%PASCAL-FUNCTIONS% 350 17591849974728)
+    (FUNCALL #<Anonymous Function #x300001D788FF> #<LISP-APPLICATION <LispApplication: 0x4624f0> (#x4624F0)> #S(CCL::OBJC-SELECTOR :NAME "run" :%SEL #<A Foreign Pointer #x7FFF8C6F3066>))
+    (FUNCALL (:OBJC-DISPATCH NEXTSTEP-FUNCTIONS:|run|) ???)
+    (EVENT-LOOP NIL)
+    (RUN-EVENT-LOOP)
+    (FUNCALL (:INTERNAL GUI::COCOA-STARTUP GUI::START-COCOA-IDE))
+
+    ERROR while ((LET ((WINDOW (MCLGUI::NSWINDOW-WINDOW MCLGUI::SELF))) (FORMAT-TRACE "-[MclguiWindow close]" WINDOW) (CATCH :CANCEL (WINDOW-CLOSE WINDOW)))):
+    Objective-C runtime exception: 
+    Item to be removed is not in the menu in the first place
+
+#+END_QUOTE
+
+** TODO 00004 Les patchs les plus complexes sont lents à charger.
+Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
+<d:s:R x 5>
+** TODO 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
+** TODO 00008 Implement Cmd-x Cmd-c Cmd-v in the listener.
+Le résultat ne peux pas se copier et c’est une fonction nécessaire (également impossibilité d’écrire dans le Listener).
+
+** TODO 00010 Quelquefois il y a eu impossibilité d’évaluation.
+En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
+crois plutôt que - pour une raison inconnue - la fenêtre du Listener
+en fonction devient inactive, en activant une nouvelle fenêtre de
+Listener l’évaluation est à nouveau possible…
+
 ** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
    CLOSED: [2014-07-24 Thu 02:55]
    - State "DONE"       from "TODO"       [2014-07-24 Thu 02:55] \\
@@ -81,86 +171,22 @@ Can't create directory "/Users/pjb/".
    CLOSED: [2014-09-02 Tue 05:29]
    - State "DONE"       from "TODO"       [2014-09-02 Tue 05:29] \\
      Can't reproduce.
-** TODO 00011 Le buffer est incomplet : il doit avoir une fonction de conservation des données obtenue par un clic sur un petit rond au centre de l’objet, ce petit rond doit alors se transformer en croix pour signifier cette conservation des données.
-
-L’objet accum doit se verrouiller, comme l’objet buffer et l’objet
-list-ed, ceci pour conserver les données qui y ont entrées
-précédemment.
-
-On doit verrouiller en cliquant sur un petit rond au centre de l’objet
-qui se transforme alors en croix, pour dévérouiller on clique sur
-cette croix qui redevient alors un petit rond.
-
-** TODO 00000 Classes that need to be implemented satisfactorily:
-
-- dialog
-- dialog-item
-- table-dialog-item
-- button-dialog-item 
-- static-text-dialog-item 
-- editable-text-dialog-ietm
-- dialog
-- fred-window
-- window
-- view
-
-** TODO 00002 Objective-C runtime exception: Item to be removed is not in the menu in the first place
-
-#+BEGIN_QUOTE
-
-    [pjb@larissa :0.0 patchwork]$ ~/Desktop/patchwork-10.0-0.889-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86-64/Patchwork.app/Contents/MacOS/Patchwork 
-    MidiShare not present. PatchWork won't play Midi.
-    (-[MclguiWindow close]                    (c-chord-boxmn-window-rtm :title "MN1" :view-position (10 28) :view-size (230 222) "#x30200192E70D"))
-    (-[MclguiWindow doClose]                  )
-    2014-04-12 16:41:33.249 Patchwork[43978:507] *** Assertion failure in -[NSMenu removeItem:], /SourceCache/AppKit/AppKit-1265.19/Menus.subproj/NSMenu.m:752
-    (BACKTRACE-AS-LIST :CONTEXT NIL :PROCESS NIL :ORIGIN NIL :COUNT 1152921504606846975 :START-FRAME-NUMBER 0 :PRINT-LEVEL 2 :PRINT-LENGTH 5 :SHOW-INTERNAL-FRAMES NIL)
-    (FUNCALL (:INTERNAL MCLGUI::|-[MclguiWindow close]|) #<CCL::NS-EXCEPTION #x302001ADAE0D>)
-    (SIGNAL #<CCL::NS-EXCEPTION #x302001ADAE0D>)
-    (%ERROR #<CCL::NS-EXCEPTION #x302001ADAE0D> NIL 1005440)
-    (FUNCALL #<COMMON-LISP:STANDARD-METHOD REMOVE-MENU-ITEMS (MENU)> (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...) (MCLGUI::ORIGINAL-MENU-ITEM :TITLE "" :ENABLEDP T ...))
-    (UPDATE-WINDOWS-MENU (MCLGUI::ORIGINAL-MENU :TITLE "Window" :ITEMS # ...))
-    (FUNCALL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER (WINDOW)> (C-CHORD-BOXMN-WINDOW-RTM :TITLE "MN1" :VIEW-POSITION # ...))
-    (%%BEFORE-AND-AFTER-COMBINED-METHOD-DCODE (NIL #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE :AFTER #> . 1005490))
-    (%%STANDARD-COMBINED-METHOD-DCODE ((#<#>) (#<#>) #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #> #<COMMON-LISP:STANDARD-METHOD WINDOW-CLOSE #>) 1005490)
-    (FUNCALL MCLGUI::|-[MclguiWindow close]| 17591849974728)
-    (%PASCAL-FUNCTIONS% 350 17591849974728)
-    (FUNCALL #<Anonymous Function #x300001D788FF> #<LISP-APPLICATION <LispApplication: 0x4624f0> (#x4624F0)> #S(CCL::OBJC-SELECTOR :NAME "run" :%SEL #<A Foreign Pointer #x7FFF8C6F3066>))
-    (FUNCALL (:OBJC-DISPATCH NEXTSTEP-FUNCTIONS:|run|) ???)
-    (EVENT-LOOP NIL)
-    (RUN-EVENT-LOOP)
-    (FUNCALL (:INTERNAL GUI::COCOA-STARTUP GUI::START-COCOA-IDE))
-
-    ERROR while ((LET ((WINDOW (MCLGUI::NSWINDOW-WINDOW MCLGUI::SELF))) (FORMAT-TRACE "-[MclguiWindow close]" WINDOW) (CATCH :CANCEL (WINDOW-CLOSE WINDOW)))):
-    Objective-C runtime exception: 
-    Item to be removed is not in the menu in the first place
-
-#+END_QUOTE
-
-** TODO 00004 Les patchs les plus complexes sont lents à charger.
-Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
-<d:s:R x 5>
-** TODO 00005 Effacements partiels et provisoires des objets 
-(réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
-** TODO 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
-** TODO 00007 Text Edit
-- Impossibilité d’inscrire une liste dans un objet.
-- Window Comment ne fonctionne pas.
-** TODO 00008 Implement Cmd-x Cmd-c Cmd-v in the listener.
-Le résultat ne peux pas se copier et c’est une fonction nécessaire (également impossibilité d’écrire dans le Listener).
-
-** TODO 00010 Quelquefois il y a eu impossibilité d’évaluation.
-En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
-crois plutôt que - pour une raison inconnue - la fenêtre du Listener
-en fonction devient inactive, en activant une nouvelle fenêtre de
-Listener l’évaluation est à nouveau possible…
-
-** TODO 00012 graphic offset in output box link drawing
-
-quand on active le lien entre deux objets (en cliquant sur le petit
-rectangle au bas de l’objet) l’origine de ce lien apparaît plus bas à
-gauche plutôt que dans le petit rectangle...
-
-** TODO 00013 Abstract (patch contenu dans un nouvel objet) ne peut pas se créer pour le moment.
+** DONE 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer. 
+   CLOSED: [2014-09-03 Wed 07:51]
+   - State "DONE"       from "TODO"       [2014-09-03 Wed 07:51] \\
+     Corrected.
+** DONE 00020 Made use of the Maestro font instead of Mus-Not-j.  Corrected chord-box.
+   CLOSED: [2014-09-04 Thu 15:37]
+   - State "DONE"       from "TODO"       [2014-09-04 Thu 15:37] \\
+     Done
+** DONE 00015 Dans le menu Kernel —> List, il manque les objets suivants : interlock, subs-posn, group-list, first-n, last-n.
+   CLOSED: [2014-09-04 Thu 15:43]
+   - State "DONE"       from "TODO"       [2014-09-04 Thu 15:43] \\
+     Added.
+** CANCELED 00013 Abstract (patch contenu dans un nouvel objet) ne peut pas se créer pour le moment.
+   CLOSED: [2014-09-04 Thu 15:51]
+   - State "CANCELED"   from "TODO"       [2014-09-04 Thu 15:51] \\
+     can't reproduce.
 
 Pour créer un nouvel objet Abstract (contenant des objets provenant
 des menus ou/et d’autres Abstracts) il faut connecter un ou plusieurs
@@ -168,20 +194,6 @@ des menus ou/et d’autres Abstracts) il faut connecter un ou plusieurs
 nommant l’Abstract dans la fenêtre « absout »), puis sélectionner le
 tout et aller dans le menu PWoper —> Abstract. Le nouvel objet doit
 alors apparaître.
-
-** TODO 00014 On génère une entrée supplémentaire pour certains objets avec alt-clic
-
-trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
-band-filter, x-union, x-intersect, x-xor, x-diff, inclued ?,
-sort-list, permut-circ, mk-note, mk-chord, chordseq, multiseq,
-quantify, rtm, poly-rtm, get-note-slots.
-
-Lors de cette opération les objets se déplacent sur la fenêtre. Pour
-l’objet test, alt-clic génère deux entrées supplémentaires plutôt
-qu’une seule. 
-
-** TODO 00015 Dans le menu Kernel —> List, il manque les objets suivants : interlock, subs-posn, group-list, first-n, last-n.
-** TODO 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer. 
 
 * Not Implemented Yet
 

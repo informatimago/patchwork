@@ -229,7 +229,7 @@
       (let ((path (choose-new-file-dialog :directory (string (pw-function self)) 
                                                 :button-string "Save patch as")))
         (when path
-          (actual-save self pat)))))
+          (actual-save self path)))))
 
 (defmethod yourself-if-collecting ((self C-patch)) nil)
 ;;======================================================
@@ -351,7 +351,6 @@
             (view-draw-contents v)))
 
 (defmethod view-draw-contents ((self C-patch))
-  (set-view-font self '("Monaco" 9 :SRCOR :PLAIN))
   (with-font-focused-view self
     #+debug-view-colors
     (with-pen-state (:pattern *light-gray-pattern*)

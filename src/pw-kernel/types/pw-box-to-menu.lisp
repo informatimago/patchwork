@@ -63,22 +63,22 @@
 
 (defun new-PW-box-menu-item (main-menu mtitle function &optional box-class) 
   (if (not (fboundp function))
-    (format t "~15A~25A" function "no such function !" )
-    (multiple-value-bind (args extensible?) (make-defunp-function-arg-list function)
-      (let ((body
-             `(make-PW-standard-box
-               ,(if box-class `',box-class
-                    (if extensible? ''C-pw-functional
-                        (if (= (length args) 2) ''C-pw-resize-x ''C-patch)))
-                    ',function))
-            (sub-menu (find-menu-item main-menu mtitle)))
-        (unless sub-menu
-          (ui:add-menu-items main-menu
-                   (setq sub-menu (make-instance 'menu-item :menu-item-title mtitle))))
-        (push (eval `(function(lambda () ,body))) *PW-box-instance-list*)
-        (set-menu-item-action-function sub-menu
-                   (lambda () (add-patch-box *active-patch-window* (eval body))))
-        sub-menu))))
+      (format t "~15A~25A" function "no such function !" )
+      (multiple-value-bind (args extensible?) (make-defunp-function-arg-list function)
+        (let ((body `(make-PW-standard-box
+                      ,(if box-class
+                           `',box-class
+                           (if extensible? ''C-pw-functional
+                               (if (= (length args) 2) ''C-pw-resize-x ''C-patch)))
+                      ',function))
+              (sub-menu (find-menu-item main-menu mtitle)))
+          (unless sub-menu
+            (ui:add-menu-items main-menu
+                               (setq sub-menu (make-instance 'menu-item :menu-item-title mtitle))))
+          (push (eval `(function(lambda () ,body))) *PW-box-instance-list*)
+          (set-menu-item-action-function sub-menu
+                                         (lambda () (add-patch-box *active-patch-window* (eval body))))
+          sub-menu))))
 
 
 ;; =============================================================================-======

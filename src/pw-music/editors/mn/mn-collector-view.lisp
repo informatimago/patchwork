@@ -582,7 +582,7 @@
                                          :view-position (make-point 0 (+ 2 max-y))
                                          :view-size size
                                          :h-scrollp nil
-                                         :view-font '("MusNot-j"  18  :srcor)
+                                         :view-font *music-font-spec*
                                          :origin 
                                          (setq last-panel-home (+ last-panel-home (- *MN-draw-offset*) (point-h size)))))
                     new-panels)

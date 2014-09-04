@@ -488,7 +488,7 @@
    (draw-string x-now *MN-note-ins-y* (ins-name self))
    (incf *MN-note-ins-y* 12)
    (tell (ins-objects self) 'draw-instrument x-now y-now t-scfactor)
-   (set-view-font  (view-container (view-container  *current-MN-editor*)) '("MusNot-j"  18  :srcor)))
+   (set-view-font  (view-container (view-container  *current-MN-editor*)) *music-font-spec*))
 
 #|
 (defmethod play-instrument ((self C-midi-ins-collection) chan dur)

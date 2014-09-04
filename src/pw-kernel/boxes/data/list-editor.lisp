@@ -32,22 +32,6 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "C-LIST-ITEM-H"    ;the package for inheritance
-  (:use "COMMON-LISP" "LELISP-MACROS" "UI" "PATCHWORK")
-  (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
-           "ADD-DOWNWARD-ELEMENT" "*CELL-WIDTH*" "*CELL-HEIGHT*" "C-LIST-ITEM" "MY-ARRAY"
-           "OUT-SIDE-LIST-P" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" 
-           "ADD-UPWARD-ROW" "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
-           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
-
-(defpackage "C-LIST-ITEM"      ;the package for a user
-  (:use "C-LIST-ITEM-H" "COMMON-LISP" "UI")
-  (:export "SET-ARRAY" "ADD-BACKWARD-ELEMENT" "ADD-FORWARD-ELEMENT" "ADD-UPWARD-ELEMENT"
-           "ADD-DOWNWARD-ELEMENT" "*CELL-WIDTH*" "*CELL-HEIGHT*" "OUT-SIDE-LIST-P" 
-           "C-LIST-ITEM" "UPDATE-SIZE" "CUT-ELEMENT" "ADD-DOWNWARD-ROW" "ADD-UPWARD-ROW"
-           "EDIT-SELECTED-CELL" "SET-ARRAY-ITEM" "NEXT-DOWN-ELEMENT"
-           "NEXT-UP-ELEMENT" "NEXT-RIGHT-ELEMENT" "NEXT-LEFT-ELEMENT"))
-
 (in-package "C-LIST-ITEM-H")
 
 ;;;======================================================
@@ -266,13 +250,6 @@
 ;;;  key-pressed-extra   ; responds to arrow keys
 ;;;==================================================
 
-(defpackage "C-TABLE-WINDOW-H"
-  (:use "COMMON-LISP" "UI" "C-LIST-ITEM"  "PATCHWORK")
-  (:export "C-TABLE-WINDOW" "THE-LIST"))
-
-(defpackage "C-TABLE-WINDOW"
-  (:use "C-TABLE-WINDOW-H")
-  (:export "C-TABLE-WINDOW" "THE-LIST"))
 
 (in-package "C-TABLE-WINDOW-H")
 

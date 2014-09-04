@@ -6,17 +6,19 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;    
-;;;;    XXX
+;;;;    Implements pop up menus called up from static-text-dialog-item boxes.
 ;;;;    
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
+;;;;    2014-09-03 <PJB> Implemented using new mclgui:pop-up-context-menu function.
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
+;;;;    Copyright Pascal J. Bourguignon 2013 - 2014
 ;;;;    Copyright IRCAM 1986 - 2012
 ;;;;    
 ;;;;    This program is free software: you can redistribute it and/or modify
@@ -33,7 +35,6 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
-(objcl:enable-objcl-reader-macros)
 
 ;;;=============================================================
 ;;;
@@ -83,12 +84,14 @@ located in the x,y position specified by the &rest key arguments"
   (:method ((self C-PopUpbox) title)
     (set-dialog-item-text self title)))
 
+
+
 #-(and)
 (
 
  (progn
    (defparameter *fi*  (make-instance 'window :window-title "fi"))
-   (defparameter *pop* (make-popupbox "A" *fi* *MN-popUpMenu*
+   (defparameter *pop* (make-popupbox "Menu" *fi* *MN-popUpMenu*
                                       :view-position (make-point 0 0)
                                       :view-container *fi*)))
 

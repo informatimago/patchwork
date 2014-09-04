@@ -35,20 +35,28 @@
 (in-package :pw)
 
 (defclass C-chord-box (C-ttybox)
-  ((chord-line :initform 
-     (make-instance 'C-chord-line 
-        :chords (list
-           (make-instance 'C-chord :t-time 0 
-              :notes (list  (make-instance 'C-note :midic 6000))))) 
-          :initarg :chord-line :accessor chord-line)))
+  ((chord-line :initform (make-instance 'C-chord-line 
+                                        :chords (list
+                                                 (make-instance 'C-chord
+                                                                :t-time 0 
+                                                                :notes (list (make-instance 'C-note
+                                                                                            :midic 6000))))) 
+               :initarg :chord-line
+               :accessor chord-line)))
+
+(defmethod initialize-instance :after ((self C-chord-box) &key &allow-other-keys)
+  (set-view-font self *music-font-spec*))
+
 
 (defmethod value ((self C-chord-box))  ;this is really the decompilation [911023]
   `(note
     ,@(mapcar #'get-useful-note-slots (notes (car (chords (chord-line self)))))))
 
+
 (defgeneric get-useful-note-slots (self)
   (:method ((self C-note))
-    `(list ,(midic self) ,(dur self) ,(offset-time self) ,(order self) ,(comm self) ,(chan self) ,(vel self)
+    `(list ,(midic self) ,(dur self) ,(offset-time self) ,(order self)
+           ,(comm self) ,(chan self) ,(vel self)
            ,(if (instrument self) (decompile (instrument self))))))
 
 (defmethod (setf value) (notes (self C-chord-box))
@@ -98,14 +106,11 @@
                       *mn-view-ins-flag* *mn-view-offset-flag*
                       *mn-view-order-flag* *staff-num*))
     (let ((mid-y (give-mid-y self))
-          (pw-win-font (view-font (view-container (view-container  self)))))
-      (with-focused-view self
-        (set-view-font  (view-container (view-container  self))
-                        '("MusNot-j"  18  :srcor))
+          (pw-win-font (view-font (view-container (view-container self)))))
+      (with-font-focused-view self
         (if (chords (chord-line self))
-         (draw-chord (car (chords (chord-line self))) 1 (+ 25 (x self)) 0 mid-y))
-        (draw-cb-staffs self mid-y))
-      (set-view-font  (view-container (view-container  self)) pw-win-font))))
+            (draw-chord (car (chords (chord-line self))) 1 (+ 25 (x self)) 0 mid-y))
+        (draw-cb-staffs self mid-y)))))
 
 (defgeneric update-control (self)
   (:method ((self C-chord-box))

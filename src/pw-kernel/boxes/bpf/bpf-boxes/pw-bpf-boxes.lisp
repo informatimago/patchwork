@@ -148,7 +148,6 @@
 
 (defmethod draw-appl-label ((self C-patch-function) label)
   (when label
-    (set-view-font self '("monaco"  9  :plain :srccopy))
     (with-font-focused-view self
       (draw-char (- (w self) 8) (- (h self) 4) label))))
 

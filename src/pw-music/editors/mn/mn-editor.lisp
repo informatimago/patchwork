@@ -588,8 +588,7 @@
                         *mn-view-dyn-flag* *mn-view-offset-flag*))
       (set-visible-chords self) 
       ;;(with-focused-view self
-      ;;(set-view-font (view-container (view-container  self))
-      ;;'("MusNot-j"  18  :srcor))
+      ;;(set-view-font (view-container (view-container  self)) *music-font-spec*))
       (with-font-focused-view self
         (tell (staff-list self) #'draw-staff 
               (+ (point-h (view-scroll-position self)) 2) 
@@ -618,8 +617,7 @@
                         *mn-view-dyn-flag* *mn-view-offset-flag*))
       (set-visible-chords self) 
       ;;(with-focused-view self
-      ;;(set-view-font (view-container my-view)
-      ;;'("MusNot-j"  18  :srcor))
+      ;;(set-view-font (view-container my-view) *music-font-spec*))
       (with-font-focused-view self
         (tell (staff-list self) #'draw-staff 
               (+ (point-h (view-scroll-position self)) 2) 
@@ -831,7 +829,7 @@
                                :view-size (subtract-points w-size (make-point 24 67))  ;(make-point 576 143)
                                :h-scrollp nil
                                :track-thumb-p t
-                               :view-font '("MusNot-j"  18  :srcor)
+                               :view-font *music-font-spec*
                                :chord-line (make-instance 'C-chord-line))))
     (setf (staff-list (car (editor-objects editor-view))) staffs)
     mn-window))
@@ -869,7 +867,7 @@
                            :view-size #@(576 143)
                            :h-scrollp nil
                            :track-thumb-p t
-                           :view-font '("MusNot-j"  18  :srcor)
+                           :view-font *music-font-spec*
                            :chord-line (nth i chordL-list)) ;(make-instance 'C-chord-line))
             editor-objects))
     (setf (editor-objects editor-view) (nreverse editor-objects))
@@ -920,13 +918,13 @@
 ;; 
 ;;   (setf (editor-objects first-scroller) (list second-scroller third-scroller fourth-scroller))
 ;; 
-;;   ;;(font-codes '("MusNot-j"  18  :srcor))
+;;   ;;(font-codes *music-font-spec*)
 ;;   ;;*font-list*
-;;   ;;(real-font '("MusNot-j"  18  :srcor))
-;;   ;;(font-info '("MusNot-j"  18  :srcor))
+;;   ;;(real-font *music-font-spec*)
+;;   ;;(font-info *music-font-spec*)
 ;;   ;;(view-font  second-scroller)
 ;;   ;; (set-view-font second-scroller '("monaco"  9  :srcor))
-;;   ;;(font-codes '("MusNot-j"  18  :srcor))
+;;   ;;(font-codes *music-font-spec*)
 ;; 
 ;;   ;;(set-view-size  first-scroller (make-point 400 380))
 ;;   ;;(set-view-size second-scroller (make-point 390 125))

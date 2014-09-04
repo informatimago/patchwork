@@ -209,9 +209,12 @@ DO:         Prints each expression and their values.
 
 (in-package "COMMON-LISP-USER")
 (let ((*print-circle* nil))
-  (format t "~&;; Use ~S to start Patchwork.~%~:*~S~%~S~%(in-package :pw)~%"
-          '(start-patchwork)
-          '(with-streams (pw::initialize-patchwork))))
+  (format t "~&;; Use ~S to start Patchwork in the main thread.~%~:*~S~%"
+          '(start-patchwork))
+  (format t  "~&;; Use ~S to start Patchwork in swank.~%~:*~S~%"
+          '(with-streams (pw::initialize-patchwork)))
+  (format t  "~&~S~%"
+          '(in-package :pw)))
 
 
 
