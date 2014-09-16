@@ -105,8 +105,7 @@
     (declare (special *mn-view-dyn-flag* *mn-view-dur-flag*
                       *mn-view-ins-flag* *mn-view-offset-flag*
                       *mn-view-order-flag* *staff-num*))
-    (let ((mid-y (give-mid-y self))
-          (pw-win-font (view-font (view-container (view-container self)))))
+    (let ((mid-y (give-mid-y self)))
       (with-font-focused-view self
         (if (chords (chord-line self))
             (draw-chord (car (chords (chord-line self))) 1 (+ 25 (x self)) 0 mid-y))

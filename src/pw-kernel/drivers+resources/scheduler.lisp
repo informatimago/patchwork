@@ -44,8 +44,6 @@
 
 ;; =============================================================================-======
 
-(defparameter *eventhook* nil)
-
 ;; User Constants
 
 (defconstant *highest-priority* 3

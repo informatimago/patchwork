@@ -494,9 +494,8 @@
 #|*|#    (#\R 
           (if (top-level-patch-win? self)
               (ui:ed-beep)
-              (let ((title
-                        (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
-                                                          :initial-string (window-title self))))
+              (let ((title (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
+                                                             :initial-string (window-title self))))
                 (when title
                   (cond 
                     ((abstract-box self)

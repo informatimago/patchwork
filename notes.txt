@@ -112,6 +112,9 @@ crois plutôt que - pour une raison inconnue - la fenêtre du Listener
 en fonction devient inactive, en activant une nouvelle fenêtre de
 Listener l’évaluation est à nouveau possible…
 
+** TODO 00021 Control modifier                                       :mclgui:
+When pressing control, event-modifiers stays 0 (key is correctly the control character/code,
+but for eg. Control-4 this doesn't work. :mclgui:
 ** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
    CLOSED: [2014-07-24 Thu 02:55]
    - State "DONE"       from "TODO"       [2014-07-24 Thu 02:55] \\
