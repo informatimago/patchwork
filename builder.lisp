@@ -126,9 +126,15 @@
 
 
 (defun install-patchwork (&key (force nil))
-  (generate-logical-pathname-translation-file "PATCHWORK" #P"/home/pjb/works/patchwork/patchwork/"                  :force force)
-  (generate-logical-pathname-translation-file "PW-USER"   #P"/home/pjb/works/patchwork/pw-user/"                    :force force)
-  (generate-logical-pathname-translation-file "CLENI"     #P"/home/pjb/works/patchwork/patchwork/src/pw-lib/cleni/" :force force))
+  (generate-logical-pathname-translation-file "PATCHWORK"
+                                              (merge-pathnames #P"works/patchwork/"                               (user-homedir-pathname) nil)
+                                              :force force)
+  (generate-logical-pathname-translation-file "PW-USER"
+                                              (merge-pathnames #P"works/patchwork/pw-user/"                       (user-homedir-pathname) nil)
+                                              :force force)
+  (generate-logical-pathname-translation-file "CLENI"
+                                              (merge-pathnames #P"works/patchwork/src/patchwork/src/pw-lib/cleni/" (user-homedir-pathname) nil)
+                                              :force force))
 ;; (install-patchwork :force t)
 
 
@@ -141,13 +147,13 @@
                      (merge-pathnames #P "../"
                                       (make-pathname :name nil :type nil :version nil :defaults this-file)
                                       nil)
-                     #P"~/works/patchwork/src/")))
+                     (merge-pathnames #P"works/patchwork/src/" (user-homedir-pathname) nil))))
   (setf (logical-pathname-translations "PATCHWORK")
-        (make-logical-pathname-translations ""            (merge-pathnames "patchwork/" base)))
+        (make-logical-pathname-translations ""            (merge-pathnames "patchwork/" base nil)))
   (setf (logical-pathname-translations "MCLGUI")
-        (make-logical-pathname-translations ""            (merge-pathnames "mclgui/" base)))
+        (make-logical-pathname-translations ""            (merge-pathnames "mclgui/" base nil)))
   (setf (logical-pathname-translations "MIDI")
-        (make-logical-pathname-translations ""            (merge-pathnames "midi/" base))))
+        (make-logical-pathname-translations ""            (merge-pathnames "midi/" base nil))))
 
 
 
@@ -169,20 +175,9 @@
 
 #-(and) (progn
           (logical-pathname-translations "PATCHWORK")
-          ((#P"PATCHWORK:**;*.*.*" #P"/Users/pjb/works/patchwork/src/patchwork/**/*.*")
-           (#P"PATCHWORK:**;*.*" #P"/Users/pjb/works/patchwork/src/patchwork/**/*.*")
-           (#P"PATCHWORK:**;*" #P"/Users/pjb/works/patchwork/src/patchwork/**/*")
-           (#P"PATCHWORK:**;" #P"/Users/pjb/works/patchwork/src/patchwork/**/"))
           (logical-pathname-translations "MCLGUI")
-          ((#P"MCLGUI:**;*.*.*" #P"/Users/pjb/works/patchwork/src/mclgui/**/*.*")
-           (#P"MCLGUI:**;*.*" #P"/Users/pjb/works/patchwork/src/mclgui/**/*.*")
-           (#P"MCLGUI:**;*" #P"/Users/pjb/works/patchwork/src/mclgui/**/*")
-           (#P"MCLGUI:**;" #P"/Users/pjb/works/patchwork/src/mclgui/**/"))
-
           (list (translate-logical-pathname #P"PATCHWORK:")
                 (translate-logical-pathname #P"MCLGUI:"))
-          (#P"/Users/pjb/works/patchwork/src/patchwork/"
-           #P"/Users/pjb/works/patchwork/src/mclgui/")
           )
 
 (defparameter *patchwork-version*

@@ -143,15 +143,13 @@
         (let ((container (view-container item)))
           (push-to-top container)
           (set-dialog-item-text *pw-controls-dialog-text-item* (dialog-item-text item))
-          (set-view-position *pw-controls-dialog-text-item* 
-                             (add-points  
-                              (view-position item) 
-                              (or point (make-point 1 0))))
+          (set-view-position *pw-controls-dialog-text-item* (add-points (view-position item) (or point (make-point 1 0))))
           (resize-text-item item size)
-          (add-subviews container
-                        *pw-controls-dialog-text-item*)
+          (add-subviews container *pw-controls-dialog-text-item*)
           (setf *current-small-inBox* item)
-          (change-menu-actions)  ))))
+          (change-menu-actions)))))
+
+
 
 (defun change-menu-actions ()
   (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")

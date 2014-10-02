@@ -552,8 +552,8 @@ DO:       Execute the BODY with a handler for CONDITION and
                   (new-leafmenu "-" nil)
                   (new-leafmenu "Save Image"          (lambda () (save-special-pw-image))))
   ;;------------------------------
-  (set-menu-title *apple-menu* "Patchwork")
-  (set-menu-item-title (first (menu-items *apple-menu*)) "About Patchwork…")
+  (set-menu-title *apple-menu* (application-name *application*))
+  (set-menu-item-title (first (menu-items *apple-menu*)) (format nil "About ~A…" (application-name *application*)))
   (setf *patchwork-menubar* 
         (list *apple-menu*
               *pw-menu-apps*

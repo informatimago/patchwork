@@ -290,7 +290,7 @@
 
 (defmethod view-click-event-handler ((self C-patch) where)
   (let ((res (call-next-method)))
-    (format-trace 'view-click-event-handler
+    (format-trace '(view-click-event-handler c-patch)
                   :where (point-to-list where)
                   :view-size (list (h self) (w self))
                   :dbl (double-click-p)
@@ -588,12 +588,14 @@
 
 (defgeneric handle-edit-events (self char)
   (:method ((self C-patch) char)
+    (format-trace '(handle-edit-events c-path) :char char :text (dialog-item-text *pw-controls-dialog-text-item*))
     (case char
-      (#\Newline 
+      (#\Etx
        (set-dialog-item-text-from-dialog *pw-controls-current-pw-control* 
                                          (dialog-item-text *pw-controls-dialog-text-item*))
        (kill-text-item))
-      (otherwise (view-key-event-handler *pw-controls-dialog-text-item* char)
+      (otherwise
+       (view-key-event-handler *pw-controls-dialog-text-item* char)
        (set-fred-display-start-mark *pw-controls-dialog-text-item* 0)
        (fred-update *pw-controls-dialog-text-item*)))))
 

@@ -77,6 +77,7 @@
 ;;events
 
 (defmethod view-click-event-handler ((self C-pw-window) where)
+  (format-trace '(view-click-event-handler c-pw-window) :where (point-to-list where) :view self)
   (set-changes-to-file-flag self)
   (when (eql (call-next-method) self)  ; click inside window
     (when *current-small-inBox*

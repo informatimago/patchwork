@@ -123,6 +123,7 @@
 Must be called on the main thread."
   (ui::reporting-errors
     (ui:initialize)
+    (setf (application-name *application*) "Patchwork")
     (initialize-streams)
     (initialize-mn-editor)
     (initialize-menus)
@@ -130,13 +131,13 @@ Must be called on the main thread."
     (initialize-directories)
     #-(and)(installapple-event-handlers))
   ;; ---
-  (format *patchwork-io* "~&Welcome to Patchwork!~%")
+  (format *patchwork-io* "~&Welcome to ~A!~%" (application-name *application*))
   (finish-output *patchwork-io*)
   (values))
 
 
 (defun date (&optional (date (get-universal-time)))
-  (format nil "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~%~8*~}"
+  (format nil "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~8*~}"
           (multiple-value-list (decode-universal-time date))))
 
 (defun safe-repl (&rest arguments &key &allow-other-keys)
@@ -156,13 +157,13 @@ Must be called on the main thread."
               ccl::*inhibit-greeting*    t))
 
 (on-restore patchwork-trace
-  (setf *trace-output* (open (merge-pathnames #P"Desktop/patchwork-trace.txt"
+  (setf *trace-output* (open (merge-pathnames #P"Desktop/Patchwork-trace.txt"
                                               (user-homedir-pathname))
                              :direction :output
                              :if-does-not-exist :create
                              :if-exists :append
                              #+ccl :sharing #+ccl :lock))
-  (format *trace-output* "~%~A~%" (date)))
+  (format *trace-output* "~%~A~2%" (date)))
 
 (on-startup patchwork-initialization
   (eval-enqueue '(initialize-patchwork)))

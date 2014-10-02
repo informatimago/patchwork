@@ -185,12 +185,18 @@
   (:nicknames "PW")
   (:use "COMMON-LISP")
   ;; (:use "COMMON-LISP-STEPPER")
-  (:use "CLOSER-MOP" "UI" "LELISP-MACROS" "PATCHWORK.SCHEDULER")
-  (:use "REDIRECTING-STREAM")
-  (:import-from "PATCHWORK.MIDI" "MIDI-RECORD" "MIDI-LOAD" "MIDI-SAVE")
+  ;; (:shadowing-import-from "COMMON-LISP-STEPPER"
+  ;;                         "DEFMETHOD" "DEFGENERIC")
+  (:use "CLOSER-MOP")
   (:shadowing-import-from "CLOSER-MOP"
                           "STANDARD-CLASS" "STANDARD-GENERIC-FUNCTION" "STANDARD-METHOD"
                           "DEFMETHOD" "DEFGENERIC")
+  (:use "UI" "LELISP-MACROS" "PATCHWORK.SCHEDULER")
+  (:use "REDIRECTING-STREAM")
+
+  (:import-from "PATCHWORK.MIDI"
+                "MIDI-RECORD" "MIDI-LOAD" "MIDI-SAVE")
+
   (:export "ENABLE-PATCHWORK-READER-MACROS"
            "DISABLE-PATCHWORK-READER-MACROS")
 
