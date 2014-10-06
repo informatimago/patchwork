@@ -143,6 +143,7 @@
         (let ((container (view-container item)))
           (push-to-top container)
           (set-dialog-item-text *pw-controls-dialog-text-item* (dialog-item-text item))
+          (multiple-value-call (function set-view-font-codes) *pw-controls-dialog-text-item* (view-font-codes item))
           (set-view-position *pw-controls-dialog-text-item* (add-points (view-position item) (or point (make-point 1 0))))
           (resize-text-item item size)
           (add-subviews container *pw-controls-dialog-text-item*)
