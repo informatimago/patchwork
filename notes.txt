@@ -22,22 +22,28 @@ otherwise:
 - #\h
            
 * Errors, Warnings, TODOs
-** TODO [#A] 00011 Le buffer est incomplet : il doit avoir une fonction de conservation des données obtenue par un clic sur un petit rond au centre de l’objet, ce petit rond doit alors se transformer en croix pour signifier cette conservation des données.
+** IN-PROGRESS [#B] 00007 Text Edit
+   - State "IN-PROGRESS" from "DONE"       [2014-10-07 Tue 09:25] \\
+     En cours.
+- Impossibilité d’inscrire une liste dans un objet.
+- Window Comment ne fonctionne pas.
+** IN-PROGRESS 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item
+   - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:24]
 
-L’objet accum doit se verrouiller, comme l’objet buffer et l’objet
-list-ed, ceci pour conserver les données qui y ont entrées
-précédemment.
+- static-text-dialog-item 
+- editable-text-dialog-ietm
 
-On doit verrouiller en cliquant sur un petit rond au centre de l’objet
-qui se transforme alors en croix, pour dévérouiller on clique sur
-cette croix qui redevient alors un petit rond.
-
+** IN-PROGRESS 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
+   - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:25] \\
+     text-edit en cours.
 ** TODO [#A] 00012 graphic offset in output box link drawing
 
 quand on active le lien entre deux objets (en cliquant sur le petit
 rectangle au bas de l’objet) l’origine de ce lien apparaît plus bas à
 gauche plutôt que dans le petit rectangle...
 
+** TODO [#A] 00005 Effacements partiels et provisoires des objets 
+(réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
 ** TODO [#A] 00014 On génère une entrée supplémentaire pour certains objets avec alt-clic
 
 trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
@@ -49,19 +55,25 @@ Lors de cette opération les objets se déplacent sur la fenêtre. Pour
 l’objet test, alt-clic génère deux entrées supplémentaires plutôt
 qu’une seule. 
 
-** TODO [#A] 00005 Effacements partiels et provisoires des objets 
-(réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
-** TODO [#B] 00007 Text Edit
-- Impossibilité d’inscrire une liste dans un objet.
-- Window Comment ne fonctionne pas.
+** TODO [#A] 00011 Le buffer est incomplet : il doit avoir une fonction de conservation des données obtenue par un clic sur un petit rond au centre de l’objet, ce petit rond doit alors se transformer en croix pour signifier cette conservation des données.
+
+L’objet accum doit se verrouiller, comme l’objet buffer et l’objet
+list-ed, ceci pour conserver les données qui y ont entrées
+précédemment.
+
+On doit verrouiller en cliquant sur un petit rond au centre de l’objet
+qui se transforme alors en croix, pour dévérouiller on clique sur
+cette croix qui redevient alors un petit rond.
+
+** TODO 00022 ajustement graphiques editable-text-dialog-item        :mclgui:
+** TODO 00023 integration hemlock Cmd-w should close hemlock window  :mclgui:
+and not try to close the Patchwork window below it.
 ** TODO 00000 Classes that need to be implemented satisfactorily:
 
 - dialog
 - dialog-item
 - table-dialog-item
 - button-dialog-item 
-- static-text-dialog-item 
-- editable-text-dialog-ietm
 - dialog
 - fred-window
 - window
@@ -102,10 +114,10 @@ qu’une seule.
 ** TODO 00004 Les patchs les plus complexes sont lents à charger.
 Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
 <d:s:R x 5>
-** TODO 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
-** TODO 00008 Implement Cmd-x Cmd-c Cmd-v in the listener.
-Le résultat ne peux pas se copier et c’est une fonction nécessaire (également impossibilité d’écrire dans le Listener).
+** TODO 00008 integration hemlock Cmd-x Cmd-c Cmd-v in the listener. :mclgui:
 
+Le résultat ne peux pas se copier et c’est une fonction nécessaire (également impossibilité d’écrire dans le Listener).
+ 
 ** TODO 00010 Quelquefois il y a eu impossibilité d’évaluation.
 En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
 crois plutôt que - pour une raison inconnue - la fenêtre du Listener
@@ -198,388 +210,293 @@ nommant l’Abstract dans la fenêtre « absout »), puis sélectionner le
 tout et aller dans le menu PWoper —> Abstract. Le nouvel objet doit
 alors apparaître.
 
+* *FEATURES* used by Patchwork/mclgui
+** Implementation features:
+
+    :allegro                  used by midishare
+    :clisp                      "
+    :cmu                        "
+    :ecl                        "
+    :lispworks                  "
+    :openmcl                    "
+    :sbcl                       "
+    :ccl                      used a lot by patchwork/mclgui for remaining ccl specific stuff
+                              (waiting for a portable objc-bridge).
+
+        :ccl-1.9              was used by patchwork loader to detect ccl 1.9 (to load a patch).
+        :ccl-4.3              used by midishare to detect MCL-4.x vs. MCL-5.x (!)
+        :ccl-5.0              used by midishare to detect MCL-4.x vs. MCL-5.x (!)
+
+
+
+    :32-bit-target            used by mclgui/cg to determine floating point type.
+    :64-bit-target            used by mclgui/cg to determine floating point type.
+    :ppc-target               used by mclgui/initialize to determined fasl file type.
+
+    :carbon-compat            used by old mcl code (remaining traces in mclgui, to be removed).
+    :carbon-compat-2          used by old mcl code (remaining traces in mclgui, to be removed).
+
+
+    :ppc-target               used by objc-bridge (unused for now).
+    :ppc32-target               "
+    :ppc64-target               "
+    :win32-target               "
+    :x86-target                 "
+    :x8632-target               "
+    :x8664-target               "
+    :darwin-target              "
+    :cocotron                   "
+    :cocotron-objc              "
+    :gnu-objc                   "
+    :apple-objc                 "
+    :apple-objc-2.0             "
+
+** Library features:
+
+    :player                   set by the midishare/player.
+
+    :loop                     used by lelisp-macros to detect the LOOP library is used (for, while).
+    :swank                    used by patchwork/{loader,init-streams,src/application} to configure streams.
+
+** features used by mclgui
+
+    :test                    activate running tests upon loading.
+
+    :has-appleevent          set by patchwork/load-libraries. (=!=) used by mclgui to detect whether to use AppleEvents.
+
+    :report-error-in-dialog  display error and backtrace in a dialog window.
+    :debug-on-error          invokes the debugger when reporting a detected error.
+
+
+The following features produce a lot of trace output.
+
+    :debug-event             activates debugging events.
+    :debug-objc              activates debugging objc-classes.
+    :debug-views-colors      activates debugging views (with colors).
+    :debug-views             activates debugging views.
+    :debug-wrapper           activates debugging wrappers.
+
+** features used by patchwork
+
+    :cocoa                   set by patchwork/gestalt. used by patchwork (loader, generate-application, etc).
+    :cocoa-10.9              set by patchwork/gestalt.
+    :cocoa-10.8              set by patchwork/gestalt.
+    :cocoa-10.7              set by patchwork/gestalt. (=!=) used by mclgui/cocoa interface
+    :cocoa-10.6              set by patchwork/gestalt. (=!=) used by mclgui/cocoa interface 
+    :cocoa-10.5              set by patchwork/gestalt.
+    :cocoa-10.4              set by patchwork/gestalt.
+
+    patchwork.builder::no-cocoa          set by patchwork/{loader,generate-application}. used by patchwork to disable requiring cocoa.
+    patchwork.builder::use-apple-events  set by patchwork/{loader,generate-application}. used by patchwork to select AppleEvent (not implemented yet).
+    patchwork.builder::cocoa-midi-player set by patchwork/{loader,generate-application}. used by patchwork to select the cocoa midi-player. (not implemented yet).
+    patchwork.builder::use-cl-midi       set by patchwork/{loader,generate-application}. used by patchwork to select the use of cl-midi instead of midishare.
+    patchwork.builder::use-midishare     set by patchwork/{loader,generate-application}. used by patchwork to select the use of midisahre instead of cl-midi.
+
+*** should not be set:
+
+    :not-yet                 used by patchwork/src/pw-lib/cl-midi/pw-midi and objc-bridge to disable features not implemented yet.
+    :not-needed              used by patchwork/src/pw-lib/cl-midi/pw-midi
+
 * Not Implemented Yet
 
 #+BEGIN_QUOTE
 
-    [pjb@kuiper :0.0 patchwork]$ find . -name \*.lisp -exec grep  -Hi '^ *(niy ' {} \;
-
-    ./src/mclgui/apple-event.lisp:    (niy open-application-document application filename startup)))
-    ./src/mclgui/apple-event.lisp:    (niy print-application-document application filename startup)))
-    ./src/mclgui/apple-event.lisp:    (niy print-documents-handler)))
-    ./src/mclgui/apple-event.lisp:    (niy quit-application-handler)
-    ./src/mclgui/apple-event.lisp:  (niy appleevent-idle event sleeptime mousergn))
-    ./src/mclgui/application.lisp:    (niy application-about-view)))
-    ./src/mclgui/application.lisp:    (niy application-about-view)))
-    ./src/mclgui/application.lisp:    (niy application-error))
-    ./src/mclgui/application.lisp:    (niy application-overwrite-dialog)))
-    ./src/mclgui/application.lisp:    (niy application-resume-event-handler)))
-    ./src/mclgui/application.lisp:    (niy application-suspend-event-handler)))
-    ./src/mclgui/application.lisp:    (niy find-edit-menu)))
-    ./src/mclgui/button-dialog-item.lisp:                  (niy draw-default-button-outline item)
-    ./src/mclgui/button-dialog-item.lisp:              (niy set-default-button dialog new-button) #-(and)
-    ./src/mclgui/button-dialog-item.lisp:            (niy set-default-button dialog new-button) #-(and)
-    ./src/mclgui/button-dialog-item.lisp:        (niy view-draw-contents item) #-(and)
-    ./src/mclgui/button-dialog-item.lisp:      (niy  press-button button)
-    ./src/mclgui/button-dialog-item.lisp:    (niy view-draw-contents item)
-    ./src/mclgui/button-dialog-item.lisp:  (niy validate-control-dialog-item item)
-    ./src/mclgui/check-box-dialog-item.lisp:        (niy check-box-check item)
-    ./src/mclgui/check-box-dialog-item.lisp:        (niy check-box-uncheck item)
-    ./src/mclgui/control-dialog-item.lisp:            (niy set-view-position item h v)
-    ./src/mclgui/control-dialog-item.lisp:            (niy set-view-size item h v)
-    ./src/mclgui/control-dialog-item.lisp:        (niy install-view-in-window :after button w)
-    ./src/mclgui/control-dialog-item.lisp:      (niy dialog-item-disable item)
-    ./src/mclgui/control-dialog-item.lisp:      (niy dialog-item-enable item)
-    ./src/mclgui/control-dialog-item.lisp:      (niy set-dialog-item-text item text)
-    ./src/mclgui/control-dialog-item.lisp:      (niy view-draw-contents item)
-    ./src/mclgui/control-dialog-item.lisp:    (niy fix-osx-dialog-item-font button)
-    ./src/mclgui/control-dialog-item.lisp:    (niy view-activate-event-handler item)
-    ./src/mclgui/control-dialog-item.lisp:    (niy view-click-event-handler item where))
-    ./src/mclgui/control-dialog-item.lisp:  (niy font-codes-string-width-for-control string ff ms start end)
-    ./src/mclgui/control-dialog-item.lisp:  (niy install-view-in-window dialog-item dialog)
-    ./src/mclgui/control-dialog-item.lisp:  (niy remove-view-from-window item)
-    ./src/mclgui/control-dialog-item.lisp:  (niy set-view-font-codes :after button ff ms m1 m2)
-    ./src/mclgui/control-dialog-item.lisp:  (niy view-deactivate-event-handler item)
-    ./src/mclgui/default-button-mixin.lisp:    (niy button-props-to-window item window)
-    ./src/mclgui/default-button-mixin.lisp:  (niy remove-view-from-window item)
-    ./src/mclgui/dialog.lisp:              (niy process-event)
-    ./src/mclgui/dialog.lisp:        (niy clip-inside-view item h v)
-    ./src/mclgui/dialog.lisp:    (niy draw-theme-text-box text rect text-justification truncwhere active-p)
-    ./src/mclgui/dialog.lisp:    (niy modal-dialog dialog close-on-exit eventhook)
-    ./src/mclgui/dialog.lisp:  (niy %return-from-modal-dialog values)
-    ./src/mclgui/dialog.lisp:  (niy current-pixel-depth)
-    ./src/mclgui/dialog.lisp:  (niy current-port-color-p)
-    ./src/mclgui/dialog.lisp:  (niy process-multi-clicks event))
-    ./src/mclgui/editable-text-dialog-item.lisp:  (niy view-clip-region view)
-    ./src/mclgui/event.lisp:  (niy wait-mouse-up-or-moved)
-    ./src/mclgui/event.lisp:  (niy with-event-processing-enabled)
-    ./src/mclgui/event.lisp:  (niy with-timer)
-    ./src/mclgui/font.lisp:  (niy atsu-line-break-given-layout layout start width)
-    ./src/mclgui/font.lisp:  (niy color->ff-index color)
-    ./src/mclgui/font.lisp:  (niy draw-string-in-rect string rect truncation justification compress-p start end ff ms color)
-    ./src/mclgui/fred-window.lisp:    (niy buffer-char buffer position)
-    ./src/mclgui/fred-window.lisp:    (niy buffer-current-sexp buffer position)
-    ./src/mclgui/fred-window.lisp:    (niy buffer-insert buffer text)))
-    ./src/mclgui/fred-window.lisp:    (niy buffer-insert-file buffer file-pathname)))
-    ./src/mclgui/fred-window.lisp:    (niy buffer-size buffer)
-    ./src/mclgui/fred-window.lisp:    (niy buffer-skip-fwd-wsp&comments buffer length size)
-    ./src/mclgui/fred-window.lisp:    (niy buffer-write-file buffer file-pathname  if-exists if-does-not-exists)))
-    ./src/mclgui/fred-window.lisp:    (niy ed-kill-selection window)
-    ./src/mclgui/fred-window.lisp:    (niy fred-update dialog-item)
-    ./src/mclgui/fred-window.lisp:    (niy set-fred-display-start-mark dialog-item position)
-    ./src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-disable :before item)#-(and)
-    ./src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-enable :after item)#-(and)
-    ./src/mclgui/message-dialog.lisp:    (niy dialog-item-text-length item)
-    ./src/mclgui/pen.lisp:      (niy line view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
-    ./src/mclgui/pen.lisp:      (niy line-to view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:                (niy draw-menu-title menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:              (niy size-rectangles menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:              (niy title-hilite menu un)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:            (niy set-pop-up-menu-default-item menu num force)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:          (niy menu-select menu num)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-disable menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-enable menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-select)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy remove-view-from-window menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy size-rectangles menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-click-event-handler menu where)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-draw-contents menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy point-in-click-region-p menu where)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy remove-menu-items menu items)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy set-pop-up-item-check-mark item mark)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-activate-event-handler menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-deactivate-event-handler menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy menu-install menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy paint-menu-gray menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-position menu h v)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-size menu h v)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:    (niy view-draw-contents menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-height pop-up-menu height)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-items menu items)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy make-new-pop-up-control menu window) #-(and)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy remove-view-from-window menu)
-    ./src/mclgui/pop-up-menu-dialog-item.lisp:  (niy view-corners item)
-    ./src/mclgui/quickdraw.lisp:  (niy clip-rect view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy clip-region view save-region)
-    ./src/mclgui/quickdraw.lisp:  (niy copy-bits source-bitmap dest-bitmap source-rect dest-rect mode mask-region)
-    ./src/mclgui/quickdraw.lisp:  (niy draw-picture view picture left top right bottom)
-    ./src/mclgui/quickdraw.lisp:  (niy erase-arc view start-angle arc-angle left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy erase-oval view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy erase-polygon view polygon)
-    ./src/mclgui/quickdraw.lisp:  (niy erase-rect view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy erase-region view region)
-    ./src/mclgui/quickdraw.lisp:  (niy erase-round-rect view oval-width oval-height left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy fill-arc view pattern start-angle arc-angle left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy fill-oval view pattern left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy fill-polygon view pattern polygon)
-    ./src/mclgui/quickdraw.lisp:  (niy fill-rect view  pattern left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy fill-region view pattern region)
-    ./src/mclgui/quickdraw.lisp:  (niy fill-round-rect view pattern oval-width oval-height left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy frame-arc view start-angle arc-angle left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy frame-oval view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy frame-polygon view polygon)
-    ./src/mclgui/quickdraw.lisp:  (niy frame-rect view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy frame-region view region)
-    ./src/mclgui/quickdraw.lisp:  (niy frame-region view region)
-    ./src/mclgui/quickdraw.lisp:  (niy frame-round-rect view oval-width oval-height left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy get-picture view)
-    ./src/mclgui/quickdraw.lisp:  (niy get-pixel view h v)
-    ./src/mclgui/quickdraw.lisp:  (niy get-polygon view)
-    ./src/mclgui/quickdraw.lisp:  (niy global-to-local view h v)
-    ./src/mclgui/quickdraw.lisp:  (niy invert-arc view start-angle arc-angle left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy invert-oval view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy invert-polygon view polygon)
-    ./src/mclgui/quickdraw.lisp:  (niy invert-rect view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy invert-region view region)
-    ./src/mclgui/quickdraw.lisp:  (niy invert-round-rect view oval-width oval-height left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy kill-picture picture)
-    ./src/mclgui/quickdraw.lisp:  (niy kill-polygon polygon)
-    ./src/mclgui/quickdraw.lisp:  (niy local-to-global view h v)
-    ./src/mclgui/quickdraw.lisp:  (niy make-bitmap left top right bottom)
-    ./src/mclgui/quickdraw.lisp:  (niy map-point source-rect dest-rect h v)
-    ./src/mclgui/quickdraw.lisp:  (niy map-polygon source-rect dest-rect polygon)
-    ./src/mclgui/quickdraw.lisp:  (niy map-rect source-rect dest-rect rect)
-    ./src/mclgui/quickdraw.lisp:  (niy map-region source-rect dest-rect region)
-    ./src/mclgui/quickdraw.lisp:  (niy offset-polygon polygon h v)
-    ./src/mclgui/quickdraw.lisp:  (niy paint-arc view start-angle arc-angle left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy paint-oval view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy paint-polygon view polygon)
-    ./src/mclgui/quickdraw.lisp:  (niy paint-rect view left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy paint-round-rect view oval-width oval-height left top right bot)
-    ./src/mclgui/quickdraw.lisp:  (niy scale-point source-rect dest-rect h v)
-    ./src/mclgui/quickdraw.lisp:  (niy scroll-rect view rect dh dv)
-    ./src/mclgui/quickdraw.lisp:  (niy set-clip-region view new-region)
-    ./src/mclgui/quickdraw.lisp:  (niy start-picture view left top right bottom)
-    ./src/mclgui/quickdraw.lisp:  (niy start-polygon view)
-    ./src/mclgui/radio-button-dialog-item.lisp:        (niy radio-button-push item)
-    ./src/mclgui/radio-button-dialog-item.lisp:    (niy radio-button-unpush item)
-    ./src/mclgui/region.lisp:     (niy with-hilite-mode ',body)
-    ./src/mclgui/region.lisp:    (niy close-region view dest-region)
-    ./src/mclgui/region.lisp:    (niy open-region view)
-    ./src/mclgui/region.lisp:  (niy inset-region region h v)
-    ./src/mclgui/region.lisp:  (niy point-in-region-p region h v))
-    ./src/mclgui/region.lisp:  (niy rect-in-region-p region left top right bot))
-    ./src/mclgui/region.lisp:  (niy with-hilite-mode body)
-    ./src/mclgui/scrap.lisp:    (niy get-internal-scrap handler)))
-    ./src/mclgui/scrap.lisp:    (niy internalize-scrap handler)))
-    ./src/mclgui/scrap.lisp:    (niy set-internal-scrap handler value)))
-    ./src/mclgui/scrap.lisp:  (niy get-scrap scrap-type))
-    ./src/mclgui/scrap.lisp:  (niy initialize/scrap))
-    ./src/mclgui/scrap.lisp:  (niy put-scrap scrap-type scrap-value overwrite-p))
-    ./src/mclgui/scratch/frec.lisp:      (niy call-with-frec frec thunk)
-    ./src/mclgui/scratch/frec.lisp:    (niy make-frec cursor owner size)
-    ./src/mclgui/scratch/frec.lisp:  (niy reinit-frec frec owner-or-wptr owner)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:      (niy install-view-in-window item view)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:      (niy track-scroll-bar-thumb item)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:    (niy dialog-item-action item)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:    (niy draw-pane-splitter-outline scrollee scroll-bar pos min max direction)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy %set-scroll-bar-setting item new-value only-if-new-value)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy outside-scroll-bar-setting scroll-bar handle)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy remove-view-from-window item)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy scroll-wheel-handler w delta direction wherep)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy track-and-draw container function pos direction delta min-pos max-pos)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy update-scroll-bar-max-min-setting item)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-activate-event-handler item)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-click-event-handler item where)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-deactivate-event-handler item)
-    ./src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-draw-contents item)
-    ./src/mclgui/select-dialog.lisp:               (niy select-item-from-list)
-    ./src/mclgui/sequence-dialog-item.lisp:  (niy put-scraps value text)
-    ./src/mclgui/table-dialog-item.lisp:                                         (niy view-click-event-handler item where)
-    ./src/mclgui/table-dialog-item.lisp:                        (niy add-to-selection-region item selected-p h v dont-compute-outline-region)
-    ./src/mclgui/table-dialog-item.lisp:                  (niy %draw-table-cell-new item h v rect selectedp)
-    ./src/mclgui/table-dialog-item.lisp:              (niy default-cell-size item width)
-    ./src/mclgui/table-dialog-item.lisp:            (niy scroll-to-cell item h v)
-    ./src/mclgui/table-dialog-item.lisp:            (niy view-draw-contents item)
-    ./src/mclgui/table-dialog-item.lisp:          (niy scroll-to-cell item h v)
-    ./src/mclgui/table-dialog-item.lisp:        (niy invert-cell-selection item h v selected-p)
-    ./src/mclgui/table-dialog-item.lisp:        (niy toggle-cell-outlining)
-    ./src/mclgui/table-dialog-item.lisp:      (niy invalidate-cell h v)
-    ./src/mclgui/table-dialog-item.lisp:      (niy toggle-selection-region item)
-    ./src/mclgui/table-dialog-item.lisp:  (niy compute-selection-regions item min-row max-row min-column max-column)
-    ./src/mclgui/table-dialog-item.lisp:  (niy dispose-selection-regions item)
-    ./src/mclgui/table-dialog-item.lisp:  (niy get-local-mouse-position)
-    ./src/mclgui/table-dialog-item.lisp:  (niy highlight-rect-frame rect)
-    ./src/mclgui/table-dialog-item.lisp:  (niy string-width-for-focused-control string ff ms)
-    ./src/mclgui/table-dialog-item.lisp:  (niy two-byte-script-p script)
-    ./src/mclgui/table-dialog-item.lisp:  (niy view-click-event-handler item where)
-    ./src/mclgui/test/test-graphics.lisp:  (niy draw-char '(x y cn))
-    ./src/mclgui/test/test-graphics.lisp:  (niy draw-string x y str)
-    ./src/mclgui/view.lisp:        (niy view-is-invalid-p view visrgn cliprgn tl br)
-    ./src/mclgui/view.lisp:  (niy initialize/view))
-    ./src/mclgui/view.lisp:  (niy view erase-p right-and-bottom-only) #-(and)
-
-    ./src/objc-bridge/objc-classes.lisp:  (niy note-class-protocols class))
-    ./src/objc-bridge/objc-runtime.lisp:  (niy with-nsstr nsstr cstring len body))
-
-    ./src/pw-kernel/box-creation/pw-patch.lisp:    (niy inval-r-view-sides view top&left?)
-    ./src/pw-kernel/boxes/bpf/bpf-editors/break-point-function.lisp:  (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
-    ./src/pw-kernel/boxes/data/file-buffer.lisp:    (niy patch-value self obj)
-    ./src/pw-kernel/boxes/data/file-buffer.lisp:  (niy add-to-file self list format)
-    ./src/pw-kernel/boxes/data/file-buffer.lisp:  (niy get-selected-file self)
-    ./src/pw-kernel/boxes/data/file-buffer.lisp:  (niy save-win self)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-clear)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-close)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-free-filter f)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-modify-filter f accept chan port type)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-new-filter chan port type)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-notes-off)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-open)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-read)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-reset)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-write event)
-    ./src/pw-kernel/drivers+resources/midi.lisp:  (niy midi-write-time event time)
-    ./src/pw-kernel/environment/mac-rsrc.lisp:  (niy get-box-cursor)
-    ./src/pw-kernel/environment/mac-rsrc.lisp:  (niy load-lisp-res)
-    ./src/pw-kernel/environment/make-image.lisp:  (niy clear-patchwork)
-    ./src/pw-kernel/environment/midi-note.lisp:      (niy write-midicent-note dur chan key vel) #-(and)
-    ./src/pw-kernel/environment/midi-note.lisp:    (niy write-midi-note dur chan key vel) #-(and)
-    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-controller-value chan controller value) #-(and)
-    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-pitch-bend-value chan value ls) #-(and)
-    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-pressure-value chan key value) #-(and)
-    ./src/pw-kernel/environment/midi-note.lisp:  (niy write-program-change-value chan program) #-(and)
-    ./src/pw-kernel/pw-graphics/controls/popupmenu.lisp:      (niy view-click-event-handler self mouse)
-    ./src/pw-kernel/pw-graphics/controls/pw-graphics.lisp:  (niy grow-gray-rect anchor float port limit)
-    ./src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy win-print-setUp self)
-    ./src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy window-hardcopy self show-fl)
-    ./src/pw-kernel/pw-graphics/window+menu/pw-menu.lisp:  (niy clear-patchwork)
-    ./src/pw-kernel/pw-graphics/window+menu/pw-menu.lisp:  (niy save-special-pw-image)
-    ./src/pw-kernel/pw-graphics/window+menu/pw-window.lisp:    (niy view-click-event-handler self where)
-
-    ./src/pw-lib/midishare/cocoa-midi-player.lisp:       (niy  ,fun ,@pars))))
-    ./src/pw-lib/midishare/cocoa-midi-player.lisp:  (niy bar e d d?) #-(and)
-    ./src/pw-lib/midishare/cocoa-midi-player.lisp:  (niy beat e d d?) #-(and)
-    ./src/pw-lib/midishare/cocoa-midi-player.lisp:  (niy unit e d d?) #-(and)
-    ./src/pw-lib/midishare/midiplay.lisp:  (niy  MidiPlayANy  object approx chanbase)
-    ./src/pw-lib/midishare/midirecord.lisp:  (niy MidiSaveAny object) #-(and)
-    ./src/pw-lib/midishare/midirecord.lisp:  (niy mievents2midilist seq units/sec) #-(and)
-    ./src/pw-lib/midishare/midirecord.lisp:  (niy patch-value self obj)
-    ./src/pw-lib/midishare/midirecord.lisp:  (niy patch-value self obj)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiAddField ev val)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiAddSeq seq ev)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiApplySeq seq proc)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiAvailEv refnum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCall proc date refNum arg1 arg2 arg3)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiClearSeq seq)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiClose refNum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiConnect src dst state)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCopyEv ev)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountAppls)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountDTasks refnum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountEvs refnum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiCountFields ev)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiDTask proc date refNum arg1 arg2 arg3)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiExec1DTask refnum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiExt2IntTime time)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFlushDTasks refnum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFlushEvs refnum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiForgetTask ev)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiForgetTaskHdl thdl)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFreeEv ev)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFreeSeq seq)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiFreeSpace)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetApplAlarm refNum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetEv refnum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetExtTime format smpteLocation)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetField ev field)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetFilter refNum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetIndAppl index)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetInfo refNum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetName refNum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetNamedAppl name)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetPortState port)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetRcvAlarm refNum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetTime)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiGetVersion)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiInt2ExtTime time)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiIsConnected src dst)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiNewCell cell)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiNewEv typenum)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiNewSeq)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiOpen name)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiReadSync adrmem)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSend refnum ev)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSendAt refnum ev date)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSendIm refnum ev)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetApplAlarm refNum alarm)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetField ev field val)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetFilter refNum p)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetInfo refNum p)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetName refNum name)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetPortState port state)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetRcvAlarm refNum alarm)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSetSyncMode mode)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiShare)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiSmpte2Time smpteLocation)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiTask proc date refNum arg1 arg2 arg3)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiTotalSpace syncInfo)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy MidiWriteSync adrmem val)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy acceptchan f p s) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy acceptport f p s) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy accepttype f p s) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy alteratio e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy bend e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy chan e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy clk e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy ctrl e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy date e d) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy dur e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy fcount e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy field e f v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy fieldlist e n) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy fields e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy filterbit p n val val?) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy firstev s e e?) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy fmsg e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy info e d) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy kpress e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy lastev s e e?) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy link e d d?) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy linkse e d d?) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy linkst e d d?) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy minor-scale e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy num e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy param e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy pgm e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy pitch e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy port e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy prefix e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy ref e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy seconds e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy song e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy subframes e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy tempo e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy text e s) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy tsclick e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy tsdenom e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy tsnum e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy tsquarter e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy type e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy val e v) #-(and)
-    ./src/pw-lib/midishare/midishare.lisp:  (niy vel e v) #-(and)
-
-    ./src/pw-lib/pwscript/closae.lisp:  (niy aesend the-appleevent the-reply mode priority timeout idleproc filterproc)
-    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfAttribute self keyword)
-    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfKeyDesc self keyword)
-    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfNthDesc self index)
-    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfParam self keyword)
-    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getNthDesc self index type)
-    ./src/pw-lib/pwscript/pw-ae.lisp:  (niy getSize self)
-    ./src/pw-lib/pwscript/recordables.lisp:  (niy *record-enable*)
-
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:    (niy play-chords midics vels chan durs offs at-time)#-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy format-midi self data) #-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy format-midi self data) #-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy midi-o bytes) #-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy play-object object chan approx)#-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-midi-filtered self data) #-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-midi-filtered self data) #-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-midi-filtered self data) #-(and)
-    ./src/pw-music/boxes/midi/pw-midi-box.lisp:  (niy pw-schedule-midi-in self box patch delay) #-(and)
-    ./src/pw-music/editors/rhythm/print-rtm.lisp:  (niy window-hardcopy self show-fl)
-    ./src/pw-music/utilities/mn-hardcopy.lisp:  (niy window-hardcopy self show-fl)
-
-    [pjb@kuiper :0.0 patchwork]$ 
+find ~/works/patchwork/src -name \*.lisp -exec grep  -Hi '^ *(niy ' {} \;
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy quit-application-handler)
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy open-application-document application filename startup)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy open-documents-handler)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy print-application-document application filename startup)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy print-documents-handler)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:  (niy appleevent-idle event sleeptime mousergn))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-error))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-overwrite-dialog)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy find-edit-menu)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-about-view)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-about-view)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-suspend-event-handler)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-resume-event-handler)))
+/Users/pjb/works/patchwork/src/mclgui/button-dialog-item.lisp:  (niy validate-control-dialog-item item)
+/Users/pjb/works/patchwork/src/mclgui/check-box-dialog-item.lisp:        (niy check-box-check item)
+/Users/pjb/works/patchwork/src/mclgui/check-box-dialog-item.lisp:        (niy check-box-uncheck item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:        (niy install-view-in-window :after button w)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy set-view-font-codes :after button ff ms m1 m2)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy set-dialog-item-text item text)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy install-view-in-window dialog-item dialog)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:            (niy set-view-position item h v)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:            (niy set-view-size item h v)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy remove-view-from-window item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy dialog-item-disable item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy dialog-item-enable item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:    (niy view-activate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy view-deactivate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy font-codes-string-width-for-control string ff ms start end)
+/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:  (niy current-pixel-depth)
+/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:  (niy current-port-color-p)
+/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:    (niy draw-theme-text-box text rect text-justification truncwhere active-p)
+/Users/pjb/works/patchwork/src/mclgui/event.lisp:  (niy with-timer)
+/Users/pjb/works/patchwork/src/mclgui/event.lisp:  (niy with-event-processing-enabled)
+/Users/pjb/works/patchwork/src/mclgui/font.lisp:  (niy color->ff-index color)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy ed-kill-selection window)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-insert-file buffer file-pathname)))
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-insert buffer text)))
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-write-file buffer file-pathname  if-exists if-does-not-exists)))
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-size buffer)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-current-sexp buffer position)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-char buffer position)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy set-fred-display-start-mark dialog-item position)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy fred-update dialog-item)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-skip-fwd-wsp&comments buffer length size)
+/Users/pjb/works/patchwork/src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-disable :before item)#-(and)
+/Users/pjb/works/patchwork/src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-enable :after item)#-(and)
+/Users/pjb/works/patchwork/src/mclgui/message-dialog.lisp:    (niy dialog-item-text-length item)
+/Users/pjb/works/patchwork/src/mclgui/pen.lisp:      (niy line-to view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
+/Users/pjb/works/patchwork/src/mclgui/pen.lisp:      (niy line view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy make-new-pop-up-control menu window) #-(and)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-height pop-up-menu height)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:            (niy set-pop-up-menu-default-item menu num force)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-size menu h v)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-position menu h v)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy size-rectangles menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy view-corners item)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy point-in-click-region-p menu where)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:                (niy draw-menu-title menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy view-draw-contents menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy paint-menu-gray menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-activate-event-handler menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-deactivate-event-handler menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-disable menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-enable menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:              (niy title-hilite menu un)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-items menu items)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy remove-menu-items menu items)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-select)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy menu-install menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy remove-view-from-window menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy remove-view-from-window menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-draw-contents menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-click-event-handler menu where)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:              (niy size-rectangles menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:          (niy menu-select menu num)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy set-pop-up-item-check-mark item mark)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy clip-region view save-region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy set-clip-region view new-region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-rect view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-rect view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-rect view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-oval view pattern left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-round-rect view pattern oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-arc view pattern start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-region view pattern region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy start-picture view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-picture view)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy draw-picture view picture left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy kill-picture picture)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy start-polygon view)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-polygon view)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy kill-polygon polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy offset-polygon polygon h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-polygon view pattern polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-pixel view h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy scale-point source-rect dest-rect h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-point source-rect dest-rect h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-rect source-rect dest-rect rect)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-region source-rect dest-rect region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-polygon source-rect dest-rect polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy make-bitmap left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy copy-bits source-bitmap dest-bitmap source-rect dest-rect mode mask-region)
+/Users/pjb/works/patchwork/src/mclgui/radio-button-dialog-item.lisp:        (niy radio-button-push item)
+/Users/pjb/works/patchwork/src/mclgui/radio-button-dialog-item.lisp:    (niy radio-button-unpush item)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy with-hilite-mode body)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:     (niy with-hilite-mode ',body)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:    (niy open-region view)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:    (niy close-region view dest-region)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy inset-region region h v)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy point-in-region-p region h v))
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy rect-in-region-p region left top right bot))
+/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:  (niy reinit-frec frec owner-or-wptr owner)
+/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:    (niy make-frec cursor owner size)
+/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:      (niy call-with-frec frec thunk)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy outside-scroll-bar-setting scroll-bar handle)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:      (niy install-view-in-window item view)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy remove-view-from-window item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-draw-contents item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-deactivate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-activate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:      (niy track-scroll-bar-thumb item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-click-event-handler item where)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:    (niy dialog-item-action item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy %set-scroll-bar-setting item new-value only-if-new-value)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy update-scroll-bar-max-min-setting item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy track-and-draw container function pos direction delta min-pos max-pos)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:    (niy draw-pane-splitter-outline scrollee scroll-bar pos min max direction)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy scroll-wheel-handler w delta direction wherep)
+/Users/pjb/works/patchwork/src/mclgui/select-dialog.lisp:               (niy select-item-from-list)
+/Users/pjb/works/patchwork/src/mclgui/sequence-dialog-item.lisp:  (niy put-scraps value text)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy highlight-rect-frame rect)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:        (niy invert-cell-selection item h v selected-p)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:      (niy invalidate-cell h v)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:          (niy scroll-to-cell item h v)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:            (niy scroll-to-cell item h v)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy string-width-for-focused-control string ff ms)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:              (niy default-cell-size item width)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy compute-selection-regions item min-row max-row min-column max-column)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy dispose-selection-regions item)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                        (niy add-to-selection-region item selected-p h v dont-compute-outline-region)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:            (niy view-draw-contents item)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                  (niy %draw-table-cell-new item h v rect selectedp)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:        (niy toggle-cell-outlining)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy view-click-event-handler item where)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                                         (niy view-click-event-handler item where)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy get-local-mouse-position)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:      (niy toggle-selection-region item)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy two-byte-script-p script)
+/Users/pjb/works/patchwork/src/mclgui/test/test-graphics.lisp:  (niy draw-char '(x y cn))
+/Users/pjb/works/patchwork/src/mclgui/test/test-graphics.lisp:  (niy draw-string x y str)
+/Users/pjb/works/patchwork/src/mclgui/view.lisp:        (niy view-is-invalid-p view visrgn cliprgn tl br)
+/Users/pjb/works/patchwork/src/mclgui/view.lisp:  (niy view erase-p right-and-bottom-only) #-(and)
+/Users/pjb/works/patchwork/src/mclgui/view.lisp:  (niy initialize/view))
+/Users/pjb/works/patchwork/src/patchwork/src/objc-bridge/objc-classes.lisp:  (niy note-class-protocols class))
+/Users/pjb/works/patchwork/src/patchwork/src/objc-bridge/objc-runtime.lisp:  (niy with-nsstr nsstr cstring len body))
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/box-creation/pw-patch.lisp:    (niy inval-r-view-sides view top&left?)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/bpf/bpf-editors/break-point-function.lisp:  (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy get-selected-file self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy save-win self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy add-to-file self list format)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:    (niy patch-value self obj)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/environment/mac-rsrc.lisp:  (niy get-box-cursor)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy win-print-setUp self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy window-hardcopy self show-fl)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-menu.lisp:  (niy save-special-pw-image)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/closae.lisp:  (niy aesend the-appleevent the-reply mode priority timeout idleproc filterproc)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getSize self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getNthDesc self index type)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfNthDesc self index)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfKeyDesc self keyword)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfParam self keyword)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfAttribute self keyword)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/recordables.lisp:  (niy *record-enable*)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-music/editors/rhythm/print-rtm.lisp:  (niy window-hardcopy self show-fl)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-music/utilities/mn-hardcopy.lisp:  (niy window-hardcopy self show-fl)
 
 #+END_QUOTE
 
