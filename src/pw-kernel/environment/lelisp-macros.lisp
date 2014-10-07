@@ -34,10 +34,8 @@
 ;;;;**************************************************************************
 (defpackage "LELISP-MACROS"
   (:use "COMMON-LISP")
-  #+:ccl
-  (:import-from "CCL" "MEMQ" "ASSQ" "DELQ" "NEQ" "TRUE" "FALSE" "WHILE" "UNTIL")
-  #+:loop
-  (:import-from "LOOP" "FOR" "WHILE") ;; seront aussi fonctions
+  #+ccl  (:import-from "CCL" "MEMQ" "ASSQ" "DELQ" "NEQ" "TRUE" "FALSE" "WHILE" "UNTIL")
+  #+loop (:import-from "LOOP" "FOR" "WHILE") ;; seront aussi fonctions
   (:export
    "MEMQ" "ASSQ" "DELQ" "NEQ" "TRUE" "FALSE"
    "RASSQ" "CASSQ"

@@ -290,7 +290,7 @@
 
 (defmethod view-click-event-handler ((self C-patch) where)
   (let ((res (call-next-method)))
-    (format-trace '(view-click-event-handler c-patch)
+    #+debug-views (format-trace '(view-click-event-handler c-patch)
                   :where (point-to-list where)
                   :view-size (list (h self) (w self))
                   :dbl (double-click-p)
@@ -352,7 +352,7 @@
 
 (defmethod view-draw-contents ((self C-patch))
   (with-font-focused-view self
-    #+debug-view-colors
+    #+debug-views-colors
     (with-pen-state (:pattern *light-gray-pattern*)
       (with-fore-color *light-gray-color*
        (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
@@ -361,7 +361,7 @@
     (draw-patch-view-outline self)
     (draw-function-name self 2 (- (h self) 7))
     (draw-rect* 0 0 (w self)(h self))
-    #+debug-view-colors
+    #+debug-views-colors
     (with-fore-color ui::*blue-color*
       (draw-rect* 0 0 (w self)(h self)))))
 

@@ -11,6 +11,8 @@ next release
 - Made use of the Maestro font instead of Mus-Not-j, corrected chord-box displaying.
 - Added (interlock subs-posn group-list first-n last-n) to Kernel/List menu.
 
+- implemented TextEdit, editable-text-dialog-item.  
+  Still need some graphic adjustments, and some integration debugging.
 
 10.0-0.714
 -----------------------

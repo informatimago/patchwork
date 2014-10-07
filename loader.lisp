@@ -105,9 +105,10 @@
 ;; (pushnew 'patchwork.builder::use-midishare *features*)
 (pushnew 'patchwork.builder::use-cl-midi   *features*)
 
-;; (pushnew :debug               *features*)
-;; (pushnew :debug-view          *features*)
-;; (pushnew :debug-view-colors   *features*)
+;; (pushnew :debug-wrapper       *features*)
+;; (pushnew :debug-objc          *features*)
+;; (pushnew :debug-views         *features*)
+;; (pushnew :debug-views-colors  *features*)
 ;; (pushnew :debug-event         *features*)
 
 

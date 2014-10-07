@@ -1876,7 +1876,7 @@
    (ff-call *midiShare* :word port :long slotRefNum :d0 #x4E :word)))
 
 
-) ; END #-:CCL-5.0
+) ; END #-CCL-5.0
 
 
 ;;;-----------------------------------------------------------------------

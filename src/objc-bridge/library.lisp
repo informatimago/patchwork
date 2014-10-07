@@ -138,7 +138,7 @@
            ;; so on standalone startup, too, and would
            ;; have to have heap-allocated the string vector
            ;; and its strings.
-           #+notyet
+           #+not-yet
            (with-string-vector (argv (list (kernel-path)))
              (#_NSInitializeProcess 1 argv)))
          
