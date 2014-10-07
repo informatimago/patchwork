@@ -39,12 +39,16 @@
 (defclass C-pw-help-window (window)())
 
 (defmethod view-key-event-handler ((self C-pw-help-window) char)
-  (case char 
-    ((:Newline)
-     (when *active-patch-window* (window-select *active-patch-window*))
-     (window-hide self)) 
-    ((:Enter)
-     (when *active-patch-window* (window-select *active-patch-window*))))) 
+  (cond
+    ((member char '(#\Return #\Newline :Newline))
+     (unless (and *current-event*
+                  (event-modifierp *current-event* cmd-key))
+       (window-hide self))
+     (when *active-patch-window*
+       (window-select *active-patch-window*)))
+    ((member char '(:Enter #\Etx))
+     (when *active-patch-window*
+       (window-select *active-patch-window*))))) 
 
 (defmethod window-grow-event-handler ((self C-pw-help-window) where)
   (declare (ignore where))
