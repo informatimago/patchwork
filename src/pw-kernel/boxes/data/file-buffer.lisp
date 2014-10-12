@@ -87,7 +87,7 @@
                        :view-position (make-point (- (w self) 13)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor)))   )
+                       :view-font pw::*patchwork-font-spec*)))
 
 (defmethod patch-value ((self C-patch-file-buffer) obj)
   (when (not (eql (car (pw-controls self)) (car (input-objects self))))

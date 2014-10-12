@@ -72,7 +72,7 @@
                           #@(84 16)
                           "Untitled"
                           NIL
-                          :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                          :VIEW-FONT *patchwork-font-spec*
                           :ALLOW-RETURNS NIL)))
 
 (defun resize-text-item (item &optional size)
@@ -96,7 +96,7 @@
                                                        #@(84 16)
                                                        "Untitled"
                                                        NIL
-                                                       :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                                       :VIEW-FONT *patchwork-font-spec*
                                                        :ALLOW-RETURNS NIL))
                                (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
                                                  #@(6 47)
@@ -108,7 +108,7 @@
                                                     *pw-controls-current-pw-control* 
                                                     (dialog-item-text *pw-controls-dialog-text-item-old*))
                                                    (window-hide *pw-controls-dialog*))
-                                                 :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                                 :VIEW-FONT *patchwork-font-spec*
                                                  :DEFAULT-BUTTON T)
                                (setf *cancel-button*
                                      (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
@@ -116,7 +116,7 @@
                                                        #@(62 16)
                                                        "Cancel"
                                                        NIL
-                                                       :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                                       :VIEW-FONT *patchwork-font-spec*
                                                        :DEFAULT-BUTTON NIL)))))
 
 (defun open-pw-controls-dialog-old (item &optional point size)
@@ -203,7 +203,7 @@
   (declare (ignore l))
   (if (slot-value self 'value) 
       (setf (value self) (eval (slot-value self 'value))))
-  (set-view-font self '("Monaco" 9 :SRCOR :PLAIN)))
+  (set-view-font self *patchwork-font-spec*))
 
 
 (defmethod value ((self C-ttybox))
@@ -543,7 +543,7 @@
 ;;   (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
 ;;    (make-instance 'C-menubox
 ;;                   :value 0
-;;                   ;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)
+;;                   ;;                     :VIEW-FONT *patchwork-font-spec*
 ;;                   :menu-box-list '("  ac" " czx" "  bx" "   z")))
 ;; 
 ;;   (defmethod INTERFACE-TOOLS::add-editor-items :after ((menubox C-menubox) editor)
@@ -579,7 +579,7 @@
 ;;    (make-instance 'C-numbox
 ;;                   :view-position #@(5 22)
 ;;                   :value 0))
-;;   ;;                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)))
+;;   ;;                     :VIEW-FONT *patchwork-font-spec*))
 ;; 
 ;;   (defmethod INTERFACE-TOOLS::copy-instance ((item C-numbox))
 ;;     (let* ((new-item (call-next-method))

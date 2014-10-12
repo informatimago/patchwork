@@ -270,10 +270,9 @@
 
 (defmethod draw-instrument ((self C-pw-window)  x y t-scfactor) 
   (declare (ignore y t-scfactor))
-  (set-view-font  (view-window *current-MN-editor*) '("Monaco"  9 :srcor))
+  (set-view-font  (view-window *current-MN-editor*) *patchwork-font-spec*)
   (draw-string x *MN-note-ins-y* (window-title self))
   (set-view-font  (view-window *current-MN-editor*) *music-font-spec*)
-  ;;   (set-view-font  self '("Monaco"  9 :srcor))
   (incf *MN-note-ins-y* 12))
 
 (defgeneric give-structured-duration1 (self rel-dur)

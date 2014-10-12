@@ -138,7 +138,7 @@
                                 (+ (* i staff-incr) 37) (+ (* i staff-incr) (- 57 (rtm-y-pixel self))) t measures))
           (setq first-time? ())))
       (tell (selection-buttons self) #'draw-view-contents** (view-container self))
-      (set-view-font  (view-container (view-container  self)) '("Monaco"  9  :srcor)))
+      (set-view-font  (view-container (view-container  self)) *patchwork-font-spec*))
       measures))
 
 
@@ -370,7 +370,7 @@
                 (setf (static-text-ctrl self)
                     (make-instance 'static-text-dialog-item 
                         :view-position (make-point 0 (- (h self) 10)) 
-                               :view-font '("monaco" 9)
+                               :view-font *patchwork-font-spec*
                                :dialog-item-text "measure staff stcnt scale   speed")) 
                 (setf (beat-number-ctrl self)
                       (make-instance 'C-numbox 
@@ -403,20 +403,20 @@
                 (make-instance 'button-dialog-item 
                                :dialog-item-text " Play "
                                :view-position (make-point 215 ctrl-y) :view-size (make-point 50 14) 
-                               :view-font '("monaco" 9)
+                               :view-font *patchwork-font-spec*
                                :dialog-item-action 
                                (lambda (item) item
                                   (play-rtm-with-options self)))
                 (make-instance 'button-dialog-item 
                                :dialog-item-text " SPlay "
                                :view-position (make-point 275 ctrl-y) :view-size (make-point 50 14) 
-                               :view-font '("monaco" 9)
+                               :view-font *patchwork-font-spec*
                                :dialog-item-action 
                                (lambda (item) item (play-rtms+scroll self)))
                 (make-instance 'button-dialog-item 
                                :dialog-item-text " Stop "
                                :view-position (make-point 335 ctrl-y) :view-size (make-point 50 14) 
-                               :view-font '("monaco" 9)
+                               :view-font *patchwork-font-spec*
                                :dialog-item-action 
                                (lambda (item) item 
                                   (tell (ask-all (beat-editors self) 'measure-line) 'stop-measure-line)))
@@ -424,13 +424,13 @@
                       (make-instance 'check-box-dialog-item 
                                      :dialog-item-text "edit"
                                      :view-position (make-point 410 ctrl-y) :view-size (make-point 50 14) 
-                                     :view-font '("monaco" 9 :srcor)
+                                     :view-font *patchwork-font-spec*
                                      :dialog-item-action 
                                      (lambda (item) (set-edit-mode self item))))
                (setf (chord-edit-ctrl self)
                       (make-instance 'check-box-dialog-item 
                                      :dialog-item-text "chord"
-                                     :view-font '("monaco" 9 :srcor)
+                                     :view-font *patchwork-font-spec*
                                      :view-position (make-point 470 ctrl-y) :view-size (make-point 50 14))))))
 
 ;;================
@@ -442,7 +442,7 @@
      :view-position (make-point x y)
      :view-container self
      :dialog-item-text txt
-     :view-font '("monaco" 9 :srcor)
+     :view-font *patchwork-font-spec*
      :dialog-item-action (lambda (item) item (erase+view-draw-contents (view-window self)))))) 
 
 ;;================

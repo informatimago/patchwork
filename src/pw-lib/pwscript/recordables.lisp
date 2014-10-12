@@ -507,7 +507,7 @@
         (make-instance 'C-disp-window
             :view-subviews 
           (list (make-instance 'C-array-item
-                    :view-font '("Monaco" 9  :plain)
+                    :view-font *patchwork-font-spec*
                     :table-dimensions (make-point 2 2)
                     :cell-size (make-point 20 12)
                     :view-size (make-point 100 80)))
@@ -543,7 +543,7 @@
         (make-instance 'C-table-window
             :view-subviews 
           (list (make-instance 'C-list-item
-                    :view-font '("Monaco" 9  :plain)
+                    :view-font *patchwork-font-spec*
                     :table-dimensions (make-point 2 2)
                     :cell-size (make-point *cell-width* *cell-height*)
                     :view-size (make-point 100 80)))

@@ -257,7 +257,7 @@
                        :view-position (make-point (- (w self) 10)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor))))
+                       :view-font *patchwork-font-spec*)))
 
 (defmethod make-application-object ((self C-patch-midi-Mod))
   (setf (application-object self)
@@ -333,7 +333,7 @@
                        :view-position (make-point (- (w self) 10)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor)))
+                       :view-font *patchwork-font-spec*))
   (-make-lock self (make-point (- (w self) 37) (- (h self) 9))))
 
 ;;(defmethod decompile ((self C-patch-PolifMN)) (call-next-method))

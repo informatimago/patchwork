@@ -352,7 +352,7 @@
   (make-instance 'C-table-window
       :view-subviews 
     (list (make-instance 'C-list-item
-              :view-font '("Monaco" 9  :plain)
+              :view-font pw::*patchwork-font-spec*
               :table-dimensions (make-point 2 2)
               :cell-size (make-point *cell-width* *cell-height*)
               :view-size (make-point 100 80)))
@@ -379,7 +379,7 @@
                        :view-position (make-point (- (w self) 10)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor)))
+                       :view-font pw::*patchwork-font-spec*))
   (-make-lock self (make-point (- (w self) 37) (- (h self) 9))))
 
 (defmethod save ((self C-patch-list-editor))

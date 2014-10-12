@@ -183,7 +183,7 @@
                                         (call-pw-pop-up-function 
                                          (cell-contents item 
                                                         (car (selected-cells ITEM)))))
-                                    :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                    :VIEW-FONT *patchwork-font-spec*
                                     :CELL-SIZE #@(200 12)
                                     :TABLE-HSCROLLP NIL
                                     :TABLE-VSCROLLP T
@@ -193,7 +193,7 @@
                                     #@(46 17)
                                     "Cancel"
                                     (lambda (item) item (window-hide *pw-pop-menu-window*))
-                                    :VIEW-FONT '("Monaco" 9 :SRCCOPY :PLAIN)
+                                    :VIEW-FONT *patchwork-font-spec*
                                     :DEFAULT-BUTTON NIL))))) 
 
 

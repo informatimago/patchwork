@@ -122,7 +122,7 @@
     (let ((views (subviews self)))
       (tell views 'pw::print-connections)
       (dolist (a-view views)
-        (set-view-font  (view-container a-view) '("Monaco"  9  :srcor))
+        (set-view-font  (view-container a-view) *patchwork-font-spec*)
         (view-draw-contents a-view)))))
 
 #|

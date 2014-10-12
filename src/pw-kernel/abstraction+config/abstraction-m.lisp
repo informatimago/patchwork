@@ -65,7 +65,7 @@
                        :view-position (make-point (- (w self) 10)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor))))
+                       :view-font *patchwork-font-spec*)))
 
 (defvar *abs-code* ())
 (defgeneric user-menu-include (self)
@@ -405,7 +405,7 @@ value))|#
                                  :view-position (make-point (- (w self) 10)
                                                             (- (h self) 14))
                                  :view-container self
-                                 :view-font '("monaco"  9  :srcor))))
+                                 :view-font *patchwork-font-spec*)))
     (setf (action-box self) (make-actionControl-box self))
     (setf (menubox self) popUpBox)))
 
@@ -418,7 +418,7 @@ value))|#
                      :view-size (make-point 8 10)
                      :dialog-item-text "D"
                      :view-container self
-                     :view-font '("monaco"  9  :srcor)
+                     :view-font *patchwork-font-spec*
                      :dialog-item-action (lambda (item) 
                                            (configure (view-container item)))))))
 

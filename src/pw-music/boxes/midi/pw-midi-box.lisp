@@ -384,7 +384,7 @@ given parameters to MIDI"
                         :view-position (ui:make-point (- (w self) 19)
                                                       (- (h self) 13))
                         :view-container self
-                        :view-font '("monaco"  9  :srcor))))
+                        :view-font pw::*patchwork-font-spec*)))
 
 (defmethod set-output ((self C-pw-midi-in) type)
   (case  type (:on (setf (state self) nil) (set-box-title (popUpbox self) "A"))

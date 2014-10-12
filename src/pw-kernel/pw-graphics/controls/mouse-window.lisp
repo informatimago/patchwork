@@ -51,21 +51,21 @@
     (make-instance 'static-text-dialog-item  
                      :view-position #@(10 0)
                      :dialog-item-text "x-val"
-                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN))
+                     :VIEW-FONT *patchwork-font-spec*)
     (make-instance 'static-text-dialog-item  
                      :view-position #@(50 0)
                      :dialog-item-text "y-val"
-                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN))
+                     :VIEW-FONT *patchwork-font-spec*)
     (setf *x-value-text*
       (make-instance 'static-text-dialog-item  
                      :view-position #@(5 15)
                      :dialog-item-text "    0"
-                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)))
+                     :VIEW-FONT *patchwork-font-spec*))
     (setf *y-value-text*
       (make-instance 'static-text-dialog-item  
                      :view-position #@(40 15)
                      :dialog-item-text "    0"
-                     :VIEW-FONT '("Monaco" 9 :SRCOR :PLAIN)))))
+                     :VIEW-FONT *patchwork-font-spec*))))
 
 ;;======================================
 (defvar *last-mouse* ())

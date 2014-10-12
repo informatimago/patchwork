@@ -59,7 +59,7 @@
                        :view-position (make-point (- (w self) 13)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor))))
+                       :view-font *patchwork-font-spec*)))
 
 (defmethod decompile ((self C-patch&popUp))
   (append (call-next-method)

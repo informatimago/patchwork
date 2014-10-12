@@ -161,7 +161,7 @@
                           (when (or (eql (pw-function (view-container self)) 'absin)
                                     (eql (pw-function (view-container self)) 'absin2))
                             (set-dialog-item-text (car (pw-controls (view-container self))) (doc-string ctrl)))
-                          (set-view-font (view-window self) '("Monaco" 9 :SRCOR :PLAIN)) ;??
+                          (set-view-font (view-window self) *patchwork-font-spec*)
                           (set-open-state ctrl nil)))
                     (tell (subviews (view-window patch)) 'draw-connections)
                     (when inde 
@@ -351,7 +351,7 @@
             (view-draw-contents v)))
 
 (defmethod view-draw-contents ((self C-patch))
-  (with-font-focused-view self
+  (with-font-focused-view self  
     #+debug-views-colors
     (with-pen-state (:pattern *light-gray-pattern*)
       (with-fore-color *light-gray-color*
@@ -359,7 +359,7 @@
     (call-next-method)
     (draw-small-rects self)
     (draw-patch-view-outline self)
-    (draw-function-name self 2 (- (h self) 7))
+    (draw-function-name self 2 (- (h self) 5))
     (draw-rect* 0 0 (w self)(h self))
     #+debug-views-colors
     (with-fore-color ui::*blue-color*

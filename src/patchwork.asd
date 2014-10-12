@@ -111,7 +111,7 @@
                #-(and)
                (:file "pw-lib/pwscript/recordables" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-lib/pwscript/record"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/abstraction+config/abstraction-m"
@@ -160,6 +160,7 @@
                
                (:file "pw-lib/midi/midirecord" 
                 :depends-on ("packages"
+                             "global"
                              "pw-lib/midi/midiplay"
                              #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
                              #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"
@@ -323,7 +324,7 @@
 
                (:file "pw-kernel/boxes/data/file-buffer" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-kernel/environment/lelisp-macros"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -331,14 +332,14 @@
                
                (:file "pw-kernel/boxes/data/table-displayer" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"
                              "pw-kernel/types/pw-type-scheme"))
                
                (:file "pw-kernel/boxes/data/list-editor" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/boxes/data/table-displayer"
                              "pw-kernel/types/pw-type-scheme"
@@ -346,7 +347,8 @@
                              "pw-kernel/pw-graphics/window+menu/application-window"))
                
                (:file "pw-kernel/boxes/data/lst-ed-help" 
-                :depends-on ("packages"))
+                :depends-on ("packages"
+                             "global"))
                
                (:file "pw-kernel/boxes/data/text-box" 
                 :depends-on ("packages"
@@ -406,7 +408,7 @@
                
                (:file "pw-kernel/boxes/bpf/bpf-boxes/pw-bpf-boxes" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-lib/pwscript/record"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/environment/reader-macros"
@@ -428,6 +430,7 @@
                
                (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-help-window" 
                 :depends-on ("packages"
+                             "global"
                              "pw-kernel/boxes/bpf/bpf-editors/bpf-menu"))
                
                (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-menu+library" 
@@ -448,6 +451,7 @@
                
                (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-window" 
                 :depends-on ("packages"
+                             "global"
                              "pw-kernel/boxes/bpf/bpf-editors/bpf-help-window" 
                              "pw-kernel/boxes/bpf/bpf-editors/bpf-menu"
                              "pw-kernel/boxes/bpf/bpf-editors/bpf-mini-view"
@@ -500,7 +504,7 @@
                
                (:file "pw-kernel/box-creation/patch+popupbox" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-kernel/types/pw-box-to-menu"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"))
                
@@ -510,7 +514,7 @@
                
                (:file "pw-kernel/box-creation/pw-patch" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-lib/pwscript/record"
                              "pw-kernel/environment/reader-macros"
                              "pw-kernel/types/pw-type-scheme"
@@ -527,6 +531,7 @@
                
                (:file "pw-kernel/pw-graphics/controls/mouse-window" 
                 :depends-on ("packages"
+                             "global"
                              "pw-kernel/environment/reader-macros"))
                
                (:file "pw-kernel/pw-graphics/controls/popupmenu" 
@@ -535,6 +540,7 @@
                
                (:file "pw-kernel/pw-graphics/controls/pw-controls" 
                 :depends-on ("packages"
+                             "global"
                              "pw-kernel/environment/reader-macros"
                              "pw-kernel/pw-graphics/controls/pw-graphics"
                              ;; "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -542,6 +548,7 @@
                
                (:file "pw-kernel/pw-graphics/controls/pw-graphics" 
                 :depends-on ("packages"
+                             "global"
                              "pw-kernel/environment/reader-macros"))
                
                (:file "pw-kernel/pw-graphics/window+menu/application-window" 
@@ -549,10 +556,12 @@
                              "pw-kernel/pw-graphics/controls/pw-controls"))
                
                (:file "pw-kernel/pw-graphics/window+menu/pw-hardcopy" 
-                :depends-on ("packages"))
+                :depends-on ("packages"
+                             "global"))
                
                (:file "pw-kernel/pw-graphics/window+menu/pw-help-window" 
-                :depends-on ("packages"))
+                :depends-on ("packages"
+                             "global"))
 
                #-(and)
                (:file "pw-kernel/environment/make-image"
@@ -569,7 +578,7 @@
                
                (:file "pw-kernel/pw-graphics/window+menu/pw-window" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-lib/pwscript/record"
                              "pw-kernel/environment/pw-scheduler"
                              "pw-kernel/pw-graphics/window+menu/pw-help-window" 
@@ -593,7 +602,7 @@
                
                (:file "pw-kernel/abstraction+config/abstraction-m" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-lib/pwscript/record"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/abstraction+config/config-setup"
@@ -629,6 +638,7 @@
                
                (:file "pw-music/boxes/midi/pw-midi-box" 
                 :depends-on ("packages"
+                             "global" 
                              #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
                              #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"
                              "pw-kernel/drivers+resources/scheduler"
@@ -652,12 +662,11 @@
                              "pw-music/boxes/edit/pw-mn-collector"
                              "pw-music/editors/mn/mn-note-chord-chordline"))
 
-               (:file "pw-music/global")
+               (:file "global")
                
                (:file "pw-music/boxes/extern+multidim/structured-time" 
                 :depends-on ("packages"
-                             "gf"
-                             "pw-music/global"
+                             "gf" "global" 
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/pw-graphics/window+menu/pw-window"
                              "pw-music/boxes/edit/pw-mn-collector"
@@ -687,14 +696,13 @@
                
                (:file "pw-music/boxes/edit/chord-box" 
                 :depends-on ("packages"
-                             "pw-music/global"
+                             "global"
                              "pw-kernel/pw-graphics/controls/pw-graphics"
                              "pw-music/editors/mn/mn-note-chord-chordline"))
                
                (:file "pw-music/boxes/edit/midi-instrument-editors" 
                 :depends-on ("packages"
-                             "gf"
-                             "pw-music/global"
+                             "gf" "global"
                              ;; "pw-kernel/environment/reader-macros"
                              "pw-kernel/drivers+resources/scheduler" 
                              "pw-kernel/pw-graphics/controls/pw-controls"
@@ -714,7 +722,7 @@
                
                (:file "pw-music/boxes/edit/pw-chord-box" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-lib/pwscript/record"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/types/pw-types"
@@ -723,7 +731,7 @@
                
                (:file "pw-music/boxes/edit/pw-mn-collector" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-kernel/boxes/bpf/bpf-editors/bpf-mn-pw-interface"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/types/pw-type-scheme"
@@ -749,6 +757,7 @@
                
                (:file "pw-music/boxes/edit/rhythm-formation" 
                 :depends-on ("packages"
+                             "global"
                              "pw-kernel/environment/epw-package"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/types/pw-box-to-menu"
@@ -759,7 +768,7 @@
                
                (:file "pw-music/boxes/edit/rtm-patch" 
                 :depends-on ("packages"
-                             "gf"
+                             "gf" "global"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/types/pw-box-to-menu"
@@ -779,7 +788,7 @@
                
                (:file "pw-music/editors/rhythm/beat-measure-measure-line" 
                 :depends-on ("packages"
-                             "pw-music/global"
+                             "global"
                              "pw-kernel/box-creation/application-box"
                              "pw-music/editors/mn/mn-chord-ed"
                              "pw-music/editors/mn/mn-collector-panel"
@@ -801,7 +810,7 @@
                
                (:file "pw-music/editors/rhythm/rtm-dialog-win" 
                 :depends-on ("packages"
-                             "pw-music/global"
+                             "global"
                              "pw-kernel/pw-graphics/controls/pw-controls"
                              "pw-music/menu/rtm-menu"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -810,7 +819,7 @@
                
                (:file "pw-music/editors/rhythm/rtm-editor" 
                 :depends-on ("packages"
-                             "pw-music/global"
+                             "global"
                              "pw-kernel/drivers+resources/scheduler"
                              "pw-music/editors/rhythm/global-vars"
                              "pw-kernel/pw-graphics/controls/pw-controls"
@@ -818,7 +827,8 @@
                              "pw-music/editors/mn/mn-note-chord-chordline"))
                
                (:file "pw-music/editors/rhythm/rtm-help-window" 
-                :depends-on ("packages"))
+                :depends-on ("packages"
+                             "global"))
                
                (:file "pw-music/editors/rhythm/rtm-midi-files" 
                 :depends-on ("packages"))
@@ -847,14 +857,15 @@
 
                
                (:file "pw-music/editors/mn/chordbox-help-win" 
-                :depends-on ("packages"))
+                :depends-on ("packages"
+                             "global"))
                
                (:file "pw-music/editors/mn/midi-files" 
                 :depends-on ("packages"))
                
                (:file "pw-music/editors/mn/mn-chord-ed" 
                 :depends-on ("packages"
-                             "pw-music/global"
+                             "global"
                              "pw-music/menu/mn-menu"
                              "pw-music/editors/mn/mn-editor"
                              "pw-music/editors/mn/mn-note-chord-chordline"
@@ -866,8 +877,7 @@
                
                (:file "pw-music/editors/mn/mn-collector-panel" 
                 :depends-on ("packages"
-                             "gf"
-                             "pw-music/global"
+                             "gf" "global"
                              "pw-kernel/box-creation/application-box"
                              "pw-kernel/pw-graphics/controls/pw-graphics"
                              "pw-kernel/types/pw-type-scheme"
@@ -880,8 +890,7 @@
                
                (:file "pw-music/editors/mn/mn-collector-view" 
                 :depends-on ("packages"
-                             "gf"
-                             "pw-music/global"
+                             "gf" "global"
                              ;; "pw-kernel/environment/reader-macros"
                              "pw-kernel/pw-graphics/controls/popupmenu"
                              "pw-kernel/drivers+resources/scheduler"
@@ -893,8 +902,7 @@
                
                (:file "pw-music/editors/mn/mn-editor" 
                 :depends-on ("packages"
-                             "gf"
-                             "pw-music/global"
+                             "gf" "global"
                              "pw-kernel/drivers+resources/scheduler"
                              "pw-kernel/environment/epw-package"
                              "pw-kernel/pw-graphics/controls/pw-controls"
@@ -905,7 +913,8 @@
                              "pw-music/menu/mn-menu"))
                
                (:file "pw-music/editors/mn/mn-help-window" 
-                :depends-on ("packages"))
+                :depends-on ("packages"
+                             "global"))
                
                (:file "pw-music/editors/mn/mn-note-chord-chordline"
                 :depends-on ("packages"

@@ -159,7 +159,7 @@
                           :view-container (view-window self)
                           :view-position (make-point (+ x-pos 182) (+ y-pos 16));;(make-point (+ x-pos 142) (+ y-pos 16))
                           :dialog-item-text "tr"
-                          :view-font '("monaco"  9  :srcor)
+                          :view-font *patchwork-font-spec*
                           :dialog-item-action
                           (lambda (item)
                               (declare (ignore item))
@@ -180,13 +180,13 @@
                           :view-container (view-window self)
                           :view-position (make-point (+ x-pos 104) (+ y-pos 2))
                           :dialog-item-text "stcnt"
-                          :view-font '("monaco"  9  :srcor)
+                          :view-font *patchwork-font-spec*
                           :view-size (make-point 36 12))
            (make-instance 'static-text-dialog-item
                           :view-container (view-window self)
                           :view-position (make-point (+ x-pos 44) (+ y-pos 16))
                           :dialog-item-text " "
-                          :view-font '("monaco"  9  :srcor)
+                          :view-font *patchwork-font-spec*
                           :view-size (make-point 50 12)))))
     (setf (external-controls self) (append (external-controls self) ctrls))
     (setf (ctrl-settings self) (append (ctrl-settings self) (list (list :channel))))
@@ -204,103 +204,103 @@
                        :dialog-item-text "From"
                        :view-position (make-point 196 40)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'dial-stT)   
         (make-instance 'static-text-dialog-item
                        :dialog-item-text "To"
                        :view-position (make-point 240 40)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'vel-button) 
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "velocity"
                        :view-position (make-point 20 60)
                        :view-size (make-point 80 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'vel-% )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "%"
                        :view-position (make-point 106 60)
                        :view-size (make-point 30 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'vel-range )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "range"
                        :view-position (make-point 134 60)
                        :view-size (make-point 50 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'vel-val1)
         (make-instance 'editable-text-dialog-item
                        :dialog-item-text "0"
                        :view-position (make-point 190 60)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'vel-val2 )
         (make-instance 'editable-text-dialog-item
                        :dialog-item-text "0"
                        :view-position (make-point 235 60)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'dur-button ) 
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "duration"
                        :view-position (make-point 20 90)
                        :view-size (make-point 80 16)
-                       :view-font '("monaco" 9 :srcor)))      
+                       :view-font *patchwork-font-spec*))      
   (setf (slot-value self 'dur-% )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "%"
                        :view-position (make-point 106 90)
                        :view-size (make-point 30 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'dur-range )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "range"
                        :view-position (make-point 134 90)
                        :view-size (make-point 50 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'dur-val1 )
         (make-instance 'editable-text-dialog-item
                        :dialog-item-text "0"
                        :view-position (make-point 190 90)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'dur-val2 ) 
         (make-instance 'editable-text-dialog-item
                        :dialog-item-text "0"
                        :view-position (make-point 235 90)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'off-button )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "offset"
                        :view-position (make-point 20 120)
                        :view-size (make-point 80 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'off-% )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "%"
                        :view-position (make-point 106 120)
                        :view-size (make-point 30 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'off-range)
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "range"
                        :view-position (make-point 134 120)
                        :view-size (make-point 50 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'off-val1)
         (make-instance 'editable-text-dialog-item
                        :dialog-item-text "0"
                        :view-position (make-point 190 120)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'off-val2 )
         (make-instance 'editable-text-dialog-item
                        :dialog-item-text "0"
                        :view-position (make-point 235 120)
                        :view-size (make-point 40 16)
-                       :view-font '("monaco" 9 :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'OK-button)
         (make-instance 'button-dialog-item
                        :default-button t

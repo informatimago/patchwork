@@ -48,7 +48,7 @@
                                                   :view-size (make-point 200 100)))
   (add-subviews *rtm-editor-dialog-window*
                 (make-instance 'static-text-dialog-item 
-                               :view-font '("monaco" 9)
+                               :view-font *patchwork-font-spec*
                                :view-position (make-point 5 5)
                                :dialog-item-text text-text)
                 (setf *rtm-win-1st-numbox*

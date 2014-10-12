@@ -92,13 +92,13 @@
                        :view-position (make-point (- (w self) 8)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (lock self)
         (make-instance 'C-patch-buffer::C-radio-button
                        :view-position (add-points (view-position (out-put self)) #@(20 -6))
                        :view-size (make-point 8 8)
                        :dialog-item-text (get-initial-button-text self)
-                       :view-font '("Monaco" 8)
+                       :view-font *patchwork-small-font-spec*
                        :view-container self
                        :dialog-item-action (get-lock-button-fun self)))
   (let ((mini-bpf (give-mini-bpf self)) bpf)

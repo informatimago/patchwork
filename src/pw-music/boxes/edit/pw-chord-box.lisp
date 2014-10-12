@@ -93,13 +93,13 @@
                        :view-position (make-point (- (w self) 13)
                                                   (- (h self) 14))
                        :view-container self
-                       :view-font '("monaco"  9  :srcor)))
+                       :view-font *patchwork-font-spec*))
   (setf (lock self)
         (make-instance 'C-patch-buffer::C-radio-button
                        :view-position (make-point 4 (- (h self) 9))
                        :view-size (make-point 8 8)
                        :dialog-item-text (get-initial-button-text self)
-                       :view-font '("Monaco" 8)
+                       :view-font *patchwork-small-font-spec*
                        :view-container self
                        :dialog-item-action (get-lock-button-fun self)))
   (if (or (not (mus-not-editor self)) 
@@ -140,9 +140,9 @@
 
 (defmethod draw-function-name ((self C-patch-chord-box-M) x y)
   (with-focused-view self
-    (set-view-font (view-container self) '("monaco"  9 :srccopy))
+    (set-view-font (view-container self) *patchwork-copy-font-spec*)
     (draw-string x (- y 2) (string-downcase (pw-function-string self)))
-    (set-view-font (view-container self) '("monaco"  9 :srcor))))
+    (set-view-font (view-container self) *patchwork-font-spec*)))
 
 
 (defmethod erase-my-connections ((self C-patch-chord-box-M))

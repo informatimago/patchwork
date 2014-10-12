@@ -68,7 +68,7 @@
   (add-subviews self 
      (make-instance 'static-text-dialog-item
          :view-position (make-point 5 3) 
-         :view-font '("Monaco" 9 :SRCOR :PLAIN)
+         :view-font *patchwork-font-spec*
          :dialog-item-text "status  contr  value   label  ")
      (setf (status-ctrl self) 
         (make-instance 'C-menubox-val
@@ -99,7 +99,7 @@
            :view-position (make-point 200 17)  
            :view-size (make-point 45 18)
            :dialog-item-action (lambda (item) (declare (ignore item))(play-note *global-selected-note*))
-           :view-font '("Monaco" 9 :SRCOR :PLAIN)
+           :view-font *patchwork-font-spec*
            :dialog-item-text "Play"))))
 
 (defmethod view-key-event-handler ((self C-fix-window) char)  
@@ -234,7 +234,7 @@
   (add-subviews self 
    (setf (static-text-ctrl2 self) 
        (make-instance 'static-text-dialog-item
-         :view-font '("Monaco" 9 :SRCOR :PLAIN)
+         :view-font *patchwork-font-spec*
          :dialog-item-text " low   high  status contr ticks "))
     (setf (label-ctrl self) (make-instance 'C-ttybox-instrument
          :view-size (make-point 40 14)
@@ -270,7 +270,7 @@
          (make-instance 'BUTTON-DIALOG-ITEM
           :dialog-item-action (lambda (item) (declare (ignore item))(play-note *global-selected-note*))
           :view-size (make-point 40 14)
-          :view-font '("Monaco" 9 :SRCOR :PLAIN)
+          :view-font *patchwork-font-spec*
           :dialog-item-text  " play"))))
 
 ;;=========================
@@ -484,7 +484,7 @@
   
 ;;!!!
 (defmethod draw-instrument ((self C-midi-ins-collection) x-now y-now t-scfactor)
-   (set-view-font  (view-container (view-container  *current-MN-editor*)) '("Monaco"  9  :srcor))
+   (set-view-font  (view-container (view-container  *current-MN-editor*)) *patchwork-font-spec*)
    (draw-string x-now *MN-note-ins-y* (ins-name self))
    (incf *MN-note-ins-y* 12)
    (tell (ins-objects self) 'draw-instrument x-now y-now t-scfactor)

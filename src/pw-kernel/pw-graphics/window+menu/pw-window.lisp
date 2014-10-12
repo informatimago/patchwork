@@ -47,7 +47,8 @@
    (patch-win-pathname :initform nil :accessor patch-win-pathname)
    (save-changes-to-file-flag :initform nil :accessor save-changes-to-file-flag)
    (super-win :initform nil :accessor super-win)
-   (super-note :initform nil :accessor super-note)))
+   (super-note :initform nil :accessor super-note))
+  (:default-initargs :view-font *patchwork-font-spec*))
 
 (defvar *pw-window-no-select-mode* ())
 
