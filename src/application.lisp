@@ -156,13 +156,15 @@ Must be called on the main thread."
         (setf ccl::*read-loop-function* 'safe-repl
               ccl::*inhibit-greeting*    t))
 
+(defvar *patchwork-trace-output* *trace-output*)
 (on-restore patchwork-trace
-  (setf *trace-output* (open (merge-pathnames #P"Desktop/Patchwork-trace.txt"
-                                              (user-homedir-pathname))
-                             :direction :output
-                             :if-does-not-exist :create
-                             :if-exists :append
-                             #+ccl :sharing #+ccl :lock))
+  (setf *patchwork-trace-output* (open (merge-pathnames #P"Desktop/Patchwork-trace.txt"
+                                                        (user-homedir-pathname))
+                                       :direction :output
+                                       :if-does-not-exist :create
+                                       :if-exists :append
+                                       #+ccl :sharing #+ccl :lock)
+        *trace-output* *patchwork-trace-output*)
   (format *trace-output* "~%~A~2%" (date)))
 
 (on-startup patchwork-initialization

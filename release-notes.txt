@@ -6,6 +6,10 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+
+10.0-0.616
+-----------------------
+
 - Corrected multi-bpf and bpf-lib crashes.
 - Implemented pop-up menus.
 - Made use of the Maestro font instead of Mus-Not-j, corrected chord-box displaying.
@@ -13,6 +17,7 @@ next release
 
 - implemented TextEdit, editable-text-dialog-item.  
   Still need some graphic adjustments, and some integration debugging.
+
 
 10.0-0.714
 -----------------------

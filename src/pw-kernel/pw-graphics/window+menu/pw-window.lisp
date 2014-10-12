@@ -77,7 +77,7 @@
 ;;events
 
 (defmethod view-click-event-handler ((self C-pw-window) where)
-  (format-trace '(view-click-event-handler c-pw-window) :where (point-to-list where) :view self)
+  #+debug-views (format-trace '(view-click-event-handler c-pw-window) :where (point-to-list where) :view self)
   (set-changes-to-file-flag self)
   (when (eql (call-next-method) self)  ; click inside window
     (when *current-small-inBox*
@@ -457,7 +457,7 @@
 
 
 (defmethod view-key-event-handler ((self C-pw-window) char)
-  (format-trace 'view-key-event-handler char self)
+  #+debug-views (format-trace 'view-key-event-handler char self)
   (cond
     ;; editing a field:
     (*current-small-inBox*
@@ -541,7 +541,7 @@
 
 (defgeneric run-boxes (self))
 (defmethod run-boxes ((self C-pw-window))
-  (format-trace 'run-boxes self)
+  #+debug-views (format-trace 'run-boxes self)
   (let ((boxes (active-patches self)))
     (dolist (box boxes)
       (eval-enqueue `(print (patch-value ,box ,box)))

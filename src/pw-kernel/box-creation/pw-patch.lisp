@@ -291,18 +291,18 @@
 (defmethod view-click-event-handler ((self C-patch) where)
   (let ((res (call-next-method)))
     #+debug-views (format-trace '(view-click-event-handler c-patch)
-                  :where (point-to-list where)
-                  :view-size (list (h self) (w self))
-                  :dbl (double-click-p)
-                  :c-o (and (control-key-p) (option-key-p))
-                  :c (control-key-p)
-                  :topbar (inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5)
-                  :botright (inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5)
-                  :botbox (inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12)
-                  :o (option-key-p)
-                  :methods (compute-applicable-methods (function view-click-event-handler) (list self where))
-                  :res res
-                  :self self)
+                                :where (point-to-list where)
+                                :view-size (list (h self) (w self))
+                                :dbl (double-click-p)
+                                :c-o (and (control-key-p) (option-key-p))
+                                :c (control-key-p)
+                                :topbar (inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5)
+                                :botright (inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5)
+                                :botbox (inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12)
+                                :o (option-key-p)
+                                :methods (compute-applicable-methods (function view-click-event-handler) (list self where))
+                                :res res
+                                :self self)
     (cond ((eql self res) ;inside patch,no active controls
            (cond ((double-click-p)
                   (open-patch-win self))
@@ -311,26 +311,26 @@
                  ((control-key-p)
                   (change-position self where))
                  ((inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5) ; top bar
-                  (format-trace 'view-click-event-handler "move top bar " (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "move top bar " (list (point-h where) (point-v where)) self)
                   (change-position self where))
                  ((inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5) ; botright corner
-                  (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
                   (change-size self (subtract-points (view-size self) where)))
-                 ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom box
-                  (format-trace 'view-click-event-handler "bottom box" (list (point-h where) (point-v where)) self)
+                 ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom left box
+                  #+debug-views (format-trace 'view-click-event-handler "bottom box" (list (point-h where) (point-v where)) self)
                   (cond ((option-key-p)  (print (list 'outputtype (type-list self)))) 
                         ((command-key-p) (print (list 'inputtypes (mapcar 'list 
                                                                           (ask-all (pw-controls self) 'doc-string)
                                                                           (ask-all (pw-controls self) 'type-list))))) 
                         (t (flip-controls self (setf (flip-flag self) (not (flip-flag self))))))) 
                  ((option-key-p)
-                 (format-trace 'view-click-event-handler "no active extra" (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "no active extra" (list (point-h where) (point-v where)) self)
                   (mouse-pressed-no-active-extra self (point-h where) (point-v where)))
                  (t
-                  (format-trace 'view-click-event-handler "toggle patch active" (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "toggle patch active" (list (point-h where) (point-v where)) self)
                   (toggle-patch-active-mode self))))
           ((option-key-p)                ;inside controls
-           (format-trace 'view-click-event-handler `(bad with option-key-p (call-next-method) -> ,res))
+           #+debug-views (format-trace 'view-click-event-handler `(bad with option-key-p (call-next-method) -> ,res))
            (let ((ctrl (ask (pw-controls self) #'view-contains-point-p+self where)))
              (when ctrl 
                (disconnect-ctrl self ctrl)
@@ -338,7 +338,7 @@
                              `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string self)) 
                                                 :|indx| (+ (position ctrl (input-objects self)) 1))))))))
           (t
-           (format-trace 'view-click-event-handler `(bad (call-next-method) -> ,res)))))) 
+           #+debug-views (format-trace 'view-click-event-handler `(bad (call-next-method) -> ,res)))))) 
 
 
 ;;======================================================
