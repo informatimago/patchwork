@@ -36,12 +36,6 @@ otherwise:
 ** IN-PROGRESS 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
    - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:25] \\
      text-edit en cours.
-** TODO [#A] 00012 graphic offset in output box link drawing
-
-quand on active le lien entre deux objets (en cliquant sur le petit
-rectangle au bas de l’objet) l’origine de ce lien apparaît plus bas à
-gauche plutôt que dans le petit rectangle...
-
 ** TODO [#A] 00005 Effacements partiels et provisoires des objets 
 (réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
 ** TODO [#A] 00014 On génère une entrée supplémentaire pour certains objets avec alt-clic
@@ -113,7 +107,7 @@ and not try to close the Patchwork window below it.
 
 ** TODO 00004 Les patchs les plus complexes sont lents à charger.
 Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
-<d:s:R x 5>
+<d:s:R x 5>*
 ** TODO 00008 integration hemlock Cmd-x Cmd-c Cmd-v in the listener. :mclgui:
 
 Le résultat ne peux pas se copier et c’est une fonction nécessaire (également impossibilité d’écrire dans le Listener).
@@ -127,6 +121,15 @@ Listener l’évaluation est à nouveau possible…
 ** TODO 00021 Control modifier                                       :mclgui:
 When pressing control, event-modifiers stays 0 (key is correctly the control character/code,
 but for eg. Control-4 this doesn't work. :mclgui:
+** DONE [#A] 00012 graphic offset in output box link drawing
+   CLOSED: [2014-10-13 Mon 14:53]
+   - State "DONE"       from "TODO"       [2014-10-13 Mon 14:53] \\
+     Corrected.
+
+quand on active le lien entre deux objets (en cliquant sur le petit
+rectangle au bas de l’objet) l’origine de ce lien apparaît plus bas à
+gauche plutôt que dans le petit rectangle...
+
 ** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
    CLOSED: [2014-07-24 Thu 02:55]
    - State "DONE"       from "TODO"       [2014-07-24 Thu 02:55] \\

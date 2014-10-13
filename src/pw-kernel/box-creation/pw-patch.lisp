@@ -106,6 +106,8 @@
 (defun get-evaluation-option () *standard-click-eval*)
 
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
+  #+debug-views
+  (format-trace '(view-click-event-handler c-pw-outrect) :where (point-to-list where) :view self)
   (if (eql (not (get-evaluation-option)) (not (option-key-p)))
       (progn
         (incf (clock *global-clock*))
@@ -118,7 +120,7 @@
   (:method ((view C-pw-outrect) where)
     (let* ((win     (view-window view))
            (last-mp (view-mouse-position win))
-           (where   (convert-coordinates where view win)))
+           (where   (convert-coordinates where (view-container view) win)))
       (flet ((draw-the-line ()
                (with-focused-view win
                  (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp)))))
@@ -290,7 +292,8 @@
 
 (defmethod view-click-event-handler ((self C-patch) where)
   (let ((res (call-next-method)))
-    #+debug-views (format-trace '(view-click-event-handler c-patch)
+    #+debug-views
+    (format-trace '(view-click-event-handler c-patch)
                                 :where (point-to-list where)
                                 :view-size (list (h self) (w self))
                                 :dbl (double-click-p)

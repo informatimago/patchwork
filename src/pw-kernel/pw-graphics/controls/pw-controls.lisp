@@ -151,7 +151,6 @@
           (change-menu-actions)))))
 
 
-
 (defun change-menu-actions ()
   (set-menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")
                                  *menu-action-cut-txt*)
