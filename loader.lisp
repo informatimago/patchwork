@@ -5,10 +5,10 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    This file contains the expressions used to load the patchwork
 ;;;;    program during development.
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2014
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -42,15 +42,15 @@
 
   (defun new-swank (&optional (port 4010) (interface #+ccl (ccl::primary-ip-interface-address)
                                                      #-ccl "localhost"))
-    (let ((swank::*loopback-interface* interface)) 
+    (let ((swank::*loopback-interface* interface))
       (swank:create-server :port port)))
-  
-  (defvar swank::*current-standard-input*)  
-  (defvar swank::*current-standard-output*) 
-  (defvar swank::*current-error-output*)    
-  (defvar swank::*current-trace-output*) 
-  (defvar swank::*current-terminal-io*)  
-  (defvar swank::*current-query-io*)        
+
+  (defvar swank::*current-standard-input*)
+  (defvar swank::*current-standard-output*)
+  (defvar swank::*current-error-output*)
+  (defvar swank::*current-trace-output*)
+  (defvar swank::*current-terminal-io*)
+  (defvar swank::*current-query-io*)
   (defvar swank::*current-debug-io*))
 
 #+swank
@@ -65,7 +65,7 @@
 
 ;;; --------------------------------------------------------------------
 ;;; remote debugging
-#-(and) 
+#-(and)
 (progn
   (ql:quickload :swank                                     :verbose t :explain t)
   (eval (read-from-string
@@ -99,15 +99,27 @@
 
 ;;; --------------------------------------------------------------------
 ;;; configure *features*
-;; (pushnew 'patchwork.builder::no-cocoa *features*)
-;; (pushnew 'patchwork.builder::use-apple-events *features*)
+
+(setf *features* (set-difference *features*
+                                 '(:debug-wrapper :debug-objc
+                                   :debug-views :debug-views-colors
+                                   :debug-event
+                                   patchwork.builder::no-cocoa
+                                   patchwork.builder::use-apple-events
+                                   patchwork.builder::cocoa-midi-player
+                                   patchwork.builder::use-midishare
+                                   patchwork.builder::use-cl-midi)))
+
+;; (pushnew 'patchwork.builder::no-cocoa          *features*)
+;; (pushnew 'patchwork.builder::use-apple-events  *features*)
 ;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
-;; (pushnew 'patchwork.builder::use-midishare *features*)
+;; (pushnew 'patchwork.builder::use-midishare     *features*)
 (pushnew 'patchwork.builder::use-cl-midi   *features*)
+
 
 ;; (pushnew :debug-wrapper       *features*)
 ;; (pushnew :debug-objc          *features*)
-;; (pushnew :debug-views         *features*)
+(pushnew :debug-views         *features*)
 ;; (pushnew :debug-views-colors  *features*)
 ;; (pushnew :debug-event         *features*)
 
@@ -172,9 +184,9 @@ DO:         Prints each expression and their values.
                        :initial-value 0)))
     `(progn
        ,@(mapcar
-          (lambda (expr) 
+          (lambda (expr)
             `(let ((vals  (multiple-value-list ,expr)))
-               (format *trace-output* 
+               (format *trace-output*
                  ,(format nil "~~~DS = ~~{~~S~~^ ; ~~%~:*~VA   ~~}~~%" width "")
                  (quote ,expr) vals)
                (values-list vals)))
@@ -227,7 +239,7 @@ DO:         Prints each expression and their values.
 ;; (ql:quickload :com.informatimago.tools)
 ;; (use-package :com.informatimago.tools.symbol)
 ;; (use-package :com.informatimago.common-lisp.cesarum.package)
-;; 
+;;
 ;; (defun duplicate-symbols (&key (packages (list-all-packages)) (exported nil))
 ;;   "Return: a list of list of symbols that have the same name."
 ;;   (let ((symbols (make-hash-table :test (function equal))) ; maps names to list of unique symbols
@@ -249,8 +261,8 @@ DO:         Prints each expression and their values.
 ;;                                symbols))
 ;;                        duplicates)
 ;;         duplicates)))
-;; 
-;; (defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" 
+;;
+;; (defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS"
 ;;                               "PATCHWORK.MIDI" "PATCHWORK.SCHEDULER" "PATCHWORK" "C-PATCH-BUFFER"
 ;;                               "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN"
 ;;                               "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE"

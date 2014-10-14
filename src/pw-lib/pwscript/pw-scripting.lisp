@@ -238,7 +238,7 @@
                                     (kill-text-item))
                                   (put-appleevent-par reply #$keyDirectObject 
                                                       (mkSO :|cbox| nil :|name| (pw-function-string thebox) )))))
-      (t (print "error no tipo para new")))))
+      (t (print "error no type for new")))))
 
 ;;LOAD 
 

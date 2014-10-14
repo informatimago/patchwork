@@ -589,11 +589,12 @@
         (setf (ui::%view-position view) pos)))
     (inval-r-view-sides view t)))
 
+
 (defgeneric handle-edit-events (self char)
   (:method ((self C-patch) char)
     (format-trace '(handle-edit-events c-path) :char char :text (dialog-item-text *pw-controls-dialog-text-item*))
     (case char
-      (#\Etx
+      ((#\Newline #|Enter:|# #\Etx #+has-return #\Return #+has-linefeed #\Linefeed)
        (set-dialog-item-text-from-dialog *pw-controls-current-pw-control* 
                                          (dialog-item-text *pw-controls-dialog-text-item*))
        (kill-text-item))
@@ -726,7 +727,7 @@
           (resize-text-item view (make-point (w view) 13))
           (add-subviews view *pw-controls-dialog-text-item*)
           (setf *current-small-inBox* (car (pw-controls view)))
-          (change-menu-actions) )
+          (change-menu-actions))
         (ui:ed-beep)) ))
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch) str)

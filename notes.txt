@@ -1,26 +1,5 @@
 # -*- mode:org; coding:utf-8 -*-
 
-* Documentation
-** Window Key Commands
-
-When *current-small-inbox* is non nil then send the keys to it.
-Ask any (controls window) if they handle the keys.
-otherwise:
-
-- #\Return (C-m)
-  + If there's an abstract-box, then hide the window, and show the abstract-box window.
-  + If there's a super window, then hide the window, and show the super window.
-  + otherwise beep.
-- #\Newline (C-j)
-  + If there's an abstract-box, then show the abstract-box window.
-  + If there's a super window, then show the super window.
-  + otherwise beep.
-- #\b
-  + browse the active patches.
-- #\Rubout (DEL)
-  + cut-delete
-- #\h
-           
 * Patchwork TO DO List, Bugs, Error, Warnings, TODOs
 ** Avancement
  1. Points              :  17/ 17 fonctions implémentées [100%]
@@ -683,6 +662,51 @@ rm application.log ; make clean ; make application 2>&1 | tee application.log
 https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
 
 * Patchwork Development Notes
+** Window Key Commands
+
+When *current-small-inbox* is non nil then send the keys to it.
+Ask any (controls window) if they handle the keys.
+otherwise:
+
+- #\Return (C-m)
+  + If there's an abstract-box, then hide the window, and show the abstract-box window.
+  + If there's a super window, then hide the window, and show the super window.
+  + otherwise beep.
+- #\Newline (C-j)
+  + If there's an abstract-box, then show the abstract-box window.
+  + If there's a super window, then show the super window.
+  + otherwise beep.
+- #\b
+  + browse the active patches.
+- #\Rubout (DEL)
+  + cut-delete
+- #\h
+           
+** Where key input is processed:
+
+pw-kernel/box-creation/pw-patch.lisp                       handle-edit-events
+
+pw-music/editors/mn/mn-chord-ed.lisp                       handle-key-event
+pw-music/editors/mn/mn-collector-panel.lisp                handle-key-event
+
+pw-kernel/boxes/bpf/bpf-boxes/multi-bpf.lisp               key-pressed-BPF-editor
+pw-kernel/boxes/bpf/bpf-editors/bpf-editor.lisp            key-pressed-BPF-editor
+
+pw-music/editors/mn/mn-editor.lisp                         key-pressed-MN-editor
+
+pw-music/editors/mn/mn-window.lisp                         key-pressed-extra
+pw-music/editors/rhythm/rtm-window.lisp                    key-pressed-extra     :forwardarrow :backwardarrow
+
+pw-kernel/pw-graphics/window+menu/application-window.lisp  view-key-event-handler
+pw-kernel/pw-graphics/window+menu/pw-help-window.lisp      view-key-event-handler
+pw-kernel/pw-graphics/window+menu/pw-window.lisp           view-key-event-handler
+
+pw-kernel/boxes/bpf/bpf-editors/bpf-menu.lisp              (menus)  
+pw-kernel/pw-graphics/window+menu/pw-menu.lisp             (menus)
+pw-music/editors/mn/mn-collector-view.lisp                 (menus)
+pw-music/menu/mn-menu.lisp                                 (menus)
+pw-music/menu/rtm-menu.lisp                                (menus)
+
 ** ffigen4
 
 `http://trac.clozure.com/ccl/wiki/BuildFFIGEN`_
@@ -722,7 +746,6 @@ Therefore we must compile midishare ourselves.
 
 (defparameter *user-library-folder-path*  (merge-pathnames "**;*.lib" *config-default-libr-path*))
 #+END_SRC
-
 
 ** Packages
 

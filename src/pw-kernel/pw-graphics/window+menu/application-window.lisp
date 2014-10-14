@@ -49,11 +49,11 @@
 ;; key-pressed
 (defmethod view-key-event-handler ((self C-application-window) char)
   (case char 
-    ((:Newline)
+    ((:Newline #\Newline #+has-return #\Return #+has-linefeed #\Linefeed)
      (when (pw-win self)
        (window-hide self)           
        (window-select (pw-win self))))
-    ((:Enter)  
+    ((:Enter #\Etx)  
      (when (pw-win self)
        (window-select (pw-win self))))
     ((#\R)
