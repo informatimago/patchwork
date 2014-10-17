@@ -235,23 +235,6 @@
 
 
 
-(defmacro handling-errors (&body body)
-  "
-DO:       Execute the BODY with a handler for CONDITION and
-          SIMPLE-CONDITION reporting the conditions.
-"
-  `(handler-case (progn ,@body)
-     (simple-error  (err) 
-       (format *trace-output* "~&~A: ~%" (class-name (class-of err)))
-       (apply (function format) *trace-output*
-              (simple-condition-format-control   err)
-              (simple-condition-format-arguments err))
-       (format *trace-output* "~&")
-       (finish-output))
-     (error (err) 
-       (format *trace-output* "~&~A: ~%  ~S~%" (class-name (class-of err)) err)
-       (finish-output))))
-
 (defun lisp-menu-action ()
   (let ((listener (find-if (lambda (w) (subtypep (type-of w) 'hemlock-listener-frame))
                            (windows))))
