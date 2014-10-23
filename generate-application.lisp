@@ -36,8 +36,8 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Load quicklisp
-(format *trace-output* "~%;;; Loading quicklisp.~%")
-(finish-output *trace-output*)
+(format t "~%;;; Loading quicklisp.~%")
+(finish-output)
 (load #P"~/quicklisp/setup.lisp")
 (setf quicklisp-client:*quickload-verbose* t)
 

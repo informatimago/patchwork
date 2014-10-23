@@ -103,7 +103,7 @@
 (setf *features* (set-difference *features*
                                  '(:debug-wrapper :debug-objc
                                    :debug-views :debug-views-colors
-                                   :debug-event
+                                   :debug-event :debug-focused-view
                                    patchwork.builder::no-cocoa
                                    patchwork.builder::use-apple-events
                                    patchwork.builder::cocoa-midi-player
@@ -121,6 +121,7 @@
 ;; (pushnew :debug-objc          *features*)
 (pushnew :debug-views         *features*)
 ;; (pushnew :debug-views-colors  *features*)
+;; (pushnew :debug-focused-view  *features*)
 ;; (pushnew :debug-event         *features*)
 
 
