@@ -22,17 +22,9 @@
      En cours.
 - Impossibilité d’inscrire une liste dans un objet.
 - Window Comment ne fonctionne pas.
-*** IN-PROGRESS 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item
-   - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:24]
-
-- static-text-dialog-item 
-- editable-text-dialog-ietm
-
 *** IN-PROGRESS 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
     - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:25] \\
       text-edit en cours.
-*** TODO [#A] 00005 Effacements partiels et provisoires des objets 
-(réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
 *** TODO [#A] 00014 On génère une entrée supplémentaire pour certains objets avec alt-clic
 
 trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
@@ -112,7 +104,7 @@ Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouv
 
 Le résultat ne peux pas se copier et c’est une fonction nécessaire (également impossibilité d’écrire dans le Listener).
  
-*** TODO 00010 Quelquefois il y a eu impossibilité d’évaluation.
+*** TODO 00010 Quelques fois il y a eu impossibilité d’évaluation.
 En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
 crois plutôt que - pour une raison inconnue - la fenêtre du Listener
 en fonction devient inactive, en activant une nouvelle fenêtre de
@@ -145,6 +137,22 @@ The next menu should be Apps instead of Patchwork.
 21/10/14 08:00:08,136 System Preferences[9841]: Unable to find class: LispApplication, exiting
 21/10/14 08:00:08,137 com.apple.launchd.peruser.1000[140]: (com.apple.systempreferences.39808[9841]) Exited with code: 1
 
+*** TODO 00035 pw-patch drag bar line off-by-1 
+The line of the drag bar of pw-patch is drawn one pixel beyond the right border some times.
+*** DONE 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item
+    CLOSED: [2014-10-23 Thu 05:41]
+    - State "DONE"       from "IN-PROGRESS" [2014-10-23 Thu 05:41] \\
+      Implemented editable-text-dialog-item as a text-edit-dialog-item.
+   - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:24]
+
+- static-text-dialog-item 
+- editable-text-dialog-ietm
+
+*** DONE [#A] 00005 Effacements partiels et provisoires des objets 
+    CLOSED: [2014-10-23 Thu 05:33]
+    - State "DONE"       from "TODO"       [2014-10-23 Thu 05:33] \\
+      Corrected.
+(réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
 *** DONE [#A] 00012 graphic offset in output box link drawing
    CLOSED: [2014-10-13 Mon 14:53]
    - State "DONE"       from "TODO"       [2014-10-13 Mon 14:53] \\
