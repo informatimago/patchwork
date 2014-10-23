@@ -1,6 +1,6 @@
 # -*- mode:org; coding:utf-8 -*-
 
-* Patchwork TO DO List, Bugs, Error, Warnings, TODOs
+* TO DO List, Bugs, Error, Warnings, TODOs
 ** Avancement
  1. Points              :  17/ 17 fonctions implémentées [100%]
  2. Fonts               :  76/ 79 fonctions implémentées [ 96%]
@@ -140,6 +140,11 @@ The application menu should be Patchwork instead of Clozure CL
 The next menu should be Apps instead of Patchwork.
 *** TODO 00032 multi-bpf breaks                                         :bug:
 *** TODO 00033 bpf-lib breaks                                           :bug:
+*** TODO 00034 Unable to find class: LispApplication             :mclgui:bug:
+
+21/10/14 08:00:08,136 System Preferences[9841]: Unable to find class: LispApplication, exiting
+21/10/14 08:00:08,137 com.apple.launchd.peruser.1000[140]: (com.apple.systempreferences.39808[9841]) Exited with code: 1
+
 *** DONE [#A] 00012 graphic offset in output box link drawing
    CLOSED: [2014-10-13 Mon 14:53]
    - State "DONE"       from "TODO"       [2014-10-13 Mon 14:53] \\
@@ -378,6 +383,7 @@ The following features produce a lot of trace output.
 
     :debug-event             activates debugging events.
     :debug-objc              activates debugging objc-classes.
+    :debug-focused-view      activates debugging of call-with-focused-view.
     :debug-views-colors      activates debugging views (with colors).
     :debug-views             activates debugging views.
     :debug-wrapper           activates debugging wrappers.

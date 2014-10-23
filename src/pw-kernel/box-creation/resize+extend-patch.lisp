@@ -53,7 +53,7 @@
       (set-view-size self point-now)
       (set-view-size (car (pw-controls self)) 
                      (make-point (- (point-h point-now) 10)
-                                 (h (car (pw-controls self))))) 
+                                 (h (car (pw-controls self)))))
       (set-view-position (out-put self) 
                          (make-point (- (round (w self) 2) 6)
                                      (- (h self) 5))))))
