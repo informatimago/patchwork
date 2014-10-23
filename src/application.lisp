@@ -157,15 +157,20 @@ Must be called on the main thread."
               ccl::*inhibit-greeting*    t))
 
 (defvar *patchwork-trace-output* *trace-output*)
-(on-restore patchwork-trace
-  (setf *patchwork-trace-output* (open (merge-pathnames #P"Desktop/Patchwork-trace.txt"
-                                                        (user-homedir-pathname))
+
+(defun redirect-trace-output-to-file (pathname)
+  (setf *patchwork-trace-output* (open pathname 
                                        :direction :output
                                        :if-does-not-exist :create
                                        :if-exists :append
                                        #+ccl :sharing #+ccl :lock)
-        *trace-output* *patchwork-trace-output*)
+        *trace-output* *patchwork-trace-output*
+        (ui::aget ui::*run-loop-bindings* '*trace-output*) *patchwork-trace-output*)
   (format *trace-output* "~%~A~2%" (date)))
+
+(on-restore patchwork-trace
+  (redirect-trace-output-to-file (merge-pathnames #P"Desktop/Patchwork-trace.txt"
+                                                  (user-homedir-pathname))))
 
 (on-startup patchwork-initialization
   (eval-enqueue '(initialize-patchwork)))
