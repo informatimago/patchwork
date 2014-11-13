@@ -61,8 +61,7 @@
 ;;Added 920412
 (defmethod resize-patch-box :after ((self C-pw-resize-x) mp delta)
   (declare (ignore mp delta))
-  (if (and *current-small-inBox* (eql (view-container *current-small-inBox*) self))
-    (resize-text-item *current-small-inBox*)))      ;this function is in pw-controls
+  (resize-text-item self))
 
 ;;=========================================================================================================
 ;;===================================

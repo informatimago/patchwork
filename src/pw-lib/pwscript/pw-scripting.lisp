@@ -224,17 +224,8 @@
                                       (setf thebox (menu-item-action themenu)))
                                   (setf *position-new-box* nil)
                                   (when  (and bname (not (string-equal bclase "funlisp")))
-                                    (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog))
-                                    (setf *pw-controls-current-pw-control* thebox)
-                                    (set-dialog-item-text *pw-controls-dialog-text-item* bname)
-                                    (set-view-position *pw-controls-dialog-text-item* 
-                                                       (make-point 1 (- (pw::h thebox) 14)))
-                                    (resize-text-item thebox (make-point (pw::w thebox) 13))
-                                    (add-subviews thebox *pw-controls-dialog-text-item*)
-                                    (setf *current-small-inBox* (car (pw::pw-controls thebox)))
-                                    (change-menu-actions)
-                                    (set-dialog-item-text-from-dialog pw::*pw-controls-current-pw-control* 
-                                                                      (dialog-item-text pw::*pw-controls-dialog-text-item*))
+                                    (open-edit-text-item-for-box thebox bname)
+                                    (set-dialog-item-text-from-dialog pw::*pw-controls-current-pw-control* bname)
                                     (kill-text-item))
                                   (put-appleevent-par reply #$keyDirectObject 
                                                       (mkSO :|cbox| nil :|name| (pw-function-string thebox) )))))
@@ -516,20 +507,10 @@
          (thePara (closae:getparam AE-clos-Ob :|----| ))
          (thename (closae:getparam AE-clos-Ob :|newn| ))
          (thesele (AEresolve thePara)))
-    (unless pw::*pw-controls-dialog-text-item* (pw::make-pw-controls-dialog))
-    (setf pw::*pw-controls-current-pw-control* thesele)
-    (set-dialog-item-text pw::*pw-controls-dialog-text-item* thename)
-    (set-view-position pw::*pw-controls-dialog-text-item* 
-                       (make-point 1 (- (pw::h thesele) 14)))
-    (pw::resize-text-item thesele (make-point (pw::w thesele) 13))
-    (add-subviews thesele pw::*pw-controls-dialog-text-item*)
-    (setf pw::*current-small-inBox* (car (pw::pw-controls thesele)))
-    (pw::change-menu-actions)
-    (pw::set-dialog-item-text-from-dialog pw::*pw-controls-current-pw-control* 
-                                          (dialog-item-text pw::*pw-controls-dialog-text-item*))
-    (pw::kill-text-item)
-    (put-appleevent-par reply #$keyDirectObject 
-                        (mkSO :|cbox| nil :|name| thename))))
+    (open-edit-text-item-for-box thesele thename)
+    (set-dialog-item-text-from-dialog pw::*pw-controls-current-pw-control* thename)
+    (kill-text-item)
+    (put-appleevent-par reply #$keyDirectObject (mkSO :|cbox| nil :|name| thename))))
 
 
      

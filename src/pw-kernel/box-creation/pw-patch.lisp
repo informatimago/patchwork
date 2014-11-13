@@ -718,17 +718,8 @@
 (defgeneric rename-yourbox (view)
   (:method ((view C-patch))
     (if (pw-controls view)
-        (progn
-          (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog))
-          (setf *pw-controls-current-pw-control* view)
-          (set-dialog-item-text *pw-controls-dialog-text-item* (pw-function-string view))
-          (set-view-position *pw-controls-dialog-text-item* 
-                             (make-point 1 (- (h view) 14)))
-          (resize-text-item view (make-point (w view) 13))
-          (add-subviews view *pw-controls-dialog-text-item*)
-          (setf *current-small-inBox* (car (pw-controls view)))
-          (change-menu-actions))
-        (ui:ed-beep)) ))
+        (open-edit-text-item-for-box view (pw-function-string view))
+        (ui:ed-beep))))
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch) str)
   (setf (pw-function-string view) (string-downcase str))

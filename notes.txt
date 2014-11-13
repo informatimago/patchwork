@@ -25,6 +25,9 @@
 *** IN-PROGRESS 00006 Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
     - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:25] \\
       text-edit en cours.
+
+- offset of yellow text-edit box: cf. editable-text-dialog-item as subview of a view.
+
 *** TODO [#A] 00014 On génère une entrée supplémentaire pour certains objets avec alt-clic
 
 trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
@@ -139,6 +142,8 @@ The next menu should be Apps instead of Patchwork.
 
 *** TODO 00035 pw-patch drag bar line off-by-1 
 The line of the drag bar of pw-patch is drawn one pixel beyond the right border some times.
+*** TODO [#C] discuter des besoins d'algorithmes (patches) nouveaux?     :ab:
+*** TODO [#C] evolution user interface (colors, zoom, bindings)?         :ab:
 *** DONE 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item
     CLOSED: [2014-10-23 Thu 05:41]
     - State "DONE"       from "IN-PROGRESS" [2014-10-23 Thu 05:41] \\

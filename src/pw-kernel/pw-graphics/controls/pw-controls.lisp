@@ -76,8 +76,9 @@
                           :ALLOW-RETURNS NIL)))
 
 (defun resize-text-item (item &optional size)
-  (set-view-size *pw-controls-dialog-text-item* 
-                 (subtract-points (or size (view-size item)) (make-point 4 4))))
+  (when (and *current-small-inBox* (eql item (view-container *current-small-inBox*)))
+    (set-view-size *pw-controls-dialog-text-item* 
+                   (subtract-points (or size (view-size item)) (make-point 2 2)))))
 
 (defvar *pw-controls-dialog-text-item-old* ())
 (defvar *cancel-button* ())
@@ -134,21 +135,33 @@
                    (subtract-points (view-size item) (make-point 2 2)))
     (window-select *pw-controls-dialog*)))
 
+
+(defun open-edit-text-item (item container inbox text &key class position size)
+  (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog class))
+  (setf *pw-controls-current-pw-control* item)
+  (set-dialog-item-text *pw-controls-dialog-text-item* text)
+  (multiple-value-call (function set-view-font-codes) *pw-controls-dialog-text-item* (view-font-codes item))
+  (add-subviews container *pw-controls-dialog-text-item*)
+  (setf *current-small-inBox* inbox)
+  (set-view-position *pw-controls-dialog-text-item* position)
+  (resize-text-item item size)
+  (change-menu-actions))
+
+(defun open-edit-text-item-for-box (box text)
+  (open-edit-text-item box box (car (pw-controls box)) text
+                       :class nil
+                       :position (make-point 1 (- (h box) 14))
+                       :size (make-point (w box) 13)))
+
 (defun open-pw-controls-dialog (item &optional point size class)
   (if (not (eql (type-of (front-window)) 'c-pw-window))
       (open-pw-controls-dialog-old item point size)
-      (progn
-        (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog class))
-        (setf *pw-controls-current-pw-control* item)
-        (let ((container (view-container item)))
-          (push-to-top container)
-          (set-dialog-item-text *pw-controls-dialog-text-item* (dialog-item-text item))
-          (multiple-value-call (function set-view-font-codes) *pw-controls-dialog-text-item* (view-font-codes item))
-          (set-view-position *pw-controls-dialog-text-item* (add-points (view-position item) (or point (make-point 1 0))))
-          (resize-text-item item size)
-          (add-subviews container *pw-controls-dialog-text-item*)
-          (setf *current-small-inBox* item)
-          (change-menu-actions)))))
+      (let ((container (view-container item)))
+        (push-to-top container)
+        (open-edit-text-item item container item (dialog-item-text item)
+                             :class class
+                             :position (add-points (view-position item) (or point (make-point 1 0)))
+                             :size size))))
 
 
 (defun change-menu-actions ()
@@ -168,10 +181,10 @@
                                  *menu-action-paste-std*))
 
 (defun kill-text-item ()
-  (remove-subviews (view-container *current-small-inBox*)
-                   *pw-controls-dialog-text-item*)
-  (setf *current-small-inBox* nil)
-  (restore-menu-actions))
+  (when *current-small-inBox*
+    (remove-subviews (view-container *current-small-inBox*) *pw-controls-dialog-text-item*)
+    (setf *current-small-inBox* nil)
+    (restore-menu-actions)))
 
 ;;===========================================================================
 ;;C-rect C-button C-button-latched C-ttybox C-menubox-val
@@ -181,7 +194,8 @@
 ;;===========================================================================
 
 (defclass C-ttybox (static-text-dialog-item) 
-  ((open-state :initform t  :initarg :open-state :accessor open-state)
+  ((open-state :initform t  :initarg :open-state :accessor open-state
+               :documentation "Selects whether to display the value (t), or the name of the doc-string (nil).")
    (doc-string :initform "" :initarg :doc-string  :accessor doc-string)
    (value :initform nil :initarg :value)
    (type-list :initform ()  :initarg :type-list :accessor type-list)))
@@ -225,17 +239,20 @@
                     :type-list ',(type-list self))))
 
 (defmethod x+w ((self C-ttybox)) (+ (x self)(w self)))
+
 ;;=========================
 ;;draw
 
 (defmethod view-draw-contents ((self C-ttybox))
-  ;;;(with-focused-view self
-  ;;modified 920818 [Camilo]
-  (with-font-focused-view self
-    (if (open-state self)
-        (call-next-method)
-        (draw-string 3 9 (doc-string self)))
-    (draw-rect* 0 0 (w self) (h self))))
+  (let ((w (w self))
+        (h (h self)))
+    (with-font-focused-view self
+      (format-trace '(self-draw-contents C-ttybox) ui::*foreground-color* (get-fore-color (view-window self)))
+      (if (open-state self)
+          (call-next-method)
+          (draw-text 1 1 (- w 2) (- h 2) (doc-string self)))
+      (format-trace '(self-draw-contents C-ttybox) ui::*foreground-color* (get-fore-color (view-window self)))
+      (draw-rect* 0 0 w h))))
 
 
 (defgeneric set-open-state (self fl)

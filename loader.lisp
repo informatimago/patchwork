@@ -123,6 +123,7 @@
 ;; (pushnew :debug-views-colors  *features*)
 ;; (pushnew :debug-focused-view  *features*)
 ;; (pushnew :debug-event         *features*)
+;; (pushnew :debug-text          *features*)
 
 
 ;;; --------------------------------------------------------------------
