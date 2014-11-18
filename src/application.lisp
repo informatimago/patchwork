@@ -131,7 +131,9 @@ Must be called on the main thread."
     (initialize-directories)
     #-(and)(installapple-event-handlers))
   ;; ---
-  (format *patchwork-io* "~&Welcome to ~A!~%" (application-name *application*))
+  (format *patchwork-io* "~2%Welcome to ~A!~2%~?" (application-name *application*)
+          #+ccl ccl:*listener-prompt-format* #+ccl '(0)
+          #-ccl "? ")
   (finish-output *patchwork-io*)
   (values))
 
