@@ -223,7 +223,7 @@
                                       (setf thebox (make-lisp-pw-boxes (read-from-string bname) *active-patch-window*))
                                       (setf thebox (menu-item-action themenu)))
                                   (setf *position-new-box* nil)
-                                  (when  (and bname (not (string-equal bclase "funlisp")))
+                                  (when (and bname (not (string-equal bclase "funlisp")))
                                     (open-edit-text-item-for-box thebox bname)
                                     (set-dialog-item-text-from-dialog pw::*pw-controls-current-pw-control* bname)
                                     (kill-text-item))

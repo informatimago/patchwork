@@ -102,7 +102,7 @@
 
 (setf *features* (set-difference *features*
                                  '(:debug-wrapper :debug-objc
-                                   :debug-views :debug-views-colors
+                                   :debug-views :debug-views-colors :debug-views-instance
                                    :debug-event :debug-focused-view
                                    patchwork.builder::no-cocoa
                                    patchwork.builder::use-apple-events
@@ -110,6 +110,7 @@
                                    patchwork.builder::use-midishare
                                    patchwork.builder::use-cl-midi)))
 
+(setf (uiop::getenv "CG_CONTEXT_SHOW_BACKTRACE") "YES")
 ;; (pushnew 'patchwork.builder::no-cocoa          *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events  *features*)
 ;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
@@ -117,13 +118,14 @@
 (pushnew 'patchwork.builder::use-cl-midi   *features*)
 
 
-;; (pushnew :debug-wrapper       *features*)
-;; (pushnew :debug-objc          *features*)
-(pushnew :debug-views         *features*)
-;; (pushnew :debug-views-colors  *features*)
-;; (pushnew :debug-focused-view  *features*)
-;; (pushnew :debug-event         *features*)
-;; (pushnew :debug-text          *features*)
+;; (pushnew :debug-wrapper        *features*)
+;; (pushnew :debug-objc           *features*)
+(pushnew :debug-views          *features*)
+;; (pushnew :debug-views-colors   *features*)
+;; (pushnew :debug-views-instance *features*)
+;; (pushnew :debug-focused-view   *features*)
+;; (pushnew :debug-event          *features*)
+;; (pushnew :debug-text           *features*)
 
 
 ;;; --------------------------------------------------------------------
