@@ -71,9 +71,8 @@
   ((fill-state :initform nil :accessor %outrect-fill-state)))
 
 (defmethod view-draw-contents ((self C-pw-outrect))
-  (with-focused-view self
-    (draw-rect* 0 0 (w self) (h self))))
-
+  (with-focused-dialog-item (self)
+    (draw-rect* (x self)(y self)(w self)(h self))))
 
 (defgeneric fill-patch-outrect (self)
   (:method ((self C-pw-outrect))
@@ -177,6 +176,18 @@
 
 ;;=======================================================================================
 ;;=======================================================================================
+
+(defgeneric input-objects      (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric pw-controls        (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric type-list          (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric in-xs              (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric in-ys              (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric active-mode        (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric flip-flag          (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric out-put            (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric pw-function-string (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric pw-function        (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+
 
 (defclass C-patch (ui:view) 
   ((input-objects :initform nil  :accessor input-objects)
@@ -354,19 +365,21 @@
             (view-draw-contents v)))
 
 (defmethod view-draw-contents ((self C-patch))
+  ;; #|PJB-DEBUG|# (format-trace "progn (view-draw-contents" 'c-patch 'before self)
   (with-font-focused-view self  
-    #+debug-views-colors
-    (with-pen-state (:pattern *light-gray-pattern*)
-      (with-fore-color *light-gray-color*
-       (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
+    (erase-rect* 0 0 (w self) (h self))
+    #+debug-views-colors (with-pen-state (:pattern *light-gray-pattern*)
+                           (with-fore-color *light-gray-color*
+                             (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
     (call-next-method)
     (draw-small-rects self)
     (draw-patch-view-outline self)
     (draw-function-name self 2 (- (h self) 5))
-    (draw-rect* 0 0 (w self)(h self))
-    #+debug-views-colors
-    (with-fore-color ui::*blue-color*
-      (draw-rect* 0 0 (w self)(h self)))))
+    (draw-rect* 0 0 (w self) (h self))
+    #+debug-views-colors (with-fore-color ui::*blue-color*
+                           (draw-rect* 0 0 (w self)(h self))))
+  ;; #|PJB-DEBUG|# (format-trace "view-draw-contents)" 'c-patch 'after- self)
+  )
 
 (defgeneric print-connections (self &optional erase-mode)
   (:method ((self C-patch) &optional erase-mode)
@@ -408,10 +421,10 @@
 
 (defgeneric draw-patch-view-outline (self)
   (:method ((self C-patch))
-    (draw-line 0 3 (w self) 3) 
     (when (active-mode self) 
       (with-pen-state (:pattern *black-pattern*)
         (fill-rect* 0 0 (w self) 3)))
+    (draw-line 0 3 (1- (w self)) 3)
     (draw-patch-extra self)))
 
 (defmethod draw-function-name ((self C-patch) x y)
@@ -434,6 +447,8 @@
   (intersection types-list *pw-object-type-list* :test 'eq))
 
 (defgeneric draw-connections (self &optional erase-mode from-patches)
+  (:method ((self simple-view) &optional erase-mode from-patches)
+    (declare (ignorable self erase-mode from-patches)))
   (:method ((self C-patch) &optional erase-mode from-patches)
     (with-focused-view (view-window self)
       (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
@@ -594,7 +609,10 @@
   (:method ((self C-patch) char)
     (format-trace '(handle-edit-events c-path) :char char :text (dialog-item-text *pw-controls-dialog-text-item*))
     (case char
-      ((#\Newline #|Enter:|# #\Etx #+has-return #\Return #+has-linefeed #\Linefeed)
+      ((#\Newline
+        #|Enter:|# #\Etx
+                   #+(and has-return (not newline-is-return)) #\Return
+                   #+(and has-linefeed (not newline-is-linefeed)) #\Linefeed)
        (set-dialog-item-text-from-dialog *pw-controls-current-pw-control* 
                                          (dialog-item-text *pw-controls-dialog-text-item*))
        (kill-text-item))
@@ -767,18 +785,24 @@
     (draw-active-mode self)))
 
 (defgeneric activate-control (self)
+  (:method ((self simple-view))
+    (declare (ignorable self)))
   (:method ((self C-patch))
     (unless (active-mode self)
       (setf (active-mode self) t)
       (draw-active-mode self))))
 
 (defgeneric deactivate-control (self)
+  (:method ((self simple-view))
+    (declare (ignorable self)))
   (:method ((self C-patch))
     (when (active-mode self)
       (setf (active-mode self) nil)
       (draw-active-mode self))))
 
 (defgeneric flip-controls (self flag)
+  (:method ((self simple-view) flag)
+    (declare (ignorable self flag)))
   (:method ((self C-patch) flag)
     (for (i 0 1 (1- (length (pw-controls self)))) 
       (when (eql (nth i (pw-controls self))(nth i (input-objects self)))
