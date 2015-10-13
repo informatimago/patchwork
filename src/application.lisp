@@ -131,9 +131,12 @@ Must be called on the main thread."
     (initialize-directories)
     #-(and)(installapple-event-handlers))
   ;; ---
-  (format *patchwork-io* "~2%Welcome to ~A!~2%~?" (application-name *application*)
+  (format *patchwork-io* "~2%Welcome to ~A Version ~A!~%~?"
+          (application-name *application*)
+          patchwork.builder:*patchwork-version*
           #+ccl ccl:*listener-prompt-format* #+ccl '(0)
-          #-ccl "? ")
+          #-ccl "? "
+          )
   (finish-output *patchwork-io*)
   (values))
 
@@ -167,7 +170,7 @@ Must be called on the main thread."
                                        :if-exists :append
                                        #+ccl :sharing #+ccl :lock)
         *trace-output* *patchwork-trace-output*
-        (ui::aget ui::*run-loop-bindings* '*trace-output*) *patchwork-trace-output*)
+        (ui::aget ui::*event-environment-bindings* '*trace-output*) *patchwork-trace-output*)
   (format *trace-output* "~%~A~2%" (date)))
 
 (on-restore patchwork-trace
