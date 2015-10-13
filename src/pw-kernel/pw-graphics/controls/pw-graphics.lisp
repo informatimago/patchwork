@@ -121,18 +121,34 @@
 
 (defgeneric erase-view-inside-rect (self)
   (:method ((self simple-view))
+    #+debug-view (format-trace '(erase-view-inside-rect simple-view))
+    ;; we're called with with-focused-view self
     (with-pen-state (:pattern *white-pattern* :mode :patcopy)
       (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
   (:method ((self view))
-    (with-pen-state (:pattern *white-pattern* :mode :patcopy)
+    #+debug-view (format-trace '(erase-view-inside-rect view))
+    ;; we're called with with-focused-view self 
+   (with-pen-state (:pattern *white-pattern* :mode :patcopy)
       (fill-rect* (1+ (point-h (view-scroll-position self))) 
                   (1+ (point-v (view-scroll-position self)))
+                  (- (w self) 2)
+                  (- (h self) 2))))
+  (:method ((self dialog-item))
+    #+debug-view (format-trace '(erase-view-inside-rect dialog-item))
+    ;; We're called with with-focused-dialog-item (self)
+    (with-pen-state (:pattern *white-pattern* :mode :patcopy)
+      (fill-rect* (1+ (point-h (view-position self))) 
+                  (1+ (point-v (view-position self)))
                   (- (w self) 2)
                   (- (h self) 2)))))
 
 (defgeneric erase+view-draw-contents (self)
   (:method ((self simple-view))
     (with-focused-view self
+      (erase-view-inside-rect self)
+      (view-draw-contents self)))
+  (:method ((self dialog-item))
+    (with-focused-dialog-item (self)
       (erase-view-inside-rect self)
       (view-draw-contents self))))
 
@@ -161,20 +177,20 @@
 ;;pop-up-menu
 
 (defvar *pw-pop-menu-window* ())
-(defvar *pw-pop-menu-window-TABLE-SEQUENCE* ())
+(defvar *pw-pop-menu-window-table-sequence* ())
 
 (defun make-pop-up-menu-instance ()
   (setf *pw-pop-menu-window*
-        (MAKE-INSTANCE 'DIALOG
-            :WINDOW-TYPE :DOCUMENT 
-            :VIEW-POSITION #@(426 42)
-            :VIEW-SIZE #@(118 128)
-            :CLOSE-BOX-P NIL
-            :VIEW-FONT '("Chicago" 12 :SRCOR :PLAIN)
+        (make-instance 'dialog
+            :window-type :document 
+            :view-position #@(426 42)
+            :view-size #@(118 128)
+            :close-box-p nil
+            :view-font '("Chicago" 12 :srcor :plain)
             :window-show nil
             :window-title "Browse"
-            :VIEW-SUBVIEWS
-            (LIST (MAKE-DIALOG-ITEM 'SEQUENCE-DIALOG-ITEM
+            :view-subviews
+            (list (make-dialog-item 'sequence-dialog-item
                                     #@(2 24)
                                     #@(114 95)
                                     "Untitled"
@@ -182,29 +198,29 @@
                                         (window-hide *pw-pop-menu-window*)
                                         (call-pw-pop-up-function 
                                          (cell-contents item 
-                                                        (car (selected-cells ITEM)))))
-                                    :VIEW-FONT *patchwork-font-spec*
-                                    :CELL-SIZE #@(200 12)
-                                    :TABLE-HSCROLLP NIL
-                                    :TABLE-VSCROLLP T
-                                    :TABLE-SEQUENCE '(FOO GLORP NJ))
-                  (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
+                                                        (car (selected-cells item)))))
+                                    :view-font *patchwork-font-spec*
+                                    :cell-size #@(200 12)
+                                    :table-hscrollp nil
+                                    :table-vscrollp t
+                                    :table-sequence '(foo glorp nj))
+                  (make-dialog-item 'button-dialog-item
                                     #@(4 4)
                                     #@(46 17)
                                     "Cancel"
                                     (lambda (item) item (window-hide *pw-pop-menu-window*))
-                                    :VIEW-FONT *patchwork-font-spec*
-                                    :DEFAULT-BUTTON NIL))))) 
+                                    :view-font *patchwork-font-spec*
+                                    :default-button nil))))) 
 
 
 (defun call-pw-pop-up-function (res-string)
   (when res-string
-    (eval (cdr (assoc res-string *pw-pop-menu-window-TABLE-SEQUENCE* :test #'string=)))))
+    (eval (cdr (assoc res-string *pw-pop-menu-window-table-sequence* :test #'string=)))))
 
 (defun make-pw-pop-up (lst)
-  (setf *pw-pop-menu-window-TABLE-SEQUENCE* lst)
+  (setf *pw-pop-menu-window-table-sequence* lst)
   ;; (set-view-size  (car (subviews *pw-pop-menu-window*)) (make-point (max  (* (length lst) 12) 220) 55))
-  (set-TABLE-SEQUENCE (car (subviews *pw-pop-menu-window*)) (mapcar #'car lst))
+  (set-table-sequence (car (subviews *pw-pop-menu-window*)) (mapcar #'car lst))
   (window-select *pw-pop-menu-window*))
 
 
