@@ -36,12 +36,13 @@
 
 
 ;; resizable PW box in x direction 
-(defclass  C-pw-resize-x (C-patch) ())
+(defclass C-pw-resize-x (C-patch) ())
 
 (defgeneric resize-patch? (self))
 (defmethod resize-patch? ((self C-pw-resize-x)) t) 
 
 (defmethod draw-patch-extra ((self C-pw-resize-x))
+  ;; #+debug-views #|DEBUG-PJB|#(ui::print-backtrace ui::*mclgui-trace*)
   (draw-rect* (- (w self) 5) (- (h self) 5) 5 5))
 
 (defgeneric resize-patch-box (self mp delta))
@@ -61,7 +62,7 @@
 ;;Added 920412
 (defmethod resize-patch-box :after ((self C-pw-resize-x) mp delta)
   (declare (ignore mp delta))
-  (resize-text-item self))
+  (resize-text-item *pw-controls-dialog-text-item* self))
 
 ;;=========================================================================================================
 ;;===================================
