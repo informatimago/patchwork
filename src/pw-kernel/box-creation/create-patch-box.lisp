@@ -210,7 +210,7 @@
 ;; (make-lisp-function-arg-list '+)
 
 (defun make-lisp-pw-boxes (function win) 
-  (if (not (fboundp function))
+  (if (not (and (symbolp function) (fboundp function)))
       (format t "~15A~25A" function "no such function !" )
       (if (defunp-function? function)
           (make-functional-pw-boxes function win)
