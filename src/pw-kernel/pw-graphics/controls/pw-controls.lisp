@@ -75,50 +75,50 @@
                           :VIEW-FONT *patchwork-font-spec*
                           :ALLOW-RETURNS NIL)))
 
-(defun resize-text-item (item &optional size)
+(defun resize-text-item (text-item item &optional size)
   (when (and *current-small-inBox* (eql item (view-container *current-small-inBox*)))
-    (set-view-size *pw-controls-dialog-text-item* 
-                   (subtract-points (or size (view-size item)) (make-point 2 2)))))
+    (set-view-size text-item (subtract-points (or size (view-size item)) (make-point 2 2)))))
 
 (defvar *pw-controls-dialog-text-item-old* ())
 (defvar *cancel-button* ())
 
 (defun make-pw-controls-dialog-old ()
-  (MAKE-INSTANCE 'DIALOG :window-show nil
-                         :WINDOW-TYPE :SINGLE-EDGE-BOX
-                         :VIEW-POSITION #@(-426 -60)
-                         :VIEW-SIZE #@(91 20)
-                         :CLOSE-BOX-P NIL
-                         :VIEW-FONT '("Chicago" 12 :SRCOR :PLAIN)
-                         :VIEW-SUBVIEWS
-                         (LIST (setf *pw-controls-dialog-text-item-old*
-                                     (MAKE-DIALOG-ITEM 'EDITABLE-TEXT-DIALOG-ITEM
+  (make-instance 'dialog :window-show nil
+                         :window-type :single-edge-box
+                         :view-position #@(-426 -60)
+                         :view-size #@(91 20)
+                         :close-box-p nil
+                         :view-font '("Chicago" 12 :srcor :plain)
+                         :view-subviews
+                         (list (setf *pw-controls-dialog-text-item-old*
+                                     (make-dialog-item 'editable-text-dialog-item
                                                        #@(2 1)
                                                        #@(84 16)
                                                        "Untitled"
-                                                       NIL
-                                                       :VIEW-FONT *patchwork-font-spec*
-                                                       :ALLOW-RETURNS NIL))
-                               (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
+                                                       nil
+                                                       :view-font *patchwork-font-spec*
+                                                       :allow-returns nil))
+                               (make-dialog-item 'button-dialog-item
                                                  #@(6 47)
                                                  #@(62 16)
                                                  "OK"
-                                                 (LAMBDA (ITEM) 
-                                                   (declare (ignore ITEM))
+                                                 (lambda (item) 
+                                                   (declare (ignore item))
                                                    (set-dialog-item-text-from-dialog
                                                     *pw-controls-current-pw-control* 
                                                     (dialog-item-text *pw-controls-dialog-text-item-old*))
                                                    (window-hide *pw-controls-dialog*))
-                                                 :VIEW-FONT *patchwork-font-spec*
-                                                 :DEFAULT-BUTTON T)
+                                                 :view-font *patchwork-font-spec*
+                                                 :default-button t)
                                (setf *cancel-button*
-                                     (MAKE-DIALOG-ITEM 'BUTTON-DIALOG-ITEM
+                                     (make-dialog-item 'button-dialog-item
                                                        #@(86 49)
                                                        #@(62 16)
                                                        "Cancel"
-                                                       NIL
-                                                       :VIEW-FONT *patchwork-font-spec*
-                                                       :DEFAULT-BUTTON NIL)))))
+                                                       nil
+                                                       :view-font *patchwork-font-spec*
+                                                       :default-button nil)))))
+
 
 (defun open-pw-controls-dialog-old (item &optional point size)
   (let ((*menubar-frozen* t)) ; to avoid flicker in the menubar
@@ -141,10 +141,10 @@
   (setf *pw-controls-current-pw-control* item)
   (set-dialog-item-text *pw-controls-dialog-text-item* text)
   (multiple-value-call (function set-view-font-codes) *pw-controls-dialog-text-item* (view-font-codes item))
-  (add-subviews container *pw-controls-dialog-text-item*)
   (setf *current-small-inBox* inbox)
-  (set-view-position *pw-controls-dialog-text-item* position)
-  (resize-text-item item size)
+  (set-view-position *pw-controls-dialog-text-item* (add-points position #@(1 1)))
+  (set-view-size *pw-controls-dialog-text-item* (subtract-points (or size (view-size item)) (make-point 2 2)))
+  (add-subviews container *pw-controls-dialog-text-item*)
   (change-menu-actions))
 
 (defun open-edit-text-item-for-box (box text)
@@ -154,14 +154,14 @@
                        :size (make-point (w box) 13)))
 
 (defun open-pw-controls-dialog (item &optional point size class)
-  (if (not (eql (type-of (front-window)) 'c-pw-window))
-      (open-pw-controls-dialog-old item point size)
+  (if (eql (type-of (front-window)) 'c-pw-window)
       (let ((container (view-container item)))
         (push-to-top container)
         (open-edit-text-item item container item (dialog-item-text item)
                              :class class
                              :position (add-points (view-position item) (or point (make-point 1 0)))
-                             :size size))))
+                             :size size))
+      (open-pw-controls-dialog-old item point size)))
 
 
 (defun change-menu-actions ()
@@ -226,7 +226,7 @@
   (:method (value (self C-ttybox))
     (set-dialog-item-text self
                           (if (not (stringp value))
-                              (format () "~D" value)
+                              (format nil "~D" value)
                               (string-downcase value)))))
 
 (defgeneric decompile (self)
@@ -244,23 +244,24 @@
 ;;draw
 
 (defmethod view-draw-contents ((self C-ttybox))
-  (let ((w (w self))
-        (h (h self)))
-    (with-font-focused-view self
-      (format-trace '(self-draw-contents C-ttybox) ui::*foreground-color* (get-fore-color (view-window self)))
+  (with-font-focused-view (view-container self)
+    (let* ((x     (point-h (view-position self)))
+           (y     (point-v (view-position self)))
+           (w     (w self))
+           (h     (h self)))
       (if (open-state self)
           (call-next-method)
-          (draw-text 1 1 (- w 2) (- h 2) (doc-string self)))
-      (format-trace '(self-draw-contents C-ttybox) ui::*foreground-color* (get-fore-color (view-window self)))
-      (draw-rect* 0 0 w h))))
+          (draw-text (1+ x) (1+ y) (- w 2) (- h 2) (doc-string self)
+                     (or (ui::text-truncation self) :clipping)
+                     (or (ui::text-justification self) :natural)
+                     (ui::compress-text self)))
+      (draw-rect* x y (- w 1) (- h 1)))))
 
 
 (defgeneric set-open-state (self fl)
   (:method ((self C-ttybox) fl)
     (setf (open-state self) fl)
-    (with-focused-view self
-      (erase-view-inside-rect self)
-      (view-draw-contents self))))
+    (erase+view-draw-contents self)))
 
 ;;=========================
 ;;events
@@ -436,7 +437,7 @@
         ((shift-key-p) 10) 
         ((command-key-p) 1000)
         (t 1))) 
-
+ 
 (defmethod view-click-event-handler ((self C-numbox) where)
   (declare (ignore where))
   (when (open-state self)
