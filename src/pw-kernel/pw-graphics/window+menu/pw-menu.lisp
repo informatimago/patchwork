@@ -469,16 +469,20 @@
                                           (get-string-from-user  "Lisp function"
                                                                  :size (make-point 200 85)
                                                                  :position :centered
+                                                                 :window-title "Lisp Function"
                                                                  :initial-string "list")))
+                                      ;; (handler-case
+                                      ;;     
+                                      ;;   (error (err) (format t "~%~A~%" err)))
                                     (when string
                                       (let ((patch (let ((*si-record* nil))
-                                                     (make-lisp-pw-boxes (read-from-string string) 
-                                                                         *active-patch-window*))))
-                                        (when patch
-                                          (record-patch "funlisp"
-                                                        (list (point-h (view-position patch))
-                                                              (point-h (view-position patch)))
-                                                        string)))))))
+                                                         (make-lisp-pw-boxes (read-from-string string) 
+                                                                             *active-patch-window*))))
+                                            (when patch
+                                              (record-patch "funlisp"
+                                                            (list (point-h (view-position patch))
+                                                                  (point-h (view-position patch)))
+                                                            string)))))))
                   (new-leafmenu "-" nil)
                   ;; (new-leafmenu "Abort" (lambda () (toplevel))))
                   )
