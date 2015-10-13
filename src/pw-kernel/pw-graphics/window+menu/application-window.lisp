@@ -49,7 +49,9 @@
 ;; key-pressed
 (defmethod view-key-event-handler ((self C-application-window) char)
   (case char 
-    ((:Newline #\Newline #+has-return #\Return #+has-linefeed #\Linefeed)
+    ((:Newline #\Newline
+               #+(and has-return (not newline-is-return)) #\Return
+               #+(and has-linefeed (not newline-is-linefeed)) #\Linefeed)
      (when (pw-win self)
        (window-hide self)           
        (window-select (pw-win self))))
