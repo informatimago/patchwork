@@ -6,13 +6,18 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+
+10.0-0.607
+-----------------------
+
 - Corrected multi-bpf and bpf-lib crashes.
 - Implemented pop-up menus.
 - Made use of the Maestro font instead of Mus-Not-j, corrected chord-box displaying.
 - Added (interlock subs-posn group-list first-n last-n) to Kernel/List menu.
-
-- implemented TextEdit, editable-text-dialog-item.  
+- Corrected origin of line when click-and-dragging from the output box.
+- Implemented TextEdit, editable-text-dialog-item.  
   Still need some graphic adjustments, and some integration debugging.
+
 
 10.0-0.714
 -----------------------

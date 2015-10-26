@@ -120,7 +120,7 @@
 (defmethod key-pressed-extra ((self C-rtm-editor-window) char)
   (case char
     ((:ForwardArrow)  (calc-next-rtm-page+scroll self ()))
-    ((:BackArrow)  (calc-prev-rtm-page+scroll self ()))
+    ((:BackArrow)     (calc-prev-rtm-page+scroll self ()))
     (#\+  (set-dialog-item-text-from-dialog
            (beat-number-ctrl (editor-collection-object self))
            (format nil "~5D" (1+ (value (beat-number-ctrl (editor-collection-object self))))))

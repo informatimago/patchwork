@@ -65,6 +65,7 @@
   (if (not (fboundp function))
       (format t "~15A~25A" function "no such function !" )
       (multiple-value-bind (args extensible?) (make-defunp-function-arg-list function)
+        ;; TODO: refactor to avoid eval:
         (let ((body `(make-PW-standard-box
                       ,(if box-class
                            `',box-class

@@ -34,9 +34,15 @@
 (in-package "PATCHWORK")
 
 ;; (defparameter *music-font-spec*   '("MusNot-j" 18 :plain :srcor))
-(defparameter *music-font-spec*         '("Maestro" 18 :plain :srcor))
-(defparameter *small-music-font-spec*   '("Maestro" 15 :plain :srcor))
-(defparameter *tiny-music-font-spec*    '("Maestro" 13 :plain :srcor))
+(defparameter *music-font-spec*            '("Maestro" 18 :plain :srcor))
+(defparameter *small-music-font-spec*      '("Maestro" 15 :plain :srcor))
+(defparameter *tiny-music-font-spec*       '("Maestro" 13 :plain :srcor))
+
+(defparameter *patchwork-font-spec*        '("Monaco"   9 :plain :srcor))
+(defparameter *patchwork-copy-font-spec*   '("Monaco"   9 :plain :srcopy))
+(defparameter *patchwork-small-font-spec*  '("Monaco"   8 :plain :srcor))
+
+
 
 ;;;; THE END ;;;;
 

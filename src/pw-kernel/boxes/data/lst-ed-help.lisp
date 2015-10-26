@@ -47,7 +47,7 @@
                          :track-thumb-p t))
     (add-subviews scroller
                   (make-instance 'static-text-dialog-item :view-position (make-point 5 5)
-                                 :view-font '("monaco" 9 :srcor)
+                                 :view-font pw::*patchwork-font-spec*
                                  :dialog-item-text 
                                  
                                  "lst-ed Editor Keyboard Commands

@@ -72,7 +72,7 @@
   (add-subviews self 
      (setf (text-disp-ctrl self)
        (make-instance 'static-text-dialog-item
-         :view-font '("Monaco" 9 :SRCOR :PLAIN)
+         :view-font *patchwork-font-spec*
          :dialog-item-text "x-off  y-off  x-val  y-val xzoom  yzoom"))
      (setf (x-origo-ctrl self) 
         (make-instance 'C-numbox-continuous-no-double-click 
@@ -113,7 +113,7 @@
    :view-container (view-window self)
    :view-position (make-point x y)
    :dialog-item-text txt
-   :view-font '("monaco"  9  :srcor) 
+   :view-font *patchwork-font-spec* 
    :dialog-item-action
    (lambda (item)
      (set-bpf-edit-mode self item (dialog-item-text item)))))

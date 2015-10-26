@@ -94,16 +94,14 @@
                                   :view-position (make-point (- (w self) 10)
                                                   (- (h self) 14))
                                   :view-container self
-                                  :view-font '("monaco"  9  :srcor)
-                                  )))
-    (setf (menubox self) popUpBox)
-    ))
+                                  :view-font *patchwork-font-spec*)))
+    (setf (menubox self) popUpBox)))
 
 (defmethod make-application-object ((self C-table-displayer))
   (make-instance 'C-disp-window
                  :view-subviews 
                  (list (make-instance 'C-array-item
-                                      :view-font '("Monaco" 9  :plain)
+                                      :view-font *patchwork-font-spec*
                                       :table-dimensions (make-point 2 2)
                                       :cell-size (make-point 20 12)
                                       :view-size (make-point 100 80)))

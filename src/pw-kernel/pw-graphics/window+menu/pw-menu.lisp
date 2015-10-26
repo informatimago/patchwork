@@ -235,23 +235,6 @@
 
 
 
-(defmacro handling-errors (&body body)
-  "
-DO:       Execute the BODY with a handler for CONDITION and
-          SIMPLE-CONDITION reporting the conditions.
-"
-  `(handler-case (progn ,@body)
-     (simple-error  (err) 
-       (format *trace-output* "~&~A: ~%" (class-name (class-of err)))
-       (apply (function format) *trace-output*
-              (simple-condition-format-control   err)
-              (simple-condition-format-arguments err))
-       (format *trace-output* "~&")
-       (finish-output))
-     (error (err) 
-       (format *trace-output* "~&~A: ~%  ~S~%" (class-name (class-of err)) err)
-       (finish-output))))
-
 (defun lisp-menu-action ()
   (let ((listener (find-if (lambda (w) (subtypep (type-of w) 'hemlock-listener-frame))
                            (windows))))
@@ -486,16 +469,20 @@ DO:       Execute the BODY with a handler for CONDITION and
                                           (get-string-from-user  "Lisp function"
                                                                  :size (make-point 200 85)
                                                                  :position :centered
+                                                                 :window-title "Lisp Function"
                                                                  :initial-string "list")))
+                                      ;; (handler-case
+                                      ;;     
+                                      ;;   (error (err) (format t "~%~A~%" err)))
                                     (when string
                                       (let ((patch (let ((*si-record* nil))
-                                                     (make-lisp-pw-boxes (read-from-string string) 
-                                                                         *active-patch-window*))))
-                                        (when patch
-                                          (record-patch "funlisp"
-                                                        (list (point-h (view-position patch))
-                                                              (point-h (view-position patch)))
-                                                        string)))))))
+                                                         (make-lisp-pw-boxes (read-from-string string) 
+                                                                             *active-patch-window*))))
+                                            (when patch
+                                              (record-patch "funlisp"
+                                                            (list (point-h (view-position patch))
+                                                                  (point-h (view-position patch)))
+                                                            string)))))))
                   (new-leafmenu "-" nil)
                   ;; (new-leafmenu "Abort" (lambda () (toplevel))))
                   )

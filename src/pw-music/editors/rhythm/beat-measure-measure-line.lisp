@@ -589,7 +589,7 @@
 (defmethod draw-tuplets ((self C-beat) win unit-length beg-x typlet-y rtm-sum)
   (let ((tuplet-num  (give-tuplet-num2 rtm-sum unit-length)))
     (unless (= (* tuplet-num 2)  rtm-sum)
-      (set-view-font  win '("Courier" 9 :srcor)) ;'("Monaco" 9 :srcor)
+      (set-view-font  win '("Courier" 9 :srcor)) ; *patchwork-font-spec*
       (let ((middle-pixel (round (+ (/ (- *rtm-last-note-pixel* beg-x) 2) beg-x))))
         (when (> (unit-length self) 1) (setq middle-pixel (- middle-pixel 5)))
         (draw-beat-slur/tuplet self beg-x (+ 4 *rtm-last-note-pixel*) (- typlet-y 5) 3)

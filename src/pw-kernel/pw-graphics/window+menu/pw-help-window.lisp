@@ -133,7 +133,7 @@
     selected boxes will be dragged.    
     
 ")))
-    (set-view-font  view-now '("monaco" 9 :srcor))))
+    (set-view-font  view-now *patchwork-font-spec*)))
 
 
 ;;====================================================================================================

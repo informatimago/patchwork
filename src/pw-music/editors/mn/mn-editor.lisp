@@ -290,13 +290,13 @@
             :view-position 
             (make-point (+ h-initial 60) (- v-extreme 2))
             :dialog-item-text "zoom"
-            :view-font '("monaco"  9  :srcor))
+            :view-font *patchwork-font-spec*)
            (make-instance 
             'check-box-dialog-item
             :view-container (view-window self)
             :view-position (make-point h-initial (- v-extreme 27))
             :dialog-item-text "ins"
-            :view-font '("monaco"  9  :srcor)
+            :view-font *patchwork-font-spec*
             :dialog-item-action
             (lambda (item)
               (rplacd (assoc :ins (ctrl-settings self))
@@ -315,7 +315,7 @@
    :view-container (view-window self)
    :view-position (make-point x y)
    :dialog-item-text txt
-   :view-font '("monaco"  9  :srcor) 
+   :view-font *patchwork-font-spec* 
    :dialog-item-action
    (lambda (item)
      (set-value-ctrl self item type)
@@ -629,7 +629,7 @@
 (defmethod view-draw-contents :after ((self C-music-notation-panel)) 
   (when (super-win (view-window self))
     (with-focused-view (view-window self)
-      (set-view-font  (view-window self) '("Monaco"  9 :srcor))
+      (set-view-font  (view-window self) *patchwork-font-spec*)
       (draw-string 5 10 (window-title (super-win (view-window self)))))))
 
 (defgeneric view-draw-specific (self zoom-scale scroll-pos MN-offset MN-C5))
@@ -923,7 +923,7 @@
 ;;   ;;(real-font *music-font-spec*)
 ;;   ;;(font-info *music-font-spec*)
 ;;   ;;(view-font  second-scroller)
-;;   ;; (set-view-font second-scroller '("monaco"  9  :srcor))
+;;   ;; (set-view-font second-scroller *patchwork-font-spec*)
 ;;   ;;(font-codes *music-font-spec*)
 ;; 
 ;;   ;;(set-view-size  first-scroller (make-point 400 380))

@@ -884,7 +884,7 @@
                   :view-position 
                   (make-point (+ x-pos 44) (+ y-pos 16))
                   :dialog-item-text " "
-                  :view-font '("monaco"  9  :srcor)
+                  :view-font *patchwork-font-spec*
                   :view-size (make-point 50 12))
                  (setf (popUpbox self)
                        (make-popUpbox "v" self (or *MN-popUpMenu*
@@ -947,7 +947,7 @@
 
 (defgeneric make-param-controller (self))
 (defmethod make-param-controller ((self C-chord-mus-not-view ))
-  (make-instance 'C-par-ctrl :view-font '("monaco"  9  :srcor)
+  (make-instance 'C-par-ctrl :view-font *patchwork-font-spec*
                              :view-size (make-point 50 12)
                              :view-position (make-point 130 (- (point-v (view-size self)) 19))))
 

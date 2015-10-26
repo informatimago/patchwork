@@ -71,9 +71,8 @@
   ((fill-state :initform nil :accessor %outrect-fill-state)))
 
 (defmethod view-draw-contents ((self C-pw-outrect))
-  (with-focused-view self
-    (draw-rect* 0 0 (w self) (h self))))
-
+  (with-focused-dialog-item (self)
+    (draw-rect* (x self)(y self)(w self)(h self))))
 
 (defgeneric fill-patch-outrect (self)
   (:method ((self C-pw-outrect))
@@ -106,6 +105,8 @@
 (defun get-evaluation-option () *standard-click-eval*)
 
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
+  #+debug-views
+  (format-trace '(view-click-event-handler c-pw-outrect) :where (point-to-list where) :view self)
   (if (eql (not (get-evaluation-option)) (not (option-key-p)))
       (progn
         (incf (clock *global-clock*))
@@ -118,7 +119,7 @@
   (:method ((view C-pw-outrect) where)
     (let* ((win     (view-window view))
            (last-mp (view-mouse-position win))
-           (where   (convert-coordinates where view win)))
+           (where   (convert-coordinates where (view-container view) win)))
       (flet ((draw-the-line ()
                (with-focused-view win
                  (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp)))))
@@ -161,7 +162,7 @@
                           (when (or (eql (pw-function (view-container self)) 'absin)
                                     (eql (pw-function (view-container self)) 'absin2))
                             (set-dialog-item-text (car (pw-controls (view-container self))) (doc-string ctrl)))
-                          (set-view-font (view-window self) '("Monaco" 9 :SRCOR :PLAIN)) ;??
+                          (set-view-font (view-window self) *patchwork-font-spec*)
                           (set-open-state ctrl nil)))
                     (tell (subviews (view-window patch)) 'draw-connections)
                     (when inde 
@@ -175,6 +176,18 @@
 
 ;;=======================================================================================
 ;;=======================================================================================
+
+(defgeneric input-objects      (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric pw-controls        (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric type-list          (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric in-xs              (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric in-ys              (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric active-mode        (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric flip-flag          (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric out-put            (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric pw-function-string (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+(defgeneric pw-function        (patch) (:method ((self simple-view)) (declare (ignorable self)) nil))
+
 
 (defclass C-patch (ui:view) 
   ((input-objects :initform nil  :accessor input-objects)
@@ -290,19 +303,20 @@
 
 (defmethod view-click-event-handler ((self C-patch) where)
   (let ((res (call-next-method)))
-    #+debug-views (format-trace '(view-click-event-handler c-patch)
-                  :where (point-to-list where)
-                  :view-size (list (h self) (w self))
-                  :dbl (double-click-p)
-                  :c-o (and (control-key-p) (option-key-p))
-                  :c (control-key-p)
-                  :topbar (inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5)
-                  :botright (inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5)
-                  :botbox (inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12)
-                  :o (option-key-p)
-                  :methods (compute-applicable-methods (function view-click-event-handler) (list self where))
-                  :res res
-                  :self self)
+    #+debug-views
+    (format-trace '(view-click-event-handler c-patch)
+                                :where (point-to-list where)
+                                :view-size (list (h self) (w self))
+                                :dbl (double-click-p)
+                                :c-o (and (control-key-p) (option-key-p))
+                                :c (control-key-p)
+                                :topbar (inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5)
+                                :botright (inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5)
+                                :botbox (inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12)
+                                :o (option-key-p)
+                                :methods (compute-applicable-methods (function view-click-event-handler) (list self where))
+                                :res res
+                                :self self)
     (cond ((eql self res) ;inside patch,no active controls
            (cond ((double-click-p)
                   (open-patch-win self))
@@ -311,26 +325,26 @@
                  ((control-key-p)
                   (change-position self where))
                  ((inside-rectangle? (point-h where) (point-v where) 0 0 (w self) 5) ; top bar
-                  (format-trace 'view-click-event-handler "move top bar " (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "move top bar " (list (point-h where) (point-v where)) self)
                   (change-position self where))
                  ((inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5) ; botright corner
-                  (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
                   (change-size self (subtract-points (view-size self) where)))
-                 ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom box
-                  (format-trace 'view-click-event-handler "bottom box" (list (point-h where) (point-v where)) self)
+                 ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom left box
+                  #+debug-views (format-trace 'view-click-event-handler "bottom box" (list (point-h where) (point-v where)) self)
                   (cond ((option-key-p)  (print (list 'outputtype (type-list self)))) 
                         ((command-key-p) (print (list 'inputtypes (mapcar 'list 
                                                                           (ask-all (pw-controls self) 'doc-string)
                                                                           (ask-all (pw-controls self) 'type-list))))) 
                         (t (flip-controls self (setf (flip-flag self) (not (flip-flag self))))))) 
                  ((option-key-p)
-                 (format-trace 'view-click-event-handler "no active extra" (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "no active extra" (list (point-h where) (point-v where)) self)
                   (mouse-pressed-no-active-extra self (point-h where) (point-v where)))
                  (t
-                  (format-trace 'view-click-event-handler "toggle patch active" (list (point-h where) (point-v where)) self)
+                  #+debug-views (format-trace 'view-click-event-handler "toggle patch active" (list (point-h where) (point-v where)) self)
                   (toggle-patch-active-mode self))))
           ((option-key-p)                ;inside controls
-           (format-trace 'view-click-event-handler `(bad with option-key-p (call-next-method) -> ,res))
+           #+debug-views (format-trace 'view-click-event-handler `(bad with option-key-p (call-next-method) -> ,res))
            (let ((ctrl (ask (pw-controls self) #'view-contains-point-p+self where)))
              (when ctrl 
                (disconnect-ctrl self ctrl)
@@ -338,7 +352,7 @@
                              `((,:|----| ,(mkSO :|cinp| (mkSO :|cbox| nil :|name| (pw-function-string self)) 
                                                 :|indx| (+ (position ctrl (input-objects self)) 1))))))))
           (t
-           (format-trace 'view-click-event-handler `(bad (call-next-method) -> ,res)))))) 
+           #+debug-views (format-trace 'view-click-event-handler `(bad (call-next-method) -> ,res)))))) 
 
 
 ;;======================================================
@@ -351,19 +365,21 @@
             (view-draw-contents v)))
 
 (defmethod view-draw-contents ((self C-patch))
-  (with-font-focused-view self
-    #+debug-views-colors
-    (with-pen-state (:pattern *light-gray-pattern*)
-      (with-fore-color *light-gray-color*
-       (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
+  ;; #|PJB-DEBUG|# (format-trace "progn (view-draw-contents" 'c-patch 'before self)
+  (with-font-focused-view self  
+    (erase-rect* 0 0 (w self) (h self))
+    #+debug-views-colors (with-pen-state (:pattern *light-gray-pattern*)
+                           (with-fore-color *light-gray-color*
+                             (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
     (call-next-method)
     (draw-small-rects self)
     (draw-patch-view-outline self)
-    (draw-function-name self 2 (- (h self) 7))
-    (draw-rect* 0 0 (w self)(h self))
-    #+debug-views-colors
-    (with-fore-color ui::*blue-color*
-      (draw-rect* 0 0 (w self)(h self)))))
+    (draw-function-name self 2 (- (h self) 5))
+    (draw-rect* 0 0 (w self) (h self))
+    #+debug-views-colors (with-fore-color ui::*blue-color*
+                           (draw-rect* 0 0 (w self)(h self))))
+  ;; #|PJB-DEBUG|# (format-trace "view-draw-contents)" 'c-patch 'after- self)
+  )
 
 (defgeneric print-connections (self &optional erase-mode)
   (:method ((self C-patch) &optional erase-mode)
@@ -405,10 +421,10 @@
 
 (defgeneric draw-patch-view-outline (self)
   (:method ((self C-patch))
-    (draw-line 0 3 (w self) 3) 
     (when (active-mode self) 
       (with-pen-state (:pattern *black-pattern*)
         (fill-rect* 0 0 (w self) 3)))
+    (draw-line 0 3 (1- (w self)) 3)
     (draw-patch-extra self)))
 
 (defmethod draw-function-name ((self C-patch) x y)
@@ -431,6 +447,8 @@
   (intersection types-list *pw-object-type-list* :test 'eq))
 
 (defgeneric draw-connections (self &optional erase-mode from-patches)
+  (:method ((self simple-view) &optional erase-mode from-patches)
+    (declare (ignorable self erase-mode from-patches)))
   (:method ((self C-patch) &optional erase-mode from-patches)
     (with-focused-view (view-window self)
       (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
@@ -586,11 +604,15 @@
         (setf (ui::%view-position view) pos)))
     (inval-r-view-sides view t)))
 
+
 (defgeneric handle-edit-events (self char)
   (:method ((self C-patch) char)
     (format-trace '(handle-edit-events c-path) :char char :text (dialog-item-text *pw-controls-dialog-text-item*))
     (case char
-      (#\Etx
+      ((#\Newline
+        #|Enter:|# #\Etx
+                   #+(and has-return (not newline-is-return)) #\Return
+                   #+(and has-linefeed (not newline-is-linefeed)) #\Linefeed)
        (set-dialog-item-text-from-dialog *pw-controls-current-pw-control* 
                                          (dialog-item-text *pw-controls-dialog-text-item*))
        (kill-text-item))
@@ -714,17 +736,8 @@
 (defgeneric rename-yourbox (view)
   (:method ((view C-patch))
     (if (pw-controls view)
-        (progn
-          (unless *pw-controls-dialog-text-item* (make-pw-controls-dialog))
-          (setf *pw-controls-current-pw-control* view)
-          (set-dialog-item-text *pw-controls-dialog-text-item* (pw-function-string view))
-          (set-view-position *pw-controls-dialog-text-item* 
-                             (make-point 1 (- (h view) 14)))
-          (resize-text-item view (make-point (w view) 13))
-          (add-subviews view *pw-controls-dialog-text-item*)
-          (setf *current-small-inBox* (car (pw-controls view)))
-          (change-menu-actions) )
-        (ui:ed-beep)) ))
+        (open-edit-text-item-for-box view (pw-function-string view))
+        (ui:ed-beep))))
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch) str)
   (setf (pw-function-string view) (string-downcase str))
@@ -772,18 +785,24 @@
     (draw-active-mode self)))
 
 (defgeneric activate-control (self)
+  (:method ((self simple-view))
+    (declare (ignorable self)))
   (:method ((self C-patch))
     (unless (active-mode self)
       (setf (active-mode self) t)
       (draw-active-mode self))))
 
 (defgeneric deactivate-control (self)
+  (:method ((self simple-view))
+    (declare (ignorable self)))
   (:method ((self C-patch))
     (when (active-mode self)
       (setf (active-mode self) nil)
       (draw-active-mode self))))
 
 (defgeneric flip-controls (self flag)
+  (:method ((self simple-view) flag)
+    (declare (ignorable self flag)))
   (:method ((self C-patch) flag)
     (for (i 0 1 (1- (length (pw-controls self)))) 
       (when (eql (nth i (pw-controls self))(nth i (input-objects self)))

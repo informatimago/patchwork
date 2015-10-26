@@ -55,7 +55,7 @@
                                   :view-container *rtm-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
     (add-subviews scroller
                   (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
-                                 :view-font '("monaco" 9 :srcor)
+                                 :view-font *patchwork-font-spec*
                                  :dialog-item-text 
                                  "    Rhythm editor keyboard shortcuts and clicks:
 
