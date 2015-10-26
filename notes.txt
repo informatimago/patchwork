@@ -1163,3 +1163,19 @@ http://explanatorygap.net/2009/10/30/apple-have-documented-the-binary-plist-form
 
 
 # THE END 
+* ASDF_OUTPUT_TRANSLATIONS
+
+Hmm, I think ASDF_OUTPUT_TRANSLATIONS still works, so my makefile looks like:
+
+LISP := "/usr/local/bin/sbcl"
+ARGS := "--non-interactive"
+
+debug: export ASDF_OUTPUT_TRANSLATIONS = "/:/tmp/lisp-cache/$@/"
+debug:
+	$(LISP) $(ARGS) --load $@.lisp --load build.lisp
+
+release: export ASDF_OUTPUT_TRANSLATIONS = "/:/tmp/lisp-cache/$@/"
+release:
+	$(LISP) $(ARGS) --load $@.lisp --load build.lisp
+
+where debug.lisp / release.lisp would contain the wanted optimization settings.
