@@ -279,14 +279,20 @@
   (PW-addmenu-fun *pw-Midi-menu* 'patchwork.midi:midi-load 'C-patch-load-midi)
   (PW-addmenu-fun *pw-Midi-menu* 'patchwork.midi:midi-save 'C-patch-save-midi))
 
+(defun pw-window-close (window)
+  (format-trace 'pw-window-close window)
+  (if (eql window *active-patch-window*)
+      (kill-patch-window window)
+      (window-close window)))
+
 (defun initialize-menus ()
   ;;------------------------------
   (setf *pw-menu-apps*         (new-menu "Apps"))
   (setf *apps-lisp-menu-item*  (add-apps-item-to-apps-menu "Lisp" 'lisp-menu-action))
   (setf *apps-PW-menu-item*    (add-apps-item-to-apps-menu "PW"   'pw-menu-action))
   ;;------------------------------
-  (setf *pw-menu-file-close-item*       (item "Close"        #\W        (kill-patch-window *active-patch-window*)))
-  (setf *pw-menu-file-only-Save-item*   (item "Save"         #\S        (PW-WINDOW-SAVE *active-patch-window*)))
+  (setf *pw-menu-file-close-item*       (item "Close"               #\W (pw-window-close (front-window))))
+  (setf *pw-menu-file-only-Save-item*   (item "Save"                #\S (PW-WINDOW-SAVE *active-patch-window*)))
   (setf *pw-menu-file-only-SaveMN-item* (item "Save with MN"        nil (PW-WINDOW-SAVE-MN *active-patch-window*)))
   (setf *pw-menu-file-Save-item*        (item "Save as..."          nil (PW-WINDOW-SAVE-as *active-patch-window*)))
   (setf *pw-menu-file-SaveMN-item*      (item "Save with MN as..."  nil (PW-WINDOW-SAVE-MN-as *active-patch-window*)))
