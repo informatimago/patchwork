@@ -33,7 +33,6 @@
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 
-#-(and)
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (unless (find-package "PATCHWORK.BUILDER")
     (cl:defpackage "PATCHWORK.BUILDER"
