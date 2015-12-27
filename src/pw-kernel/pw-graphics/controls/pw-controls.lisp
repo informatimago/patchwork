@@ -249,6 +249,7 @@
            (y     (point-v (view-position self)))
            (w     (w self))
            (h     (h self)))
+      (format-trace '(view-draw-contents C-ttybox) (open-state self))
       (if (open-state self)
           (call-next-method)
           (draw-text (1+ x) (1+ y) (- w 2) (- h 2) (doc-string self)
