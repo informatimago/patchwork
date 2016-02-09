@@ -1,13 +1,16 @@
 # -*- mode:org; coding:utf-8 -*-
 * TODO [/] Patchwork Project                                      :patchwork:
 ** TODO [#A] debug Patchwork and produce a release                      :bug:
+   CLOCK: [2016-02-08 Mon 00:16]--[2016-02-08 Mon 00:56] =>  0:40
    :DEADLINE: <2016-03-01 -3m>
+
+- updated for explicit ccl *readtable* dependencies.
 
 https://github.com/informatimago/mclgui/graphs/code-frequency
 https://github.com/informatimago/patchwork/graphs/code-frequency
 
 ** TODO [#A] save-image --> dead macptrs in wrappers                    :bug:
-     :DEADLINE: <2016-09-01 -3m>
+   :DEADLINE: <2016-09-01 -3m>
 
 ** TODO [#A] generate-application --> patchwork menus missing           :bug:
      :DEADLINE: <2016-09-01 -3m>
@@ -1314,4 +1317,4 @@ release: export ASDF_OUTPUT_TRANSLATIONS = "/:/tmp/lisp-cache/$@/"
 release:
 	$(LISP) $(ARGS) --load $@.lisp --load build.lisp
 
-where debug.lisp / release.lisp would contain the wanted optimization settings.
+    where debug.lisp / release.lisp would contain the wanted optimization setting
