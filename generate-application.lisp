@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    This script generates the Patchwork application on CCL on MacOSX.
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2014
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -117,7 +117,7 @@
                                    (user-homedir-pathname)))
 
 (ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
-(setf (logical-pathname-translations "RELEASE") 
+(setf (logical-pathname-translations "RELEASE")
       (make-logical-pathname-translations "" *release-directory*))
 
 (say "Generating manifest.")
@@ -170,7 +170,7 @@
     :|UTTypeTagSpecification| (dictionary
                                :|com.apple.ostype| "PTCH" ;; ???
                                :|public.filename-extension| #("pwpatch9")))
-   
+
    (dictionary
     :|UTTypeIdentifier| "com.informatimago.patckwork.macosx.patchwork-file"
     :|UTTypeDescription| "MacOSX Patchwork file"
