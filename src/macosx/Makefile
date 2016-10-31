@@ -24,3 +24,4 @@ patchwork-icon.icns:patchwork-icon.iconset
 interfaces:
 	ccl -norc -l generate-interfaces.lisp -e '(quit)'
 
+.PHONY:icons
