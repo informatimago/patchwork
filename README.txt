@@ -25,7 +25,7 @@ Installing the sources of Patchwork
 2- Obtain the sources and dependencies
 
    cd "${SRC}"
-   git clone git@gitorious.org:patchwork/scripts.gitn
+   git clone git@gitorious.org:patchwork/scripts.git
    scripts/get-sources
 
 3- Compile the dependencies and Patchwork
