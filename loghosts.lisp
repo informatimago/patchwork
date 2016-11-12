@@ -178,7 +178,7 @@ TRANSLATIONS: a list of logical pathname translations.
                                                                  *load-truename*
                                                                  #P"./")))))
       (set-host "SRC"
-                '("INFORMATIMAGO")  "src/public/lisp/"             home
+                '("INFORMATIMAGO")  "informatimago/"               src
                 '("PATCHWORK")      "patchwork/"                   src
                 '("MCLGUI")         "mclgui/"                      src
                 '("MIDI")           "midi/"                        src
@@ -198,9 +198,8 @@ TRANSLATIONS: a list of logical pathname translations.
                 '()                 "patchwork/src/src-lib/cleni/" src)
 
       (set-host "PW-USER"
-                '()                 "Documents/Patchwork/"         home))))
-
-
+                '()                 "Documents/Patchwork/"         home)))
+  *logical-hosts*)
 
 (define-logical-hosts)
 
