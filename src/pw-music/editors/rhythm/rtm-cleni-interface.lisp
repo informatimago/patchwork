@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -90,7 +90,7 @@
             *cleni-notehead-list*)
       (while beats
         (write-cleni-beat (pop beats) self (give-low-number (read-from-string (low self))))))))
- 
+
 ;;  :chord 1/4 '(c5 g5)
 ;;  :rest 1/8
 ;; note rest slur
@@ -100,7 +100,7 @@
        (alteration (alteration note)))
 ;;  (print (list diatone alteration))
   (read-from-string
-    (concatenate 'string 
+    (concatenate 'string
       (string (case (mod diatone 7)
                 (0 'c)(1 'd)(2 'e)(3 'f)(4 'g)(5 'a)(6 'b)))
       (format nil "~A" (1- (truncate diatone 7)))
@@ -113,7 +113,7 @@
 (defmethod write-cleni-beat  ((self C-beat) super-beat low)
   (let* ((rtm-list (rtm-list self))
          (rtm-sum (round (apply #'+ (mapcar #'abs (ask-all (rtm-list self) 'unit-length)))))
-         (tuplet-flag (draw-tuplets? rtm-sum (unit-length self))) 
+         (tuplet-flag (draw-tuplets? rtm-sum (unit-length self)))
          rtm-now rtm-obj note-head-info tuplet-num cleni-tuplet-unit)
      (when (eql (class-name  (class-of  super-beat)) 'C-measure)
          (setf *global-rtm-level-list* nil)
@@ -129,9 +129,9 @@
       (setq rtm-obj (pop rtm-list))
       (setq rtm-now (unit-length rtm-obj))
       (if (no-beat-leaf? rtm-obj)
-        (write-cleni-beat rtm-obj self (+ (calc-next-note-level (unit-length self) rtm-sum) low)) 
+        (write-cleni-beat rtm-obj self (+ (calc-next-note-level (unit-length self) rtm-sum) low))
         (progn
-            (setq note-head-info 
+            (setq note-head-info
                (calc-next-note-head  (unit-length self) rtm-sum rtm-now low))
 ;;            (print (list (car *notehead-type-list*) note-head-info))
             (cond
@@ -149,18 +149,18 @@
               ((floatp rtm-now)              ;slur
                  (nconc *cleni-previous-chord-info-list*
                        `(:tie ',(make-list (length (eval (third *cleni-previous-chord-info-list*))) :initial-element t)))
-                 (push 
-                      `(:chord 
+                 (push
+                      `(:chord
                           ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                           ,(third *cleni-previous-chord-info-list*))
                        *cleni-notehead-list*)) )
               (when (eql (second note-head-info) 'slur)
                  (setq *cleni-notehead-list*
-                   (cons 
+                   (cons
                      (append (car *cleni-notehead-list*)
                           `(:tie ',(make-list (length (eval (third *cleni-previous-chord-info-list*))) :initial-element t)))
                      (cdr *cleni-notehead-list*)))
-                 (push 
+                 (push
                    `(:chord  ,(convert-rtm-unit-to-cleni (+ (car *global-rtm-level-list*) 2) nil)
                              ,(third *cleni-previous-chord-info-list*))
                     *cleni-notehead-list*))
@@ -175,7 +175,7 @@
 (defmethod write-cleni-beat  ((self C-beat) super-beat low)
   (let* ((rtm-list (rtm-list self))
          (rtm-sum (round (apply #'+ (mapcar #'abs (ask-all (rtm-list self) 'unit-length)))))
-         (tuplet-flag (draw-tuplets? rtm-sum (unit-length self))) 
+         (tuplet-flag (draw-tuplets? rtm-sum (unit-length self)))
          rtm-now rtm-obj note-head-info tuplet-num cleni-tuplet-unit
          )
     (when (eql (class-name  (class-of  super-beat)) 'C-measure)
@@ -192,9 +192,9 @@
       (setq rtm-obj (pop rtm-list))
       (setq rtm-now (unit-length rtm-obj))
       (if (no-beat-leaf? rtm-obj)
-        (write-cleni-beat rtm-obj self (+ (calc-next-note-level (unit-length self) rtm-sum) low)) 
+        (write-cleni-beat rtm-obj self (+ (calc-next-note-level (unit-length self) rtm-sum) low))
         (progn
-          (setq note-head-info 
+          (setq note-head-info
                 (calc-next-note-head  (unit-length self) rtm-sum rtm-now low))
           ;(print (list (car *notehead-type-list*) note-head-info))
           (cond
@@ -214,19 +214,19 @@
             (when *cleni-previous-obj-info-list*
               (nconc *cleni-previous-obj-info-list*
                      `(:tie ',(make-list (length  (third *cleni-previous-chord-info-list*)) :initial-element t))))
-            (push 
+            (push
              (setq  *cleni-previous-obj-info-list*
-                    `(:chord 
+                    `(:chord
                       ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                       ,(third *cleni-previous-chord-info-list*)))
              *cleni-notehead-list*)) )
           (when (eql (second note-head-info) 'slur) (print 'slur)
                 (setq *cleni-notehead-list*
-                      (cons 
+                      (cons
                        (append (car *cleni-notehead-list*)
                                `(:tie ,(make-list (length  (third *cleni-previous-chord-info-list*)) :initial-element t)))
                        (cdr *cleni-notehead-list*)))
-                (push 
+                (push
                  `(:chord  ,(convert-rtm-unit-to-cleni (+ (car *global-rtm-level-list*) 2) nil)
                            ,(third *cleni-previous-chord-info-list*))
                  *cleni-notehead-list*))
@@ -244,7 +244,7 @@
   (:method ((self C-beat) super-beat low)
     (let* ((rtm-list (rtm-list self))
            (rtm-sum (round (apply #'+ (mapcar #'abs (ask-all (rtm-list self) 'unit-length)))))
-           (tuplet-flag (draw-tuplets? rtm-sum (unit-length self))) 
+           (tuplet-flag (draw-tuplets? rtm-sum (unit-length self)))
            rtm-now rtm-obj note-head-info tuplet-num cleni-tuplet-unit
            )
       (when (eql (class-name  (class-of  super-beat)) 'C-measure)
@@ -261,9 +261,9 @@
         (setq rtm-obj (pop rtm-list))
         (setq rtm-now (unit-length rtm-obj))
         (if (no-beat-leaf? rtm-obj)
-            (write-cleni-beat rtm-obj self (+ (calc-next-note-level (unit-length self) rtm-sum) low)) 
+            (write-cleni-beat rtm-obj self (+ (calc-next-note-level (unit-length self) rtm-sum) low))
             (progn
-              (setq note-head-info 
+              (setq note-head-info
                     (calc-next-note-head  (unit-length self) rtm-sum rtm-now low))
                                         ;(print (list (car *notehead-type-list*) note-head-info))
               (cond
@@ -285,24 +285,24 @@
                  (when *cleni-previous-obj-info-list*
                    (nconc *cleni-previous-obj-info-list*
                           `(:tie ',(make-list (length  (third *cleni-previous-chord-info-list*)) :initial-element t))))
-                 (push 
+                 (push
                   (setq  *cleni-previous-obj-info-list*
-                         `(:chord 
+                         `(:chord
                            ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                            ,(third *cleni-previous-chord-info-list*)))
                   *cleni-notehead-list*)) )
-              (when (eql (second note-head-info) 'slur) 
+              (when (eql (second note-head-info) 'slur)
                 (cond ((eql (caar *cleni-notehead-list*) :rest)
-                       (push 
+                       (push
                         `(:rest  ,(convert-rtm-unit-to-cleni (+ (car *global-rtm-level-list*) 2) nil))
                         *cleni-notehead-list*))
                       (t
                        (setq *cleni-notehead-list*
-                             (cons 
+                             (cons
                               (append (car *cleni-notehead-list*)
                                       `(:tie ,(make-list (length  (third *cleni-previous-chord-info-list*)) :initial-element t)))
                               (cdr *cleni-notehead-list*)))
-                       (push 
+                       (push
                         `(:chord  ,(convert-rtm-unit-to-cleni (+ (car *global-rtm-level-list*) 2) nil)
                                   ,(third *cleni-previous-chord-info-list*))
                         *cleni-notehead-list*))))
@@ -329,7 +329,7 @@
 ;;(cleni:translate-score *rtm-cleni-score* "root;rtm-test")
 
 (defun save-cleni-rtm-score ()
-  (let ((new-name (choose-new-file-dialog   
+  (let ((new-name (choose-new-file-dialog
              :directory (window-title *active-rtm-window*)
              :prompt "Save RTM As…")))
      (calc-cleni-rtm-score *active-rtm-window*)

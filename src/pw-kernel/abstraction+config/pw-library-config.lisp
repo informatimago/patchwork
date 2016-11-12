@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    User Library configuration
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -77,7 +77,7 @@
 (defvar *added-box-object* nil)
 (defun load&form-abstr-menu (path &optional index)
   (if path
-    (with-cursor *watch-cursor* 
+    (with-cursor *watch-cursor*
       (let ((patches (directory (format () "~A**:*.*"path))))
         (when patches
           (setf *user-abstracts-config* (nconc *user-abstracts-config* (list path)))
@@ -88,27 +88,27 @@
                 (setf (fdefinition 'add-patch-box) (fdefinition 'no-add-patch-box))
                 (load file-name)
                 (setf (fdefinition 'add-patch-box) (fdefinition saved-fun))
-                (form-abstract-subMenu 
-                 (namestring file-name) (namestring path) 
+                (form-abstract-subMenu
+                 (namestring file-name) (namestring path)
                  `(add-patch-box *active-patch-window*
                                  ,(decompile *added-box-object*))
                  index)))))))))
 
 (defun form-abstract-subMenu (patch-file-name from-folder code &optional index)
-  (let ((sub-dir-list 
+  (let ((sub-dir-list
          (nthcdr (- (length (parse-file-name from-folder)) (or index 2))
                  (parse-file-name patch-file-name)))
         (current-sub-menu *pw-menu-patch*)
         (menu))
     (dotimes (x (1- (length sub-dir-list)))
-      (unless 
+      (unless
           (setq menu (find-menu-item current-sub-menu (car sub-dir-list)))
         (ui:add-menu-items current-sub-menu
-                           (setq menu (new-menu (car sub-dir-list)))))                          
+                           (setq menu (new-menu (car sub-dir-list)))))
       (setq current-sub-menu menu)
       (pop sub-dir-list))
     (or (find-menu-item current-sub-menu (car sub-dir-list))
-        (ui:add-menu-items current-sub-menu (new-leafmenu (trim-extension (car sub-dir-list)) 
+        (ui:add-menu-items current-sub-menu (new-leafmenu (trim-extension (car sub-dir-list))
                                                           (eval `(function (lambda () ,code))))))))
 
 
@@ -171,7 +171,7 @@ GA 17/5/94
       (load&form-abstr-menu abstr-path))
     (load&form-abstr-menu (namestring *config-default-abst-path*) 1)
     (and (third file-config-list)
-         (restore-global-options (third file-config-list) 
+         (restore-global-options (third file-config-list)
                                  (fourth file-config-list)))))
 
 (defun forget-all-config ()
@@ -199,7 +199,7 @@ GA 17/5/94
              (unwind-protect
                   (load-again path-to-load)
                (setf (logical-pathname-translations logical-dir-str) old-path))))
-          (t (format t "can't find library in path: ~S" 
+          (t (format t "can't find library in path: ~S"
                      (full-pathname (format nil "~A:" logical-dir-str)))
              (ui:ed-beep)))))
 
@@ -234,7 +234,7 @@ GA 17/5/94
       (load&form-abstr-menu abstr-path))
     (load&form-abstr-menu (namestring *config-default-abst-path*) 1)
     (and (third file-config-list)
-         (restore-global-options (third file-config-list) 
+         (restore-global-options (third file-config-list)
                                  (fourth file-config-list)))))
 
 (defun load-one-user-library (path)

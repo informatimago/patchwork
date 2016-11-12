@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -91,7 +91,7 @@
   (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((playerIdle))
       (ccl:rlet ((myState :<P>layer<S>tate))
-        (patchwork.midi:getStatePlayer patchwork.midi:*player* myState) 
+        (patchwork.midi:getStatePlayer patchwork.midi:*player* myState)
         (when (= (patchwork.midi:s-state myState) kIdle) (setf playerIdle t)))
       (unless playerIdle (print "Wait end of previous play!"))
       (when playerIdle
@@ -109,7 +109,7 @@
   (when (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
     (let ((playerIdle))
       (patchwork.midi:with-temporary-player-state (mystate)
-        (patchwork.midi:getStatePlayer patchwork.midi:*player* myState) 
+        (patchwork.midi:getStatePlayer patchwork.midi:*player* myState)
         (when (= (patchwork.midi:s-state myState) patchwork.midi:kIdle)
           (setf playerIdle t))
         (unless playerIdle
@@ -170,7 +170,7 @@
   (loop for note in (notes chord)
         for offset from 0 by 50
         do (MidiPlay note  (round (+  (convert-time-1 offset unit/sec) (convert-time-1 (offset-time note) unit/sec) at)) approx chanbase seq unit/sec)))
-      
+
 
 (defmethod MidiPlay ((chline C-CHORD-LINE) at approx chanbase seq unit/sec)
   (loop for chord in (chords chline)
@@ -213,15 +213,15 @@
         (thechord  (if (equal (class-name (class-of (pw-win (view-container self)))) 'c-pw-window)
                      (chord-line (car (editor-objects self)))
                      (car (chords (chord-line (car (editor-objects self))))))))
-    (cond 
+    (cond
      ((setting-of self :time)
       (setf *play-chseq-w/offset* t)
       (MidiPlayAny thechord approx 0))
      ((setting-of self :arp)
       (play-arpeggiated self))
      (t (setf *play-chseq-w/offset* (get-ctrl-setting self :offs)) (MidiPlayAny thechord approx 0)))))
-  
- 
+
+
 
 (defmethod play-arpeggiated ((self C-chord-mus-not-view))
   (let* ((chord (car (chords (chord-line (car (editor-objects self))))))
@@ -233,7 +233,7 @@
 
 ;;=====play Chordseq and Multiseq
 
-(defmethod play ((self C-patch-midi)) 
+(defmethod play ((self C-patch-midi))
   (play-all-staffs (car (subviews (application-object self)))))
 
 (defmethod play-all-staffs ((self C-MN-view-mod))
@@ -256,7 +256,7 @@
 
 
 
-(defun play-from-pw (self) 
+(defun play-from-pw (self)
   (let* ((editor (car (subviews (application-object self))))
          (*play-chseq-w/offset* (check-box-checked-p (third (rtm-radio-ctrls editor))))
          (editors (give-selected-editors editor)))
@@ -267,7 +267,7 @@
 (defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
-    (let ((c-line (make-instance 'C-chord-line 
+    (let ((c-line (make-instance 'C-chord-line
                     :chords (remove nil (flat (rtm-chords (ask-all editors 'measure-line)))))))
       (if *mn-view-offset-flag*
         (let ((*play-chseq-w/offset* t)) (MidiPlayAny c-line  (compute-approx) 0))
@@ -286,16 +286,16 @@
 (defmethod stop-play ((self c-patch-polifrtm))
   (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
-(defmethod stop-play ((self C-patch-score-voice)) 
+(defmethod stop-play ((self C-patch-score-voice))
   (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
-(defmethod stop-play ((self C-patch-midi)) 
+(defmethod stop-play ((self C-patch-midi))
   (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
 (defmethod stop-all-staffs ((self C-mus-not-view))
   (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
-(defmethod stop-measure-line ((self C-measure-line)) 
+(defmethod stop-measure-line ((self C-measure-line))
   (when patchwork.midi:*player* (patchwork.midi:stopplayer patchwork.midi:*player*)))
 
 

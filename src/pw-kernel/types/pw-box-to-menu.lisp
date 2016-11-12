@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    The PW add-box-to-menu function.
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -54,14 +54,14 @@
     (t (if (defunp-function? fun)
            (new-PW-box-menu-item menu (string-downcase fun) fun box-class)
            (ui:add-menu-items menu
-                              (make-instance 'ui:menu-item 
+                              (make-instance 'ui:menu-item
                                              :menu-item-title (string-downcase fun)
                                              :menu-item-action
-                                             (lambda () 
+                                             (lambda ()
                                                (make-lisp-pw-boxes
                                                 fun *active-patch-window*))))))))
 
-(defun new-PW-box-menu-item (main-menu mtitle function &optional box-class) 
+(defun new-PW-box-menu-item (main-menu mtitle function &optional box-class)
   (if (not (fboundp function))
       (format t "~15A~25A" function "no such function !" )
       (multiple-value-bind (args extensible?) (make-defunp-function-arg-list function)
@@ -85,7 +85,7 @@
 ;; =============================================================================-======
 ;;
 ;;corrections to basic boxes
- 
+
 (defclass C-pw-functional (C-pw-extend) ())
 
 (defmethod give-new-extended-title ((self C-pw-functional)) )
@@ -93,9 +93,9 @@
 #|
 (defmethod generate-extended-inputs ((self C-pw-functional))
   (make-defunp-function-arg-list (pw-function self) (1+ (length (pw-controls self)))))
-(defmethod mouse-pressed-no-active-extra ((self C-pw-functional) x y) 
-  (declare (ignore x y) ) 
-  (if (option-key-p) 
+(defmethod mouse-pressed-no-active-extra ((self C-pw-functional) x y)
+  (declare (ignore x y) )
+  (if (option-key-p)
    (let ((box-now
            (make-PW-standard-box  (type-of self) (pw-function self)
               (make-point (x self) (y self))
@@ -114,9 +114,9 @@
     nil))
 |#
 
-(defmethod mouse-pressed-no-active-extra ((self C-pw-functional) x y) 
-  (declare (ignore x y) ) 
-  (if (option-key-p) 
+(defmethod mouse-pressed-no-active-extra ((self C-pw-functional) x y)
+  (declare (ignore x y) )
+  (if (option-key-p)
    (let ((box-now
            (make-PW-standard-box  (type-of self) (pw-function self)
               (make-point (x self) (y self))
@@ -151,7 +151,7 @@
 
 (defmethod decompile ((self C-pw-resize-x))
   (if (and (pw-function self) (defunp-function? (pw-function self)))
-    `(sbox ',(type-of self) ',(pw-function self) ,(pw-function-string self) 
+    `(sbox ',(type-of self) ',(pw-function self) ,(pw-function-string self)
           ,(active-mode self) ,(view-position self)
           (list ,@(ask-all (pw-controls self) 'value)) ,(view-size self))
     (call-next-method)))

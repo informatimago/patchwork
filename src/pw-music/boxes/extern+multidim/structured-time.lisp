@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,11 +36,11 @@
 
 
 (defgeneric give-structured-duration2 (self rel-dur super-note)
-  (:method ((self C-MN-window) rel-dur super-note) 
+  (:method ((self C-MN-window) rel-dur super-note)
     (if (super-win self)
-        (give-structured-duration2 (super-win self) 
-                                   (* rel-dur 
-                                      (calc-relative-duration (car (editor-objects (editor-view-object self))) super-note)) 
+        (give-structured-duration2 (super-win self)
+                                   (* rel-dur
+                                      (calc-relative-duration (car (editor-objects (editor-view-object self))) super-note))
                                    (super-note self))
         (round (* rel-dur (dur super-note))))))
 
@@ -48,30 +48,30 @@
 ;; if not -> absolute begin-time in ticks
 
 (defgeneric give-structured-begin-time2 (self rel-begin-time super-note)
-  (:method ((self C-MN-window) rel-begin-time super-note) 
+  (:method ((self C-MN-window) rel-begin-time super-note)
     (declare (ignore rel-begin-time))
     (let* ((MN-view (car (editor-objects (editor-view-object self))))
            (new-rel-begin (calc-relative-begin-time MN-view super-note))
            )
       (if (super-win self)
-          (progn 
-            (setq new-rel-begin 
-                  (+ (give-t-time-for-note MN-view super-note) 
+          (progn
+            (setq new-rel-begin
+                  (+ (give-t-time-for-note MN-view super-note)
                      (* new-rel-begin (dur super-note))))
-            (give-structured-begin-time2 (super-win self) 
+            (give-structured-begin-time2 (super-win self)
                                          (calc-relative-begin-time new-rel-begin ())
                                          (super-note self)))
           (give-t-time-for-note MN-view super-note)))))
 
 (defgeneric record-structured-process (self)
   (:method ((self C-MN-window))
-    (with-cursor  *watch-cursor* 
+    (with-cursor  *watch-cursor*
       (let ((chords (chords (chord-line (car (editor-objects (editor-view-object self))))))
             begin-times duration-times midi-boxes midi-boxes-temp pw-windows pw-windows-temp
             pw-win-now midi-box-now total-dur)
         (while chords
           (setq pw-windows-temp
-                (ask-all (ask-all (notes (car chords)) 'instrument) 'pw-win)) ;PW returns nil     
+                (ask-all (ask-all (notes (car chords)) 'instrument) 'pw-win)) ;PW returns nil
           (while pw-windows-temp
             (when (setq pw-win-now (pop pw-windows-temp))
               (when (setq midi-box-now
@@ -83,7 +83,7 @@
         (setq midi-boxes-temp (setq midi-boxes (nreverse midi-boxes)))
         (setq  begin-times (ask-all pw-windows 'give-structured-begin-time))
         (setq duration-times (ask-all pw-windows 'give-structured-duration1 1))
-        (setq total-dur (apply #'max (mapcar #'+ begin-times duration-times))) 
+        (setq total-dur (apply #'max (mapcar #'+ begin-times duration-times)))
         (while midi-boxes-temp
           (set-begin-time (car midi-boxes-temp) (pop begin-times))
           (set-duration-time (car midi-boxes-temp) (pop duration-times))
@@ -98,21 +98,21 @@
 
 (defgeneric make-structured-score (self)
   (:method ((self C-MN-window))
-    (with-cursor *watch-cursor* 
+    (with-cursor *watch-cursor*
       (let ((chords (chords (chord-line (car (editor-objects (editor-view-object self))))))
-            MN-chord-lines pw-win-now super-notes super-notes-temp midi-box-now 
+            MN-chord-lines pw-win-now super-notes super-notes-temp midi-box-now
             res-chord-lines last-diatone patch-box)
-        (setq super-notes 
-              (ask-all 
+        (setq super-notes
+              (ask-all
                (remove nil
                        (ask-all (ask-all (apply #'append (ask-all chords 'notes)) 'instrument) 'pw-win)
                        :test 'eq)
-               'super-note)) 
+               'super-note))
         (setq super-notes (setq super-notes-temp (sort super-notes '> :key (lambda (a) (diatone a)))))
         (while super-notes
-          (setq pw-win-now (pw-win (instrument (car super-notes))))     
+          (setq pw-win-now (pw-win (instrument (car super-notes))))
           (when (setq midi-box-now (car (find-all-midi-out-boxes pw-win-now)))
-            (push 
+            (push
              (eval (decompile (give-MN-editor-chord-line midi-box-now 0)))
              MN-chord-lines)
             (add-constant-t-time (car MN-chord-lines)
@@ -126,13 +126,13 @@
               (progn
                 (setq chords (chords (pop MN-chord-lines)))
                 (while chords
-                  (sort-chord-by-time (car res-chord-lines) (pop chords)))) 
-              (progn 
+                  (sort-chord-by-time (car res-chord-lines) (pop chords))))
+              (progn
                 (push (pop MN-chord-lines) res-chord-lines)
                 (setq last-diatone (diatone (car super-notes-temp)))))
           (pop super-notes-temp))
 ;;;Camilo====================== put in new typing scheme into dynamically created polif box 920120
-        (setq patch-box 
+        (setq patch-box
                                         ;(make-patch-box 'C-patch-polifMN-mod 'PMNN
                                         ;(make-pw-npolif-editor-list (length res-chord-lines)))
               (make-PW-standard-box 'C-patch-polifMN-mod 'poly-coll (make-point 15 15)
@@ -142,7 +142,7 @@
         (set-pw-window-pointers patch-box (pw-win self))
         (add-patch-box (pw-win self) patch-box)
         (activate-control patch-box )
-        ;;     (pretty-visible-layout (car (controls (application-object patch-box)))) 
+        ;;     (pretty-visible-layout (car (controls (application-object patch-box))))
         (open-patch-win patch-box)))))
 
 (defun set-all-chords (ch-list from-ch-list)
@@ -150,7 +150,7 @@
 
 (defun make-pw-npolif-editor-list (count)
   (let ((arg-list))
-    (for (i 0 1 (1- count)) 
+    (for (i 0 1 (1- count))
       (push  '*MN-collector-type* arg-list)
       (push  (concatenate  'string  "coll" (format nil "~D" (1+ i))) arg-list))
     (nreverse arg-list)))
@@ -167,9 +167,9 @@
 
 (defgeneric give-t-time-for-note (self note)
   (:method ((self C-music-notation-panel) note)
-    (let ((chords (chords (chord-line self))) 
+    (let ((chords (chords (chord-line self)))
           res-chord)
-      (while chords 
+      (while chords
         (when (member note (notes (car chords)) :test 'eq)
           (setq res-chord (car chords))
           (setq chords ()))
@@ -180,15 +180,15 @@
   (:method ((self C-music-notation-panel) super-note)
     (let ((dur (dur super-note))
           (t-times+dur (max-t-time+dur self)))
-      (/ dur t-times+dur)))) 
+      (/ dur t-times+dur))))
 
 (defgeneric calc-relative-begin-time (self super-note &optional begintime)
   (:method ((self C-music-notation-panel) super-note &optional begintime)
     (let ((begin (give-t-time-for-note self super-note))
           (t-times+dur (max-t-time+dur self)))
-      (if begintime 
-          (/ t-times+dur begintime) 
-          (if (zerop begin) 0 (/ t-times+dur begin)))))) 
+      (if begintime
+          (/ t-times+dur begintime)
+          (if (zerop begin) 0 (/ t-times+dur begin))))))
 
 ;;====================================================================================================
 ;; C-note
@@ -197,12 +197,12 @@
 (defvar *pw-struct-collector-counter* 0)
 
 (defun make-new-structured-window (string &optional counter)
-  (let ((win-string 
-          (concatenate  'string  string 
+  (let ((win-string
+          (concatenate  'string  string
                         (if counter
                             (format nil "~D" counter)
                             (format nil "~D" (incf *pw-struct-window-counter*))))))
-    (make-instance 'C-pw-window 
+    (make-instance 'C-pw-window
                    :window-title win-string
                    :view-position (make-point 50 38)
                    :view-size (make-point 200 200) :close-box-p nil :window-show ())))
@@ -215,7 +215,7 @@
   (:method ((self C-note) win x y)
     (declare (ignore x y))
     (let ((pw-win (make-new-structured-window "Strcoll"))
-          (midi-patch (make-new-note-collector))) 
+          (midi-patch (make-new-note-collector)))
       (setf (pw-win (view-window (give-MN-editor midi-patch))) pw-win)
       (setf (super-win  (view-window (give-MN-editor midi-patch))) win)
       (setf (super-note (view-window (give-MN-editor midi-patch))) self)
@@ -268,7 +268,7 @@
   (let ((midi-patch (car (find-all-midi-out-boxes self))))
     (if midi-patch self nil)))
 
-(defmethod draw-instrument ((self C-pw-window)  x y t-scfactor) 
+(defmethod draw-instrument ((self C-pw-window)  x y t-scfactor)
   (declare (ignore y t-scfactor))
   (set-view-font  (view-window *current-MN-editor*) *patchwork-font-spec*)
   (draw-string x *MN-note-ins-y* (window-title self))
@@ -276,12 +276,12 @@
   (incf *MN-note-ins-y* 12))
 
 (defgeneric give-structured-duration1 (self rel-dur)
-  (:method ((self C-pw-window) rel-dur) 
+  (:method ((self C-pw-window) rel-dur)
     (if (super-win self)
         (give-structured-duration2 (super-win self) rel-dur (super-note self))
         rel-dur)))
 
-(defmethod give-structured-begin-time ((self C-pw-window)) 
+(defmethod give-structured-begin-time ((self C-pw-window))
   (if (super-win self)
       (give-structured-begin-time2 (super-win self) 0 (super-note self))
       0))
@@ -290,14 +290,14 @@
 ;;======================================================================================
 ;;pw
 
-(defmethod give-structured-begin-time ((self C-patch)) 
+(defmethod give-structured-begin-time ((self C-patch))
   (give-structured-begin-time (view-window self)))
 
 ;;=======================================
 ;;  structured duration
 ;;=======================================
 
-(defclass C-structured-dur (C-patch) ()) 
+(defclass C-structured-dur (C-patch) ())
 
 (defmethod patch-value ((self C-structured-dur) obj)
   (give-structured-duration1 (view-window self)
@@ -307,13 +307,13 @@
     "Str-dur (structured duration) box returns the duration of a super-note.
 This value is multiplied by the value of the input box (by default 1).
 Str-dur box is normally used in context of structured time.
-" 
+"
   (declare (ignore time)))
 
 ;;========================================================================================
 ;; structured begin time
 
-(defclass C-structured-outbox (C-pw-out) 
+(defclass C-structured-outbox (C-pw-out)
   ((clock :initform 0 :accessor clock)))
 
 (defmethod patch-value ((self C-structured-outbox) obj)
@@ -321,14 +321,14 @@ Str-dur box is normally used in context of structured time.
         (+ (clock obj)
            (- (give-structured-begin-time obj)
               (give-structured-begin-time (view-window self)))))
-  (patch-value (car (input-objects self)) self)) 
+  (patch-value (car (input-objects self)) self))
 
-;; !!  obj will be me after this call and the clock will accessed from this object !! 
+;; !!  obj will be me after this call and the clock will accessed from this object !!
 
 (defunp strout ((patch user-out)) nil
     "Strout (structured out) is used always in combination with a 'in' box.
 It is similar to to an 'out' box except that it adds to the clockvalue of
-the requesting box the begintime of the super-note of the requesting box. 
+the requesting box the begintime of the super-note of the requesting box.
 Strout box is normally used in context of structured time.
 "
   (declare (ignorable patch))

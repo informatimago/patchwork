@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -47,11 +47,11 @@
 (defclass C-reducer (C-patch) ())
 
 (defmethod patch-value ((self C-reducer) obj)
-  (store-buffer (first (input-objects self)) 
+  (store-buffer (first (input-objects self))
                 (get-list (first (input-objects self)) obj))
   (dolist (elem (get-list (third (input-objects self)) obj))
     (store-buffer (third (input-objects self)) elem)
-    (store-buffer (first (input-objects self)) 
+    (store-buffer (first (input-objects self))
                   (patch-value (second (input-objects self)) obj)))
   (patch-value (first (input-objects self)) obj))
 
@@ -60,21 +60,21 @@
      (progn (ui:ed-beep)(format t "Disconnection of the first or third input is not allowed !"))
      (call-next-method)))
 
-(defunp loop+accum ((c-red (symbol (:type-list (loop)))) 
+(defunp loop+accum ((c-red (symbol (:type-list (loop))))
                      (patch (list (:type-list ())))
                      (c-enum (symbol (:type-list (loop))))) list
 "behaves like the CL Reduce function with a patch instead of a function"
   (declare (ignore c-red patch c-enum)))
 
-(defunp pwreduce ((c-red (symbol (:type-list (loop)))) 
+(defunp pwreduce ((c-red (symbol (:type-list (loop))))
                      (patch (list (:type-list ())))
                      (c-enum (symbol (:type-list (loop))))) list
 "The pwreduce module applies a function to a list of elements.
-The list is entered in enum and the function is defined by patch. 
-.accum ;gives an initial value for the function, 
-and serves to accumulate the results of the function for each step 
-in the loop. In other words, pwreduce ;repeatedly applies a 
-function--patch--to each of a list of elements--enum;--and puts the results 
+The list is entered in enum and the function is defined by patch.
+.accum ;gives an initial value for the function,
+and serves to accumulate the results of the function for each step
+in the loop. In other words, pwreduce ;repeatedly applies a
+function--patch--to each of a list of elements--enum;--and puts the results
 of each successive evaluation in accum.   The output is the last computed result."
   (declare (ignore c-red patch c-enum)))
- 
+

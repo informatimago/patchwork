@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    This is an old typing scheme, superseeded in 911020. It is kept for compatibility
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,26 +16,26 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
 (enable-patchwork-reader-macros)
 
-;; x , y , doc-string has to be given from outside 
+;; x , y , doc-string has to be given from outside
 
 (defclass C-pw-type ()
   ((control-form :initform nil :initarg :control-form :reader control-form)))
@@ -172,7 +172,7 @@
 (defvar *midicent-pw-type*
   (make-instance 'C-pw-type
   :control-form
-   `(make-instance 'C-numbox  :view-size #@(36 14) :value 6000 :min-val 0 :max-val 12700 
+   `(make-instance 'C-numbox  :view-size #@(36 14) :value 6000 :min-val 0 :max-val 12700
        :type-list '(fixnum list))))
 
 (defvar *midi-pw-type-chan16*
@@ -219,7 +219,7 @@
 ;;================================
 (defvar *boolean-pw-type*
   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-val  :view-size #@(36 14)
-    :menu-box-list '(("T" . t) ("NIL". nil)) 
+    :menu-box-list '(("T" . t) ("NIL". nil))
     :type-list '(boolean))))
 
 
@@ -235,7 +235,7 @@
 ;;(setq *fix-float-list-pw-type*
 ;;  (make-instance 'C-pw-type
 ;;  :control-form
-;;   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "0" 
+;;   `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "0"
 ;;      :type-list '(fixnum float list))))
 
 ;;;; THE END ;;;;

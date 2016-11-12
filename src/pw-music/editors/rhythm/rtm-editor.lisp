@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,30 +15,30 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;  
+;;;;
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
 
 ;;========================================================
 
-(defclass C-beat-editor-panel (ui:view) 
+(defclass C-beat-editor-panel (ui:view)
   ((measure-line :initform () :initarg :measure-line :accessor measure-line)
    (first-beat-num :initform 0 :initarg :first-beat-num :accessor first-beat-num)
    (edit-mode :initform () :initarg :edit-mode :accessor edit-mode)
@@ -53,15 +53,15 @@
   (declare (ignore args))
   (add-subviews self
                 (setf (selection-button self)
-                      (make-instance 'C-button-latched 
+                      (make-instance 'C-button-latched
                                      :dialog-item-text "S"
                                      :view-position (make-point 2 10) :view-size (make-point 10 14))))
-  (set-selection-button self t)) 
- 
+  (set-selection-button self t))
+
 
 (defmethod decompile ((self C-beat-editor-panel))
   `(make-instance 'C-beat-editor-panel
-        :view-position ,(view-position self) :view-size ,(view-size self) 
+        :view-position ,(view-position self) :view-size ,(view-size self)
         :staff-number ,(staff-number self) :C-5-y-pixel ,(C-5-y-pixel self)
         :rtm-y-pixel ,(rtm-y-pixel self)
         :beat-zoom ,(beat-zoom self)
@@ -97,7 +97,7 @@
 (defgeneric init-rtm-draw (self)
   (:method ((self C-beat-editor-panel))
     (setq *staff-num* (staff-number self))
-    (when (edit-mode self) 
+    (when (edit-mode self)
       (connect-to-selection-button self (measure-line self) 2 45 10 22 'open-measure-line-editor))))
 
 
@@ -110,7 +110,7 @@
          (*mn-view-dur-flag* (second draw-info))
          (*mn-view-offset-flag* (third draw-info))
          (*mn-view-ins-flag* (fourth draw-info))
-         (monof? (= (length (beat-editors (view-container self))) 1)) 
+         (monof? (= (length (beat-editors (view-container self))) 1))
          (staff-incr 0)(staff-count 1)
          measures (first-time? t))
     (when monof?
@@ -119,7 +119,7 @@
     (setf *MN-global-ins-y* (+ 60 (give-C5-value self)))
     ; GA 12/4/94 causes crash ?
     (setf *current-MN-editor* self)
-    (add-to-free-buttons-pool *selection-buttons-pool* (selection-buttons self)) 
+    (add-to-free-buttons-pool *selection-buttons-pool* (selection-buttons self))
     (setf (selection-buttons self) nil)
     (with-focused-view self
       (view-draw-contents (selection-button self))
@@ -127,14 +127,14 @@
       (set-view-font  (view-container (view-container  self)) *music-font-spec*)
       (init-rtm-draw self)
       (for (i 0 1 (1- staff-count))
-        (tell (symbol-value (nth (1- (staff-number self)) *global-staff-list*)) 'draw-staff 
-            (- (x self) 15) (if monof? (+ (* i staff-incr) (give-C5-value-staff-count  self staff-count)) (give-C5-value self))) 
+        (tell (symbol-value (nth (1- (staff-number self)) *global-staff-list*)) 'draw-staff
+            (- (x self) 15) (if monof? (+ (* i staff-incr) (give-C5-value-staff-count  self staff-count)) (give-C5-value self)))
         (when (or measures first-time?)
           (setq measures
                 (draw-measures- (measure-line self) self
                                 (if monof? (+ (* i staff-incr) (give-C5-value-staff-count  self staff-count)) (give-C5-value self))
-                                (beat-zoom self)(first-beat-num self) 
-                                28 (w self) 
+                                (beat-zoom self)(first-beat-num self)
+                                28 (w self)
                                 (+ (* i staff-incr) 37) (+ (* i staff-incr) (- 57 (rtm-y-pixel self))) t measures))
           (setq first-time? ())))
       (tell (selection-buttons self) #'draw-view-contents** (view-container self))
@@ -148,13 +148,13 @@
 
 (defgeneric set-edit-mode (self value))
 (defmethod set-edit-mode ((self C-beat-editor-panel) value)
-  (setf (edit-mode self) value)) 
+  (setf (edit-mode self) value))
 (defgeneric set-first-beat-num (self value)
   (:method ((self C-beat-editor-panel) value)
-    (setf (first-beat-num self) value))) 
+    (setf (first-beat-num self) value)))
 (defgeneric set-beat-zoom (self value)
   (:method ((self C-beat-editor-panel) value)
-    (setf (beat-zoom self) value))) 
+    (setf (beat-zoom self) value)))
 
 (defparameter *rtm-editor-velocity-list* '(100 100))
 
@@ -174,12 +174,12 @@
     (progn
       (let ((inside-sel-butt? (inside-rectangle? (point-h (view-mouse-position self))(point-v (view-mouse-position self))
                                                  (x (selection-button self))(y (selection-button self))(w (selection-button self))(h (selection-button self)))))
-        (unless inside-sel-butt? 
+        (unless inside-sel-butt?
           (unless  (eql (current-rtm-editor (view-container self)) self)
              (fill-xor-view-selections (current-rtm-editor (view-container self)))
              (setf (current-rtm-editor (view-container self)) self))))
       (unless (ask (selection-buttons self) #'inside-rtm-selection-buttons- (view-mouse-position self) self)
-        (cond 
+        (cond
          ((< (point-h (view-mouse-position self)) 20)
           (let* ((win (view-window self))
                  (first-v (point-v (view-mouse-position win)))
@@ -191,13 +191,13 @@
                 (unless (eql mp last-mp)
                   (setq last-mp mp
                         temp (- last-value (- first-v (point-v last-mp))))
-                  (if (shift-key-p) 
+                  (if (shift-key-p)
                     (setf (rtm-y-pixel self) temp)
                     (setf (C-5-y-pixel self) temp))
                   (erase+view-draw-contents self))))))
          (t   ;plain click
               (fill-xor-view-selections self)))))))
- 
+
 ;;=======================
 
 (defun fill-xor-view-selections (editor)
@@ -215,14 +215,14 @@
   (cond ((= count 1) (list low))
         ((or (= (length lst) 0)(= (length lst) 1)) (make-list count :initial-element low))
         ((< (length lst) count)
-          (scale-low-high (break-point-fun count (interpol (length lst) 0 100)  lst) high low t)) 
+          (scale-low-high (break-point-fun count (interpol (length lst) 0 100)  lst) high low t))
         (t
          (let ((incr (/ (length lst) (1- count))) res)
            (for (i 0 incr (1- (length lst)))(push (nth (truncate i) lst) res))
            (scale-low-high (nreverse (cons (car (last lst)) res)) high low  t))))) ;reversed y
 
-;;(get-every-nth-item-of-list '(12 13 45 75) 3 50 100) 
-;;(break-point-fun 5  '(0 100) '(78 67)) 
+;;(get-every-nth-item-of-list '(12 13 45 75) 3 50 100)
+;;(break-point-fun 5  '(0 100) '(78 67))
 ;;===================================
 (defgeneric open-measure-line-editor (self ctrl)
   (:method ((self C-measure-line) ctrl)
@@ -230,7 +230,7 @@
 
 (defmethod paste-beat ((self C-measure-line))
   (when (current-rtm-editor (editor-collection-object *active-rtm-window*))
-    (paste-beat (current-rtm-editor (editor-collection-object *active-rtm-window*))))) 
+    (paste-beat (current-rtm-editor (editor-collection-object *active-rtm-window*)))))
 
 (defmethod paste-beat ((self C-beat-editor-panel))
  (when *measure-line-selection-scrap*
@@ -238,7 +238,7 @@
 
 ;;========================================================
 
-(defclass C-beat-editor-collection (ui:view) 
+(defclass C-beat-editor-collection (ui:view)
   ((beat-editors :initform () :initarg :beat-editors :accessor beat-editors)
    (first-staff-num :initform 0 :initarg :first-staff-num :accessor first-staff-num)
    (visible-staffs-count :initform 1 :initarg :visible-staffs-count :accessor visible-staffs-count)
@@ -269,7 +269,7 @@
 
 (defmethod get-window-state ((self C-beat-editor-collection) win)
   (declare (ignore win))
-  (list (view-position self) (view-size self) (first-staff-num self) (visible-staffs-count self) (value (beat-zoom-ctrl self)))) 
+  (list (view-position self) (view-size self) (first-staff-num self) (visible-staffs-count self) (value (beat-zoom-ctrl self))))
 
 (defmethod put-window-state ((self C-beat-editor-collection) win state)
   (declare (ignore win))
@@ -284,22 +284,22 @@
   (setf (beat-zoom-ctrl-value self) (fifth state))
   (set-numbox-item-text  (beat-zoom-ctrl self) (fifth state))
   (setf (value (beat-zoom-ctrl self)) (fifth state))
-  (resize-new-rtm-w self ())) 
+  (resize-new-rtm-w self ()))
 
 ;;(defvar *rtm-playing-option* ())
 
 #|(defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
-    (if (eql *rtm-playing-option* :pb) 
+    (if (eql *rtm-playing-option* :pb)
       (progn
         (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
-        (start 
+        (start
           (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
-                                'play-measure-line (get-play-speed self))))))     
-      (play-sequence (make-instance 'C-chord-line 
-                       :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line))))) 
+                                'play-measure-line (get-play-speed self))))))
+      (play-sequence (make-instance 'C-chord-line
+                       :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line)))))
                      (cond ((eql *current-approx-scale* *1/4-tone-chromatic-scale*) 4)
                            ((eql *current-approx-scale* *1/8-tone-chromatic-scale*) 8)
                            (t 2))))))|#
@@ -309,20 +309,20 @@
 (defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
-    (if (eql *playing-option* :pb) 
+    (if (eql *playing-option* :pb)
       (progn
         (setf patchwork.scheduler::*print-on-late?* t)
-        (start 
+        (start
           (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
-                                'play-measure-line (get-play-speed self))))))     
-      (let ((c-line (make-instance 'C-chord-line 
+                                'play-measure-line (get-play-speed self))))))
+      (let ((c-line (make-instance 'C-chord-line
                        :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
           (play-your-chords c-line)
           (progn (setf patchwork.scheduler::*print-on-late?* t)
-                 (start 
+                 (start
                    (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
@@ -332,20 +332,20 @@
 (defun play-rtm-with-options (self)
   (let ((editors (give-selected-editors self)))
     (setf *mn-view-offset-flag* (check-box-checked-p (third (rtm-radio-ctrls self))))
-    (if (eql *playing-option* :pb) 
+    (if (eql *playing-option* :pb)
       (progn
         (setf patchwork.scheduler::*print-on-late?* t)
-        (start 
+        (start
           (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
-                                'play-measure-line (get-play-speed self))))))     
-      (let ((c-line (make-instance 'C-chord-line 
+                                'play-measure-line (get-play-speed self))))))
+      (let ((c-line (make-instance 'C-chord-line
                        :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
           (play-your-chords c-line)
           (progn (setf patchwork.scheduler::*print-on-late?* t)
-                 (start 
+                 (start
                    (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
@@ -356,7 +356,7 @@
 
 (defmethod initialize-instance :after ((self C-beat-editor-collection) &key controls)
  (declare (ignore controls))
- (apply #'add-subviews self (beat-editors self)) 
+ (apply #'add-subviews self (beat-editors self))
  ;(setf (visible-staffs-count self) (max 1 (length (beat-editors self))))
  (let ((ctrl-y (- (h self) 25)))
   (for (i 0 1 (1- (length (beat-editors self))))
@@ -366,69 +366,69 @@
   (push (add-rtm-editor-radio-cluster self 510 (- (h self) 10) "offs") (rtm-radio-ctrls self))
   (push (add-rtm-editor-radio-cluster self 560 (- (h self) 10) "ins") (rtm-radio-ctrls self))
   (setf (rtm-radio-ctrls self) (nreverse (rtm-radio-ctrls self)))
-  (add-subviews self 
+  (add-subviews self
                 (setf (static-text-ctrl self)
-                    (make-instance 'static-text-dialog-item 
-                        :view-position (make-point 0 (- (h self) 10)) 
+                    (make-instance 'static-text-dialog-item
+                        :view-position (make-point 0 (- (h self) 10))
                                :view-font *patchwork-font-spec*
-                               :dialog-item-text "measure staff stcnt scale   speed")) 
+                               :dialog-item-text "measure staff stcnt scale   speed"))
                 (setf (beat-number-ctrl self)
-                      (make-instance 'C-numbox 
-                                     :view-position (make-point 2 ctrl-y) :view-size (make-point 36 14) 
-                                     :min-val 1  :value 1 
-                                     :dialog-item-action 
+                      (make-instance 'C-numbox
+                                     :view-position (make-point 2 ctrl-y) :view-size (make-point 36 14)
+                                     :min-val 1  :value 1
+                                     :dialog-item-action
                                      (lambda (item) (scroll-beat self item))))
                 (setf (first-staff-num-ctrl self)
-                  (make-instance 'C-numbox 
-                                     :view-position (make-point 40 ctrl-y) :view-size (make-point 36 14) 
-                                     :min-val 1  :value (1+ (first-staff-num self)) 
-                                     :dialog-item-action 
+                  (make-instance 'C-numbox
+                                     :view-position (make-point 40 ctrl-y) :view-size (make-point 36 14)
+                                     :min-val 1  :value (1+ (first-staff-num self))
+                                     :dialog-item-action
                                      (lambda (item) (scroll-to-staff-number self item))))
                 (setf (visible-staffs-count-ctrl self)
-                   (make-instance 'C-numbox 
-                                     :view-position (make-point 78 ctrl-y) :view-size (make-point 36 14) 
+                   (make-instance 'C-numbox
+                                     :view-position (make-point 78 ctrl-y) :view-size (make-point 36 14)
                                      :min-val 1  :value (visible-staffs-count self)
-                                     :dialog-item-action 
+                                     :dialog-item-action
                                      (lambda (item) (update-staff-count-number self item))))
                 (setf (beat-zoom-ctrl self)
-                      (make-instance 'C-numbox 
-                                     :view-position (make-point 116 ctrl-y) :view-size (make-point 36 14) 
+                      (make-instance 'C-numbox
+                                     :view-position (make-point 116 ctrl-y) :view-size (make-point 36 14)
                                      :min-val 10 :min-val 1000  :value (beat-zoom-ctrl-value self)
-                                     :dialog-item-action 
+                                     :dialog-item-action
                                      (lambda (item) (zoom-beat self item))))
                 (setf (play-speed-ctrl self)
-                      (make-instance 'C-numbox 
-                                     :view-position (make-point 167 ctrl-y) :view-size (make-point 36 14) 
+                      (make-instance 'C-numbox
+                                     :view-position (make-point 167 ctrl-y) :view-size (make-point 36 14)
                                      :min-val 10 :max-val 1000  :value 100))
-                (make-instance 'button-dialog-item 
+                (make-instance 'button-dialog-item
                                :dialog-item-text " Play "
-                               :view-position (make-point 215 ctrl-y) :view-size (make-point 50 14) 
+                               :view-position (make-point 215 ctrl-y) :view-size (make-point 50 14)
                                :view-font *patchwork-font-spec*
-                               :dialog-item-action 
+                               :dialog-item-action
                                (lambda (item) item
                                   (play-rtm-with-options self)))
-                (make-instance 'button-dialog-item 
+                (make-instance 'button-dialog-item
                                :dialog-item-text " SPlay "
-                               :view-position (make-point 275 ctrl-y) :view-size (make-point 50 14) 
+                               :view-position (make-point 275 ctrl-y) :view-size (make-point 50 14)
                                :view-font *patchwork-font-spec*
-                               :dialog-item-action 
+                               :dialog-item-action
                                (lambda (item) item (play-rtms+scroll self)))
-                (make-instance 'button-dialog-item 
+                (make-instance 'button-dialog-item
                                :dialog-item-text " Stop "
-                               :view-position (make-point 335 ctrl-y) :view-size (make-point 50 14) 
+                               :view-position (make-point 335 ctrl-y) :view-size (make-point 50 14)
                                :view-font *patchwork-font-spec*
-                               :dialog-item-action 
-                               (lambda (item) item 
+                               :dialog-item-action
+                               (lambda (item) item
                                   (tell (ask-all (beat-editors self) 'measure-line) 'stop-measure-line)))
                (setf (beat-edit-ctrl self)
-                      (make-instance 'check-box-dialog-item 
+                      (make-instance 'check-box-dialog-item
                                      :dialog-item-text "edit"
-                                     :view-position (make-point 410 ctrl-y) :view-size (make-point 50 14) 
+                                     :view-position (make-point 410 ctrl-y) :view-size (make-point 50 14)
                                      :view-font *patchwork-font-spec*
-                                     :dialog-item-action 
+                                     :dialog-item-action
                                      (lambda (item) (set-edit-mode self item))))
                (setf (chord-edit-ctrl self)
-                      (make-instance 'check-box-dialog-item 
+                      (make-instance 'check-box-dialog-item
                                      :dialog-item-text "chord"
                                      :view-font *patchwork-font-spec*
                                      :view-position (make-point 470 ctrl-y) :view-size (make-point 50 14))))))
@@ -437,13 +437,13 @@
 
 (defgeneric add-rtm-editor-radio-cluster (self x y txt)
   (:method ((self C-beat-editor-collection) x y txt)
-    (make-instance 
+    (make-instance
      'check-box-dialog-item
      :view-position (make-point x y)
      :view-container self
      :dialog-item-text txt
      :view-font *patchwork-font-spec*
-     :dialog-item-action (lambda (item) item (erase+view-draw-contents (view-window self)))))) 
+     :dialog-item-action (lambda (item) item (erase+view-draw-contents (view-window self))))))
 
 ;;================
 
@@ -451,13 +451,13 @@
   (:method ((self C-beat-editor-collection))
     (float (/ (value (play-speed-ctrl self)) 100))))
 (defgeneric give-selected-editors (self)
-  (:method ((self C-beat-editor-collection)) 
+  (:method ((self C-beat-editor-collection))
     (let ((editors (beat-editors self))
           res)
-      (while editors 
+      (while editors
         (when (value (selection-button (car editors))) (push (car editors) res))
         (pop editors))
-      (nreverse res)))) 
+      (nreverse res))))
 
 ;;================================
 (defgeneric update-staff-count-number (self item)
@@ -473,7 +473,7 @@
 #|
 (defmethod scroll-beat ((self C-beat-editor-collection) ctrl)
   (tell (beat-editors self) 'set-first-beat-num (1-  (value ctrl)))
-  (with-focused-view self (erase+view-draw-contents self))) 
+  (with-focused-view self (erase+view-draw-contents self)))
 |#
 (defgeneric scroll-beat (self ctrl)
   (:method ((self C-beat-editor-collection) ctrl)
@@ -491,7 +491,7 @@
 
 (defmethod set-edit-mode ((self C-beat-editor-collection) ctrl)
   (tell (beat-editors self) 'set-edit-mode (check-box-checked-p ctrl))
-  (tell (draw-beat-editor-objects self) 'erase+view-draw-contents)) 
+  (tell (draw-beat-editor-objects self) 'erase+view-draw-contents))
 
 
 (defgeneric draw-control-extra-stuff (self)
@@ -499,7 +499,7 @@
     (draw-rect* 0 0 (- (w self) 0) (- (h self) 25))))
 
 (defgeneric draw-beat-editor-objects (self)
-  (:method ((self C-beat-editor-collection)) 
+  (:method ((self C-beat-editor-collection))
     ;;(beat-editors self))
     (let ((editors (nthcdr (first-staff-num self) (beat-editors self))))
       (firstn  (visible-staffs-count self) editors))))
@@ -518,7 +518,7 @@
 
 (defmethod view-draw-contents :after ((self C-beat-editor-collection))
   (draw-control-extra-stuff self))
- 
+
 ;;(defmethod view-draw-contents :before ((self C-beat-editor-collection)))
 ;;  (init-beat-selection-buttons-pool *selection-buttons-pool*))
 
@@ -534,24 +534,24 @@
 
 (defgeneric resize-new-rtm-w (self size)
   (:method ((self C-beat-editor-collection) size)
-    (if size 
+    (if size
         (set-view-size self (subtract-points size (make-point 20 5)))
         (setq size (view-size self)))
     (let ((v-incr (round (/ (- (h self) 50) (length (draw-beat-editor-objects self)))))
           (rest-editors (set-difference (beat-editors self) (draw-beat-editor-objects self))))
-      (tell rest-editors #'set-view-position -10000 -10000) 
+      (tell rest-editors #'set-view-position -10000 -10000)
       (for (i 0 1 (1- (length (draw-beat-editor-objects self))))
-        (set-view-position (nth i  (draw-beat-editor-objects self)) (make-point 10 (* v-incr i))) 
+        (set-view-position (nth i  (draw-beat-editor-objects self)) (make-point 10 (* v-incr i)))
         (set-view-size (nth i  (draw-beat-editor-objects self)) (make-point (- (point-h size) 30) v-incr))))
-    (tell (set-difference 
-           (set-difference (subviews self)(beat-editors self)) 
+    (tell (set-difference
+           (set-difference (subviews self)(beat-editors self))
            (cons (static-text-ctrl self)(rtm-radio-ctrls self))) #'set-view-y (- (h self) 25))
     (tell (cons (static-text-ctrl self)(rtm-radio-ctrls self)) #'set-view-y (- (h self) 11))))
 
 ;;============================
 
 (defgeneric give-rtm-range-chords (self chord-fl)
-  (:method ((self C-beat-editor-collection) chord-fl)    
+  (:method ((self C-beat-editor-collection) chord-fl)
     (when (and (rtm-selection-1 self) (current-rtm-editor self))
       (setf *beat-leaf-objs* ())
       (let (pos1 pos2 measures beats res beats1 beats2)
@@ -559,7 +559,7 @@
                (setq res (collect-all-chord-beat-leafs (rtm-selection-1 self))))
               ((eql 'C-measure (class-name (class-of (rtm-selection-1 self)))) ; measure
                (setq measures (measures (measure-line (current-rtm-editor self))))
-               (setq pos1 (position (rtm-selection-1 self) measures)) 
+               (setq pos1 (position (rtm-selection-1 self) measures))
                (setq pos2 (position (rtm-selection-2 self) measures))
                (unless  pos2 (setq pos2 pos1))
                (tell (subseq measures (min pos1 pos2)(1+ (max pos1 pos2))) #'collect-all-chord-beat-leafs)
@@ -572,9 +572,9 @@
                (setf *beat-leaf-objs* ())
                (when (rtm-selection-2 self)
                  (setq beats2 (collect-all-chord-beat-leafs (rtm-selection-2 self))))
-               (setq pos1 (position (car beats1) beats)) 
+               (setq pos1 (position (car beats1) beats))
                (setq pos2 (position (car beats2) beats))
-               (if (not pos2) 
+               (if (not pos2)
                    (setq pos2 (position (car (last beats1)) beats))
                    (if (< pos1 pos2)
                        (setq pos2 (position (car (last beats2)) beats))
@@ -583,13 +583,13 @@
                (setq res *beat-leaf-objs*))
               (t                        ; beat-chords
                (setq beats (collect-all-chord-beat-leafs (measure-line (current-rtm-editor self))))
-               (setq pos1 (position (rtm-selection-1 self) beats)) 
+               (setq pos1 (position (rtm-selection-1 self) beats))
                (setq pos2 (position (rtm-selection-2 self) beats))
                (unless  pos2 (setq pos2 pos1))
                (setq res (subseq beats (min pos1 pos2)(1+ (max pos1 pos2))))))
         (if chord-fl (ask-all res #'beat-chord) res)))))
 #|
-(defmethod give-rtm-range-chords ((self C-beat-editor-collection) chord-fl)    
+(defmethod give-rtm-range-chords ((self C-beat-editor-collection) chord-fl)
   (when (and (rtm-selection-1 self) (current-rtm-editor self))
     (setf *beat-leaf-objs* ())
     (let (pos1 pos2 measures beats res)
@@ -597,7 +597,7 @@
              (setq res (collect-all-chord-beat-leafs (rtm-selection-1 self))))
             ((eql 'C-measure (class-name (class-of (rtm-selection-1 self))))
              (setq measures (measures (measure-line (current-rtm-editor self))))
-             (setq pos1 (position (rtm-selection-1 self) measures)) 
+             (setq pos1 (position (rtm-selection-1 self) measures))
              (setq pos2 (position (rtm-selection-2 self) measures))
              (unless  pos2 (setq pos2 pos1))
              (tell (subseq measures (min pos1 pos2)(1+ (max pos1 pos2))) #'collect-all-chord-beat-leafs)
@@ -605,14 +605,14 @@
             ((and (not (beat-chord (rtm-selection-1 self)))
                   (eql 'C-beat (class-name (class-of (rtm-selection-1 self))))
              (setq beats (apply #'append (ask-all (measures (measure-line (current-rtm-editor self))) #'beat-objects))))
-             (setq pos1 (position (rtm-selection-1 self) beats)) 
+             (setq pos1 (position (rtm-selection-1 self) beats))
              (setq pos2 (position (rtm-selection-2 self) beats))
              (unless  pos2 (setq pos2 pos1))
              (tell (subseq beats (min pos1 pos2)(1+ (max pos1 pos2))) #'collect-all-chord-beat-leafs)
              (setq res *beat-leaf-objs*))
             (t ; beat-chords
              (setq beats (collect-all-chord-beat-leafs (measure-line (current-rtm-editor self))))
-             (setq pos1 (position (rtm-selection-1 self) beats)) 
+             (setq pos1 (position (rtm-selection-1 self) beats))
              (setq pos2 (position (rtm-selection-2 self) beats))
              (unless  pos2 (setq pos2 pos1))
              (setq res (subseq beats (min pos1 pos2)(1+ (max pos1 pos2))))))

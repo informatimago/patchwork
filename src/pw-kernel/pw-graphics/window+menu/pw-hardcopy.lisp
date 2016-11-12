@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    Printing PW windows
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -51,7 +51,7 @@
 ;;          traps::$boutrefnum traps::$sPortB))
 ;;
 ;;(defun reset-printer-port()
-;;  (#~SerReset $boutRefNum 
+;;  (#~SerReset $boutRefNum
 ;;              (+ $baud9600 $data8 $stop20 $noParity)))
 
 (defgeneric win-print-setup (view)
@@ -60,7 +60,7 @@
 
 ;; (defmethod set-window-hardcopy-wptr ((self simple-view) wptr)
 ;;  (set-wptr self wptr))
-;; 
+;;
 ;; (defmethod set-window-hardcopy-wptr ((self view) wptr)
 ;;  (set-wptr self wptr)
 ;;  (tell (subviews self) 'set-window-hardcopy-wptr wptr))
@@ -90,7 +90,7 @@
   ;;           (declare (special *hc-page-open-p* ui::*inhibit-error*))
   ;;           (without-interrupts
   ;;            (let* ((window-ptr (wptr self))
-  ;;                   (hardcopy-ptr 
+  ;;                   (hardcopy-ptr
   ;;                    (#_PrOpenDoc :ptr (get-print-record) :long 0 :long 0 :ptr)))
   ;;              (unwind-protect
   ;;                (with-dereferenced-handles ((ppRec PRec))
@@ -116,7 +116,7 @@
   ;;           t))))
   ;;   (#_PrClose))
   )
-  
+
 (defgeneric print-all-subviews (self)
   (:method ((self pw::C-pw-window))
     (let ((views (subviews self)))
@@ -126,7 +126,7 @@
         (view-draw-contents a-view)))))
 
 #|
-                        
+
 ;;(window-hardcopy pw::*active-mn-window*)
 ;;(window-hardcopy pw::*active-bpf-window*)
 ;;(window-hardcopy  pw::*active-patch-window*)

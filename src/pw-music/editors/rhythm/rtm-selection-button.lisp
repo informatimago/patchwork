@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,23 +15,23 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;  
+;;;;
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
@@ -49,9 +49,9 @@
 (defgeneric connect-control (self func obj))
 (defmethod connect-control ((self C-beat-selection-button) func obj) (setf (selection-button-function self) (cons func obj)))
 
-(defmethod set-view-position ((self C-beat-selection-button) h &optional v) 
+(defmethod set-view-position ((self C-beat-selection-button) h &optional v)
   (setf (view-position self) (if v  (make-point h v) h)))
-(defmethod set-view-size ((self C-beat-selection-button) h &optional v) 
+(defmethod set-view-size ((self C-beat-selection-button) h &optional v)
   (setf (view-size self) (if v  (make-point h v) h)))
 
 (defgeneric inside-rtm-selection-buttons- (self where view)
@@ -63,11 +63,11 @@
         (let ((rtm-sel1 (rtm-selection-1 (view-container view)))
               butt)
           (fill-xor-view-selections view)
-          (setf (rtm-selection-2 (view-container view)) 
-                (if  (and 
-                      (shift-key-p) 
+          (setf (rtm-selection-2 (view-container view))
+                (if  (and
+                      (shift-key-p)
                       (eql (class-name (class-of rtm-sel1))
-                          (class-name (class-of (cdr (selection-button-function self)))))) 
+                          (class-name (class-of (cdr (selection-button-function self))))))
                      rtm-sel1     ()))
           (setf (rtm-selection-1 (view-container view)) (cdr (selection-button-function self)))
           (with-focused-view view (fill-xor-view-contents** self))
@@ -79,7 +79,7 @@
           self)))))
 
 (defgeneric selected-rtm-button\? (self obj)
-  (:method ((self C-beat-selection-button) obj) 
+  (:method ((self C-beat-selection-button) obj)
     (when (eql obj (cdr (selection-button-function self))) self)))
 
 (defgeneric fill-xor-view-contents** (self)
@@ -106,15 +106,15 @@
  (let (ctrls)
    (repeat 50 (push (make-instance 'C-beat-selection-button) ctrls))
    (setf (buttons-pool self) ctrls)
-   (init-beat-selection-buttons-pool self))) 
-           
+   (init-beat-selection-buttons-pool self)))
+
 (defgeneric init-beat-selection-buttons-pool (self)
   (:method ((self C-selection-buttons-pool))
     (setf (free-beat-selection-buttons self)(copy-list (buttons-pool self)))))
 
 (defgeneric add-to-free-buttons-pool (self butts)
   (:method ((self C-selection-buttons-pool) butts)
-    (setf (free-beat-selection-buttons self)(append (free-beat-selection-buttons self) butts)))) 
+    (setf (free-beat-selection-buttons self)(append (free-beat-selection-buttons self) butts))))
 
 (defgeneric give-beat-selection-button (self win x y w h)
   (:method ((self C-selection-buttons-pool) win x y w h)
@@ -124,10 +124,10 @@
                 (pop (free-beat-selection-buttons self))
                 (progn (setq ctrl (make-instance 'C-beat-selection-button))
                        (push ctrl (buttons-pool self))
-                       ctrl)))  
+                       ctrl)))
       (set-view-position ctrl x y)
       (set-view-size ctrl w h)
-      (when win (setf (rtm-view-obj ctrl) win)) 
+      (when win (setf (rtm-view-obj ctrl) win))
       ctrl)))
 
 (defun connect-to-selection-button (panel-obj rtm-obj x y w h function)

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,27 +16,27 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
 
 ;;
-;; Printing MN windows 
-;; 
+;; Printing MN windows
+;;
 
 
 ;; (require 'traps)
@@ -64,7 +64,7 @@
   ;;             (declare (special *hc-page-open-p* ui::*inhibit-error*))
   ;;             (without-interrupts
   ;;              (let* ((window-ptr (wptr self))
-  ;;                     (hardcopy-ptr 
+  ;;                     (hardcopy-ptr
   ;;                      (#_PrOpenDoc :ptr (get-print-record) :long 0 :long 0 :ptr)))
   ;;                (unwind-protect
   ;;                  (with-dereferenced-handles ((ppRec PRec))
@@ -98,7 +98,7 @@
     (if (not (or (rest panels) (rest (pw::chords (pw::chord-line (first panels))))))
       0
       (dolist (panel panels max-val)
-        (if (pw::chords (pw::chord-line panel)) 
+        (if (pw::chords (pw::chord-line panel))
           (if (> (setq temp (pw::t-time (car (last (pw::chords (pw::chord-line panel))))))
                  max-val)
             (setq max-val temp)))))))
@@ -118,7 +118,7 @@
 
 (defgeneric get-last-chord (self panels))
 (defmethod get-last-chord ((self pw::C-MN-window) panels)
-  (truncate 
+  (truncate
    (pw::scaled-mouse-h (car panels)
                        (+ (origin (car  panels))
                           (point-h (view-scroll-position (car panels)))))))

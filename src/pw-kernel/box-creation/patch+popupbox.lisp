@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,23 +15,23 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;  
+;;;;
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 ;;;; A class for PW boxes with PopUp menu
 ;;;; User should subclass C-patch&popUp with a class having methods:
@@ -53,7 +53,7 @@
 (defmethod initialize-instance :after ((self C-patch&popUp) &key controls)
   (declare (ignore controls))
   (setf (current-str self) (default-char self))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox  (current-str self) self
                        (make-local-menu (local-menu self))
                        :view-position (make-point (- (w self) 13)
@@ -68,7 +68,7 @@
 (defmethod complete-box ((self C-patch&popUp) output-type)
   (set-output self output-type))
 
-(defun make-local-menu (menu-a-list) 
+(defun make-local-menu (menu-a-list)
   (let (res)
     (apply #'new-menu " "
            (dolist (item menu-a-list (nreverse res))
@@ -111,7 +111,7 @@
             (t (print str))))
 
     (defmethodp my-box C-my-box ((entry fix)) fix " "
-      (+ entry 
+      (+ entry
          (cond ((string= (current-str self) "O") 1)
                ((string= (current-str self) "T") 2)
                ((string= (current-str self) "H") 3))))

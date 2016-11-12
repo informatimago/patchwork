@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -39,19 +39,19 @@
   (declare (ignore value))
   (values))
 
-(defmethod set-default-pw-value ((self C-numbox) value) 
+(defmethod set-default-pw-value ((self C-numbox) value)
   (when (numberp value)
-    (setf (value self) value) 
+    (setf (value self) value)
     (set-dialog-item-text self (format nil "~5D" value))))
 
-(defmethod set-default-pw-value ((self C-menubox) value) 
+(defmethod set-default-pw-value ((self C-menubox) value)
   (when (numberp value)
-    (setf (value self) value) 
+    (setf (value self) value)
     (set-dialog-item-text self (menubox-value self))))
 
-(defmethod set-default-pw-value ((self C-ttybox) value) 
+(defmethod set-default-pw-value ((self C-ttybox) value)
   (when value
-    (cond ((stringp value) (set-dialog-item-text self (string-downcase value))) 
+    (cond ((stringp value) (set-dialog-item-text self (string-downcase value)))
           ((listp value) (set-dialog-item-text self (prin1-to-string value)))
           ((numberp value) (set-dialog-item-text self (format nil "~5D" value)))
           ((symbolp value) (set-dialog-item-text self (string-downcase (string value)))))))
@@ -60,14 +60,14 @@
 ;;==========================
 
 (defun order-inside-box-by-two (ws hs w-max)
-  (let (res temp h-temp 
-            (w-sum 0)) 
+  (let (res temp h-temp
+            (w-sum 0))
     (setq w-max (1+ (max (apply #'max ws) w-max)))
     (while ws
       (setq w-sum 0)
       (setq temp () h-temp ())
       (while (and ws (< (length temp) 3) (< (+ (car ws) w-sum)  w-max))
-        (incf w-sum (car ws)) 
+        (incf w-sum (car ws))
         (push (pop ws) temp)
         (push (pop hs) h-temp))
       (push (list (nreverse temp) (apply #'max h-temp)) res))
@@ -77,7 +77,7 @@
 ;;(order-inside-box-by-two '(56 36 36 55 36) '(65 15 5 14 66) 78)
 ;;(order-inside-box-by-two '(56 36 36 42 36 42 87 36 36 36) '(5 5 5 5 5 5 65 5 15 5) 78)
 
-(defun make-patch-box 
+(defun make-patch-box
     (patch pw-function pw-control-type-list &optional out-type-list defaults-list)
   (let (input-boxes (w-now 46)(y-now 5))
     (when pw-control-type-list
@@ -85,7 +85,7 @@
         (push (eval (control-form (eval (pop pw-control-type-list)))) input-boxes)
         (setf (doc-string (car input-boxes)) (pop pw-control-type-list)))
       (setq input-boxes (nreverse input-boxes))
-      (let* ((input-boxes-temp input-boxes) 
+      (let* ((input-boxes-temp input-boxes)
              (ws (ask-all input-boxes 'w))
              (hs (ask-all input-boxes 'h))
              (box-list+ys (order-inside-box-by-two ws hs 84))
@@ -104,13 +104,13 @@
             ;;         (setf (y (car input-boxes-temp)) y-now)
             (pop input-boxes-temp))
           (incf y-now (+ 2 (pop row-ys)))
-          (pop box-w-list)) 
+          (pop box-w-list))
         (setq w-now (+ 5 (apply #'max (ask-all input-boxes 'x+w))))
         ;;     (tell input-boxes 'dmove-control 15 15)
         (when defaults-list
           (for (i 0 1 (1- (length input-boxes)))
             (set-default-pw-value (nth i input-boxes) (pop defaults-list))))))
-    (make-instance patch :view-position (make-point 15 15) 
+    (make-instance patch :view-position (make-point 15 15)
                          :view-size  (make-point w-now (+ 13 y-now))
                          :pw-function pw-function
                          :type-list out-type-list
@@ -122,7 +122,7 @@
   (let ((arg-list))
     (push  '*symbol-argfn-type* arg-list)
     (push  "fn" arg-list)
-    (for (i 0 1 (1- count)) 
+    (for (i 0 1 (1- count))
       (push  '*symbol-test-type* arg-list)
       (push  (concatenate  'string  "arg" (format nil "~D" (1+ i))) arg-list))
     (nreverse arg-list)))
@@ -133,7 +133,7 @@
     (push  "testfn" arg-list)
     (push  '*nil-numbox-pw-type* arg-list)
     (push  "input" arg-list)
-    (for (i 0 1 (1- count)) 
+    (for (i 0 1 (1- count))
       (push  '*nil-numbox-pw-type* arg-list)
       (push  (concatenate  'string  "test" (format nil "~D" (1+ i))) arg-list)
       (push  '*nil-numbox-pw-type* arg-list)
@@ -167,7 +167,7 @@
     (when (null (car arg-list)) ; no argument == (())
       (setq arg-list ()))
     (while (and arg-list (not (memq (car arg-list) lambda-list-keywords)))
-      (setq res 
+      (setq res
             (list* (string-downcase (string (pop arg-list))) '*symbol-test-type* res))
       (decf nb-arg))
     (setq extensible? (not (null (intersection arg-list *lisp-keywords-for-extension*))))
@@ -188,7 +188,7 @@
            (setq res (list* "otval" '*symbol-test-type*
                             "otkey" '*symbol-test-type* res)))
          (setq nb-arg 0))
-        (t (when (endp arg-list) 
+        (t (when (endp arg-list)
              (error "Function ~S cannot provide ~D extra argument~:P.~%"
                     function nb-arg))
          (ccase keyword
@@ -209,13 +209,13 @@
 ;; (make-lisp-function-arg-list 'car)
 ;; (make-lisp-function-arg-list '+)
 
-(defun make-lisp-pw-boxes (function win) 
+(defun make-lisp-pw-boxes (function win)
   (if (not (and (symbolp function) (fboundp function)))
       (format t "~15A~25A" function "no such function !" )
       (if (defunp-function? function)
           (make-functional-pw-boxes function win)
           (multiple-value-bind (args extensible?) (get-lisp-function-arg-list function)
-            (add-patch-box win 
+            (add-patch-box win
                            (make-patch-box
                             (cond
                               (extensible?           'C-pw-lispfun)

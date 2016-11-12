@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,7 +36,7 @@
 
 
 ;;(latency) ??
-(defun write-midi-note (dur chan key vel) 
+(defun write-midi-note (dur chan key vel)
   (unless (or (minusp key) (> key 127))
     (setq chan (1- chan))
     (setf dur (* 10 dur))
@@ -62,7 +62,7 @@
       (for (i 0 1 99)
         (setq temp (/ (* i steps) 100))
         (setf (svref *cents-vector* i)
-              (cons 
+              (cons
                (+ 64 (truncate (/ temp 128)))    ; high
                (truncate (mod temp 128))))))) ; low
 
@@ -112,7 +112,7 @@
 
 
 ;; ????
-(defun write-program-change-value (chan program) 
+(defun write-program-change-value (chan program)
   (setq chan (1- chan))
   (let ((event (patchwork.midi:MidiNewEv patchwork.midi:typeProgChange)))	
     (unless (patchwork.midi:null-event-p event)	
@@ -140,7 +140,7 @@
 (defun parse-midi-stream (list)
   (let ((res)(temp)(status))
     (while list
-      (cond 
+      (cond
         ((>= (caar list) #x80)
          (setq status (caar list))
          (setq temp (list (cadar list)))
@@ -179,7 +179,7 @@
 (defun quantize-chords (list)
   (let ((chords)(notes-on)(res-temp)(time-now)(tolerance 10))
     (while list
-      (when (and (not (= 0 (fourth (car list))))(> (second (car list)) 143)) ;  only note-on 
+      (when (and (not (= 0 (fourth (car list))))(> (second (car list)) 143)) ;  only note-on
         (push (car list) notes-on))
       (pop list))
     (setq notes-on (nreverse notes-on))
@@ -187,7 +187,7 @@
       (setq res-temp (list (setq time-now (caar notes-on))))
       (push (cdar notes-on) res-temp)
       (pop notes-on)
-      (while (and notes-on (< (- (caar notes-on) time-now) tolerance)) 
+      (while (and notes-on (< (- (caar notes-on) time-now) tolerance))
         (push (cdar notes-on) res-temp)
         (pop notes-on))
       (push (nreverse res-temp) chords))
@@ -200,7 +200,7 @@
         (list (quantize-chords (read-from-midi))))
     (while list
       (setq t-time (caar list))
-      (setq midics (mapcar #'* (mapcar #'second (cdar list)) (cirlist 100))) 
+      (setq midics (mapcar #'* (mapcar #'second (cdar list)) (cirlist 100)))
       (add-new-chord (chord-line mn-editor) (make-chord-object midics t-time))
       (pop list))
     (update-editor (give-MN-editor midi-obj) ())

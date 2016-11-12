@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    ObjC support routines.
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,10 +15,10 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;  
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (c) 2003 Randall D. Beer
-;;;;  
+;;;;
 ;;;;    This software is licensed under the terms of the Lisp Lesser
 ;;;;    GNU Public License, known as the LLGPL.  The LLGPL consists of
 ;;;;    a preamble and  the LGPL. Where these conflict, the preamble
@@ -27,19 +27,19 @@
 ;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;  
+;;;;
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;  
+;;;;
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -339,7 +339,7 @@ instance variable."
           (dotimes (i nbytes ptr)
             (setf (ccl:%get-unsigned-byte ptr i) (pop code-bytes)))))
 
-    (defun objc-callback-error-return (condition return-value-pointer return-address-pointer) 
+    (defun objc-callback-error-return (condition return-value-pointer return-address-pointer)
       ;; The callback glue reserves space for %rax at return-value-pointer-8,
       ;; for %rdx at -16, for %xmm0 at -24.  Store NS-EXCEPTION in the
       ;; %rax slot, the address of #_objc_exception_throw in the %rdx slot, the
@@ -427,7 +427,7 @@ instance variable."
   (or (objc-class-p nsobject)
       (objc-metaclass-p nsobject)
       (has-lisp-slot-vector nsobject)
-      (let* ((cf-p  (%cf-instance-p nsobject)) 
+      (let* ((cf-p  (%cf-instance-p nsobject))
              (isize (if cf-p
                         (ccl:external-call "malloc_size" :address nsobject :size_t)
                         (%objc-class-instance-size (#/class nsobject))))

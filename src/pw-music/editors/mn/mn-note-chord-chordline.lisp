@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -50,7 +50,7 @@
     (if (and (= (approx-factor self) 25) (= index (1- vlength))) (incf up-octave))
     (list (svref  (diatone-vector self) index) (svref  (alteration-vector self) index) up-octave)))
 
-(defparameter *chromatic-scale* (make-instance 'C-scale 
+(defparameter *chromatic-scale* (make-instance 'C-scale
    :alteration-vector
 ;;          c   c#     d  d#   e     f   f#    g   g#   a   a#    h
   (vector  () #\Y    () #\Y  ()    ()  #\Y   ()  #\Y   ()  #\Y  ())
@@ -58,7 +58,7 @@
   (vector  0   0      1  1     2     3   3     4   4    5     5   6)
   :approx-factor 100))
 
-(defparameter *c-major-scale* (make-instance 'C-scale 
+(defparameter *c-major-scale* (make-instance 'C-scale
    :alteration-vector
 ;;          c   c#     d  es    e     f   f#    g   as   a   b    h
   (vector  () #\Y    () #\I   ()    ()  #\Y   ()  #\I   ()  #\I  ())
@@ -66,11 +66,11 @@
   (vector  0   0      1   2     2     3   3     4   5    5   6   6)
   :approx-factor 100))
 
-(defparameter *1/4-tone-chromatic-scale* (make-instance 'C-scale 
+(defparameter *1/4-tone-chromatic-scale* (make-instance 'C-scale
     :alteration-vector
-;;          c  c+  c#  c++    d  d+  d#  d++   e  e+    f  f+   f#  f++      g  g+  g#  g++ 
-  (vector  () #\y #\Y #\L    () #\y #\Y  #\L  () #\y   () #\y  #\Y #\L     () #\y  #\Y #\L 
-;;           a   a+  a#  a++   h  h+ 
+;;          c  c+  c#  c++    d  d+  d#  d++   e  e+    f  f+   f#  f++      g  g+  g#  g++
+  (vector  () #\y #\Y #\L    () #\y #\Y  #\L  () #\y   () #\y  #\Y #\L     () #\y  #\Y #\L
+;;           a   a+  a#  a++   h  h+
            ()  #\y  #\Y #\L   () #\y)
    :diatone-vector
   (vector  0   0    0  0      1   1   1   1    2   2    3   3   3   3       4   4    4   4
@@ -78,10 +78,10 @@
   :approx-factor 50))
 
 ;
-(defparameter *1/8-tone-chromatic-scale* (make-instance 'C-scale 
+(defparameter *1/8-tone-chromatic-scale* (make-instance 'C-scale
     :alteration-vector
-;;          c   c^  c+  c+!  c#  c#^ c++  C++!    d   d!      d+  d+! d#  d#^ d++  eb+ e  e!  e+   e+!   
-  (vector  () #\Z #\y  #\u  #\Y #\U #\L   #\z ()   #\Z    #\y #\u #\Y #\U #\L  #\z  () #\Z #\y  #\z 
+;;          c   c^  c+  c+!  c#  c#^ c++  C++!    d   d!      d+  d+! d#  d#^ d++  eb+ e  e!  e+   e+!
+  (vector  () #\Z #\y  #\u  #\Y #\U #\L   #\z ()   #\Z    #\y #\u #\Y #\U #\L  #\z  () #\Z #\y  #\z
 ;;           f  f!  f+   f+! f#  f#^ f++  f++!   g  g^ g+  g+! g#  g#^ g++ ab+
            () #\Z #\y  #\u #\Y  #\U #\L #\z  () #\Z #\y #\u #\Y #\U #\L #\z
 ;;           a  a^ a+   a+! a#  a#^ a++  a++!  h h^   h+ h+!
@@ -114,7 +114,7 @@
     (comm :initform nil :initarg :comm :accessor comm)
     (extra :initform nil :accessor extra)))
 
-;; more compact 
+;; more compact
 
 (defmethod decompile ((self C-note))
   `(make-C-note
@@ -127,7 +127,7 @@
 
 
 (defun make-C-note (midic diatone alteration dur vel chan &optional instrument offset order comm)
-  (let ((note (make-instance 'C-note 
+  (let ((note (make-instance 'C-note
            :midic midic :diatone  diatone :alteration alteration
            :dur  dur :vel vel :chan chan
            :instrument instrument
@@ -148,7 +148,7 @@
 
 (defgeneric make-a-copy (self))
 (defmethod make-a-copy ((self C-note))
-  (make-C-note 
+  (make-C-note
    (midic self) (diatone self) (alteration self)
    (dur self) (vel self) (chan self)
    (when (instrument self)(eval (decompile (instrument self))))
@@ -160,12 +160,12 @@
 
 (defgeneric update-note (self))
 (defmethod update-note ((self C-note))
-  (let* ((scale-change? 
+  (let* ((scale-change?
            (zerop (mod (* (approx-factor *current-approx-scale*)
                           (round (mod (midic self) 100)
                                  (approx-factor *current-approx-scale*))) 100)))
-         (dia-alt (give-alteration 
-                   (if scale-change?  *current-music-notation-scale* *current-approx-scale*) 
+         (dia-alt (give-alteration
+                   (if scale-change?  *current-music-notation-scale* *current-approx-scale*)
                    (midic self))))
     (setf (diatone self) (+ (* 7 (+ (truncate (/ (midic self) 1200)) (third dia-alt))) (first dia-alt)))
     (setf (alteration self) (second dia-alt))))
@@ -182,7 +182,7 @@
 (defmethod transpose-note ((self C-note) cents)
   (setf (midic self) (+ (midic self) cents))
   (update-note self))
- 
+
 
 ;;___________________________
 ;;___________________________
@@ -190,15 +190,15 @@
 
 (defgeneric open-instrument-editor (self win x y))
 (defmethod open-instrument-editor ((self C-note) win x y)
-  (if (instrument self) 
-      (progn 
+  (if (instrument self)
+      (progn
         (setq *global-selected-note* self)
         (open-instrument-editor (instrument self) win x y))
       (ui:ed-beep)))
 
 (defgeneric remove-instrument-item (self x y))
 (defmethod remove-instrument-item ((self C-note) x y)
-  (when (instrument self) 
+  (when (instrument self)
     (setq *global-selected-note* self)
     (remove-instrument-item (instrument self) x y)))
 
@@ -216,8 +216,8 @@
       (if *mn-view-dur-flag*
           (draw-note-duration-line self x-now y-now t-scfactor))
       (if (and *mn-view-offset-flag* (not *mn-view-time-flag*))
-          (draw-note-offset-line self x-now y-now t-scfactor)) ) 
-    (when (and (instrument self) *mn-view-ins-flag* t-scfactor) 
+          (draw-note-offset-line self x-now y-now t-scfactor)) )
+    (when (and (instrument self) *mn-view-ins-flag* t-scfactor)
       (draw-char x-now y-now #\Ω)
       (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
     (if (and alt (not (eql *staff-num* 7) )) ; empty staff
@@ -234,7 +234,7 @@
 (defmethod draw-note-duration-line-xor ((self C-note) x C5 t-scfactor)
   (let ((y-now (give-pixel-y self C5))
         (x-now (+ x (delta-x self))))
-    (with-pen-state  (:mode :patxor) 
+    (with-pen-state  (:mode :patxor)
       (draw-line (+ 3 x-now) (- y-now 2)
                  (round (+ (* t-scfactor (dur self)) (+ 3 x-now))) (- y-now 2)))))
 
@@ -256,7 +256,7 @@
 (defmethod draw-note-offset-line-xor ((self C-note) x C5 t-scfactor)
   (let ((y-now (give-pixel-y self C5))
         (x-now (+ x (delta-x self))))
-    (with-pen-state (:mode :patxor) 
+    (with-pen-state (:mode :patxor)
       (draw-line (+ 3 x-now) (- y-now 2)
                  (round (+ (* t-scfactor (offset-time self)) (+ 3 x-now))) (- y-now 2)))))
 
@@ -264,7 +264,7 @@
 
 (defgeneric map-to-note-symbolic-dynamic (self))
 (defmethod map-to-note-symbolic-dynamic ((self C-note))
-  (cond 
+  (cond
     ((< (vel self) 60) #\π)
     ((< (vel self) 75) #\p)
     ((< (vel self) 90) #\P)
@@ -280,8 +280,8 @@
 
 (defgeneric inside-note\?-3 (self mouse-x chord-x y-val))
 (defmethod inside-note?-3 ((self C-note) mouse-x chord-x y-val)
-  (when (and (eql y-val (diatone self)) 
-             (< (- (+ chord-x (delta-x self)) 3) mouse-x 
+  (when (and (eql y-val (diatone self))
+             (< (- (+ chord-x (delta-x self)) 3) mouse-x
                 (+ (+ chord-x (delta-x self)) 5)))
     self))
 
@@ -292,14 +292,14 @@
 #|
 (defmethod play-note ((self C-note))
   (when (instrument self) (play-instrument (instrument self) (chan self)(dur self)))
-  (write-midicent-note (dur self) (chan self) (midic self) (vel self))) 
+  (write-midicent-note (dur self) (chan self) (midic self) (vel self)))
 |#
 
 (defgeneric play-note (self &optional approx))
 (defmethod play-note ((self C-note) &optional approx)
-  (if (instrument self) 
+  (if (instrument self)
       (play-instrument (instrument self) self)
-      (write-midicent-note (dur self) (chan self) 
+      (write-midicent-note (dur self) (chan self)
                            (if approx (epw::approx-m (midic self) approx) (midic self))
                            (vel self))))
 
@@ -310,7 +310,7 @@
     (progn (setf (t-time (car midics)) t-time) (car midics))
     (let ((order -1) notes)
       (dolist (pitch midics)
-        (push (make-instance 'C-note 
+        (push (make-instance 'C-note
                         :midic pitch :offset-time 0
                         :dur 100 :order (incf order) :vel 100)
               notes))
@@ -324,10 +324,10 @@
     (notes  :initform nil :initarg :notes :accessor notes)
     (extra :initform nil :accessor extra)))
 
-;; more compact 
+;; more compact
 
 (defmethod decompile ((self C-chord))
-  `(make-C-chord ,(t-time self) (list ,@(ask-all (notes self) 'decompile)))) 
+  `(make-C-chord ,(t-time self) (list ,@(ask-all (notes self) 'decompile))))
 
 (defun make-C-chord (t-time notes)
   (make-instance 'C-chord :t-time t-time :notes notes))
@@ -386,14 +386,14 @@
   (when (notes self)
     (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
       (draw-stem self x-now C5 mode)
-      (tell (give-all-draw-notes self) 'draw-note-4 x-now C5 t-scfactor) 
+      (tell (give-all-draw-notes self) 'draw-note-4 x-now C5 t-scfactor)
       (draw-extra-info self x-now C5 mode))))
 ;;__________
 
 (defgeneric draw-extra-info (self x-now C5 mode))
 (defmethod draw-extra-info ((self C-chord) x-now C5 mode)
   (declare (ignore x-now C5 mode)))
- 
+
 (defgeneric draw-single-note (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-note  ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
@@ -402,12 +402,12 @@
 (defgeneric draw-single-dur-line (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-dur-line ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
-    (draw-note-duration-line-xor note x-now C5 t-scfactor))) 
+    (draw-note-duration-line-xor note x-now C5 t-scfactor)))
 
 (defgeneric draw-single-symbolic-dynamic (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-symbolic-dynamic ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
-    (draw-note-symbolic-dynamic-xor note x-now C5 t-scfactor))) 
+    (draw-note-symbolic-dynamic-xor note x-now C5 t-scfactor)))
 
 (defgeneric draw-single-offset-line (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-offset-line ((self C-chord) note t-scfactor beg-x time1 C5)
@@ -418,7 +418,7 @@
 ;; stem shows the exact time
 (defgeneric draw-stem (self x C5 &optional mode))
 (defmethod draw-stem ((self C-chord) x C5 &optional mode)
-  (declare (ignore mode)) 
+  (declare (ignore mode))
   (let ((y-min (1- (give-pixel-y (car (notes self)) C5)))
         (y-max (give-pixel-y (car (last (notes self))) C5)))
     ;;    (let-window-pen win :mode (if mode :patxor  :srcor)
@@ -450,12 +450,12 @@
   (let ((notes (notes self))
         (group-length 1)
         (alt-now) (big-alt-temp))
-    (while notes 
+    (while notes
       (while (and notes (not (alteration (car notes)))) (pop notes))
       (if notes (setq alt-now (diatone (pop notes))))
       (while (and notes (not (alteration (car notes)))) (pop notes))
-      (while (and notes 
-                                        ;(< (- alt-now (diatone (car notes))) *alt-tolerance*)) 
+      (while (and notes
+                                        ;(< (- alt-now (diatone (car notes))) *alt-tolerance*))
                   (< (-  (diatone (car notes)) alt-now) *alt-tolerance*))
         (incf group-length)
         (pop notes)
@@ -470,7 +470,7 @@
         (x-values)(left)(right)(alt-group-temp)
         (x-now)(x-shift 5)(left?))
     (while (setq alt-group-temp (pop alt-groups))
-      (setq left (* x-shift (truncate (/ (1+  alt-group-temp) 2)))) 
+      (setq left (* x-shift (truncate (/ (1+  alt-group-temp) 2))))
       (setq right (- left x-shift))
       (setq x-now 0)
       (setq left? ())
@@ -550,7 +550,7 @@
         (dia-now)(dia-tolerance 2)(big-dia-temp))
     (while notes
       (setq dia-now (diatone (pop notes)))
-      (while (and notes 
+      (while (and notes
                   (< (abs (- dia-now (diatone (car notes)))) dia-tolerance))
         (incf group-length)
         (pop notes))
@@ -564,7 +564,7 @@
         (x-values)(left)(right)(dia-group-temp)
         (x-now)(x-shift 7)(left?))
     (while (setq dia-group-temp (pop dia-groups))
-      (setq left (* x-shift (truncate (/ (1+  dia-group-temp) 2)))) 
+      (setq left (* x-shift (truncate (/ (1+  dia-group-temp) 2))))
       (setq right (- left x-shift))
       (setq x-now 0)
       (setq left? ())
@@ -577,7 +577,7 @@
     (nreverse x-values)))
 
 (defgeneric calc-chord-x-values (self))
-(defmethod calc-chord-x-values ((self C-chord)) (make-chord-zig-zag self)) 
+(defmethod calc-chord-x-values ((self C-chord)) (make-chord-zig-zag self))
 
 ;;___________
 
@@ -589,7 +589,7 @@
       (setf (notes self)
             (sort (notes self) #'< :key (lambda (note)(midic note)))))
     (notes self)))
-          
+
 (defgeneric update-chord (self))
 (defmethod update-chord ((self C-chord))
   (when (notes self)
@@ -599,7 +599,7 @@
           (x-heads (calc-chord-x-values self))
           (alt-x-values (make-alt-zig-zag self)))
       (while notes
-        (setf (alt-delta-x (car notes)) 
+        (setf (alt-delta-x (car notes))
               (if  (alteration (car notes))  (- (pop alt-x-values) 12) 0))
         (setf (delta-x  (car notes)) (- (pop x-heads) 6))
         (pop notes))))
@@ -623,7 +623,7 @@
 
 (defmethod decompile ((self C-chord-line))
   `(make-instance ',(class-name (class-of self))
-                  :chords  (list ,@(ask-all (chords self) 'decompile)))) 
+                  :chords  (list ,@(ask-all (chords self) 'decompile))))
 
 (defgeneric kill-chords (self))
 (defmethod kill-chords ((self C-chord-line))
@@ -661,7 +661,7 @@
 (defgeneric continue-play-chords (self chords start-time))
 (defmethod continue-play-chords ((self C-chord-line) chords start-time)
   (when (and (play-flag self) *MN-play-flag*)
-    (play-chord (pop chords)) 
+    (play-chord (pop chords))
     (when chords
       (let ((new-start-time (t-time (car chords))))
         (dfuncall (- new-start-time start-time) 'continue-play-chords self chords new-start-time)))))
@@ -670,11 +670,11 @@
 
 ;;(defmethod draw-chord-line1  ((self C-chord-line) t-scfactor beg-x time1 time2 C5)
 ;;  (set-visible-chords self time1 time2)
-;;  (tell (visible-chords self)  'draw-chord t-scfactor beg-x time1 C5)) 
+;;  (tell (visible-chords self)  'draw-chord t-scfactor beg-x time1 C5))
 
 (defgeneric draw-active-chord (self chord t-scfactor beg-x time1 C5))
-(defmethod draw-active-chord  ((self C-chord-line) chord t-scfactor beg-x time1 C5) 
-  (draw-chord chord t-scfactor beg-x time1 C5 t)) 
+(defmethod draw-active-chord  ((self C-chord-line) chord t-scfactor beg-x time1 C5)
+  (draw-chord chord t-scfactor beg-x time1 C5 t))
 
 (defgeneric add-new-chord (self new-chord))
 (defmethod add-new-chord ((self C-chord-line) new-chord)
@@ -682,7 +682,7 @@
 
 (defgeneric remove-chord (self chord &optional kill-lock))
 (defmethod remove-chord ((self C-chord-line) chord &optional kill-lock)
-  (unless kill-lock 
+  (unless kill-lock
     (tell (notes chord) 'remove-instrument-item ()()))
   (setf (chords self) (remove chord (chords self) :test 'eq)))
 
@@ -699,7 +699,7 @@
     (while (and chords (> time2 (t-time (car chords))))
       (push  (pop chords) visible-chords))
     (nreverse visible-chords)))
-     
+
 (defgeneric sort-chord-by-time (self new-chord))
 (defmethod sort-chord-by-time ((self C-chord-line) new-chord)
   (let ((chords (chords self))

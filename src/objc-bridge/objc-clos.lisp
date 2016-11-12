@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;  
-;;;;  
-;;;;  
+;;;;
+;;;;
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -25,37 +25,37 @@
 ;;;;    - Need to fully handle init keywords and ObjC init messages
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;  
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (C) 2003-2009 Clozure Associates and contributors.
 ;;;;    Parts of this file were part of Clozure CL.
-;;;; 
+;;;;
 ;;;;    Clozure CL is licensed under the terms of the Lisp Lesser GNU Public
 ;;;;    License , known as the LLGPL and distributed with Clozure CL as the
 ;;;;    file "LICENSE".  The LLGPL consists of a preamble and the LGPL,
 ;;;;    which is distributed with Clozure CL as the file "LGPL".  Where these
 ;;;;    conflict, the preamble takes precedence.
-;;;; 
+;;;;
 ;;;;    Clozure CL is referenced in the preamble as the "LIBRARY."
-;;;; 
+;;;;
 ;;;;    The LLGPL is also available online at
 ;;;;    http://opensource.franz.com/preamble.html
-;;;;  
+;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;  
+;;;;
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;  
+;;;;
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -298,9 +298,9 @@ problems.")
 
 (defmethod print-object ((c objc:objc-class) stream)
   (print-unreadable-object (c stream)
-    (format stream "~s ~:[~;[MetaClass] ~]~s (#x~x)" 
-            'objc:objc-class 
-            (objc-metaclass-p c) 
+    (format stream "~s ~:[~;[MetaClass] ~]~s (#x~x)"
+            'objc:objc-class
+            (objc-metaclass-p c)
             (if (slot-boundp c 'name)
                 (class-name c)
                 "<unnamed>")
@@ -308,11 +308,11 @@ problems.")
 
 (defmethod print-object ((c objc:objc-metaclass) stream)
   (print-unreadable-object (c stream)
-    (format stream "~s ~s (#x~x)" 
-            'objc:objc-metaclass 
+    (format stream "~s ~s (#x~x)"
+            'objc:objc-metaclass
             (if (slot-boundp c 'name)
                 (class-name c)
-                "<unnamed>") 
+                "<unnamed>")
             (ccl:%ptr-to-int c))))
 
 (defmethod print-object ((o objc:objc-object) stream)
@@ -540,7 +540,7 @@ problems.")
                 (loop
                   :with n = (ccl:pref ivars :objc_ivar_list.ivar_count)
                   :for i :from 1 :to n
-                  :for ivar = (ccl:pref ivars :objc_ivar_list.ivar_list) 
+                  :for ivar = (ccl:pref ivars :objc_ivar_list.ivar_list)
                   :then (ccl:%inc-ptr ivar (record-length :objc_ivar))
                   :when (string= name (ccl:%get-cstring (ccl:pref ivar :objc_ivar.ivar_name)))
                   :do (return-from %objc-ivar-offset-in-class (ccl:pref ivar :objc_ivar.ivar_offset))))))))
@@ -707,8 +707,8 @@ problems.")
   (flet ((foreign-slot-p (s) (typep s 'foreign-effective-slot-definition)))
     (let* ((cpl (ccl::%class-precedence-list class))
            (slots (call-next-method))
-           (instance-slots 
-            (remove-if #'foreign-slot-p 
+           (instance-slots
+            (remove-if #'foreign-slot-p
                        (remove :class slots :key #'%slot-definition-allocation)))
            (class-slots (remove :instance slots :key #'%slot-definition-allocation))
            (foreign-slots (remove-if-not #'foreign-slot-p slots)))
@@ -830,7 +830,7 @@ problems.")
     (setf (find-class name) class)
     (ensure-dealloc-method-for-class class)))
 
-(defmethod shared-initialize ((instance objc:objc-object) slot-names 
+(defmethod shared-initialize ((instance objc:objc-object) slot-names
                               &rest initargs)
   (let ((class (class-of instance)))
     ;; Initialize CLOS slots
@@ -852,7 +852,7 @@ problems.")
                 (let* ((loc (slot-definition-location slotd))
                        (curval (ccl::%standard-instance-instance-location-access
                                 instance loc)))
-                  (when (and (or (eq slot-names t) 
+                  (when (and (or (eq slot-names t)
                                  (member sname slot-names :test #'eq))
                              (eq curval (ccl::%slot-unbound-marker))
                              initfunction)
@@ -920,21 +920,21 @@ problems.")
   (let* ((pname (string sym))
          (first-alpha (position-if #'alpha-char-p pname)))
     (string-downcase
-     (apply #'string-cat 
+     (apply #'string-cat
             (mapcar #'string-capitalize (split-if-char #\- pname :elide)))
      :end (if first-alpha (1+ first-alpha) 1))))
 
-(defmethod allocate-instance ((metaclass objc:objc-metaclass) 
+(defmethod allocate-instance ((metaclass objc:objc-metaclass)
                               &key name direct-superclasses
                               &allow-other-keys)
   (let ((superclass
          (loop for s in direct-superclasses
             when (typep s 'objc:objc-class)
             collect s into objc-supers
-            finally 
+            finally
               (if (= (length objc-supers) 1)
                   (return (first objc-supers))
-                  (error "Exactly one OBJC:OBJC-CLASS must appear in ~S, found ~S" 
+                  (error "Exactly one OBJC:OBJC-CLASS must appear in ~S, found ~S"
                          direct-superclasses
                          (length objc-supers))))))
     (%allocate-objc-class name superclass)))

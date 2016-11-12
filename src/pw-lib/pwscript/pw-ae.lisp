@@ -76,7 +76,7 @@
 
 ;;*******************************************************************
 ;;*                                                                 *
-;;* AEDesc Class                                                    * 
+;;* AEDesc Class                                                    *
 ;;*                                                                 *
 ;;*   nullAEDesc         ()                                         *
 ;;*   fromClosObject     ((self Symbol) &optional object type size) *
@@ -96,7 +96,7 @@
   ((descRecPtr :writer setDescRecPtr
                :reader getDescRecPtr)))
 
-(defmethod initialize-Instance ((self AEDesc) &key 
+(defmethod initialize-Instance ((self AEDesc) &key
                                 object
                                 (type    (getAEType object))
                                 (recSize (getAESize object))
@@ -105,8 +105,8 @@
     (%stack-Block ((dataPtr recSize))
       (putInAE object dataPtr)
       (setq descRecPtr (make-Record :AEDesc))
-      (#_AECreateDesc 
-       type 
+      (#_AECreateDesc
+       type
        dataPtr
        recSize
        descRecPtr)))
@@ -116,21 +116,21 @@
   (make-Instance
     'AEDesc
     :descRecPtr (let ((descRecPtr (make-Record :aedesc)))
-                  (#_AECreateDesc 
-                   :|null| 
+                  (#_AECreateDesc
+                   :|null|
                    (%null-Ptr)
                    0
                    descRecPtr)
                   descRecPtr)))
 
-(defmethod fromClosObject ((self Symbol) 
-                           object &optional 
+(defmethod fromClosObject ((self Symbol)
+                           object &optional
                            (type (getAEType object))
                            (size (getAESize object)))
   (make-Instance
     self
     :object  object
-    :type    type 
+    :type    type
     :recSize size))
 
 (defmethod asClosObject ((self AEDesc))
@@ -166,7 +166,7 @@
     (setDescRecPtr result self)
    ;AAA (dispose self)
    self))
-  
+
 
 
 (defmethod getAEType ((self AEDesc))
@@ -188,7 +188,7 @@
 
 (defmethod initialize-Instance ((self AEAddressDesc) &key
                                 object
-                                type 
+                                type
                                 recSize
                                 descRecPtr)
   (declare (ignore type) (ignore recSize))
@@ -207,9 +207,9 @@
   (make-Instance
     'AEAddressDesc
     :descRecPtr (let ((descRecPtr (make-Record :AEAddressDesc)))
-                  (choose-AppleEvent-Target 
-                   descRecPtr 
-                   :prompt prompt 
+                  (choose-AppleEvent-Target
+                   descRecPtr
+                   :prompt prompt
                    :title  title)
                   descRecPtr)))
 
@@ -235,7 +235,7 @@
 
 (defmethod initialize-Instance ((self AEDescList) &key
                                 object
-                                type 
+                                type
                                 recSize
                                 descRecPtr)
   (declare (ignore type) (ignore recSize))
@@ -250,7 +250,7 @@
 
 (defmethod getSize ((self AEDescList))
   (niy getSize self)
-  ;; (rlet ((result :Signed-Long))         
+  ;; (rlet ((result :Signed-Long))
   ;;   (#_AECountItems
   ;;    (getDescRecPtr self)
   ;;    result)
@@ -275,7 +275,7 @@
       (values item keyword))))
 
 (defmethod setNthDesc ((self AEDescList) index desc)
-  (#_AEPutDesc 
+  (#_AEPutDesc
    (getDescRecPtr self)
    index
    (getDescRecPtr desc)))
@@ -303,9 +303,9 @@
   (niy getAESizeOfNthDesc self index)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
-  ;;   (#_AESizeOfNthItem 
-  ;;    (getDescRecPtr self) 
-  ;;    index 
+  ;;   (#_AESizeOfNthItem
+  ;;    (getDescRecPtr self)
+  ;;    index
   ;;    type
   ;;    size)
   ;;   (values (%get-Signed-Long size) (%get-OSType type)))
@@ -335,8 +335,8 @@
   ())
 
 (defmethod initialize-Instance ((self AERecord) &key
-                                object 
-                                type 
+                                object
+                                type
                                 recSize
                                 descRecPtr)
   (declare (ignore type) (ignore recSize))
@@ -345,15 +345,15 @@
     (#_AECreateList (%null-Ptr) 0 T descRecPtr)
     (setDescRecPtr descRecPtr self)
     (if object
-      (maphash 
+      (maphash
        (lambda (keyword item)
            (setKeyItem self keyword item))
        object)))
   (setDescRecPtr descRecPtr self))
 
 (defmethod deleteKeyItem ((self AERecord) keyword)
-  (#_AEDeleteKeyDesc 
-   (getDescRecPtr self) 
+  (#_AEDeleteKeyDesc
+   (getDescRecPtr self)
    keyword))
 
 (defmethod setKeyItem ((self AERecord) keyword item)
@@ -368,7 +368,7 @@
     item))
 
 (defmethod setKeyDesc ((self AERecord) keyword desc)
-  (#_AEPutKeyDesc 
+  (#_AEPutKeyDesc
    (getDescRecPtr self)
    keyword
    (getDescRecPtr desc)))
@@ -376,7 +376,7 @@
 (defmethod getKeyDesc ((self AERecord) keyword &optional (type :|****|))
   (let ((result (make-Record :AEDesc))
         (descClass nil))
-    (#_AEGetKeyDesc 
+    (#_AEGetKeyDesc
      (getDescRecPtr self)
      keyword
      type
@@ -390,9 +390,9 @@
   (niy getAESizeOfKeyDesc self keyword)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
-  ;;   (#_AESizeOfNthItem 
-  ;;    (getDescRecPtr self) 
-  ;;    keyword 
+  ;;   (#_AESizeOfNthItem
+  ;;    (getDescRecPtr self)
+  ;;    keyword
   ;;    type
   ;;    size)
   ;;   (values (%get-Signed-Long size) (%get-OSType type)))
@@ -436,16 +436,16 @@
     (setq descRecPtr (make-Record :AppleEvent))
     (#_AECreateAppleEvent
      class
-     id 
+     id
      (getDescRecPtr target)
-     returnId 
+     returnId
      transactionId
      descRecPtr))
   (setDescRecPtr descRecPtr self))
 
 (defmethod deleteParam ((self AppleEvent) keyword)
-  (#_AEDeleteParam 
-   (getDescRecPtr self) 
+  (#_AEDeleteParam
+   (getDescRecPtr self)
    keyword))
 
 (defmethod setParam ((self AppleEvent) keyword item)
@@ -468,7 +468,7 @@
 (defmethod getParamDesc ((self AppleEvent) keyword &optional (type :|****|))
   (let ((result (make-Record :AEDesc))
         (descClass nil))
-    (#_AEGetParamDesc 
+    (#_AEGetParamDesc
      (getDescRecPtr self)
      keyword
      type
@@ -482,9 +482,9 @@
   (niy getAESizeOfParam self keyword)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
-  ;;   (#_AESizeOfParam 
-  ;;    (getDescRecPtr self) 
-  ;;    keyword 
+  ;;   (#_AESizeOfParam
+  ;;    (getDescRecPtr self)
+  ;;    keyword
   ;;    type
   ;;    size)
   ;;   (values (%get-Signed-Long size) (%get-OSType type)))
@@ -502,7 +502,7 @@
     item))
 
 (defmethod setAttributeDesc ((self AppleEvent) keyword desc)
-  (#_AEPutAttributeDesc 
+  (#_AEPutAttributeDesc
    (getDescRecPtr self)
    keyword
    (getDescRecPtr desc)))
@@ -510,7 +510,7 @@
 (defmethod getAttributeDesc ((self AppleEvent) keyword &optional (type :|****|))
   (let ((result (make-Record :AEDesc))
         (descClass nil))
-    (#_AEGetAttributeDesc 
+    (#_AEGetAttributeDesc
      (getDescRecPtr self)
      keyword
      type
@@ -524,9 +524,9 @@
   (niy getAESizeOfAttribute self keyword)
   ;; (rlet ((size :Signed-Long)
   ;;        (type :OSType))
-  ;;   (#_AESizeOfAttribute 
-  ;;    (getDescRecPtr self) 
-  ;;    keyword 
+  ;;   (#_AESizeOfAttribute
+  ;;    (getDescRecPtr self)
+  ;;    keyword
   ;;    type
   ;;    size)
   ;;   (values (%get-Signed-Long size) (%get-OSType type)))
@@ -537,20 +537,20 @@
   :|aevt|)
 
 (defmethod send ((self AppleEvent) &key
-                 (reply-mode :no-reply) 
+                 (reply-mode :no-reply)
                  (interact-mode nil)
                  (can-switch-layer nil)
                  (dont-reconnect nil)
-                 (want-receipt nil) 
+                 (want-receipt nil)
                  (priority #$kAENormalPriority)
                  (timeout #$kAEDefaultTimeout)
                  (idleproc appleevent-idle)
                  filterproc)
   (let ((reply (make-Record :aedesc)))
-    (send-appleevent 
+    (send-appleevent
      (getDescRecPtr self)
      reply
-     :reply-mode reply-mode 
+     :reply-mode reply-mode
      :interact-mode interact-mode
      :can-switch-layer can-switch-layer
      :dont-reconnect dont-reconnect
@@ -648,12 +648,12 @@
     :form      (getKeyItem desc $keyAEKeyForm)
     :data      (getKeyItem desc $keyAEKeyData)))
 
-(defmethod asAEDesc ((self ObjectSpecifier) &optional 
+(defmethod asAEDesc ((self ObjectSpecifier) &optional
                      (type (getAEType self)))
   (let ((rec  (make-instance 'AERecord))
         (cont (getContainer self))
-        (form (make-instance 
-                'AEDesc 
+        (form (make-instance
+                'AEDesc
                 :object (getForm self)
                 :type   :|enum|)))
     (setKeyItem rec $keyAEDesiredClass (getClass self))
@@ -687,11 +687,11 @@
   (declare (ignore self) (ignore desc))
   T)
 
-(defmethod asAEDesc ((self T) &optional 
+(defmethod asAEDesc ((self T) &optional
                      (type (getAEType self)))
-  (make-instance 
-    'AEDesc 
-    :object self 
+  (make-instance
+    'AEDesc
+    :object self
     :type   type))
 
 (defmethod putInAE ((self T) dataPtr)
@@ -727,9 +727,9 @@
       (setq list (append list (list (getNthItem descriptorList i)))))
     list))
 
-(defmethod asAEDesc ((self List) &optional 
+(defmethod asAEDesc ((self List) &optional
                      (type (getAEType self)))
-  (make-instance 
+  (make-instance
     'AEDescList
     :object self
     :type   type))
@@ -738,7 +738,7 @@
   (declare (ignore self))
   :|list|)
 
-(defmethod getAESize ((self List))     
+(defmethod getAESize ((self List))
   (declare (ignore self)))
 
 
@@ -762,9 +762,9 @@
         (setf (getHash keyword htab) value)))
     htab))
 
-(defmethod asAEDesc ((self Hash-Table) &optional 
+(defmethod asAEDesc ((self Hash-Table) &optional
                      (type (getAEType self)))
-  (make-instance 
+  (make-instance
     'AERecord
     :object self
     :type   type))
@@ -824,7 +824,7 @@
 
 (defmethod fromAEDesc ((self (eql 'double-float)) desc)
   (declare (ignore self))
-  (read-from-string 
+  (read-from-string
    (with-aedescs (coerced.desc)
      (let ((err (#_AECoerceDesc (getDescRecPtr desc)
                  #$typechar coerced.desc)))
@@ -927,7 +927,7 @@
 
 (defmethod getAESize ((self String))
   (length self))
- 
+
 
 ;;******************************************
 ;;*                                        *
@@ -960,7 +960,7 @@
 
 
 
-(defmethod asAEDesc ((self integer) &optional 
+(defmethod asAEDesc ((self integer) &optional
                      (type (getAEType self)))
   (declare (ignore type))
   (let* ((thedesc (make-Record :AEDesc)))
@@ -970,7 +970,7 @@
     (make-instance 'AEDesc :descRecPtr thedesc)))
 
 
-(defmethod asAEDesc ((self String) &optional 
+(defmethod asAEDesc ((self String) &optional
                      (type (getAEType self)))
   (declare (ignore type))
   (let* ((thedesc (make-Record :AEDesc)))
@@ -978,7 +978,7 @@
       (ae-error (#_AECreateDesc #$typeChar cstring (length self) thedesc)))
     (make-instance 'AEDesc :descRecPtr thedesc)))
 
-(defmethod asAEDesc ((self symbol) &optional 
+(defmethod asAEDesc ((self symbol) &optional
                      (type (getAEType self)))
  (if (equal self t)
     (let ((thedesc (make-Record :AEDesc)))
@@ -988,13 +988,13 @@
       (make-instance 'AEDesc :descRecPtr thedesc))
     (make-instance 'AEDesc :object self :type  type)))
 
-(defmethod asAEDesc ((self character) &optional 
+(defmethod asAEDesc ((self character) &optional
                      (type (getAEType self)))
   (declare (ignore type))
   (asAEDesc (string self)))
 
 
-(defmethod asAEDesc ((self float) &optional 
+(defmethod asAEDesc ((self float) &optional
                      (type (getAEType self)))
   (declare (ignore type))
   (let ((float-string (format nil "~f" self))
@@ -1003,7 +1003,7 @@
     (make-instance 'AEDesc :descRecPtr thedesc)))
 
 
-(defmethod asAEDesc ((self null) &optional 
+(defmethod asAEDesc ((self null) &optional
                                    (type (getAEType self)))
   (let ((thedesc (make-Record :AEDesc)))
     (%stack-block ((bool-ptr 1))
@@ -1027,7 +1027,7 @@
 (defmethod getKeyDesc ((self AEDesc) keyword &optional (type :|****|))
   (let ((result (make-Record :AEDesc))
         (descClass nil))
-    (#_AEGetKeyDesc 
+    (#_AEGetKeyDesc
      (getDescRecPtr self)
      keyword
      type

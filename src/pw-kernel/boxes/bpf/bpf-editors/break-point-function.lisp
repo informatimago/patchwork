@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -57,7 +57,7 @@
 (defmethod decompile ((self C-break-point-function))
   `(make-instance 'C-break-point-function :break-point-list ',(copy-list (break-point-list self))))
 
-;;================== 
+;;==================
 
 (defgeneric set-break-point-function (self points)
   (:method ((self C-break-point-function) points)
@@ -72,21 +72,21 @@
   (:method ((self C-break-point-function))
     (y-points self)))
 
-;;================== 
+;;==================
 
 #|(defun draw-bpf-function-points (x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
    (let (point-x-now point-y-now)
     (when x-points
-      (setq point-x-now (round (car x-points) h-view-scaler) 
-            point-y-now (round (car y-points) v-view-scaler)) 
+      (setq point-x-now (round (car x-points) h-view-scaler)
+            point-y-now (round (car y-points) v-view-scaler))
       (#_MoveTo :long (make-point point-x-now (- y point-y-now)))
-      (when draw-rects-fl (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3)) 
+      (when draw-rects-fl (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3))
       (pop x-points)(pop y-points)
       (while x-points
-         (setq point-x-now (round (car x-points) h-view-scaler) 
-               point-y-now (round (car y-points) v-view-scaler)) 
+         (setq point-x-now (round (car x-points) h-view-scaler)
+               point-y-now (round (car y-points) v-view-scaler))
          (#_LineTo :long (make-point (make-point point-x-now (- y point-y-now))))
-         (when draw-rects-fl (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3)) 
+         (when draw-rects-fl (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3))
          (pop x-points)(pop y-points)))))|#
 
 (defvar *no-line-segments* ())
@@ -95,9 +95,9 @@
 #|(defun draw-bpf-function-points (x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
    (let (point-x-now point-y-now)
     (when x-points
-      (setq point-x-now (round (car x-points) h-view-scaler) 
-            point-y-now (round (car y-points) v-view-scaler)) 
-      (unless *no-line-segments* 
+      (setq point-x-now (round (car x-points) h-view-scaler)
+            point-y-now (round (car y-points) v-view-scaler))
+      (unless *no-line-segments*
         (#_MoveTo :long (make-point point-x-now (- y point-y-now))))
       (if draw-rects-fl
         (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 3 3)
@@ -105,7 +105,7 @@
           (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
       (pop x-points)(pop y-points)
       (while x-points
-         (setq point-x-now (round (car x-points) h-view-scaler) 
+         (setq point-x-now (round (car x-points) h-view-scaler)
                point-y-now (round (car y-points) v-view-scaler))
          (unless *no-line-segments*
            (#_LineTo :long (make-point (make-point point-x-now (- y point-y-now)))))
@@ -118,9 +118,9 @@
 #|(defun draw-bpf-function-points (x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
    (let (point-x-now point-y-now)
     (when x-points
-      (setq point-x-now (round (car x-points) h-view-scaler) 
-            point-y-now (round (car y-points) v-view-scaler)) 
-      (unless *no-line-segments* 
+      (setq point-x-now (round (car x-points) h-view-scaler)
+            point-y-now (round (car y-points) v-view-scaler))
+      (unless *no-line-segments*
         (#_MoveTo :long (make-point point-x-now (- y point-y-now))))
       (if draw-rects-fl
         (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
@@ -128,7 +128,7 @@
           (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)))
       (pop x-points)(pop y-points)
       (while x-points
-         (setq point-x-now (round (car x-points) h-view-scaler) 
+         (setq point-x-now (round (car x-points) h-view-scaler)
                point-y-now (round (car y-points) v-view-scaler))
          (unless *no-line-segments*
            (#_LineTo :long (make-point (make-point point-x-now (- y point-y-now)))))
@@ -142,9 +142,9 @@
   (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
    ;; (let (point-x-now point-y-now)
    ;;  (when x-points
-   ;;    (setq point-x-now (min #.(1- (expt 2 15)) (round (car x-points) h-view-scaler)) 
+   ;;    (setq point-x-now (min #.(1- (expt 2 15)) (round (car x-points) h-view-scaler))
    ;;          point-y-now (min #.(1- (expt 2 15)) (round (car y-points) v-view-scaler)))
-   ;;    (unless *no-line-segments* 
+   ;;    (unless *no-line-segments*
    ;;      (#_MoveTo :long (make-point point-x-now (- y point-y-now))))
    ;;    (if draw-rects-fl
    ;;      (draw-rect* (- point-x-now 1) (- (- y point-y-now) 1) 1 1)
@@ -175,18 +175,18 @@
             x-point-1 x-point-2)
     (let* ((pos1 (position x-point-1 (x-points self) :test #'eql))
            (pos2 (position x-point-2 (x-points self) :test #'eql))
-           (x-points (subseq (x-points self) 
+           (x-points (subseq (x-points self)
                              (if pos1 pos1 0) (if pos2 (1+ pos2) (length (x-points self)))))
-           (y-points (subseq (y-points self) 
+           (y-points (subseq (y-points self)
                              (if pos1 pos1 0) (if pos2 (1+ pos2) (length (y-points self)))))
            (y (point-v (view-size view))))
-      (with-pen-state (:mode :patxor) 
+      (with-pen-state (:mode :patxor)
         (draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)))))
 
 ;;==================
 
 ;;(defmethod insert-point-by-h ((self C-break-point-function) new-point)
-;;  (set-break-point-function self 
+;;  (set-break-point-function self
 ;;     (sort (cons new-point (break-point-list self))  #'< :key (lambda (a) (point-h a)))))
 
 (defgeneric insert-point-by-h (self new-bp)
@@ -195,16 +195,16 @@
           (x1 (point-h new-bp))
           (bps1))
       (while (and bps (>= x1 (point-h (car bps)))) (push (pop bps) bps1))
-      (set-break-point-function self 
+      (set-break-point-function self
                                 (append  (nreverse bps1)(list new-bp) bps)))))
 
 (defgeneric remove-point-from-bpf (self point)
   (:method ((self C-break-point-function) point)
-    (set-break-point-function self (remove point (break-point-list self) :test #'eql))))      
+    (set-break-point-function self (remove point (break-point-list self) :test #'eql))))
 
 (defgeneric kill-all-except-first (self)
   (:method ((self C-break-point-function))
-    (set-break-point-function self (list (car (break-point-list self))))))    
+    (set-break-point-function self (list (car (break-point-list self))))))
 
 ;;point has to be included in (break-point-list self)
 
@@ -219,7 +219,7 @@
                   x2 (nth (1+ count) (break-point-list self)))))
       (setq x1 (if x1 (point-h x1) -32000))
       (setq x2 (if x2 (point-h x2) 32000))
-      (list x1 x2)))) 
+      (list x1 x2))))
 
 (defgeneric give-points-in-time-range (self x1 x2)
   (:method ((self C-break-point-function) x1 x2)
@@ -234,7 +234,7 @@
   (:method ((self C-break-point-function) xval xincr)
     (let ((points (break-point-list self))
           res-points)
-      (while points 
+      (while points
         (if (>= (point-h (car points)) xval)
             (push (make-point (+ (point-h (car points)) xincr) (point-v (car points)))
                   res-points)
@@ -266,10 +266,10 @@
 
 ;;==================================================================================================================
 
-;;(setq bp (make-instance 'C-break-point-function 
+;;(setq bp (make-instance 'C-break-point-function
 ;;   :break-point-list (list (make-point 0 0)(make-point 10 0)(make-point 20 50)(make-point 90 10))))
-;;(time (repeat 1000 
-;;  (make-instance 'C-break-point-function 
+;;(time (repeat 1000
+;;  (make-instance 'C-break-point-function
 ;;   :break-point-list (list (make-point 0 0)(make-point 10 0)
 ;;                            (make-point 20 50)(make-point 90 10)))))
 ;;(time (repeat 1000 (eval (decompile bp))))

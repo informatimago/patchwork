@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -70,10 +70,10 @@
 (defgeneric set-points-list-to-rect (self points sort-mode)
   (:method ((self C-points-rect) points sort-mode)
     (when (string= sort-mode "sort")
-      (setq points 
+      (setq points
             (sort (mapcar #'list (first points)(second points)) #'< :key (lambda (a)(car a))))
       (setq points (list (mapcar #'first points)(mapcar #'second points))))
-    (scale-x&y-points self points (w self)(h self)))) 
+    (scale-x&y-points self points (w self)(h self))))
 
 ;;=====================================
 
@@ -81,10 +81,10 @@
 ;;   (make-instance 'C-pw-type
 ;;           :control-form
 ;;            `(make-instance 'C-points-rect  :view-size (make-point 74 74) :type-list '(no-connection))))
-;; 
-;; 
+;;
+;;
 ;; (setq *points-view-sort-pw-type*
-;;   (make-instance 'C-pw-type :control-form 
+;;   (make-instance 'C-pw-type :control-form
 ;;    `(make-instance 'C-menubox  :view-size (make-point 36 14)
 ;;     :menu-box-list '("sort" "nosort")
 ;;     :type-list '(no-connection))))
@@ -92,12 +92,12 @@
 
 ;;===================================
 ;; save points ??
-(defclass C-pw-points-view (C-pw-oscilloscope) ()) 
+(defclass C-pw-points-view (C-pw-oscilloscope) ())
 
 
 (defmethod patch-value ((self C-pw-points-view) obj)
   (when (nth-connected-p self 0)
-     (set-points-list-to-rect (third (input-objects self)) 
+     (set-points-list-to-rect (third (input-objects self))
           (patch-value (car (input-objects self)) obj)
           (patch-value (second (input-objects self)) ()))
      (erase+view-draw-contents (third (input-objects self)) ))
@@ -117,7 +117,7 @@
 "Points-view accepts in its first input
 a list of x-values and y-values.The second input has two
 menu options sort and nosort.If sort option is on the
-points are sorted in ascending x-values,if nosort is on 
+points are sorted in ascending x-values,if nosort is on
 the points are not sorted.Points from points-view can be accesssd
 with md-get box by generic functions x-points and y-points."
   (declare (ignore plist output points)))

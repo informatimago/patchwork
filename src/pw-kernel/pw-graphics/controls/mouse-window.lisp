@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -83,11 +83,11 @@
         (view-mouse-dragged active-subview mouse)
         (view-mouse-moved active-subview mouse))
       (no-active-mouse-moved self)))))
-           
+
 (defgeneric no-active-mouse-moved (self))
 (defmethod no-active-mouse-moved ((self C-mouse-window)))
 
-(defmethod window-update-cursor :around ((self C-mouse-window) where) 
+(defmethod window-update-cursor :around ((self C-mouse-window) where)
   (declare (ignore where))
   (call-next-method))
 
@@ -104,7 +104,7 @@
 (defmethod window-mouse-up-event-handler ((self C-mouse-window))
   (tell (subviews self) #'view-mouse-up))
 
-#|  
+#|
 (defobfun (window-null-event-handler *CCL-internal-window*) ()
    (declare (ccl::object-variable clpf-object clicked))
    (let ((mouse (ui:window-mouse-position)))
@@ -113,5 +113,5 @@
        (if clicked
          (mouse-dragged clpf-object (ui:point-h mouse) (ui:point-v mouse))
          (mouse-moved clpf-object (ui:point-h mouse) (ui:point-v mouse))))))
-|#  
+|#
 

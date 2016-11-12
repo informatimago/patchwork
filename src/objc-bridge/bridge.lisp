@@ -5,7 +5,7 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    A Lisp bridge for Objective-C and OpenStep.
 ;;;;
 ;;;;    This provides:
@@ -13,7 +13,7 @@
 ;;;;      (2) Convenient Lisp syntax for invoking ObjC methods
 ;;;;
 ;;;;    This is a fork of objc-bridge from ccl-1.8.
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    <RDB> Randall D. Beer <beer@eecs.cwru.edu>
@@ -22,10 +22,10 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;  
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (c) 2003 Randall D. Beer
-;;;;  
+;;;;
 ;;;;    This software is licensed under the terms of the Lisp Lesser
 ;;;;    GNU Public License, known as the LLGPL.  The LLGPL consists of
 ;;;;    a preamble and  the LGPL. Where these conflict, the preamble
@@ -34,19 +34,19 @@
 ;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;  
+;;;;
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;  
+;;;;
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -369,7 +369,7 @@
     :finally (return (values keys vals))))
 
 
-;;; Return the typestring for an ObjC METHOD 
+;;; Return the typestring for an ObjC METHOD
 
 (defun method-typestring (method)
   #+ccl (ccl:%get-cstring #+(or apple-objc-2.0 cocotron-objc)
@@ -398,7 +398,7 @@
           ;; (THING1 ARG1 ... THINGN ARGN VARGS)
           (t (multiple-value-bind (ks vs) (keys-and-vals (butlast args))
                (if (every #'constantp ks)
-                   (%parse-message 
+                   (%parse-message
                     (nconc (mapcan #'list (mapcar #'eval ks) vs) (last args)))
                    (values f (rest args) nil)))))))
 
@@ -409,7 +409,7 @@
   (let ((f (first args))
         (l (first (last args))))
     (cond ((stringp f)
-           ;; (STRING-with-N-colons ARG1 ... ARGN {LIST}) 
+           ;; (STRING-with-N-colons ARG1 ... ARGN {LIST})
            (let* ((n (count #\: (the simple-string f)))
                   (message-info (need-objc-message-info f))
                   (args (rest args))
@@ -450,7 +450,7 @@
 
 (defun declared-type (form env)
   (cond ((symbolp form)
-         (multiple-value-bind (ignore ignore decls) 
+         (multiple-value-bind (ignore ignore decls)
              (variable-information form env)
            (declare (ignore ignore))
            (or (cdr (assoc 'type decls)) t)))
@@ -481,7 +481,7 @@
 
 
 ;;; Returns the ObjC class corresponding to the declared type OTYPE if
-;;; possible, NIL otherwise 
+;;; possible, NIL otherwise
 
 (defun get-objc-class-from-declaration (otype)
   (cond ((symbolp otype) (lookup-objc-class (lisp-to-objc-classname otype)))
@@ -495,18 +495,18 @@
            (unless (null c) (objc-class-of c))))))
 
 
-;;; Returns the selector of MSG 
+;;; Returns the selector of MSG
 
 (defun get-selector (msg)
   (%get-selector (load-objc-selector msg)))
 
 
-;;; Get the instance method structure corresponding to SEL for CLASS 
+;;; Get the instance method structure corresponding to SEL for CLASS
 
 (defun get-method (class sel)
   (let ((m (class-get-instance-method class sel)))
     (if #+ccl (ccl::%null-ptr-p m) #-ccl (niy null-ptr-p m)
-        (error "Instances of ObjC class ~S cannot respond to the message ~S" 
+        (error "Instances of ObjC class ~S cannot respond to the message ~S"
                (objc-class-name class)
                (lisp-string-from-sel sel))
         m)))
@@ -517,7 +517,7 @@
 (defun get-class-method (class sel)
   (let ((m (class-get-class-method class sel)))
     (if #+ccl (ccl::%null-ptr-p m) #-ccl (niy null-ptr-p m)
-        (error "ObjC class ~S cannot respond to the message ~S" 
+        (error "ObjC class ~S cannot respond to the message ~S"
                (objc-class-name class)
                (lisp-string-from-sel sel))
         m)))
@@ -538,11 +538,11 @@
 ;;; must be used when a structure larger than 4 bytes is returned
 
 (defun requires-stret-p (rspec)
-  (when (member rspec '(:DOUBLE-FLOAT :UNSIGNED-DOUBLEWORD :SIGNED-DOUBLEWORD) 
+  (when (member rspec '(:DOUBLE-FLOAT :UNSIGNED-DOUBLEWORD :SIGNED-DOUBLEWORD)
                 :test #'eq)
     (return-from requires-stret-p nil))
   (setf rspec (fudge-objc-type rspec))
-  (if (numberp rspec) 
+  (if (numberp rspec)
       (> rspec 1)
       (> #+ccl (ccl::ensure-foreign-type-bits (ccl::parse-foreign-type rspec))
          #-ccl (niy ccl::ensure-foreign-type-bits (ccl::parse-foreign-type rspec))
@@ -566,7 +566,7 @@
       :do (multiple-value-setf (r s) (sletify val t var))
       :collect r :into rvarforms
       :unless (null s) :collect s :into stretforms
-      :finally 
+      :finally
       (return
         #+ccl `(ccl:rlet ,rvarforms
                          ,@decls
@@ -575,7 +575,7 @@
         #-ccl `(niy slet varforms body)))))
 
 
-;;; Note that SLET* does not allow declarations 
+;;; Note that SLET* does not allow declarations
 
 (defmacro slet* (varforms &body body &environment env)
   (declare (ignorable env))
@@ -585,19 +585,19 @@
              (slet* ,(rest varforms) ,@body))))
 
 
-;;; Collect the info necessary to transform a SLET into an RLET 
+;;; Collect the info necessary to transform a SLET into an RLET
 
 (defun sletify (form &optional errorp (var (gensym)))
   (if (listp form)
       (case (first form)
-        (ns-make-point 
+        (ns-make-point
          (assert (= (length form) 3))
          `(,var :<NSP>oint :x ,(second form) :y ,(third form)))
-        (ns-make-rect 
+        (ns-make-rect
          (assert (= (length form) 5))
          `(,var :<NSR>ect :origin.x ,(second form) :origin.y ,(third form)
                 :size.width ,(fourth form) :size.height ,(fifth form)))
-        (ns-make-range 
+        (ns-make-range
          (assert (= (length form) 3))
          `(,var :<NSR>ange :location ,(second form) :length ,(third form)))
         (ns-make-size
@@ -658,7 +658,7 @@
 ;;; Convenience macros for some common Cocoa structures.  More
 ;;; could be added
 
-(defmacro ns-max-range (r) 
+(defmacro ns-max-range (r)
   (let ((rtemp (gensym)))
     `(let ((,rtemp ,r))
        (+ (ccl:pref ,rtemp :<NSR>ange.location) (ccl:pref ,rtemp :<NSR>ange.length)))))
@@ -667,7 +667,7 @@
 (defmacro ns-max-x (r)
   (let ((rtemp (gensym)))
     `(let ((,rtemp ,r))
-       (+ (ccl:pref ,r :<NSR>ect.origin.x) 
+       (+ (ccl:pref ,r :<NSR>ect.origin.x)
           (ccl:pref ,r :<NSR>ect.size.width)))))
 (defmacro ns-max-y (r)
   (let ((rtemp (gensym)))
@@ -797,13 +797,13 @@
                 ;; signature.
                 (closer-mop:set-funcallable-instance-function
                  gf
-                 (compile-named-function 
+                 (compile-named-function
                   `(lambda (receiver &rest args)
                      (declare (dynamic-extent args))
                      (or (check-receiver receiver)
-                         (with-ns-exceptions-as-errors 
+                         (with-ns-exceptions-as-errors
                              (apply (objc-method-signature-info-function
-                                     (load-time-value                              
+                                     (load-time-value
                                       (objc-method-info-signature-info ,first-method)))
                                     receiver ,selector args))))
                   :name `(:objc-dispatch ,name)))
@@ -831,7 +831,7 @@
                        (declare (dynamic-extent args))
                        (or (check-receiver receiver)
                            (let* ((function
-                                   (objc-method-signature-info-function 
+                                   (objc-method-signature-info-function
                                     (or (dolist (pair ',protocol-pairs)
                                           (when (conforms-to-protocol receiver (car pair))
                                             (return (cdr pair))))
@@ -917,7 +917,7 @@
          (ambiguous (getf (objc-message-info-flags m) :ambiguous)))
     (if (not ambiguous)
         (car methods)
-        (or 
+        (or
          (dolist (method methods)
            (let* ((mclass (get-objc-method-info-class method)))
              (if (typep o mclass)
@@ -1040,7 +1040,7 @@
                (methods (ccl::objc-message-info-methods message-info))
                (method (if (not ambiguous) (car methods))))
           (when ambiguous
-            (let* ((class (if sclassname 
+            (let* ((class (if sclassname
                               (find-objc-class sclassname)
                               (get-objc-class-from-declaration (declared-type o env)))))
               (if class
@@ -1074,10 +1074,10 @@
 
 
 ;;; Return a call to the method specified by SEL on object O, with the args
-;;; specified by ARGSPECS.  This decides whether a normal or stret call is 
+;;; specified by ARGSPECS.  This decides whether a normal or stret call is
 ;;; needed and, if the latter, uses the memory S to hold the result. If SUPER
-;;; is nonNIL, then this builds a send to super.  Finally, this also 
-;;; coerces return #$YES/#$NO values to T/NIL. The entire call takes place 
+;;; is nonNIL, then this builds a send to super.  Finally, this also
+;;; coerces return #$YES/#$NO values to T/NIL. The entire call takes place
 ;;; inside an implicit SLET.
 
 (defun build-call (o sel msg argspecs svarforms sinitforms &optional s super)
@@ -1292,7 +1292,7 @@
   (multiple-value-bind (ks vs) (keys-and-vals initargs)
     (declare (dynamic-extent ks vs))
     (let* ((class (etypecase cname
-                    (string (canonicalize-registered-class 
+                    (string (canonicalize-registered-class
                              (find-objc-class cname)))
                     (symbol (find-class cname))
                     (class cname))))

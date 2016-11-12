@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    PW-Music Conversion boxes
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -51,15 +51,15 @@ allowing to get, for example, any of the two whole-tone scales (with <approx>=1)
     (+ ref-midic
        (round (* (floor (+ (* (- midic ref-midic) approx) 100) 200) 200) approx) )))
 
-(defunp approx-m ((midics? midics?) 
+(defunp approx-m ((midics? midics?)
                   (approx approx (:value 2)) &optional (ref-midic fix)) midics?
-  "approx-m takes a midicent value   midicents ;and returns an approximation 
-to the nearest division of the octave as defined by the user, approx. The value 
-of resolution determines the resolution of approximation. An argument of 1, 
-results in an output where all values are  rounded to the nearest whole tone; 2, 
-to the nearest semitone; 4, to the nearest  quartertone; 4.5, to the nearest 4.5th 
-of a tone, etc. When approx = 1, the optional argument ref-m in midicents 
-specifies the frequency resolution of the approximation. A value of 100 specifies 
+  "approx-m takes a midicent value   midicents ;and returns an approximation
+to the nearest division of the octave as defined by the user, approx. The value
+of resolution determines the resolution of approximation. An argument of 1,
+results in an output where all values are  rounded to the nearest whole tone; 2,
+to the nearest semitone; 4, to the nearest  quartertone; 4.5, to the nearest 4.5th
+of a tone, etc. When approx = 1, the optional argument ref-m in midicents
+specifies the frequency resolution of the approximation. A value of 100 specifies
 semitone resolution, 50 specifies quartertone resolution, and so on.
 "
   (deep-mapcar 'approx-m 'approx-m1 midics? approx ref-midic))
@@ -110,11 +110,11 @@ semitone resolution, 50 specifies quartertone resolution, and so on.
 
 (defunp f->mc ((freqs? freqs?) &optional (approx (fix/float (:value 100)))
                                          (ref-midic fix/float)) midics?
-  "Converts   frequency ;to midicents.  It takes a frequency (Hz) or list of 
-frequencies and returns corresponding midicent values. The optional approx 
+  "Converts   frequency ;to midicents.  It takes a frequency (Hz) or list of
+frequencies and returns corresponding midicent values. The optional approx
 argument lets one limit returned values to a given approximation (see  approx-
-m).  When approx = 1, the optional argument ref-m in midicents specifies the 
-frequency resolution of the approximation. A value of 100 specifies   semitone 
+m).  When approx = 1, the optional argument ref-m in midicents specifies the
+frequency resolution of the approximation. A value of 100 specifies   semitone
 ;;resolution, 50 specifies   quartertone ;resolution, and so on."
   (deep-mapcar 'f->mc 'f->mc1 freqs? approx ref-midic))
 
@@ -212,7 +212,7 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
 
 ;; called "itv->ascii" by CR
 (defunp int->symb ((ints fixs)) list
-  "<int->symb> takes an interval expressed in midi-cents, and returns a 
+  "<int->symb> takes an interval expressed in midi-cents, and returns a
 symbolic interval name.
 Intervals are labeled as follows:
 
@@ -223,9 +223,9 @@ Intervals are labeled as follows:
 	6m = minor sixth	6M = major sixth	
 	7m = minor seventh	7M = major seventh
 
-All intervals larger than an octave are expressed by adding or  subtracting an 
+All intervals larger than an octave are expressed by adding or  subtracting an
 octave displacement after the simple interval name;
- for example, a major tenth becomes 3M+1, etc.  Note: for the time being,  the 
+ for example, a major tenth becomes 3M+1, etc.  Note: for the time being,  the
 program has a strange way of expressing downward intervals:
  it labels the interval as its inversion, and then transposes downwards as
  necessary.  Thus, a major third down (-400 in midicents), returns 6m-1."
@@ -241,9 +241,9 @@ program has a strange way of expressing downward intervals:
          (pclass (coerce (butlast int-str (length rest-oct)) 'string)))
     (* 100  (+ (position pclass *ascii-intervals* :test #'string=)
                (* 12 (if neg-oct (- oct) oct))))))
-  
+
 (defunp symb->int ((ints fixs)) list
-  "<symb->int> takes a symbolic interval name  , and returns an interval 
+  "<symb->int> takes a symbolic interval name  , and returns an interval
 expressed in midi-cents. Intervals are labeled as follows:
 
 	1 = unison			2m = minor second
@@ -253,11 +253,11 @@ expressed in midi-cents. Intervals are labeled as follows:
 	6m = minor sixth		6M = major sixth	
 	7m = minor seventh	7M = major seventh
 
-All intervals larger than an octave are expressed by adding or subtracting an 
+All intervals larger than an octave are expressed by adding or subtracting an
 octave displacement after the simple interval name;
  for example, a major tenth becomes 3M+1, etc.  Note: for the time being,
-Patchwork has a strange way of expressing downward intervals:  it labels the 
-interval as its inversion, and then transposes downwards as necessary. Thus, a 
+Patchwork has a strange way of expressing downward intervals:  it labels the
+interval as its inversion, and then transposes downwards as necessary. Thus, a
 major third down 6m-1, returns -400 in midicents ."
   (deep-mapcar #'symb->int #'symb->int1 ints))
 
@@ -265,12 +265,12 @@ major third down 6m-1, returns -400 in midicents ."
 
 (defunp mc->n ((midics? midics?)) strings?
   "mc->n takes a midi-cent value <midics> or list of midi-cent values,
- and returns corresponding symbolic (ASCII) note names. 
- Symbolic note names follow standard notation with middle c 
+ and returns corresponding symbolic (ASCII) note names.
+ Symbolic note names follow standard notation with middle c
 \(midi-cent 6000) being C3.  Semitones are labeled with a '#' or a 'b.'
-Quartertone flats are labeled with a '_', and quartertone sharps with a '+'.  Thus, 
-C3 a quartertone sharp (midi-cent 6050), would be labeled 'C+3'.  Gradations 
-smaller than a quartertone are expressed as the closest  quartertone + or - the 
+Quartertone flats are labeled with a '_', and quartertone sharps with a '+'.  Thus,
+C3 a quartertone sharp (midi-cent 6050), would be labeled 'C+3'.  Gradations
+smaller than a quartertone are expressed as the closest  quartertone + or - the
 remaining cent value (i.e., midi-cent 8176 would be expressed as Bb4-24)."
   (deep-mapcar 'mc->n 'mc->n1 midics?))
 
@@ -296,7 +296,7 @@ remaining cent value (i.e., mid-cent 8176 would be expressed as Bb4-24)."
 ;; (n->mc1 "C3")
 
 (defunp cents->coef ((nb-cents midic)) float
-  "<cents->coef> takes an interval expressed in midi-cents and returns the ratio 
+  "<cents->coef> takes an interval expressed in midi-cents and returns the ratio
 between two frequencies separated by that interval; i.e., the value: (freq + <nb-
 cents>) / freq."
   (expt 2.0 (/ nb-cents 1200.0)))
@@ -307,7 +307,7 @@ cents>) / freq."
 ;; (cents->coef   50)  => 1.029302236643492
 
 (defunp coef->cents ((coef float)) midic
-  "<coef->cents> takes a frequency ratio <coef> f1/f2 and returns the interval, 
+  "<coef->cents> takes a frequency ratio <coef> f1/f2 and returns the interval,
 expressed in midi-cents, between f1 and f2."
   (round (log coef) #.(/ (log 2) 1200)))
 
@@ -326,33 +326,33 @@ expressed in midi-cents, between f1 and f2."
 ;;     (if (and (> format 0 )(= 0 min))
 ;;         (list (lldecimals sec nbdec))
 ;;         (list min 'min (lldecimals (mod sec 60) nbdec)))))
-;; 
+;;
 ;; (defune sec->min ((lsec numbers?) (format fix)) list
 ;; "conversion secondes en minutes+secondes
 ;; Format 0 : normal (ex: 1 min 15 ,  0 min 32)
 ;; Format 1 : 0 min n'est pas noté (ex: 1 min 15 , 32)"
 ;;   (deep-mapcar/1  'sec->min1 lsec 2 format))
-;; 
+;;
 ;; (defune min->sec ((minutes numbers?)) numbers? ;;faire marcher pour atoms
 ;; "conversion  minutes -> secondes
-;; orthographe : (3 x 25.3) ,  ou (3 25.3), ou (25.3), ou 25.3 
+;; orthographe : (3 x 25.3) ,  ou (3 25.3), ou (25.3), ou 25.3
 ;; x étant un caractère quelconque"
 ;;   (less-deep-mapcar  'min->sec1 (list! minutes)))
-;; 
-;; (defun min->sec1 (minutage) 
+;;
+;; (defun min->sec1 (minutage)
 ;;  (setq minutage (carlist! minutage))
 ;;   (let ((sec (if (atom minutage) minutage (l-last minutage)))
 ;;         (minutes (if (atom minutage) 0 (car minutage))))
 ;;     (lldecimals (+  sec (* minutes 60)) 2)))
 
-(defun microton1  (midics approx) 
+(defun microton1  (midics approx)
   (let ((result nil))
     (while midics (push (+ 1 (/ (mod (approx-m (nextl midics) approx) 100) 25)) result))
     (nreverse result)))
 
-(defunp microtone  ((midics midic) (approx fix (:value 4))) list 
-"microtone  returns a list of microinterval numbers given a list of midi-cent 
-values <midics>. The micro-interval numbers  and their corresponding 
+(defunp microtone  ((midics midic) (approx fix (:value 4))) list
+"microtone  returns a list of microinterval numbers given a list of midi-cent
+values <midics>. The micro-interval numbers  and their corresponding
 microinterval value, in <approx>, is given below:
 1 = no micro-interval.
 2 = eighth tone
@@ -364,24 +364,24 @@ returns the list (2 1 3 3 4)."
   (unless (member approx '(2 4 8)) (setq approx 2))
   (less-deep-mapcar 'microton1 (list! midics) approx))
 
-#|(defun lin->db1 (amp) 
+#|(defun lin->db1 (amp)
   (lldecimals (- (* 3.6322497830622554E9 (expt amp 2.391325004739499E-9))
  3.6322497830622554E9 ) 2))|#
 
-(defun lin->db1 (amp) 
+(defun lin->db1 (amp)
   (if (zerop amp) -3.63224978306E9
       (lldecimals (* 20.0 (log amp 10)) 2)))
 
 (defunp lin->db ((amps fix/fl/list (:value 1.0))) list
-"<lin->db> takes a  number <amps> and returns the corresponding value 
-expressed in decibels. The input can be a list of numbers. In this case a list of 
+"<lin->db> takes a  number <amps> and returns the corresponding value
+expressed in decibels. The input can be a list of numbers. In this case a list of
 db values is returned."
   (deep-mapcar/1 'lin->db1 amps))
 
 (defun epw::dB->lin1 (amp) (expt 10.0 (/ amp 20.0)))
 (defunp epw::db->lin ((amps fix/fl/list (:value 0.0))) list
         "<dB->lin> takes a  number <amps> in decibels and converts it
-to linear. The input can be a list of numbers. In this case a list of 
+to linear. The input can be a list of numbers. In this case a list of
 linear values is returned."
   (epw::deep-mapcar/1  'epw::db->lin1 amps))
 

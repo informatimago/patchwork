@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -60,8 +60,8 @@
     (if (open-state self)
        (let ((bpf-mini (BPF-mini-view self)))
           (set-break-point-function-to-mini bpf-mini (menubox-value self))
-          (erase-view-inside-rect self)  
-          (view-draw-contents bpf-mini)) 
+          (erase-view-inside-rect self)
+          (view-draw-contents bpf-mini))
        (draw-string 3 9 (doc-string self)))))
 
 (defmethod view-click-event-handler ((view C-menubox-bpf) where)
@@ -79,7 +79,7 @@
           (unless (eql mp last-mp)
             (setq last-mp mp)
                (setf (value view)
-                  (+ last-value 
+                  (+ last-value
                     (* (map-mouse-increment view) (- first-v (point-v last-mp)))))
             (view-draw-contents view)))))))
 
@@ -113,26 +113,26 @@
 
 (add-new-bpf-lib-object *pw-BPF-library*
    (make-instance 'C-break-point-function :break-point-list
-     (list 
+     (list
        (make-point 0 0)
        (make-point 100 100))))
 
 (add-new-bpf-lib-object *pw-BPF-library*
    (make-instance 'C-break-point-function :break-point-list
-     (list 
+     (list
        (make-point 0 50)
        (make-point 100 0))))
 
 (add-new-bpf-lib-object *pw-BPF-library*
    (make-instance 'C-break-point-function :break-point-list
-     (list 
+     (list
        (make-point 0 0)
        (make-point 100 100)
        (make-point 200 0))))
 
 (add-new-bpf-lib-object *pw-BPF-library*
    (make-instance 'C-break-point-function :break-point-list
-     (list 
+     (list
        (make-point -30 -50)
        (make-point 10 100)
        (make-point 20 80)
@@ -141,19 +141,19 @@
 
 
 ;; (setq w2 (make-instance 'window :window-title "Test-bpflib"))
-;; 
-;; (setq bpfmenu1 (make-instance 'C-menubox-bpf 
+;;
+;; (setq bpfmenu1 (make-instance 'C-menubox-bpf
 ;;    :view-position (make-point 50 150) :view-size (make-point 74 54) :doc-string "BPFlib"
 ;;                     :menu-box-list *pw-BPF-library*))
-;; 
+;;
 ;; (add-subviews w2 bpfmenu1)
-;; 
-;; (setq bpfmenu2 (make-instance 'C-menubox-bpf 
+;;
+;; (setq bpfmenu2 (make-instance 'C-menubox-bpf
 ;;     :view-position (make-point 50 20) :view-size (make-point 74 54) :doc-string "BPFlib"
 ;;                     :menu-box-list *pw-BPF-library*))
 ;; (add-subviews w2 bpfmenu2)
-;; 
-;; (setq bpfmenu3 (make-instance 'C-menubox-bpf 
+;;
+;; (setq bpfmenu3 (make-instance 'C-menubox-bpf
 ;;     :view-position (make-point 140 5) :view-size (make-point 84 34) :doc-string "BPFlib"
 ;;                     :menu-box-list *pw-BPF-library*))
 ;; (add-subviews w2 bpfmenu3)
@@ -180,17 +180,17 @@
   (let ((name (CHOOSE-FILE-DIALOG :button-string "Load BPF lib")))
     (load name :verbose t)))
 
-(defun reset-BPF-lib (lib) 
-  (setf (bpf-lib-objects lib) ()) 
+(defun reset-BPF-lib (lib)
+  (setf (bpf-lib-objects lib) ())
   (setf (bpf-lib-pointer *active-BPF-window*) 0)
   (add-new-bpf-lib-object lib
     (make-instance 'C-break-point-function :break-point-list
-     (list 
+     (list
        (make-point 0 0)
        (make-point 100 100)))))
 
 (defun next-from-BPF-lib (win lib &optional dec-num)
-   (setf (bpf-lib-pointer win) 
+   (setf (bpf-lib-pointer win)
       (mod (+ (bpf-lib-pointer win) (if dec-num -1 1))
             (length (bpf-lib-objects lib))))
    (let ((bpf (nth (bpf-lib-pointer win) (bpf-lib-objects lib)))

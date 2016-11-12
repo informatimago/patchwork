@@ -15,19 +15,19 @@
 ;;;   25-Nov-90, Continue change en Cont -Yo-
 ;;;   26-Nov-90, Modification de firstEv, lastEv, link,
 ;;;              on ne pouvais pas ecrire par ex: (firstEv seq nil) qui
-;;;              etait 
+;;;              etait
 ;;;              confondu avec (firstEv seq)
 ;;;   01-Dec-90, Ajout d'une macro DOEVENTS, analogue a DOLIST, pour
 ;;;              parcourir une chaine d'evenements.-Yo-
 ;;;              Ajout des fonctions : Clock, typeName, name, fieldslist,
 ;;;              printEv, printSeq. -Yo-
-;;;              Ajout des fonctions ou macro : pushevent, dupevents, 
+;;;              Ajout des fonctions ou macro : pushevent, dupevents,
 ;;;              delevents, mergeevents. -Yo-
 ;;;   07-Dec-90, Correction de ProgChange. -Yo-
 ;;;   12-Dec-90  Ajout de linkSE,linkST
 ;;;-----------------------------------------------------------------------
 ;;;   15-Dec-90  Nouvelle version de l'interface, restreinte aux seules
-;;;              fonctions de MidiShare et utilisant des macros. -Yo- 
+;;;              fonctions de MidiShare et utilisant des macros. -Yo-
 ;;;   09-Jan-91  Ajout d'une variante info dans la description d'un
 ;;;              evenement et des fonctions d'acces associees.
 ;;;   09-Jan-91  Ajout fonctions d'acces aux filtres
@@ -37,7 +37,7 @@
 ;;;   31-Mai-91  Ajout des "s", (eval-when () ...)
 ;;;   18-Jul-91  Ajout de la fonction bend (de l'ancienne version de
 ;;;              msh-interface)
-;;;   04-Aou-91  Toutes les macros d'acces transferees dans le fichier 
+;;;   04-Aou-91  Toutes les macros d'acces transferees dans le fichier
 ;;;               extension
 ;;;   31-Oct-91  Modification de MidiForgetTask
 ;;;-----------------------------------------------------------------------
@@ -50,15 +50,15 @@
 ;;;              la pile la place pour le resultat !!!
 ;;;   23-07-96   Integration du fichiers "0 - quit-actions.lisp" et
 ;;;              d'une partie du fichier "2 - MidiShare-Extension.lisp"
-;;;   13-04-01   Ajout du type PortPrefix 
+;;;   13-04-01   Ajout du type PortPrefix
 ;;;   15-06-01   Ajout des fonctions de gestion du filtre
 ;;;   19-06-01   Changement du fonctionnement des fonctions de connection
-;;;              et etat des filtres 
+;;;              et etat des filtres
 ;;;              pour rendre le code multi-platorm
 ;;;   24-06-01   Correction MidiForgetTask
 ;;;   25-06-01   add-startup-action et add-quit-action changees en
 ;;;              fonctions
-;;;   27-06-01   Ajout du code correspondant a l'interface Linux 
+;;;   27-06-01   Ajout du code correspondant a l'interface Linux
 ;;;   05-07-01   Nettoyage
 ;;;   07-01-02   Ajout des fonctions de gestion des drivers sur Macintosh
 ;;;   19-11-02   Version MCL 5.0 : MacOSX
@@ -71,23 +71,23 @@
 ;;;   29-01-04   Make the MidiShare return 1 or 0 (instead of T and Nil)
 ;;;   17-03-04   Rename type macro to evtype in OpenMCL and CMUCL interfaces
 ;;;   19-03-04   New MidiNewSmpteLocation, MidiFreeSmpteLocation, MidiNewSyncInfo, MidiFreeSyncInfo
-;;;   19-03-04   Add nullptr and nullptrp for OpenMCL interface 
+;;;   19-03-04   Add nullptr and nullptrp for OpenMCL interface
 ;;;   22-03-04   Correct MidiFreeSmpteLocation and MidiFreeSyncInfo for OpenMcl interface
 ;;;   07-07-04   Val renamed to valint to avoid symbol conflict
 ;;;   02-06-06   Remove MIDISHARE symbol that cause a package conflict on MCL 5.1
 
-(in-package :cl-user)     
-  
+(in-package :cl-user)
+
 (defpackage "MIDISHARE"
   (:nicknames ms)
   (:use common-lisp
         #+ccl ccl
         #+cmu alien #+cmu c-call)
-  (:export "TYPENOTE" "TYPEKEYON" "TYPEKEYOFF" "TYPEKEYPRESS" 
-          "TYPECTRLCHANGE" "TYPEPROGCHANGE" "TYPECHANPRESS" "TYPEPITCHWHEEL" 
-          "TYPEPITCHBEND" "TYPESONGPOS" "TYPESONGSEL" "TYPECLOCK" "TYPESTART" 
+  (:export "TYPENOTE" "TYPEKEYON" "TYPEKEYOFF" "TYPEKEYPRESS"
+          "TYPECTRLCHANGE" "TYPEPROGCHANGE" "TYPECHANPRESS" "TYPEPITCHWHEEL"
+          "TYPEPITCHBEND" "TYPESONGPOS" "TYPESONGSEL" "TYPECLOCK" "TYPESTART"
           "TYPECONTINUE" "TYPESTOP" "TYPETUNE" "TYPEACTIVESENS" "TYPERESET" "TYPESYSEX"
-          "TYPESTREAM" "TYPEPRIVATE" "TYPEPROCESS" "TYPEDPROCESS" 
+          "TYPESTREAM" "TYPEPRIVATE" "TYPEPROCESS" "TYPEDPROCESS"
           "TYPEQFRAME" "TYPECTRL14B" "TYPENONREGPARAM" "TYPEREGPARAM"
           "TYPESEQNUM" "TYPETEXTUAL" "TYPECOPYRIGHT" "TYPESEQNAME"
           "TYPEINSTRNAME" "TYPELYRIC" "TYPEMARKER" "TYPECUEPOINT"
@@ -107,7 +107,7 @@
           "LINKSE" "LINKST" "KPRESS" "CTRL" "PARAM" "NUM" "PREFIX" "TEMPO" "SECONDS"
           "SUBFRAMES" "VALINT" "PGM" "BEND" "CLK" "SONG" "FIELDS" "TEXT" "FMSG" "FCOUNT"
           "TSNUM" "TSDENOM" "TSCLICK" "TSQUARTER" "ALTERATION" "MINOR-SCALE" "INFO"
-          "FIRSTEV" "LASTEV" 
+          "FIRSTEV" "LASTEV"
           "MIDIGETVERSION" "MIDICOUNTAPPLS" "MIDIGETINDAPPL"
           "MIDIGETNAMEDAPPL" "MIDIOPEN" "MIDICLOSE"
           "MIDIGETNAME" "MIDISETNAME" "MIDIGETINFO" "MIDISETINFO" "MIDINEWFILTER"
@@ -216,7 +216,7 @@
 
 ;;; Constant definition for the synchronisation modes
 
-(defconstant MidiExternalSync #x8000 
+(defconstant MidiExternalSync #x8000
   "Bit-15 set for external synchronisation")
 (defconstant MidiSyncAnyPort  #x4000
   "Bit-14 set for synchronisation on any port")
@@ -278,7 +278,7 @@
   (let ((*warn-if-redefine* nil))
     (require :ff)))
 
-#+(and apple mcl powerpc) 
+#+(and apple mcl powerpc)
 
 ;;;-----------------------------------------------------------------------
 ;;;
@@ -288,7 +288,7 @@
 
 (progn
 
-(defun %%get-string (ps) 
+(defun %%get-string (ps)
   "Same as %get-string but work with mac non-zone pointers"
   (let (name count)
     (setq count (%get-byte ps))
@@ -365,7 +365,7 @@
 (defrecord TMidiSeq
   (first (:pointer TMidiEv))    ; first event
   (last (:pointer TMidiEv))     ; last event
-  (undef1 :pointer) 
+  (undef1 :pointer)
   (undef2 :pointer) )
 
 ;;;-----------------------------------------------------------------------
@@ -398,7 +398,7 @@
   (fracs :short))
 
 ;;;-----------------------------------------------------------------------
-;;; Constants and records for MidiShare drivers 
+;;; Constants and records for MidiShare drivers
 ;;;-----------------------------------------------------------------------
 
 (defconstant MidiInputSlot 1)
@@ -408,14 +408,14 @@
 (defrecord TSlotRefNum
   (drvRef :short)
   (slotRef :short))
- 
+
 (defrecord TSlotInfos
   (name (string 31))
   (direction :byte)
   (cnx (string 31))
   (reserved0 :longint)
   (reserved1 :longint))
- 
+
 (defrecord TDriverInfos
   (name (string 31))
   (version :short)
@@ -728,7 +728,7 @@
 ;;;			 MCL 5.0
 ;;;-----------------------------------------------------------------------
 
-#+CCL-5.0 
+#+CCL-5.0
 (progn
 
 ;; To load Frameworks on MacOSX
@@ -740,7 +740,7 @@
 (defun CFSTR (string)
   (with-cstrs ((cstr string))
     (ccl::ff-call-slep *__CFStringMakeConstantString-slep*
-                       :address cstr 
+                       :address cstr
                        :address)))
 
 (defun create-frameworks-url ()
@@ -762,14 +762,14 @@
       (setq *frameworks-url* (create-frameworks-url))))
 
 (defun load-framework-bundle (framework-name)
-  (let* ((bundle-url 
+  (let* ((bundle-url
           (#_CFURLCreateCopyAppendingPathComponent
            (%null-ptr)
            (frameworks-url)    ; file:///System/Library/Frameworks/
            (CFSTR framework-name)
            #$false)))
     (if (%null-ptr-p bundle-url)
-      (error "Can't create URL for ~s in system frameworks folder" 
+      (error "Can't create URL for ~s in system frameworks folder"
              framework-name)
       (let* ((bundle (#_CFBundleCreate (%null-ptr) bundle-url)))
         (if (%null-ptr-p bundle)
@@ -782,9 +782,9 @@
   (let* ((addr (#_CFBundleGetFunctionPointerForName
                 bundle (CFSTR symbol-name))))
     (if (%null-ptr-p addr)
-      (error "Couldn't resolve address of foreign function ~s" 
+      (error "Couldn't resolve address of foreign function ~s"
              symbol-name)
-      ;; This may be a little confusing: MCL uses fixnums (whose low 2 
+      ;; This may be a little confusing: MCL uses fixnums (whose low 2
       ;; bits are zero) to represent function addresses (whose low 2 bits
       ;; are zero ...)Shove the pointer in a buffer, fetch a signed 32-bit
       ;; integer, shift it right 2 bits ... voila.
@@ -831,14 +831,14 @@
 ;;;..................................................: MidiGetIndAppl
 (defun MidiGetIndAppl (index)
   "Give the reference number of a MidiShare application from its index, a fixnum between 1 and (MidiCountAppls)"
-  (ccl::ppc-ff-call (get-fun-addr "MidiGetIndAppl" *midishare*) 
+  (ccl::ppc-ff-call (get-fun-addr "MidiGetIndAppl" *midishare*)
                     :signed-halfword index :signed-halfword))
 
 ;;;..................................................: MidiGetNamedAppl
 (defun MidiGetNamedAppl (name)
   "Give the reference number of a MidiShare application from its name"
   (with-cstrs ((s name))
-    (ccl::ppc-ff-call (get-fun-addr "MidiGetNamedAppl" *midishare*) 
+    (ccl::ppc-ff-call (get-fun-addr "MidiGetNamedAppl" *midishare*)
                       :address s :signed-halfword)))
 
 
@@ -881,14 +881,14 @@
 
 ;;;..................................................: MidiGetInfo
 (defun MidiGetInfo (refNum)
-  "Give the 32-bits user defined content of the info field of a MidiShare application. 
+  "Give the 32-bits user defined content of the info field of a MidiShare application.
  Analogous to window's refcon."
-  (ccl::ppc-ff-call (get-fun-addr "MidiGetInfo" *midishare*) 
+  (ccl::ppc-ff-call (get-fun-addr "MidiGetInfo" *midishare*)
                     :signed-halfword refNum :address))
 
 ;;;..................................................: MidiSetInfo
 (defun MidiSetInfo (refNum p)
-  "Set the 32-bits user defined content of the info field of a MidiShare application. 
+  "Set the 32-bits user defined content of the info field of a MidiShare application.
  Analogous to window's refcon."
   (ccl::ppc-ff-call (get-fun-addr "MidiSetInfo" *midishare*)
                     :signed-halfword refNum :address p :void))
@@ -915,14 +915,14 @@
 (defun MidiAcceptType (f c s)
   "Change the type state of a filter"
   (ccl::ppc-ff-call (get-fun-addr "MidiAcceptType" *midishare*)
-                    :address f :signed-halfword c 
+                    :address f :signed-halfword c
                     :unsigned-byte s :void))
 
 ;;;..................................................: MidiAcceptPort
 (defun MidiAcceptPort (f c s)
   "Change the port state of a filter"
   (ccl::ppc-ff-call (get-fun-addr "MidiAcceptPort" *midishare*)
-                    :address f :signed-halfword c 
+                    :address f :signed-halfword c
                     :unsigned-byte s :void))
 
 ;;;..................................................: MidiIsAcceptedChan
@@ -945,7 +945,7 @@
 
 ;;;..................................................: MidiGetFilter
 (defun MidiGetFilter (refNum)
-  "Give a pointer to the input filter record of a MidiShare application. 
+  "Give a pointer to the input filter record of a MidiShare application.
  Give NIL if no filter is installed"
   (ccl::ppc-ff-call (get-fun-addr "MidiGetFilter" *midishare*)
                     :signed-halfword refNum :address))
@@ -989,14 +989,14 @@
 (defun MidiConnect (src dst s)
   "Connect or disconnect two MidiShare applications"
   (ccl::ppc-ff-call (get-fun-addr "MidiConnect" *midishare*)
-                    :signed-halfword src :signed-halfword dst 
+                    :signed-halfword src :signed-halfword dst
                     :unsigned-byte s :void))
 
 ;;;..................................................: MidiIsConnected
 (defun MidiIsConnected (src dst)
   "Test if two MidiShare applications are connected"
   (ccl::ppc-ff-call (get-fun-addr "MidiIsConnected" *midishare*)
-                    :signed-halfword src :signed-halfword dst 
+                    :signed-halfword src :signed-halfword dst
                     :unsigned-byte))
 
 ;;;..................................................: MidiGetPortState
@@ -1039,14 +1039,14 @@
   (ccl::ppc-ff-call (get-fun-addr "MidiFreeEv" *midishare*)
                     :address ev :void))
 
-;;; HKT: I converted the next four from macros to functions because 
+;;; HKT: I converted the next four from macros to functions because
 ;;; earlier macros use them BEFORE their macroexpansions are known.
 
 ;;;..................................................: MidiSetField
 (defun MidiSetField (ev f v)
   "Set a field of a MidiEvent"
   (ccl::ppc-ff-call (get-fun-addr "MidiSetField" *midishare*)
-                    :address ev :signed-fullword f 
+                    :address ev :signed-fullword f
                     :signed-fullword v :void))
 
 ;;;..................................................: MidiGetField
@@ -1131,7 +1131,7 @@
 (defun MidiSendAt (refNum ev date)
   "send an event at date <date>"
   (ccl::ppc-ff-call (get-fun-addr "MidiSendAt" *midishare*)
-                    :signed-halfword refNum :address ev 
+                    :signed-halfword refNum :address ev
                     :unsigned-fullword date :void ))
 
 ;;;-----------------------------------------------------------------------
@@ -1186,30 +1186,30 @@
 (defun MidiCall (proc date refNum arg1 arg2 arg3)
   "Call the routine <proc> at date <date> with arguments <arg1> <arg2> <arg3>"
   (ccl::ppc-ff-call (get-fun-addr "MidiCall" *midishare*)
-                    :address proc :unsigned-fullword date 
-                    :signed-halfword refNum  :signed-fullword arg1 
+                    :address proc :unsigned-fullword date
+                    :signed-halfword refNum  :signed-fullword arg1
                     :signed-fullword arg2 :signed-fullword arg3 :void))
 
 ;;;..................................................: MidiTask
 (defun MidiTask (proc date refNum arg1 arg2 arg3)
   "Call the routine <proc> at date <date> with arguments <arg1> <arg2> <arg3>. Return a pointer to the corresponding typeProcess event"
   (ccl::ppc-ff-call (get-fun-addr "MidiTask" *midishare*)
-                    :address proc :unsigned-fullword date 
-                    :signed-halfword refNum  :signed-fullword arg1 
-                    :signed-fullword arg2 :signed-fullword arg3 
+                    :address proc :unsigned-fullword date
+                    :signed-halfword refNum  :signed-fullword arg1
+                    :signed-fullword arg2 :signed-fullword arg3
                     :void))
 
 ;;;..................................................: MidiDTask
 (defun MidiDTask (proc date refNum arg1 arg2 arg3)
-  "Call the routine <proc> at date <date> with arguments <arg1> <arg2> <arg3>. 
+  "Call the routine <proc> at date <date> with arguments <arg1> <arg2> <arg3>.
  Return a pointer to the corresponding typeDProcess event"
   (ccl::ppc-ff-call (get-fun-addr "MidiDTask" *midishare*)
-                    :address proc :unsigned-fullword date 
-                    :signed-halfword refNum  :signed-fullword arg1 
+                    :address proc :unsigned-fullword date
+                    :signed-halfword refNum  :signed-fullword arg1
                     :signed-fullword arg2 :signed-fullword arg3 :void))
 
 
-;; 19/11/02 A VERIFIER !! 
+;; 19/11/02 A VERIFIER !!
 ;;;..................................................: MidiForgetTaskHdl
 (defun MidiForgetTaskHdl (thdl)
   "Forget a previously scheduled typeProcess or typeDProcess event created by MidiTask or MidiDTask"
@@ -1219,9 +1219,9 @@
 ;;;..................................................: MidiForgetTask
 (defun MidiForgetTask (ev)
   "Forget a previously scheduled typeProcess or typeDProcess event created by MidiTask or MidiDTask"
-  (without-interrupts 
+  (without-interrupts
     (%stack-block ((taskptr 4))
-      (%put-ptr taskptr ev) 
+      (%put-ptr taskptr ev)
       (midiforgetTaskHdl taskptr))))
 
 ;;;..................................................: MidiCountDTasks
@@ -1309,7 +1309,7 @@
 (defun MidiTime2Smpte (time format smpteLocation)
   "convert time to Smpte location"
   (ccl::ppc-ff-call (get-fun-addr "MidiTime2Smpte" *midishare*)
-                    :signed-fullword time :signed-halfword format 
+                    :signed-fullword time :signed-halfword format
                     :address smpteLocation :void))
 
 ;;;..................................................: MidiSmpte2Time
@@ -1348,7 +1348,7 @@
 (defun MidiGetIndSlot  (refNum  index)
   "Give the reference number of a driver slot from its order number."
   (ccl::ppc-ff-call (get-fun-addr "MidiGetIndSlot" *midishare*)
-                    :signed-halfword refNum  :signed-halfword index 
+                    :signed-halfword refNum  :signed-halfword index
                     :address))
 
 ;;;..................................................: MidiGetSlotInfos
@@ -1361,14 +1361,14 @@
 (defun MidiConnectSlot  (port slotRefNum state)
   "Make or remove a connection between a slot and a MidiShare logical port"
    (ccl::ppc-ff-call (get-fun-addr "MidiConnectSlot" *midishare*)
-                     :signed-halfword port  :address slotRefNum 
+                     :signed-halfword port  :address slotRefNum
                      :unsigned-byte state :void))
 
 ;;;..................................................: MidiIsSlotConnected
 (defun MidiIsSlotConnected  (port slotRefNum)
   "Test a connection between a slot and a MidiShare logical port"
    (ccl::ppc-ff-call (get-fun-addr "MidiGetIndSlot" *midishare*)
-                     :signed-halfword port  :address slotRefNum 
+                     :signed-halfword port  :address slotRefNum
                      :unsigned-byte))
 
 (defun MidiNewSmpteLocation ()
@@ -1395,7 +1395,7 @@
 ;;;-----------------------------------------------------------------------
 
 
-;;; Interface description for a MidiShare PROCEDURE 
+;;; Interface description for a MidiShare PROCEDURE
 ;;; with a word and a pointer parameter
 ;;; (ff-call *midiShare* :word <arg1> :ptr <arg2> :d0 <MidiShare routine #>)
 ;;;
@@ -1403,7 +1403,7 @@
 ;;; with a word and a pointer parameter and a pointer result
 ;;; (ff-call *midiShare*  :ptr (%null-ptr) :word <arg1> :ptr <arg2> :d0 <MidiShare routine #> :ptr)
 ;;;
-;;; Interface description for a MidiShare FUNCTION (with MCL PPC 3.9) 
+;;; Interface description for a MidiShare FUNCTION (with MCL PPC 3.9)
 ;;; with a word and a pointer parameter and a pointer result
 ;;; (ff-call *midiShare* :word <arg1> :ptr <arg2> :d0 <MidiShare routine #> :ptr)
 ;;;
@@ -1433,7 +1433,7 @@
 ;;;..................................................: MidiGetIndAppl
 (defun MidiGetIndAppl (index)
   "Give the reference number of a MidiShare application from its index, a fixnum between 1 and (MidiCountAppls)"
-  (%%unsigned-to-signed-word 
+  (%%unsigned-to-signed-word
     (ff-call *midiShare* :word index :d0 2 :word)))
 
 ;;;..................................................: MidiGetNamedAppl
@@ -1480,7 +1480,7 @@
 
 ;;;..................................................: MidiSetInfo
 (defun MidiSetInfo (refNum p)
-  "Set the 32-bits user defined content of the info field of a MidiShare application. 
+  "Set the 32-bits user defined content of the info field of a MidiShare application.
  Analogous to window's refcon."
   (ff-call *midiShare* :word refNum :ptr p :d0 9))
 
@@ -1733,7 +1733,7 @@
 
 ;;;..................................................: MidiDTask
 (defun MidiDTask (proc date refNum arg1 arg2 arg3)
-  "Call the routine <proc> at date <date> with arguments <arg1> <arg2> <arg3>. 
+  "Call the routine <proc> at date <date> with arguments <arg1> <arg2> <arg3>.
  Return a pointer to the corresponding typeDProcess event"
   (ff-call *midiShare* :ptr proc :long date :word refNum :long arg1 :long arg2 :long arg3 :d0 #x2E :ptr))
 
@@ -1745,7 +1745,7 @@
 ;;;..................................................: MidiForgetTask
 (defun MidiForgetTask (ev)
   "Forget a previously scheduled typeProcess or typeDProcess event created by MidiTask or MidiDTask"
-  (without-interrupts 
+  (without-interrupts
     (%stack-block ((taskptr 4))
       (%put-ptr taskptr ev) (midiforgetTaskHdl taskptr))))
 
@@ -1848,7 +1848,7 @@
 ;;;..................................................: MidiGetDriverInfos
 (defun MidiGetDriverInfos  (refNum  info)
   "Give information about a driver"
-  (%%word-high-byte 
+  (%%word-high-byte
    (ff-call *midiShare* :word refNum :ptr info :d0 #x48 :word)))
 
 ;;;..................................................: MidiGetIndSlot
@@ -2088,7 +2088,7 @@
     (multiple-value-bind (ms7b ls7b) (floor (+ v 8192) 128)
       (setf (ccl:pref e :<tm>idi<e>v.info.note.pitch) ls7b)
       (setf (ccl:pref e :<tm>idi<e>v.info.note.vel) ms7b))
-    (- (+ (ccl:pref e :<tm>idi<e>v.info.note.pitch) 
+    (- (+ (ccl:pref e :<tm>idi<e>v.info.note.pitch)
           (* 128 (ccl:pref e :<tm>idi<e>v.info.note.vel)))
        8192)))
 
@@ -2186,7 +2186,7 @@
   "returns true if MidiShare is installed"
   (if (null *midishare*) 0 1)) ; hkt: The MCL version checked a macptr.
 
-(defun MidiGetVersion () 
+(defun MidiGetVersion ()
   "Give MidiShare version as a fixnum. For example 131 as result, means : version 1.31"
   (#_MidiGetVersion))
 
@@ -2452,9 +2452,9 @@
 
 (defun MidiForgetTask (ev)
   "Forget a previously scheduled typeProcess or typeDProcess event created by MidiTask or MidiDTask"
-  (ccl:without-interrupts 
+  (ccl:without-interrupts
    (ccl:%stack-block ((taskptr 4))
-     (setf (ccl:%get-ptr taskptr) ev) 
+     (setf (ccl:%get-ptr taskptr) ev)
      (MidiForgetTask taskptr))))
 
 (defun MidiCountDTasks (refNum)
@@ -2609,7 +2609,7 @@
 
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 				Utilities                                       
+;;; 				Utilities
 ;;;
 ;;;-----------------------------------------------------------------------
 
@@ -2627,9 +2627,9 @@
 (def-alien-type ptr  (* t))
 
 ;; Test if p is a null pointer
-                                                                    
+
 (defun nullptrp (p)
-  (if (typep p '(alien (* t))) 
+  (if (typep p '(alien (* t)))
     (zerop (system:sap-int (alien-sap p)))
     (zerop (system:sap-int p))))
 
@@ -2640,9 +2640,9 @@
 
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
-;;;                                                                               
-;;; 				MidiShare Data Structures                         
-;;;                                                                                
+;;;
+;;; 				MidiShare Data Structures
+;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
@@ -2670,45 +2670,45 @@
 	
 
 ;;;-----------------------------------------------------------------------
-;;; Common Record for all MidiShare events                                      
+;;; Common Record for all MidiShare events
 ;;;-----------------------------------------------------------------------
 
 ;; Possible types for the last field of the structure
-                                                    
-(def-alien-type nil                                 
-  (struct PitchVelDur                              
-	  (pitch char  )                            
-	  (vel   char  )                           
-	  (dur   short )))                       
-                                                   
-(def-alien-type nil                                 
-  (struct datas                                     
-	  (data0 char)                             
-	  (data1 char)                              
-	  (data2 char)                             
-	  (data3 char) ))                           
-                                                    
-(def-alien-type T_info long)                        
-(def-alien-type T_linkSE (*(struct TMidiSEX)))      
-(def-alien-type T_linkST (*(struct TMidiST) ))     
-                                                    
-(def-alien-type nil                                 
-   (union evData                                    
-	  (note (struct pitchVelDur))              
-	  (data (struct datas      ))               
-	  (info T_info              )              
-	  (linkSE T_linkSE          )             
-	  (linkST T_linkST          )))          
-                                                   
-                                                    
+
+(def-alien-type nil
+  (struct PitchVelDur
+	  (pitch char  )
+	  (vel   char  )
+	  (dur   short )))
+
+(def-alien-type nil
+  (struct datas
+	  (data0 char)
+	  (data1 char)
+	  (data2 char)
+	  (data3 char) ))
+
+(def-alien-type T_info long)
+(def-alien-type T_linkSE (*(struct TMidiSEX)))
+(def-alien-type T_linkST (*(struct TMidiST) ))
+
+(def-alien-type nil
+   (union evData
+	  (note (struct pitchVelDur))
+	  (data (struct datas      ))
+	  (info T_info              )
+	  (linkSE T_linkSE          )
+	  (linkST T_linkST          )))
+
+
 ;;; The last field of a TMidiEv is either :
-;;;                                                  
-;;;     - a note (with a pitch, a velocite and a duration) 
-;;;     - a 4 byte field (4 au total)          
-;;;     - a fiels info  (4 bytes)                                 
-;;;     - a link to a TMidiSEX                   
-;;;     - a link to a TMidiST                    
-;;;                                                  
+;;;
+;;;     - a note (with a pitch, a velocite and a duration)
+;;;     - a 4 byte field (4 au total)
+;;;     - a fiels info  (4 bytes)
+;;;     - a link to a TMidiSEX
+;;;     - a link to a TMidiST
+;;;
 
 (def-alien-type nil
   (struct TMidiEv
@@ -2724,7 +2724,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;; Record for a MidiShare Sequence                                               
+;;; Record for a MidiShare Sequence
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2737,7 +2737,7 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; Record for MidiShare SMPTE synchronisation informations                        
+;;; Record for MidiShare SMPTE synchronisation informations
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2757,7 +2757,7 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; Record for MidiShare SMPTE locations                                            
+;;; Record for MidiShare SMPTE locations
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2772,7 +2772,7 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; Record for MidiShare Filters                                                 
+;;; Record for MidiShare Filters
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2785,11 +2785,11 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; pointers on alien data structures                                             
+;;; pointers on alien data structures
 ;;;-----------------------------------------------------------------------
 
-(def-alien-type MidiSEXPtr     ( *(struct TMidiSEX) )      ) 
-(def-alien-type MidiSTPtr      ( *(struct TMidiST))        ) 
+(def-alien-type MidiSEXPtr     ( *(struct TMidiSEX) )      )
+(def-alien-type MidiSTPtr      ( *(struct TMidiST))        )
 (def-alien-type MidiEvPtr      ( *(struct TMidiEv))        )
 (def-alien-type MidiSeqPtr     ( *(struct TMidiSeq))       )
 (def-alien-type SyncInfoPtr    ( *(struct TSyncInfo))      )
@@ -2799,9 +2799,9 @@
 
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
-;;;                                                                                
-;;; 		Macros for accessing MidiShare Events data structures            
-;;;                                                                               
+;;;
+;;; 		Macros for accessing MidiShare Events data structures
+;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
@@ -2811,68 +2811,68 @@
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: link
-;;                                                                                                                                        
+;;
 (defun link (e &optional (d nil d?))
   "read or set the link of an event"
   (if d?
-    (midiSetLink e d);  (setf (slot e 'link) d )               
+    (midiSetLink e d);  (setf (slot e 'link) d )
     (midiGetLink e   );  (slot e 'link           )
   )
 )
 
 ;;;..................................................: date
-;;                                                                                                                                     
+;;
 (defun date (e &optional d)
   "read or set the date of an event"
   (if d
       (MidiSetDate e d); (setf (slot e 'date) d )
-      (MidiGetDate e   ); (slot e 'date           )              
+      (MidiGetDate e   ); (slot e 'date           )
   )
 )
 
 ;;;..................................................: type
-;;                                                                                                                                        
+;;
 (defun evtype (e &optional v)
-  "read or set the type of an event. Be careful in 
+  "read or set the type of an event. Be careful in
  modifying the type of an event"
   (if v
       (MidiSetType e v); (setf (slot e 'evType) v )
-      (MidiGetType e   ); (slot e 'evType           )            
+      (MidiGetType e   ); (slot e 'evType           )
   )
 )
 
 ;;;..................................................: ref
-;;                                                                                                                                        
+;;
 (defun ref (e &optional v)
   "read or set the reference number of an event"
   (if v
       (MidiSetRefNum e v); (setf (slot e 'ref) v)
-      (MidiGetRefNum e    ); (slot e 'ref          )              
+      (MidiGetRefNum e    ); (slot e 'ref          )
   )
 )
 
 ;;;..................................................: port
-;;                                                                                                                                           
+;;
 (defun port (e &optional v)
   "read or set the port number of an event"
   (if v
       (MidiSetPort e v); (setf (slot e 'port) v)
-      (MidiGetPort e   ); (slot e 'port          )               
+      (MidiGetPort e   ); (slot e 'port          )
    )
 )
 
 ;;;..................................................: chan
-;;                                                                                                                                         
+;;
 (defun chan (e &optional v)
   "read or set the chan number of an event"
   (if v
       (MidiSetChan e v); (setf (slot e 'chan) v)
-      (MidiGetChan e   ); (slot e 'chan          )                
+      (MidiGetChan e   ); (slot e 'chan          )
   )
 )
 
 ;;;..................................................: field
-;;                                                                                                                                         
+;;
 (defun field (e &optional f v)
   "give the number of fields or read or set a particular field of an event"
   (if f
@@ -2882,7 +2882,7 @@
     (midicountfields e)))
 
 ;;;..................................................: fieldsList
-;;                                                                                                                 
+;;
 (defun fieldsList (e &optional (n 4))
   "collect all the fields of an event into a list"
   (let (l)
@@ -2896,7 +2896,7 @@
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: pitch
-;;                                                                                                                                          
+;;
 (defun pitch (e &optional v)
   "read or set the pitch of an event"
   (if v
@@ -2906,22 +2906,22 @@
 )
 
 ;;;..................................................: vel
-;;                                                                                                                                       
+;;
 (defun vel (e &optional v)
   "read or set the velocity of an event"
   (if v
       (midisetfield e 1 v); (setf (slot (slot (slot e 'data) 'note) 'vel) v)
-      (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel          )  
+      (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel          )
   )
 )
 
 ;;;..................................................: dur
-;;                                                                                                                                           
+;;
 (defun dur (e &optional v)
   "read or set the duration of an event"
   (if v
       (midisetfield e 2 v); (setf (slot (slot (slot e 'data) 'note) 'dur) v)
-      (midigetfield e 2   ); (slot (slot (slot e 'data) 'note) 'dur          )  
+      (midigetfield e 2   ); (slot (slot (slot e 'data) 'note) 'dur          )
   )
 )
 
@@ -2931,7 +2931,7 @@
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: linkSE
-;;                                                                                             
+;;
 (defun linkSE (e &optional (d nil d?))
   "read or set the link of an SEXevent "
   (if d?
@@ -2941,7 +2941,7 @@
 )
 
 ;;;..................................................: linkST
-;;                                                                                              
+;;
 (defun linkST (e &optional (d nil d?))
  "read or set the link of an STevent "
   (if d?
@@ -2952,7 +2952,7 @@
 
 
 ;;;..................................................: kpress
-;;                                                                                             
+;;
 (defun kpress (e &optional v)
   (if v
       (midisetfield e 1 v); (setf (slot (slot (slot e 'data) 'note) 'vel) v)
@@ -2962,7 +2962,7 @@
 
 
 ;;;..................................................: ctrl
-;;                                                                                             
+;;
 (defun ctrl (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2970,7 +2970,7 @@
 
 
 ;;;..................................................: param
-;;                                                                                           
+;;
 (defun param (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2978,7 +2978,7 @@
 
 
 ;;;..................................................: num
-;;                                                                                            
+;;
 (defun num (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2986,7 +2986,7 @@
 
 
 ;;;..................................................: prefix
-;;                                                                                             
+;;
 (defun prefix (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2994,7 +2994,7 @@
 
 
 ;;;..................................................: tempo
-;;                                                                                              
+;;
 (defun tempo (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -3002,7 +3002,7 @@
 
 
 ;;;..................................................: seconds
-;;                                                                                             
+;;
 (defun seconds (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -3010,7 +3010,7 @@
 
 
 ;;;..................................................: subframes
-;;                                                                                              
+;;
 (defun subframes (e &optional v)
   (if v
     (midisetfield e 1 v)
@@ -3018,7 +3018,7 @@
 
 
 ;;;..................................................: val
-;;                                                                                             
+;;
 (defun valint (e &optional v)
   (if v
     (midisetfield e 1 v)
@@ -3026,7 +3026,7 @@
 
 
 ;;;..................................................: pgm
-;;                                                                                             
+;;
 (defun pgm (e &optional v)
   (if v
       (midisetfield e 0 v); (setf (slot (slot (slot e 'data) 'note) 'pitch) v)
@@ -3036,7 +3036,7 @@
 
 
 ;;;..................................................: bend
-;;                                                                                              
+;;
 (defun bend (e &optional v)
   "read or set the bend value of an event"
   (if v
@@ -3044,38 +3044,38 @@
         (midisetfield e 0 ls7b); (setf (slot (slot (slot e 'data) 'note) 'pitch) ls7b)
         (midisetfield e 1 ms7b); (setf (slot (slot (slot e 'data) 'note) 'vel  ) ms7b)
         )
-    (- (+ (midigetfield e 0) (* 128 (midigetfield e 1))) 8192)                                              
+    (- (+ (midigetfield e 0) (* 128 (midigetfield e 1))) 8192)
     ;; (- (+ (slot (slot (slot e 'data) 'note) 'pitch) (* 128 (slot (slot (slot e 'data) 'note) 'vel))) 8192)
   )
 )
 
 
 ;;;..................................................: clk
-;;                                                                                              
+;;
 (defun clk (e &optional v)
   (if v
       (multiple-value-bind (ms7b ls7b) (floor (round (/ v 6)) 128)
          (midisetfield e 0 ls7b); (setf (slot (slot (slot e 'data) 'note) 'pitch) ls7b)
          (midisetfield e 1 ms7b); (setf (slot (slot (slot e 'data) 'note) 'vel  ) ms7b)
        )
-      (* 6 (+ (midigetfield e 0) (*128 (midigetfield e 1))))                                            
+      (* 6 (+ (midigetfield e 0) (*128 (midigetfield e 1))))
       ;; (* 6 (+ (slot (slot (slot e 'data) 'note) 'pitch) (* 128 (slot (slot (slot e 'data) 'note) 'vel))))
   )
 )
 
 
 ;;;..................................................: song
-;;                                                                                              
+;;
 (defun song (e &optional v)
   (if v
       (midisetfield e 0 v); (setf (slot (slot (slot e 'data) 'note) 'pitch) v)
-      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          ) 
+      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )
   )
 )
 
 
 ;;;..................................................: fields
-;;                                                                                             
+;;
 (defun fields (e &optional v)
   (if v
     (let ((e e))
@@ -3099,7 +3099,7 @@
 (defun fmsg (e &optional v)
   (if v
     (midisetfield e 0 v); (setf (slot (slot (slot e 'data) 'note) 'pitch) v)
-    (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          ) 
+    (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )
   )
 )
 
@@ -3108,7 +3108,7 @@
 (defun fcount (e &optional v)
   (if v
     (midisetfield e 1 v); (setf (slot (slot (slot e 'data) 'note) 'vel) v)
-    (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel)              
+    (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel)
   )
 )
 
@@ -3181,7 +3181,7 @@
   "read or set the first event of a sequence"
   (if e?
       (midiSetFirstEv s e); (setf (slot s 'first) e)
-      (midiGetFirstEv s   ); (slot s 'first          )        
+      (midiGetFirstEv s   ); (slot s 'first          )
   )
 )
 
@@ -3191,20 +3191,20 @@
   "read or set the last event of a sequence"
   (if e?
       (midiSetLastEv s e); (setf (slot s 'last) e)
-      (midiGetLastEv s   ); (slot s 'last          )         
+      (midiGetLastEv s   ); (slot s 'last          )
   )
 )
 
 
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
-;;;                                                                                  
-;;; 				MidiShare Entry Points                              
-;;;                                                                                 
+;;;
+;;; 				MidiShare Entry Points
+;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
-;; Interface description for a MidiShare PROCEDURE 
+;; Interface description for a MidiShare PROCEDURE
 ;; with short parameter
 ;; (def-alien-routine "My_Procedure" void
 ;;       (parameter1 short))
@@ -3223,9 +3223,9 @@
 ;;;			To Know about MidiShare and Active Sessions
 ;;;-----------------------------------------------------------------------
 
-;;;..................................................: MidiShare 
+;;;..................................................: MidiShare
 
-(def-alien-routine "MidiShare" char 
+(def-alien-routine "MidiShare" char
   "returns true if MidiShare is installed")
 
 ;;;..................................................: MidiGetVersion
@@ -3283,21 +3283,21 @@
 ;;;..................................................: MidiSetName
 
 (def-alien-routine "MidiSetName" void
-  (refNum short) (name c-string)                                     
+  (refNum short) (name c-string)
   "Change the name of a MidiShare application")
 
 ;;;..................................................: MidiGetInfo
 
 (def-alien-routine "MidiGetInfo" (* t)
   (refNum short)
-  "Give the 32-bits user defined content of the info field of a MidiShare application. 
+  "Give the 32-bits user defined content of the info field of a MidiShare application.
  Analogous to window's refcon.")
 
 ;;;..................................................: MidiSetInfo
 
 (def-alien-routine "MidiSetInfo" void
   (refNum short) (p (* t))
-  "Set the 32-bits user defined content of the info field of a MidiShare application. 
+  "Set the 32-bits user defined content of the info field of a MidiShare application.
  Analogous to window's refcon.")
 
 
@@ -3352,7 +3352,7 @@
 
 (def-alien-routine "MidiGetFilter" MidiFilterPtr
   (refNum short)
-  "Give a pointer to the input filter record of a MidiShare application. 
+  "Give a pointer to the input filter record of a MidiShare application.
  Give NIL if no filter is installed")
 
 ;;;..................................................: MidiSetFilter
@@ -3426,7 +3426,7 @@
   "Amount of free MidiShare cells")
 
 ;;;..................................................: MidiNewEv
-;;                                                                                                                                      
+;;
 (def-alien-routine "MidiNewEv" MidiEvPtr
   (typeNum short)
   "Allocate a new MidiEvent")
@@ -3557,7 +3557,7 @@
 
 ;;;..................................................: MidiNewSeq
 
-(def-alien-routine "MidiNewSeq" MidiSeqPtr     
+(def-alien-routine "MidiNewSeq" MidiSeqPtr
   "Allocate an empty sequence")
 
 ;;;..................................................: MidiAddSeq
@@ -3810,7 +3810,7 @@
   (add-startup-action #'install-midishare-interface)
   (add-quit-action #'remove-midishare-interface)
   (install-midishare-interface))
- 
+
 (eval-when (:load-toplevel :execute)
   (pushnew ':midishare *features*))
 

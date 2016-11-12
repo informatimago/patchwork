@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -70,7 +70,7 @@
                               zoom-scale scroll-pos MN-offset MN-C5))
           ((not (visible-chords self)))
           (t
-           (draw-chord (car (visible-chords self)) 1 
+           (draw-chord (car (visible-chords self)) 1
                        MN-offset (t-time (car (visible-chords self))) MN-C5)
            (if *mn-view-channel-flag*
                (draw-all-channels self (car (visible-chords self)) MN-offset
@@ -78,7 +78,7 @@
 
 (defparameter *arp-note-offset* 18)
 
-;; (defmethod draw-arpeggiated-chord ((self C-MN-panel-ChordBox) chord 
+;; (defmethod draw-arpeggiated-chord ((self C-MN-panel-ChordBox) chord
 ;;                                    zoom-scale scroll-pos MN-offset MN-C5)
 ;;   (declare (ignore scroll-pos zoom-scale))
 ;;   (let ((notes (sort (notes chord) #'< :key #'order))
@@ -90,7 +90,7 @@
 ;;       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
 ;;       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
 ;;       (draw-note-4 one-note
-;;                    (setf (order one-note) 
+;;                    (setf (order one-note)
 ;;                          (calc-chord-pixel-x chord 1
 ;;                                              (setf (arp-view-x one-note) offset-x)
 ;;                                              (t-time chord)))
@@ -105,7 +105,7 @@
 ;;   (if (zone-selection? self) (draw-zone-selection self)))
 
 (defgeneric draw-arpeggiated-chord (self chord zoom-scale scroll-pos MN-offset MN-C5))
-(defmethod draw-arpeggiated-chord ((self C-MN-panel-ChordBox) chord 
+(defmethod draw-arpeggiated-chord ((self C-MN-panel-ChordBox) chord
                                    zoom-scale scroll-pos MN-offset MN-C5)
   (declare (ignore scroll-pos zoom-scale))
   (let ((notes (sort (notes chord) #'< :key #'order))
@@ -119,7 +119,7 @@
       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
       (draw-note-4 one-note
-                   (setf (order one-note) 
+                   (setf (order one-note)
                          (calc-chord-pixel-x chord 1
                                              (progn (setf (arp-view-x one-note) offset-x)
                                                     (truncate offset-x
@@ -162,7 +162,7 @@
 (defgeneric draw-all-channels (self chord MN-offset beg-t MN-C5))
 (defmethod draw-all-channels ((self C-MN-panel-ChordBox) chord MN-offset beg-t MN-C5)
   (dolist (note (notes chord))
-    (draw-channel self note 
+    (draw-channel self note
                   (+ 10 (calc-chord-pixel-x chord 0 MN-offset beg-t))
                   (give-pixel-y note MN-C5))))
 
@@ -177,7 +177,7 @@
   (truncate (offset-time one-note) (MN-zoom-scaler (view-container self)) ))
 
 (defgeneric draw-offset-chord (self chord zoom-scale scroll-pos MN-offset C5))
-(defmethod draw-offset-chord ((self C-MN-panel-ChordBox) chord 
+(defmethod draw-offset-chord ((self C-MN-panel-ChordBox) chord
                               zoom-scale scroll-pos MN-offset C5)
   (declare (ignore scroll-pos))
   (let ((notes (notes chord))
@@ -185,19 +185,19 @@
         (my-offset (+ MN-offset *MN-left-offset*)))
     (dolist (one-note notes)
       (setq y-min (1- (give-pixel-y one-note C5)))
-      (draw-ledger-lines-arp self one-note 
+      (draw-ledger-lines-arp self one-note
                              (+ my-offset (scaled-offset-time-x self one-note))
                              y-min y-min C5)
       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
-      (draw-note-4 one-note 
-                   (calc-chord-pixel-x 
+      (draw-note-4 one-note
+                   (calc-chord-pixel-x
                     chord  0
                     (+ my-offset (scaled-offset-time-x self one-note))
                     (t-time chord))
                    C5 zoom-scale)
       (setf (alt-delta-x one-note) alt (delta-x one-note) dx) )
-    (draw-extra-info chord (calc-chord-pixel-x 
+    (draw-extra-info chord (calc-chord-pixel-x
                             chord  0
                             my-offset
                             (t-time chord)) C5 ()))
@@ -210,7 +210,7 @@
          (draw-single-dur-line chord note
                                0 (arp-view-x note)
                                (t-time chord) *MN-C5*))
-        ((setting-of (view-container self) :time) 
+        ((setting-of (view-container self) :time)
          (draw-single-dur-line chord note
                                0
                                (+ *MN-draw-offset* *MN-left-offset*
@@ -223,34 +223,34 @@
 (defgeneric draw-single-symbolic-dynamic-2 (self chord note))
 (defmethod draw-single-symbolic-dynamic-2  ((self C-MN-panel-ChordBox) chord note)
   (set-view-font  (view-container (view-container  self)) *music-font-spec*);  TODO: SRCXOR -> INSTANCE
-  (cond ((setting-of (view-container self) :arp) 
+  (cond ((setting-of (view-container self) :arp)
          (draw-single-symbolic-dynamic chord note
-                                       0 *MN-draw-offset* 
+                                       0 *MN-draw-offset*
                                        (t-time chord) *MN-C5*))
-        ((setting-of (view-container self) :time) 
+        ((setting-of (view-container self) :time)
          (draw-single-symbolic-dynamic chord note
-                                       0 
+                                       0
                                        (+ *MN-draw-offset* *MN-left-offset*
                                           (scaled-offset-time-x self note))
                                        (t-time chord) *MN-C5*))
         (t (draw-single-symbolic-dynamic chord note
-                                         0 *MN-draw-offset* 
+                                         0 *MN-draw-offset*
                                          (t-time chord)  *MN-C5*))))
 
 (defgeneric draw-single-channel (self chord note))
 (defmethod draw-single-channel  ((self C-MN-panel-ChordBox) chord note)
   (set-view-font  (view-container (view-container  self)) *music-font-spec*); TODO: SRCXOR -> INSTANCE
-  (cond ((setting-of (view-container self) :arp) 
+  (cond ((setting-of (view-container self) :arp)
          (draw-channel self note (- (order note) 6) (+ (give-pixel-y note *MN-C5*) 8)))
         ((setting-of (view-container self) :time))
-        (t (draw-channel self note 
+        (t (draw-channel self note
                          (+ 10 (calc-chord-pixel-x chord 0 *MN-draw-offset* (t-time chord)))
                          (give-pixel-y note *MN-C5*)))))
 
 (defgeneric draw-single-offset-line-2 (self chord note))
 (defmethod draw-single-offset-line-2  ((self C-MN-panel-ChordBox) chord note)
   (unless (setting-of (view-container self) :time)
-    (if (setting-of (view-container self) :arp) 
+    (if (setting-of (view-container self) :arp)
         (draw-single-offset-line chord note
                                  0 *MN-draw-offset*
                                  (t-time chord) *MN-C5*)
@@ -270,11 +270,11 @@
           ((setting-of (view-container self) :time)
            (setf (active-note self) (find-time-active-note self mouse-h mouse-v)))
           (t (setf (active-note self) (find-active-note self mouse-h mouse-v))))
-    (cond ((active-note self) 
+    (cond ((active-note self)
            (set-pitch&value self (active-note self)))
           ((and (setting-of the-view :time) (get-ctrl-setting the-view :offs))
-           (set-display-value the-view 
-                              (with-time-scale self 
+           (set-display-value the-view
+                              (with-time-scale self
                                 (- mouse-h (+ *MN-draw-offset* *MN-left-offset*)) )))
           (t (reset-pitch&value self (active-note self))))))
 
@@ -300,10 +300,10 @@
 
 (defgeneric find-active-note (self x y))
 (defmethod find-active-note ((self C-MN-panel-chordBox) x y)
-  (ask (notes (active-chord self)) 
+  (ask (notes (active-chord self))
        'inside-note?-3  x
        (calc-chord-pixel-x (active-chord self)
-                           0 *MN-draw-offset* 
+                           0 *MN-draw-offset*
                            (t-time (active-chord self)))
        (give-y-diatone self y)))
 
@@ -313,11 +313,11 @@
 ;;       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
 ;;       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
 ;;       (setq pixel-x (calc-chord-pixel-x (active-chord self) 0
-;;                                         (if time-offset 
+;;                                         (if time-offset
 ;;                                             (+ time-offset (scaled-offset-time-x self one-note))
 ;;                                             (arp-view-x one-note))
 ;;                                         (t-time (active-chord self))))
-;;       (setq active-tmp 
+;;       (setq active-tmp
 ;;             (or (inside-note?-3  one-note x pixel-x (give-y-diatone self y))
 ;;                 (and (not time-offset)
 ;;                      (inside-note?-3  one-note (- x 6) pixel-x (give-y-diatone self y)))))
@@ -331,13 +331,13 @@
       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
       (setq pixel-x (calc-chord-pixel-x (active-chord self) 0
-                                        (if time-offset 
+                                        (if time-offset
                                             (+ time-offset (scaled-offset-time-x self one-note))
                                             ;;(arp-view-x one-note))
                                             (truncate (arp-view-x one-note)
                                                       (MN-zoom-scaler (view-container self))))
                                         (t-time (active-chord self))))
-      (setq active-tmp 
+      (setq active-tmp
             (or (inside-note?-3  one-note x pixel-x (give-y-diatone self y))
                 (and (not time-offset)
                      (inside-note?-3  one-note (- x 6) pixel-x (give-y-diatone self y)))))
@@ -349,7 +349,7 @@
   (find-arp-active-note self x y  (+ *MN-draw-offset* *MN-left-offset*)))
 
 
-;; mouse-pressed 
+;; mouse-pressed
 
 (defmethod view-click-event-handler ((self C-MN-panel-ChordBox) where)
   (call-next-method)
@@ -363,9 +363,9 @@
                            (- (point-h (view-mouse-position self)) (sel-start self))))
         (t (new-selection self))))
 
-(defmethod view-mouse-up ((self C-MN-panel-ChordBox)) 
+(defmethod view-mouse-up ((self C-MN-panel-ChordBox))
   (cond ((active-note self)
-         (when (and (selected-notes self) 
+         (when (and (selected-notes self)
                     (or (get-ctrl-setting (view-container self) :order)
                         (and (get-ctrl-setting (view-container self) :offs)
                              (setting-of (view-container self) :time))))
@@ -410,14 +410,14 @@
       (add-new-note chord (setf (active-note self) active-note))
       (if (setting-of (view-container self) :arp)
           (setf (order active-note) (+ mouse-h  6))
-          (progn 
+          (progn
             (setq notes (notes chord))
             (setf (order active-note)
-                  (dolist (note notes last-order) 
+                  (dolist (note notes last-order)
                     (if (> (order note) last-order) (setq last-order (order note)))))
             (if (setting-of (view-container self) :time)
                 (setf (offset-time active-note)
-                      (with-time-scale self 
+                      (with-time-scale self
                         (- mouse-h (+ *MN-draw-offset* *MN-left-offset*))))) )) )
     (setf (selected-notes self) nil)
     (if (zone-selection? self) (undo-selection self))))
@@ -547,7 +547,7 @@
          (m-diff-h (- (point-h (view-mouse-position self))
                       (point-h *MN-first-click-mouse*))))
     (if (active-note self)
-        (cond 
+        (cond
           ((get-ctrl-setting (view-container self) :dur)
            (edit-note-duration self mouse-h mouse-v mouse-diff))
           ((get-ctrl-setting (view-container self) :dyn)
@@ -558,7 +558,7 @@
            (if (setting-of (view-container self) :time)
                (note-travel self mouse-h mouse-v m-diff-h)
                (edit-note-offset self mouse-h mouse-v mouse-diff)))
-          ((and (get-ctrl-setting (view-container self) :order) 
+          ((and (get-ctrl-setting (view-container self) :order)
                 (setting-of (view-container self) :arp))
            (edit-note-order self mouse-h mouse-v mouse-diff))
           (t (edit-note-midic self mouse-h mouse-v mouse-diff)))
@@ -586,7 +586,7 @@
     (setf (sel-end self) (point-h *MN-first-click-mouse*))))
 
 (defgeneric zone-selection? (self))
-(defmethod zone-selection? ((self C-MN-panel-ChordBox)) 
+(defmethod zone-selection? ((self C-MN-panel-ChordBox))
   (not (= (sel-start self) (sel-end self))))
 
 (defgeneric undo-selection (self))
@@ -617,9 +617,9 @@
 
 (defgeneric within-rectangle? (self left right chord one-note &optional time-offset))
 (defmethod within-rectangle? ((self C-MN-panel-ChordBox) left right chord one-note &optional time-offset)
-  (let ((pix-x (calc-chord-pixel-x chord 
+  (let ((pix-x (calc-chord-pixel-x chord
                                    0
-                                   (if time-offset 
+                                   (if time-offset
                                        (+ time-offset (scaled-offset-time-x self one-note))
                                        (arp-view-x one-note))
                                    (t-time chord))))
@@ -636,7 +636,7 @@
             (setf (active-note self) ())
             (erase+view-draw-contents self))
            ((and (active-note self) (> (length (notes chord)) 1))
-            (remove-note  chord (active-note self)) 
+            (remove-note  chord (active-note self))
             (setf (active-note self) ())
             (erase+view-draw-contents self))
            ((ui:ed-beep)))))
@@ -660,18 +660,18 @@
            (erase+view-draw-contents self))
           ((and (or active-note (selected-notes self)) (eql char #\Backspace))
            (remove-chord-or-note self))
-          ((eql char #\r) (when active-note 
+          ((eql char #\r) (when active-note
                            (setf *global-music-notation-panel* self)
                            (remove-instrument-item active-note 0 0)))
-          ((eql char #\B) (when active-note 
+          ((eql char #\B) (when active-note
                            (setf *global-music-notation-panel* self)
                            ;;(add-bpf-to-note (active-note self) 0 0)
                            ))
-          ((eql char #\F) (when active-note 
+          ((eql char #\F) (when active-note
                            (setf *global-music-notation-panel* self)
                            ;;(add-fix-to-note (active-note self) 0 0)
                            ))
-          ((eql char #\M) (when active-note 
+          ((eql char #\M) (when active-note
                            (setf *global-music-notation-panel* self)
                            (add-MN-to-note active-note (view-window self) 0 0)))
           ((and (eql char #\e) (or active-note (selected-notes self)))
@@ -690,18 +690,18 @@
   (let ((selections (selected-notes self)))
     (if selections
         (dolist (note selections)
-          (transpose-note note 
+          (transpose-note note
                           (* (cond ((shift-key-p) 2)
                                    ((control-key-p) 24)
                                    (t 1))
-                             (if (eql char :UpArrow) 
+                             (if (eql char :UpArrow)
                                  (approx-factor *current-approx-scale*)
                                  (- 0 (approx-factor *current-approx-scale*))))))
         (transpose-note (active-note self)
                         (* (cond ((shift-key-p) 2)
                                  ((control-key-p) 24)
                                  (t 1))
-                           (if (eql char :UpArrow) 
+                           (if (eql char :UpArrow)
                                (approx-factor *current-approx-scale*)
                                (- 0 (approx-factor *current-approx-scale*))))))))
 
@@ -732,17 +732,17 @@
                (if (selected-notes self)
                    (let* ((selection (sort (selected-notes self) '< :key #'offset-time))
                           (to (offset-time (car (last selection)))))
-                     (dolist (note new-notes) 
+                     (dolist (note new-notes)
                        (setf (offset-time note)
                              (if selection (offset-time (pop selection)) to))
                        (add-new-note chord note))
                      (remove-chord-or-note self)
                      (setf (selected-notes self) nil)
                      (undo-selection self))
-                   (let* ((to (with-time-scale self 
+                   (let* ((to (with-time-scale self
                                 (- (point-h (view-mouse-position self))
                                    (+ *MN-draw-offset* *MN-left-offset*)) )))
-                     (dolist (note new-notes) 
+                     (dolist (note new-notes)
                        (setf (offset-time note) to)
                        (add-new-note chord note))
                      (update-view-controler (view-container self)))))
@@ -752,7 +752,7 @@
                           (to (order (car (last selection))))
                           (notes (notes chord))
                           (all-higher (remove to notes :test #'>= :key #'order)))
-                     (dolist (note new-notes) 
+                     (dolist (note new-notes)
                        (setf (order note) (incf to))
                        (add-new-note chord note))
                      (dolist (note all-higher) (setf (order note) (incf to)))
@@ -761,13 +761,13 @@
                      (undo-selection self))
                    (let* ((notes (notes chord))
                           (to (point-h (view-mouse-position self)))
-                          (all-higher 
-                            (remove to notes :test #'>= 
-                                             :key (lambda (note) 
+                          (all-higher
+                            (remove to notes :test #'>=
+                                             :key (lambda (note)
                                                     (calc-chord-pixel-x chord 0 (arp-view-x note) (t-time chord))))))
                      (if all-higher
                          (setq to (- (order (car all-higher)) 2)))
-                     (dolist (note new-notes) 
+                     (dolist (note new-notes)
                        (setf (order note) (incf to))
                        (add-new-note chord note))
                      (dolist (note all-higher) (setf (order note) (incf to)))
@@ -779,7 +779,7 @@
 (defgeneric save-undo (self))
 (defmethod save-undo ((self C-MN-panel-ChordBox))
   (menu-item-enable *undo-MN-menu*)
-  (setf (undo-MN-edit self) 
+  (setf (undo-MN-edit self)
         (notes (car (chords (chord-line self))))))
 
 (defgeneric restore-MN-edition (self))
@@ -795,7 +795,7 @@
     (if (no-button-pushed-p self radio-b)
         (progn (set-value-ctrl (view-container self) (car radio-b) (car radio-names))
                (radio-button-push (car radio-b)))
-        (do ((item radio-b (cdr item)) 
+        (do ((item radio-b (cdr item))
              (names radio-names (cdr names))) ((null item) (car radio-b))
           (when (radio-button-pushed-p (car item))
             (set-value-ctrl (view-container self) (car item) (car names))
@@ -814,7 +814,7 @@
 
 ;;=========================================================
 
-(defclass C-chord-mus-not-view (C-mus-not-view) 
+(defclass C-chord-mus-not-view (C-mus-not-view)
   ((arp-ctrl :initform nil  :accessor arp-ctrl)
    (time-ctrl :initform nil :accessor time-ctrl)
    (param-ctrl :initform nil :accessor param-ctrl)
@@ -822,36 +822,36 @@
 
 
 (defun make-chord-ed-pops ()
-  (new-menu 
+  (new-menu
    " "
-   (new-menu "Chord view" 
-             (new-leafmenu "arpeggio" 
+   (new-menu "Chord view"
+             (new-leafmenu "arpeggio"
                            (lambda () (change-arp-view *target-action-object* 'arp)))
-             (new-leafmenu "chord" 
+             (new-leafmenu "chord"
                            (lambda () (change-arp-view *target-action-object* 'chord)))
              (new-leafmenu "time offset"
                            (lambda () (change-arp-view *target-action-object* 'time))))
    (new-menu "Approximation"
              (prog1 (setf a-leaf-menu
-                          (new-leafmenu "SemiTone" 
+                          (new-leafmenu "SemiTone"
                                         (lambda () (use-all-approx-scale
                                                     *target-action-object* *c-major-scale*))))
                (set-command-key a-leaf-menu #\2))
              (prog1 (setf a-leaf-menu
-                          (new-leafmenu "Quarter tone" 
+                          (new-leafmenu "Quarter tone"
                                         (lambda () (use-all-approx-scale
                                                     *target-action-object* *1/4-tone-chromatic-scale*))))
                (set-command-key a-leaf-menu #\4))
              (prog1 (setf a-leaf-menu
-                          (new-leafmenu "Eigth tone" 
+                          (new-leafmenu "Eigth tone"
                                         (lambda () (use-all-approx-scale
                                                     *target-action-object* *1/8-tone-chromatic-scale*))))
                (set-command-key a-leaf-menu #\8)))
    (new-menu "Scale"
-             (new-leafmenu "C-major" 
+             (new-leafmenu "C-major"
                            (lambda () (use-all-scale
                                        *target-action-object* *c-major-scale*)))
-             (new-leafmenu "Chromatic" 
+             (new-leafmenu "Chromatic"
                            (lambda () (use-all-scale
                                        *target-action-object* *chromatic-scale*))))
    (new-menu "Staff"
@@ -859,15 +859,15 @@
                            (lambda () (use-staff  *target-action-object* 1 *g2-g-staffs*)))
              (new-leafmenu "G"
                            (lambda () (use-staff  *target-action-object* 2 *g-plain-staffs*)))
-             (new-leafmenu "G F" 
+             (new-leafmenu "G F"
                            (lambda () (use-staff  *target-action-object* 3 *g-f-staffs*)))
-             (new-leafmenu "F" 
+             (new-leafmenu "F"
                            (lambda () (use-staff  *target-action-object* 4 *f-plain-staffs*)))
-             (new-leafmenu "G F F2" 
+             (new-leafmenu "G F F2"
                            (lambda () (use-staff  *target-action-object* 5 *g-f-f2-staffs*)))
-             (new-leafmenu "G2 G F F2" 
+             (new-leafmenu "G2 G F F2"
                            (lambda () (use-staff  *target-action-object* 6 *g2-g-f-f2-staffs*)))
-             (new-leafmenu "Empty" 
+             (new-leafmenu "Empty"
                            (lambda () (use-staff  *target-action-object* 7 *empty-staffs*))))))
 
 (defvar *MN-popUpMenu* nil)
@@ -878,10 +878,10 @@
          (ctrls
            (list (add-to-radio-cluster self x-pos y-pos "order" :order)
                  (add-to-radio-cluster self (+ x-pos 48) y-pos "channel" :channel)
-                 (make-instance 
+                 (make-instance
                   'static-text-dialog-item
                   :view-container (view-window self)
-                  :view-position 
+                  :view-position
                   (make-point (+ x-pos 44) (+ y-pos 16))
                   :dialog-item-text " "
                   :view-font *patchwork-font-spec*
@@ -918,7 +918,7 @@
          (value (read-from-string (dialog-item-text self)))
          param)
     (when (numberp value)
-      (setq param 
+      (setq param
             (cond ((and (get-ctrl-setting edit-view :dur) (>= value 0)) 'dur)
                   ((and (get-ctrl-setting edit-view :dyn) (>= value 0) (< value 128)) 'vel)
                   ((and (get-ctrl-setting edit-view :channel) (>= value 0) (< value 33)) 'chan)
@@ -927,7 +927,7 @@
                         (> value 0) (< value 12800)) 'midic)))
       (when  param
         (cond (selections
-               (dolist (note selections) 
+               (dolist (note selections)
                  (setf (slot-value note param) value)
                  (update-note note))
                (update-chord (car (chords (chord-line panel)))))
@@ -958,7 +958,7 @@
     (setf (a-note ctrl) (active-note (car (editor-objects self))))
     (set-view-position ctrl (make-point 130 (- (point-v (view-size self)) 19)))
     (set-dialog-item-text ctrl
-                          (if (a-note ctrl) 
+                          (if (a-note ctrl)
                               (set-pitch&value panel (a-note ctrl))
                               (set-pitch&value panel (car (selected-notes panel)))))
     (add-subviews self ctrl)))
@@ -1000,11 +1000,11 @@
          (play-your-chords (chord-line (car (editor-objects self)))))
         ((setting-of self :arp)
          (play-arpeggiated self))
-        ((get-ctrl-setting self :dur) 
+        ((get-ctrl-setting self :dur)
          (let ((panels (editor-objects self)))
            (progn (setf patchwork.scheduler::*print-on-late?* t)
                   (start
-                    (apdfuncall 10  2 20 
+                    (apdfuncall 10  2 20
                                 'play-chords (chord-line (car panels)) 0)))))
         (t (play-your-chords (chord-line (car (editor-objects self)))))))
 
@@ -1016,7 +1016,7 @@
 ;;         (t (let ((panels (editor-objects self)))
 ;;              (progn (setf patchwork.scheduler::*print-on-late?* t)
 ;;                     (start
-;;                       (apdfuncall 10  2 20 
+;;                       (apdfuncall 10  2 20
 ;;                                   'play-chords (chord-line (car panels)) 0)))))))
 ;;         ;; (t (call-next-method))
 
@@ -1054,8 +1054,8 @@
                      self notes))))
 
 ;;______________________________________
-;; 
-(defmethod monofonic-mn? ((self C-chord-mus-not-view)) 
+;;
+(defmethod monofonic-mn? ((self C-chord-mus-not-view))
   t)
 
 

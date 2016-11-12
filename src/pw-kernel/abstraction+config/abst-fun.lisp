@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -48,10 +48,10 @@
 ;;;
 ;;; Classes considered in this file are:
 ;;;
-;;;    C-patch, C-abstract-out, C-abstract-in, C-abstract, 
-;;;    C-patch-chord-box-M (the chord box), 
-;;;    C-pw-circ, C-pw-circ-end, 
-;;;    C-patch-midi (the collector), 
+;;;    C-patch, C-abstract-out, C-abstract-in, C-abstract,
+;;;    C-patch-chord-box-M (the chord box),
+;;;    C-pw-circ, C-pw-circ-end,
+;;;    C-patch-midi (the collector),
 ;;;    C-patch-PolifMN (the polyphonic collector)
 ;;;    C-pw-stop-time, C-clock-constant
 ;;;    C-enum-collect-sink (the loop box)
@@ -65,21 +65,21 @@
 (defgeneric compile-me (self obj))
 
 
-(defclass C-compiled-patch (C-patch) 
+(defclass C-compiled-patch (C-patch)
   ((code :initform nil :initarg :code :accessor code)))
 
 (defpackage "USER-COMP-ABSTR")   ;the compiled abstractions package
 
 (defmethod save ((self C-compiled-patch))
-  (if *pw-nosave-mode* 
+  (if *pw-nosave-mode*
       (ui::message-dialog "Sorry this version cannot save files.")
-      (actual-save self (choose-new-file-dialog :directory (format () "~A.comp" (string-downcase (pw-function self))) 
+      (actual-save self (choose-new-file-dialog :directory (format () "~A.comp" (string-downcase (pw-function self)))
                                                 :button-string "Save patch as"))))
 
-(defmethod actual-save ((self C-compiled-patch) file-name) 
+(defmethod actual-save ((self C-compiled-patch) file-name)
   (let* ((my-in-types  (get (pw-function self) '*type-intypes*))
          (my-out-types (get (pw-function self) '*type-outtype*))
-       
+
          (*print-pretty* nil))
     (multiple-value-bind (file-name exists?)
         (intern (trim-extension (string-downcase (pathname-name file-name)))
@@ -92,17 +92,17 @@ A previous function called ~D will be redefined" file-name file-name)
       (init-pw-function-string self)
       (with-cursor *watch-cursor*
         (WITH-OPEN-FILE (out file-name
-                             :direction :output 
+                             :direction :output
                              :if-exists :supersede
                              :if-does-not-exist :create)
           (prin1 '(in-package :pw) out)
           (let ((*package* :pw))
-            (prin1 
+            (prin1
              `(progn (setf (fdefinition ',(pw-function self)) (eval ,(code self)))
                      (setf (get ',(pw-function self) '*type-intypes*) ',my-in-types)
                      (setf (get ',(pw-function self) '*type-outtype*) ',my-out-types)
                      ;;(PW-addmenu *pw-menu-patch* (list ',(pw-function self)))
-                     (let ((box ,(multiple-value-bind (args extensible?) 
+                     (let ((box ,(multiple-value-bind (args extensible?)
                                      (make-defunp-function-arg-list (pw-function self))
                                    `(make-PW-standard-box
                                      ,(if extensible? ''C-pw-functional
@@ -127,12 +127,12 @@ A previous function called ~D will be redefined" file-name file-name)
          (patches (controls (patch-win self)))
          (in-boxes (find-abstract-in-boxes (patch-win self) patches))
          (in-docs-temp)
-         (in-put-docs 
-           (when in-boxes 
+         (in-put-docs
+           (when in-boxes
              (setq in-docs-temp (get-absin-boxes-types-n patches in-boxes))
              (cond
                ((member nil in-docs-temp)
-                (ui:message-dialog 
+                (ui:message-dialog
                  "WARNING! absin box connected to irreducible types. ALL-type used")
                 (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum))
                         in-docs-temp))
@@ -150,7 +150,7 @@ A previous function called ~D will be redefined" file-name file-name)
     ))
 
 (defmethod compile-me ((self C-patch) obj)
-  (let ((abs (mapcar (lambda (ctrl input) 
+  (let ((abs (mapcar (lambda (ctrl input)
                        (if (eql ctrl input)
                            `'',(patch-value ctrl obj)
                            (compile-me input obj) ))
@@ -160,11 +160,11 @@ A previous function called ~D will be redefined" file-name file-name)
 (defmethod compile-me ((self C-abstract-in) obj)
   (declare (ignore obj))
   (let ((var        ; (read-from-string  (format nil "X~A" (in-index self)))))
-            (read-from-string 
-                                        ;(format () "~A~A" 
+            (read-from-string
+                                        ;(format () "~A~A"
                                         ;        (doc-string (nth  (in-index self)
                                         ;                         (pw-controls (abstract-box self)))) (in-index self))
-             (format () "~A~A" 
+             (format () "~A~A"
                      (doc-string self) (in-index self))
              )))
     (unless (assoc (in-index self) (abstract-in-list (abstract-box self)))
@@ -187,7 +187,7 @@ A previous function called ~D will be redefined" file-name file-name)
   (let ((code (if (eql (car (input-objects self)) (car (pw-controls self)))
                   `',(patch-value (car (input-objects self)) obj)
                   (compile-me (car (input-objects self)) obj)))
-        (fun 
+        (fun
           `(let ((*closure-data* nil)
                  (*closure-flag* nil))
              (lambda (code)
@@ -202,7 +202,7 @@ A previous function called ~D will be redefined" file-name file-name)
                   (pop *closure-data*))
                  (t (stop-clock (clock-obj *global-calling-object*))
                     (pop *closure-data*)))))))
-    `(list 'funcall ,fun 
+    `(list 'funcall ,fun
            (list 'if '(zerop (clock (clock-obj *global-calling-object*))) ,code nil))))
 
 ;;best-way to compile C-pw-stop-time is to make it a standard patch (as it should!)
@@ -214,7 +214,7 @@ A previous function called ~D will be redefined" file-name file-name)
   (let ((code (if (eql (car (input-objects self)) (car (pw-controls self)))
                   `',(patch-value (car (input-objects self)) obj)
                   (compile-me (car (input-objects self)) obj)))
-        (fun 
+        (fun
           `(let ((*closure-data* nil)
                  (*closure-clock* -1))
              (lambda (code)
@@ -228,13 +228,13 @@ A previous function called ~D will be redefined" file-name file-name)
 (defmethod compile-me ((self C-enum-collect-sink) obj)
   (if (eql (first (pw-controls self)) (first (input-objects self)))
       '()
-      (let* ((var (setf (slot-value (first (input-objects self)) 'comp-var) 
+      (let* ((var (setf (slot-value (first (input-objects self)) 'comp-var)
                         (intern (format () "~S" (gensym "*enum-value*")))))
              (code (if (eql (second (input-objects self))
                            (second (pw-controls self)))
                        `'',(patch-value (second (input-objects self)) obj)
                        (compile-me (second (input-objects self)) obj)))
-             (enum 
+             (enum
                (compile-me (first (input-objects self)) (list self))))
         `(list 'let '(,var)
                '(declare (special ,var))
@@ -246,8 +246,8 @@ A previous function called ~D will be redefined" file-name file-name)
 (defmethod compile-me ((self C-map-first) obj)
   (let* ((inputs (input-objects self))
          (enums (list* (first inputs) (nthcdr 2 inputs)))
-         (vars (mapcar (lambda (input) 
-                         (setf (slot-value input 'comp-var) 
+         (vars (mapcar (lambda (input)
+                         (setf (slot-value input 'comp-var)
                                (intern (format () "~S" (gensym "*enum-value*"))))) enums))
          (code (if (eql (second inputs) (second (pw-controls self)))
                    `'',(patch-value (second inputs) obj)
@@ -282,7 +282,7 @@ A previous function called ~D will be redefined" file-name file-name)
                            (first (input-objects self)))
                        `',(patch-value (first (input-objects self)) obj)
                        (compile-me (first (input-objects self)) obj)))
-            (vlist (if (eql (second (pw-controls self)) 
+            (vlist (if (eql (second (pw-controls self))
                            (second (input-objects self)))
                        `',(patch-value (second (input-objects self)) obj)
                        (compile-me (second (input-objects self)) obj))))
@@ -302,7 +302,7 @@ A previous function called ~D will be redefined" file-name file-name)
         (x-val (if (eql (second (pw-controls self)) (second (input-objects self)))
                    `',(patch-value (second (input-objects self)) obj)
                    (compile-me (second (input-objects self)) obj))))
-    `(list 'bpf-out-osc-period ,code '(clock *global-calling-object*) 
+    `(list 'bpf-out-osc-period ,code '(clock *global-calling-object*)
            ,x-val (list 'give-x-points ,code))))
 
 (defmethod compile-me ((self  C-patch-osc-phase) obj)
@@ -312,21 +312,21 @@ A previous function called ~D will be redefined" file-name file-name)
         (period (if (eql (second (input-objects self)) (second (pw-controls self)))
                     `',(patch-value (second (input-objects self)) obj)
                     (compile-me (second (input-objects self)) obj)))
-        (fun 
+        (fun
           `(let ((*osc-phase* 0)
                  (*old-time* 0))
              (lambda (code period)
                (declare (special *global-calling-object*))
                (let* ((points (give-x-points code))
                       (time-diff (- (car (last points)) (car points))))
-                 (prog1 
-                     (bpf-out code 
+                 (prog1
+                     (bpf-out code
                               (+ (setf *osc-phase*
                                        (float (mod (+ *osc-phase*
                                                       (/ (* time-diff (- (clock *global-calling-object*)
                                                                          *old-time*)) period))
                                                    time-diff)))
-                                 (car points)) 
+                                 (car points))
                               points)
                    (setf *old-time* (clock *global-calling-object*))))))))
     `(list 'funcall ,fun ,code ,period)))
@@ -345,7 +345,7 @@ A previous function called ~D will be redefined" file-name file-name)
          (length (length objects))
          cond-body)
     (for (k 2 2 (- length 2))
-      (push `(list (list ,fun ,input 
+      (push `(list (list ,fun ,input
                          ,(if (eql (nth k objects) (nth k controls))
                               `',(patch-value (nth k objects) obj)
                               (compile-me (nth k objects) obj)))

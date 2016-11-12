@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -42,7 +42,7 @@
   (set-pen-pattern self *dark-gray-pattern*)
   (with-focused-view self
     (let ((bpfs (break-point-functions self)))
-      (while bpfs 
+      (while bpfs
         (draw-bpf-function   (pop bpfs) self nil (h-view-scaler self)(v-view-scaler self)))))
   (set-pen-pattern self *black-pattern*)
   (call-next-method))
@@ -57,9 +57,9 @@
 
 (defmethod key-pressed-BPF-editor ((self C-multi-bpf-view) char)
   (case char
-    (#\s 
+    (#\s
         (let ((bpf (nth (break-point-functions-pointer self) (break-point-functions self))))
-          (when bpf 
+          (when bpf
               (setf (break-point-functions self) (remove bpf (break-point-functions self)))
               (push (break-point-function self) (break-point-functions self))
               (setf  (break-point-function self) bpf)
@@ -82,7 +82,7 @@
 
 ;;================================================================================================================
 
-(defclass  C-patch-multi-function (C-patch-function) ()) 
+(defclass  C-patch-multi-function (C-patch-function) ())
 
 (defmethod make-application-object ((self C-patch-multi-function))
   (setf (application-object self)
@@ -96,7 +96,7 @@
 
 (defmethod decompile ((self C-patch-multi-function))
   (let ((temp (call-next-method))
-        (bpfs (cons (break-point-function (give-mini-bpf self)) 
+        (bpfs (cons (break-point-function (give-mini-bpf self))
                     (break-point-functions (editor-view-object (application-object self))))))
     `(,@(butlast temp)
         ',(cons (eval (car (last temp)))  (list (ask-all bpfs #'break-point-list ))))))
@@ -107,7 +107,7 @@
           (make-instance 'C-break-point-function :break-point-list (pop args)))
     (while args
       (push (make-instance 'C-break-point-function :break-point-list (pop args)) bpfs))
-    (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))  
+    (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))
     (set-break-point-function-to-mini mini-bpf (break-point-function mini-bpf))
     (add-bpf-to-bpf-editor-from-PW (application-object self) (break-point-function mini-bpf))
     (set-mini-view (application-object self) mini-bpf)
@@ -123,7 +123,7 @@
             (make-instance 'C-break-point-function :break-point-list (pop args)))
       (while args
         (push (make-instance 'C-break-point-function :break-point-list (pop args)) bpfs))
-      (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))  
+      (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))
       (set-break-point-function-to-mini mini-bpf (break-point-function mini-bpf))
       (add-bpf-to-bpf-editor-from-PW (application-object self) (break-point-function mini-bpf))
       (set-mini-view (application-object self) mini-bpf)
@@ -146,7 +146,7 @@
 
 (defun fill-to-equal-length-lst (a b)
   (let ((short-l (if (< (length a) (length b)) a b)))
-     (append short-l 
+     (append short-l
         (make-list (abs (- (length a) (length b))) :initial-element (car (last short-l))))))
 
 ;;(fill-to-equal-length-lst '(1 2 3) '(7 8 9 8 7))
@@ -156,7 +156,7 @@
 #|
 (defun convert-to-lst-lst (a)
   (cond ((atom a) (list a))
-        ((and (listp a) (atom (car a))) (list a)) 
+        ((and (listp a) (atom (car a))) (list a))
         ((and (listp a) (listp (car a)) (atom (caar a))) a)
         (t nil)))
 
@@ -177,20 +177,20 @@
         (progn
           (setq ts (convert-to-lst-lst ts))
           (setq vs (convert-to-lst-lst vs))
-          (if (> (length ts) (length vs)) 
+          (if (> (length ts) (length vs))
             (setq vs (fill-to-equal-length-lst ts vs))
             (setq ts (fill-to-equal-length-lst ts vs)))
           (while (and ts vs)
-            (if (not bpf) 
-              (progn 
+            (if (not bpf)
+              (progn
                 (setq bpf (make-break-point-function (car ts) (car vs)))
                 (setf (break-point-function (give-mini-bpf self)) bpf)
                 (update-mini-view (give-mini-bpf self))
                 (add-bpf-to-bpf-editor-from-PW (application-object self) bpf))
               (push  (make-break-point-function (car ts) (car vs)) bpfs))
-            (pop ts)(pop vs))   
+            (pop ts)(pop vs))
           (setf (break-point-functions (editor-view-object (application-object self))) bpfs)))))
-  (cons (break-point-function (give-mini-bpf self)) 
+  (cons (break-point-function (give-mini-bpf self))
         (break-point-functions (editor-view-object (application-object self)))))|#
 
 ;;So that it really becomes generic [Camilo 930113]
@@ -210,7 +210,7 @@
         (update-mini-view (give-mini-bpf self))
         (add-bpf-to-bpf-editor-from-PW (application-object self) (first bpfs))
         (setf (break-point-functions (editor-view-object (application-object self))) (rest bpfs)))
-      (setq bpfs (cons (break-point-function (give-mini-bpf self)) 
+      (setq bpfs (cons (break-point-function (give-mini-bpf self))
                        (break-point-functions (editor-view-object (application-object self))))))
     (case (out-type self)
     (:bpf (if (second bpfs) bpfs (first bpfs)))
@@ -269,11 +269,11 @@
           (when bpfs
             (set-pen-pattern self *light-gray-pattern*)
             (while bpfs
-              (draw-bpf-function 
+              (draw-bpf-function
                (pop bpfs) self nil (h-view-scaler self)(v-view-scaler self)))
-            (set-pen-pattern self *black-pattern*)) 
+            (set-pen-pattern self *black-pattern*))
            (when (break-point-function self)
-             (draw-bpf-function 
+             (draw-bpf-function
                (break-point-function self) self nil (h-view-scaler self)(v-view-scaler self))))
         (draw-string 3 9 (doc-string self))))))
 
@@ -281,12 +281,12 @@
 
 (defunp multi-bpf ((tlist (fix>0s? (:value 10))) (vl/bpfs list (:value 100 :type-list (bpf list)))
              (mini-bpf bpf)) list
-"The multi-bpf  module can be used to create and edit 
-simultaneous breakpoint functions an once, create and edit 
-coordinate pairs (x,y), display a series of coordinate pairs, 
+"The multi-bpf  module can be used to create and edit
+simultaneous breakpoint functions an once, create and edit
+coordinate pairs (x,y), display a series of coordinate pairs,
 either as a BPF or as a series of points, save and load multi-bpf
-modules  to and from a library and retrieve data concerning the points 
-contained in the multi-bpf  module. A function editor can be opened by 
+modules  to and from a library and retrieve data concerning the points
+contained in the multi-bpf  module. A function editor can be opened by
 selecting this box and typing o from the keyboard.
  The multi-bpfcan be changed from PatchWork by connecting a value-list to the vl/bpf
  (or a list of lists-values) input box and option-clicking its output box.

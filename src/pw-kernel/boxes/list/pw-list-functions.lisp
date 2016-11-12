@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
-;;;;    PW-list-functions 
-;;;;  
+;;;;
+;;;;    PW-list-functions
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    contributions by Tristan Murail
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -37,7 +37,7 @@
 
 
 (defunp flat-once ((list list)) list
-    "flattens the first level of a list of lists.Ex: 
+    "flattens the first level of a list of lists.Ex:
 '( ((1 2 3)  (4 5 6))  ((7 8 9) (10 11 12)) ) becomes:
 \((1 2 3) (4 5 6) (7 8 9) (10 11 12))"
   (if (consp (car list))
@@ -50,7 +50,7 @@
 (defunp create-list ((count (fix (:value 10))) (elem nilNum)
                      &optional (list-fill list)) list
     "Returns a list of length <count> filled with repetitions of element <elem> "
-  (if list-fill 
+  (if list-fill
       (list-fill list-fill count)
       (make-list count :initial-element elem)))
 
@@ -63,7 +63,7 @@ Eg: (l-nth  '(2 (0) 1) '(a b c d)) => (c (a) b)."
 (defunp posn-match ((list list) (l-nth numbers?)) nil
     "<posn-match> can be a number or a list of numbers.  Returns a copy of <l-
 nth> where each number is replaced by the corresponding element in the list <l>.
-For example,  if  <list> is  (a b c d) and <l-nth> is (2 (0) 1)) the box returns  (c 
+For example,  if  <list> is  (a b c d) and <l-nth> is (2 (0) 1)) the box returns  (c
 \(a) b), where the list returned has the same structure as <list> "
   (deep-mapcar 'l-nth 'nth l-nth (pw::list! list)))
 
@@ -83,14 +83,14 @@ For example,  if  <list> is  (a b c d) and <l-nth> is (2 (0) 1)) the box returns
 (defun the-max (x) (apply 'max x))
 
 (defunp g-min ((list list)) midics?
-    "returns a tree of the minimum value(s) of the leaves of each deepest level 
+    "returns a tree of the minimum value(s) of the leaves of each deepest level
 subtree.
 Trees must be well-formed: The children of a node must be either all leaves or
 all nonleaves. "
   (less-deep-mapcar #'the-min (list! list)))
 
 (defunp g-max ((list list)) midics?
-    "returns a tree of the maximum value(s) of the leaves of each deepest level 
+    "returns a tree of the maximum value(s) of the leaves of each deepest level
 subtree.
 Trees must be well-formed: The children of a node must be either all leaves or
 all nonleaves. "
@@ -189,7 +189,7 @@ effectuée."
 
 (defunp x-append ((l1? list (:type-list ())) (l2? list (:type-list ()))
                   &rest (lst? list (:type-list ()))) list
-    "appends lists or atoms together to form a new list. This box can be 
+    "appends lists or atoms together to form a new list. This box can be
 extended."
 
   (apply 'append (list! l1?) (list! l2?) (mapcar #'list! lst?)))
@@ -200,24 +200,24 @@ extended."
 
 ;; (defunp rem-dups ((lst list)
 ;;                   &optional (test symbol (:value 'eq :type-list ()))) list
-;;     "<rem-dups>  removes repetitions of elements in <lst>,  according to <test> (if the 
-;; second input is open by clicking on 'E'). <test> must be commutative. For example, the list 
-;; \(this this is my list list) returns (this is my list). Note that the last occurrence of a 
-;; repeated element in a list is preserved;  thus, the list: (1 2 3 1 4) returns  (2 3 1 4). 
+;;     "<rem-dups>  removes repetitions of elements in <lst>,  according to <test> (if the
+;; second input is open by clicking on 'E'). <test> must be commutative. For example, the list
+;; \(this this is my list list) returns (this is my list). Note that the last occurrence of a
+;; repeated element in a list is preserved;  thus, the list: (1 2 3 1 4) returns  (2 3 1 4).
 ;; Returns a copy of <lst>."
 ;;   (if test test #'eq)
 ;;   (cond
 ;;     ((not (consp lst)) lst)
 ;;     ((listp (car lst)) (mapcar (lambda (x) (rem-dups x test)) lst))
 ;;     (t (unique-1 lst test))))
-;; 
+;;
 ;; (defunp rem-dups ((lst list)
 ;;                   &optional (test symbol (:value 'eq :type-list ()))
 ;;                   (depth menu (:menu-box-list (("shallow" . 1) ("deep". 2))))) list
-;;     "<rem-dups>  removes repetitions of elements in <lst>,  according to <test> (if 
-;; the second input is open by clicking on 'E'). <test> must be commutative. For 
-;; example, the list (this this is my list list) returns (this is my list). Note that the last 
-;; occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3 1 
+;;     "<rem-dups>  removes repetitions of elements in <lst>,  according to <test> (if
+;; the second input is open by clicking on 'E'). <test> must be commutative. For
+;; example, the list (this this is my list list) returns (this is my list). Note that the last
+;; occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3 1
 ;; 4) returns  (2 3 1 4). Returns a copy of <lst>."
 ;;   (unless test (setq test #'eq))
 ;;   (cond
@@ -233,10 +233,10 @@ extended."
 (defunp rem-dups ((lst list)
                   &optional (test symbol (:value 'eq :type-list ()))
                   (depth menu (:menu-box-list (("shallow" . 1) ("deep". 2))))) list
-    "<rem-dups>  removes repetitions of elements in <lst>,  according to <test> (if 
-the second input is open by clicking on 'E'). <test> must be commutative. For 
-example, the list (this this is my list list) returns (this is my list). Note that the last 
-occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3 1 
+    "<rem-dups>  removes repetitions of elements in <lst>,  according to <test> (if
+the second input is open by clicking on 'E'). <test> must be commutative. For
+example, the list (this this is my list list) returns (this is my list). Note that the last
+occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3 1
 4) returns  (2 3 1 4). Returns a copy of <lst>."
 
   (unless test (setq test #'eq))
@@ -258,31 +258,31 @@ occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3
 (defunp sort-list ((lst list)
                    &optional (test symbol (:value '< :type-list ()))
                    (key list (:value '() :type-list ()))) list
-    "This module sorts  a list. By default, the order of the sort is ascending, but 
-since the module is extensible, you can open a second entry <test> to set the 
-choice of order. If <test> is '>' the order is ascending, '<' indicates descending, 
-and '=' keeps the order the same. One can also open a third input <key> for a 
-function. The function <key> evaluates each element of the list <lst> and the 
+    "This module sorts  a list. By default, the order of the sort is ascending, but
+since the module is extensible, you can open a second entry <test> to set the
+choice of order. If <test> is '>' the order is ascending, '<' indicates descending,
+and '=' keeps the order the same. One can also open a third input <key> for a
+function. The function <key> evaluates each element of the list <lst> and the
 result is then sorted according to the parameter <test>.
 \(epw::sort-list ‘(3 13 15 17 9 10 16 3 6 7 1 12 6))will return
  ? PW->(1 3 3 6 6 7 9 10 12 13 15 16 17),
 
 \(epw::sort-list ‘(3 13 15 17 9 10 16 3 6 7 1 12 6)  ‘>)
- will return 
+ will return
 ? PW->(17 16 15 13 12 10 9 7 6 6 3 3 1),
 
 \(epw::sort-list ‘((13 13 4) ( 3 9 3) ( 16 16 1) (11 13 6) )   ‘<   ‘first)
-will return 
+will return
 ? PW->((3 9 3) (11 13 6) (13 13 4) (16 16 1)), and
 
 \(epw::sort-list ‘((13 13 4) ( 3 9 3) ( 16 16 1) (11 13 6) )   ‘<   ‘second)
-will return 
+will return
 ? PW->((3 9 3) (13 13 4) (11 13 6) (16 16 1))
 "
   (sort (copy-list lst) (or test #'<) :key key))
 
 (defunp l-order ((list list)  (funct list (:value "<"))) list
-    "gives the order of the elements of <list> according to 
+    "gives the order of the elements of <list> according to
 function <funct> ( < by default)"
   (mapcar (lambda (x) (position x list)) (epw::sort-list list funct)))
 
@@ -317,9 +317,9 @@ function <funct> ( < by default)"
                  (key (symbol (:value 'identity)))
                  &rest (list list (:type-list ()))) list
     "This box merges 2  lists, <l1?> and <l2?>,
-into a single list, with no repetitions. 
+into a single list, with no repetitions.
 If the optional <test> argument is added, it is used as a predicate to
-detect equality between elements and and avoid repetition. Default value for <test> is the 
+detect equality between elements and and avoid repetition. Default value for <test> is the
 function 'equal. If the optional <key> argument is added, it is used as
 an accessor (e.g. first, second etc.) into the elements of the lists,
 prior to executing the <test> function.
@@ -330,13 +330,13 @@ Additional lists  can be compared by extending the box."
                      &optional (test symbol (:value 'equal :type-list ()))
                      (key (symbol (:value 'identity)))
                      &rest (list list (:type-list ()))) list
-    "This box returns a list of elements which are common 
+    "This box returns a list of elements which are common
 to both <l1?> and <l2?>.If the optional <test> argument is added, it is used as a predicate to
-detect equality between elements. Default value for <test> is the 
+detect equality between elements. Default value for <test> is the
 function 'equal. If the optional <key> argument is added, it is used as
 an accessor (e.g. first, second etc.) into the elements of the lists,
 prior to executing the <test> function.
-Additional lists  can be compared by extending the box. 
+Additional lists  can be compared by extending the box.
 Beware that this operation is not commutative. For example:
 \(epw::x-intersect  '(1 2 4 5 4) '( 2 4)) will return -> (2 4 4)
 \(epw::x-intersect  '( 2 4)  (1 2 4 5 4)) will return -> (2 4 )
@@ -347,10 +347,10 @@ Beware that this operation is not commutative. For example:
                &optional (test (symbol (:value 'equal)))
                (key (symbol (:value 'identity)))
                &rest (list list (:type-list ()))) list
-    "This box compares lists <l1?> and <l2?> for elements that are present in 
-either one or the other list (but not in both), and then 
+    "This box compares lists <l1?> and <l2?> for elements that are present in
+either one or the other list (but not in both), and then
 returns them in a list. If the optional <test> argument is added, it is used as a predicate to
-detect equality between elements. Default value for <test> is the 
+detect equality between elements. Default value for <test> is the
 function 'equal. If the optional <key> argument is added, it is used as
 an accessor (e.g. first, second etc.) into the elements of the lists,
 prior to executing the <test> function.
@@ -362,10 +362,10 @@ Additional lists  can be compared by extending the box."
                 &optional (test symbol (:value '= :type-list ()))
                 (key (symbol (:value 'identity)))
                 &rest (list list (:type-list ()))) list
-    "This box compares l1? to l2? and then returns all elements 
+    "This box compares l1? to l2? and then returns all elements
 present in l1? but not in l2?, as a list.
 If the optional <test> argument is added, it is used as a predicate to
-detect equality between elements. Default value for <test> is the 
+detect equality between elements. Default value for <test> is the
 function 'equal. If the optional <key> argument is added, it is used as
 an accessor (e.g. first, second etc.) into the elements of the lists,
 prior to executing the <test> function.
@@ -374,7 +374,7 @@ Additional lists  can be compared by extending the box. They have the same statu
 
 
 (defunp included? ((lst1 list) (lst2 list) &optional (test (symbol (:value 'equal)))) bool
-    "This box compares two lists, returning true if all the elements 
+    "This box compares two lists, returning true if all the elements
 in the first are also elements of the second. If the optional <test> argument
  is added, it is used as a predicate to detect equality between elements.
 Default value for <test> is the function 'equal. "
@@ -397,29 +397,29 @@ Default value for <test> is the function 'equal. "
       (nextl list))
     (nreverse l)))
 
-(defunp list-filter1 ((liste list)(fct (list (:value "="))) (val float) ) list 
+(defunp list-filter1 ((liste list)(fct (list (:value "="))) (val float) ) list
     "retire de la liste <list> toutes les valeurs répondant à la condition <fct val>"
   (let ((res))
     (dolist (num liste (nreverse res))
       (unless (funcall fct  num val) (push num res)))))
 
-(defunp list-filter ( (test (list (:value "="))) (val float) (list list)) list 
-    "list-filter  removes elements from a <list> according to a predicate <test>. If the 
-predicate is 'eq', all instances of <val>  are removed from the list, regardless of 
-their level. If, for example, the predicate is >, all elements of list which are 
-greater than <val> are removed. Note that <val> can be a string, but only if the 
+(defunp list-filter ( (test (list (:value "="))) (val float) (list list)) list
+    "list-filter  removes elements from a <list> according to a predicate <test>. If the
+predicate is 'eq', all instances of <val>  are removed from the list, regardless of
+their level. If, for example, the predicate is >, all elements of list which are
+greater than <val> are removed. Note that <val> can be a string, but only if the
 predicate <test> can handle a string.
 \(epw::list-filter  ‘=    5   ‘(5 7 3 5 11 5 16 3 1 7 15 5 8 10 0 7 5 4 5 10))
 will return		? PW->(7 3 11 16 3 1 7 15 8 10 0 7 4 10) ,
 with    test.    "
   (less-deep-mapcar 'list-filter1 list test val ))
 
-(defunp multi-filter ((test (list (:value "="))) (val float) (list list) (numcol fix)) list 
+(defunp multi-filter ((test (list (:value "="))) (val float) (list list) (numcol fix)) list
     "retire de chacune des sous-listes de <list> les éléments dont le numéro d'ordre
 correspond à chaque élément de la sous-liste de numéro <numcol> qui satisfait
 à la condition <test val>"
   (if (atom (car list)) (list-filter test val list)
-      (let ((longueur (length (nth numcol list))) 
+      (let ((longueur (length (nth numcol list)))
             (ncol (1- (length list)))  res)
         (dotimes (n longueur)
           (if (funcall test  (car (nth numcol list)) val)
@@ -429,7 +429,7 @@ correspond à chaque élément de la sous-liste de numéro <numcol> qui satisfai
           (setq list (ll-suppress list 0)) )
         (list-part (reverse res) (1+ ncol))) ))
 
-(defunp table-filter ((test (list (:value "="))) (val float) (list list) (numcol fix)) list 
+(defunp table-filter ((test (list (:value "="))) (val float) (list list) (numcol fix)) list
     "<list> is a list of sub-lists. <numcol> is an index into <list> that selects a sub-list.
 <test> is a test function that is tested against each element of that sublist and <val>
 \(e.g. (<test> <val> <element>). Matching elements are deleted from that sublist, as well
@@ -439,7 +439,7 @@ Example:
 -> '((1 3) (4 6) (7 9))"
   (multi-filter test val list numcol))
 
-(defun list-filter2 (liste val &optional not) 
+(defun list-filter2 (liste val &optional not)
   "deletes from liste all elements contained in any one of tha ranges give in the
 list of lists val."
   (let ((res))
@@ -453,31 +453,31 @@ list of lists val."
     (if (and (>= value (apply 'min range)) (<= value (apply 'max range)))
         (return t))))
 
-(defunp band-reject ((list list) (val list)) list 
+(defunp band-reject ((list list) (val list)) list
     "band-reject"
   (if (not (consp (car val))) (setq val (list val)))
   (less-deep-mapcar 'list-filter2 list val ))
 
-(defunp band-pass ((list list) (val list)) list 
+(defunp band-pass ((list list) (val list)) list
     "band-pass"
   (if (not (consp (car val))) (setq val (list val)))
   (less-deep-mapcar 'list-filter2 list val t))
 
 (defunp band-filter ((list list) (val list)
-                     &optional (pass? fix>=0 (:value 1 :max-val 1))) list 
-    "<band-filter>  passes or rejects all elements from <list> that fall inside a band 
-of specified values of <val> . The range of values <val>  is given either as a list 
-of two numbers or as a list of lists of two numbers. Each pair of numbers define 
-an interval.  If <pass?> (the optional argument)  is one (the default) only the 
-element in list falling inside one of these intervals (of <val>) is selected. If 
-<delete>  is zero, elements in <list>  not falling 
-inside one of those intervals is selected. Intervals are defined by values inside 
+                     &optional (pass? fix>=0 (:value 1 :max-val 1))) list
+    "<band-filter>  passes or rejects all elements from <list> that fall inside a band
+of specified values of <val> . The range of values <val>  is given either as a list
+of two numbers or as a list of lists of two numbers. Each pair of numbers define
+an interval.  If <pass?> (the optional argument)  is one (the default) only the
+element in list falling inside one of these intervals (of <val>) is selected. If
+<delete>  is zero, elements in <list>  not falling
+inside one of those intervals is selected. Intervals are defined by values inside
 list.
 For example, if <list> is  (2 4 6 8 10 12 14 16 18 20) and <val> is ((1 2 3) (7  9)),
-<band-filter> returns (2 8), (the default is one). On the other hand (if the third 
-input is open), if <list> is  (2 4 6 8 10 12 14 16 18 20),  <val> is ((1 2 3) (7  9)) 
-and <pass?> is 0 (zero), <band-filter> returns (4 6 10 12 14 16 18 20). The 
-argument list can be a list of lists. In this case the described behavior applies to 
+<band-filter> returns (2 8), (the default is one). On the other hand (if the third
+input is open), if <list> is  (2 4 6 8 10 12 14 16 18 20),  <val> is ((1 2 3) (7  9))
+and <pass?> is 0 (zero), <band-filter> returns (4 6 10 12 14 16 18 20). The
+argument list can be a list of lists. In this case the described behavior applies to
 each sublist."
   (if (not (consp (car val))) (setq val (list val)))
   (less-deep-mapcar 'list-filter2 list val (= pass? 1)))
@@ -496,7 +496,7 @@ each sublist."
       (incf ind))))
 
 
-(defunp band-select ((list list) (posn list) 
+(defunp band-select ((list list) (posn list)
                      &optional (delete integer (:value 0 :min-val 0 :max-val 1))) list
     "selects those elements of list that are within the range of positions given in posn.
 if the optional argument is = 1, it rejects those elements"
@@ -504,46 +504,46 @@ if the optional argument is = 1, it rejects those elements"
         (test (= delete 0)))
     (less-deep-mapcar 'band-select2 list posns test)))
 
-(defunp range-filter ((list list) (posn list) 
+(defunp range-filter ((list list) (posn list)
                       &optional (delete integer (:value 0 :min-val 0 :max-val 1))) list
-    "<range-filter>  selects from a  list <list> all elements falling inside a range of 
-given positions <posn>.  The range of positions <posn>  is given either as a list 
-of two numbers or as a list of lists of two numbers. Each pair of numbers define 
-an interval.  If <delete> (the optional argument)  is zero (the default) any 
-element in list   falling inside one of these intervals is selected. If <delete>  is 
-one, elements in <list>  not falling inside one of those intervals is selected. 
-Intervals are defined by position inside list. For example, if <list> is  (4 7 2 3 1 8 
-5) and <posn> is ((4 5) (0 2)),  <range-filter> returns (4 7 2 1 8). On the other 
+    "<range-filter>  selects from a  list <list> all elements falling inside a range of
+given positions <posn>.  The range of positions <posn>  is given either as a list
+of two numbers or as a list of lists of two numbers. Each pair of numbers define
+an interval.  If <delete> (the optional argument)  is zero (the default) any
+element in list   falling inside one of these intervals is selected. If <delete>  is
+one, elements in <list>  not falling inside one of those intervals is selected.
+Intervals are defined by position inside list. For example, if <list> is  (4 7 2 3 1 8
+5) and <posn> is ((4 5) (0 2)),  <range-filter> returns (4 7 2 1 8). On the other
 hand (if the third input is open),
 if <list> is  (4 7 2 3 1 8 5),  <posn> is ((4 5) (0 2))  and <delete> is 1, <range-
-filter> returns (3 5). The argument list  can be a list of lists. In this case the 
+filter> returns (3 5). The argument list  can be a list of lists. In this case the
 described behaviour applies to each sublist."
   (band-select list posn delete))
 
 
-(defunp list-part ((list list) (ncol fix>0 (:value 2))) list 
+(defunp list-part ((list list) (ncol fix>0 (:value 2))) list
     "partitions <list> in <ncol> lists containing the elements modulo <ncol>"
   (let ((vector (make-array ncol :initial-element nil)) res)
-    (while list 
+    (while list
       (for (i 0 1 (1- ncol))
         (and list (vset vector i (push (pop list) (vref vector i))))))
     (for (i 0 1 (1- ncol))
       (push (remove nil (nreverse (vref vector i))) res))
     (nreverse res)))
 
-(defunp list-modulo ((list list) (ncol fix>0 (:value 2))) list 
+(defunp list-modulo ((list list) (ncol fix>0 (:value 2))) list
     "<list-modulo>  groups elements of a list that occur at regular intervals,
- and returns these groups as lists. <ncol> defines the interval between group 
+ and returns these groups as lists. <ncol> defines the interval between group
 members.
- For example, if we take the list (1 2 3 4 5 6 7 8 9) and give 2 for ncol, the result 
-is ((1 3 5 7 9) (2 4 6 8)).  In other words, every second element starting with the 
-first, and then every second element starting with the second. If the number of 
-<ncol> exceeds the number of elements in the list, the remaining lists are 
-returned as nil. In effect, list-modulo divides <list> into <ncol> sublists 
+ For example, if we take the list (1 2 3 4 5 6 7 8 9) and give 2 for ncol, the result
+is ((1 3 5 7 9) (2 4 6 8)).  In other words, every second element starting with the
+first, and then every second element starting with the second. If the number of
+<ncol> exceeds the number of elements in the list, the remaining lists are
+returned as nil. In effect, list-modulo divides <list> into <ncol> sublists
 containing elements modulo <ncol> according to their position in the list."
   (list-part list ncol))
 
-;; (defunp list-explode ((list list) (nlists fix>0 (:value 2))) list 
+;; (defunp list-explode ((list list) (nlists fix>0 (:value 2))) list
 ;;     "list-explode  divides a list into <nlist> sublists of consecutives elements.
 ;; For example, if list is (1 2 3 4 5 6 7 8 9), and ncol is 2, the result will be: ((1 2 3 4 5) (6 7 8 9)),
 ;; if list is (1 2 3 4 5 6 7 8 9), and ncol is 5, the result will be: ((1 2) (3 4) (5 6) (7 8) (9)).
@@ -551,21 +551,21 @@ containing elements modulo <ncol> according to their position in the list."
 ;; the remaining divisions will be returned as nil."
 ;;   (let* ((length (length list))  res
 ;;          (step (ceiling length nlists))
-;;          (end (- length 1))  ;step)) 
+;;          (end (- length 1))  ;step))
 ;;          (ser (arithm-ser 0 1 (1- step))) )
 ;;     (for (i 0 step end)
 ;;       (push (remove () (l-nth  list(l+ i ser))) res))
 ;;     (nreverse res)))
 
 ;;high feverish and ugly... Minimizes number of sublists of different lengths [Camilo]
-(defunp list-explode ((list list) (nlists fix>0 (:value 2))) list 
+(defunp list-explode ((list list) (nlists fix>0 (:value 2))) list
     "list-explode divides a list into <nlist> sublists of consecutives elements.
-For example, if list is (1 2 3 4 5 6 7 8 9), and ncol is 2, the result is ((1 2 3 4 5) 
+For example, if list is (1 2 3 4 5 6 7 8 9), and ncol is 2, the result is ((1 2 3 4 5)
 \(6 7 8 9)),
-if list is (1 2 3 4 5 6 7 8 9), and ncol is 5, the result is: ((1 2) (3 4) (5 6) (7 8) (9)). 
-If the number of divisions exceeds the number of elements in the list, the 
+if list is (1 2 3 4 5 6 7 8 9), and ncol is 5, the result is: ((1 2) (3 4) (5 6) (7 8) (9)).
+If the number of divisions exceeds the number of elements in the list, the
 remaining divisions are returned as nil."
-  (if (> nlists (length list)) 
+  (if (> nlists (length list))
       (setq list (append list (make-list (- nlists (length list)) :initial-element (first (last list))))))
   (if (<= nlists 1) list
       (let* ((length (length list))
@@ -574,14 +574,14 @@ remaining divisions are returned as nil."
              (step (if (< (abs (- length (* (1- nlists) high))) (abs (- length (* nlists low))))
                        high  low))
              (rest (mod length nlists))
-             (end (- length 1 rest)) 
+             (end (- length 1 rest))
              (ser (arithm-ser 0 1 (1- step)))
              res)
         (for (i 0 step end)
           (push (remove () (l-nth  list(l+ i ser))) res))
         (setq low (length (flat-once res)))
         (if (< low length) (setq res (cons (append (first res) (nthcdr low list)) (rest res))))
-        (cond ((> (length res) nlists) 
+        (cond ((> (length res) nlists)
                (nreverse (cons (nconc (second res) (first res)) (nthcdr 2 res))))
               ((< (length res) nlists)
                (when (= (length (first res)) 1)
@@ -591,7 +591,7 @@ remaining divisions are returned as nil."
               (t (nreverse res))))))
 
 (defunp lo-flat ((list list)) list
-    "Flattens lowest level sublists. Ex: 
+    "Flattens lowest level sublists. Ex:
 '( ((1 2 3)  (4 5 6))  ((7 8 9) (10 11 12)) ) becomes:
 \((1 2 3 4 5 6) (7 8 9 10 11 12)) "
   (cond ((atom list) list)
@@ -600,7 +600,7 @@ remaining divisions are returned as nil."
         (t (cons (lo-flat (car list)) (lo-flat (cdr list))))))
 
 (defunp flat-low ((list list)) list
-    "Flattens lowest level sublists. Ex: 
+    "Flattens lowest level sublists. Ex:
 '( ((1 2 3)  (4 5 6))  ((7 8 9) (10 11 12)) ) becomes:
 \((1 2 3 4 5 6) (7 8 9 10 11 12)) "
   (lo-flat list))
@@ -613,7 +613,7 @@ remaining divisions are returned as nil."
     "deletes the elemth (can be a list) element from list. If <elem> is a list of
 numbers, these have to be ordered "
   (let ((numbers (get-useful-nums elem (length list))))
-    (if numbers 
+    (if numbers
         (let ((save-l (copy-list list)))
           (if (zerop (car numbers))
               (cdr (remove-all save-l (cdr numbers)))
@@ -643,25 +643,25 @@ numbers, these have to be ordered "
   (epw::g-scaling/sum list sum))
 
 (defunp g-scaling/sum ((list list) (sum midics? (:value 1))) list
-    "scales <list> (may be tree) so that its sum becomes <sum>. Trees must be 
+    "scales <list> (may be tree) so that its sum becomes <sum>. Trees must be
 well-formed. The children of a node must be either all leaves or all nonleaves. "
   (less-tree-mapcar (lambda (x y) (l* x (/ y (apply #'+ x)))) list sum t))
 
 (defunp g-scaling/max ((list list) (max midics? (:value 1))) list
-    "scales <list>  (may be tree) so that its max becomes <max>. Trees must be 
+    "scales <list>  (may be tree) so that its max becomes <max>. Trees must be
 well-formed: The children of a node must be either all leaves or all nonleaves. "
   (less-tree-mapcar (lambda (x y) (l* x (/ y (list-max x)))) list max t))
 
 (defunp permut-circ ((list list) &optional (nth (fix (:value 1)))) list
-    "Returns a circular permutation of a copy of <list> starting from its <nth> 
+    "Returns a circular permutation of a copy of <list> starting from its <nth>
 element,
- (<nth> is the argument of the second optional input)  (which defaults to 1) , 
-\(<nth> = 0 means the first element of <list>,  <nth> = 1 means the second 
+ (<nth> is the argument of the second optional input)  (which defaults to 1) ,
+\(<nth> = 0 means the first element of <list>,  <nth> = 1 means the second
 element of <list>, and so on)
-For example, if <list> is  (1 2 3 4 5 6 7 8 9 10)   <permut-circ> returns (2 3 4 5 6 
+For example, if <list> is  (1 2 3 4 5 6 7 8 9 10)   <permut-circ> returns (2 3 4 5 6
 7 8 9 10 1), (the default is one). On the other hand (if the second input is open,
 <nth> ),
-if <list> is  (1 2 3 4 5 6 7 8 9 10),   and <nth> is 3 (zero) ,  <permut-circ> returns 
+if <list> is  (1 2 3 4 5 6 7 8 9 10),   and <nth> is 3 (zero) ,  <permut-circ> returns
 \(4 5 6 7 8 9 10 1 2 3).."
   (permut-circn (copy-list list) nth))
 
@@ -678,9 +678,9 @@ defaults to 1) element, (n=0 means the \"car\", n=1 means the \"cadr\")."
 
 (defunp nth-random ((list list)) ()
     "nth-random returns a random element from its input <list>.
-  For example, if the list (1 2 3 foo bar) might return the value 3 at the first 
+  For example, if the list (1 2 3 foo bar) might return the value 3 at the first
 evaluation;
- at the next time a value was requested it might return the string foo, the next 
+ at the next time a value was requested it might return the string foo, the next
 time maybe 3 again, etc."
   (nth (random (length list)) list))
 
@@ -703,7 +703,7 @@ time maybe 3 again, etc."
 (defunp mat-trans ((matrix list (:value '((1 2))))) list
     "<mat-trans>  transposes a matrix. That is, it interchanges rows and columns.
  Thus for example, (mat-trans  '((1 2) (5 7))) returns the list ((1 5) (2 7)), or
-if <matrix> is ((1 2) (3 4) (5 6) (7 8) (9 10)) <mat-trans> returns ((1 3 5 7 9) (2 4 
+if <matrix> is ((1 2) (3 4) (5 6) (7 8) (9 10)) <mat-trans> returns ((1 3 5 7 9) (2 4
 6 8 10)).
  <mat-trans> behaves as if the sublists of matrix  where arranged vertically.
  Then a sublist is constructed for each column resulting from this arrangement.
@@ -742,12 +742,12 @@ if <matrix> is ((1 2) (3 4) (5 6) (7 8) (9 10)) <mat-trans> returns ((1 3 5 7 9)
 1. Repeating each item number times following a pattern
    of the form: number*
 
-2. Creating a sequence of numbers going from n to m by steps of k, 
-indicated by the pattern n-m s k. A step of 1 can be omitted. 
+2. Creating a sequence of numbers going from n to m by steps of k,
+indicated by the pattern n-m s k. A step of 1 can be omitted.
 
 For example the list (3* (2 4) 0-8), returns
 
- (2 4 2 4 2 4 0 1 2 3 4 5 6 7 8), 
+ (2 4 2 4 2 4 0 1 2 3 4 5 6 7 8),
 
  and the list (2* (a z 2*(4 12)  (1-5 )) 0-16s2) returns
 
@@ -756,7 +756,7 @@ For example the list (3* (2 4) 0-8), returns
        (let ((lists (pw::list! list))  result)
          (while lists
            (let ((next-elem (pop lists)))
-             (cond 
+             (cond
                ((symbolp next-elem)
                 (let* ((form (coerce (format () "~A" next-elem) 'list))
                        (from-char (is-in form *valid-expand-chars*))
@@ -764,12 +764,12 @@ For example the list (3* (2 4) 0-8), returns
                        (third (cdr from-char))
                        (int (butlast form (length from-char)))
                        up-to)
-                  (cond 
+                  (cond
                     ((and (not third) char-symb (char= #\* char-symb) int
                           (numberp (setq int (read-from-string (coerce int 'string)))))
                      (push (apply #'append
                                   (make-list int
-                                             :initial-element 
+                                             :initial-element
                                              (expand-lst (pop lists))))
                            result))
                     ((and char-symb (char= #\_ char-symb) third
@@ -777,12 +777,12 @@ For example the list (3* (2 4) 0-8), returns
                      (if (setq from-char (member #\s third :test #'char=))
                          (progn (setq up-to (butlast third (length from-char))
                                       char-symb (car from-char) third (cdr from-char))
-                                (if (and char-symb 
+                                (if (and char-symb
                                          (char= #\s char-symb)
                                          (or (null third)
-                                             (numberp 
+                                             (numberp
                                               (setq third (read-from-string (coerce third 'string)))))
-                                         (numberp 
+                                         (numberp
                                           (setq up-to (read-from-string (coerce up-to 'string)))))
                                     (push (epw::arithm-ser int (or third 1) up-to) result)
                                     (push (list next-elem) result)))

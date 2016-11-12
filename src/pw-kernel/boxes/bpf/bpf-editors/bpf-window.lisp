@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -42,7 +42,7 @@
   (declare (ignore where)))
 ;;====================================================================================================
 
-(defclass C-BPF-window (C-mouse-window C-application-window) 
+(defclass C-BPF-window (C-mouse-window C-application-window)
   ((bpf-lib-pointer :initform 0 :allocation :class :accessor bpf-lib-pointer)
    (BPF-editor-object :initform nil  :accessor BPF-editor-object)
    (bpf-radio-ctrls :initform nil  :accessor bpf-radio-ctrls)
@@ -56,44 +56,44 @@
 
 (defmethod decompile ((self C-BPF-window))
   `(let ((win (make-instance 'C-BPF-window :close-box-p nil :window-show nil
-                             :window-title ,(window-title self) 
-                             :view-position #@(10 40) 
-                             :view-size #@(240 235)))) 
+                             :window-title ,(window-title self)
+                             :view-position #@(10 40)
+                             :view-size #@(240 235))))
       (setf (BPF-editor-object win)
-         (make-instance 
-           'C-bpf-view 
+         (make-instance
+           'C-bpf-view
                :view-container win
-               :view-position #@(2 2) :view-size #@(230 230) 
+               :view-position #@(2 2) :view-size #@(230 230)
                :track-thumb-p t))
      win))
 
 (defmethod initialize-instance :after ((self C-BPF-window) &rest l)
   (declare (ignore l))
-  (add-subviews self 
+  (add-subviews self
      (setf (text-disp-ctrl self)
        (make-instance 'static-text-dialog-item
          :view-font *patchwork-font-spec*
          :dialog-item-text "x-off  y-off  x-val  y-val xzoom  yzoom"))
-     (setf (x-origo-ctrl self) 
-        (make-instance 'C-numbox-continuous-no-double-click 
-           :view-size (make-point 40 15) :dialog-item-text "  0" :min-val -9999 
+     (setf (x-origo-ctrl self)
+        (make-instance 'C-numbox-continuous-no-double-click
+           :view-size (make-point 40 15) :dialog-item-text "  0" :min-val -9999
            :dialog-item-action (lambda (item) (set-bpf-x-origo (editor-view-object self) item))))
-     (setf (y-origo-ctrl self) 
-        (make-instance 'C-numbox-continuous-no-double-click 
+     (setf (y-origo-ctrl self)
+        (make-instance 'C-numbox-continuous-no-double-click
            :view-size (make-point 40 15) :dialog-item-text "  0" :min-val -9999
            :dialog-item-action (lambda (item) (set-bpf-y-origo (editor-view-object self) item))))
-     (setf (x-disp-ctrl self) 
+     (setf (x-disp-ctrl self)
         (make-instance 'C-ttybox :view-size (make-point 40 15) :dialog-item-text "  0"))
-     (setf (y-disp-ctrl self) 
+     (setf (y-disp-ctrl self)
         (make-instance 'C-ttybox :view-size (make-point 40 15) :dialog-item-text "  0"))
-     (setf (x-zoom-ctrl self) 
-        (make-instance 'C-numbox-continuous-no-double-click 
-           :view-size (make-point 40 15) :dialog-item-text "  0" 
+     (setf (x-zoom-ctrl self)
+        (make-instance 'C-numbox-continuous-no-double-click
+           :view-size (make-point 40 15) :dialog-item-text "  0"
            :value 100 :min-val 35
            :dialog-item-action (lambda (item) (set-bpf-x-zoom (editor-view-object self) item))))
-     (setf (y-zoom-ctrl self) 
-        (make-instance 'C-numbox-continuous-no-double-click 
-            :view-size (make-point 40 15) :dialog-item-text "  0" 
+     (setf (y-zoom-ctrl self)
+        (make-instance 'C-numbox-continuous-no-double-click
+            :view-size (make-point 40 15) :dialog-item-text "  0"
             :value 100 :min-val 35
            :dialog-item-action (lambda (item) (set-bpf-y-zoom (editor-view-object self) item)))) )
   (push (add-bpf-editor-radio-cluster self 0 0 "drag") (bpf-radio-ctrls self))
@@ -108,12 +108,12 @@
 
 (defgeneric add-bpf-editor-radio-cluster (self x y txt))
 (defmethod add-bpf-editor-radio-cluster ((self C-BPF-window) x y txt)
-  (make-instance 
+  (make-instance
    'radio-button-dialog-item
    :view-container (view-window self)
    :view-position (make-point x y)
    :dialog-item-text txt
-   :view-font *patchwork-font-spec* 
+   :view-font *patchwork-font-spec*
    :dialog-item-action
    (lambda (item)
      (set-bpf-edit-mode self item (dialog-item-text item)))))
@@ -144,7 +144,7 @@
 (defmethod view-activate-event-handler :after ((self C-BPF-window))
   (when (pw-object self)
     (draw-appl-label (pw-object self) #\*))
-  (setq *active-BPF-window* self) 
+  (setq *active-BPF-window* self)
   (ui:set-menubar *BPF-menu-root*)
   (enable-all-apps-menu-items)
   (menu-item-disable *apps-BPF-menu-item*))
@@ -176,7 +176,7 @@
 (defgeneric add-bpf-to-bpf-editor-from-PW (self bpf))
 (defmethod add-bpf-to-bpf-editor-from-PW ((self C-BPF-window) bpf)
   (setf (break-point-function (editor-view-object self)) bpf)
-  (scale-to-fit-in-rect (editor-view-object self)) 
+  (scale-to-fit-in-rect (editor-view-object self))
   (view-draw-contents self))
 
 ;;==========================================
@@ -201,15 +201,15 @@
 
 (defgeneric set-ctrl-positions (self)
   (:method ((self C-BPF-window))
-    (let ((y1 (BPF-window-ctrl-1st-y self)) 
+    (let ((y1 (BPF-window-ctrl-1st-y self))
           (y2 (BPF-window-ctrl-2nd-y self))
           (y3 (BPF-window-ctrl-3rd-y self)))
-      (set-view-position (text-disp-ctrl self) (make-point 5 y1)) 
-      (set-view-position (x-origo-ctrl self)   (make-point 2 y2)) 
+      (set-view-position (text-disp-ctrl self) (make-point 5 y1))
+      (set-view-position (x-origo-ctrl self)   (make-point 2 y2))
       (set-view-position (y-origo-ctrl self)   (make-point 42 y2))
-      (set-view-position (x-disp-ctrl self)    (make-point 82 y2)) 
+      (set-view-position (x-disp-ctrl self)    (make-point 82 y2))
       (set-view-position (y-disp-ctrl self)    (make-point 122 y2))
-      (set-view-position (x-zoom-ctrl self)    (make-point 162 y2)) 
+      (set-view-position (x-zoom-ctrl self)    (make-point 162 y2))
       (set-view-position (y-zoom-ctrl self)    (make-point 202 y2))
       (for (i 0 1 (1- (length (bpf-radio-ctrls self))))
         (set-view-position (nth  i (bpf-radio-ctrls self)) (make-point (* i 60)  y3)))
@@ -256,17 +256,17 @@
                                     :window-show nil
                                     :view-position #@(10 40)
                                     :view-size #@(250 275)))
-         (bp-view     (make-instance (or editor-view-class 'C-bpf-view) 
+         (bp-view     (make-instance (or editor-view-class 'C-bpf-view)
                                      :view-container win
                                      :view-position #@(2 2)
-                                     :view-size #@(240 217) 
-                                     :break-point-function bp 
+                                     :view-size #@(240 217)
+                                     :break-point-function bp
                                      :track-thumb-p t)))
       (add-subviews win bp-view)
       (setf (BPF-editor-object win) bp-view)
       (scale-to-fit-in-rect bp-view)
       win))
 
-;;(window-select (make-BPF-editor (make-break-point-function '(0 100) '(0 100)))) 
+;;(window-select (make-BPF-editor (make-break-point-function '(0 100) '(0 100))))
 
 ;;;; THE END ;;;;

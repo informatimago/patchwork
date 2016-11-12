@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
-;;;;    PW Arithmetic modules 
-;;;;  
+;;;;
+;;;;    PW Arithmetic modules
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    several modules by Tristan Murail.
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2014
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -54,7 +54,7 @@ a one-element list"
 ;;     ((not (consp list?)) (apply fun1 list? args))
 ;;     (t (cons (apply #'deep-mapcar fun fun1 (car list?) args)
 ;;              (apply #'deep-mapcar fun fun1 (cdr list?) args)))))
-;; 
+;;
 ;; (defun double-mapcar (fun1 list1? list2? &rest args)
 ;;   "Mapcars <fun> or applies <fun1> to <list1?> <list2?> <args>
 ;; whether each of <list1?> <list2?> is a list or not."
@@ -70,25 +70,25 @@ a one-element list"
 ;;      (mapcar (lambda (x) (apply fun1 list1? x args))
 ;;              list2?))
 ;;     (t (apply fun1 list1? list2? args))))
-;; 
-;; 
+;;
+;;
 ;; (defmethod arith-tree-mapcar ((fun cl:function) (arg1 number) (arg2 number))
 ;;   (funcall fun arg1 arg2))
-;; 
+;;
 ;; (defmethod arith-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 number))
 ;;   (cons (arith-tree-mapcar fun (car arg1) arg2)
 ;;         (arith-tree-mapcar fun  (cdr arg1) arg2)))
-;; 
+;;
 ;; (defmethod arith-tree-mapcar ((fun cl:function) (arg1 null) arg2)
 ;;   (declare (ignore arg1 arg2)) nil)
-;; 
+;;
 ;; (defmethod arith-tree-mapcar ((fun cl:function) (arg1 number) (arg2 cons))
 ;;   (cons (arith-tree-mapcar fun arg1 (car arg2))
 ;;         (arith-tree-mapcar fun  arg1 (cdr arg2))))
-;; 
+;;
 ;; (defmethod arith-tree-mapcar ((fun cl:function) arg1 (arg2 null))
 ;;   (declare (ignore arg1 arg2)) nil)
-;; 
+;;
 ;; (defmethod arith-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 cons))
 ;;   (cons (arith-tree-mapcar fun (car arg1) (car arg2))
 ;;         (arith-tree-mapcar fun  (cdr arg1) (cdr arg2))))
@@ -120,7 +120,7 @@ a one-element list"
   (cond
     ((null list?) ())
     ((atom (car list?)) (apply fun list? args))
-    ((atom (car (car list?))) 
+    ((atom (car (car list?)))
      (cons (apply fun (car list?)  args ) (apply #'less-deep-mapcar fun (cdr list?) args)))
     (t (cons (apply #'less-deep-mapcar fun  (car list?) args)
              (apply #'less-deep-mapcar fun  (cdr list?) args)))))
@@ -175,16 +175,16 @@ a one-element list"
   (deep-mapcar/1 'log l?))
 
 (defun approx-decimals (x y nbdec)
-  (let ((ndec 
+  (let ((ndec
           (if (> nbdec 0 ) (float (expt 10 nbdec)) (expt 10 nbdec))))
     (/ (round (/ x y) (/ ndec)) ndec)))
 
 (defunp g-round ((l1? numbers?)
                  &optional (decimals fix)
                  (l2? numbers? (:value 1))) numbers?
-    "Rounds a number or tree. This module allows many operations, since it is 
-extendible. (See the letter E on the module.) The input decimals sets the choice 
-of number of decimal places to round to. I2? specifies division of this rounded 
+    "Rounds a number or tree. This module allows many operations, since it is
+extendible. (See the letter E on the module.) The input decimals sets the choice
+of number of decimal places to round to. I2? specifies division of this rounded
 number by a second before  rounding;."
   (arith-tree-mapcar (lambda (x y) (approx-decimals x y decimals)) l1? l2?))
 
@@ -202,7 +202,7 @@ number by a second before  rounding;."
 
 (defunp g-mod ((l1? numbers?) (mod numbers? (:value 1))) numbers?
     "Calculate the number that is congruent modulo l2? to l1?, or the remainder
-of an integer division (Euclidean division between two numbers l1? and l2?). 
+of an integer division (Euclidean division between two numbers l1? and l2?).
 "
   (arith-tree-mapcar (function mod) l1? mod))
 
@@ -271,7 +271,7 @@ of an integer division (Euclidean division between two numbers l1? and l2?).
   (deep-mapcar/1  'mulalea list percent))
 
 (defunp g-alea ((list numbers?) (percent numbers?)) numbers?
-    "Add a uniform random function to the list <list> of some depth according to a 
+    "Add a uniform random function to the list <list> of some depth according to a
 percentage <percent> indicated. "
   (arith-tree-mapcar (function mulalea) list percent))
 
@@ -282,21 +282,21 @@ percentage <percent> indicated. "
   (deep-mapcar 'L-abs-f 'abs-f1 l?))
 
 (defunp x->dx ((xs list)) list
-    "Returns the list of the intervals between the contiguous values of a list <xs>. 
+    "Returns the list of the intervals between the contiguous values of a list <xs>.
 For example
 \(pw::x->dx ‘(0 4 5 9 6 2 3 3))
  will return     ? PW->(4 1 4 -3 -4 1 0)  "
   (mapcar #'- (cdr xs) xs))
 
 (defunp dx->x ((start fix/float) (dxs fixs)) list
-    "Constructs a list of numbers from <start> with the consecutives intervals  of 
-<dxs>. 
+    "Constructs a list of numbers from <start> with the consecutives intervals  of
+<dxs>.
 For example
- 
-\(pw::dx->x  0  ‘(0 4 5 9 6 2 3 3)) 
+
+\(pw::dx->x  0  ‘(0 4 5 9 6 2 3 3))
 will return  ? PW->(0 0 4 9 18 24 26 29 32)
 
-and 
+and
 \(pw::dx->x  8  ‘(0 4 5 9 6 2 3 3))
 will return  ? PW->(8 8 12 17 26 32 34 37 40)
 "
@@ -305,7 +305,7 @@ will return  ? PW->(8 8 12 17 26 32 34 37 40)
 
 (defunp LLdecimals ((list numbers? (:value 1.6)) (nbdec fix)) numbers?
     "Arrondit liste de profondeur quelconque avec <nbdec> décimales"
-  (let ((ndec 
+  (let ((ndec
           (if (> nbdec 0 ) (float (expt 10 nbdec)) (expt 10 nbdec))))
     (deep-mapcar/1 '/
                    (deep-mapcar/1 'round list (/ 1 ndec)) ndec )))
@@ -331,10 +331,10 @@ can be trees. "
 (in-package "EPW")
 (defunp g-oper ((fun symbol (:value "+")) (obj1? list (:value 0 :type-list ()))
                 &optional (obj2? list (:value '() :type-list ()))) nil
-    "Applies fun to leaves of trees of obj1? and (optionally) obj2?. 
-fun may be a Lisp function (list, +, *, cons, etc.) 
+    "Applies fun to leaves of trees of obj1? and (optionally) obj2?.
+fun may be a Lisp function (list, +, *, cons, etc.)
 or a function object created by the  make-num-fun box.
- 
+
 For example:
 \(pw::g-oper   '+  4   5)       will return  ? PW->9  ,
 \(pw::g-oper 'list  4 5) will return    ? PW->(4 5)   ,
@@ -374,17 +374,17 @@ will return     ?
   (mapcar (lambda (x) (mapcar (lambda (y) (funcall fun x y)) (list! l2?))) (list! l1?)))
 
 (defunp cartesian ((l1? numbers?) (l2? numbers?) (fun symbol (:value "+"))) numbers?
-    "Applies the function fun to elements 
-of l1? and l2? considered as matrices. 
-Like  g-oper ;fun may be a Lisp function 
-\(list, +, *, cons, etc.)  or a function object 
+    "Applies the function fun to elements
+of l1? and l2? considered as matrices.
+Like  g-oper ;fun may be a Lisp function
+\(list, +, *, cons, etc.)  or a function object
 created by  the  make-num-fun ;box .
 The result is a cartesian product of l1? by l2?.
 
 \(epw::cartesian 5 5 '+)
 will return ? PW->((10)) ,
  will return
-? PW->((6 7 8 9) (7 8 9 10) (8 9 10 11) (9 10 11 12)) and 
+? PW->((6 7 8 9) (7 8 9 10) (8 9 10 11) (9 10 11 12)) and
 \(epw::cartesian '(1 2 3 4) '(5 6 7 8)  '+) will return
 ? PW->  (((1 5) (1 6) (1 7) (1 8)) ((2 5) (2 6) (2 7) (2 8)) ((3 5) (3 6) (3 7) (3 8))
  ((4 5) (4 6) (4 7) (4 8)))

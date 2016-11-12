@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    Handles the translation between ObjC and Lisp names
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    <RDB> Randall D. Beer <beer@eecs.cwru.edu>
@@ -16,10 +16,10 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;  
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (c) 2003 Randall D. Beer
-;;;;  
+;;;;
 ;;;;    This software is licensed under the terms of the Lisp Lesser
 ;;;;    GNU Public License, known as the LLGPL.  The LLGPL consists
 ;;;;    of a preamble and  the LGPL. Where these conflict, the
@@ -28,19 +28,19 @@
 ;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;  
+;;;;
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;  
+;;;;
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -64,7 +64,7 @@
 ;;; from longest to shortest
 
 (defmacro define-special-objc-word (str)
-  `(setf *special-objc-words* 
+  `(setf *special-objc-words*
          (sort (pushnew ,str *special-objc-words* :test #'equal)
                #'>
                :key #'length)))
@@ -119,7 +119,7 @@
 ;;;;                              Utilities                                 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; Concatenate all of the simple strings STRS 
+;;; Concatenate all of the simple strings STRS
 
 (defun string-cat (&rest strs)
   (apply #'concatenate 'simple-string strs))
@@ -147,11 +147,11 @@
     :collect (apply #'string-cat (butlast l i))))
 
 
-;;; Concatenate a list of strings with optional separator into a symbol 
+;;; Concatenate a list of strings with optional separator into a symbol
 
 (defun symbol-concatenate (slist &optional (sep "") (package *package*))
-  (values 
-   (intern 
+  (values
+   (intern
     (reduce (lambda (s1 s2) (string-cat s1 sep s2))
             (mapcar #'string-upcase slist))
     package)))
@@ -161,32 +161,32 @@
 ;;;;                             Implementation                             ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; Convert an ObjC name to a corresponding Lisp name 
-;;; Example: "NSURLHandleClient" ==> ns-url-handle-client 
+;;; Convert an ObjC name to a corresponding Lisp name
+;;; Example: "NSURLHandleClient" ==> ns-url-handle-client
 ;;;
 ;;; 1) Break the string at each uppercase letter
 ;;;    e.g., "NSWindow" ==> ("N" "S" "Window")
-;;; 2) Collapse known sequences of letters 
+;;; 2) Collapse known sequences of letters
 ;;;    e.g., ("N" "S" "Window") ==> ("NS" "Window")
 ;;; 3) Uppercase and concatenate with hyphens into a symbol
 ;;;    e.g., ("NS" "Window") ==> NS-WINDOW
 
 (defun compute-lisp-name (str &optional (package *package*))
   (symbol-concatenate
-   (collapse-prefix 
+   (collapse-prefix
     (split-if (lambda (ch) (or (upper-case-p ch) (digit-char-p ch))) str))
    "-"
    package))
 
 
 ;;; Convert a Lisp classname into a corresponding ObjC classname
-;;; Example: ns-url-handle-client ==> "NSURLHandleClient" 
+;;; Example: ns-url-handle-client ==> "NSURLHandleClient"
 
 (defun compute-objc-classname (sym)
   (apply #'string-cat
          (loop for str in (split-if-char #\- (string sym) :elide)
-            for e = (member str *special-objc-words* 
-                            :test #'equal 
+            for e = (member str *special-objc-words*
+                            :test #'equal
                             :key #'string-upcase)
             collect (if e (first e) (string-capitalize str)))))
 
@@ -221,13 +221,13 @@
                                     (break "Huh?"))
                                   (substrings (subseq str i pos))
                                   (setq i (1+ pos)))))))
-           (split 
+           (split
             (mapcar (lambda (s)
                         (collapse-prefix
                          (split-if (lambda (ch)
                                        (or (upper-case-p ch) (digit-char-p ch)))
                                    s)))
-                  
+
                     subs))
            (namelen (+ (if trailing (length split) 0)
                        (let* ((c 0))
@@ -264,18 +264,18 @@
 
 (defun compute-lisp-to-objc-message (klist)
   (flet ((objcify (sym)
-           (apply 
+           (apply
             #'string-cat
             (loop
               :for str :in (split-if-char #\- (string sym) :elide)
               :for first-word-flag = t :then nil
-              :for e = (member str *special-objc-words* 
-                               :test #'equal 
+              :for e = (member str *special-objc-words*
+                               :test #'equal
                                :key #'string-upcase)
               :collect (cond (e (first e))
                              (first-word-flag (string-downcase str))
                              (t (string-capitalize str)))))))
-    (if (and (= (length klist) 1) 
+    (if (and (= (length klist) 1)
              (not (eq (symbol-package (first klist)) (find-package :keyword))))
         (objcify (first klist))
         (apply #'string-cat
@@ -287,7 +287,7 @@
 ;;; Example: "initWithCString:length:" ==> (:with-c-string :length)
 
 (defun compute-objc-to-lisp-init (init)
-  (cond 
+  (cond
     ((= (length init) 0) nil)
     ((and (> (length init) 3) (string= init "init" :start1 0 :end1 4))
      (mapcar (lambda (s) (compute-lisp-name s (find-package "KEYWORD")))
@@ -300,10 +300,10 @@
 ;;; Example: (:with-c-string :length) ==> "initWithCString:length:"
 
 (defun compute-lisp-to-objc-init (initargs)
-  (if (null initargs) 
+  (if (null initargs)
       "init"
       (let ((str (compute-lisp-to-objc-message initargs)))
-        (if (string/= (first (split-if-char #\- (string (first initargs)))) 
+        (if (string/= (first (split-if-char #\- (string (first initargs))))
                       "INIT")
             (string-cat "init" (nstring-upcase str :start 0 :end 1))
             str))))
@@ -320,7 +320,7 @@
 
 
 ;;; Define a hard-wired ObjC class name translation (if the automatic
-;;; translation doesn't apply) 
+;;; translation doesn't apply)
 
 (defmacro define-classname-translation (str sym)
   (let ((str-temp (gensym))
@@ -341,7 +341,7 @@
 ;;; Translate an ObjC class name to a Lisp class name
 
 (defun objc-to-lisp-classname (str &optional (package *package*))
-  (let ((sym 
+  (let ((sym
          (or (gethash str *lisp-classname-table*)
              (compute-lisp-name str package))))
     (setf (gethash sym *objc-classname-table*) str)
@@ -351,7 +351,7 @@
 ;;; Translate a Lisp class name to an ObjC class name
 
 (defun lisp-to-objc-classname (sym)
-  (let ((str 
+  (let ((str
          (or (gethash sym *objc-classname-table*)
              (compute-objc-classname sym))))
     (setf (gethash str *lisp-classname-table*) sym)
@@ -369,7 +369,7 @@
 
 
 ;;; Define a hard-wired message-keyword translation (if the automatic
-;;; translation doesn't apply) 
+;;; translation doesn't apply)
 
 (defmacro define-message-translation (message msg-keywords)
   (let ((message-temp (gensym))
@@ -378,9 +378,9 @@
         (old-msg-keywords-temp (gensym)))
     `(let* ((,message-temp ',message)
             (,msg-keywords-temp ',msg-keywords)
-            (,old-message-temp 
+            (,old-message-temp
              (gethash ,message-temp *lisp-message-table*))
-            (,old-msg-keywords-temp 
+            (,old-msg-keywords-temp
              (gethash ,msg-keywords-temp *objc-message-table*)))
        (remhash ,old-message-temp *lisp-message-table*)
        (remhash ,old-msg-keywords-temp *objc-message-table*)
@@ -392,17 +392,17 @@
 ;;; Translate an ObjC message to a list of Lisp message keywords
 
 (defun objc-to-lisp-message (message)
-  (let ((msg-keywords 
+  (let ((msg-keywords
          (or (gethash message *lisp-message-table*)
              (compute-objc-to-lisp-message message))))
     (setf (gethash msg-keywords *objc-message-table*) message)
     (setf (gethash message *lisp-message-table*) msg-keywords)))
 
 
-;;; Translate a set of Lisp message keywords to an ObjC message 
+;;; Translate a set of Lisp message keywords to an ObjC message
 
 (defun lisp-to-objc-message (msg-keywords)
-  (let ((message 
+  (let ((message
          (or (gethash msg-keywords *objc-message-table*)
              (compute-lisp-to-objc-message msg-keywords))))
     (setf (gethash message *lisp-message-table*) msg-keywords)
@@ -420,7 +420,7 @@
 
 
 ;;; Define a hard-wired init-keyword translation (if the automatic
-;;; translation doesn't apply) 
+;;; translation doesn't apply)
 
 (defmacro define-init-translation (initmsg initargs)
   (let ((initmsg-temp (gensym))
@@ -429,9 +429,9 @@
         (old-initargs-temp (gensym)))
     `(let* ((,initmsg-temp ',initmsg)
             (,initargs-temp ',initargs)
-            (,old-initmsg-temp 
+            (,old-initmsg-temp
              (gethash ,initmsg-temp *lisp-initializer-table*))
-            (,old-initargs-temp 
+            (,old-initargs-temp
              (gethash ,initargs-temp *objc-initializer-table*)))
        (remhash ,old-initmsg-temp *lisp-initializer-table*)
        (remhash ,old-initargs-temp *objc-initializer-table*)
@@ -443,17 +443,17 @@
 ;;; Translate an ObjC initializer to a list of Lisp initargs
 
 (defun objc-to-lisp-init (initmsg)
-  (let ((initargs 
+  (let ((initargs
          (or (gethash initmsg *lisp-initializer-table*)
              (compute-objc-to-lisp-init initmsg))))
     (setf (gethash initargs *objc-initializer-table*) initmsg)
     (setf (gethash initmsg *lisp-initializer-table*) initargs)))
 
 
-;;; Translate a set of Lisp initargs to an ObjC initializer 
+;;; Translate a set of Lisp initargs to an ObjC initializer
 
 (defun lisp-to-objc-init (initargs)
-  (let ((initmsg 
+  (let ((initmsg
          (or (gethash initargs *objc-initializer-table*)
              (compute-lisp-to-objc-init initargs))))
     (setf (gethash initmsg *lisp-initializer-table*) initargs)

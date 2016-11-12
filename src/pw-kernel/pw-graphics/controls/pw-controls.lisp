@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -57,11 +57,11 @@
 (defvar *menu-action-paste-txt* (lambda () (paste *pw-controls-dialog-text-item*)))
 
 (defun set-all-menu-actions ()
-  (setf *menu-action-cut-std* 
+  (setf *menu-action-cut-std*
         (menu-item-action-function (find-menu-item *pw-menu-edit* "Cut")))
-  (setf *menu-action-copy-std* 
+  (setf *menu-action-copy-std*
         (menu-item-action-function (find-menu-item *pw-menu-edit* "Copy")))
-  (setf *menu-action-paste-std* 
+  (setf *menu-action-paste-std*
         (menu-item-action-function (find-menu-item *pw-menu-edit* "Paste"))))
 
 (defun make-pw-controls-dialog (&optional class)
@@ -102,10 +102,10 @@
                                                  #@(6 47)
                                                  #@(62 16)
                                                  "OK"
-                                                 (lambda (item) 
+                                                 (lambda (item)
                                                    (declare (ignore item))
                                                    (set-dialog-item-text-from-dialog
-                                                    *pw-controls-current-pw-control* 
+                                                    *pw-controls-current-pw-control*
                                                     (dialog-item-text *pw-controls-dialog-text-item-old*))
                                                    (window-hide *pw-controls-dialog*))
                                                  :view-font *patchwork-font-spec*
@@ -125,13 +125,13 @@
     (unless *pw-controls-dialog* (setf *pw-controls-dialog* (make-pw-controls-dialog-old)))
     (setf *pw-controls-current-pw-control* item)
     (set-dialog-item-text *pw-controls-dialog-text-item-old* (dialog-item-text item))
-    (set-view-position *pw-controls-dialog* 
+    (set-view-position *pw-controls-dialog*
                        (add-points
-                        (local-to-global (view-container item) (view-position item)) 
+                        (local-to-global (view-container item) (view-position item))
                         (or point (make-point 1 0))))
-    (set-view-size *pw-controls-dialog* 
+    (set-view-size *pw-controls-dialog*
                    (subtract-points (or size (view-size item)) (make-point 2 2)))
-    (set-view-size *pw-controls-dialog-text-item-old* 
+    (set-view-size *pw-controls-dialog-text-item-old*
                    (subtract-points (view-size item) (make-point 2 2)))
     (window-select *pw-controls-dialog*)))
 
@@ -193,7 +193,7 @@
 ;;                       C-ttybox
 ;;===========================================================================
 
-(defclass C-ttybox (static-text-dialog-item) 
+(defclass C-ttybox (static-text-dialog-item)
   ((open-state :initform t  :initarg :open-state :accessor open-state
                :documentation "Selects whether to display the value (t), or the name of the doc-string (nil).")
    (doc-string :initform "" :initarg :doc-string  :accessor doc-string)
@@ -206,7 +206,7 @@
     (print-unreadable-object (self stream :identity t :type t)
       (format stream "~{~S~^ ~}"
               (list :open-state (pw::open-state self)
-                    :doc-string (subseq (pw::doc-string self) 0 (position #\newline (pw::doc-string self))) 
+                    :doc-string (subseq (pw::doc-string self) 0 (position #\newline (pw::doc-string self)))
                     :value (slot-value self 'pw::value)
                     :type-list (pw::type-list self))))
     (terpri stream))
@@ -214,7 +214,7 @@
 
 (defmethod initialize-instance :after ((self C-ttybox) &rest l)
   (declare (ignore l))
-  (if (slot-value self 'value) 
+  (if (slot-value self 'value)
       (setf (value self) (eval (slot-value self 'value))))
   (set-view-font self *patchwork-font-spec*))
 
@@ -269,7 +269,7 @@
 
 (defmethod view-double-click-event-handler ((self C-ttybox) where)
   (declare (ignore where))
-  (open-pw-controls-dialog self)) 
+  (open-pw-controls-dialog self))
 
 (defgeneric set-dialog-item-text-from-dialog (self text)
   (:method ((self C-ttybox) text)
@@ -282,7 +282,7 @@
 ;;=========================
 ;;PW
 
-(defmethod patch-value ((self C-ttybox) obj) 
+(defmethod patch-value ((self C-ttybox) obj)
   (declare (ignore obj))
   (read-from-string (dialog-item-text self)))
 
@@ -296,7 +296,7 @@
 ;;=========================
 ;;PW
 
-(defmethod patch-value ((self C-TTYBOX-EVAL) obj) 
+(defmethod patch-value ((self C-TTYBOX-EVAL) obj)
   (declare (ignore obj))
   (eval (read-from-string (dialog-item-text self))))
 
@@ -306,11 +306,11 @@
 
 (defclass C-ttybox-str (C-ttybox) ())
 
-(defmethod patch-value ((self C-ttybox-str) obj) 
+(defmethod patch-value ((self C-ttybox-str) obj)
   (declare (ignore obj))
   (dialog-item-text self))
 
-(defmethod set-open-state ((self C-ttybox-str) fl) 
+(defmethod set-open-state ((self C-ttybox-str) fl)
   (declare (ignore fl))
   (setf (open-state self) t))
 
@@ -325,7 +325,7 @@
 
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-out) text)
   (set-dialog-item-text self text)
-  (set (intern text "USER-SUPPLIED-IN-OUTS") (view-container self))) 
+  (set (intern text "USER-SUPPLIED-IN-OUTS") (view-container self)))
 
 ;;===========================================================================
 (defclass C-ttybox-in-box (C-ttybox-str) ())
@@ -333,7 +333,7 @@
 (defmethod set-dialog-item-text-from-dialog ((self C-ttybox-in-box) text)
   (set-dialog-item-text self text))
 
-(defmethod patch-value ((self C-ttybox-in-box) obj) 
+(defmethod patch-value ((self C-ttybox-in-box) obj)
   (declare (ignore obj))
   (intern (dialog-item-text self) "USER-SUPPLIED-IN-OUTS" ))
 
@@ -366,7 +366,7 @@
   (declare (ignore where))
   (setf (open-state self) (not (open-state self)))
   (with-focused-view self
-    (with-pen-state (:mode :srcxor) 
+    (with-pen-state (:mode :srcxor)
       (fill-rect*  1 1 (- (w self) 2)(- (h self) 2))))
   (when (dialog-item-action-function self)
     (funcall (dialog-item-action-function  self) self)))
@@ -375,7 +375,7 @@
   (with-focused-view self
     (draw-string 3 9 (dialog-item-text self))
     (unless (open-state self)
-      (with-pen-state (:mode :srcxor) 
+      (with-pen-state (:mode :srcxor)
         (fill-rect*  1 1 (- (w self) 2)(- (h self) 2))))
     (draw-rect* 0 0 (w self)(h self))))
 
@@ -413,7 +413,7 @@
 
 (defgeneric set-numbox-item-text (view value)
   (:method ((view C-numbox) value)
-    (set-dialog-item-text view (format nil "~5D" value)))) 
+    (set-dialog-item-text view (format nil "~5D" value))))
 
 (defmethod set-dialog-item-text-from-dialog ((self C-numbox) text)
   (let ((value (read-from-string text)))
@@ -434,11 +434,11 @@
     (funcall (dialog-item-action-function  self) self)))
 
 (defmethod map-mouse-increment ((view C-numbox))
-  (cond ((option-key-p) 100) 
-        ((shift-key-p) 10) 
+  (cond ((option-key-p) 100)
+        ((shift-key-p) 10)
         ((command-key-p) 1000)
-        (t 1))) 
- 
+        (t 1)))
+
 (defmethod view-click-event-handler ((self C-numbox) where)
   (declare (ignore where))
   (when (open-state self)
@@ -458,7 +458,7 @@
               (set-numbox-item-text self
                                     (setf (value self)
                                           (max (min-val self) (min (max-val self)
-                                                                   (+ last-value 
+                                                                   (+ last-value
                                                                       (* (map-mouse-increment self) (- first-v (point-v last-mp))))))))
               (with-focused-view self
                 (view-draw-contents self)
@@ -470,7 +470,7 @@
 ;;=========================
 ;;PW
 
-(defmethod patch-value ((self C-numbox) obj) 
+(defmethod patch-value ((self C-numbox) obj)
   (declare (ignore obj))
   (value self))
 
@@ -511,7 +511,7 @@
 
 (defgeneric menubox-value (self)
   (:method ((self C-menubox))
-    (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self)))) 
+    (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self))))
 
 (defmethod set-numbox-item-text ((self C-menubox) value)
   (if (stringp value)
@@ -535,24 +535,24 @@
 
 ;;===========================================================================
 ;;                      C-menubox-val
-;;=========================================================================== 
+;;===========================================================================
 ;; menu-box-list is list of dotted pairs '(("foo" . 3)("glorp" . 123))
 
 (defclass  C-menubox-val (C-menubox) ())
 
-(defmethod menubox-value ((self C-menubox-val)) 
-  (car (call-next-method))) 
+(defmethod menubox-value ((self C-menubox-val))
+  (car (call-next-method)))
 
 ;;=========================
 ;;PW
 
-(defmethod patch-value ((self C-menubox-val) obj) 
+(defmethod patch-value ((self C-menubox-val) obj)
   (declare (ignore obj))
-  (cdr (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self)))) 
+  (cdr (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self))))
 
 
-;;=========================================================================== 
-;;=========================================================================== 
+;;===========================================================================
+;;===========================================================================
 
 ;; (progn
 ;;   ;;=========================
@@ -563,7 +563,7 @@
 ;;                   :value 0
 ;;                   ;;                     :VIEW-FONT *patchwork-font-spec*
 ;;                   :menu-box-list '("  ac" " czx" "  bx" "   z")))
-;; 
+;;
 ;;   (defmethod INTERFACE-TOOLS::add-editor-items :after ((menubox C-menubox) editor)
 ;;     (let ((position (add-points INTERFACE-TOOLS::*editor-items-start-pos* #@(0 66))))
 ;;       (add-subviews
@@ -574,19 +574,19 @@
 ;;                            (declare (ignore item))
 ;;                            (set-menu-box-list
 ;;                             menubox
-;;                             (INTERFACE-TOOLS::get-new-table-data 
+;;                             (INTERFACE-TOOLS::get-new-table-data
 ;;                              (menu-box-list menubox) "strings")))))))
-;; 
+;;
 ;;   (defmethod INTERFACE-TOOLS::copy-instance ((item C-menubox))
 ;;     (let* ((new-item (call-next-method)))
 ;;       (setf (value new-item) (value item))
 ;;       (setf (menu-box-list new-item) (menu-box-list item))
 ;;       new-item))
-;; 
+;;
 ;;   (defmethod INTERFACE-TOOLS::object-source-code ((item C-menubox))
 ;;     (nconc (call-next-method)
 ;;            `(:menu-box-list ',(menu-box-list item))))
-;; 
+;;
 ;;   ;;====================================================================================================
 ;;   |#
 ;; #|
@@ -598,17 +598,17 @@
 ;;                   :view-position #@(5 22)
 ;;                   :value 0))
 ;;   ;;                     :VIEW-FONT *patchwork-font-spec*))
-;; 
+;;
 ;;   (defmethod INTERFACE-TOOLS::copy-instance ((item C-numbox))
 ;;     (let* ((new-item (call-next-method))
 ;;            (value (value item)))
 ;;       (set-numbox-item-text new-item value)
 ;;       new-item))
-;; 
+;;
 ;;   (defmethod INTERFACE-TOOLS::object-source-code ((item C-numbox))
 ;;     (nconc (call-next-method)
 ;;            `(:value ,(value item))))
-;; 
+;;
 ;;   ;;=========================
 ;;   )
 

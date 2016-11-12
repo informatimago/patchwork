@@ -5,10 +5,10 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    Utilities for interacting with the Apple/GNU Objective-C
 ;;;;    runtime systems.
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -16,11 +16,11 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;  
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (C) 2002-2009 Clozure Associates
 ;;;;    Parts of this file were part of Clozure CL.
-;;;;  
+;;;;
 ;;;;    Clozure CL is licensed under the terms of the Lisp Lesser GNU
 ;;;;    Public License , known as the LLGPL and distributed with
 ;;;;    Clozure CL as the file "LICENSE".  The LLGPL consists of a
@@ -36,19 +36,19 @@
 ;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;  
+;;;;
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;  
+;;;;
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -295,7 +295,7 @@
       (defun objc-metaclass-map () objc-metaclass-map)
       (defun %objc-metaclass-count () next-objc-metaclass-id)
       (defun %register-private-objc-class (c name)
-        (setf (gethash c private-objc-classes) 
+        (setf (gethash c private-objc-classes)
               (make-private-objc-class-info :name name)))
       (defun %get-private-objc-class (c)
         (gethash c private-objc-classes))
@@ -472,8 +472,8 @@
                 (ccl:%get-unsigned-long p 8) (ppc-lap-word (bctr)))
         ;;; Force this code out of the data cache and into memory, so
         ;;; that it'll get loaded into the icache.
-          (ff-call (ccl:%kernel-import #.target::kernel-import-makedataexecutable) 
-                   :address p 
+          (ff-call (ccl:%kernel-import #.target::kernel-import-makedataexecutable)
+                   :address p
                    :unsigned-fullword 12
                    :void)
           p)))
@@ -698,7 +698,7 @@
   (format t "install foreign objc class ~A~%" class) (finish-output)
   (let* ((id (objc-class-id class)))
     (if id
-        (format t "class ~A installed as ~A~%" class id) 
+        (format t "class ~A installed as ~A~%" class id)
         (let* ((name (ccl:%get-cstring #+(or apple-objc-2.0 cocotron-objc) (#_class_getName class)
                                        #-(or apple-objc-2.0 cocotron-objc) (ccl:pref class :objc_class.name)))
                (decl (get-objc-class-decl name use-db)))
@@ -720,7 +720,7 @@
                   (unless (null super)
                     (install-foreign-objc-class super))
                   (let* ((class-name (objc-to-lisp-classname name "NS"))
-                         (meta-id    (objc-class-id->objc-metaclass-id id)) 
+                         (meta-id    (objc-class-id->objc-metaclass-id id))
                          (meta       (id->objc-metaclass meta-id)))
                     ;; Metaclass may already be initialized.  It'll have a
                     ;; class wrapper if so.
@@ -968,7 +968,7 @@ argument lisp string."
             (ccl:%get-cstring (ccl:pref object :objc_class.name)))))))
 
 
-;;; Convert a Lisp object X to a desired foreign type FTYPE 
+;;; Convert a Lisp object X to a desired foreign type FTYPE
 ;;; The following conversions are currently done:
 ;;;   - T/NIL => *YES*/*NO*
 ;;;   - NIL => (ccl:%null-ptr)
@@ -1031,7 +1031,7 @@ argument lisp string."
 ;;;;                       Boolean Return Hackery                           ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; Convert a foreign object X to T or NIL 
+;;; Convert a foreign object X to T or NIL
 
 (defun coerce-from-bool (x)
   (cond
@@ -1635,11 +1635,11 @@ argument lisp string."
                          (incf ,gpr-total 1)))
                    (if (> ,gpr-total 8)
                        (setf ,gpr-total (- ,gpr-total 8))
-                       (setf ,gpr-total 0))         
+                       (setf ,gpr-total 0))
                    (ccl:%stack-block ((,marg-ptr (+ ,(ccl:%foreign-type-or-record-size
                                                   :<MARG> :bytes)
                                                 (* 4 ,gpr-total))))
-                               
+
                                  (ccl:with-macptrs ((,regparams (ccl:pref ,marg-ptr :<MARG>.reg<P>arams)))
                                    (progn ,@(static-arg-forms))
                                    (ccl:%process-varargs-list ,regparams ,marg-ptr ,n-static-gprs ,n-static-fprs  ,rest-arg)
@@ -1688,8 +1688,8 @@ argument lisp string."
                             (if (eq spec :<BOOL>)
                                 (setf arg `(%coerce-to-bool ,arg)))
                             (static-arg-forms
-                             `(setf (ccl:paref ,marg-ptr (:* 
-                                                      (,(if (foreign-integer-type-signed 
+                             `(setf (ccl:paref ,marg-ptr (:*
+                                                      (,(if (foreign-integer-type-signed
                                                              static-arg-type)
                                                             :signed
                                                             :unsigned)
@@ -1795,7 +1795,7 @@ argument lisp string."
                     (static-arg-forms
                      `(setf (ccl:paref ,gpr-base (:* address) ,n-static-gprs) ,arg))
                     (incf n-static-gprs)))))
-           
+
              (compile
               nil
               `(lambda (,receiver ,selector ,@args &rest ,rest-arg)
@@ -1808,7 +1808,7 @@ argument lisp string."
                                                           (ccl:%setf-macptr-to-object ,gen-arg-ptr (+ ,c-frame (ash ppc64::c-frame.param0 (- ppc64::word-shift))))
                                                           (progn ,@(static-arg-forms))
                                                           (ccl:%load-fp-arg-regs (ccl:%process-varargs-list ,gen-arg-ptr ,fp-arg-ptr ,n-static-gprs ,n-static-fprs  ,rest-arg) ,fp-arg-ptr)
-                                                        
+
                                                           (ccl:%do-ff-call nil (ccl:%reference-external-entry-point (load-time-value (external "objc_msgSend"))))
                                                           ;; Using VALUES here is a hack: the multiple-value
                                                           ;; returning machinery clobbers imm0.
@@ -2223,7 +2223,7 @@ argument lisp string."
               (ccl:%get-ptr (ccl:pref symtab :objc_symtab.defs)) class
               (ccl:pref class :objc_class.info) (logior *CLS-RESOLV* (ccl:pref class :objc_class.info)))
         ;; (#___objc_exec_class m)
-        (funcall (read-from-string "#___objc_exec_class") m)) 
+        (funcall (read-from-string "#___objc_exec_class") m))
       (funcall (read-from-string "#_objc_registerClassPair") class)))
 
 
@@ -2274,7 +2274,7 @@ argument lisp string."
       (flet ((ensure-method-signature (m)
                (or (objc-method-info-signature m)
                    (setf (objc-method-info-signature m)
-                         (let* ((sig 
+                         (let* ((sig
                                  (cons (reduce-to-ffi-type
                                         (ccl::objc-method-info-result-type m))
                                        (mapcar #'reduce-to-ffi-type
@@ -2878,9 +2878,9 @@ ultimately malloc-based.
                                                      :address (@class ,class-name) :address))
                                     #-(or apple-objc-2.0 cocotron-objc)
                                     `((ccl:pref (@class ,class-name) :objc_class.super_class)))))
-                     (macrolet ((send-super (msg &rest args &environment env) 
+                     (macrolet ((send-super (msg &rest args &environment env)
                                   (make-optimized-send nil msg args env nil ',super ,class-name))
-                                (send-super/stret (s msg &rest args &environment env) 
+                                (send-super/stret (s msg &rest args &environment env)
                                   (make-optimized-send nil msg args env s ',super ,class-name)))
                        ,@body)))
              (%define-lisp-objc-method
@@ -2983,7 +2983,7 @@ ultimately malloc-based.
                         (typestring (encode-objc-method-arglist arg-types result-type))
                         (signature (cons result-type (cddr arg-types))))
                    (multiple-value-bind (body decls) (parse-body body env)
-                   
+
                      (setf body `((progn ,@(bool-args) ,@(type-assertions) ,@body)))
                      (if (eq result-type :<BOOL>)
                          (setf body `((%coerce-to-bool ,@body))))

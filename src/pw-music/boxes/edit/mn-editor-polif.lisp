@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -38,14 +38,14 @@
 
 (defun make-polif-arg-list (count)
   (let ((arg-list))
-    (for (i 0 1 (1- count)) 
+    (for (i 0 1 (1- count))
          (push  '*MN-collector-type* arg-list)
-         (push  (string-downcase 
+         (push  (string-downcase
                   (concatenate  'string  "coll" (format nil "~D" (1+ i)))) arg-list))
     (nreverse arg-list)))
 
 ;;(make-polif-arg-list 6)
-      
+
 ;;====================================================================================================
 (defclass  C-patch-PolifMN (C-patch-application)
   ((chord-line-list :initform nil :initarg :chord-line-list :accessor chord-line-list)))
@@ -60,7 +60,7 @@
 ;;_________
 
 (defmethod draw-patch-extra :after ((self C-patch-PolifMN))
-  (draw-char (+ -16 (w self)) (- (h self) 4) #\E)) 
+  (draw-char (+ -16 (w self)) (- (h self) 4) #\E))
 ;;_________
 ;; extend
 
@@ -73,11 +73,11 @@
 
 ;;(defmethod generate-extended-inputs ((self C-patch-PolifMN)) (call-next-method))
 
-(defmethod give-new-extended-title ((self C-patch-PolifMN)) 'pmnn) 
+(defmethod give-new-extended-title ((self C-patch-PolifMN)) 'pmnn)
 
-(defmethod mouse-pressed-no-active-extra :after ((self C-patch-PolifMN) x y) 
+(defmethod mouse-pressed-no-active-extra :after ((self C-patch-PolifMN) x y)
   (declare (ignore x y))
-  (when (option-key-p) 
+  (when (option-key-p)
     (remove-yourself-control self)))
 ;;_________
 

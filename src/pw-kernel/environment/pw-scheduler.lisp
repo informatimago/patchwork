@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -74,7 +74,7 @@
             (wait-list (wait-list self)))
         (while wait-list
           (if (= (clock self) (caar (wait-list self)))
-              (progn 
+              (progn
                 (push (pop (wait-list self)) ready-list)
                 (pop wait-list))
               (setq wait-list ())))
@@ -82,7 +82,7 @@
         (while ready-list
           (eval (cadr (pop ready-list))))
         (incf (clock self))
-        (continue-clock self)))) 
+        (continue-clock self))))
 
 ;;______________
 
@@ -105,7 +105,7 @@
 
 (defgeneric dfuncall-process (self delay))
 (defmethod  dfuncall-process  ((self C-process) delay)
-  (insert-in-wait-list (clock-obj self) 
+  (insert-in-wait-list (clock-obj self)
                        (*dfuncall* (+ delay (clock (clock-obj self))) (process self) self)))
 
 ;;______________
@@ -125,14 +125,14 @@
 
     (defmethod  proc-print-foo  ((self C-process))
       (print (list 'foo (clock (clock-obj self))))
-      (dfuncall-process self  (random2 10 12))) 
+      (dfuncall-process self  (random2 10 12)))
 
     (defmethod  proc-print-blah  ((self C-process))
       (print (list 'blah (clock (clock-obj self))))
       (dfuncall-process self 10))
 
     (defmethod  proc-print-blah2  ((self C-process))
-    ;;  (write-midi-note 10 1 60 100) 
+    ;;  (write-midi-note 10 1 60 100)
       (print (list 'blah2 (clock (clock-obj self))))
       (dfuncall-process self 20))
 
@@ -163,7 +163,7 @@
     (defmethod  proc-print-beg1  ((self C-process-begin+end))
      (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
        (if  (>= (clock (clock-obj self)) (begin-time self))
-          (progn 
+          (progn
             (print (list 'beg1 (clock (clock-obj self))))
             (dfuncall-process self 30))
           (dfuncall-process self (begin-time self)))))
@@ -171,7 +171,7 @@
     (defmethod  proc-print-beg2  ((self C-process-begin+end))
      (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
        (if  (>= (clock (clock-obj self)) (begin-time self))
-         (progn 
+         (progn
            (print (list 'beg2 (clock (clock-obj self))))
            (dfuncall-process self 20))
          (dfuncall-process self (begin-time self)))))
@@ -179,7 +179,7 @@
     (defmethod  proc-print-beg3  ((self C-process-begin+end))
      (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
        (if  (>= (clock (clock-obj self)) (begin-time self))
-         (progn 
+         (progn
            (print (list 'beg3 (clock (clock-obj self))))
            (dfuncall-process self 15))
          (dfuncall-process self (begin-time self)))))
@@ -187,7 +187,7 @@
     (defmethod  proc-print-beg31  ((self C-process-begin+end))
      (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
        (if  (>= (clock (clock-obj self)) (begin-time self))
-         (progn 
+         (progn
            (print (list 'beg31 (clock (clock-obj self))))
            (dfuncall-process self 2))
          (dfuncall-process self (begin-time self)))))
@@ -195,21 +195,21 @@
     (defmethod  proc-print-beg11  ((self C-process-begin+end))
      (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
        (if  (>= (clock (clock-obj self)) (begin-time self))
-         (progn 
+         (progn
            (print (list 'beg11 (clock (clock-obj self))))
            (dfuncall-process self 5))
          (dfuncall-process self (begin-time self)))))
 
 
-    (setq procb1 (make-instance 'C-process-begin+end :process 'proc-print-beg1 
+    (setq procb1 (make-instance 'C-process-begin+end :process 'proc-print-beg1
          :begin-time 0 :duration-time 300))
-    (setq procb11 (make-instance 'C-process-begin+end :process 'proc-print-beg11 
+    (setq procb11 (make-instance 'C-process-begin+end :process 'proc-print-beg11
         :begin-time 0 :duration-time 50))
-    (setq procb2 (make-instance 'C-process-begin+end :process 'proc-print-beg2 
+    (setq procb2 (make-instance 'C-process-begin+end :process 'proc-print-beg2
         :begin-time 100 :duration-time 150))
-    (setq procb31 (make-instance 'C-process-begin+end :process 'proc-print-beg31 
+    (setq procb31 (make-instance 'C-process-begin+end :process 'proc-print-beg31
         :begin-time 150 :duration-time 25))
-    (setq procb3 (make-instance 'C-process-begin+end :process 'proc-print-beg3 
+    (setq procb3 (make-instance 'C-process-begin+end :process 'proc-print-beg3
         :begin-time 200 :duration-time 150))
 
     (start-clock (clock-obj procb1) 1000 (list procb1 procb2 procb3 procb11 procb31))

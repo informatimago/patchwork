@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -105,7 +105,7 @@
                 (epw::x->dx (pw::get-slot chords 'pw::t-time))))
         (setf (chords (chord-seq self))
               ;(dolist (chord chords (nreverse all-chords))
-              (progn 
+              (progn
                 (while (or chords durs offs vels chans time-list)
                   (setq chord (pop chords))
                   (push
@@ -154,9 +154,9 @@
     (let* ((my-in (input-objects self))
            (my-ctrl (pw-controls self))
            (time-list (if (eql (second my-in) (second my-ctrl))
-                        `'(cons 0 (pw::list! 
+                        `'(cons 0 (pw::list!
                                   (epw::ll/round ',(patch-value (second my-in) obj) 1)))
-                        `(list 'cons 0 (list 'pw::list! 
+                        `(list 'cons 0 (list 'pw::list!
                                   (list 'epw::ll/round ,(compile-me (second my-in) obj) 1)))))
            (chords (if (eql (first my-in) (first my-ctrl))
                          `'(pw::list! ,(patch-value (first my-in) obj))
@@ -177,10 +177,10 @@
                      (if (eql (seventh my-in) (seventh my-ctrl))
                        `',(patch-value (seventh my-in) obj)
                        `,(compile-me (seventh my-in) obj)) 0)))
-      `(list 'let* (list 
+      `(list 'let* (list
                     (list 'chords ,chords)
                     'chord 'a-chord 'all-chords
-                    (list 'the-ch-line 
+                    (list 'the-ch-line
                           (list 'make-instance ''C-chord-line ))
                     (list 'time-list ,time-list)
                     (list 'durs ,durs)
@@ -193,7 +193,7 @@
                     '(def-vels (car (last vels)))
                     '(def-chans (car (last chans)))
                     '(def-offs (car (last offs))))
-             '(progn 
+             '(progn
                 (while (or chords durs offs vels chans time-list)
                   (setq chord (pop chords))
                   (push
@@ -226,11 +226,11 @@
                     (start fix>=0)
                     (insts list (:value '() :type-list ()))
                     ) collector
-"<chord-seqn> is a sequence constructor object. Builds a chord-line (an object with a 'chords' slot containing a 
+"<chord-seqn> is a sequence constructor object. Builds a chord-line (an object with a 'chords' slot containing a
 list of chords). <chords> can be either a list (or list of lists) of midics or note objects,
  a chord object or list of chord objects or a single midic or note object. The <dels> input controls the
 spacing of the chords (in 100ths of a second). <durs> input controls the duration of the chord (in 100ths of a second) , <vels> input
- controls the dynamic of the chord, <chans> input controls the MIDI channel number  of the chord  , <offs> 
+ controls the dynamic of the chord, <chans> input controls the MIDI channel number  of the chord  , <offs>
 input controls the offset time of each note   of the chord, <start> is the start point of the sequence (in 100ths of a second),
 <insts> input allow to connect an instrument to chord  .
 A popUp menu is linked to the letter "
@@ -246,22 +246,22 @@ A popUp menu is linked to the letter "
                     (start fix>=0)
                     (insts list (:value '() :type-list ()))
                     ) collector
-"<chord-seqn> is a sequence constructor object. It builds a chord-line (an 
-object with a 'chords' slot containing a list of chords). <chords> can be either a 
-list (or list of lists) of midics or note objects, a chord object (or list of chord 
-objects), or a single midic or note object. The <dels> input controls the spacing 
-of the chords (in 100ths of a second). <durs> input controls the duration of the 
-chord (in 100ths of a second) , <vels> input  controls the dynamic of the chord, 
-<chans> input controls the MIDI channel number of the chord, <offs>  input 
-controls the offset time of each note of the chord, <start> is the start point of the 
-sequence (in 100ths of a second), and the <insts> input lets one connect an 
-instrument to chord. A popUp menu is linked to the letter 'A' just to the right of 
-the output box.  This menu can save the module (and its collected chord 
-sequence) into a file. An editor for the <chord-seqn> object is entered either by 
-selecting the module and typing the letter ‘o’ or by double-clicking on the 
-module's name. Click 'h' with the music-notation-editor opened for more 
-informations. The module can be locked (to avoid new evaluations of the patch 
-that is under 'chord') to keep its contents by clicking on the small ‘o’ in the lower 
+"<chord-seqn> is a sequence constructor object. It builds a chord-line (an
+object with a 'chords' slot containing a list of chords). <chords> can be either a
+list (or list of lists) of midics or note objects, a chord object (or list of chord
+objects), or a single midic or note object. The <dels> input controls the spacing
+of the chords (in 100ths of a second). <durs> input controls the duration of the
+chord (in 100ths of a second) , <vels> input  controls the dynamic of the chord,
+<chans> input controls the MIDI channel number of the chord, <offs>  input
+controls the offset time of each note of the chord, <start> is the start point of the
+sequence (in 100ths of a second), and the <insts> input lets one connect an
+instrument to chord. A popUp menu is linked to the letter 'A' just to the right of
+the output box.  This menu can save the module (and its collected chord
+sequence) into a file. An editor for the <chord-seqn> object is entered either by
+selecting the module and typing the letter ‘o’ or by double-clicking on the
+module's name. Click 'h' with the music-notation-editor opened for more
+informations. The module can be locked (to avoid new evaluations of the patch
+that is under 'chord') to keep its contents by clicking on the small ‘o’ in the lower
 right of the module The ‘o’ indicates that the module is open."
   (declare (ignore chords dels durs vels offs chans insts start)))
 
@@ -271,7 +271,7 @@ right of the module The ‘o’ indicates that the module is open."
 (defparameter pw::*chord-line-object-type*
   (make-instance 'C-pw-type
     :control-form
-    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "()" 
+    `(make-instance 'C-ttybox  :view-size #@(36 14) :dialog-item-text "()"
                     :type-list '(pw::chord list))))
 
 ;;(pw::pw-addmenu-fun (pw::the-user-menu) 'chordseq 'C-patch-chord-line::C-patch-chord-line)

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
-;;;;    The chord box with Menu chosen functionalities. 
-;;;;  
+;;;;
+;;;;    The chord box with Menu chosen functionalities.
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -55,7 +55,7 @@
 (defvar *g2-g-f-f2-staffs*)
 ;; (defgeneric editor-objects (object))
 
-(defclass C-patch-chord-box-M (C-patch-application) 
+(defclass C-patch-chord-box-M (C-patch-application)
  ((mus-not-editor :initform nil  :accessor mus-not-editor)
   (out-type :initform :midic :initarg :out-type :accessor out-type)
   (popUpBox :initform nil :accessor popUpBox)
@@ -87,7 +87,7 @@
 
 (defmethod initialize-instance :after ((self C-patch-chord-box-M) &key controls)
   (declare (ignore controls))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox  "M" self
                        *Chord-box-popUpMenu*
                        :view-position (make-point (- (w self) 13)
@@ -102,7 +102,7 @@
                        :view-font *patchwork-small-font-spec*
                        :view-container self
                        :dialog-item-action (get-lock-button-fun self)))
-  (if (or (not (mus-not-editor self)) 
+  (if (or (not (mus-not-editor self))
           (window-killed-p (mus-not-editor self)))
     (rebuild-editor self))
   (set-pw-win+pw-obj (mus-not-editor self) *active-patch-window* self))
@@ -110,7 +110,7 @@
 (defmethod get-lock-button-fun ((self C-patch-chord-box-M))
   (lambda (item)
       (if (value (view-container item))
-        (progn 
+        (progn
           (set-dialog-item-text item "o")
           (record-event :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self))))))
         (progn
@@ -149,7 +149,7 @@
   (let ((patches (subviews *active-patch-window*)))
     (dolist (patch patches)
       (if (am-i-connected? patch self)
-          (progn 
+          (progn
             (draw-connections patch t)
             (disconnect-my-self patch self)
             (draw-connections patch ))))
@@ -163,7 +163,7 @@
   (values))
 
 (defmethod open-patch-win ((self C-patch-chord-box-M ))
-  (if (or (not (mus-not-editor self)) 
+  (if (or (not (mus-not-editor self))
               (window-killed-p (mus-not-editor self)))
             (rebuild-editor self))
   (let ((editor (car (editor-objects (car (subviews (mus-not-editor self))))))
@@ -186,11 +186,11 @@
 
 (defgeneric set-my-win-pos (self MN-win))
 (defmethod set-my-win-pos ((self C-patch-chord-box-M) MN-win)
-  (set-view-position MN-win 
-                     (add-points (view-position self) 
+  (set-view-position MN-win
+                     (add-points (view-position self)
                                  (view-position *active-patch-window*))))
 
-(defmethod update-win-pointers ((self C-patch-chord-box-M ) win-ptr) 
+(defmethod update-win-pointers ((self C-patch-chord-box-M ) win-ptr)
   (set-pw-win+pw-obj  (mus-not-editor self) win-ptr self))
 
 (defmethod patch-value ((self C-patch-chord-box-M ) obj)
@@ -202,7 +202,7 @@
 
 (defmethod patch-work-type-of ((self C-patch-chord-box-M) ctrl-index)
   (declare (ignore ctrl-index))
-  (list 'list (list :value 
+  (list 'list (list :value
                     (format nil "~D" (get-chord-midics (car (pw-controls self))))
                     :type-list '(list midic chord))))
 
@@ -212,7 +212,7 @@
          (old-chords (chords  (chord-line my-in))))
     (cond ((subtypep (type-of (car val)) (type-of (car old-chords))) ;entry is an object
            (setf (t-time (car val)) 0)
-           (setf (chords  (chord-line my-in)) val)) 
+           (setf (chords  (chord-line my-in)) val))
           (t
            (setf (chords  (chord-line my-in))
                  (list (make-chord-object val 0 (type-of (car old-chords)))))
@@ -237,7 +237,7 @@
       (:offset (get-chord-offset my-in))
       (:duration (get-chord-duration my-in))
       (:dynamic (get-chord-dynamic my-in))
-      (:order (order-chord-midics self (get-chord-midics my-in) 
+      (:order (order-chord-midics self (get-chord-midics my-in)
                                   (get-chord-order my-in))))))
 
 (defgeneric order-chord-midics (self midics order))
@@ -250,14 +250,14 @@
 
 (defunp chord ((chord ch-box)) list
 "cThe module chord is a constructor module for chords.
-Its input can be a list  of  midicents or a chord object. 
-In the first case, a chord object having notes with 
-the given pitches is created (or modified, 
-if a chord for the module exists already). 
-In the  second case, the given chord object is 
-copied into the module. A chord module has a 
-popUp  menu linked to the letter just to the right of its output box. The output of the 
-chord  module depends on the menu item chosen. The items in this menu are as 
+Its input can be a list  of  midicents or a chord object.
+In the first case, a chord object having notes with
+the given pitches is created (or modified,
+if a chord for the module exists already).
+In the  second case, the given chord object is
+copied into the module. A chord module has a
+popUp  menu linked to the letter just to the right of its output box. The output of the
+chord  module depends on the menu item chosen. The items in this menu are as
 follows:
 
 midics:		output is the list of midic slots of the notes.
@@ -268,20 +268,20 @@ Velocity:	output is the list of vel  slots of the notes.
 
 offsets: 	output is the list of offset-time  slots.
 
-Reorder: 	output is the list of midic  slots, reordered according to their 
+Reorder: 	output is the list of midic  slots, reordered according to their
               order slots.
 
 Chord Object:  	output is the whole chord object.
 
 Save Chord:  	output does not change. The module is saved in a file.
 
-The letter to the right of the chord module's output box indicates the current 
-output 
+The letter to the right of the chord module's output box indicates the current
+output
 option.
 
-An   editor ;for the chord object is entered either by selecting the module and 
-typing 
-the letter o, or by double-clicking on the module's name. Type h with the music 
+An   editor ;for the chord object is entered either by selecting the module and
+typing
+the letter o, or by double-clicking on the module's name. Type h with the music
 notation editor opened for more information.
 
 "
@@ -290,7 +290,7 @@ notation editor opened for more information.
 ;;(push-to-object-types 'chord)
 
 ;;(setf *chord-box-M-pw-type*
-;;  (make-instance 'C-pw-type :control-form 
+;;  (make-instance 'C-pw-type :control-form
 ;;                 `(make-instance 'C-chord-box  :view-size (make-point 38 120)
 ;;     :type-list '(list midic chord))))
 
@@ -316,7 +316,7 @@ notation editor opened for more information.
   (let* ((editor (car (subviews self)))
          (ctrl (param-ctrl editor)))
     (if (member ctrl (subviews editor))
-      (if (eql char #\Newline) 
+      (if (eql char #\Newline)
         (exit-from-param-ctrl ctrl)
         (view-key-event-handler ctrl char))
       (call-next-method))))

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -120,17 +120,17 @@ You must eventually AEDisposeDesc the result of choose-appleevent-target!
   (rlet ((port-info :PortInfoRec)
          (target-id :TargetID))
         (choose-process-dialog
-         :prompt prompt :title title 
+         :prompt prompt :title title
          :location-name-record (rref target-id TargetID.location :storage :pointer)
          :port-info-record port-info)
         (setf (pref target-id TargetID.name) (pref port-info PortInfoRec.name))
-        (ae-error (#_AECreateDesc #$typeTargetID target-id 
+        (ae-error (#_AECreateDesc #$typeTargetID target-id
                                   #.(record-length :TargetID) the-desc))
         the-desc))
 
 
 
-(defun choose-process-dialog (&key prompt title default-specified location-name-record 
+(defun choose-process-dialog (&key prompt title default-specified location-name-record
                                 port-info-record (port-filter (%null-ptr)) nbp-type)
   "Pop up the PPC Browser dialog to select a process.
 
@@ -160,7 +160,7 @@ Returns two values:   1) location-name-rec
         (error))
     (unless (and location-name-record port-info-record)
       (setq default-specified nil))
-    (unless location-name-record 
+    (unless location-name-record
       (setq location-name-record (make-record :LocationNameRec)
             location-name-allocated t))
     (unless port-info-record
@@ -169,7 +169,7 @@ Returns two values:   1) location-name-rec
     (%stack-block ((prompt-ptr 256)
                    (title-ptr 256)
                    (nbp-type-ptr 256))
-                  (if prompt 
+                  (if prompt
                       (%put-string prompt-ptr prompt)
                       (%setf-macptr prompt-ptr (%null-ptr)))
                   (if title
@@ -201,7 +201,7 @@ the-desc      An AEDesc record.
 Return value: the-desc
 "
   (unless the-desc (setq the-desc (make-record :AEDesc)))
-  (rlet ((psn :ProcessSerialNumber 
+  (rlet ((psn :ProcessSerialNumber
               :highLongOfPSN 0
               :lowLongOfPSN #$kCurrentProcess))
         (ae-error
@@ -441,9 +441,9 @@ you know it will be very fast.
                  (if can-switch-layer #$kAECanSwitchLayer 0)
                  (if dont-reconnect #$kAEDontReconnect 0)
                  (if want-receipt #$nreturnreceipt 0))))
-    (ae-error 
+    (ae-error
      (let ((*inside-aesend* t)
-           (res (#_AESend the-appleevent the-reply mode priority 
+           (res (#_AESend the-appleevent the-reply mode priority
                           timeout idleproc (or filterproc (%null-ptr)))))
        (if (eql res #$errAEWaitCanceled)        ;; be silent about aborts
            #$NoErr
@@ -463,7 +463,7 @@ reply      An AEDesc record containing the reply to an Apple Event."
       (error (make-condition 'appleevent-error
                              :oserr error-number
                              :error-string (get-error-string reply nil))))))
-  
+
 
 ;; some common toplevel thingies:
 

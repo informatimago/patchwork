@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;  
+;;;;
 ;;;;    XXX
-;;;;  
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;  
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;  
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;  
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;  
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -62,7 +62,7 @@
              (when limit (setq delta (point-max delta limit)))
              (draw-gray-rect (pt2rect anchor delta))
              (get-next-event nil 0 1)
-             (setf old-mouse new-mouse))))    
+             (setf old-mouse new-mouse))))
         (new-instance view)))
     delta))
 
@@ -127,9 +127,9 @@
       (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
   (:method ((self view))
     #+debug-view (format-trace '(erase-view-inside-rect view))
-    ;; we're called with with-focused-view self 
+    ;; we're called with with-focused-view self
    (with-pen-state (:pattern *white-pattern* :mode :patcopy)
-      (fill-rect* (1+ (point-h (view-scroll-position self))) 
+      (fill-rect* (1+ (point-h (view-scroll-position self)))
                   (1+ (point-v (view-scroll-position self)))
                   (- (w self) 2)
                   (- (h self) 2))))
@@ -137,7 +137,7 @@
     #+debug-view (format-trace '(erase-view-inside-rect dialog-item))
     ;; We're called with with-focused-dialog-item (self)
     (with-pen-state (:pattern *white-pattern* :mode :patcopy)
-      (fill-rect* (1+ (point-h (view-position self))) 
+      (fill-rect* (1+ (point-h (view-position self)))
                   (1+ (point-v (view-position self)))
                   (- (w self) 2)
                   (- (h self) 2)))))
@@ -182,7 +182,7 @@
 (defun make-pop-up-menu-instance ()
   (setf *pw-pop-menu-window*
         (make-instance 'dialog
-            :window-type :document 
+            :window-type :document
             :view-position #@(426 42)
             :view-size #@(118 128)
             :close-box-p nil
@@ -196,8 +196,8 @@
                                     "Untitled"
                                     (lambda (item)
                                         (window-hide *pw-pop-menu-window*)
-                                        (call-pw-pop-up-function 
-                                         (cell-contents item 
+                                        (call-pw-pop-up-function
+                                         (cell-contents item
                                                         (car (selected-cells item)))))
                                     :view-font *patchwork-font-spec*
                                     :cell-size #@(200 12)
@@ -210,7 +210,7 @@
                                     "Cancel"
                                     (lambda (item) item (window-hide *pw-pop-menu-window*))
                                     :view-font *patchwork-font-spec*
-                                    :default-button nil))))) 
+                                    :default-button nil)))))
 
 
 (defun call-pw-pop-up-function (res-string)
