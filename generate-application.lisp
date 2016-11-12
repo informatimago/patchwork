@@ -34,26 +34,68 @@
 ;;;;**************************************************************************
 (in-package "COMMON-LISP-USER")
 
+(defun say (fmt &rest args)
+  (format t "~&;;; ~?~%" fmt args)
+  (finish-output))
+
+(defun local-file (name &optional type)
+  (make-pathname :name name
+                 :type type
+                 :version nil
+                 :defaults #.(or *compile-file-truename* *load-truename*)))
+
 ;;; --------------------------------------------------------------------
 ;;; Load quicklisp
-(format t "~%;;; Loading quicklisp.~%")
-(finish-output)
+(say "Loading quicklisp.")
 (load #P"~/quicklisp/setup.lisp")
 (setf quicklisp-client:*quickload-verbose* t)
+
+
+;;; --------------------------------------------------------------------
+;; Logical Hosts used at compilation time
+;; --------------------------------------
+;;
+;;   PATCHWORK
+;;
+;;     The logical host PATCHWORK should be set so that the .git/
+;;     subdirectory should be  at its root:
+;;
+;;         #+ccl (probe-file #P"PATCHWORK:.git;") --> true
+;;
+;;   MCLGUI
+;;
+;;   MIDI
+;;
+;; Logical Hosts used at run-time
+;; ------------------------------
+;;
+;; Those logical hosts are used by patchwork or its dependencies include:
+;;
+;;   PW-USER  -- See src/application.lisp  initialize-directories
+;;
+;;   CLENI
+
+(say "Defining logical hosts.")
+(load (local-file "loghosts"))
 
 ;;; --------------------------------------------------------------------
 ;;; Configure quicklisp.
 ;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
 #+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
-(push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
+(say "Configure quicklisp.")
+(push (translate-logical-pathname #P"SRC:INFORMATIMAGO;") ql:*local-project-directories*)
 
 ;;; --------------------------------------------------------------------
 ;;; Load builder stuff.
+(say "Load builder stuff from quicklisp.")
 (ql:quickload :cffi                                       :verbose t :explain t)
 (ql:quickload :com.informatimago.tools.pathname           :verbose t :explain t)
 (ql:quickload :com.informatimago.tools.manifest           :verbose t :explain t)
 (ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
-(load (merge-pathnames "builder.lisp" (or *load-pathname* #P"./")))
+
+(say "Load builder.")
+(load (local-file "builder"))
+
 (in-package "PATCHWORK.BUILDER")
 (load (translate-logical-pathname #P"PATCHWORK:PROPERTY-LIST-KEYS"))
 
@@ -121,8 +163,26 @@
       (make-logical-pathname-translations "" *release-directory*))
 
 (say "Generating manifest.")
-(let ((*default-pathname-defaults* *release-directory*))
-  (write-manifest *name-and-version* *program-system*))
+(let ((*default-pathname-defaults* *release-directory*)
+      (*print-circle* nil))
+  (let ((manifest-pathname (write-manifest *name-and-version* *program-system*))
+        (git-source-sandboxes '(#P"SRC:INFORMATIMAGO;"
+                                #P"SRC:PATCHWORK:MCLGUI;"
+                                #P"SRC:PATCHWORK:PATCHWORK;"))
+        (svn-source-sandboxes '())
+        (pwd (ccl:current-directory)))
+    (with-open-file (manifest manifest-pathname :direction :output
+                                                :if-exists :append
+                                                :if-does-not-exist :create)
+      (unwind-protect
+           (dolist (git-source-log git-source-sandboxes)
+             (let ((git-source (translate-logical-pathname git-source-log)))
+               (format manifest "~2%~A~%~V@{-~}~2%~A~2%"
+                       (namestring git-source-log) (length (namestring git-source-log))
+                       (namestring git-source))
+               (setf (ccl:current-directory) git-source)
+               (format manifest "~A~%" (com.informatimago.tools.manifest::shell-command-to-string "git-info"))))
+        (setf (ccl:current-directory) pwd)))))
 
 (say "Copying release notes.")
 (copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")

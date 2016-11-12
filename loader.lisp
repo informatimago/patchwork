@@ -73,9 +73,38 @@
 
 
 ;;; --------------------------------------------------------------------
+;; Logical Hosts used at compilation time
+;; --------------------------------------
+;;
+;;   PATCHWORK
+;;
+;;     The logical host PATCHWORK should be set so that the .git/
+;;     subdirectory should be  at its root:
+;;
+;;         #+ccl (probe-file #P"PATCHWORK:.git;") --> true
+;;
+;;   MCLGUI
+;;
+;;   MIDI
+;;
+;; Logical Hosts used at run-time
+;; ------------------------------
+;;
+;; Those logical hosts are used by patchwork or its dependencies include:
+;;
+;;   PW-USER  -- See src/application.lisp  initialize-directories
+;;
+;;   CLENI
+
+(say "Defining logical hosts.")
+(load (local-file "loghosts"))
+
+;;; --------------------------------------------------------------------
 ;;; Configure quicklisp.
 ;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
 #+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
+(say "Configure quicklisp.")
+(push (translate-logical-pathname #P"SRC:INFORMATIMAGO;") ql:*local-project-directories*)
 
 
 ;;; --------------------------------------------------------------------
