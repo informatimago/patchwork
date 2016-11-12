@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -173,7 +173,7 @@
         (open-patch-win Pname)
         (let ((name Pname)
               ;; #+ccl (ccl:*compile-definitions* nil)
-              )  
+              )
           (with-cursor *watch-cursor* 
             (load name :verbose t)
             (pw::PW-update-wins-menu name))))))
@@ -204,7 +204,7 @@
                                         (set-view-position theabs (make-point (first bposi) (second bposi) )))
                                       (put-appleevent-par reply #$keyDirectObject 
                                                           (mkSO :|cbox| nil :|name| (pw-function-string theabs)))))))
-      
+    
       ((equal eltipo :|cpat|) (progn (pw::make-new-pw-window t)
                                      (put-appleevent-par reply #$keyDirectObject 
                                                          (mkSO :|cpat| nil :|name| (win-title *active-patch-window*)))))
@@ -277,7 +277,7 @@
          (theinput (AEresolve thePara))
          (thedata (closae:getparam AE-clos-Ob :|data| )) theinbox theentre)
     (cond
-      ((listp theinput)  
+      ((listp theinput)
        (setf theentre (nth (first theinput)  (pw-controls (second theinput))))
        (setf theinbox (nth (first theinput)  (input-objects (second theinput))))
        (if (or (equal (class-name (class-of theentre)) 'C-ttybox-absout)
@@ -309,7 +309,7 @@
          (theinput (if (equal (closae:getclass thepara) :|prop|) (AEresolve (closae:getcontainer thepara)) 
                        (AEresolve thePara))))
     (cond 
-      ((equal (closae:getclass thepara) :|prop|)  
+      ((equal (closae:getclass thepara) :|prop|)
        (put-appleevent-par reply #$keyDirectObject (eval-ae (solucione theinput (closae:getdata thepara)))))
       ((or (equal (closae:getclass thepara) :|cpat|) (equal (closae:getclass thepara) :|cbox|))
        (put-appleevent-par reply #$keyDirectObject (closae:getdescrecptr (closae:asaedesc thepara))))
@@ -342,8 +342,8 @@
     ((equal clase :|ctim|) (if (equal (class-name (class-of nota)) 'pw::c-note)
                                (offset-time nota)
                                (t-time nota)))))
-       
-       
+     
+     
 
  
 ;;CONNECT
@@ -370,7 +370,7 @@
 
 
 
-  
+
 ;;MOVE
 
 (defmethod even-move ((a application) theAppleEvent reply handlerRefcon)
@@ -513,7 +513,7 @@
     (put-appleevent-par reply #$keyDirectObject (mkSO :|cbox| nil :|name| thename))))
 
 
-     
+   
 ;;LOCK
 (defmethod even-lock ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
@@ -572,15 +572,15 @@
     (enable-all-apps-menu-items)
     (menu-item-disable *apps-PW-menu-item*)
     (window-select  *active-patch-window*)))
-  
 
-  
+
+
 ;;DUPLICATE
 
 (defmethod even-dupli ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply theAppleEvent))
   (duplicate *active-patch-window*))
-  
+
 ;;DELETE
 
 (defmethod even-delete ((a application) theAppleEvent reply handlerRefcon)

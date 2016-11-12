@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    A typing scheme for PW.
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -122,7 +122,7 @@
                           (cons current-key element)
                           collection :test (lambda (x y) (string= (car x) (car y)))))))
     collection))
-  
+
 (defun valid-keyword-p (arg)
   (and (symbolp arg)
        (member arg *valid-defune-keywords* :test (lambda (x y) (string= x (car y))))))
@@ -252,7 +252,7 @@
   (make-type-object 'ch-box 'C-chord-box
                  (list  :view-size (make-point 38 120)
                         :type-list '(list midic chord))))
-    
+  
 (defvar *PW-all-basic-types*
   (make-type-set 
    (list *pw-integer-type* *pw-fix/float-type* *pw-midic-type* *pw-fx/fl/l-type*
@@ -402,7 +402,7 @@
     `(set-PW-symbolic-type-data ',name  ',(collect-keywords args) ',outtype))
 
 ;; (nconc (cassq 'function *define-type-alist*) (list "unp" "unt"))
-  
+
 (defgeneric set-PW-symbolic-type-data (me intypes outtype)
   (:documentation "the symbol stores information about its function")
   (:method ((me symbol) intypes outtype)
@@ -444,7 +444,7 @@
   (mapc (lambda (form) (check-io-type (if (not (consp (cadr form)))
                                           (cadr form) (caadr form)) :input fun))
         (cdr type-form)))
-  
+
 (defconstant *error-unknown-symbolic-pw-type* "unknown symbolic ~A type ~A for fun ~A")
 (defvar *keywords-for-extension* '(&optional &rest))
 
@@ -521,7 +521,7 @@
              (search-arg (cdr args) num)
              (if (eql (car args) var) num (search-arg (cdr args) (1+ num))))))
     (search-arg args 0)))
-  
+
 ;;=================================
 ;; the PW-box construction function
 ;;=================================

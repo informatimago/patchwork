@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,23 +15,23 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
+;;;;  
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
@@ -97,7 +97,7 @@
         (fill-rect* (x self) (y self) (w self) (h self))))))
 ;;================================================================
 
-(defclass C-selection-buttons-pool ()  
+(defclass C-selection-buttons-pool ()
   ((buttons-pool :initform () :initarg :buttons-pool :accessor buttons-pool)
    (free-beat-selection-buttons :initform () :accessor free-beat-selection-buttons)))
 
@@ -107,7 +107,7 @@
    (repeat 50 (push (make-instance 'C-beat-selection-button) ctrls))
    (setf (buttons-pool self) ctrls)
    (init-beat-selection-buttons-pool self))) 
-             
+           
 (defgeneric init-beat-selection-buttons-pool (self)
   (:method ((self C-selection-buttons-pool))
     (setf (free-beat-selection-buttons self)(copy-list (buttons-pool self)))))
@@ -124,7 +124,7 @@
                 (pop (free-beat-selection-buttons self))
                 (progn (setq ctrl (make-instance 'C-beat-selection-button))
                        (push ctrl (buttons-pool self))
-                       ctrl)))    
+                       ctrl)))  
       (set-view-position ctrl x y)
       (set-view-size ctrl w h)
       (when win (setf (rtm-view-obj ctrl) win)) 

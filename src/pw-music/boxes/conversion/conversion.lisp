@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    PW-Music Conversion boxes
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -241,7 +241,7 @@ program has a strange way of expressing downward intervals:
          (pclass (coerce (butlast int-str (length rest-oct)) 'string)))
     (* 100  (+ (position pclass *ascii-intervals* :test #'string=)
                (* 12 (if neg-oct (- oct) oct))))))
-    
+  
 (defunp symb->int ((ints fixs)) list
   "<symb->int> takes a symbolic interval name  , and returns an interval 
 expressed in midi-cents. Intervals are labeled as follows:
@@ -255,7 +255,7 @@ expressed in midi-cents. Intervals are labeled as follows:
 
 All intervals larger than an octave are expressed by adding or subtracting an 
 octave displacement after the simple interval name;
- for example, a major tenth becomes 3M+1, etc.  Note: for the time being,  
+ for example, a major tenth becomes 3M+1, etc.  Note: for the time being,
 Patchwork has a strange way of expressing downward intervals:  it labels the 
 interval as its inversion, and then transposes downwards as necessary. Thus, a 
 major third down 6m-1, returns -400 in midicents ."
@@ -267,7 +267,7 @@ major third down 6m-1, returns -400 in midicents ."
   "mc->n takes a midi-cent value <midics> or list of midi-cent values,
  and returns corresponding symbolic (ASCII) note names. 
  Symbolic note names follow standard notation with middle c 
-\(midi-cent 6000) being C3.  Semitones are labeled with a '#' or a 'b.'  
+\(midi-cent 6000) being C3.  Semitones are labeled with a '#' or a 'b.'
 Quartertone flats are labeled with a '_', and quartertone sharps with a '+'.  Thus, 
 C3 a quartertone sharp (midi-cent 6050), would be labeled 'C+3'.  Gradations 
 smaller than a quartertone are expressed as the closest  quartertone + or - the 
@@ -283,7 +283,7 @@ remaining cent value (i.e., midi-cent 8176 would be expressed as Bb4-24)."
   Semi-tones are labeled with a '#' or 'b.'  Quartertone flats are
  labeled with a '_', and quartertone sharps with a '+'.  Thus, C3 a
  quartertone sharp (midi-cent 6050), would be labeled 'C+3'.  Gradations
- smaller than a quartertone are expressed as the closest quartertone + or - the  
+ smaller than a quartertone are expressed as the closest quartertone + or - the
 remaining cent value (i.e., mid-cent 8176 would be expressed as Bb4-24)."
   (deep-mapcar 'n->mc 'n->mc1 strs))
 

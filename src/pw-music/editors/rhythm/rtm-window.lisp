@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -40,7 +40,7 @@
 (defmethod decompile ((self C-rtm-editor-window))
   `(let ((rtm-win (make-instance 'C-rtm-editor-window  :window-show nil :close-box-p nil
                     :window-title ,(window-title self) 
-                    :view-position ,(view-position self) :view-size ,(view-size self))))  
+                    :view-position ,(view-position self) :view-size ,(view-size self))))
        (add-subviews rtm-win ,(decompile (editor-collection-object self)))
        rtm-win))
  
@@ -173,7 +173,7 @@
            (record-rtm-chords-from-midi (give-rtm-range-chords (editor-collection-object self) nil))
            (erase+view-draw-contents (current-rtm-editor (editor-collection-object self)))))
     (#\k (read-from-midi)) 
-    (#\K  
+    (#\K
      (tell (ask-all (beat-editors (editor-collection-object self)) 'measure-line) 'kill-all-measures)
      (erase+view-draw-contents self))
     ((:Backspace) 
@@ -198,7 +198,7 @@
                 (check-box-uncheck  e-ctrl) (check-box-check  e-ctrl))
             (set-edit-mode (editor-collection-object self) e-ctrl)))
     (t (ui:ed-beep))))
-  
+
 ;;=================
 
 (defmethod view-activate-event-handler :after ((self C-rtm-editor-window))

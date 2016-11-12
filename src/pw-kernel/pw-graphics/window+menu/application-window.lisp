@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,25 +16,25 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
 
-(defclass  C-application-window (window)  
+(defclass  C-application-window (window)
   ((pw-win :initform nil :accessor pw-win)
    (pw-object :initform nil :accessor pw-object)))
 
@@ -53,9 +53,9 @@
                #+(and has-return (not newline-is-return)) #\Return
                #+(and has-linefeed (not newline-is-linefeed)) #\Linefeed)
      (when (pw-win self)
-       (window-hide self)           
+       (window-hide self)         
        (window-select (pw-win self))))
-    ((:Enter #\Etx)  
+    ((:Enter #\Etx)
      (when (pw-win self)
        (window-select (pw-win self))))
     ((#\R)

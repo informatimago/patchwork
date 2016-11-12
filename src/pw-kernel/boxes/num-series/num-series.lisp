@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    Numeric series functions
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda, Gérard Assayag.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -84,7 +84,7 @@ returns
                        &optional(begin fix/float)(end (fix/float (:value most-positive-fixnum))))
     list
     " The geometric-ser module returns a  geometric series ;of numbers in which 
-the first element is seed  and the multiplicative coefficient is factor. The limit  
+the first element is seed  and the multiplicative coefficient is factor. The limit
 parameter is the limit of this list.  It is also possible to specify two parameters 
 begin and end which delimit the calculation of the series. For example: 
 
@@ -104,9 +104,9 @@ one obtains:
 
 (defunp sinus ((phase fix/float) (nb-osc fix/float (:value 1))
                (nb-samples fix/float (:value 8)) (amp numbers? (:value 1))) list
-    "parameters: phase = where we start on the sine curve (xmin)  
+    "parameters: phase = where we start on the sine curve (xmin)
 nb-osc = number of oscillations needed (-> determines xmax)
-nb-samples = how many steps on the fragment of curve thus defined  
+nb-samples = how many steps on the fragment of curve thus defined
 amplitude (ambitus normal -1 / 1)"
   (let* ((xmin (* phase (/ pi 180))) (xmax (+ xmin (* 2 pi nb-osc)))
          (step (/ (- xmax xmin) (1- nb-samples))))

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -89,19 +89,19 @@ Label is used for browsing inside the MN-editor.
 ;;_________________
 
 (defparameter *bpf-lib-midi-ins-pw-type*
-  (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf  
+  (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf
     :view-size (make-point 36 14)
     :menu-box-list ,*pw-BPF-library* :type-list '(bpf))))
 
 (defparameter *midi-collection-label-pw-type*
   (make-instance 'C-pw-type
           :control-form
-           `(make-instance 'C-ttybox-str  
+           `(make-instance 'C-ttybox-str
               :view-size (make-point 36 14) 
               :dialog-item-text "label" :type-list '(no-connection))))
 
 (defparameter *bpf-lib-midi-status-pw-type*
-  (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-val  
+  (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-val
     :view-size (make-point 36 14)
     :menu-box-list '(("paftr" . #xA0) ("contr". #xB0) ("prog" . #xC0) ("maftr" . #xD0) ("ptchb" . #xE0)) 
     :type-list '(fixnum))))
@@ -118,7 +118,7 @@ Label is used for browsing inside the MN-editor.
 
 (defmethod patch-value ((self C-patch-midi-ins) obj)
   (when (not (eql (nth 1 (input-objects self)) (nth 1 (pw-controls self))))
-    (make-instance 'C-midi-ins-collection  
+    (make-instance 'C-midi-ins-collection
         :ins-name (dialog-item-text (car (pw-controls self)))
         :ins-objects (ask-all (nth 1 (input-objects self)) 'patch-value obj))))
 
@@ -142,7 +142,7 @@ Label is used for browsing inside the MN-editor.
 (defvar midi-ins ()
 "A PW-box that should allways to be connected with an
 midi-box (m-ins input). 
-The first input is used to give the midi-instrument a name.  
+The first input is used to give the midi-instrument a name.
 The second input can accept any collection of midi-fix and 
 midi-bpf boxes - so this box acts as collector for 
 midi-instrument information.
@@ -152,13 +152,13 @@ midi-instrument information.
 (defparameter *midi-ins-label-pw-type*
   (make-instance 'C-pw-type
           :control-form
-           `(make-instance 'C-ttybox-str  
+           `(make-instance 'C-ttybox-str
                :view-size (make-point  36 14) 
                :dialog-item-text "flute" :type-list '(no-connection))))
 (defparameter *midi-ins-nargs-pw-type*
   (make-instance 'C-pw-type
           :control-form
-           `(make-instance 'C-ttybox  
+           `(make-instance 'C-ttybox
               :view-size (make-point 36 14) 
               :dialog-item-text "nargs" :type-list '(midi-fix midi-bpf))))
 

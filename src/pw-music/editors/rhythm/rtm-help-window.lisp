@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -71,7 +71,7 @@
     ->        next page
     <-        previous page
     p         play selected measure in all selected staffs
-    P         play only selected measure  
+    P         play only selected measure
 
     e         toggle edit-mode on/off
     a         add measure/beat after selected measure-line/measure/beat
@@ -90,8 +90,8 @@
 
     to select (in edit mode) measure-line/measure/beat/chord click inside a gray rectangle
     to select a range shift-click 
-      (in range selection only the first and the last items are black)  
-      (range selection is used by the edit selection menu-items)  
+      (in range selection only the first and the last items are black)
+      (range selection is used by the edit selection menu-items)
     to open the rhythm-editor-dialog double-click inside a gray rectangle
     to open a chord-editor you have to double-click inside a leaf and the 
     chord-check-box should be selected

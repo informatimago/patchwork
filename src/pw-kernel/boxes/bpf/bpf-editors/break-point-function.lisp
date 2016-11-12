@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -53,7 +53,7 @@
   (declare (ignore points))
   (setf (x-points self) (mapcar #'point-h (break-point-list self)))
   (setf (y-points self) (mapcar #'point-v (break-point-list self))))
-  
+
 (defmethod decompile ((self C-break-point-function))
   `(make-instance 'C-break-point-function :break-point-list ',(copy-list (break-point-list self))))
 
@@ -200,11 +200,11 @@
 
 (defgeneric remove-point-from-bpf (self point)
   (:method ((self C-break-point-function) point)
-    (set-break-point-function self (remove point (break-point-list self) :test #'eql))))        
+    (set-break-point-function self (remove point (break-point-list self) :test #'eql))))      
 
 (defgeneric kill-all-except-first (self)
   (:method ((self C-break-point-function))
-    (set-break-point-function self (list (car (break-point-list self))))))      
+    (set-break-point-function self (list (car (break-point-list self))))))    
 
 ;;point has to be included in (break-point-list self)
 
@@ -217,8 +217,8 @@
             (setq x2 (second (break-point-list self)))
             (setq x1 (nth (1- count) (break-point-list self))
                   x2 (nth (1+ count) (break-point-list self)))))
-      (setq x1 (if x1 (point-h x1) -32000))  
-      (setq x2 (if x2 (point-h x2) 32000))  
+      (setq x1 (if x1 (point-h x1) -32000))
+      (setq x2 (if x2 (point-h x2) 32000))
       (list x1 x2)))) 
 
 (defgeneric give-points-in-time-range (self x1 x2)

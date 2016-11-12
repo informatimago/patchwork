@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    PW rythmic input.
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Camilo Rueda
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 1992
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,7 +36,7 @@
 
 (defvar *valid-rtm-expands* '(#\/))
 
-(defun expand-lists (lists)  
+(defun expand-lists (lists)
   (and lists
        (let ((lists (expand-lst lists))  result)
          (while lists
@@ -105,7 +105,7 @@ and eight 32ths notes (in a beat).
 module can be locked (to avoid new evaluations of the patch that is under 
 'chord') to keep its contents by clicking on the small ‘o’ in the lower right of the 
 module. The ‘o’ indicates that the module is open. An editor for the <score-
-voice> object is entered either by selecting the module and typing the letter 'o',  
+voice> object is entered either by selecting the module and typing the letter 'o',
 or by double-clicking on the module's name. Click 'h' with the rhythm-notation-
 editor opened for more information."
   (declare (ignore signs beats chords objs tempi)))
@@ -309,7 +309,7 @@ editor opened for more information."
               (lambda (beats-in-meas) 
                 (mapcar (lambda (beat) 
                           (let ((form (decompile beat)))
-                            (list (second form) (eval (third form)))))                                   
+                            (list (second form) (eval (third form)))))                                 
                         beats-in-meas))
               (get-all-slots (get-all-slots m-line 'measures) 'beat-objects))))
           measure-lines))

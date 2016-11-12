@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    Mikael Laurson
@@ -18,19 +18,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -55,7 +55,7 @@ When <fexpr> begins with something like (f(x)= ...), the formal arguments are
 taken from the given list, otherwise they are deduced from the body of <fexpr> 
 and collected in the order they appear in it. Local variables are automatically 
 handled. The resulting function is compiled when the value of *compile-num-
-lambda* is T (default). <make-num-fun> has two different possible syntaxes.  
+lambda* is T (default). <make-num-fun> has two different possible syntaxes.
 One being the standard Lisp syntax, i.e., (f(x) = (- (* x x) x))); the other being 
 format like the C language, i.e., (f(x)= (x * x) - x). Note that the only difference 
 between this notation and standard C notation is that spaces  must be put 
@@ -118,7 +118,7 @@ figures out which variables are involved."
     (set (if (null sym) 'fline sym)
          ;;(compile ()
          (eval `(function
-                 (lambda (x) (+ ,b (* x ,a)))) ))                      
+                 (lambda (x) (+ ,b (* x ,a)))) ))                    
     ))
 
 (defvar *weird-symb* nil)
@@ -129,7 +129,7 @@ figures out which variables are involved."
                                            :type-list (no-connection)))
                     ) ()
     "Calculate the parameters of the equation y = a x + b as a function 
-of the two points (x0,y0) (x1,y1). The optional parameter print  
+of the two points (x0,y0) (x1,y1). The optional parameter print
 lets one print the function. "
   (linear x0 y0 x1 y1 (if (= print 1) '*weird-symb* nil)))
 
@@ -146,7 +146,7 @@ lets one print the function. "
         (set  (if (null sym) 'fpuiss2 sym) 
               ;;(compile ()
               (eval `(function
-                      (lambda (x) (* ,a (expt x ,b)))) ))                      
+                      (lambda (x) (* ,a (expt x ,b)))) ))                    
         )))
 
 ;;Taken from (c) Copyright Gerald Roylance 1982
@@ -190,7 +190,7 @@ Si sym = nil, la fct n'est pas affichée dans le listener"
           (do ((bmin bmin-min (+ bmin incr))) 
               ((>= bmin bmax) (and res (apply 'max res)))
             (setq power
-                  (false-position-search  
+                  (false-position-search
                    (lambda (b) #i(y/y * (x1 ** b - x0 ** b) - (x2 ** b - x1 ** b)))
                    bmin bmax 0.001))
             (if power (push power res))))
@@ -204,7 +204,7 @@ Si sym = nil, la fct n'est pas affichée dans le listener"
     (set  (if (null sym) 'fpuiss3 sym)
           ;;(compile ()
           (eval `(function
-                  (lambda (x) (+ ,c (* ,a (expt x ,b)))) ) ))                   
+                  (lambda (x) (+ ,c (* ,a (expt x ,b)))) ) ))                 
     ))
 
 
@@ -215,7 +215,7 @@ Si sym = nil, la fct n'est pas affichée dans le listener"
                    (y2 float (:value 9))
                    (print menu (:menu-box-list (("yes" . 1) ("no". 2))
                                 :type-list (no-connection)))) ()
-    "Calculate the parameters of the equation y = a xb + c  or y = a xb   
+    "Calculate the parameters of the equation y = a xb + c  or y = a xb 
 as a function of the points (x0,y0)  (x1,y1) and (optional) (x2,y2) 
 and create the corresponding function, either y = axb 
 \(for two pairs of points) or  y = a xb + c   (for three pairs of points).  "
@@ -228,7 +228,7 @@ and create the corresponding function, either y = axb
 ;;                    &optional
 ;;                    (x2 list (:value '() :type-list (float fixnum)))
 ;;                    (y2 float (:value 9))) ()
-;;     "Calculate the parameters of the equation y = a xb + c  or y = a xb   
+;;     "Calculate the parameters of the equation y = a xb + c  or y = a xb 
 ;; as a function of the points (x0,y0)  (x1,y1) and (optional) (x2,y2) 
 ;; and create the corresponding function, either y = axb 
 ;; (for two pairs of points) or  y = a xb + c   (for three pairs of points).  "
@@ -242,14 +242,14 @@ and create the corresponding function, either y = axb
                     (sym list (:value "fparab2")) ) ()
     "calcule les paramètres de l'équation  y = ax^2 + b  en fct de deux points 
 \(x0,y0) (x1,y1)"
-  
+
   (let* ((a #i((y1 - y0) / (x1 * x1 - x0 * x0)))
          (b #i(y0 - a * x0 * x0)))
     (if (not (eql sym ())) (format t "y = ~S x 2 + ~S ~%"  (lldecimals a 6) (lldecimals b 6)))
     (set (if (null sym) 'fparab2 sym) 
          ;;(compile ()
          (eval `(function
-                 (lambda (x) (+  (* ,a x x ) ,b )))))                      
+                 (lambda (x) (+  (* ,a x x ) ,b )))))                    
     ))
 
 ;; (defunp parabole/2 ((x0 float) (y0 float)
@@ -272,7 +272,7 @@ and create the corresponding function, either y = axb
                     (sym list (:value "fparab3")) ) ()
     "calcule les paramètres de l'équation  y = ax^2 + bx + c en fct de trois points 
 \(x0,y0) (x1,y1) (x2,y2) ."
-  
+
   (let* ((a #i((y0 * (x1 - x2) + y1 * (x2 - x0) + y2 * (x0 - x1))
                /(x0 * x0 * (x1 - x2) + x1 * x1 * (x2 - x0) + x2 * x2 * (x0 - x1))))
          (b #i((y1 - y2 + a * (x2 * x2 - x1 * x1)) / (x1 - x2)))

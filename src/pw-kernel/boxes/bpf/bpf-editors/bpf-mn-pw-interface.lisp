@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -52,8 +52,8 @@
              (if (not times)
                last-value
                (interpol5 time last-time (car times) last-value (car values))))
-          (if (not float-fl) (round res) res)))))   
-    
+          (if (not float-fl) (round res) res))))) 
+  
 (defun bpf-out-osc (bpf time points)
   (bpf-out bpf (+ (mod time (- (car (last points)) (car points)))
                   (car points)) points))
@@ -79,9 +79,9 @@
      (cond ((and (numberp tlist)(numberp vlist))
               (setq tlist (list tlist) vlist (list vlist))) 
            ((numberp tlist)
-              (setq tlist (cumul-diff-lst-sum-from-0 (make-list (1- (length vlist)) :initial-element tlist))))   
+              (setq tlist (cumul-diff-lst-sum-from-0 (make-list (1- (length vlist)) :initial-element tlist)))) 
            ((numberp vlist)
-              (setq vlist (make-list (length tlist) :initial-element vlist))))   
+              (setq vlist (make-list (length tlist) :initial-element vlist)))) 
      (while (and vlist tlist)
        (push (make-point (pop tlist) (pop vlist)) points))
      (make-instance 'C-break-point-function 
@@ -92,9 +92,9 @@
      (cond ((and (numberp tlist)(numberp vlist))
               (setq tlist (list tlist) vlist (list vlist))) 
            ((numberp tlist)
-              (setq tlist (cumul-diff-lst-sum-from-0 (make-list (1- (length vlist)) :initial-element tlist))))   
+              (setq tlist (cumul-diff-lst-sum-from-0 (make-list (1- (length vlist)) :initial-element tlist)))) 
            ((numberp vlist)
-              (setq vlist (make-list (length tlist) :initial-element vlist))))   
+              (setq vlist (make-list (length tlist) :initial-element vlist)))) 
      (while (and vlist tlist)
        (setq t-point (min #.(1- (expt 2 15)) (pop tlist))
              v-point (min #.(1- (expt 2 15)) (pop vlist)))

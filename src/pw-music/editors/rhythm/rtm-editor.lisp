@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,23 +15,23 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
+;;;;  
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
@@ -40,14 +40,14 @@
 
 (defclass C-beat-editor-panel (ui:view) 
   ((measure-line :initform () :initarg :measure-line :accessor measure-line)
-   (first-beat-num :initform 0 :initarg :first-beat-num :accessor first-beat-num)  
-   (edit-mode :initform () :initarg :edit-mode :accessor edit-mode)  
-   (staff-number :initform 3  :initarg :staff-number :accessor staff-number)  
-   (C-5-y-pixel :initform 50  :initarg :C-5-y-pixel :accessor C-5-y-pixel)  
-   (rtm-y-pixel :initform 20  :initarg :rtm-y-pixel :accessor rtm-y-pixel)  
-   (selection-buttons :initform ()  :accessor selection-buttons)  
-   (selection-button :initform ()  :accessor selection-button)  
-   (beat-zoom :initform 1 :initarg :beat-zoom :accessor beat-zoom)))  
+   (first-beat-num :initform 0 :initarg :first-beat-num :accessor first-beat-num)
+   (edit-mode :initform () :initarg :edit-mode :accessor edit-mode)
+   (staff-number :initform 3  :initarg :staff-number :accessor staff-number)
+   (C-5-y-pixel :initform 50  :initarg :C-5-y-pixel :accessor C-5-y-pixel)
+   (rtm-y-pixel :initform 20  :initarg :rtm-y-pixel :accessor rtm-y-pixel)
+   (selection-buttons :initform ()  :accessor selection-buttons)
+   (selection-button :initform ()  :accessor selection-button)
+   (beat-zoom :initform 1 :initarg :beat-zoom :accessor beat-zoom)))
 
 (defmethod initialize-instance :after ((self C-beat-editor-panel) &key args)
   (declare (ignore args))
@@ -62,8 +62,8 @@
 (defmethod decompile ((self C-beat-editor-panel))
   `(make-instance 'C-beat-editor-panel
         :view-position ,(view-position self) :view-size ,(view-size self) 
-        :staff-number ,(staff-number self) :C-5-y-pixel ,(C-5-y-pixel self)  
-        :rtm-y-pixel ,(rtm-y-pixel self)  
+        :staff-number ,(staff-number self) :C-5-y-pixel ,(C-5-y-pixel self)
+        :rtm-y-pixel ,(rtm-y-pixel self)
         :beat-zoom ,(beat-zoom self)
         :measure-line ,(decompile (measure-line self))))
 
@@ -73,8 +73,8 @@
 
 (defmethod put-window-state ((self C-beat-editor-panel) win state)
   (declare (ignore win))
-  (set-view-position self (first state))  
-  (set-view-size self (second state))  
+  (set-view-position self (first state))
+  (set-view-size self (second state))
   (setf (staff-number self) (third state))
   (setf (C-5-y-pixel self) (fourth state))
   (setf (rtm-y-pixel self) (fifth state))
@@ -105,7 +105,7 @@
   (view-draw-contents self))
 
 (defmethod view-draw-contents ((self C-beat-editor-panel))
-  (let* ((draw-info (ask-all (rtm-radio-ctrls (view-container self)) 'check-box-checked-p))  
+  (let* ((draw-info (ask-all (rtm-radio-ctrls (view-container self)) 'check-box-checked-p))
          (*mn-view-dyn-flag* (first draw-info))
          (*mn-view-dur-flag* (second draw-info))
          (*mn-view-offset-flag* (third draw-info))
@@ -131,8 +131,8 @@
             (- (x self) 15) (if monof? (+ (* i staff-incr) (give-C5-value-staff-count  self staff-count)) (give-C5-value self))) 
         (when (or measures first-time?)
           (setq measures
-                (draw-measures- (measure-line self) self  
-                                (if monof? (+ (* i staff-incr) (give-C5-value-staff-count  self staff-count)) (give-C5-value self))  
+                (draw-measures- (measure-line self) self
+                                (if monof? (+ (* i staff-incr) (give-C5-value-staff-count  self staff-count)) (give-C5-value self))
                                 (beat-zoom self)(first-beat-num self) 
                                 28 (w self) 
                                 (+ (* i staff-incr) 37) (+ (* i staff-incr) (- 57 (rtm-y-pixel self))) t measures))
@@ -209,7 +209,7 @@
       (setf (rtm-selection-2 (view-container editor)) ()) ;;;;
       (when butt1 (with-focused-view editor (fill-xor-view-contents** butt1)))
       (when butt2 (with-focused-view editor (fill-xor-view-contents** butt2)))))))
-  
+
 
 (defun get-every-nth-item-of-list (lst count low high)
   (cond ((= count 1) (list low))
@@ -225,14 +225,14 @@
 ;;(break-point-fun 5  '(0 100) '(78 67)) 
 ;;===================================
 (defgeneric open-measure-line-editor (self ctrl)
-  (:method ((self C-measure-line) ctrl)  
+  (:method ((self C-measure-line) ctrl)
     (declare (ignore ctrl))))
 
 (defmethod paste-beat ((self C-measure-line))
   (when (current-rtm-editor (editor-collection-object *active-rtm-window*))
     (paste-beat (current-rtm-editor (editor-collection-object *active-rtm-window*))))) 
 
-(defmethod paste-beat ((self C-beat-editor-panel))  
+(defmethod paste-beat ((self C-beat-editor-panel))
  (when *measure-line-selection-scrap*
    (setf (measures (measure-line self)) (measures (eval *measure-line-selection-scrap*)))))
 
@@ -240,10 +240,10 @@
 
 (defclass C-beat-editor-collection (ui:view) 
   ((beat-editors :initform () :initarg :beat-editors :accessor beat-editors)
-   (first-staff-num :initform 0 :initarg :first-staff-num :accessor first-staff-num)  
-   (visible-staffs-count :initform 1 :initarg :visible-staffs-count :accessor visible-staffs-count)  
-   (visible-staffs-count-ctrl :initform () :initarg :visible-staffs-count-ctrl :accessor visible-staffs-count-ctrl)  
-   (first-staff-num-ctrl :initform () :initarg :first-staff-num-ctrl :accessor first-staff-num-ctrl)  
+   (first-staff-num :initform 0 :initarg :first-staff-num :accessor first-staff-num)
+   (visible-staffs-count :initform 1 :initarg :visible-staffs-count :accessor visible-staffs-count)
+   (visible-staffs-count-ctrl :initform () :initarg :visible-staffs-count-ctrl :accessor visible-staffs-count-ctrl)
+   (first-staff-num-ctrl :initform () :initarg :first-staff-num-ctrl :accessor first-staff-num-ctrl)
    (beat-zoom-ctrl :initform ()  :accessor beat-zoom-ctrl)
    (beat-zoom-ctrl-value :initform 100  :initarg :beat-zoom-ctrl-value :accessor beat-zoom-ctrl-value)
    (beat-edit-ctrl :initform ()  :accessor beat-edit-ctrl)
@@ -262,8 +262,8 @@
 
 (defmethod decompile ((self C-beat-editor-collection))
   `(make-instance 'C-beat-editor-collection
-        :view-position ,(view-position self) :view-size ,(view-size self)  
-        :first-staff-num ,(first-staff-num self) :visible-staffs-count ,(visible-staffs-count self)  
+        :view-position ,(view-position self) :view-size ,(view-size self)
+        :first-staff-num ,(first-staff-num self) :visible-staffs-count ,(visible-staffs-count self)
         :beat-zoom-ctrl-value ,(value (beat-zoom-ctrl self))
         :beat-editors (list ,@(ask-all (beat-editors self) 'decompile))))
 
@@ -273,8 +273,8 @@
 
 (defmethod put-window-state ((self C-beat-editor-collection) win state)
   (declare (ignore win))
-  (set-view-position self (first state))  
-  (set-view-size self (second state))  
+  (set-view-position self (first state))
+  (set-view-size self (second state))
   (setf (first-staff-num self) (third state))
   (set-numbox-item-text  (first-staff-num-ctrl self) (1+ (third state)))
   (setf (value (first-staff-num-ctrl self)) (1+ (third state)))
@@ -297,7 +297,7 @@
           (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
-                                'play-measure-line (get-play-speed self))))))       
+                                'play-measure-line (get-play-speed self))))))     
       (play-sequence (make-instance 'C-chord-line 
                        :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line))))) 
                      (cond ((eql *current-approx-scale* *1/4-tone-chromatic-scale*) 4)
@@ -316,7 +316,7 @@
           (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
-                                'play-measure-line (get-play-speed self))))))       
+                                'play-measure-line (get-play-speed self))))))     
       (let ((c-line (make-instance 'C-chord-line 
                        :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
@@ -339,7 +339,7 @@
           (apdfuncall 100 (priority) 15
                       (lambda ()
                           (tell (ask-all editors 'measure-line)
-                                'play-measure-line (get-play-speed self))))))       
+                                'play-measure-line (get-play-speed self))))))     
       (let ((c-line (make-instance 'C-chord-line 
                        :chords (remove nil (epw::flat (rtm-chords (ask-all editors 'measure-line)))))))
         (if *mn-view-offset-flag*
@@ -510,7 +510,7 @@
     ; GA 12/4/94 causes crash ?
     ;(setf *current-MN-window* (view-container self)) ???
     (with-focused-view self
-      (tell (set-difference (subviews self) (beat-editors self)) 'view-draw-contents)  
+      (tell (set-difference (subviews self) (beat-editors self)) 'view-draw-contents)
       (while beat-editors
          (when (< (+ (y (car beat-editors)) (h (car beat-editors))) (h self))
               (erase+view-draw-contents (car beat-editors)))
@@ -551,7 +551,7 @@
 ;;============================
 
 (defgeneric give-rtm-range-chords (self chord-fl)
-  (:method ((self C-beat-editor-collection) chord-fl)      
+  (:method ((self C-beat-editor-collection) chord-fl)    
     (when (and (rtm-selection-1 self) (current-rtm-editor self))
       (setf *beat-leaf-objs* ())
       (let (pos1 pos2 measures beats res beats1 beats2)
@@ -589,7 +589,7 @@
                (setq res (subseq beats (min pos1 pos2)(1+ (max pos1 pos2))))))
         (if chord-fl (ask-all res #'beat-chord) res)))))
 #|
-(defmethod give-rtm-range-chords ((self C-beat-editor-collection) chord-fl)      
+(defmethod give-rtm-range-chords ((self C-beat-editor-collection) chord-fl)    
   (when (and (rtm-selection-1 self) (current-rtm-editor self))
     (setf *beat-leaf-objs* ())
     (let (pos1 pos2 measures beats res)

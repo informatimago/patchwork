@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    PW-list-functions 
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    contributions by Tristan Murail
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -238,7 +238,7 @@ the second input is open by clicking on 'E'). <test> must be commutative. For
 example, the list (this this is my list list) returns (this is my list). Note that the last 
 occurrence of a repeated element in a list is preserved;  thus, the list: (1 2 3 1 
 4) returns  (2 3 1 4). Returns a copy of <lst>."
-  
+
   (unless test (setq test #'eq))
   (cond
     ((not (consp lst)) lst)
@@ -264,7 +264,7 @@ choice of order. If <test> is '>' the order is ascending, '<' indicates descendi
 and '=' keeps the order the same. One can also open a third input <key> for a 
 function. The function <key> evaluates each element of the list <lst> and the 
 result is then sorted according to the parameter <test>.
-\(epw::sort-list ‘(3 13 15 17 9 10 16 3 6 7 1 12 6))will return  
+\(epw::sort-list ‘(3 13 15 17 9 10 16 3 6 7 1 12 6))will return
  ? PW->(1 3 3 6 6 7 9 10 12 13 15 16 17),
 
 \(epw::sort-list ‘(3 13 15 17 9 10 16 3 6 7 1 12 6)  ‘>)
@@ -316,7 +316,7 @@ function <funct> ( < by default)"
                  &optional (test symbol (:value 'equal :type-list ()))
                  (key (symbol (:value 'identity)))
                  &rest (list list (:type-list ()))) list
-    "This box merges 2  lists, <l1?> and <l2?>,  
+    "This box merges 2  lists, <l1?> and <l2?>,
 into a single list, with no repetitions. 
 If the optional <test> argument is added, it is used as a predicate to
 detect equality between elements and and avoid repetition. Default value for <test> is the 
@@ -336,7 +336,7 @@ detect equality between elements. Default value for <test> is the
 function 'equal. If the optional <key> argument is added, it is used as
 an accessor (e.g. first, second etc.) into the elements of the lists,
 prior to executing the <test> function.
-Additional lists  can be compared by extending the box.   
+Additional lists  can be compared by extending the box. 
 Beware that this operation is not commutative. For example:
 \(epw::x-intersect  '(1 2 4 5 4) '( 2 4)) will return -> (2 4 4)
 \(epw::x-intersect  '( 2 4)  (1 2 4 5 4)) will return -> (2 4 )
@@ -473,7 +473,7 @@ element in list falling inside one of these intervals (of <val>) is selected. If
 <delete>  is zero, elements in <list>  not falling 
 inside one of those intervals is selected. Intervals are defined by values inside 
 list.
-For example, if <list> is  (2 4 6 8 10 12 14 16 18 20) and <val> is ((1 2 3) (7  9)),  
+For example, if <list> is  (2 4 6 8 10 12 14 16 18 20) and <val> is ((1 2 3) (7  9)),
 <band-filter> returns (2 8), (the default is one). On the other hand (if the third 
 input is open), if <list> is  (2 4 6 8 10 12 14 16 18 20),  <val> is ((1 2 3) (7  9)) 
 and <pass?> is 0 (zero), <band-filter> returns (4 6 10 12 14 16 18 20). The 
@@ -544,7 +544,7 @@ containing elements modulo <ncol> according to their position in the list."
   (list-part list ncol))
 
 ;; (defunp list-explode ((list list) (nlists fix>0 (:value 2))) list 
-;;     "list-explode  divides a list into <nlist> sublists of consecutives elements.  
+;;     "list-explode  divides a list into <nlist> sublists of consecutives elements.
 ;; For example, if list is (1 2 3 4 5 6 7 8 9), and ncol is 2, the result will be: ((1 2 3 4 5) (6 7 8 9)),
 ;; if list is (1 2 3 4 5 6 7 8 9), and ncol is 5, the result will be: ((1 2) (3 4) (5 6) (7 8) (9)).
 ;; If the number of divisions exceeds the number of elements in the list,
@@ -559,7 +559,7 @@ containing elements modulo <ncol> according to their position in the list."
 
 ;;high feverish and ugly... Minimizes number of sublists of different lengths [Camilo]
 (defunp list-explode ((list list) (nlists fix>0 (:value 2))) list 
-    "list-explode divides a list into <nlist> sublists of consecutives elements.  
+    "list-explode divides a list into <nlist> sublists of consecutives elements.
 For example, if list is (1 2 3 4 5 6 7 8 9), and ncol is 2, the result is ((1 2 3 4 5) 
 \(6 7 8 9)),
 if list is (1 2 3 4 5 6 7 8 9), and ncol is 5, the result is: ((1 2) (3 4) (5 6) (7 8) (9)). 
@@ -659,7 +659,7 @@ element,
 \(<nth> = 0 means the first element of <list>,  <nth> = 1 means the second 
 element of <list>, and so on)
 For example, if <list> is  (1 2 3 4 5 6 7 8 9 10)   <permut-circ> returns (2 3 4 5 6 
-7 8 9 10 1), (the default is one). On the other hand (if the second input is open,  
+7 8 9 10 1), (the default is one). On the other hand (if the second input is open,
 <nth> ),
 if <list> is  (1 2 3 4 5 6 7 8 9 10),   and <nth> is 3 (zero) ,  <permut-circ> returns 
 \(4 5 6 7 8 9 10 1 2 3).."

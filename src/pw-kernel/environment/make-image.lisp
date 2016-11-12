@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -56,7 +56,7 @@
               ((not (numberp pref-size))
                (message-dialog "Preferred size must be a number"))
               ((not (>= pref-size min-size))
-               (message-dialog "Preferred size must be greater or equal minimum size"))              
+               (message-dialog "Preferred size must be greater or equal minimum size"))            
               ((not (or (null toplevel)
                         (functionp toplevel)
                         (and (symbolp toplevel)
@@ -64,9 +64,9 @@
                (message-dialog "Toplevel function must be a defined function or NIL"))
               ((not (and (stringp sig)
                          (eql (length sig) 4)))
-               (message-dialog "Application signature must be 4 characters long"))                           
+               (message-dialog "Application signature must be 4 characters long"))                         
               (t
-               (setq sig (intern sig (find-package :keyword)))                 
+               (setq sig (intern sig (find-package :keyword)))               
                (catch-cancel
                  (let ((file (choose-new-file-dialog
                               :prompt (if applic-p
@@ -94,7 +94,7 @@
                                 :init-file "image-init" 
                                 :resources (get-app-resources res-file sig)
                                 :clear-clos-caches (check-box-checked-p (view-named 'caches d))
-                                :excise-compiler   (check-box-checked-p (view-named 'excise d))                                              
+                                :excise-compiler   (check-box-checked-p (view-named 'excise d))                                            
                                 :creator sig)))))))))))))
 
 |#
@@ -126,7 +126,7 @@
                :directory "CL:images;PW.image"))
         (sizes (list (* 8500 1024)
                      (* 6500  1024))))
-    (eval-enqueue        
+    (eval-enqueue      
      (lambda ()
          (save-application
           file

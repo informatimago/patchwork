@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -89,7 +89,7 @@
 ;;       (draw-ledger-lines-arp self one-note  offset-x y-min y-min MN-C5)
 ;;       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
 ;;       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
-;;       (draw-note-4 one-note  
+;;       (draw-note-4 one-note
 ;;                    (setf (order one-note) 
 ;;                          (calc-chord-pixel-x chord 1
 ;;                                              (setf (arp-view-x one-note) offset-x)
@@ -113,12 +113,12 @@
         (y-min) (alt) (dx))
     (dolist (one-note notes)
       (setq y-min (1- (give-pixel-y one-note MN-C5)))
-      (draw-ledger-lines-arp self one-note  
+      (draw-ledger-lines-arp self one-note
                              (truncate offset-x
                                        (MN-zoom-scaler (view-container self))) y-min y-min MN-C5)
       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
-      (draw-note-4 one-note  
+      (draw-note-4 one-note
                    (setf (order one-note) 
                          (calc-chord-pixel-x chord 1
                                              (progn (setf (arp-view-x one-note) offset-x)
@@ -692,14 +692,14 @@
         (dolist (note selections)
           (transpose-note note 
                           (* (cond ((shift-key-p) 2)
-                                   ((control-key-p) 24)  
+                                   ((control-key-p) 24)
                                    (t 1))
                              (if (eql char :UpArrow) 
                                  (approx-factor *current-approx-scale*)
                                  (- 0 (approx-factor *current-approx-scale*))))))
         (transpose-note (active-note self)
                         (* (cond ((shift-key-p) 2)
-                                 ((control-key-p) 24)  
+                                 ((control-key-p) 24)
                                  (t 1))
                            (if (eql char :UpArrow) 
                                (approx-factor *current-approx-scale*)
@@ -834,25 +834,25 @@
    (new-menu "Approximation"
              (prog1 (setf a-leaf-menu
                           (new-leafmenu "SemiTone" 
-                                        (lambda () (use-all-approx-scale  
+                                        (lambda () (use-all-approx-scale
                                                     *target-action-object* *c-major-scale*))))
                (set-command-key a-leaf-menu #\2))
              (prog1 (setf a-leaf-menu
                           (new-leafmenu "Quarter tone" 
-                                        (lambda () (use-all-approx-scale  
+                                        (lambda () (use-all-approx-scale
                                                     *target-action-object* *1/4-tone-chromatic-scale*))))
                (set-command-key a-leaf-menu #\4))
              (prog1 (setf a-leaf-menu
                           (new-leafmenu "Eigth tone" 
-                                        (lambda () (use-all-approx-scale  
+                                        (lambda () (use-all-approx-scale
                                                     *target-action-object* *1/8-tone-chromatic-scale*))))
                (set-command-key a-leaf-menu #\8)))
    (new-menu "Scale"
              (new-leafmenu "C-major" 
-                           (lambda () (use-all-scale  
+                           (lambda () (use-all-scale
                                        *target-action-object* *c-major-scale*)))
              (new-leafmenu "Chromatic" 
-                           (lambda () (use-all-scale  
+                           (lambda () (use-all-scale
                                        *target-action-object* *chromatic-scale*))))
    (new-menu "Staff"
              (new-leafmenu "G2-G"

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,7 +36,7 @@
 
 ;;============================================================================================
 (defclass  C-menubox-bpf (ui:view ; needed to add subviews to it.
-                          C-menubox)  
+                          C-menubox)
   ((BPF-mini-view :initform (make-instance 'C-mini-bpf-view) :accessor BPF-mini-view)))
 
 (defmethod initialize-instance :after ((self C-menubox-bpf) &rest ctrls)
@@ -60,7 +60,7 @@
     (if (open-state self)
        (let ((bpf-mini (BPF-mini-view self)))
           (set-break-point-function-to-mini bpf-mini (menubox-value self))
-          (erase-view-inside-rect self)    
+          (erase-view-inside-rect self)  
           (view-draw-contents bpf-mini)) 
        (draw-string 3 9 (doc-string self)))))
 
@@ -169,7 +169,7 @@
 (defun save-BPF-lib (lib)
   (setq *print-pretty* ())
   (let* ((new-name (choose-new-file-dialog :directory  "BPF-lib" :prompt "Save BPF lib As…")))
-     (delete-file new-name)  
+     (delete-file new-name)
      (WITH-OPEN-FILE (out new-name :direction :output :if-does-not-exist :create :if-exists :supersede)
        (prin1 '(in-package :pw) out)
         (let ((*package* :pw))
@@ -188,7 +188,7 @@
      (list 
        (make-point 0 0)
        (make-point 100 100)))))
-  
+
 (defun next-from-BPF-lib (win lib &optional dec-num)
    (setf (bpf-lib-pointer win) 
       (mod (+ (bpf-lib-pointer win) (if dec-num -1 1))

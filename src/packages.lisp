@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
-;;;;    Defines some Patchwork packages.
 ;;;;  
+;;;;    Defines some Patchwork packages.
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2014
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -62,16 +62,16 @@
         #+patchwork.builder::use-midishare "MIDISHARE")
 
   #-patchwork.builder::use-midishare (:import-from "UI" "DELETEF")
-  
+
   (:export "MIDI-OPEN" "MIDI-CLOSE" "MIDI-WRITE" "MIDI-WRITE-TIME"
            "MIDI-WRITE-NOW" "MIDI-READ" "MIDI-CLEAR"
            "CLOCK-TIME" "MIDI-GET-TIME" "MIDI-RESET"
            "MIDI-RECORD" "MIDI-LOAD" "MIDI-SAVE"
-           
+         
            "*PW-REFNUM*" "*PLAYER*"
            "WITH-TEMPORARY-MIDI-FILE-INFOS"
            "WITH-TEMPORARY-PLAYER-STATE"
-           
+         
            ;; stuff from midishare:
            "TYPENOTE" "TYPEKEYON" "TYPEKEYOFF" "TYPEKEYPRESS" 
            "TYPECTRLCHANGE" "TYPEPROGCHANGE" "TYPECHANPRESS" "TYPEPITCHWHEEL" 
@@ -165,7 +165,7 @@
   (:shadowing-import-from "CLOSER-MOP"
                           "STANDARD-CLASS" "STANDARD-GENERIC-FUNCTION" "STANDARD-METHOD"
                           "DEFMETHOD" "DEFGENERIC")
-  
+
   (:import-from "UI"
                 "WITHOUT-INTERRUPTS" "*EVENTHOOK*" "EVENT-DISPATCH")
   (:export "START" "*ERROR-WHEN-EXTRA-START?*" "DFUNCALL" "APDFUNCALL"
@@ -200,7 +200,7 @@
            "DISABLE-PATCHWORK-READER-MACROS")
 
   (:export "INITIALIZE")
-  
+
   (:export "DRAW-CHAR" "DRAW-STRING" "DRAW-POINT" "DRAW-LINE" 
            "DRAW-RECT*" "FILL-RECT*" "DRAW-ELLIPSE" "FILL-ELLIPSE"
            "WITH-PEN-STATE" "X" "Y" "W" "H")
@@ -232,9 +232,9 @@
            "SET-PW-WIN+PW-OBJ" "T-TIME" "TYPE-LIST" "UPDATE-EDITOR"
            "UPDATE-NOTE" "VALUE"  "STOP-PLAY"
            "YOURSELF-IF-COLLECTING"
-           
+         
            "GET-LOCK-BUTTON-FUN"
-           
+         
            "SCALE%" "RANDOM2" "MAPCAR-FUN" "CIRLIST" "CUMUL-SUM"
            "INTERPOL" "BREAK-POINT-FUN" "NTH-REMOVE"  "FIRSTN")
 

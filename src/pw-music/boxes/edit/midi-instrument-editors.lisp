@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -72,37 +72,37 @@
          :dialog-item-text "status  contr  value   label  ")
      (setf (status-ctrl self) 
         (make-instance 'C-menubox-val
-          :view-position (make-point 2 17)  
+          :view-position (make-point 2 17)
           :view-size (make-point 48 16)
           :dialog-item-action (lambda (item) (update-status (view-window item) item))
           :menu-box-list 
             '((" paftr" . #xA0) (" contr". #xB0) (" prog" . #xC0) (" maftr" . #xD0) (" ptchb" . #xE0)))) 
      (setf (controller-ctrl self) 
          (make-instance 'C-numbox
-           :view-position (make-point 52 17)  
+           :view-position (make-point 52 17)
            :view-size (make-point 40 14)
            :dialog-item-action (lambda (item) (update-controller (view-window item) item))
            :min-val 0 :max-val 127)) 
      (setf (value-ctrl self) 
          (make-instance 'C-numbox
-           :view-position (make-point 97 17)  
+           :view-position (make-point 97 17)
            :view-size (make-point 40 14)
            :dialog-item-action (lambda (item) (update-value (view-window item) item))
            :min-val 0 :max-val 127)) 
      (setf (label-ctrl self) 
           (make-instance 'C-ttybox-instrument
-           :view-position (make-point 142 17)  
+           :view-position (make-point 142 17)
            :view-size (make-point 40 14)
            :dialog-item-action (lambda (item) (update-label (view-window item) item))
            :dialog-item-text "label")) 
      (setf (note-play-ctrl self) (make-instance 'BUTTON-DIALOG-ITEM
-           :view-position (make-point 200 17)  
+           :view-position (make-point 200 17)
            :view-size (make-point 45 18)
            :dialog-item-action (lambda (item) (declare (ignore item))(play-note *global-selected-note*))
            :view-font *patchwork-font-spec*
            :dialog-item-text "Play"))))
 
-(defmethod view-key-event-handler ((self C-fix-window) char)  
+(defmethod view-key-event-handler ((self C-fix-window) char)
   (if (not (eql char #\Newline))
       (call-next-method)
       (progn (when (pw-win self) 
@@ -140,12 +140,12 @@
 (defun make-fix-ins-editor ()
   (make-instance 'C-fix-window :window-title "fix" :close-box-p nil :window-show nil
      :view-position (make-point 30 40) :view-size (make-point 254 45)))
-     
-;;(make-fix-ins-editor)        
+   
+;;(make-fix-ins-editor)      
 
 ;;==============================================================================
 ;;==============================================================================
-;; midi-ins data types  
+;; midi-ins data types
 ;;==============================================================================
 ;; abstract data type
 (defclass C-midi-ins-data-type ()
@@ -439,7 +439,7 @@
      (cond ((eql (status self) #xA0)) 
            ((eql (status self) #xB0) 
              (start 
-               (continue-play-contr self (sample-rate self) chan (controller self) points)))  
+               (continue-play-contr self (sample-rate self) chan (controller self) points)))
            ((eql (status self) #xC0)) 
            ((eql (status self) #xD0)) 
            ((eql (status self) #xE0)
@@ -463,7 +463,7 @@
      (cond ((eql (status self) #xA0)) 
            ((eql (status self) #xB0) 
              (start 
-               (continue-play-contr self (sample-rate self) (chan note) (controller self) points)))  
+               (continue-play-contr self (sample-rate self) (chan note) (controller self) points)))
            ((eql (status self) #xC0)) 
            ((eql (status self) #xD0)) 
            ((eql (status self) #xE0)
@@ -481,7 +481,7 @@
   `(make-instance ',(class-name (class-of self))
       :ins-name ',(ins-name self)
       :ins-objects (list ,@(ask-all (ins-objects self) 'decompile))))
-  
+
 ;;!!!
 (defmethod draw-instrument ((self C-midi-ins-collection) x-now y-now t-scfactor)
    (set-view-font  (view-container (view-container  *current-MN-editor*)) *patchwork-font-spec*)

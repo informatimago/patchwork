@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -466,7 +466,7 @@
                                  :view-size (make-point 710 205) :window-title win-string))
          (rtm-col (make-instance 'C-beat-editor-collection 
                       :view-position (make-point 5 5) 
-                      :view-size (make-point 700 200)  
+                      :view-size (make-point 700 200)
                       :beat-editors 
                       (list 
                        (make-instance 'C-beat-editor-panel 
@@ -474,7 +474,7 @@
                            :measure-line measure-line)))))
     (add-subviews rtm-win rtm-col)
     (resize-new-rtm-w rtm-col (view-size rtm-win))
-    rtm-win))           
+    rtm-win))         
 
 
 
@@ -641,7 +641,7 @@
                (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum)) in-docs-temp))
               (t in-docs-temp))))
          (abstract-box 
-          (make-std-patch-box (type-of self)  
+          (make-std-patch-box (type-of self)
                               (read-from-string title) in-put-docs win in-boxes)))
     (dmove-patch abstract-box (x self) (y self))
                                         ;   connections

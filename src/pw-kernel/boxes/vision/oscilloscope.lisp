@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -57,7 +57,7 @@
 
 ;;__________
 (defmethod draw-patch-extra :after ((self C-pw-oscilloscope))
-  (when (play-flag self) (fill-patch-outrect (out-put self))))     
+  (when (play-flag self) (fill-patch-outrect (out-put self))))   
 
 (defmethod patch-value ((self C-pw-oscilloscope) obj)(declare (ignore obj)) nil)
 
@@ -65,8 +65,8 @@
   (tell (input-objects self) 'init-patch)
   (setf (play-flag self) t)
   (with-focused-view self
-     (view-draw-contents (third (pw-controls self))))       
-  (fill-patch-outrect (out-put self))      
+     (view-draw-contents (third (pw-controls self))))     
+  (fill-patch-outrect (out-put self))    
   (setf (clock self) 0)
   (setf (x-now self) 1)
   (start (dfuncall 20 'continue-play self)))
@@ -86,14 +86,14 @@
         (when (>= (x-now self) w-now)
           (setf (x-now self) (mod (x-now self) w-now))
           (with-focused-view self
-            (view-draw-contents (third (pw-controls self)))))       
+            (view-draw-contents (third (pw-controls self)))))     
         (incf (clock self) delay)
         (dfuncall delay 'continue-play self)))))
 
 (defmethod stop-play ((self C-pw-oscilloscope))
  (when (play-flag self)
    (setf (play-flag self) ())
-   (fill-patch-outrect (out-put self))))      
+   (fill-patch-outrect (out-put self))))    
 
 (defmethod clock-obj  ((self C-pw-oscilloscope)) self)
 (defmethod stop-clock  ((self C-pw-oscilloscope)) (stop-play self))

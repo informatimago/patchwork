@@ -33,7 +33,7 @@
                     (the fixnum (1+ (the fixnum stop))) 
                     stop))
          while stop)))
-  
+
 (defun split-if-char (char seq &optional dir)
   (split-if (lambda (ch) (eq ch char)) seq dir))
 

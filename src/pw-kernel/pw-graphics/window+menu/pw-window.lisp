@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -211,7 +211,7 @@
 (defmethod PW-WINDOW-SAVE-as ((self C-pw-window))
   (if *pw-nosave-mode*
       (ui::message-dialog "Sorry this version cannot save files.")
-      (let ((new-name (choose-new-file-dialog    
+      (let ((new-name (choose-new-file-dialog  
                        :directory (concatenate 'string  (save-window-title self) ".pw")
                        :prompt "Save Patch As…"))
             newfile
@@ -566,8 +566,8 @@
 (defgeneric record-midi-out-boxes- (self stop-time))
 (defmethod record-midi-out-boxes- ((self C-pw-window) stop-time)
   (let ((boxes (find-midi-out-boxes self)))
-    (tell boxes 'set-begin-time 0)  
-    (tell boxes 'set-duration-time stop-time)  
+    (tell boxes 'set-begin-time 0)
+    (tell boxes 'set-duration-time stop-time)
     (tell boxes 'init-patch)            ; before scheduling !! 
     (eval-enqueue `(start-clock *global-clock* ',stop-time ',boxes))))
 

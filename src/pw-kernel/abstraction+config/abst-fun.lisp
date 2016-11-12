@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -60,7 +60,7 @@
 ;;;    C-patch-env   (the BPF-ENV)
 ;;;    C-patch-osc    (the oscillator)
 ;;;    C-patch-osc-period (the osc-period)
-;;;=================================================  
+;;;=================================================
 
 (defgeneric compile-me (self obj))
 
@@ -79,7 +79,7 @@
 (defmethod actual-save ((self C-compiled-patch) file-name) 
   (let* ((my-in-types  (get (pw-function self) '*type-intypes*))
          (my-out-types (get (pw-function self) '*type-outtype*))
-         
+       
          (*print-pretty* nil))
     (multiple-value-bind (file-name exists?)
         (intern (trim-extension (string-downcase (pathname-name file-name)))
@@ -194,7 +194,7 @@ A previous function called ~D will be redefined" file-name file-name)
                (declare (special *global-calling-object*))
                (if (zerop (clock (clock-obj *global-calling-object*)))
                    (setf *closure-flag* nil))
-               (cond  
+               (cond
                  ((cdr *closure-data*) (pop *closure-data*))
                  ((not *closure-flag*)
                   (setf *closure-flag* t)
@@ -322,7 +322,7 @@ A previous function called ~D will be redefined" file-name file-name)
                  (prog1 
                      (bpf-out code 
                               (+ (setf *osc-phase*
-                                       (float (mod (+ *osc-phase*  
+                                       (float (mod (+ *osc-phase*
                                                       (/ (* time-diff (- (clock *global-calling-object*)
                                                                          *old-time*)) period))
                                                    time-diff)))

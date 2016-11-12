@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -126,7 +126,7 @@
     (setf *pw-controls-current-pw-control* item)
     (set-dialog-item-text *pw-controls-dialog-text-item-old* (dialog-item-text item))
     (set-view-position *pw-controls-dialog* 
-                       (add-points  
+                       (add-points
                         (local-to-global (view-container item) (view-position item)) 
                         (or point (make-point 1 0))))
     (set-view-size *pw-controls-dialog* 
@@ -269,7 +269,7 @@
 
 (defmethod view-double-click-event-handler ((self C-ttybox) where)
   (declare (ignore where))
-  (open-pw-controls-dialog self))   
+  (open-pw-controls-dialog self)) 
 
 (defgeneric set-dialog-item-text-from-dialog (self text)
   (:method ((self C-ttybox) text)
@@ -455,7 +455,7 @@
           (let ((mp (view-mouse-position win)))
             (unless (eql mp last-mp)
               (setq last-mp mp)
-              (set-numbox-item-text self  
+              (set-numbox-item-text self
                                     (setf (value self)
                                           (max (min-val self) (min (max-val self)
                                                                    (+ last-value 
@@ -558,7 +558,7 @@
 ;;   ;;=========================
 ;;   ;;for INTERFACE-TOOLS
 ;;   ;;=========================
-;;   (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
+;;   (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM
 ;;    (make-instance 'C-menubox
 ;;                   :value 0
 ;;                   ;;                     :VIEW-FONT *patchwork-font-spec*
@@ -593,7 +593,7 @@
 ;;   ;;=========================
 ;;   ;;for INTERFACE-TOOLS
 ;;   ;;=========================
-;;   (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM  
+;;   (INTERFACE-TOOLS::ADD-EDITABLE-DIALOG-ITEM
 ;;    (make-instance 'C-numbox
 ;;                   :view-position #@(5 22)
 ;;                   :value 0))

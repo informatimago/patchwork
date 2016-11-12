@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -49,7 +49,7 @@
                        :view-size (make-point 710 205) :window-title win-string))
          (rtm-col (make-instance 'C-beat-editor-collection 
                        :view-position (make-point 5 5) 
-                       :view-size (make-point 700 200)  
+                       :view-size (make-point 700 200)
                         :beat-editors 
                          (list 
                             (make-instance 'C-beat-editor-panel 
@@ -62,11 +62,11 @@
 
 
 ;;(window-select (setf gh (make-rtm-editor-window)))
-;;(window-select (setf gh2 (eval (decompile gh))))    
-;;(window-select (setf gh3 (eval (decompile gh2))))    
+;;(window-select (setf gh2 (eval (decompile gh))))  
+;;(window-select (setf gh3 (eval (decompile gh2))))  
 ;;==================
 
-(defclass  C-patch-application-rtm-editor (C-patch-application C-process-begin+end)  
+(defclass  C-patch-application-rtm-editor (C-patch-application C-process-begin+end)
   ((clock           :initform 0                               :accessor   clock)
    (clock-obj       :initform *global-clock*                  :allocation :class          :accessor clock-obj)
    (chord-objects   :initform nil                             :accessor   chord-objects)
@@ -124,7 +124,7 @@
     (append 
             (get-window-state rtm-view win)
             (get-window-state (car (beat-editors rtm-view)) win)
-            (list (view-position win)(view-size win)(window-title win)))))  
+            (list (view-position win)(view-size win)(window-title win)))))
 
 (defmethod put-window-state ((self C-patch-application-rtm-editor) win state)
   (set-view-position win (nth 11 state))
@@ -194,12 +194,12 @@
       (dfuncall-process self delay))))
 
 (defmethod  begin-process  ((self C-patch-application-rtm-editor))
-  (fill-patch-outrect (out-put self))  
+  (fill-patch-outrect (out-put self))
   (setf (clock self) 0)
 ;;  (setf (previous-t-time self) 0)
   (setf (chord-objects self) 
     (ask-all (collect-all-chord-beat-leafs (give-measure-line self)) 'beat-chord))
-;;  (print (ask-all (chord-objects self) 't-time))  
+;;  (print (ask-all (chord-objects self) 't-time))
   (calc-t-time-measure-line  (give-measure-line self) 1) 
   (dfuncall-process self (t-time (car (chord-objects self)))))
 
@@ -212,7 +212,7 @@
   (fill-patch-outrect (out-put self)))
 
 (defmethod draw-patch-extra :after ((self C-patch-application-rtm-editor))
-  (when (play-flag self) (fill-patch-outrect (out-put self))))     
+  (when (play-flag self) (fill-patch-outrect (out-put self))))   
 
 ;;====================================================================================================
 ;;====================================================================================================
@@ -225,7 +225,7 @@
     (nreverse arg-list)))
 
 ;;(make-rtm-polif-arg-list 6)
-        
+      
 ;;====================================================================================================
 
 (defun make-n-rtm-editors-window (count measure-lines)
@@ -329,8 +329,8 @@
         (window-close win)
         (setf (application-object self) 
               (make-application-object self))
-        (set-pw-win+pw-obj (application-object self) *active-patch-window* self))   
-      (put-window-state self (application-object self) (first args))   
+        (set-pw-win+pw-obj (application-object self) *active-patch-window* self)) 
+      (put-window-state self (application-object self) (first args)) 
     (setf (value self) (third args))
     (if (third args) (set-dialog-item-text (lock self) "x"))
     (let ((eds (beat-editors (editor-collection-object (application-object self)))))
@@ -362,7 +362,7 @@
     (append 
             (get-window-state rtm-view win)
             (ask-all (beat-editors rtm-view) 'get-window-state win)
-            (list (view-position win)(view-size win)(window-title win)))))  
+            (list (view-position win)(view-size win)(window-title win)))))
 
 (defmethod put-window-state ((self C-patch-Polifrtm) win state)
   (let* ((length-ed (length (beat-editors (editor-collection-object win))))
@@ -482,7 +482,7 @@ else the input has to be a list of chord-objects. "
 ;;(make-car+cdr-list '(2 3 4)) 
 ;;(make-car+cdr-list '(2 3 (3 4 5) 7))
 ;;(make-car+cdr-list '(2 (3 4 5) (4 (5 6 7)) 7))
-  
+
 (defunp make-beat2 ((unit+rtm list (:value "(1 2 1)"))) beat
   "Creates a beat object according to unit+rtm where unit is car of
 unit+rtm and rtm-list is cdr of unit+rtm."
@@ -570,5 +570,5 @@ Click 'h' with the <poly-rtm> editor opened for more information."
 (push-to-object-types 'measure)
 (push-to-object-types 'measure-line)
 (push-to-object-types 'measure-lines)
-     
+   
 ;;;; THE END ;;;;

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -191,7 +191,7 @@
 
 (defmethod  begin-process  ((self C-patch-midi))
   (setf (chord-line-list self) ())
-  (fill-patch-outrect (out-put self))  
+  (fill-patch-outrect (out-put self))
   (setf (clock self) 0)
   (funcall (process self) self))
 
@@ -380,7 +380,7 @@
       (dotimes (i (length ch-line-forms))
         (push (make-instance 'C-chord-line) (chord-line-list box)))
       (window-close (application-object box))
-      (rebuild-collector-win box))       
+      (rebuild-collector-win box))     
     (mapc (lambda (ch-line chords-form editor)
             (form-to-chord-line ch-line chords-form)
             (setf (chord-line editor) ch-line))
@@ -428,7 +428,7 @@
 ;;           (setq control (nth i controls))
 ;;           (unless (eql control object)
 ;;             (setf (nth i the-list) (patch-value object obj)))
-;;           (incf i))      
+;;           (incf i))    
 ;;         (setf (chord-line-list self) the-list))))
 ;; 
 ;; (defmethod patch-value ((self C-patch-polifMN-mod) obj)
@@ -543,8 +543,8 @@ The inputs
        other arguments is skipped and no pitches are played
        or recorded - this is an easy way of making rests)
 - dur (duration) 
-- midic (midi-keynumber * 100  
-         -> 6000 = middle-C, 6050 = middle-C + 50 cents)  
+- midic (midi-keynumber * 100
+         -> 6000 = middle-C, 6050 = middle-C + 50 cents)
         (can be a midic or a list of midics or a chord object) 
 - vel (velocity)
 - chan (channel)

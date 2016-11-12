@@ -5,7 +5,7 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    A Lisp bridge for Objective-C and OpenStep.
 ;;;;
 ;;;;    This provides:
@@ -13,7 +13,7 @@
 ;;;;      (2) Convenient Lisp syntax for invoking ObjC methods
 ;;;;
 ;;;;    This is a fork of objc-bridge from ccl-1.8.
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    <RDB> Randall D. Beer <beer@eecs.cwru.edu>
@@ -22,10 +22,10 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;    
+;;;;  
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (c) 2003 Randall D. Beer
-;;;;    
+;;;;  
 ;;;;    This software is licensed under the terms of the Lisp Lesser
 ;;;;    GNU Public License, known as the LLGPL.  The LLGPL consists of
 ;;;;    a preamble and  the LGPL. Where these conflict, the preamble
@@ -34,19 +34,19 @@
 ;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;    
+;;;;  
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;    
+;;;;  
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -278,7 +278,7 @@
     (nil ns::ns-decimal-length :<NSD>ecimal._length)
     (nil ns::ns-decimal-is-negative :<NSD>ecimal._is<N>egative wrap-boolean unwrap-boolean)
     (nil ns::ns-decimal-is-compact :<NSD>ecimal._is<C>ompact wrap-boolean unwrap-boolean))
-  
+
 
   (defun ns::init-ns-decimal (data exponent length is-negative is-compact mantissa)
     (setf (ccl:pref data :<NSD>ecimal._exponent) exponent
@@ -291,8 +291,8 @@
         (dotimes (i 8)
           (setf (ccl:paref m (:* (:unsigned 16)) i) (aref v i))))))
 
-  
-  (defun ns::make-ns-decimal (exponent length is-negative is-compact mantissa)  
+
+  (defun ns::make-ns-decimal (exponent length is-negative is-compact mantissa)
     (let* ((data (make-gcable-record :<NSD>ecimal)))
       (ns::init-ns-decimal data exponent length is-negative is-compact mantissa)
       data))
@@ -306,7 +306,7 @@
               (setf (aref dest i) (ccl:paref m (:* (:unsigned 16)) i)))))
         (report-bad-arg decimal 'ns::ns-decimal)))
 
-  
+
   (defun (setf ns::ns-decimal-mantissa) (new decimal)
     (if (typep decimal 'ns::ns-decimal)
         (let* ((src (coerce new '(simple-array (unsigned-byte 16) (8)))))
@@ -315,7 +315,7 @@
             (dotimes (i 8 new)
               (setf (ccl:paref m (:* (:unsigned 16)) i) (aref src i)))))
         (report-bad-arg decimal 'ns::ns-decimal)))
-  
+
   );;#-cocotron-objc
 
 
@@ -803,7 +803,7 @@
                      (or (check-receiver receiver)
                          (with-ns-exceptions-as-errors 
                              (apply (objc-method-signature-info-function
-                                     (load-time-value                                
+                                     (load-time-value                              
                                       (objc-method-info-signature-info ,first-method)))
                                     receiver ,selector args))))
                   :name `(:objc-dispatch ,name)))

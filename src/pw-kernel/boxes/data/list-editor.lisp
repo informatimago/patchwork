@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -96,7 +96,7 @@
       (call-next-method)))
 
 (defmethod edit-selected-cell ((self C-list-item))
-  (let ((selection (car (selected-cells self))))    
+  (let ((selection (car (selected-cells self))))  
     (set-dialog-item-text self (format () "~A" (cell-contents self selection)))
     (open-pw-controls-dialog
      self 
@@ -175,7 +175,7 @@
                           (copy-list (nthcdr place sublist))
                           (cons 0 (copy-list (nthcdr place sublist))))))
     (if (zerop place)
-        (progn  
+        (progn
           (setf (nthcdr (1+ place) sublist) added-items)
           (setf (nth 0 sublist) 0))
         (setf (nthcdr place sublist) added-items))
@@ -219,7 +219,7 @@
               (copy-list (nthcdr place the-list))
               (cons new-list (copy-list (nthcdr place the-list))))))
     (if (zerop place)
-        (progn  
+        (progn
           (setf (nthcdr (1+ place) the-list) added-items)
           (setf (nth 0 the-list) new-list))
         (setf (nthcdr place the-list) added-items))
@@ -421,6 +421,6 @@ To obtain more information, type ‘o’ with the module open."
 
 ;; (in-package :pw)
 ;; (add-patch-box *active-patch-window* 
-;; (make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd  
+;; (make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd
 ;; '(*symbol-eval-pw-type* "list") '(list)))
 

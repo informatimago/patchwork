@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    A module with a Fred-Window 
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -175,7 +175,7 @@
   ;;     (buffer-write-file (fred-buffer win) (file-name self) :if-exists :supersede)
   ;;     (update-box-name self (file-name self))))
   )
-        
+      
 (defmethod add-to-file ((self C-patch-file-buffer) list format)
   (niy add-to-file self list format)
   ;; (let ((count 0)
@@ -344,7 +344,7 @@ Menu options are:
 ;; (buffer-size fa)
 ;; (in-package :pw)
 ;; (add-patch-box *active-patch-window* 
-;;                (make-patch-box  'C-patch-file-buffer:C-patch-file-buffer 'f-buff  
+;;                (make-patch-box  'C-patch-file-buffer:C-patch-file-buffer 'f-buff
 ;;                                () '(list)))
 ;; (setq fu (car (subviews pw::*active-patch-window* )))
 ;; (setq fuwin (C-patch-file-buffer::fred-win fu))

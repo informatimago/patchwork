@@ -5,16 +5,16 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    Macros (and functions/constants used at macroexpand-time) ONLY.
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;MODIFICATIONS
 ;;;;    2012-06-02 <PJB> Extracted from ccl lib/macros.lisp.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;    
+;;;;  
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (C) 2009 Clozure Associates
 ;;;;    Copyright (C) 1994-2001 Digitool, Inc
@@ -25,7 +25,7 @@
 ;;;;    License , known as the LLGPL and distributed with Clozure CL as the
 ;;;;    file "LICENSE".  The LLGPL consists of a preamble and the LGPL,
 ;;;;    which is distributed with Clozure CL as the file "LGPL".  Where these
-;;;;    conflict, the preamble takes precedence.  
+;;;;    conflict, the preamble takes precedence.
 ;;;;
 ;;;;    Clozure CL is referenced in the preamble as the "LIBRARY."
 ;;;;
@@ -34,19 +34,19 @@
 ;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;    
+;;;;  
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;    
+;;;;  
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -66,7 +66,7 @@
 ;;;
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  
+
   (defun collect-normal-expander (n-value fun forms)
     `(progn
        ,@(mapcar (lambda (form) `(setf ,n-value (,fun ,form ,n-value))) forms)
@@ -168,8 +168,8 @@
   Initial-Value is supplied for Collect, the stuff will be rplacd'd onto the
   end.  Note that Function may be anything that can appear in the functional
   position, including macros and lambdas."
-  
-  
+
+
   (let ((macros ())
         (binds ()))
     (dolist (spec collections)
@@ -181,7 +181,7 @@
             (name (first spec))
             (default (second spec))
             (kind (or (third spec) 'collect)))
-        
+      
         (push `(,n-value ,default) binds)
         (if (eq kind 'collect)
           (let ((n-tail (gensym)))

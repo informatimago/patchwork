@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -37,11 +37,11 @@
 
 ;;;;;;; paging
 
-(defun calc-next-rtm-page (self)  
+(defun calc-next-rtm-page (self)
   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
          (all-measures (measures (measure-line (car (beat-editors (editor-collection-object self))))))
          (measures (nthcdr beat-number all-measures))
-         (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
+         (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))
          (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self)))))
          (monof? (= (length (beat-editors (editor-collection-object self))) 1)) 
          (beat-number-temp (1+ beat-number))
@@ -61,15 +61,15 @@
             (pop measures)))))
     (if (> beat-number (length all-measures))
       beat-number-temp beat-number)))
-             
-(defun calc-prev-rtm-page (self)  
+           
+(defun calc-prev-rtm-page (self)
   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
          (measures (reverse (subseq  (measures (measure-line (car (beat-editors (editor-collection-object self))))) 0 beat-number)))
-         (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
+         (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))
          (monof? (= (length (beat-editors (editor-collection-object self))) 1)) 
          (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self)))))
          (staff-count (visible-staffs-count (editor-collection-object self))))
-    (incf beat-number)    
+    (incf beat-number)  
     (if (not monof?)
       (while (and measures (< new-beg-x end-x))
         (setq new-beg-x (+ *rtm-editor-measure-x-offset* (calc-measure-pixel-x (car measures) beat-zoom new-beg-x)))
@@ -84,7 +84,7 @@
             (pop measures)))))
     (max 1 beat-number)))
 
-(defun calc-next-rtm-page+scroll (self beat-number)  
+(defun calc-next-rtm-page+scroll (self beat-number)
   (unless beat-number (setq beat-number (calc-next-rtm-page self)))
   (unless (= beat-number (value (beat-number-ctrl (editor-collection-object self))))
     (set-dialog-item-text-from-dialog
@@ -92,7 +92,7 @@
     (scroll-beat (editor-collection-object self)(beat-number-ctrl (editor-collection-object self))))
   beat-number) 
 
-(defun calc-prev-rtm-page+scroll (self beat-number)  
+(defun calc-prev-rtm-page+scroll (self beat-number)
   (unless beat-number (setq beat-number (calc-prev-rtm-page self)))
   (unless (= beat-number (value (beat-number-ctrl (editor-collection-object self))))
     (set-dialog-item-text-from-dialog
@@ -142,11 +142,11 @@
 
 ;;(ui:add-menu-items *RTM-menu* (new-leafmenu "Play-rtms+scroll" (lambda () (play-rtms+scroll (editor-collection-object *active-rtm-window*))))) 
 ;;; only polif
-;; (defun calc-next-rtm-page (self)  
+;; (defun calc-next-rtm-page (self)
 ;;   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
 ;;          (all-measures (measures (measure-line (car (beat-editors (editor-collection-object self))))))
 ;;          (measures (nthcdr beat-number all-measures))
-;;          (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
+;;          (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))
 ;;          (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self)))))
 ;;          (beat-number-temp (1+ beat-number)))
 ;;     (incf beat-number)
@@ -155,13 +155,13 @@
 ;;       (when (< new-beg-x end-x) (incf beat-number))
 ;;       (pop measures))
 ;;     (if (> beat-number (length all-measures))
-;;          beat-number-temp beat-number)))             
+;;          beat-number-temp beat-number)))           
 ;; 
 ;; 
-;; (defun calc-prev-rtm-page (self)  
+;; (defun calc-prev-rtm-page (self)
 ;;   (let* ((beat-number (1- (value (beat-number-ctrl (editor-collection-object self)))))
 ;;          (measures (reverse (subseq  (measures (measure-line (car (beat-editors (editor-collection-object self))))) 0 beat-number)))
-;;          (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))  
+;;          (beg-x 28)(new-beg-x beg-x) (end-x (w (car (beat-editors (editor-collection-object self)))))
 ;;          (beat-zoom (beat-zoom (car (beat-editors (editor-collection-object self))))))
 ;;     (incf beat-number)
 ;;     (while (and measures (< new-beg-x end-x))

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    Gérard Assayag
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -126,7 +126,7 @@
 
 
 (defclass Rest (ScoreEvent)
-  (   
+  ( 
    (pitch :initform #x0060 :accessor pitch :initarg :pitch)
    ))
 
@@ -269,7 +269,7 @@
 
 (defmethod number-objects ((self Score))
     (number-objects (event-system self)))
-    
+  
 (defmethod rewind-measure ((self Score))
   (setf (current-measure self)
         (first (measure-list (measure-system self)))))
@@ -298,7 +298,7 @@
     (setf (current-voice self) (voice staff))
     staff))
 
-   
+ 
 (defmethod select-measure ((self Score) index)
   (let ( measure
          (measure-list (measure-list (measure-system self))) )
@@ -477,13 +477,13 @@
             (1+ (event-count  self)))
     (mapl
      (lambda (levent)
-         (setf next (if (cdr levent) (rank (cadr levent)) 0)  
+         (setf next (if (cdr levent) (rank (cadr levent)) 0)
                cprev 0 cnext 0)
          (if (not (typep (car levent) 'chord))
            (translate-event-to-enigma (car levent) prev next cprev cnext)
            (mapl 
             (lambda (lnote) 
-                (setf cnext (if (cdr lnote) (rank (cadr lnote)) 0))  
+                (setf cnext (if (cdr lnote) (rank (cadr lnote)) 0))
                 (translate-event-to-enigma (car lnote) prev next cprev cnext )
                 (setf prev 0 next 0 cprev (rank (car lnote))) )
             (note-list (car levent))))
@@ -674,7 +674,7 @@
             (and want-err
                  (cleni-error "Syntax error.A token of type ~S was expected.~%~S"
                               type (subseq tok-list 0 )))))) ))
-                    
+                  
 (defmacro pop-token (tok-list type err)
   `(when (check-pop-token ,tok-list ,type ,err) 
          (pop ,tok-list)))
@@ -725,9 +725,9 @@
              (:note
               (setf pitch (pop-token event-list (cons 'symbol number-type) t)))
              (:chord
-              (setf pitch (pop-token event-list 'list t))))           
-           (setf token2 nil)      
-           (loop      
+              (setf pitch (pop-token event-list 'list t))))         
+           (setf token2 nil)    
+           (loop    
              (setf token2 (or (pop-token event-list :follow nil)
                               (pop-token event-list :tie nil)))
              (unless token2 (return))
@@ -746,14 +746,14 @@
         (t (cleni-error "Syntax Error. Unknown token~%~S"
                         (cons token (subseq event-list 0 10)) ))) )
     t))
-                       
+                     
 
 (defun translate-score (score filename)
   (let ((template-file
          (full-pathname
           (coerce (format nil "CLENI:template~D.etf" (slot-value score 'temperament))
                   'simple-string)))
-        (target-file (full-pathname (merge-pathnames filename ".etf"))))    
+        (target-file (full-pathname (merge-pathnames filename ".etf"))))  
     (format *error-output* "~%copying ~S to ~S~%"  template-file target-file)
     (alexandria:copy-file template-file target-file :if-to-exists :overwrite)
     (format *error-output* "appending score desc. to ~S~%" target-file)

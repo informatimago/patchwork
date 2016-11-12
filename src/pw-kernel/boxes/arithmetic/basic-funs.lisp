@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    PW Arithmetic modules 
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    several modules by Tristan Murail.
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2014
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -202,7 +202,7 @@ number by a second before  rounding;."
 
 (defunp g-mod ((l1? numbers?) (mod numbers? (:value 1))) numbers?
     "Calculate the number that is congruent modulo l2? to l1?, or the remainder
-of an integer division (Euclidean division between two numbers l1? and l2?).   
+of an integer division (Euclidean division between two numbers l1? and l2?). 
 "
   (arith-tree-mapcar (function mod) l1? mod))
 
@@ -307,7 +307,7 @@ will return  ? PW->(8 8 12 17 26 32 34 37 40)
     "Arrondit liste de profondeur quelconque avec <nbdec> décimales"
   (let ((ndec 
           (if (> nbdec 0 ) (float (expt 10 nbdec)) (expt 10 nbdec))))
-    (deep-mapcar/1 '/  
+    (deep-mapcar/1 '/
                    (deep-mapcar/1 'round list (/ 1 ndec)) ndec )))
 
 (defunp random2 ((low fix/float) (high fix/float)) number
@@ -383,7 +383,7 @@ The result is a cartesian product of l1? by l2?.
 
 \(epw::cartesian 5 5 '+)
 will return ? PW->((10)) ,
- will return  
+ will return
 ? PW->((6 7 8 9) (7 8 9 10) (8 9 10 11) (9 10 11 12)) and 
 \(epw::cartesian '(1 2 3 4) '(5 6 7 8)  '+) will return
 ? PW->  (((1 5) (1 6) (1 7) (1 8)) ((2 5) (2 6) (2 7) (2 8)) ((3 5) (3 6) (3 7) (3 8))

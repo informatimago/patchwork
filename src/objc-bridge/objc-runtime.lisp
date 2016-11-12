@@ -5,10 +5,10 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    Utilities for interacting with the Apple/GNU Objective-C
 ;;;;    runtime systems.
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -16,17 +16,17 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;    
+;;;;  
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
 ;;;;    Copyright (C) 2002-2009 Clozure Associates
-;;;;    Parts of this file were part of Clozure CL.  
-;;;;    
+;;;;    Parts of this file were part of Clozure CL.
+;;;;  
 ;;;;    Clozure CL is licensed under the terms of the Lisp Lesser GNU
 ;;;;    Public License , known as the LLGPL and distributed with
 ;;;;    Clozure CL as the file "LICENSE".  The LLGPL consists of a
 ;;;;    preamble and the LGPL, which is distributed with Clozure CL as
 ;;;;    the file "LGPL".  Where these conflict, the preamble takes
-;;;;    precedence.  
+;;;;    precedence.
 ;;;;
 ;;;;
 ;;;;    Clozure CL is referenced in the preamble as the "LIBRARY."
@@ -36,19 +36,19 @@
 ;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;    
+;;;;  
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;    
+;;;;  
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -445,7 +445,7 @@
 
     )
 
-  
+
 
 ;;; A malloc'ed pointer to three words of machine code.  The first
 ;;; instruction copies the address of the trampoline callback from r14
@@ -1066,7 +1066,7 @@ argument lisp string."
            `(ccl:%ff-call (ccl:%reference-external-entry-point (load-time-value (external "objc_msgSend"))))
            `(:address ,receiver :<SEL> (%get-selector ,selector) ,@argspecs)
            :arg-coerce 'objc-arg-coerce
-           :result-coerce 'objc-result-coerce)  
+           :result-coerce 'objc-result-coerce)
   #+gnu-objc
   (let* ((r (gensym))
          (s (gensym))
@@ -1635,11 +1635,11 @@ argument lisp string."
                          (incf ,gpr-total 1)))
                    (if (> ,gpr-total 8)
                        (setf ,gpr-total (- ,gpr-total 8))
-                       (setf ,gpr-total 0))           
+                       (setf ,gpr-total 0))         
                    (ccl:%stack-block ((,marg-ptr (+ ,(ccl:%foreign-type-or-record-size
                                                   :<MARG> :bytes)
                                                 (* 4 ,gpr-total))))
-                                 
+                               
                                  (ccl:with-macptrs ((,regparams (ccl:pref ,marg-ptr :<MARG>.reg<P>arams)))
                                    (progn ,@(static-arg-forms))
                                    (ccl:%process-varargs-list ,regparams ,marg-ptr ,n-static-gprs ,n-static-fprs  ,rest-arg)
@@ -1795,7 +1795,7 @@ argument lisp string."
                     (static-arg-forms
                      `(setf (ccl:paref ,gpr-base (:* address) ,n-static-gprs) ,arg))
                     (incf n-static-gprs)))))
-             
+           
              (compile
               nil
               `(lambda (,receiver ,selector ,@args &rest ,rest-arg)
@@ -1808,7 +1808,7 @@ argument lisp string."
                                                           (ccl:%setf-macptr-to-object ,gen-arg-ptr (+ ,c-frame (ash ppc64::c-frame.param0 (- ppc64::word-shift))))
                                                           (progn ,@(static-arg-forms))
                                                           (ccl:%load-fp-arg-regs (ccl:%process-varargs-list ,gen-arg-ptr ,fp-arg-ptr ,n-static-gprs ,n-static-fprs  ,rest-arg) ,fp-arg-ptr)
-                                                          
+                                                        
                                                           (ccl:%do-ff-call nil (ccl:%reference-external-entry-point (load-time-value (external "objc_msgSend"))))
                                                           ;; Using VALUES here is a hack: the multiple-value
                                                           ;; returning machinery clobbers imm0.
@@ -2983,7 +2983,7 @@ ultimately malloc-based.
                         (typestring (encode-objc-method-arglist arg-types result-type))
                         (signature (cons result-type (cddr arg-types))))
                    (multiple-value-bind (body decls) (parse-body body env)
-                     
+                   
                      (setf body `((progn ,@(bool-args) ,@(type-assertions) ,@body)))
                      (if (eq result-type :<BOOL>)
                          (setf body `((%coerce-to-bool ,@body))))

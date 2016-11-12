@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    The chord box with Menu chosen functionalities. 
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -161,7 +161,7 @@
 (defmethod draw-appl-label ((self C-patch-chord-box-M ) label)
   (declare (ignore label))
   (values))
-  
+
 (defmethod open-patch-win ((self C-patch-chord-box-M ))
   (if (or (not (mus-not-editor self)) 
               (window-killed-p (mus-not-editor self)))
@@ -249,7 +249,7 @@
 
 
 (defunp chord ((chord ch-box)) list
-"cThe module chord is a constructor module for chords.  
+"cThe module chord is a constructor module for chords.
 Its input can be a list  of  midicents or a chord object. 
 In the first case, a chord object having notes with 
 the given pitches is created (or modified, 

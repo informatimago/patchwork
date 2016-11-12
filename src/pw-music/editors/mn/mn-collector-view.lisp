@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -52,7 +52,7 @@
 ;;;   transpose-selection       ;transposes selected chords according to value in button
 ;;;   retro-selection           ;retrogrades selected chords
 ;;;   accell-selection          ;affects chord fields of selected chords
-;;;   
+;;; 
 
 (defun make-chord-collector-pops ()
   (new-menu 
@@ -164,13 +164,13 @@
                           (lambda (item)
                               (declare (ignore item))
                               (transpose-selection self)))
-           (make-instance 'C-numbox  
+           (make-instance 'C-numbox
                           :view-size (make-point 36 14)
                           :value 100 :min-val -12700 :max-val 12700
                           :type-list '(fixnum)
                           :view-container (view-window self)
                           :view-position (make-point (+ x-pos 144) (+ y-pos 16))) ;;(make-point (+ x-pos 104) (+ y-pos 16)))
-           (make-instance 'C-numbox-staffcnt  
+           (make-instance 'C-numbox-staffcnt
                           :view-size (make-point 36 14)
                           :value 1 :min-val 1 :max-val 10
                           :type-list '(fixnum)
@@ -205,7 +205,7 @@
                        :view-position (make-point 196 40)
                        :view-size (make-point 40 16)
                        :view-font *patchwork-font-spec*))
-  (setf (slot-value self 'dial-stT)   
+  (setf (slot-value self 'dial-stT) 
         (make-instance 'static-text-dialog-item
                        :dialog-item-text "To"
                        :view-position (make-point 240 40)
@@ -246,7 +246,7 @@
                        :dialog-item-text "duration"
                        :view-position (make-point 20 90)
                        :view-size (make-point 80 16)
-                       :view-font *patchwork-font-spec*))      
+                       :view-font *patchwork-font-spec*))    
   (setf (slot-value self 'dur-% )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "%"
@@ -329,7 +329,7 @@
 (defmethod Do-selections ((self C-MN-view-mod) sel)
   (let ((selections))
     (unselect-all-chords (car (editor-objects self)) 0 0)
-    (dolist (panel (editor-objects self))      
+    (dolist (panel (editor-objects self))    
       (setq selections (if sel (chords (chord-line panel))
                            (visible-chords panel)))
       (dolist (chord selections)
@@ -340,7 +340,7 @@
 (defmethod Do-selections-all ((self C-MN-view-mod)) 
   (let ((selections))
     (dolist (panel (if (active-editor self) (list (active-editor self))
-                       (editor-objects self)))      
+                       (editor-objects self)))    
       (setq selections (chords (chord-line panel)))
       (dolist (chord selections)
         (hilite-if-not-selected panel chord 0 0)
@@ -458,7 +458,7 @@
       (update-the-chord-line self chord t))
     (tell (editor-objects self) 'update-editor)
     (return-from-modal-dialog ())))
-    
+  
 
 (defgeneric update-velocity (self vel))
 (defmethod update-velocity ((self C-chord) vel)
@@ -525,7 +525,7 @@
         (valmax (read-from-string (dialog-item-text (slot-value self 'off-val2)))))
     (transform-chord-notes self 'offset  selections count percent range valmin valmax)
     (update-editor self)))
-    
+  
 (defgeneric transform-chord-notes (self field selections count perc range valmin valmax))
 (defmethod transform-chord-notes ((self C-MN-view-mod) field selections count perc range valmin valmax) 
   (let ((vals (if range (interpol count valmin valmax))) (value))

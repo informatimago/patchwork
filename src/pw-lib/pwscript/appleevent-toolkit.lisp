@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -56,7 +56,7 @@
 ;; 09/13/91 bill Bogus ECASE clause in send-appleevent
 ;; 08/28/91 Getting Old Fast.
 ;; 08/24/91 Older.
-;; 5/1/91 New.  
+;; 5/1/91 New.
 
 ;; Note that the Appleevents docs are kind of misleading in terms of allocating &
 ;; deallocating storage for appleevents. As it turns out, you have to provide storage
@@ -463,7 +463,7 @@ reply      An AEDesc record containing the reply to an Apple Event."
       (error (make-condition 'appleevent-error
                              :oserr error-number
                              :error-string (get-error-string reply nil))))))
-    
+  
 
 ;; some common toplevel thingies:
 

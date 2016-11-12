@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,12 +36,12 @@
 
 ;;====================================================================================================
 ;; circular buffer
-#|(defclass  C-pw-circ (C-pw-resize-x)  
+#|(defclass  C-pw-circ (C-pw-resize-x)
   ((data :initform nil :accessor data)
    (lock :initform nil :accessor lock)
    (value :initform nil :accessor value)))|#
 
-(defclass  C-pw-circ (C-pw-resize-x)  
+(defclass  C-pw-circ (C-pw-resize-x)
   ((data :initform nil :accessor data)
    (value :initform nil :accessor value)
    (last-clock :initform 32000 :accessor last-clock)))
@@ -107,7 +107,7 @@
            (setf (value self) (patch-value (car (input-objects self)) obj))
            (setf (data self) (value self))
            (pop (data self)))))
-  
+
 ;;(defmethod draw-patch-extra :after ((self C-pw-circ)) )
   ;;(draw-char (+ -10 (x self)(w self)) (- (+ (y self)(h self)) 4) #\B)) 
 
@@ -120,7 +120,7 @@ evaluation of circ  (select the module and type 'v') causes the list of circulat
 
 ;;===================================
 
-(defclass  C-pw-circ-end (C-pw-circ)     
+(defclass  C-pw-circ-end (C-pw-circ)   
   ((stop-flag  :initform t :accessor stop-flag)))
  
 (defmethod init-patch ((self C-pw-circ-end))
@@ -128,7 +128,7 @@ evaluation of circ  (select the module and type 'v') causes the list of circulat
   (setf (stop-flag self) ()))
 
 (defmethod patch-value ((self C-pw-circ-end) obj)
-   (cond  
+   (cond
       ((cdr (data self)) (pop (data self)))
       ((not (stop-flag self))
          (setf (stop-flag self) t)
@@ -148,7 +148,7 @@ and dragging the mouse."
 
 ;;===================================
 
-(defclass C-pw-narg (C-pw-extend)())  
+(defclass C-pw-narg (C-pw-extend)())
 
 (defmethod patch-value ((self C-pw-narg) obj)
   (let ((args (ask-all (cdr (input-objects self)) 'patch-value obj)))
@@ -157,13 +157,13 @@ and dragging the mouse."
 (defvar arg1 () "Applies function (fn) with argument (arg1) 
 This box can be extended by option-clicking bottom-right 
 \(E = extend).") 
-(defvar arg2 () "Applies function (fn) with arguments (arg1 - arg2)  
+(defvar arg2 () "Applies function (fn) with arguments (arg1 - arg2)
 This box can be extended by option-clicking bottom-right 
 \(E = extend).") 
-(defvar arg3 () "Applies function (fn) with arguments (arg1 - arg3)  
+(defvar arg3 () "Applies function (fn) with arguments (arg1 - arg3)
 This box can be extended by option-clicking bottom-right 
 \(E = extend).") 
-(defvar arg4 () "Applies function (fn) with arguments (arg1 - arg4)  
+(defvar arg4 () "Applies function (fn) with arguments (arg1 - arg4)
 This box can be extended by option-clicking bottom-right 
 \(E = extend).") 
 (defvar arg5 () "Look at the documentation of arg2.")
@@ -174,7 +174,7 @@ This box can be extended by option-clicking bottom-right
 (defvar arg10 () "Look at the documentation of arg2.")
 
 ;;===================================
-(defclass C-pw-test (C-pw-extend)())  
+(defclass C-pw-test (C-pw-extend)())
 
 (defmethod give-new-extended-title ((self C-pw-test)) 'test)
 
@@ -193,7 +193,7 @@ This box can be extended by option-clicking bottom-right
       (setf (open-state (nth (1- (length values)) (pw-controls new-box))) t)
       (setf (car (last (input-objects new-box))) (car (last  (input-objects self))))
       (setf (open-state (car (last  (pw-controls new-box)))) nil))))
-  
+
 
 (defmethod patch-value ((self  C-pw-test) obj)
   (let ((fun (patch-value (car (input-objects self)) obj))
@@ -205,12 +205,12 @@ This box can be extended by option-clicking bottom-right
       (setq test t count 1 res nil)
       (while test
         (if (= count (- (length (input-objects self)) 2))
-          (progn  
+          (progn
             (setq test ())
             (setq res 
                   (patch-value (nth (1- (length (input-objects self)))
                                     (input-objects self)) obj)))
-          (progn  
+          (progn
             (when (funcall fun testarg1
                            (patch-value (nth (incf count) (input-objects self)) obj))
               (setq test ())
@@ -227,7 +227,7 @@ else is evaluated.  This module can be extended to include multiple cases. In
 this case input is  compared with test1, then test2, test3, etc.; as soon as the 
 test function succeeds, the corresponding val patch will 
 be evaluated. For example if test1 and test2 return nil, but test3 returns a true, 
-val3 is evaluated.  
+val3 is evaluated.
 In this case test4 and test5 will never be considered.  If all tests fail, then the 
 else patch is evaluated. If input is a list, a list is returned with the results of 
 applying the module's result to each element of the input list."
@@ -239,13 +239,13 @@ side of the PW-box.
 The test is repeated for each test-box and 
 if one of the tests succeeds,the corresponding val-box is
 evaluated.If none of the tests succeed,else-box is 
-evaluated.  
+evaluated.
 This box can be extended by option-clicking bottom-right 
 \(E = extend)."
 )
 
 ;;===================================
-(defclass C-pw-gclock (C-patch)())  
+(defclass C-pw-gclock (C-patch)())
 
 (defmethod patch-value ((self  C-pw-gclock) obj)
   (declare (ignore obj))
@@ -255,7 +255,7 @@ This box can be extended by option-clicking bottom-right
 "Returns the value of the global clock in ticks.")
 ;;===================================
 
-(defclass C-clock-constant (C-patch)  
+(defclass C-clock-constant (C-patch)
    ((last-clock :initform 32000 :accessor last-clock)
     (last-value :initform 0 :accessor last-value)))
  
@@ -287,7 +287,7 @@ the keyboard ('v') to evaluate when there is an ev-once in your patch."
   (declare (ignore val)))
 
 ;;===================================
-(defclass C-pw-loop (C-patch)())  
+(defclass C-pw-loop (C-patch)())
 
 (defmethod patch-value ((self  C-pw-loop) obj)
   (let ((res)(count (patch-value (car (input-objects self)) obj)))
@@ -302,12 +302,12 @@ input <patch> <count> times.The first input <count> tells how many times the
 second
 input <patch> is evaluated."
   (declare (ignore count patch)))
-  
+
 ;;===================================
 ;; 
 (defpackage "USER-SUPPLIED-IN-OUTS")
 
-(defclass C-pw-out (C-patch)())  
+(defclass C-pw-out (C-patch)())
 
 (defmethod initialize-instance :after ((self C-pw-out) &key controls)
   (declare (ignore controls))
@@ -338,7 +338,7 @@ or changing the names of the already used  in ;and out modules."
 
 ;;===================================
 
-(defclass C-pw-in (C-patch)())  
+(defclass C-pw-in (C-patch)())
 
 (defmethod init-patch ((self C-pw-in))
   (init-patch (symbol-value (patch-value (car (input-objects self)) ()))))

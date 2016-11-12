@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -67,7 +67,7 @@
       (setq w-sum 0)
       (setq temp () h-temp ())
       (while (and ws (< (length temp) 3) (< (+ (car ws) w-sum)  w-max))
-        (incf w-sum (car ws))   
+        (incf w-sum (car ws)) 
         (push (pop ws) temp)
         (push (pop hs) h-temp))
       (push (list (nreverse temp) (apply #'max h-temp)) res))
@@ -91,7 +91,7 @@
              (box-list+ys (order-inside-box-by-two ws hs 84))
              (box-w-list (mapcar #'first box-list+ys))
              (row-ys (mapcar #'second box-list+ys))
-             )  
+             )
         (while box-w-list
           (set-view-position (car input-boxes-temp) (make-point 5 y-now))
           ;;       (setf (x (car input-boxes-temp)) 5)
@@ -226,7 +226,7 @@
 ;; =============================================================================-======
 
 
-(defclass C-pw-lispfun (C-pw-extend) ())  
+(defclass C-pw-lispfun (C-pw-extend) ())
 
 (defmethod give-new-extended-title ((self C-pw-lispfun))
   (pw-function self))

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -82,7 +82,7 @@
                                           (not (%outrect-fill-state self)))
                                     *black-pattern*
                                     *white-pattern*))
-        (fill-rect* 1 1 8 3)))))      
+        (fill-rect* 1 1 8 3)))))    
 
 (defgeneric mid-x (self)
   (:method ((self C-pw-outrect))
@@ -144,8 +144,8 @@
           (let ((inde (if (patch-type-p patch) (find-nth-ctrl patch ctrl))))
             (when (and (patch-type-p (view-container ctrl)) 
                        (not (eql (class-name (class-of ctrl)) 'C-pw-outrect)))
-              (if (and (and (not (equal (type-list ctrl) '(no-connection)))  
-                            (not (equal (type-list (view-container self)) '(no-connection))))  
+              (if (and (and (not (equal (type-list ctrl) '(no-connection)))
+                            (not (equal (type-list (view-container self)) '(no-connection))))
                        (or (intersection  (type-list ctrl) (type-list (view-container self)) :test 'eq)
                            (not (type-list ctrl))(not (type-list (view-container self))))) ; no type-list specified
                   (progn 
@@ -216,7 +216,7 @@
           (while input-objects-now
             (setq nth-control (nth? (pop input-objects-now)  patch-controls))
             (when nth-control 
-              (push  
+              (push
                `(connect-nth-control (nth ,nth-control-self controls) ,i (nth ,nth-control controls)) 
                connections)))))
       (nreverse connections))))
@@ -336,7 +336,7 @@
                   #+debug-views (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
                   (change-size self (subtract-points (view-size self) where)))
                  ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom left box
-                  
+                
                   #+debug-views (format-trace 'view-click-event-handler "bottom box" (list (point-h where) (point-v where)) self)
                   (cond ((option-key-p)
                          #+debug-click (format-trace'click '(bottom left box) '(option) 'output-type)
@@ -383,7 +383,7 @@
 (defmethod view-draw-contents ((self C-patch))
   ;; #|PJB-DEBUG|#
   (format-trace "progn (view-draw-contents" 'c-patch 'before self)
-  (with-font-focused-view self  
+  (with-font-focused-view self
     (erase-rect* 0 0 (w self) (h self))
     #+debug-views-colors (with-pen-state (:pattern *light-gray-pattern*)
                            (with-fore-color *light-gray-color*
@@ -401,7 +401,7 @@
 (defgeneric print-connections (self &optional erase-mode)
   (:method ((self C-patch) &optional erase-mode)
     (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
-    (with-pen-state (:mode :srccopy)    ;srccopy  
+    (with-pen-state (:mode :srccopy)    ;srccopy
       (let* ((input-objects (input-objects self)) (pw-controls (pw-controls self))
              (x-self (x self))
              (y-self (y self))
@@ -414,7 +414,7 @@
           (setq x-off2 (if right? (* (truncate i 2) 2) (* (truncate i 2) -2)))
           (when (and (setq ctrl (pop input-objects))
                      (not (eql ctrl (pop pw-controls))))
-            (when (atom ctrl)(setq ctrl (list ctrl))) ; for nargs  
+            (when (atom ctrl)(setq ctrl (list ctrl))) ; for nargs
             (while ctrl
               (unless (eql erase-mode *white-pattern*) 
                 (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
@@ -469,7 +469,7 @@
   (:method ((self C-patch) &optional erase-mode from-patches)
     (with-focused-view (view-window self)
       (setq erase-mode (if erase-mode *white-pattern* *black-pattern*))
-      (with-pen-state (:mode :srccopy)  ;srccopy  
+      (with-pen-state (:mode :srccopy)  ;srccopy
         (let* ((input-objects (input-objects self)) (pw-controls (pw-controls self))
                (x-self (x self))
                (y-self (y self))
@@ -483,7 +483,7 @@
             (when (and (setq ctrl (pop input-objects))
                        (not (eql ctrl (pop pw-controls)))
                        (or (null from-patches) (member ctrl from-patches :test #'eq)))
-              (if (atom ctrl) (setq ctrl (list ctrl))) ; for nargs  
+              (if (atom ctrl) (setq ctrl (list ctrl))) ; for nargs
               (while ctrl
                 (unless (eql erase-mode *white-pattern*) 
                   (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
@@ -738,7 +738,7 @@
                    (unless (mouse-down-p) (return))
                    (let ((mp (view-mouse-position view)))
                      (unless (eql mp last-mp)
-                       (setq last-mp mp)        
+                       (setq last-mp mp)      
                        (resize-patch-box view mp delta)
                        (new-instance container)
                        (view-frame-patch view 0))))
@@ -963,7 +963,7 @@ tutorial file only if the names differ"
   (add-subviews win patch)
   (set-changes-to-file-flag win)
   (setf *position-new-box* nil)
-  (record-patch (pw-function patch)  
+  (record-patch (pw-function patch)
                 (list (point-h (view-position patch)) (point-v (view-position patch))) nil)
   patch) 
 

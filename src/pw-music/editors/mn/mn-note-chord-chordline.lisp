@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -52,7 +52,7 @@
 
 (defparameter *chromatic-scale* (make-instance 'C-scale 
    :alteration-vector
-;;          c   c#     d  d#   e     f   f#    g   g#   a   a#    h  
+;;          c   c#     d  d#   e     f   f#    g   g#   a   a#    h
   (vector  () #\Y    () #\Y  ()    ()  #\Y   ()  #\Y   ()  #\Y  ())
    :diatone-vector
   (vector  0   0      1  1     2     3   3     4   4    5     5   6)
@@ -60,7 +60,7 @@
 
 (defparameter *c-major-scale* (make-instance 'C-scale 
    :alteration-vector
-;;          c   c#     d  es    e     f   f#    g   as   a   b    h  
+;;          c   c#     d  es    e     f   f#    g   as   a   b    h
   (vector  () #\Y    () #\I   ()    ()  #\Y   ()  #\I   ()  #\I  ())
    :diatone-vector
   (vector  0   0      1   2     2     3   3     4   5    5   6   6)
@@ -68,7 +68,7 @@
 
 (defparameter *1/4-tone-chromatic-scale* (make-instance 'C-scale 
     :alteration-vector
-;;          c  c+  c#  c++    d  d+  d#  d++   e  e+    f  f+   f#  f++      g  g+  g#  g++   
+;;          c  c+  c#  c++    d  d+  d#  d++   e  e+    f  f+   f#  f++      g  g+  g#  g++ 
   (vector  () #\y #\Y #\L    () #\y #\Y  #\L  () #\y   () #\y  #\Y #\L     () #\y  #\Y #\L 
 ;;           a   a+  a#  a++   h  h+ 
            ()  #\y  #\Y #\L   () #\y)
@@ -80,7 +80,7 @@
 ;
 (defparameter *1/8-tone-chromatic-scale* (make-instance 'C-scale 
     :alteration-vector
-;;          c   c^  c+  c+!  c#  c#^ c++  C++!    d   d!      d+  d+! d#  d#^ d++  eb+ e  e!  e+   e+!     
+;;          c   c^  c+  c+!  c#  c#^ c++  C++!    d   d!      d+  d+! d#  d#^ d++  eb+ e  e!  e+   e+!   
   (vector  () #\Z #\y  #\u  #\Y #\U #\L   #\z ()   #\Z    #\y #\u #\Y #\U #\L  #\z  () #\Z #\y  #\z 
 ;;           f  f!  f+   f+! f#  f#^ f++  f++!   g  g^ g+  g+! g#  g#^ g++ ab+
            () #\Z #\y  #\u #\Y  #\U #\L #\z  () #\Z #\y #\u #\Y #\U #\L #\z
@@ -117,7 +117,7 @@
 ;; more compact 
 
 (defmethod decompile ((self C-note))
-  `(make-C-note  
+  `(make-C-note
        ,(midic self) ,(diatone self) ,(alteration self)
        ,(dur self) ,(vel self) ,(chan self)
        ,(when (instrument self)(decompile (instrument self)))
@@ -216,7 +216,7 @@
       (if *mn-view-dur-flag*
           (draw-note-duration-line self x-now y-now t-scfactor))
       (if (and *mn-view-offset-flag* (not *mn-view-time-flag*))
-          (draw-note-offset-line self x-now y-now t-scfactor)) )   
+          (draw-note-offset-line self x-now y-now t-scfactor)) ) 
     (when (and (instrument self) *mn-view-ins-flag* t-scfactor) 
       (draw-char x-now y-now #\Ω)
       (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
@@ -393,7 +393,7 @@
 (defgeneric draw-extra-info (self x-now C5 mode))
 (defmethod draw-extra-info ((self C-chord) x-now C5 mode)
   (declare (ignore x-now C5 mode)))
-   
+ 
 (defgeneric draw-single-note (self note t-scfactor beg-x time1 C5))
 (defmethod draw-single-note  ((self C-chord) note t-scfactor beg-x time1 C5)
   (let ((x-now (calc-chord-pixel-x self t-scfactor beg-x time1)))
@@ -441,7 +441,7 @@
       (when (pop alts)
         (push (car dias) dias-with-alts))
       (pop dias))
-    dias-with-alts))  
+    dias-with-alts))
 
 (defvar *alt-tolerance* 6)
 
@@ -455,7 +455,7 @@
       (if notes (setq alt-now (diatone (pop notes))))
       (while (and notes (not (alteration (car notes)))) (pop notes))
       (while (and notes 
-                                        ;(< (- alt-now (diatone (car notes))) *alt-tolerance*))   
+                                        ;(< (- alt-now (diatone (car notes))) *alt-tolerance*)) 
                   (< (-  (diatone (car notes)) alt-now) *alt-tolerance*))
         (incf group-length)
         (pop notes)
@@ -482,7 +482,7 @@
         (setq left? (not left?))))
     x-values))
 ;;___________
-;; ledger-lines  
+;; ledger-lines
 ;;*g2-g-staffs* *g-plain-staffs* -> (low-y-off-set  (+ C5 0)
 
 (defun round-midic (midic)
@@ -589,7 +589,7 @@
       (setf (notes self)
             (sort (notes self) #'< :key (lambda (note)(midic note)))))
     (notes self)))
-            
+          
 (defgeneric update-chord (self))
 (defmethod update-chord ((self C-chord))
   (when (notes self)
@@ -607,7 +607,7 @@
 
 (defgeneric max-dur (self))
 (defmethod max-dur ((self C-chord))
-  (apply #'max (ask-all (notes self) 'dur)))  
+  (apply #'max (ask-all (notes self) 'dur)))
 
 (defgeneric min-max-diatone (self))
 (defmethod min-max-diatone ((self C-chord))
@@ -699,7 +699,7 @@
     (while (and chords (> time2 (t-time (car chords))))
       (push  (pop chords) visible-chords))
     (nreverse visible-chords)))
-       
+     
 (defgeneric sort-chord-by-time (self new-chord))
 (defmethod sort-chord-by-time ((self C-chord-line) new-chord)
   (let ((chords (chords self))

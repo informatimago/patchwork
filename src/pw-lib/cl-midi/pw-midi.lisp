@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    This package exports an interface to midi files using the CL-MIDI system.
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -16,7 +16,7 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 1996
 ;;;;    Copyright Pascal J. Bourguignon 2014 - 2014
 ;;;;
@@ -24,12 +24,12 @@
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -207,7 +207,7 @@
     (if (listp object)
         (first object)
         object))
-  
+
   );;eval-when
 
 
@@ -233,7 +233,7 @@ is defined, with the structure as mandatory argument, and an optional
 value argument.  Called with one argument, the value of the field is
 returned; called with two arguments, the value of the field is set.
 "
-  
+
   (let (sname options include conc-name
         documentation 
         fields compulsory-fields variable-fields)
@@ -317,10 +317,10 @@ and the FINALIZATION is the clean-up form."
     (
      (pitch
       clk bend
-      pgm      fmsg    song ; clk.hi  bend.hi   
+      pgm      fmsg    song ; clk.hi  bend.hi 
       ctrl param num prefix tempo seconds tsnum      alteration ; 0
       )
-     (kpress fcount       ; clk.lo  bend.lo   
+     (kpress fcount       ; clk.lo  bend.lo 
              vel
              subframes valint                    tsdenom    minor-scale% ; 1
              )
@@ -870,7 +870,7 @@ and the FINALIZATION is the clean-up form."
 ;;;
 
 (defun install-midishare-interface ()
-  
+
   (unless (midishare) (error "MidiShare not installed")))
 
 (defun remove-midishare-interface ()
@@ -886,7 +886,7 @@ and the FINALIZATION is the clean-up form."
 ;;===============================
 
 ;;-------------------------------------------------------------------------- 
-;; Player state   
+;; Player state 
 ;;-------------------------------------------------------------------------- 
 
 (defconstant kIdle       0)
@@ -897,7 +897,7 @@ and the FINALIZATION is the clean-up form."
 
 
 ;;-------------------------------------------------------------------------- 
-;; Tracks state   
+;; Tracks state 
 ;;-------------------------------------------------------------------------- 
 
 (defconstant kMaxTrack	256)
@@ -909,7 +909,7 @@ and the FINALIZATION is the clean-up form."
 (defconstant kSolo  1)
 
 ;;-------------------------------------------------------------------------- 
-;; Recording management  
+;; Recording management
 ;;-------------------------------------------------------------------------- 
 
 (defconstant kNoTrack		-1)
@@ -917,21 +917,21 @@ and the FINALIZATION is the clean-up form."
 (defconstant kMixMode 		0)
 
 ;;-------------------------------------------------------------------------- 
-;; Loop  management  
+;; Loop  management
 ;;-------------------------------------------------------------------------- 
 
 (defconstant kLoopOn  	0)
 (defconstant kLoopOff 	1)
 
 ;;-------------------------------------------------------------------------- 
-;; Step Playing  
+;; Step Playing
 ;;-------------------------------------------------------------------------- 
 
 (defconstant kStepPlay  1)
 (defconstant kStepMute  0)
 
 ;;-------------------------------------------------------------------------- 
-;; Synchronisation  
+;; Synchronisation
 ;;-------------------------------------------------------------------------- 
 
 (defconstant kInternalSync	0)
@@ -943,7 +943,7 @@ and the FINALIZATION is the clean-up form."
 (defconstant kClockSyncOut 1)
 
 ;;-------------------------------------------------------------------------- 
-;; MIDIfile  
+;; MIDIfile
 ;;-------------------------------------------------------------------------- 
 
 (defconstant midifile0  0)
@@ -962,20 +962,20 @@ and the FINALIZATION is the clean-up form."
 ;;-------------------------------------------------------------------------- 
 
 (defconstant noErr               0)   ;; no error
-(defconstant ErrOpen             1)   ;; file open error       
-(defconstant ErrRead             2)   ;; file read error       
-(defconstant ErrWrite            3)   ;; file write error      
-(defconstant ErrVol              4)   ;; Volume error          
-(defconstant ErrGetInfo          5)   ;; GetFInfo error        
-(defconstant ErrSetInfo          6)   ;; SetFInfo error        
-(defconstant ErrMidiFileFormat   7)   ;; bad MidiFile format   
+(defconstant ErrOpen             1)   ;; file open error     
+(defconstant ErrRead             2)   ;; file read error     
+(defconstant ErrWrite            3)   ;; file write error    
+(defconstant ErrVol              4)   ;; Volume error        
+(defconstant ErrGetInfo          5)   ;; GetFInfo error      
+(defconstant ErrSetInfo          6)   ;; SetFInfo error      
+(defconstant ErrMidiFileFormat   7)   ;; bad MidiFile format 
 
 ;;-------------------------------------------------------------------------- 
 ;; Errors  : for the player
 ;;-------------------------------------------------------------------------- 
 
-(defconstant PLAYERnoErr           -1)  ;; No error            
-(defconstant PLAYERerrAppl         -2)  ;; Unable to open MidiShare app  
+(defconstant PLAYERnoErr           -1)  ;; No error          
+(defconstant PLAYERerrAppl         -2)  ;; Unable to open MidiShare app
 (defconstant PLAYERerrEvent        -3)  ;; No more MidiShare Memory
 (defconstant PLAYERerrMemory       -4)  ;; No more Mac Memory
 (defconstant PLAYERerrSequencer    -5)  ;; Sequencer error
@@ -1191,7 +1191,7 @@ and the FINALIZATION is the clean-up form."
                               :channel chan
                               :key (pitch event)
                               :velocity (vel event)))))
-      
+    
       ((#.typeKeyOff) #| key off with pitch and velocity |#
        (list (let ((class 'midi::note-off-message))
                (make-instance class
@@ -1200,7 +1200,7 @@ and the FINALIZATION is the clean-up form."
                               :channel chan
                               :key (pitch event)
                               :velocity (vel event)))))
-      
+    
       ((#.typeKeyPress) #| key pressure with pitch and pressure value |#
        (list (let ((class 'midi::polyphonic-key-pressure-message))
                (make-instance class
@@ -1209,7 +1209,7 @@ and the FINALIZATION is the clean-up form."
                               :channel chan
                               :key (pitch event)
                               :pressure (kpress event)))))
-      
+    
       ((#.typeCtrlChange) #| control change with control number and control value |#
        (list (let ((class 'midi:control-change-message))
                (make-instance class
@@ -1218,7 +1218,7 @@ and the FINALIZATION is the clean-up form."
                               :channel chan
                               :controller (ctrl event)
                               :value (valint event)))))
-      
+    
       ((#.typeProgChange) #| program change with program number |#
        (list (let ((class 'midi:program-change-message))
                (make-instance class
@@ -1226,7 +1226,7 @@ and the FINALIZATION is the clean-up form."
                               :status (+ (midi:status-min class) chan)
                               :channel chan
                               :program (pgm event)))))
-      
+    
       ((#.typeChanPress) #| channel pressure with pressure value |#
        (list (let ((class 'midi:channel-pressure-message))
                (make-instance class
@@ -1234,7 +1234,7 @@ and the FINALIZATION is the clean-up form."
                               :status (+ (midi:status-min class) chan)
                               :channel chan
                               :pressure (kpress event)))))
-      
+    
       ((#.typePitchBend) #| pitch bender with lsb and msb of the 14-bit value |#
        (list (let ((class 'midi:pitch-bend-message))
                (make-instance class
@@ -1245,32 +1245,32 @@ and the FINALIZATION is the clean-up form."
 
       ((#.typeSongPos) #| song position with lsb and msb of the 14-bit position |#)
       ((#.typeSongSel) #| song selection with a song number |#)
-      
+    
       ((#.typeClock) #| clock request (no argument) |#
        (list (make-instance 'midi:timing-clock-message :time date)))
-      
+    
       ((#.typeStart) #| start request (no argument) |#
        (list (make-instance 'midi:start-sequence-message :time date)))
-      
+    
       ((#.typeContinue) #| continue request (no argument) |#
        (list (make-instance 'midi:continue-sequence-message :time date)))
-      
+    
       ((#.typeStop) #| stop request (no argument) |#
        (list (make-instance 'midi:stop-sequence-message :time date)))
-      
+    
       ((#.typeTune) #| tune request (no argument) |#
        (list (make-instance 'midi:tune-request-message :time date)))
-      
+    
       ((#.typeActiveSens) #| active sensing code (no argument) |#
        (list (make-instance 'midi:active-sensing-message :time date)))
-      
+    
       ((#.typeReset) #| reset request (no argument) |#
        (list (let ((class 'midi:reset-all-controllers-message))
                (make-instance class
                               :time date
                               :status (+ (midi:status-min class) chan)
                               :channel chan))))
-      
+    
       ((#.typeSysEx) #| system exclusive with any number of data bytes. Leading $F0 and tailing $F7 are automatically supplied by MidiShare and MUST NOT be included by the user |#
        'midi:system-exclusive-message
        nil)
@@ -1283,32 +1283,32 @@ and the FINALIZATION is the clean-up form."
       ((#.typeCtrl14b))
       ((#.typeNonRegParam))
       ((#.typeRegParam))
-      
+    
       ((#.typeSeqNum)
        (list (make-instance 'midi:sequence-number-message
                             :time date
                             :sequence (num event))))
-      
+    
       ((#.typeTextual)
        (list (make-instance 'midi:general-text-message
                             :time date
                             :text (text event))))
-      
+    
       ((#.typeCopyright)
        (list (make-instance 'midi:copyright-message
                             :time date
                             :text (text event))))
-      
+    
       ((#.typeSeqName)
        (list (make-instance 'midi:sequence/track-name-message
                             :time date
                             :text (text event))))
-      
+    
       ((#.typeInstrName)
        (list (make-instance 'midi:instrument-message
                             :time date
                             :text (text event))))
-      
+    
       ((#.typeLyric)
        (list (make-instance 'midi:lyric-message
                             :time date
@@ -1318,20 +1318,20 @@ and the FINALIZATION is the clean-up form."
        (list (make-instance 'midi:marker-message
                             :time date
                             :text (text event))))
-      
+    
       ((#.typeCuePoint)
        (list (make-instance 'midi:cue-point-message
                             :time date
                             :text (text event))))
-      
+    
       ((#.typeChanPrefix)
        (list (make-instance 'midi:channel-prefix-message
                             :time date
                             :channel chan)))
-      
+    
       ((#.typeEndTrack)
        (list (make-instance 'midi:end-of-track-message)))
-      
+    
       ((#.typeTempo)
        (list (let ((class 'midi:tempo-message))
                (make-instance class
@@ -1347,7 +1347,7 @@ and the FINALIZATION is the clean-up form."
                                     :se
                                     :fr
                                     :ff)))
-      
+    
       ((#.typeTimeSign)
        'midi:time-signature-message
        )
@@ -1371,7 +1371,7 @@ and the FINALIZATION is the clean-up form."
 
 
 (defgeneric convert-midi-message-to-midishare-event (message)
-  
+
   (:method (message)
     (declare (ignorable message))
     nil)
@@ -1459,7 +1459,7 @@ and the FINALIZATION is the clean-up form."
                      :date (midi:message-time message)
                      :port 0
                      :chan (midi:message-channel message)))
-  
+
   (:method ((message midi:sequence-number-message))
     (let ((ev (make-midi-event :evtype typeSeqNum
                                :date (midi:message-time message)

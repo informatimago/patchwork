@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    Mikael Laurson
@@ -18,19 +18,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -185,7 +185,7 @@
                              (* 6500 1024))))
     (when file
       (clear-patchwork)
-      (eval-enqueue        
+      (eval-enqueue      
        (lambda ()
          #+ccl (ccl::build-application
                 :name (file-namestring file)
@@ -304,7 +304,7 @@
                                  *pw-menu-file-only-SaveMN-item*
                                  *pw-menu-file-Save-item*
                                  *pw-menu-file-SaveMN-item*))
-  
+
   ;;------------------------------
   (setf *pw-menu-edit* (new-menu "Edit"
                                  (item "Cut"         #\X  (cut   *active-patch-window*))
@@ -352,12 +352,12 @@
   (pw::pw-addmenu-fun *pw-MN-Edit-menu* 'chordseq 'C-patch-chord-line:C-patch-chord-line)
   ;;(PW-addmenu-fun *pw-MN-Edit-menu* 'epw::ascii-chord 'EPW::C-pw-ascii-chord-box)
   (PW-addmenu-fun *pw-MN-Edit-menu* 'multiseq 'C-patch-PolifMN-mod)
-  
+
   (setf *pw-Conv-approx-menu* (new-menu "Conv-Approx"))
   (PW-addmenu *pw-Conv-approx-menu*
               '(f->mc mc->f mc->n n->mc int->symb symb->int cents->coef coef->cents approx-m
                 lin->db epw::db->lin))
-  
+
   (setf *pw-Music-Extern-menu* (new-menu "Extern"))
   ;;(pw-addmenu-fun *pw-Music-Extern-menu* 'pw-clock 'C-pw-gclock)
   ;;(pw-addmenu-fun *pw-Music-Extern-menu* 'str-dur 'C-structured-dur)
@@ -366,7 +366,7 @@
   ;;  '(*string-pw-type* "strcoll") '(midi-ins) '("Strcoll"))
 
 
-  
+
   (setf *pw-Midi-menu* (new-menu "Midi"))
   ;;(pw-addmenu *pw-Midi-menu* '(midi-o pgmout volume TXtune))
   ;;(pw-addmenu *pw-Midi-menu* '(bendout))
@@ -452,7 +452,7 @@
                   'c-get-selections::C-get-selections)
 
 
-  
+
   (add-menu-items *pw-menu-Music*
                   *pw-MN-Edit-menu*
                   *pw-Conv-approx-menu*
@@ -478,7 +478,7 @@
                                                                  :window-title "Lisp Function"
                                                                  :initial-string "list")))
                                       ;; (handler-case
-                                      ;;     
+                                      ;;   
                                       ;;   (error (err) (format t "~%~A~%" err)))
                                     (when string
                                       (let ((patch (let ((*si-record* nil))
@@ -511,13 +511,13 @@
   (setf *option-click-menu*    (new-leafmenu "Option-Click"   (lambda () (set-eval-click t))))
   ;;------------------------------
   (add-menu-items *PWoper-menu*
-                  
+                
                   (new-leafmenu "-" nil)
                   (setf *pw-debug-menu* (new-leafmenu "PW-debug-ON" (lambda () (flip-pw-debug))))
                   *pw-debug-menu*
                   (new-leafmenu "Show Scheduler Queue" (lambda () (patchwork.scheduler:print-scheduler-queue)))
                   (new-leafmenu "Show Error Box" 'activate-current-patch-value-patch)
-                  
+                
                   (new-leafmenu "-" nil)
                   (new-menu "Global options"
                             (new-menu "Scale" *g-option-c-major* *g-option-chromatic*)
@@ -531,7 +531,7 @@
                             (new-menu "Evaluation"
                                       *option-click-menu*
                                       *click-menu*))
-                  
+                
                   (new-leafmenu "-" nil)
                   (new-leafmenu "Load Library…"      (lambda () (load-library-config)))
                   (new-leafmenu "Load Abstracts…"    (lambda () (load-abstr-config)))
@@ -541,7 +541,7 @@
                   (new-leafmenu  "-" ())
                   (new-leafmenu "MIDI Reset"          (lambda () (pw-reset-for-midi)))
                   (new-leafmenu "MIDI all-notes-off"  (lambda () (all-off)))
-                  
+                
                   (new-leafmenu "-" nil)
                   (new-leafmenu "Save Image"          (lambda () (save-special-pw-image))))
   ;;------------------------------

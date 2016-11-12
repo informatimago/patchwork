@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -49,7 +49,7 @@
     (unless (=  x-max x-min)
       (setf (h-view-scaler view) (/ (+ (- x-max x-min)(* (- x-max x-min) .01)) (w view) ))) 
     (unless (=  y-max y-min)
-      (setf (v-view-scaler view) (/ (+ (- y-max y-min)(* (- y-max y-min).01)) (h view) )))  
+      (setf (v-view-scaler view) (/ (+ (- y-max y-min)(* (- y-max y-min).01)) (h view) )))
     (set-origin view 
          (make-point (round x-min (h-view-scaler view)) 
                      (- (h view) (round y-max (v-view-scaler view))))))))
@@ -156,7 +156,7 @@
          (if (listp (first list))
            (append (flatt (first list)) (flatt (rest list)))
            (cons (first list) (flatt (rest list)))))))
-        
+      
 ;; scales all bps not just the active one 
 ;;changed by aaa 28-08-95 from pw-modif
 (defun scale-to-fit-in-rect (view)
@@ -201,7 +201,7 @@
      :view-position ,(view-position self)
      :view-size ,(view-size self)
      :doc-string ,(doc-string self)
-     :type-list ',(type-list self)  
+     :type-list ',(type-list self)
      :break-point-function ,(decompile (break-point-function self))))
 
 (defmethod initialize-instance :after ((self C-mini-bpf-view) &key controls)
@@ -249,7 +249,7 @@
 ;;                  :view-position #@(5 145)
 ;;                  :view-size #@(60 100)))
 ;; 
-;; ;;(time (repeat 400 (view-draw-contents bm)))  
+;; ;;(time (repeat 400 (view-draw-contents bm)))
 ;; ;;(time (repeat 100 (scale-to-fit-in-rect bm)))
 ;; ;;(set-break-point-function-to-mini bm bb2)
 

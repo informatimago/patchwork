@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    Midi boxes for PW
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -103,7 +103,7 @@ between
                        (chan fix>=0 (:value 1)) &optional (approx approx (:value 4))) nil
     "Plays a chord sequence (first argument). The second argument is a channel
 for chord notes. The third (optional) argument gives the approximation (default: quarter tone)"
-  
+
   (let* ((chords (chords ch-l))
          (notes (ask-all chords 'notes))
          (midics (mapcar (lambda (note) (ask-all note 'midic)) notes))
@@ -251,9 +251,9 @@ chan + 2 (quartertones),  chan + 3 (three-eighths tones).
                       (durs (fix>=0 (:type-list (fixnum list))))
                       &optional (offs (integer (:type-list (fixnum list))))
                       (at-time (fix>=0 (:type-list (fixnum list))))) list
-    "<snd-midinote> formats and plays MIDI note events.  
+    "<snd-midinote> formats and plays MIDI note events.
 If <midics> is a list, then the result is a chord.  Notes are played with 
-a channel <chan>  velocity  
+a channel <chan>  velocity
 <vels>  and duration <durs> as determined by the inputs. The 
 optional input  <offs> lets one 
 assign a time offset (in 100ths of a second relative to time zero) for 
@@ -528,13 +528,13 @@ endlessly: 'late Task'.
 (defmethod format-midi ((self C-pw-chord-in) data)
   (let* ((the-chord (the-chord self))
          (the-notes (pw::notes the-chord))
-         (a-note (pw::make-C-note   
+         (a-note (pw::make-C-note 
                   (* 100 (patchwork.midi:pitch data)) nil nil 100 
                   (patchwork.midi:vel data) (1+ (patchwork.midi:chan data))
                   nil 0 0)))
     (setf (pw::order a-note) (length the-notes))
     (setf (pw::notes the-chord)
-          (push (pw::make-C-note   
+          (push (pw::make-C-note 
                  (* 100 (patchwork.midi:pitch data)) nil nil 100 
                  (patchwork.midi:vel data) (1+ (patchwork.midi:chan data))
                  nil 0 0) the-notes))
@@ -559,8 +559,8 @@ endlessly: 'late Task'.
     "The chord-in and   m-data ;modules work in a similar way as   note-in;. The 
 chord-in module filters   MIDI ;events other than note-on messages. The patch 
 connected to patch  is repeatedly evaluated for each new MIDI note-on event. 
-The output of the m-data box is a chord object with all accumulated notes  
-since the last box request. The optional input delay gives the delay time  
+The output of the m-data box is a chord object with all accumulated notes
+since the last box request. The optional input delay gives the delay time
 evaluation (in 100ths of a second) of the input patch. . Warning,  Very 
 Important!:: If the module is not deactivated after use, patch evaluation will be 
 very slow.  It is very dangerous because may cause Patchwork to report 
@@ -599,7 +599,7 @@ endlessly: 'late Task'."
   ;;(patchwork.scheduler:set-scheduler-state :oot)
   (patchwork.midi:midi-close)
   (patchwork.scheduler::init-scheduler)
-  (patchwork.midi:midi-open)  
+  (patchwork.midi:midi-open)
   ;;(patchwork.scheduler:set-scheduler-state :rt)
   )
 

@@ -130,7 +130,7 @@
   (make-Instance
     self
     :object  object
-    :type    type   
+    :type    type 
     :recSize size))
 
 (defmethod asClosObject ((self AEDesc))
@@ -166,7 +166,7 @@
     (setDescRecPtr result self)
    ;AAA (dispose self)
    self))
-    
+  
 
 
 (defmethod getAEType ((self AEDesc))
@@ -250,7 +250,7 @@
 
 (defmethod getSize ((self AEDescList))
   (niy getSize self)
-  ;; (rlet ((result :Signed-Long))           
+  ;; (rlet ((result :Signed-Long))         
   ;;   (#_AECountItems
   ;;    (getDescRecPtr self)
   ;;    result)
@@ -428,7 +428,7 @@
 
 (defmethod initialize-instance ((self AppleEvent) &key
                                 object type recSize descRecPtr
-                                class  id   target  
+                                class  id   target
                                 (returnId      #$kAutoGenerateReturnID)
                                 (transactionId #$kAnyTransactionID))
   (declare (ignore object) (ignore type) (ignore recSize))
@@ -738,7 +738,7 @@
   (declare (ignore self))
   :|list|)
 
-(defmethod getAESize ((self List))       
+(defmethod getAESize ((self List))     
   (declare (ignore self)))
 
 
@@ -919,7 +919,7 @@
 (defmethod putInAE ((self String) dataPtr)
   (%put-CString dataPtr self))
 
-  
+
 (defmethod getAEType ((self String))
   (declare (ignore self))
   :|TEXT|)
@@ -959,7 +959,7 @@
 
 
 
-  
+
 (defmethod asAEDesc ((self integer) &optional 
                      (type (getAEType self)))
   (declare (ignore type))

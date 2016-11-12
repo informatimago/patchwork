@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -124,7 +124,7 @@
                         in-docs-temp))
                (t in-docs-temp))))
          (abstract-box 
-           (make-std-patch-box (type-of self)  
+           (make-std-patch-box (type-of self)
                                (read-from-string title) in-put-docs win in-boxes)))
     (dmove-patch abstract-box (x self) (y self))
     ;;   connections
@@ -172,7 +172,7 @@
                                                    (make-point (third active-rect) (fourth active-rect)) ))
                (apply #'add-subviews new-win patches)
                (deactivate-control out-box)
-               ;;inboxes        
+               ;;inboxes      
                (setq in-boxes (find-abstract-in-boxes self patches))
                (setq abstract-box 
                      (make-std-abstract-box self patches new-win in-boxes abstract-class ))
@@ -192,15 +192,15 @@
 (defgeneric make-std-abstract-box (self patches new-win in-boxes abstract-class)
   (:method ((self C-pw-window) patches new-win in-boxes  abstract-class)
     (let (in-put-docs)
-      (when in-boxes        
+      (when in-boxes      
         (setq in-put-docs (get-absin-boxes-types-n patches in-boxes))
         (when (member nil in-put-docs)
-          (message-dialog  
+          (message-dialog
            "WARNING! absin box connected to irreducible types. ALL-type used.")
           (setq in-put-docs
                 (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum))
                         in-put-docs))))
-      (make-std-patch-box abstract-class  
+      (make-std-patch-box abstract-class
                           (read-from-string (window-title new-win)) in-put-docs new-win in-boxes))))
 
 (defun all-absins-different (absins)
@@ -499,8 +499,8 @@ value))|#
 
 ;;;==========================================================================
 ;;; the config functions
-;;;==========================================================================    
-(defun SAVE-PATCH-CONFIG()                              
+;;;==========================================================================  
+(defun SAVE-PATCH-CONFIG()                            
   (SHOW-PATCH-LIB nil nil))
 
 (defun SHOW-PATCH-LIB(conf-list obj)   ;useless parameters. Present for "connection-style".
@@ -558,7 +558,7 @@ value))|#
       (unless 
           (setq menu (find-menu-item current-sub-menu (car sub-dir-list)))
         (ui:add-menu-items current-sub-menu
-                           (setq menu (new-menu (car sub-dir-list)))))                            
+                           (setq menu (new-menu (car sub-dir-list)))))                          
       (setq current-sub-menu menu)
       (pop sub-dir-list))
     (or (find-menu-item current-sub-menu (car sub-dir-list))
@@ -583,7 +583,7 @@ value))|#
     (dolist (file-pair1 cf1)
       (if (library-p (car file-pair1))
           (setq result (merge-lib-select file-pair1 result))
-          (setq result (adjoin file-pair1 result :test #'string=  
+          (setq result (adjoin file-pair1 result :test #'string=
                                                  :key (lambda (item) (car item))))))
     result))
 
@@ -592,7 +592,7 @@ value))|#
     (dolist (file-pair1 take-list)
       (if (library-p (car file-pair1))
           (setq result (delete-lib-select file-pair1 result))
-          (setq result (remove (car file-pair1) result :test #'string=  
+          (setq result (remove (car file-pair1) result :test #'string=
                                                        :key (lambda (item) (car item))))))
     result))
 

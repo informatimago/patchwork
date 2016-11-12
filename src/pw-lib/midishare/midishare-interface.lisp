@@ -9,7 +9,7 @@
 ;;;  It is in conformity with MPW Pascal MidiShareUnit.p .
 ;;;
 ;;;  History :
-;;;  
+;;;
 ;;;   11-Nov-90, First version. -Yo-
 ;;;   25-Nov-90, Ajoute def de TMidiSeq + FirstEv & LastEv -Yo-
 ;;;   25-Nov-90, Continue change en Cont -Yo-
@@ -76,8 +76,8 @@
 ;;;   07-07-04   Val renamed to valint to avoid symbol conflict
 ;;;   02-06-06   Remove MIDISHARE symbol that cause a package conflict on MCL 5.1
 
-(in-package :cl-user)       
-    
+(in-package :cl-user)     
+  
 (defpackage "MIDISHARE"
   (:nicknames ms)
   (:use common-lisp
@@ -253,7 +253,7 @@
 ;;; 			 To Add Startup and Quit Actions
 ;;;-----------------------------------------------------------------------
 
-(unless (and (boundp '*lisp-startup-functions*)  
+(unless (and (boundp '*lisp-startup-functions*)
              (boundp '*lisp-cleanup-functions*))
   (defvar *lisp-startup-functions* nil)
   (defvar *lisp-cleanup-functions* nil))
@@ -292,14 +292,14 @@
   "Same as %get-string but work with mac non-zone pointers"
   (let (name count)
     (setq count (%get-byte ps))
-    (setq name (make-string count))  
+    (setq name (make-string count))
     (dotimes (i count)
       (setq ps (%inc-ptr ps 1))
       (setf (aref name i) (coerce (%get-byte ps) 'character)))
     name))
 
 ;;; For bug (?) in MCL PPC 3.9 when returning signed word
-  
+
 (defun %%unsigned-to-signed-word (w)
   "convert an unsigned word to a signed word"
   (if (< w 32768) w (- w 65536)))
@@ -307,7 +307,7 @@
 (defun %%word-high-byte (w)
   "most significant byte of a word"
   (ash w -8))
-  
+
 (defun nullptrp (p) (%null-ptr-p p))
 
 (defun nullptr () (%null-ptr))
@@ -322,7 +322,7 @@
 
 ;;; Extension record for typeSysEx events
 
-(defrecord TMidiSEX  
+(defrecord TMidiSEX
   (link (:pointer TMidiSEX))
   (data (:array :byte 12)))
 
@@ -365,8 +365,8 @@
 (defrecord TMidiSeq
   (first (:pointer TMidiEv))    ; first event
   (last (:pointer TMidiEv))     ; last event
-  (undef1 :pointer)   
-  (undef2 :pointer) )  
+  (undef1 :pointer) 
+  (undef2 :pointer) )
 
 ;;;-----------------------------------------------------------------------
 ;;; Record for MidiShare SMPTE synchronisation informations
@@ -794,7 +794,7 @@
 
 (defmacro get-fun-addr (name framework)
   `(lookup-function-in-framework ,name ,framework))
-  
+
 
 ;;; MidiShare entry point
 
@@ -2609,7 +2609,7 @@
 
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 				Utilities                                         
+;;; 				Utilities                                       
 ;;;
 ;;;-----------------------------------------------------------------------
 
@@ -2627,7 +2627,7 @@
 (def-alien-type ptr  (* t))
 
 ;; Test if p is a null pointer
-                                                                      
+                                                                    
 (defun nullptrp (p)
   (if (typep p '(alien (* t))) 
     (zerop (system:sap-int (alien-sap p)))
@@ -2640,9 +2640,9 @@
 
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
-;;;                                                                                 
-;;; 				MidiShare Data Structures                           
-;;;                                                                                  
+;;;                                                                               
+;;; 				MidiShare Data Structures                         
+;;;                                                                                
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
@@ -2667,48 +2667,48 @@
 	  (ptr4 ptr )
   )
 )
-	  
+	
 
 ;;;-----------------------------------------------------------------------
-;;; Common Record for all MidiShare events                                        
+;;; Common Record for all MidiShare events                                      
 ;;;-----------------------------------------------------------------------
 
 ;; Possible types for the last field of the structure
-                                                      
-(def-alien-type nil                                   
-  (struct PitchVelDur                                
-	  (pitch char  )                              
-	  (vel   char  )                             
-	  (dur   short )))                         
-                                                     
-(def-alien-type nil                                   
-  (struct datas                                       
-	  (data0 char)                               
-	  (data1 char)                                
-	  (data2 char)                               
-	  (data3 char) ))                             
-                                                      
-(def-alien-type T_info long)                          
-(def-alien-type T_linkSE (*(struct TMidiSEX)))        
-(def-alien-type T_linkST (*(struct TMidiST) ))       
-                                                      
-(def-alien-type nil                                   
-   (union evData                                      
-	  (note (struct pitchVelDur))                
-	  (data (struct datas      ))                 
-	  (info T_info              )                
-	  (linkSE T_linkSE          )               
-	  (linkST T_linkST          )))            
-                                                     
-                                                      
-;;; The last field of a TMidiEv is either :  
-;;;                                                    
+                                                    
+(def-alien-type nil                                 
+  (struct PitchVelDur                              
+	  (pitch char  )                            
+	  (vel   char  )                           
+	  (dur   short )))                       
+                                                   
+(def-alien-type nil                                 
+  (struct datas                                     
+	  (data0 char)                             
+	  (data1 char)                              
+	  (data2 char)                             
+	  (data3 char) ))                           
+                                                    
+(def-alien-type T_info long)                        
+(def-alien-type T_linkSE (*(struct TMidiSEX)))      
+(def-alien-type T_linkST (*(struct TMidiST) ))     
+                                                    
+(def-alien-type nil                                 
+   (union evData                                    
+	  (note (struct pitchVelDur))              
+	  (data (struct datas      ))               
+	  (info T_info              )              
+	  (linkSE T_linkSE          )             
+	  (linkST T_linkST          )))          
+                                                   
+                                                    
+;;; The last field of a TMidiEv is either :
+;;;                                                  
 ;;;     - a note (with a pitch, a velocite and a duration) 
-;;;     - a 4 byte field (4 au total)            
-;;;     - a fiels info  (4 bytes)                                   
-;;;     - a link to a TMidiSEX                     
-;;;     - a link to a TMidiST                      
-;;;                                                    
+;;;     - a 4 byte field (4 au total)          
+;;;     - a fiels info  (4 bytes)                                 
+;;;     - a link to a TMidiSEX                   
+;;;     - a link to a TMidiST                    
+;;;                                                  
 
 (def-alien-type nil
   (struct TMidiEv
@@ -2724,7 +2724,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;; Record for a MidiShare Sequence                                                 
+;;; Record for a MidiShare Sequence                                               
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2737,7 +2737,7 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; Record for MidiShare SMPTE synchronisation informations                          
+;;; Record for MidiShare SMPTE synchronisation informations                        
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2757,7 +2757,7 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; Record for MidiShare SMPTE locations                                              
+;;; Record for MidiShare SMPTE locations                                            
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2772,7 +2772,7 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; Record for MidiShare Filters                                                   
+;;; Record for MidiShare Filters                                                 
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type nil
@@ -2785,7 +2785,7 @@
 )
 
 ;;;-----------------------------------------------------------------------
-;;; pointers on alien data structures                                               
+;;; pointers on alien data structures                                             
 ;;;-----------------------------------------------------------------------
 
 (def-alien-type MidiSEXPtr     ( *(struct TMidiSEX) )      ) 
@@ -2799,9 +2799,9 @@
 
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
-;;;                                                                                  
-;;; 		Macros for accessing MidiShare Events data structures              
-;;;                                                                                 
+;;;                                                                                
+;;; 		Macros for accessing MidiShare Events data structures            
+;;;                                                                               
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
@@ -2811,68 +2811,68 @@
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: link
-;;                                                                                                                                          
+;;                                                                                                                                        
 (defun link (e &optional (d nil d?))
   "read or set the link of an event"
   (if d?
-    (midiSetLink e d);  (setf (slot e 'link) d )                 
+    (midiSetLink e d);  (setf (slot e 'link) d )               
     (midiGetLink e   );  (slot e 'link           )
   )
 )
 
 ;;;..................................................: date
-;;                                                                                                                                       
+;;                                                                                                                                     
 (defun date (e &optional d)
   "read or set the date of an event"
   (if d
       (MidiSetDate e d); (setf (slot e 'date) d )
-      (MidiGetDate e   ); (slot e 'date           )                
+      (MidiGetDate e   ); (slot e 'date           )              
   )
 )
 
 ;;;..................................................: type
-;;                                                                                                                                          
+;;                                                                                                                                        
 (defun evtype (e &optional v)
   "read or set the type of an event. Be careful in 
  modifying the type of an event"
   (if v
       (MidiSetType e v); (setf (slot e 'evType) v )
-      (MidiGetType e   ); (slot e 'evType           )              
+      (MidiGetType e   ); (slot e 'evType           )            
   )
 )
 
 ;;;..................................................: ref
-;;                                                                                                                                          
+;;                                                                                                                                        
 (defun ref (e &optional v)
   "read or set the reference number of an event"
   (if v
       (MidiSetRefNum e v); (setf (slot e 'ref) v)
-      (MidiGetRefNum e    ); (slot e 'ref          )                
+      (MidiGetRefNum e    ); (slot e 'ref          )              
   )
 )
 
 ;;;..................................................: port
-;;                                                                                                                                             
+;;                                                                                                                                           
 (defun port (e &optional v)
   "read or set the port number of an event"
   (if v
       (MidiSetPort e v); (setf (slot e 'port) v)
-      (MidiGetPort e   ); (slot e 'port          )                 
+      (MidiGetPort e   ); (slot e 'port          )               
    )
 )
 
 ;;;..................................................: chan
-;;                                                                                                                                           
+;;                                                                                                                                         
 (defun chan (e &optional v)
   "read or set the chan number of an event"
   (if v
       (MidiSetChan e v); (setf (slot e 'chan) v)
-      (MidiGetChan e   ); (slot e 'chan          )                  
+      (MidiGetChan e   ); (slot e 'chan          )                
   )
 )
 
 ;;;..................................................: field
-;;                                                                                                                                           
+;;                                                                                                                                         
 (defun field (e &optional f v)
   "give the number of fields or read or set a particular field of an event"
   (if f
@@ -2882,7 +2882,7 @@
     (midicountfields e)))
 
 ;;;..................................................: fieldsList
-;;                                                                                                                   
+;;                                                                                                                 
 (defun fieldsList (e &optional (n 4))
   "collect all the fields of an event into a list"
   (let (l)
@@ -2896,32 +2896,32 @@
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: pitch
-;;                                                                                                                                            
+;;                                                                                                                                          
 (defun pitch (e &optional v)
   "read or set the pitch of an event"
   (if v
       (midisetfield e 0 v); (setf (slot (slot (slot e 'data) 'note) 'pitch) v)
-      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )  
+      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )
   )
 )
 
 ;;;..................................................: vel
-;;                                                                                                                                         
+;;                                                                                                                                       
 (defun vel (e &optional v)
   "read or set the velocity of an event"
   (if v
       (midisetfield e 1 v); (setf (slot (slot (slot e 'data) 'note) 'vel) v)
-      (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel          )    
+      (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel          )  
   )
 )
 
 ;;;..................................................: dur
-;;                                                                                                                                             
+;;                                                                                                                                           
 (defun dur (e &optional v)
   "read or set the duration of an event"
   (if v
       (midisetfield e 2 v); (setf (slot (slot (slot e 'data) 'note) 'dur) v)
-      (midigetfield e 2   ); (slot (slot (slot e 'data) 'note) 'dur          )    
+      (midigetfield e 2   ); (slot (slot (slot e 'data) 'note) 'dur          )  
   )
 )
 
@@ -2931,7 +2931,7 @@
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: linkSE
-;;                                                                                               
+;;                                                                                             
 (defun linkSE (e &optional (d nil d?))
   "read or set the link of an SEXevent "
   (if d?
@@ -2941,7 +2941,7 @@
 )
 
 ;;;..................................................: linkST
-;;                                                                                                
+;;                                                                                              
 (defun linkST (e &optional (d nil d?))
  "read or set the link of an STevent "
   (if d?
@@ -2952,17 +2952,17 @@
 
 
 ;;;..................................................: kpress
-;;                                                                                               
+;;                                                                                             
 (defun kpress (e &optional v)
   (if v
       (midisetfield e 1 v); (setf (slot (slot (slot e 'data) 'note) 'vel) v)
-      (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel          )  
+      (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel          )
   )
 )
 
 
 ;;;..................................................: ctrl
-;;                                                                                               
+;;                                                                                             
 (defun ctrl (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2970,7 +2970,7 @@
 
 
 ;;;..................................................: param
-;;                                                                                             
+;;                                                                                           
 (defun param (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2978,7 +2978,7 @@
 
 
 ;;;..................................................: num
-;;                                                                                              
+;;                                                                                            
 (defun num (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2986,7 +2986,7 @@
 
 
 ;;;..................................................: prefix
-;;                                                                                               
+;;                                                                                             
 (defun prefix (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -2994,7 +2994,7 @@
 
 
 ;;;..................................................: tempo
-;;                                                                                                
+;;                                                                                              
 (defun tempo (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -3002,7 +3002,7 @@
 
 
 ;;;..................................................: seconds
-;;                                                                                               
+;;                                                                                             
 (defun seconds (e &optional v)
   (if v
     (midisetfield e 0 v)
@@ -3010,7 +3010,7 @@
 
 
 ;;;..................................................: subframes
-;;                                                                                                
+;;                                                                                              
 (defun subframes (e &optional v)
   (if v
     (midisetfield e 1 v)
@@ -3018,7 +3018,7 @@
 
 
 ;;;..................................................: val
-;;                                                                                               
+;;                                                                                             
 (defun valint (e &optional v)
   (if v
     (midisetfield e 1 v)
@@ -3026,17 +3026,17 @@
 
 
 ;;;..................................................: pgm
-;;                                                                                               
+;;                                                                                             
 (defun pgm (e &optional v)
   (if v
       (midisetfield e 0 v); (setf (slot (slot (slot e 'data) 'note) 'pitch) v)
-      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )  
+      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )
   )
 )
 
 
 ;;;..................................................: bend
-;;                                                                                                
+;;                                                                                              
 (defun bend (e &optional v)
   "read or set the bend value of an event"
   (if v
@@ -3044,38 +3044,38 @@
         (midisetfield e 0 ls7b); (setf (slot (slot (slot e 'data) 'note) 'pitch) ls7b)
         (midisetfield e 1 ms7b); (setf (slot (slot (slot e 'data) 'note) 'vel  ) ms7b)
         )
-    (- (+ (midigetfield e 0) (* 128 (midigetfield e 1))) 8192)                                                
+    (- (+ (midigetfield e 0) (* 128 (midigetfield e 1))) 8192)                                              
     ;; (- (+ (slot (slot (slot e 'data) 'note) 'pitch) (* 128 (slot (slot (slot e 'data) 'note) 'vel))) 8192)
   )
 )
 
 
 ;;;..................................................: clk
-;;                                                                                                
+;;                                                                                              
 (defun clk (e &optional v)
   (if v
       (multiple-value-bind (ms7b ls7b) (floor (round (/ v 6)) 128)
          (midisetfield e 0 ls7b); (setf (slot (slot (slot e 'data) 'note) 'pitch) ls7b)
          (midisetfield e 1 ms7b); (setf (slot (slot (slot e 'data) 'note) 'vel  ) ms7b)
        )
-      (* 6 (+ (midigetfield e 0) (*128 (midigetfield e 1))))                                              
+      (* 6 (+ (midigetfield e 0) (*128 (midigetfield e 1))))                                            
       ;; (* 6 (+ (slot (slot (slot e 'data) 'note) 'pitch) (* 128 (slot (slot (slot e 'data) 'note) 'vel))))
   )
 )
 
 
 ;;;..................................................: song
-;;                                                                                                
+;;                                                                                              
 (defun song (e &optional v)
   (if v
       (midisetfield e 0 v); (setf (slot (slot (slot e 'data) 'note) 'pitch) v)
-      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )   
+      (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          ) 
   )
 )
 
 
 ;;;..................................................: fields
-;;                                                                                               
+;;                                                                                             
 (defun fields (e &optional v)
   (if v
     (let ((e e))
@@ -3099,7 +3099,7 @@
 (defun fmsg (e &optional v)
   (if v
     (midisetfield e 0 v); (setf (slot (slot (slot e 'data) 'note) 'pitch) v)
-    (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          )   
+    (midigetfield e 0   ); (slot (slot (slot e 'data) 'note) 'pitch          ) 
   )
 )
 
@@ -3108,7 +3108,7 @@
 (defun fcount (e &optional v)
   (if v
     (midisetfield e 1 v); (setf (slot (slot (slot e 'data) 'note) 'vel) v)
-    (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel)                
+    (midigetfield e 1   ); (slot (slot (slot e 'data) 'note) 'vel)              
   )
 )
 
@@ -3181,7 +3181,7 @@
   "read or set the first event of a sequence"
   (if e?
       (midiSetFirstEv s e); (setf (slot s 'first) e)
-      (midiGetFirstEv s   ); (slot s 'first          )          
+      (midiGetFirstEv s   ); (slot s 'first          )        
   )
 )
 
@@ -3191,16 +3191,16 @@
   "read or set the last event of a sequence"
   (if e?
       (midiSetLastEv s e); (setf (slot s 'last) e)
-      (midiGetLastEv s   ); (slot s 'last          )           
+      (midiGetLastEv s   ); (slot s 'last          )         
   )
 )
 
 
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
-;;;                                                                                    
-;;; 				MidiShare Entry Points                                
-;;;                                                                                   
+;;;                                                                                  
+;;; 				MidiShare Entry Points                              
+;;;                                                                                 
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
@@ -3283,7 +3283,7 @@
 ;;;..................................................: MidiSetName
 
 (def-alien-routine "MidiSetName" void
-  (refNum short) (name c-string)                                       
+  (refNum short) (name c-string)                                     
   "Change the name of a MidiShare application")
 
 ;;;..................................................: MidiGetInfo
@@ -3426,7 +3426,7 @@
   "Amount of free MidiShare cells")
 
 ;;;..................................................: MidiNewEv
-;;                                                                                                                                        
+;;                                                                                                                                      
 (def-alien-routine "MidiNewEv" MidiEvPtr
   (typeNum short)
   "Allocate a new MidiEvent")
@@ -3476,7 +3476,7 @@
 
 (def-alien-routine "MidiSetDate" void
   (ev MidiEvPtr) (date long))
-  
+
 ;;;..................................................: MidiGetLink
 
 (def-alien-routine "MidiGetLink" MidiEvPtr
@@ -3557,7 +3557,7 @@
 
 ;;;..................................................: MidiNewSeq
 
-(def-alien-routine "MidiNewSeq" MidiSeqPtr       
+(def-alien-routine "MidiNewSeq" MidiSeqPtr     
   "Allocate an empty sequence")
 
 ;;;..................................................: MidiAddSeq

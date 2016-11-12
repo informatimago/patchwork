@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,23 +15,23 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
+;;;;  
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 ;;;=========================================================================
 ;;;
@@ -254,7 +254,7 @@
 (defun get-scaled-atimes (atimes dur-max)
   (epw::dx->x (car atimes) (epw::l-scaler/sum (epw::x->dx atimes) dur-max)))
 
-(defun get-list-section (list from to)          
+(defun get-list-section (list from to)        
   (let (result (epsilon -1e-3))
     (dolist (elem list)
       (cond ((>= (- elem to) epsilon) ;; GA 10/10/94 (> elem to)
@@ -353,7 +353,7 @@ becomes prev-slur in the next call)."
 (defun quanti-of (quant-structure) (cdr quant-structure))
 
 (defun deleted-of (quant-structure) (second (first quant-structure)))
-    
+  
 (defun compound-beats (beat-list)
   (mapcar (lambda (beat) (if (null (cdr beat)) (car beat) (list 1 beat))) beat-list))
 
@@ -697,7 +697,7 @@ A list of forbidden unit divisions can optionally be given."
 ;;                          tattack)) 100) 1)))
 ;; 
 ;;   ;;(pw-addmenu pw::*rtm-boxes-menu* '(transf-durs))
-;;   
+;; 
 ;;   ;;(transf-durs '(100 100 100 100 100 100 100 100 100) 120 60)
 ;;   ;;(transf-durs '(100) 120 60)
 ;; 

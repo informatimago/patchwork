@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -60,7 +60,7 @@
     (let ((steps (truncate (/  8192 pitch-bend-range))) ; 8192 = high (64) * low (128) -> 1 octave
           (temp))
       (for (i 0 1 99)
-        (setq temp (/ (* i steps) 100))  
+        (setq temp (/ (* i steps) 100))
         (setf (svref *cents-vector* i)
               (cons 
                (+ 64 (truncate (/ temp 128)))    ; high
@@ -179,7 +179,7 @@
 (defun quantize-chords (list)
   (let ((chords)(notes-on)(res-temp)(time-now)(tolerance 10))
     (while list
-      (when (and (not (= 0 (fourth (car list))))(> (second (car list)) 143)) ;  only note-on   
+      (when (and (not (= 0 (fourth (car list))))(> (second (car list)) 143)) ;  only note-on 
         (push (car list) notes-on))
       (pop list))
     (setq notes-on (nreverse notes-on))

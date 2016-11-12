@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -71,7 +71,7 @@
             pw-win-now midi-box-now total-dur)
         (while chords
           (setq pw-windows-temp
-                (ask-all (ask-all (notes (car chords)) 'instrument) 'pw-win)) ;PW returns nil       
+                (ask-all (ask-all (notes (car chords)) 'instrument) 'pw-win)) ;PW returns nil     
           (while pw-windows-temp
             (when (setq pw-win-now (pop pw-windows-temp))
               (when (setq midi-box-now
@@ -85,9 +85,9 @@
         (setq duration-times (ask-all pw-windows 'give-structured-duration1 1))
         (setq total-dur (apply #'max (mapcar #'+ begin-times duration-times))) 
         (while midi-boxes-temp
-          (set-begin-time (car midi-boxes-temp) (pop begin-times))  
+          (set-begin-time (car midi-boxes-temp) (pop begin-times))
           (set-duration-time (car midi-boxes-temp) (pop duration-times))
-          (pop midi-boxes-temp))  
+          (pop midi-boxes-temp))
         (start-clock *global-clock* total-dur midi-boxes)))))
 
 (defgeneric add-constant-t-time (self time))
@@ -110,12 +110,12 @@
                'super-note)) 
         (setq super-notes (setq super-notes-temp (sort super-notes '> :key (lambda (a) (diatone a)))))
         (while super-notes
-          (setq pw-win-now (pw-win (instrument (car super-notes))))       
+          (setq pw-win-now (pw-win (instrument (car super-notes))))     
           (when (setq midi-box-now (car (find-all-midi-out-boxes pw-win-now)))
             (push 
-             (eval (decompile (give-MN-editor-chord-line midi-box-now 0)))  
+             (eval (decompile (give-MN-editor-chord-line midi-box-now 0)))
              MN-chord-lines)
-            (add-constant-t-time (car MN-chord-lines)  
+            (add-constant-t-time (car MN-chord-lines)
                                  (give-structured-begin-time pw-win-now)))
           (pop super-notes))
         (setq MN-chord-lines (nreverse MN-chord-lines))
@@ -123,7 +123,7 @@
         (setq res-chord-lines (list (pop MN-chord-lines)))
         (while super-notes-temp
           (if (= last-diatone (diatone (car super-notes-temp))) ; to same staff
-              (progn  
+              (progn
                 (setq chords (chords (pop MN-chord-lines)))
                 (while chords
                   (sort-chord-by-time (car res-chord-lines) (pop chords)))) 
@@ -203,7 +203,7 @@
                             (format nil "~D" counter)
                             (format nil "~D" (incf *pw-struct-window-counter*))))))
     (make-instance 'C-pw-window 
-                   :window-title win-string  
+                   :window-title win-string
                    :view-position (make-point 50 38)
                    :view-size (make-point 200 200) :close-box-p nil :window-show ())))
 
@@ -215,7 +215,7 @@
   (:method ((self C-note) win x y)
     (declare (ignore x y))
     (let ((pw-win (make-new-structured-window "Strcoll"))
-          (midi-patch (make-new-note-collector)))   
+          (midi-patch (make-new-note-collector))) 
       (setf (pw-win (view-window (give-MN-editor midi-patch))) pw-win)
       (setf (super-win  (view-window (give-MN-editor midi-patch))) win)
       (setf (super-note (view-window (give-MN-editor midi-patch))) self)
@@ -264,7 +264,7 @@
   (window-select self))
 
 
-(defmethod pw-win ((self C-pw-window))  
+(defmethod pw-win ((self C-pw-window))
   (let ((midi-patch (car (find-all-midi-out-boxes self))))
     (if midi-patch self nil)))
 
@@ -319,11 +319,11 @@ Str-dur box is normally used in context of structured time.
 (defmethod patch-value ((self C-structured-outbox) obj)
   (setf (clock self)
         (+ (clock obj)
-           (- (give-structured-begin-time obj)  
+           (- (give-structured-begin-time obj)
               (give-structured-begin-time (view-window self)))))
-  (patch-value (car (input-objects self)) self))   
+  (patch-value (car (input-objects self)) self)) 
 
-;; !!  obj will be me after this call and the clock will accessed from this object !!   
+;; !!  obj will be me after this call and the clock will accessed from this object !! 
 
 (defunp strout ((patch user-out)) nil
     "Strout (structured out) is used always in combination with a 'in' box.

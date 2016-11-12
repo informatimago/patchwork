@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -114,7 +114,7 @@
   (setf *f-staff*  (make-instance 'C-staff  :clef-obj *f-clef* :delta-y (- (* *mn-staff-line-width* -5) 1)))
   (setf *f2-staff* (make-instance 'C-staff  :clef-obj *f-clef* :delta-y (- (* *mn-staff-line-width* -12) 1)))
 
-  (setf *empty-staff* (make-instance 'C-staff-empty))  
+  (setf *empty-staff* (make-instance 'C-staff-empty))
 
   (setf *g2-g-staffs*      (list *g2-staff* *g-staff*))          ;1
   (setf *g-plain-staffs*   (list *g-staff*))                     ;2
@@ -435,10 +435,10 @@
   (cond ((eql char #\p) (play-all-staffs self))
         ((eql char #\s) (stop-all-staffs self))
         ((eql char #\o) (tell (editor-objects self) 'open-object-editor (view-window self)))
-        ((and (eql char #\c) (active-editor self))  
+        ((and (eql char #\c) (active-editor self))
          (when (active-note (active-editor self)) 
            (add-MN-to-note (active-note (active-editor self)) (view-window self) 0 0)))
-        ((eql char #\w)  
+        ((eql char #\w)
          (when (active-note (active-editor self)) 
            (add-PWwin-to-note (active-note (active-editor self)) (view-window self) 0 0)))
         ((eql char #\A) (Do-selections-all self))
@@ -656,7 +656,7 @@
     (for (i 0 1 4)
       (draw-string 
        (+ (point-h (view-scroll-position self))
-          (-  (point-h  
+          (-  (point-h
                *MN-first-click-mouse*) 10)) (+ (* 20 i) y-off) *staff-lines-short*))))
 
 (defgeneric erase-yourself (view))
@@ -721,7 +721,7 @@
     (when (active-chord self) 
       (setf (active-note self) 
             (ask (notes (active-chord self)) 
-                 'inside-note?-3 mouse-h     
+                 'inside-note?-3 mouse-h   
                  (calc-chord-pixel-x (active-chord self)
                                      (MN-zoom-scaler (view-container  self))
                                      (+ *MN-draw-offset* 
@@ -768,7 +768,7 @@
 (defmethod open-object-editor ((self C-music-notation-panel) window )
   (let ((*menubar-frozen* t))
     (if (active-note self)
-        (open-instrument-editor (active-note self) window 0 0))   
+        (open-instrument-editor (active-note self) window 0 0)) 
     (when (eql (class-name (class-of self)) 'C-MN-PANEL-MOD)
       (let ((active-notes (apply #'append (ask-all (selected-chords self) #'notes))))
         (when active-notes

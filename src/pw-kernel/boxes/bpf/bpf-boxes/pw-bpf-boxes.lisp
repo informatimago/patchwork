@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -80,7 +80,7 @@
   ((popUpBox :initform nil :accessor popUpBox)
    (points-state :initform nil :accessor points-state)
    (out-type :initform :bpf :accessor out-type)
-   (current-str :initform #\B :accessor current-str)   
+   (current-str :initform #\B :accessor current-str) 
    (lock :initform nil :accessor lock)
    (value :initform nil :accessor value)))
 
@@ -102,7 +102,7 @@
                        :view-container self
                        :dialog-item-action (get-lock-button-fun self)))
   (let ((mini-bpf (give-mini-bpf self)) bpf)
-    (unless (break-point-function mini-bpf)  
+    (unless (break-point-function mini-bpf)
       (setq bpf (make-break-point-function '(0 100) '(0 100)))
       (set-break-point-function-to-mini mini-bpf bpf))
     (add-bpf-to-bpf-editor-from-PW (application-object self) (break-point-function mini-bpf))
@@ -317,7 +317,7 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
 (defunp bpf-sample ((bpf-ob0 list (:value 'nil :type-list (list pw::bpf)))
                     (echan1 fix>0 (:min-val 2 :value 2)) (xinit2 fix) (xend3 fix (:value 100))
                     (fact4 fix/float (:value 1)) (nbdec5 fix)) list 
-"  The bpf-sample module creates a list starting by sampling a  
+"  The bpf-sample module creates a list starting by sampling a
 breakpoint function table;. bpf-ob  is the input to the table, 
 echant is the number of samples desired, xinit et xend delimit the  sampling interval;. 
 The fact   variable is a multiplicative coefficient for scaling the data, 
@@ -395,7 +395,7 @@ by the second inputbox"
       (setf (old-time self) time)
       (bpf-out break-point-function 
             (+ (setf (osc-phase self)
-                  (float (mod (+ (osc-phase self)  
+                  (float (mod (+ (osc-phase self)
                           (/ (* time-diff (- time old-time)) period)) time-diff)))
                 (car points)) 
              points)))
@@ -421,7 +421,7 @@ request at input."
 
 ;; ;;not needed??!!  [911107]
 ;; (setq *bpf-lib-pw-type*
-;;   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf  
+;;   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf
 ;;     :view-size (make-point 40 40)
 ;;     :menu-box-list ,*pw-BPF-library* :type-list '(no-connection))))
 
@@ -431,10 +431,10 @@ request at input."
                          :menu-box-list *pw-BPF-library* :type-list '(no-connection)))
 
 (defunp bpf-lib ((bpflib bpf-lib)) bpf
-"Breakpoint functions can be stored in a library.  
+"Breakpoint functions can be stored in a library.
 There is only one current  library, structured as 
 a circular list. The menu item add to lib 
-\(in the bpf  menu, when the window of multiple-bpf  module is open)  
+\(in the bpf  menu, when the window of multiple-bpf  module is open)
 adds the current BPF to the library and reset lib resets the library to one item: a ramp. 
 The menu items next BPF from lib   and prev BPF from lib   allow browsing in the library.
 "

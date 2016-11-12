@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -120,7 +120,7 @@
       (setf (sel-end   self) (max x1-now x2-now))
       ;;    (print (list (sel-start self) (sel-end self)))
       (draw-selection self))))
-     
+   
 ;;=====================================
 ;; select-all cut copy paste
 (defgeneric select-all-bpf (self)
@@ -151,7 +151,7 @@
   (:method ((self C-bpf-view)) 
     (when *BPF-scrap*
       (when (selection? self)
-        (let ((points  
+        (let ((points
                 (give-points-in-time-range (break-point-function self) (sel-start self) (sel-end self))))
           (while points (remove-point-from-bpf (break-point-function self) (pop points)))))
       (let ((points (copy-list *BPF-scrap*)) (temp)(first-x)
@@ -183,7 +183,7 @@
 ;;(mapcar 'point-h *BPF-scrap*)
 ;;(mapcar 'point-v *BPF-scrap*)
 ;;=====================================
-;;   
+;; 
 
 #|(defmethod scale-selection-by-time ((self C-bpf-view) h-scaler)
   (when (selection? self)
@@ -191,7 +191,7 @@
                                              (sel-start self)) (print(sel-end self))))
       (if points
         (let* ((h-points (mapcar #'point-h points))
-               (min-v (apply #'min h-points))  
+               (min-v (apply #'min h-points))
                (max-v (apply #'max h-points))
                new-xs new-selection-end)
           (setq new-xs (scale-low-high h-points min-v  (+ min-v (* h-scaler (- max-v min-v))) t))
@@ -209,7 +209,7 @@
                                                (sel-start self) (sel-end self))))
         (if points
             (let* ((h-points (mapcar #'point-h points))
-                   (min-v (apply #'min h-points))  
+                   (min-v (apply #'min h-points))
                    (max-v (apply #'max h-points))
                    (previous-points (get-points-range self min-v #'<))
                    (after-points (get-points-range self max-v #'>))
@@ -247,9 +247,9 @@
                                                (sel-start self) (sel-end self))))
         (if points
             (let* ((v-points (mapcar #'point-v points))
-                   (min-v (apply #'min v-points))  
+                   (min-v (apply #'min v-points))
                    (max-v (apply #'max v-points))
-                   new-ys)  
+                   new-ys)
               (setq new-ys (scale-low-high v-points min-v  (+ min-v (* v-scaler (- max-v min-v))) t))
               (set-new-ys-in-range (break-point-function self) (sel-start self) (sel-end self) new-ys) 
               (update-bpf-view self)))))))
@@ -259,14 +259,14 @@
 
 (defgeneric shrink-selection-by-value (self)
   (:method ((self C-bpf-view)) (scale-selection-by-value self 0.95)))
-      
+    
 ;;=====================================
 ;;moved dragged 
 
 ;;??
 (defgeneric view-position-dragged (self)
   (:method ((self C-bpf-view))
-    (let ((point-diff (subtract-points (view-mouse-position (view-window self))  
+    (let ((point-diff (subtract-points (view-mouse-position (view-window self))
                                        *global-last-mouse-point*)))
       (set-view-scroll-position self
                                 (subtract-points *last-scroll-position*
@@ -282,7 +282,7 @@
     (let ((rect-w (abs (- (point-h *last-mouse-point*) (point-h (view-mouse-position self)))))
           (rect-h (abs (- (point-v *last-mouse-point*) (point-v (view-mouse-position self))))))
       (setf (h-view-scaler self) (max 0.07 (/ rect-w (w self)))) 
-      (setf (v-view-scaler self) (max 0.07 (/ rect-h (h self))))  
+      (setf (v-view-scaler self) (max 0.07 (/ rect-h (h self))))
       (set-origin self (make-point (round (point-h *last-mouse-point*) (h-view-scaler self)) 
                                    (- (h self) (round (point-v *last-mouse-point*) (v-view-scaler self)))))
       (update-bpf-scroll-bar-settings self)
@@ -309,7 +309,7 @@
                (draw-bpf-function-xor self)
                (set-break-point-function (break-point-function self)
                                          (subst new-point (active-point self) 
-                                                (break-point-list (break-point-function self)) :test #'eql))        
+                                                (break-point-list (break-point-function self)) :test #'eql))      
                (setf (active-point self) new-point) 
                (draw-bpf-function-xor self))))))))
 
@@ -323,7 +323,7 @@
 (defgeneric display-mouse-moved (self mouse-h mouse-v)
   (:method ((self C-bpf-view) mouse-h mouse-v)
     (set-dialog-item-text  (x-disp-ctrl (view-window self)) (format nil "~5D" mouse-h))
-    (set-dialog-item-text  (y-disp-ctrl (view-window self)) (format nil "~5D" mouse-v))))   
+    (set-dialog-item-text  (y-disp-ctrl (view-window self)) (format nil "~5D" mouse-v)))) 
 
 (defmethod view-mouse-moved ((self C-bpf-view) mouse)
   (setq mouse (view-mouse-position self))
@@ -331,7 +331,7 @@
          (mouse-v (point-v mouse)))
     (setf (active-point self) (find-mouse-point-in-bpf- self mouse-h mouse-v)) 
     (if (active-point self) 
-        (progn  
+        (progn
           (display-mouse-moved self (point-h (active-point self))(point-v (active-point self))))
         (display-mouse-moved self mouse-h mouse-v)))) 
 
@@ -394,7 +394,7 @@
         (when (not (zerop i)) (draw-string -32 (+ temp-y 5) (car axis-strings)))
         (pop axis-strings)
         (draw-line x-off temp-y -x-off temp-y)))))
-       
+     
 (defmethod view-draw-contents ((self C-bpf-view))
   (let ((*no-line-segments* (display-only-points (view-container (mini-view self)))))
     (with-focused-view self
@@ -443,7 +443,7 @@
    (reset-selection self)
    (let ((new-point (view-mouse-position self)))
      (setf *last-mouse-point* new-point)
-     (setf *global-last-mouse-point* (view-mouse-position (view-window self)))  
+     (setf *global-last-mouse-point* (view-mouse-position (view-window self)))
      (setf *last-scroll-position* (view-scroll-position self))
      (when (string= (edit-mode self) "edit")
        (unless (active-point self)
@@ -480,8 +480,8 @@
 
 (defgeneric update-bpf-scroll-bar-settings (self)
   (:method ((self C-bpf-view))
-    (set-scroll-bar-setting (ui::h-scroller self) (point-h (view-scroll-position self)))   
-    (set-scroll-bar-setting (ui::v-scroller self) (point-v (view-scroll-position self)))))   
+    (set-scroll-bar-setting (ui::h-scroller self) (point-h (view-scroll-position self))) 
+    (set-scroll-bar-setting (ui::v-scroller self) (point-v (view-scroll-position self))))) 
 
 (defgeneric key-pressed-BPF-editor (self char)
   (:method ((self C-bpf-view) char)
@@ -551,28 +551,28 @@
 ;; BPF window ctrls
 
 (defgeneric update-bpf-zoom-ctrls (self)
-  (:method ((self C-bpf-view))  
+  (:method ((self C-bpf-view))
     (set-dialog-item-text-from-dialog (x-zoom-ctrl (view-window self)) 
                                       (format nil "~5D" (round (* (w self)(h-view-scaler self)))))
     (set-dialog-item-text-from-dialog (y-zoom-ctrl (view-window self)) 
                                       (format nil "~5D" (round (* (h self)(v-view-scaler self)))))))
 
 (defgeneric update-bpf-origo-ctrls (self)
-  (:method ((self C-bpf-view))  
+  (:method ((self C-bpf-view))
     (set-dialog-item-text-from-dialog (x-origo-ctrl (view-window self)) 
                                       (format nil "~5D" (round (* (point-h (view-scroll-position self)) (h-view-scaler self)))))
     (set-dialog-item-text-from-dialog (y-origo-ctrl (view-window self)) 
                                       (format nil "~5D" (- (round (* (point-v (view-scroll-position self)) (v-view-scaler self))))))))
 
 (defgeneric set-bpf-x-origo (self ctrl)
-  (:method ((self C-bpf-view) ctrl)  
+  (:method ((self C-bpf-view) ctrl)
     (set-origin self 
                 (make-point (round (value ctrl) (h-view-scaler self)) (point-v (view-scroll-position self))))
     (update-bpf-scroll-bar-settings self)
     (update-bpf-view self t)))
 
 (defgeneric set-bpf-y-origo (self ctrl)
-  (:method ((self C-bpf-view) ctrl)  
+  (:method ((self C-bpf-view) ctrl)
     (set-origin self 
                 (make-point (point-h (view-scroll-position self)) 
                             (-  (round (value ctrl) (v-view-scaler self))) ))
@@ -585,6 +585,6 @@
     (update-bpf-view self t)))
 
 (defgeneric set-bpf-y-zoom (self ctrl)
-  (:method ((self C-bpf-view) ctrl)  
+  (:method ((self C-bpf-view) ctrl)
     (setf (v-view-scaler self) (/ (value ctrl) (h self))) 
     (update-bpf-view self t)))

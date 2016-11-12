@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    ESQUISSE PATCHWORK
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    Contributions by Tristan Murail
@@ -18,19 +18,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -606,7 +606,7 @@ subtractive combinations are produced.
 
 If the arguments <hqa> or <hqb> are a list, rather then including all the 
 partials up to and including the number given: only the listed partials 
-for both fundamentals will included in the calculations.   
+for both fundamentals will included in the calculations. 
 
 The optional argument <unit> determines whether <funda> and <fundb> are 
 given in midicents, ('midic'), or in hertz ('freq'). If 'midic' is 
@@ -1223,7 +1223,7 @@ Extrapolation à gauche interdite"
                                  (lldecimals a 6) (lldecimals c 6) (lldecimals b 6) (lldecimals d 6)))
     (set (if (null sym) 'fpuiss9 sym) 
          (eval `(function 
-                 (lambda (x) (+ ,d (* ,a (expt (+ x ,c) ,b))))) ) )                      
+                 (lambda (x) (+ ,d (* ,a (expt (+ x ,c) ,b))))) ) )                    
     ))
 
 (defunp l-distor/2 ((newmin float (:value 1)) (newmax float (:value 2))
@@ -1395,7 +1395,7 @@ than <max>; all other parts of the list will be returned unchanged."
 
 ;; pourrait être mis dans kernel
 
-(defunp insert ((item list (:value 'toto) ) (inter fix>0)  
+(defunp insert ((item list (:value 'toto) ) (inter fix>0)
                 (liste list) &optional (nb fix>0)  ) list
     "insère un élément <item> dans une liste, à intervalle régulier
 <inter> = intervalle de séparation

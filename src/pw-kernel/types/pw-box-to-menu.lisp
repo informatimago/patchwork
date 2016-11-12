@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    The PW add-box-to-menu function.
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -86,7 +86,7 @@
 ;;
 ;;corrections to basic boxes
  
-(defclass C-pw-functional (C-pw-extend) ())  
+(defclass C-pw-functional (C-pw-extend) ())
 
 (defmethod give-new-extended-title ((self C-pw-functional)) )
 
@@ -146,7 +146,7 @@
                :view-size ,(view-size self)
                :active-mode  ,(active-mode self)
                :pw-function  ',(pw-function self)
-               :type-list ',(type-list self)  
+               :type-list ',(type-list self)
                :view-subviews (list ,@(ask-all (pw-controls self) 'decompile)))))
 
 (defmethod decompile ((self C-pw-resize-x))

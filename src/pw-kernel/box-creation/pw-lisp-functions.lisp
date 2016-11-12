@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -42,9 +42,9 @@
 (defun mapcar-fun (fun a b)
   "applies fun to a and b
    a and b can be atoms or lists"
-  (cond ((and (listp a) (listp b)) (mapcar fun a b))  
-        ((and (listp a) (atom  b)) (mapcar fun a (cirlist b)))   
-        ((and (atom a) (listp  b)) (mapcar fun (cirlist a) b))   
+  (cond ((and (listp a) (listp b)) (mapcar fun a b))
+        ((and (listp a) (atom  b)) (mapcar fun a (cirlist b))) 
+        ((and (atom a) (listp  b)) (mapcar fun (cirlist a) b)) 
         (t (funcall fun a b))))
 
 (defun cirlist (elem)
@@ -104,7 +104,7 @@ The length of the list is determined by count."
 (defun scale-low-high (lst low high
                            &optional fix-fl)
 "Scales all values in lst beween low high."
-  (let* ((max-val (apply #'max lst))  
+  (let* ((max-val (apply #'max lst))
          (min-val (apply #'min lst))
          scfc res)
     (if (= min-val max-val)

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -107,7 +107,7 @@
           (make-instance 'C-break-point-function :break-point-list (pop args)))
     (while args
       (push (make-instance 'C-break-point-function :break-point-list (pop args)) bpfs))
-    (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))    
+    (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))  
     (set-break-point-function-to-mini mini-bpf (break-point-function mini-bpf))
     (add-bpf-to-bpf-editor-from-PW (application-object self) (break-point-function mini-bpf))
     (set-mini-view (application-object self) mini-bpf)
@@ -123,7 +123,7 @@
             (make-instance 'C-break-point-function :break-point-list (pop args)))
       (while args
         (push (make-instance 'C-break-point-function :break-point-list (pop args)) bpfs))
-      (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))    
+      (when bpfs (setf (break-point-functions (editor-view-object (application-object self))) bpfs))  
       (set-break-point-function-to-mini mini-bpf (break-point-function mini-bpf))
       (add-bpf-to-bpf-editor-from-PW (application-object self) (break-point-function mini-bpf))
       (set-mini-view (application-object self) mini-bpf)
@@ -188,7 +188,7 @@
                 (update-mini-view (give-mini-bpf self))
                 (add-bpf-to-bpf-editor-from-PW (application-object self) bpf))
               (push  (make-break-point-function (car ts) (car vs)) bpfs))
-            (pop ts)(pop vs))     
+            (pop ts)(pop vs))   
           (setf (break-point-functions (editor-view-object (application-object self))) bpfs)))))
   (cons (break-point-function (give-mini-bpf self)) 
         (break-point-functions (editor-view-object (application-object self)))))|#
@@ -284,7 +284,7 @@
 "The multi-bpf  module can be used to create and edit 
 simultaneous breakpoint functions an once, create and edit 
 coordinate pairs (x,y), display a series of coordinate pairs, 
-either as a BPF or as a series of points, save and load multi-bpf  
+either as a BPF or as a series of points, save and load multi-bpf
 modules  to and from a library and retrieve data concerning the points 
 contained in the multi-bpf  module. A function editor can be opened by 
 selecting this box and typing o from the keyboard.

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -82,7 +82,7 @@
                          (make-instance 'C-numbox 
                                         :view-position (make-point 50 25)
                                         :min-val min2 :max-val max2  :value val2)))))
-  
+
   (when (string=  "Unit   Metronome" text-text)
      (set-view-font  *rtm-win-1st-numbox* *tiny-music-font-spec*))
   (modal-dialog *rtm-editor-dialog-window*))
@@ -179,7 +179,7 @@
     (let ((chords (give-rtm-range-chords (editor-collection-object self) t)))
       (when chords
         (setf *rtm-duration-scaler* (float (/ dur1 100)))
-        (calc-t-time-measure-line  
+        (calc-t-time-measure-line
          (measure-line (current-rtm-editor (editor-collection-object self)))
          (get-play-speed (editor-collection-object self)) chords)
         ;; GA 12/4/94 crashes otherwise
@@ -230,7 +230,7 @@
 
 (defgeneric give-all-beat-chord-objects (self))
 (defmethod give-all-beat-chord-objects ((self C-rtm-editor-window))
-  (let ((leaves-lst-lst  
+  (let ((leaves-lst-lst
           (ask-all (ask-all (beat-editors (editor-collection-object self)) #'measure-line)
                    #'collect-all-chord-beat-leafs)))
     (ask-all (apply #'append leaves-lst-lst) #'beat-chord)))
@@ -274,7 +274,7 @@
 (defgeneric edit-rtm-editor-chans-global-2 (self))
 (defmethod edit-rtm-editor-chans-global-2 ((self C-rtm-editor-window))
   (with-cursor *watch-cursor*
-    (let ((leaves-lst-lst  
+    (let ((leaves-lst-lst
             (ask-all (ask-all (beat-editors (editor-collection-object self)) #'measure-line)
                      #'collect-all-chord-beat-leafs))
           chords)

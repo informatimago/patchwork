@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -87,7 +87,7 @@
 (defmethod update-editor ((self C-MN-panel-Mod))
   (let ((selections (selected-chords self)))
     (setf (selected-chords self) nil)
-    (dolist (chord  selections) (unhilite-if-not-selected self chord 0 0))            
+    (dolist (chord  selections) (unhilite-if-not-selected self chord 0 0))          
     (erase+view-draw-contents self)
     (dolist (chord  selections) (hilite-if-not-selected self chord 0 0))
     (setf (selected-chords self) selections)
@@ -146,7 +146,7 @@
                              y-min y-min MN-C5)
       (setq alt (alt-delta-x one-note) dx (delta-x one-note))
       (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
-      (draw-note-4 one-note  
+      (draw-note-4 one-note
                    (calc-chord-pixel-x chord zoom-scale MN-offset
                                        (- (scaled-origin self) (offset-time one-note)))
                    MN-C5 zoom-scale)
@@ -186,7 +186,7 @@
   (let ((active-tmp))
     (dolist (one-note (notes (active-chord self)))
       (setq active-tmp 
-            (inside-note?-3  
+            (inside-note?-3
              one-note x
              (calc-chord-pixel-x (active-chord self)
                                  (MN-zoom-scaler (view-container  self))
@@ -231,7 +231,7 @@
         (setq y-min (1- (give-pixel-y one-note C5)))
         (setq alt (alt-delta-x one-note) dx (delta-x one-note))
         (setf (alt-delta-x one-note) -12  (delta-x one-note) -6)
-        (hilite-note one-note  
+        (hilite-note one-note
                      (calc-chord-pixel-x self t-scfactor beg-x
                                          (- time1 (offset-time one-note)))
                      C5)
@@ -481,7 +481,7 @@
 (defmethod view-mouse-up ((self  C-MN-panel-Mod))
   (declare (special *time-drag* *top-rect* *bottom-rect*))
   (set-display-value (view-container self) nil)
-  (if  *time-drag*    
+  (if  *time-drag*  
        (let* ((mouse (point-h (view-mouse-position self)))
               (x-val (truncate (scaled-mouse-h self 
                                                (- mouse (point-h (get-old-click self))))))
@@ -520,7 +520,7 @@
 
 (defmethod handle-key-event ((self C-MN-panel-Mod) char)
   (declare (special *global-music-notation-panel*))
-  (cond  
+  (cond
     ((eql char #\K) (remove-all-chords-from-chord-line self))
     ((eql char #\p) (play-chords (chord-line self)))
     ((eql char #\P) 
@@ -629,7 +629,7 @@
   (let ((editor (car (editor-objects (car (subviews win-obj)))))
         (chord-l (make-instance 'C-chord-line 
                                 :chords (list chord) )))
-    (setf (chord-line editor) chord-l)               
+    (setf (chord-line editor) chord-l)             
     (set-view-position win-obj x (max 35 y))
     (set-pw-win+pw-obj win-obj win obj)
     (window-select win-obj)

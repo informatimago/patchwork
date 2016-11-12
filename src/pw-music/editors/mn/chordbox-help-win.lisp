@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -79,8 +79,8 @@
     t            time view
     n            normal view
 
-    up arrow     tranpose selected note up  
-    down arrow   tranpose selected note down  
+    up arrow     tranpose selected note up
+    down arrow   tranpose selected note down
                  (normal 1/4 tone,shift 1/2 tone,control 1 octave)
     Back Space   delete selected note (or notes) 
 
@@ -112,7 +112,7 @@
 
      Pressing the mouse on the letter 'A', 'V' or 'T' appearing at the bottom right
      rolls down a menu where view mode and staff type can be selected.
-     
+   
      A chord module has a popUp menu linked to the letter just to the right
      of its output box. The output of the chord module depends on the menu item chosen.
      The items in this menu are as follows:

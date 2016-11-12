@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -90,7 +90,7 @@
 (defmethod MidiPlayANy ((object t) &optional (approx 2) (chanbase 1))
   (when (and  patchwork.midi:*pw-refnum* patchwork.midi:*player* )
     (let ((playerIdle))
-      (ccl:rlet ((myState :<P>layer<S>tate))  
+      (ccl:rlet ((myState :<P>layer<S>tate))
         (patchwork.midi:getStatePlayer patchwork.midi:*player* myState) 
         (when (= (patchwork.midi:s-state myState) kIdle) (setf playerIdle t)))
       (unless playerIdle (print "Wait end of previous play!"))
@@ -170,7 +170,7 @@
   (loop for note in (notes chord)
         for offset from 0 by 50
         do (MidiPlay note  (round (+  (convert-time-1 offset unit/sec) (convert-time-1 (offset-time note) unit/sec) at)) approx chanbase seq unit/sec)))
-        
+      
 
 (defmethod MidiPlay ((chline C-CHORD-LINE) at approx chanbase seq unit/sec)
   (loop for chord in (chords chline)
@@ -220,7 +220,7 @@
      ((setting-of self :arp)
       (play-arpeggiated self))
      (t (setf *play-chseq-w/offset* (get-ctrl-setting self :offs)) (MidiPlayAny thechord approx 0)))))
-    
+  
  
 
 (defmethod play-arpeggiated ((self C-chord-mus-not-view))

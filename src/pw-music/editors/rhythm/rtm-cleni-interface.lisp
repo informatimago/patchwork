@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;  
 ;;;;    XXX
-;;;;    
+;;;;  
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;  
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;  
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;  
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;  
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -108,7 +108,7 @@
         (#\Y "s")(#\I "b")(#\y "+")(t ""))))))
 
 ;;(convert-note-to-cleani-symbol (make-C-note 6100 36 #\I 100 120 1))
-  
+
 #|
 (defmethod write-cleni-beat  ((self C-beat) super-beat low)
   (let* ((rtm-list (rtm-list self))
@@ -134,16 +134,16 @@
             (setq note-head-info 
                (calc-next-note-head  (unit-length self) rtm-sum rtm-now low))
 ;;            (print (list (car *notehead-type-list*) note-head-info))
-            (cond  
-              ((beat-chord rtm-obj)  
-                (push  
+            (cond
+              ((beat-chord rtm-obj)
+                (push
                   (setq *cleni-previous-chord-info-list*
                     `(:chord ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                            ',(mapcar #'convert-note-to-cleani-symbol (notes (beat-chord rtm-obj)))))
                            ;;(ask-all (notes (beat-chord rtm-obj)) 'midic)
                  *cleni-notehead-list*))
               ((eql (car *notehead-type-list*) 'rest)
-                (push  
+                (push
                   `(:rest ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info)))
                   *cleni-notehead-list*))
               ((floatp rtm-now)              ;slur
@@ -197,16 +197,16 @@
           (setq note-head-info 
                 (calc-next-note-head  (unit-length self) rtm-sum rtm-now low))
           ;(print (list (car *notehead-type-list*) note-head-info))
-          (cond  
+          (cond
            ((beat-chord rtm-obj)
-            (push  
+            (push
              (setq *cleni-previous-obj-info-list*
                    (setq *cleni-previous-chord-info-list*
                          `(:chord ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
                                   ,(ask-all (notes (beat-chord rtm-obj)) 'midic))))
              *cleni-notehead-list*))
            ((eql (car *notehead-type-list*) 'rest)
-            (push  
+            (push
              `(:rest ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info)))
              *cleni-notehead-list*)
             (setq *cleni-previous-obj-info-list* ()))
@@ -266,9 +266,9 @@
               (setq note-head-info 
                     (calc-next-note-head  (unit-length self) rtm-sum rtm-now low))
                                         ;(print (list (car *notehead-type-list*) note-head-info))
-              (cond  
+              (cond
                 ((beat-chord rtm-obj)
-                 (push  
+                 (push
                   (setq *cleni-previous-obj-info-list*
                         (setq *cleni-previous-chord-info-list*
                               `(:chord ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info))
@@ -277,7 +277,7 @@
                                                        *cleni-temperament-mode*))))
                   *cleni-notehead-list*))
                 ((eql (car *notehead-type-list*) 'rest)
-                 (push  
+                 (push
                   `(:rest ,(convert-rtm-unit-to-cleni (car *global-rtm-level-list*)(second note-head-info)))
                   *cleni-notehead-list*)
                  (setq *cleni-previous-obj-info-list* ()))
@@ -324,12 +324,12 @@
   (let ((measure-lines (ask-all (beat-editors (editor-collection-object win)) #'measure-line)))
     (for (i 0 1 (1- (length measure-lines)))
       (write-cleni-measure-line (nth i measure-lines) (1+ i)))))
-  
+
 ;;(calc-cleni-rtm-score *active-rtm-window*)
 ;;(cleni:translate-score *rtm-cleni-score* "root;rtm-test")
 
 (defun save-cleni-rtm-score ()
-  (let ((new-name (choose-new-file-dialog     
+  (let ((new-name (choose-new-file-dialog   
              :directory (window-title *active-rtm-window*)
              :prompt "Save RTM As…")))
      (calc-cleni-rtm-score *active-rtm-window*)
