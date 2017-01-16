@@ -1,5 +1,5 @@
 # -*- mode:org; coding:utf-8 -*-
-* TODO [/] Patchwork Project                                      :patchwork:
+* TODO [#A] Patchwork Project                                     :patchwork:
 ** TODO [#A] debug Patchwork and produce a release                      :bug:
    CLOCK: [2016-02-08 Mon 00:16]--[2016-02-08 Mon 00:56] =>  0:40
    :DEADLINE: <2016-03-01 -3m>
@@ -19,7 +19,7 @@ This generates a patchwork.app, but when launched, we don't have the
 Patchwork menus, but Clozure CL menus.
 
 ** TODO [#A] use manifest in generate-application                       :bug:
-Use com.informatimago.manifest.lisp in Patchwork (generate-application). 
+Use com.informatimago.manifest.lisp in Patchwork (generate-application).
 ** TODO [#A] AppleEvent                                                 :bug:
    - State "TODO"       from "IN-PROGRESS" [2014-06-22 Sun 06:32] \\
      To be done.
@@ -48,7 +48,7 @@ Use com.informatimago.manifest.lisp in Patchwork (generate-application).
 13. Files               :  18/ 18 fonctions implémentées [100%]
 14. Divers              : 257/258 fonctions implémentées [ 99%]
 *** Bugs https://gitlab.com/groups/patchwork/issues
-**** IN-PROGRESS [#A] 00007 Text Edit                               :feature:                             
+**** IN-PROGRESS [#A] 00007 Text Edit                               :feature:
    :DEADLINE: <2016-03-01 -3m>
    - State "IN-PROGRESS" from "DONE"       [2014-10-07 Tue 09:25] \\
      En cours.
@@ -64,7 +64,7 @@ Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la 
 - offset of yellow text-edit box: cf. editable-text-dialog-item as subview of a view.
 
 *** Patchwork Issues https://gitlab.com/patchwork/patchwork/issues
-**** TODO [#A] 00014 doublons sur opt-clic                              :bug:                        
+**** TODO [#A] 00014 doublons sur opt-clic                              :bug:
 pOn génère une entrée supplémentaire pour certains objets avec alt-clic
 
 trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
@@ -74,9 +74,9 @@ quantify, rtm, poly-rtm, get-note-slots.
 
 Lors de cette opération les objets se déplacent sur la fenêtre. Pour
 l’objet test, alt-clic génère deux entrées supplémentaires plutôt
-qu’une seule. 
+qu’une seule.
 
-**** TODO [#A] 00011 Le buffer est incomplet                            :bug:                      
+**** TODO [#A] 00011 Le buffer est incomplet                            :bug:
 
 il doit avoir une fonction de conservation des données obtenue par un
 clic sur un petit rond au centre de l’objet, ce petit rond doit alors
@@ -90,28 +90,28 @@ On doit verrouiller en cliquant sur un petit rond au centre de l’objet
 qui se transforme alors en croix, pour dévérouiller on clique sur
 cette croix qui redevient alors un petit rond.
 
-**** TODO 00024 growing while editing                                   :bug:
+**** TODO [#A] 00024 growing while editing                                   :bug:
 - Open for editing a text field.
 - Try to grow the patch.
 Growing fails, the patch box size becomes slightly smaller.
 
-**** TODO 00010 Qque fois il y a eu impossibilité d’évaluation.         :bug:
+**** TODO [#A] 00010 Qque fois il y a eu impossibilité d’évaluation.         :bug:
 En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
 crois plutôt que - pour une raison inconnue - la fenêtre du Listener
 en fonction devient inactive, en activant une nouvelle fenêtre de
 Listener l’évaluation est à nouveau possible…
 
-**** TODO 00004 Les patchs complexes sont lents à charger.          :feature:
+**** TODO [#A] 00004 Les patchs complexes sont lents à charger.          :feature:
 Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
 <d:s:R x 5>*
-**** TODO 00027 numbox click-and-drag w/ opt/cmd aphazadical.           :bug:
+**** TODO [#A] 00027 numbox click-and-drag w/ opt/cmd aphazadical.           :bug:
 Note: option-click and command-click have specific meanings.
-**** TODO 00031 the first menus must berenamed                         :port:
+**** TODO [#A] 00031 the first menus must berenamed                         :port:
 The application menu should be Patchwork instead of Clozure CL
 The next menu should be Apps instead of Patchwork.
-**** TODO 00032 multi-bpf breaks                                        :bug:
-**** TODO 00033 bpf-lib breaks                                          :bug:
-**** TODO 00035 pw-patch drag bar line off-by-1                         :bug:
+**** TODO [#A] 00032 multi-bpf breaks                                        :bug:
+**** TODO [#A] 00033 bpf-lib breaks                                          :bug:
+**** TODO [#A] 00035 pw-patch drag bar line off-by-1                         :bug:
 The line of the drag bar of pw-patch is drawn one pixel beyond the right border some times.
 *** Done
 **** DONE 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item
@@ -120,10 +120,10 @@ The line of the drag bar of pw-patch is drawn one pixel beyond the right border 
       Implemented editable-text-dialog-item as a text-edit-dialog-item.
    - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:24]
 
-- static-text-dialog-item 
+- static-text-dialog-item
 - editable-text-dialog-ietm
 
-**** DONE [#A] 00005 Effacements partiels et provisoires des objets 
+**** DONE [#A] 00005 Effacements partiels et provisoires des objets
     CLOSED: [2014-10-23 Thu 05:33]
     - State "DONE"       from "TODO"       [2014-10-23 Thu 05:33] \\
       Corrected.
@@ -196,7 +196,7 @@ Can't create directory "/Users/pjb/".
      CLOSED: [2014-09-02 Tue 05:29]
      - State "DONE"       from "TODO"       [2014-09-02 Tue 05:29] \\
        Can't reproduce.
-**** DONE 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer. 
+**** DONE 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer.
      CLOSED: [2014-09-03 Wed 07:51]
      - State "DONE"       from "TODO"       [2014-09-03 Wed 07:51] \\
        Corrected.
@@ -267,8 +267,8 @@ nommant l’Abstract dans la fenêtre « absout »), puis sélectionner le
 tout et aller dans le menu PWoper —> Abstract. Le nouvel objet doit
 alors apparaître.
 
-*** Features
-**** TODO [#A] event sources and event handling           :feature:
+*** Features                                                        :feature:
+**** TODO [#A] event sources and event handling
 
 There seem to be two paths of event handling, with MacOSX events being
 delivered directly to views thru MclGui, and some other events being
@@ -277,18 +277,18 @@ delivered thru get-next-event.
 Check that all events (key, mouse, etc) and all modifiers are
 correctly transmitted where they must go.
 
-**** TODO [#A] Windows                                    :feature:
-**** TODO [#A] Dialog Items                               :feature:
-**** TODO [#A] Dialogs                                    :feature:
-**** TODO [#B] Midi: revis  midi stuff                    :feature:
+**** TODO [#A] Windows
+**** TODO [#A] Dialog Items
+**** TODO [#A] Dialogs
+**** TODO [#B] Midi: revis  midi stuff
 Restructure it: midiplay redefines methods. Use Cocoa Midi libraries.
-**** TODO Pathnames: revise the handling of pathnames     :feature:
+**** TODO Pathnames: revise the handling of pathnames
 Mac pathnames, logical pathnames, loading libraries, resources, saving images.
-**** TODO [#B] Quickdraw                                  :feature:
-**** TODO [#B] Views                                      :feature:
-**** TODO [#C] Fonts                                      :feature:
-**** TODO [#C] Clipboard                                  :feature:
-**** TODO [#C] Apple Events                               :feature:
+**** TODO [#B] Quickdraw
+**** TODO [#B] Views
+**** TODO [#C] Fonts
+**** TODO [#C] Clipboard
+**** TODO [#C] Apple Events
 
 Apple Events are only used for external scriptability: aesend is only
 called from send-appleevent, which is only called from record--ae et
@@ -297,9 +297,9 @@ al. in recordables.lisp
 Therefore this todo is not prioritary at all.
 
 ***** ~/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
-  
-**** TODO find-grep ';; *('                                       
-**** TODO a keymap to bind keys to commands dynamicaly    :feature:
+
+**** TODO find-grep ';; *('
+**** TODO a keymap to bind keys to commands dynamicaly
 **** DONE [#A] Delivery: debug de/serialization of wrapper/NSObjects save-image.
      CLOSED: [2014-04-01 Tue 04:36]
      - State "DONE"       from "TODO"       [2014-04-01 Tue 04:36] \\
@@ -377,7 +377,7 @@ The following features produce a lot of trace output.
      :cocoa-10.9              set by patchwork/gestalt.
      :cocoa-10.8              set by patchwork/gestalt.
      :cocoa-10.7              set by patchwork/gestalt. (=!=) used by mclgui/cocoa interface
-     :cocoa-10.6              set by patchwork/gestalt. (=!=) used by mclgui/cocoa interface 
+     :cocoa-10.6              set by patchwork/gestalt. (=!=) used by mclgui/cocoa interface
      :cocoa-10.5              set by patchwork/gestalt.
      :cocoa-10.4              set by patchwork/gestalt.
 
@@ -637,7 +637,7 @@ rm application.log ; make clean ; make application 2>&1 | tee application.log
 #+END_SRC
 
 #+BEGIN_SRC lisp
-(push #P"/home/pjb/works/patchwork/tools/" asdf:*central-registry*) 
+(push #P"/home/pjb/works/patchwork/tools/" asdf:*central-registry*)
 (ql:quickload :com.informatimago.check-asdf)
 (com.informatimago.check-asdf:check-asdf-system-file #P"~/works/patchwork/patchwork/src/patchwork.asd")
 
@@ -670,7 +670,7 @@ otherwise:
 - #\Rubout (DEL)
   + cut-delete
 - #\h
-           
+
 *** Where key input is processed:
 
 pw-kernel/box-creation/pw-patch.lisp                       handle-edit-events
@@ -690,7 +690,7 @@ pw-kernel/pw-graphics/window+menu/application-window.lisp  view-key-event-handle
 pw-kernel/pw-graphics/window+menu/pw-help-window.lisp      view-key-event-handler
 pw-kernel/pw-graphics/window+menu/pw-window.lisp           view-key-event-handler
 
-pw-kernel/boxes/bpf/bpf-editors/bpf-menu.lisp              (menus)  
+pw-kernel/boxes/bpf/bpf-editors/bpf-menu.lisp              (menus)
 pw-kernel/pw-graphics/window+menu/pw-menu.lisp             (menus)
 pw-music/editors/mn/mn-collector-view.lisp                 (menus)
 pw-music/menu/mn-menu.lisp                                 (menus)
@@ -721,7 +721,7 @@ Therefore we must compile midishare ourselves.
 (defvar *PW-user-library-extension* "lib")
 (defvar *library-selection* ())
 
-;;The path-names for user patches and user libraries. Folders "PW-user-patches" and 
+;;The path-names for user patches and user libraries. Folders "PW-user-patches" and
 ;;"PW-user-library" should exist somewhere within the "PW;" path.
 (defvar *PW-user-abstract-pathName* "PW-USER:PW-user-patches;**;*.*")
 (defvar *PW-user-library-pathName*  "PW-USER:PW-user-library;**;*.*")
@@ -750,7 +750,7 @@ Therefore we must compile midishare ourselves.
   "COM.INFORMATIMAGO.SIMPLE-TEST" "COM.INFORMATIMAGO.OBJECTIVE-C.LOWER" "COM.INFORMATIMAGO.OBJECTIVE-CL"
  "COM.INFORMATIMAGO.CLEXT.ASSOCIATION" "COM.INFORMATIMAGO.CLEXT.CHARACTER-SETS" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK" "COM.INFORMATIMAGO.CLEXT.CLOSER-WEAK-USER"
 
-(defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" "MIDI-PLAYER" "MIDISHARE" "MIDI" "PATCH-WORK.SCHEDULER" "PATCH-WORK" "C-PATCH-BUFFER" "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN" "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE" "EPW" "C-LIST-ITEM-H" "C-LIST-ITEM" "C-TABLE-WINDOW-H" "C-TABLE-WINDOW" "C-PATCH-LIST-EDITOR" "C-GET-NOTE-SLOTS" "C-GET-SELECTIONS" "USER-ABSTRACTION" "C-PATCH-CHORD-LINE" "C-PW-SEND-MIDI-NOTE" "CLENI" "COMBINATORIAL-INTERV" "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING")) 
+(defparameter *pw-packages* '("PATCHWORK.LOADER" "MCLGUI" "LELISP-MACROS" "MIDI-PLAYER" "MIDISHARE" "MIDI" "PATCH-WORK.SCHEDULER" "PATCH-WORK" "C-PATCH-BUFFER" "C-PATCH-ACCUM" "C-PATCH-FILE-BUFFER" "C-PW-MIDI-IN" "CLOS-APPLE-EVENT" "USER-SUPPLIED-IN-OUTS" "CLPF-UTIL" "PW-STYPE" "EPW" "C-LIST-ITEM-H" "C-LIST-ITEM" "C-TABLE-WINDOW-H" "C-TABLE-WINDOW" "C-PATCH-LIST-EDITOR" "C-GET-NOTE-SLOTS" "C-GET-SELECTIONS" "USER-ABSTRACTION" "C-PATCH-CHORD-LINE" "C-PW-SEND-MIDI-NOTE" "CLENI" "COMBINATORIAL-INTERV" "C-PW-TEXT-INPUT" "C-PW-TEXT-BOX" "USER-COMP-ABSTR" "QUANTIZING"))
 
 #+END_SRC
 
@@ -770,7 +770,7 @@ Therefore we must compile midishare ourselves.
 -   cl-user::getDescRecPtr        pw-lib/pwscript/pw-ae.lisp
 -   cl-user::asAEDesc             pw-lib/pwscript/pw-ae.lisp
 -   #_AEPutParamDesc
- 
+
 
 
 pw-lib/pwscript/pw-scripting.lisp         pw
@@ -785,7 +785,7 @@ pw-lib/pwscript/recordables.lisp          pw
 
 pw-lib/pwscript/pw-ae.lisp                cl-user
 
-    AppleEvents <-> Clos Object layer  V 1.02 
+    AppleEvents <-> Clos Object layer  V 1.02
 
 pw-lib/pwscript/appleevent-toolkit.lisp   appleevent-toolkit ae
 
@@ -813,7 +813,7 @@ appleevent-toolkit.lisp stuff used:
     create-Named-Process-Target
     create-Self-Target
     choose-AppleEvent-Target
-    send-appleevent 
+    send-appleevent
 
   /Users/pjb/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
 
@@ -825,7 +825,7 @@ apple-event.lisp stuff used:
 
     install-appleevent-handler
     appleevent-idle
-    ae-error 
+    ae-error
     with-aedescs
 
 *** Miscellaneous
@@ -919,12 +919,12 @@ git clone git@gitorious.org:patchwork/patchwork.git
 
 *** Common Lisp Implementation
 
-On the MacMini, 
+On the MacMini,
 
 uname -a
 Darwin galatea 11.4.2 Darwin Kernel Version 11.4.2: Thu Aug 23 16:26:45 PDT 2012; root:xnu-1699.32.7~1/RELEASE_I386 i386
 
-**** MacPort - /opt/local/bin/ccl 
+**** MacPort - /opt/local/bin/ccl
 
 /opt/local/bin/ccl  --version
 Version 1.8  (DarwinX8632)
@@ -941,12 +941,12 @@ Version 1.8  (DarwinX8664)
 
 forced 64-bit, with patches (with-standard-io-syntax (format …)) for selectors.
 
-- Success. 
+- Success.
 
 **** Clozure CL.app from the AppStore
 
 
-/Applications/Clozure\ CL.app/Contents/MacOS/dx86cl64 
+/Applications/Clozure\ CL.app/Contents/MacOS/dx86cl64
 Version 1.8.1 (15418)
 
 :cocoa is pre-loaded, no CLI.
@@ -979,7 +979,7 @@ MCL / CCL
 - save image:
    - `*lisp-cleanup-functions*` are called.
    - `*save-exit-functions*` are called.
-   
+
 - exit image:
    - `*lisp-cleanup-functions*` are called.
 
@@ -1004,7 +1004,7 @@ MCL / CCL
     *LISP-STARTUP-FUNCTIONS* are run after the functions specified by
     DEF-LOAD-POINTERS and before the init file is loaded.  The functions
     are called in reverse order from the order in which they appear in the
-    list. 
+    list.
     ")
 
 
@@ -1128,7 +1128,7 @@ http://recherche.ircam.fr/equipes/repmus/Rapports/PeterHanappe95/
 
 ** sandboxing appstore
 
-#+BEGIN_QUOTE 
+#+BEGIN_QUOTE
 
 
     From: Michael Minerva <minerva@agentsheets.com>
@@ -1245,7 +1245,7 @@ http://recherche.ircam.fr/equipes/repmus/Rapports/PeterHanappe95/
 http://explanatorygap.net/2009/10/30/apple-have-documented-the-binary-plist-format/
 
 
-#+BEGIN_QUOTE 
+#+BEGIN_QUOTE
 
     Apple have documented the binary plist format
 
@@ -1301,7 +1301,7 @@ http://explanatorygap.net/2009/10/30/apple-have-documented-the-binary-plist-form
 #+END_QUOTE
 
 
-# THE END 
+# THE END
 ** ASDF_OUTPUT_TRANSLATIONS
 
 Hmm, I think ASDF_OUTPUT_TRANSLATIONS still works, so my makefile looks like:
