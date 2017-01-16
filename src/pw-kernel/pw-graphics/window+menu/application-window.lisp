@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,31 +16,31 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
 
-(defclass  C-application-window (window)  
+(defclass  C-application-window (window)
   ((pw-win :initform nil :accessor pw-win)
    (pw-object :initform nil :accessor pw-object)))
 
 (defgeneric set-pw-win+pw-obj (self win pw-object))
 
-(defmethod set-pw-win+pw-obj ((self C-application-window) win pw-object) 
+(defmethod set-pw-win+pw-obj ((self C-application-window) win pw-object)
   (setf (pw-win self) win)
   (when pw-object (setf (pw-object self) pw-object)))
 
@@ -48,14 +48,14 @@
 
 ;; key-pressed
 (defmethod view-key-event-handler ((self C-application-window) char)
-  (case char 
+  (case char
     ((:Newline #\Newline
                #+(and has-return (not newline-is-return)) #\Return
                #+(and has-linefeed (not newline-is-linefeed)) #\Linefeed)
      (when (pw-win self)
-       (window-hide self)           
+       (window-hide self)
        (window-select (pw-win self))))
-    ((:Enter #\Etx)  
+    ((:Enter #\Etx)
      (when (pw-win self)
        (window-select (pw-win self))))
     ((#\R)
@@ -66,8 +66,8 @@
          (set-window-title self string)
          (when (pw-object self)
            (setf (pw-function-string (pw-object self)) string)
-           (with-focused-view (pw-object self) 
-             (view-draw-contents (pw-object self))))))) 
+           (with-focused-view (pw-object self)
+             (view-draw-contents (pw-object self)))))))
     ((#\h) (open-application-help-window self))
     (otherwise (key-pressed-extra self char))))
 

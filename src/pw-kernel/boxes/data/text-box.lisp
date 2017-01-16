@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    A text box for PW Windows
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -53,15 +53,15 @@
 (defmethod initialize-instance :after ((self C-pw-text-box) &key ctrl)
   (declare (ignore ctrl))
   (let ((box (car (pw-controls self))))
-    (set-view-size box (point-h (view-size box)) (- (h self) 5))   
+    (set-view-size box (point-h (view-size box)) (- (h self) 5))
     (set-view-position (out-put self) (w self) (+ (h self) 5))))
 
 (defmethod resize-patch-box ((self C-pw-text-box) mp delta)
   (let ((point-now (make-point (add-points mp delta)))
         (min-w 46) (min-h 28))
-    (when (and (< min-w (point-h point-now))(< min-h (point-v point-now))) 
+    (when (and (< min-w (point-h point-now))(< min-h (point-v point-now)))
       (set-view-size self point-now)
-      (set-view-size (car (pw-controls self)) 
+      (set-view-size (car (pw-controls self))
                      (make-point (- (point-h point-now) 10)
                                  (- (point-v point-now) 5)))
       (set-view-position (out-put self) (w self) (+ (h self) 5)))))
@@ -70,12 +70,12 @@
   (declare (ignore x y)))
 
 (defmethod view-draw-contents ((self C-pw-text-box))
-  (pw::with-pen-state (:pattern *white-pattern*) 
+  (pw::with-pen-state (:pattern *white-pattern*)
     (pw::fill-rect* 1 1 (- (w self) 2) (- (h self) 2)))
   (set-view-font self '("Chicago" 9 :SRCOR :PLAIN))
-  (with-font-focused-view self 
+  (with-font-focused-view self
     (pw::tell (subviews self) 'view-draw-contents)
-    (when (pw::active-mode self) 
+    (when (pw::active-mode self)
       (pw::with-pen-state (:pattern *black-pattern*)
         (pw::fill-rect* 0 0 (w self) 3)))
     (pw::draw-patch-extra self)))
@@ -97,7 +97,7 @@
 
 (in-package :pw)
 
-(defunp c-pw-text-box::text ((win string 
+(defunp c-pw-text-box::text ((win string
                                   (:type-list (no-connection) :dialog-item-text " ")))
         nil
         "a window comment can go inside this box"
@@ -107,15 +107,15 @@
   (make-instance 'C-pw-type
   :control-form
    `(make-instance 'C-pw-text-input:C-pw-text-input
-                   :view-size #@(36 8) :dialog-item-text "" 
+                   :view-size #@(36 8) :dialog-item-text ""
                    :type-list '(no-connection))))
 
-(defun get-window-text-box () 
-  (add-patch-box *active-patch-window* 
+(defun get-window-text-box ()
+  (add-patch-box *active-patch-window*
          (make-PW-standard-box 'C-pw-text-box:C-pw-text-box 'C-pw-text-box::text)))
 
-;; (add-patch-box *active-patch-window* 
-;;                (make-patch-box  'C-pw-text-box:C-pw-text-box 'C-pw-text-box::text  
+;; (add-patch-box *active-patch-window*
+;;                (make-patch-box  'C-pw-text-box:C-pw-text-box 'C-pw-text-box::text
 ;;                                '(*Text-input-pw-type* "text") '(no-connection)))
 ;; (unintern 'controls)
 

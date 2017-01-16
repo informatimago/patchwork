@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,7 +36,7 @@
 (enable-patchwork-reader-macros)
 
 ;;;==================================================
-;;; The Class of a view controller for a MN editor. 
+;;; The Class of a view controller for a MN editor.
 ;;;
 ;;; Contains buttons for changing view, chord field selection, scrolling and transposing. Contains
 ;;; a PopUp Menu (see code above) for additional functionalities
@@ -52,52 +52,52 @@
 ;;;   transpose-selection       ;transposes selected chords according to value in button
 ;;;   retro-selection           ;retrogrades selected chords
 ;;;   accell-selection          ;affects chord fields of selected chords
-;;;   
+;;;
 
 (defun make-chord-collector-pops ()
-  (new-menu 
+  (new-menu
    " "
-   (new-menu "Play" 
+   (new-menu "Play"
              (new-leafmenu "All" (lambda () (play-all-staffs *target-action-object*)))
                                         ;(new-leafmenu "Visible" (lambda ()(play-the-chords *target-action-object* t)))
                                         ;(new-leafmenu "selected" (lambda ()(play-the-chords *target-action-object* ())))
              (new-leafmenu "Stop Playing" (lambda () (stop-all-staffs *target-action-object*))))
    (new-menu "Approximation"
              (prog1 (setf a-leaf-menu
-                          (new-leafmenu "SemiTone" 
+                          (new-leafmenu "SemiTone"
                                         (lambda () (use-all-approx-scale  *target-action-object* *c-major-scale*))))
                (set-command-key a-leaf-menu #\2))
              (prog1 (setf a-leaf-menu
-                          (new-leafmenu "Quarter tone" 
+                          (new-leafmenu "Quarter tone"
                                         (lambda () (use-all-approx-scale  *target-action-object* *1/4-tone-chromatic-scale*))))
                (set-command-key a-leaf-menu #\4))
              (prog1 (setf a-leaf-menu
-                          (new-leafmenu "Eigth tone" 
+                          (new-leafmenu "Eigth tone"
                                         (lambda () (use-all-approx-scale  *target-action-object* *1/8-tone-chromatic-scale*))))
                (set-command-key a-leaf-menu #\8)))
    (new-menu "Scale"
-             (new-leafmenu "C-major" 
+             (new-leafmenu "C-major"
                            (lambda () (use-all-scale  *target-action-object* *c-major-scale*)))
-             (new-leafmenu "Chromatic" 
+             (new-leafmenu "Chromatic"
                            (lambda () (use-all-scale  *target-action-object* *chromatic-scale*))))
    (new-menu "Choose Staff"   ;;;;;;;;"Lay out"
              ;;(new-leafmenu "Add Staff" (lambda () (add-new-staff-to-MN-editor *target-action-object*)))
              ;;(new-menu "Choose Staff"
-             (new-leafmenu "G2-G" (lambda () 
+             (new-leafmenu "G2-G" (lambda ()
                                     (use-staff  *target-action-object* 1 *g2-g-staffs*)))
-             (new-leafmenu "G" (lambda () 
+             (new-leafmenu "G" (lambda ()
                                  (use-staff  *target-action-object* 2 *g-plain-staffs*)))
-             (new-leafmenu "G F" (lambda () 
+             (new-leafmenu "G F" (lambda ()
                                    (use-staff  *target-action-object* 3 *g-f-staffs*)))
-             (new-leafmenu "F" (lambda () 
+             (new-leafmenu "F" (lambda ()
                                  (use-staff  *target-action-object* 4 *f-plain-staffs*)))
-             (new-leafmenu "G F F2" (lambda () 
+             (new-leafmenu "G F F2" (lambda ()
                                       (use-staff  *target-action-object* 5 *g-f-f2-staffs*)))
-             (new-leafmenu "G2 G F F2" (lambda () 
+             (new-leafmenu "G2 G F F2" (lambda ()
                                          (use-staff  *target-action-object* 6 *g2-g-f-f2-staffs*)))
              (new-leafmenu "Empty" (lambda ()
                                      (use-staff  *target-action-object* 7 *empty-staffs*))))
-   (new-menu "Select" 
+   (new-menu "Select"
              (new-leafmenu "visible" (lambda () (Do-selections *target-action-object* nil)))
              (new-leafmenu "All" (lambda () (Do-selections *target-action-object* t))))
    (new-leafmenu "-" ())
@@ -116,7 +116,7 @@
 (defmethod item-action-after-drag ((self C-numbox-staffcnt))
   (set-staff-count (car (subviews (view-container self))) (value self)))
 
-(defclass C-MN-view-mod (C-mus-not-view) 
+(defclass C-MN-view-mod (C-mus-not-view)
   ((selections :initform nil)
    (popUpBox :initform nil :accessor popUpBox)
    (dial-stf :initform nil)
@@ -142,7 +142,7 @@
 (defmethod make-extra-controls :after ((self C-MN-view-mod))
   (let* ((x-pos (+ 86 (point-h (view-position self))))
          (y-pos (+  (point-v (view-position self)) (point-v (view-size self)) -35))
-         (ctrls 
+         (ctrls
           (list
            (add-to-radio-cluster self (+ 86 (point-h (view-position self)))
                                  (+  (point-v (view-position self)) (point-v (view-size self)) -35)
@@ -151,7 +151,7 @@
                  (make-popUpbox "M" self
                                 (or *MN-common-popUpMenu*
                                     (setf *MN-common-popUpMenu* (make-chord-collector-pops)))
-                                :view-position (make-point (+ x-pos 204) 
+                                :view-position (make-point (+ x-pos 204)
                                                            (+ y-pos 18))
                                 :view-container (view-window self)))
            (make-instance 'button-dialog-item
@@ -164,13 +164,13 @@
                           (lambda (item)
                               (declare (ignore item))
                               (transpose-selection self)))
-           (make-instance 'C-numbox  
+           (make-instance 'C-numbox
                           :view-size (make-point 36 14)
                           :value 100 :min-val -12700 :max-val 12700
                           :type-list '(fixnum)
                           :view-container (view-window self)
                           :view-position (make-point (+ x-pos 144) (+ y-pos 16))) ;;(make-point (+ x-pos 104) (+ y-pos 16)))
-           (make-instance 'C-numbox-staffcnt  
+           (make-instance 'C-numbox-staffcnt
                           :view-size (make-point 36 14)
                           :value 1 :min-val 1 :max-val 10
                           :type-list '(fixnum)
@@ -205,13 +205,13 @@
                        :view-position (make-point 196 40)
                        :view-size (make-point 40 16)
                        :view-font *patchwork-font-spec*))
-  (setf (slot-value self 'dial-stT)   
+  (setf (slot-value self 'dial-stT)
         (make-instance 'static-text-dialog-item
                        :dialog-item-text "To"
                        :view-position (make-point 240 40)
                        :view-size (make-point 40 16)
                        :view-font *patchwork-font-spec*))
-  (setf (slot-value self 'vel-button) 
+  (setf (slot-value self 'vel-button)
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "velocity"
                        :view-position (make-point 20 60)
@@ -241,12 +241,12 @@
                        :view-position (make-point 235 60)
                        :view-size (make-point 40 16)
                        :view-font *patchwork-font-spec*))
-  (setf (slot-value self 'dur-button ) 
+  (setf (slot-value self 'dur-button )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "duration"
                        :view-position (make-point 20 90)
                        :view-size (make-point 80 16)
-                       :view-font *patchwork-font-spec*))      
+                       :view-font *patchwork-font-spec*))
   (setf (slot-value self 'dur-% )
         (make-instance 'check-box-dialog-item
                        :dialog-item-text "%"
@@ -265,7 +265,7 @@
                        :view-position (make-point 190 90)
                        :view-size (make-point 40 16)
                        :view-font *patchwork-font-spec*))
-  (setf (slot-value self 'dur-val2 ) 
+  (setf (slot-value self 'dur-val2 )
         (make-instance 'editable-text-dialog-item
                        :dialog-item-text "0"
                        :view-position (make-point 235 90)
@@ -309,7 +309,7 @@
                        :view-size (make-point 40 23)
                        :dialog-item-action
                        (lambda (item) (declare (ignore item)) (do-chosen-action self))))
-  (setf (slot-value self 'Cancel-button) 
+  (setf (slot-value self 'Cancel-button)
         (make-instance 'button-dialog-item
                        :default-button ()
                        :dialog-item-text "cancel"
@@ -329,7 +329,7 @@
 (defmethod Do-selections ((self C-MN-view-mod) sel)
   (let ((selections))
     (unselect-all-chords (car (editor-objects self)) 0 0)
-    (dolist (panel (editor-objects self))      
+    (dolist (panel (editor-objects self))
       (setq selections (if sel (chords (chord-line panel))
                            (visible-chords panel)))
       (dolist (chord selections)
@@ -337,10 +337,10 @@
         (setf (selected-chords panel)
               (insert-in-time panel (selected-chords panel) chord))))))
 
-(defmethod Do-selections-all ((self C-MN-view-mod)) 
+(defmethod Do-selections-all ((self C-MN-view-mod))
   (let ((selections))
     (dolist (panel (if (active-editor self) (list (active-editor self))
-                       (editor-objects self)))      
+                       (editor-objects self)))
       (setq selections (chords (chord-line panel)))
       (dolist (chord selections)
         (hilite-if-not-selected panel chord 0 0)
@@ -355,17 +355,17 @@
 (defgeneric play-the-chords (self sel &optional all))
 (defmethod play-the-chords ((self C-MN-view-mod) sel &optional all)
   (declare (special *MN-great-advance*))
-  (let* ((*current-music-notation-scale* 
+  (let* ((*current-music-notation-scale*
            (or (local-scale self) *current-music-notation-scale*))
          (*current-approx-scale* (or (local-approx self) *current-approx-scale*))
          (the-panels (editor-objects self))
          (a-panel (car the-panels))
-         (x-origo (truncate 
+         (x-origo (truncate
                    (scaled-mouse-h  a-panel (point-h (view-scroll-position a-panel)))))
          all-the-chords notes beginT)
     (declare (ignorable beginT))
     (dolist (panel the-panels)
-      (let ((chords 
+      (let ((chords
               (cond (all (chords (chord-line panel)))
                     (sel (visible-chords panel))
                     (t (selected-chords panel)))))
@@ -421,7 +421,7 @@
 (defmethod accell-selection ((self C-MN-view-mod))
   (declare (special *Cresc-action*))
   (let ((dialog (make-instance 'dialog :window-show nil :view-size (make-point 285 200)
-                                       :window-type :double-edge-box 
+                                       :window-type :double-edge-box
                                        :view-position (make-point 100 200))))
     (add-subviews  dialog
                    (slot-value self 'vel-%)
@@ -430,7 +430,7 @@
                    (slot-value self 'vel-val2)
                    (slot-value self 'cancel-button)
                    (slot-value self 'OK-button))
-    (setf (slot-value self 'selections) 
+    (setf (slot-value self 'selections)
           (apply #'append (ask-all (editor-objects self) 'selected-chords)))
     (setf *cresc-action* ())
     (modal-dialog dialog)))
@@ -452,13 +452,13 @@
       (setf (t-time chord)
             (max 0
                  (+ (t-time chord)
-                    (if percent 
+                    (if percent
                         (truncate (* (t-time chord) (or (pop vals) valmin)) 100)
                         (or (pop vals) valmin)))))
       (update-the-chord-line self chord t))
     (tell (editor-objects self) 'update-editor)
     (return-from-modal-dialog ())))
-    
+
 
 (defgeneric update-velocity (self vel))
 (defmethod update-velocity ((self C-chord) vel)
@@ -467,8 +467,8 @@
 
 (defgeneric Cresc-selection (self))
 (defmethod Cresc-selection ((self C-MN-view-mod))
-  (let ((dialog (make-instance 'dialog :window-show nil :view-size #@(285 200) 
-                                       :window-type :double-edge-box 
+  (let ((dialog (make-instance 'dialog :window-show nil :view-size #@(285 200)
+                                       :window-type :double-edge-box
                                        :view-position (ui:make-point 100 200))))
     (add-subviews dialog
                   (slot-value self 'dial-stF) (slot-value self 'dial-stT)
@@ -482,7 +482,7 @@
                   (slot-value self 'off-range) (slot-value self 'off-val1)
                   (slot-value self 'off-val2)
                   (slot-value self 'cancel-button) (slot-value self 'OK-button))
-    (setf (slot-value self 'selections) 
+    (setf (slot-value self 'selections)
           (apply #'append (ask-all (editor-objects self) 'selected-chords)))
     (setf *Cresc-action* t)
     (modal-dialog dialog)))
@@ -525,9 +525,9 @@
         (valmax (read-from-string (dialog-item-text (slot-value self 'off-val2)))))
     (transform-chord-notes self 'offset  selections count percent range valmin valmax)
     (update-editor self)))
-    
+
 (defgeneric transform-chord-notes (self field selections count perc range valmin valmax))
-(defmethod transform-chord-notes ((self C-MN-view-mod) field selections count perc range valmin valmax) 
+(defmethod transform-chord-notes ((self C-MN-view-mod) field selections count perc range valmin valmax)
   (let ((vals (if range (interpol count valmin valmax))) (value))
     (dolist (chord selections)
       (setq value (if vals (pop vals) valmin))
@@ -549,7 +549,7 @@
                 (t value)))))
 
 (defgeneric update-editor (self))
-(defmethod update-editor ((self C-MN-view-mod)) 
+(defmethod update-editor ((self C-MN-view-mod))
   (update-view-controler self))
 
 (defgeneric set-staff-count (self value))
@@ -583,7 +583,7 @@
                                          :view-size size
                                          :h-scrollp nil
                                          :view-font *music-font-spec*
-                                         :origin 
+                                         :origin
                                          (setq last-panel-home (+ last-panel-home (- *MN-draw-offset*) (point-h size)))))
                     new-panels)
                    (setq max-y (+ 2 max-y (point-v size)))
@@ -593,7 +593,7 @@
               (t nil)))))
 
 (defgeneric monofonic-mn? (self))
-(defmethod monofonic-mn? ((self C-MN-view-mod)) 
+(defmethod monofonic-mn? ((self C-MN-view-mod))
   (not (polifonic? (pw-object (view-container self)))))
 
 (defgeneric update-editor-objects (self))
@@ -653,11 +653,11 @@
              (play-note (car (pop notes)) approx)))
           ((eql *playing-option* :mc)
            (let ((approx-m (approx-for-playing (midic (caar notes)) approx)))
-             (write-midi-note (dur (caar notes)) (+ (chan (caar notes)) (micro-channel approx-m) -1) 
+             (write-midi-note (dur (caar notes)) (+ (chan (caar notes)) (micro-channel approx-m) -1)
                               (truncate approx-m 100) (vel (car (pop notes))))
              (while (and notes (= start-time (cdr (car notes))))
                (setq approx-m (approx-for-playing (midic (caar notes)) approx))
-               (write-midi-note (dur (caar notes)) (+ (chan (caar notes)) (micro-channel approx-m) -1) 
+               (write-midi-note (dur (caar notes)) (+ (chan (caar notes)) (micro-channel approx-m) -1)
                                 (truncate approx-m 100) (vel (car (pop notes))))))))
     (if notes
         (re-dfuncall (- (cdr (car notes)) start-time)

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -37,7 +37,7 @@
 
 (defun put-appleevent-par (aevent param-key data)
   (closae:putparam aevent param-key data)
-  ;; (if (ccl:macptrp data) 
+  ;; (if (ccl:macptrp data)
   ;;   (ae-error (#_AEPutParamDesc aevent param-key data))
   ;;   (ae-error (#_AEPutParamDesc aevent param-key (cl-user::getDescRecPtr (cl-user::asAEDesc  data))))
   ;;   )
@@ -46,7 +46,7 @@
 ;;(closae:asAEDesc  100.0)
 
 (defun mkSO (a b c d)
-  (make-instance 
+  (make-instance
    'closae:objectspecifier
    :class     a
    :container b
@@ -62,9 +62,9 @@
      (when (wins-menu-item self)
        (set-menu-item-title (wins-menu-item self) (window-title self)))
      (delete-file new-name)   ;ML
-     (ui:with-cursor *watch-cursor* 
-       (WITH-OPEN-FILE  (out new-name :direction :output 
-                                      :if-does-not-exist :create :if-exists :supersede) 
+     (ui:with-cursor *watch-cursor*
+       (WITH-OPEN-FILE  (out new-name :direction :output
+                                      :if-does-not-exist :create :if-exists :supersede)
          (prin1 '(in-package :pw) out)
           (let ((*package* :pw))
             (prin1 (decompile self) out))))))
@@ -103,7 +103,7 @@
                                    (nth (- (closae:getdata theData) 1) (notes (AEresolve (closae:getcontainer TheData))))))
         ((equal clase :|ccho|) (if (equal (closae:getForm theData) :|name|)
                                    (get-pw-script-obj (closae:getdata TheData))
-                                   (nth (- (closae:getdata theData) 1) 
+                                   (nth (- (closae:getdata theData) 1)
                                         (let* ((obj (AEresolve (closae:getcontainer TheData))))
                                           (if (equal (class-name (class-of obj)) 'c-beat)
                                               (get-chords-from-beat obj)
@@ -173,8 +173,8 @@
         (open-patch-win Pname)
         (let ((name Pname)
               ;; #+ccl (ccl:*compile-definitions* nil)
-              )  
-          (with-cursor *watch-cursor* 
+              )
+          (with-cursor *watch-cursor*
             (load name :verbose t)
             (pw::PW-update-wins-menu name))))))
 
@@ -200,13 +200,13 @@
                                     (bposi (closae:getparam AE-clos-Ob :|mbpb|)))
                                 (if (equal t theabs) (put-appleevent-par reply #$keyDirectObject  nil)
                                     (progn
-                                      (when bposi 
+                                      (when bposi
                                         (set-view-position theabs (make-point (first bposi) (second bposi) )))
-                                      (put-appleevent-par reply #$keyDirectObject 
+                                      (put-appleevent-par reply #$keyDirectObject
                                                           (mkSO :|cbox| nil :|name| (pw-function-string theabs)))))))
-      
+
       ((equal eltipo :|cpat|) (progn (pw::make-new-pw-window t)
-                                     (put-appleevent-par reply #$keyDirectObject 
+                                     (put-appleevent-par reply #$keyDirectObject
                                                          (mkSO :|cpat| nil :|name| (win-title *active-patch-window*)))))
       ((equal eltipo :|cbox|) (let* ((bclase (closae:getparam AE-clos-Ob :|mbcn|))
                                      (bname (closae:getparam AE-clos-Ob :|mbnb|))
@@ -217,7 +217,7 @@
                                      thebox)
                                 (when themenu
                                   (setf *position-new-box* (make-point 15 15 ))
-                                  (when bposi 
+                                  (when bposi
                                     (setf *position-new-box* (make-point (first bposi) (second bposi) )))
                                   (if (string-equal bclase "funlisp")
                                       (setf thebox (make-lisp-pw-boxes (read-from-string bname) *active-patch-window*))
@@ -227,30 +227,30 @@
                                     (open-edit-text-item-for-box thebox bname)
                                     (set-dialog-item-text-from-dialog pw::*pw-controls-current-pw-control* bname)
                                     (kill-text-item))
-                                  (put-appleevent-par reply #$keyDirectObject 
+                                  (put-appleevent-par reply #$keyDirectObject
                                                       (mkSO :|cbox| nil :|name| (pw-function-string thebox) )))))
       (t (print "error no type for new")))))
 
-;;LOAD 
+;;LOAD
 
 (defmethod even-load ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
   (let* ((AE-clos-Ob (make-instance 'closae:AppleEvent :descRecPtr theAppleEvent ))
-         (thePara (closae:getparam AE-clos-Ob :|----| )) 
+         (thePara (closae:getparam AE-clos-Ob :|----| ))
          (thetype (closae:getclass ThePara))
          (Pname (AEresolve thePara)))
     (cond
      ((equal thetype :|obli|) (load-one-user-library (pathname Pname)))
      ((equal thetype :|obab|) (load&form-abstr-menu (pathname Pname)) )
      (t (print "load a library or an abstract")))))
- 
+
 
 
 ;;OPTIONS
 (defmethod even-options ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
   (let* ((AE-clos-Ob (make-instance 'closae:AppleEvent :descRecPtr theAppleEvent ))
-         (Scale (closae:getparam AE-clos-Ob :|opsc| )) 
+         (Scale (closae:getparam AE-clos-Ob :|opsc| ))
          (Appro (closae:getparam AE-clos-Ob :|opap| ))
          (Playop (closae:getparam AE-clos-Ob :|oppl| )))
     (when Scale
@@ -273,11 +273,11 @@
 (defmethod even-set ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
   (let* ((AE-clos-Ob (make-instance 'closae:AppleEvent :descRecPtr theAppleEvent ))
-         (thePara (closae:getparam AE-clos-Ob :|----| )) 
+         (thePara (closae:getparam AE-clos-Ob :|----| ))
          (theinput (AEresolve thePara))
          (thedata (closae:getparam AE-clos-Ob :|data| )) theinbox theentre)
     (cond
-      ((listp theinput)  
+      ((listp theinput)
        (setf theentre (nth (first theinput)  (pw-controls (second theinput))))
        (setf theinbox (nth (first theinput)  (input-objects (second theinput))))
        (if (or (equal (class-name (class-of theentre)) 'C-ttybox-absout)
@@ -306,15 +306,15 @@
   (declare (ignore handlerRefcon))
   (let* ((AE-clos-Ob (make-instance 'closae:AppleEvent :descRecPtr theAppleEvent ))
          (thePara (closae:getparam AE-clos-Ob :|----| ))
-         (theinput (if (equal (closae:getclass thepara) :|prop|) (AEresolve (closae:getcontainer thepara)) 
+         (theinput (if (equal (closae:getclass thepara) :|prop|) (AEresolve (closae:getcontainer thepara))
                        (AEresolve thePara))))
-    (cond 
-      ((equal (closae:getclass thepara) :|prop|)  
+    (cond
+      ((equal (closae:getclass thepara) :|prop|)
        (put-appleevent-par reply #$keyDirectObject (eval-ae (solucione theinput (closae:getdata thepara)))))
       ((or (equal (closae:getclass thepara) :|cpat|) (equal (closae:getclass thepara) :|cbox|))
        (put-appleevent-par reply #$keyDirectObject (closae:getdescrecptr (closae:asaedesc thepara))))
       ((equal (closae:getclass thepara) :|cinp|)
-       (put-appleevent-par reply #$keyDirectObject 
+       (put-appleevent-par reply #$keyDirectObject
                            (eval-ae (patch-value (nth (first theinput)  (input-objects (second theinput)))
                                                  (nth (first theinput)  (input-objects (second theinput)))))))
       (t  (put-appleevent-par reply #$keyDirectObject (eval-ae theinput))))))
@@ -329,7 +329,7 @@
     ((equal clase :|cdur|) (dur nota))
     ((equal clase :|cvel|) (vel nota))
     ((equal clase :|ccha|) (chan nota))
-    ((equal clase :|leng|) 
+    ((equal clase :|leng|)
      (cond
        ((equal (class-name (class-of nota)) 'pw::c-chord-line)
         (length (chords nota)))
@@ -342,10 +342,10 @@
     ((equal clase :|ctim|) (if (equal (class-name (class-of nota)) 'pw::c-note)
                                (offset-time nota)
                                (t-time nota)))))
-       
-       
 
- 
+
+
+
 ;;CONNECT
 (defmethod even-connect ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
@@ -357,7 +357,7 @@
     (pw::connect-nth-control (second input) (first input) theData)
     (pw::draw-connections (second input))))
 
- 
+
 ;;UNCONNECT
 
 (defmethod even-unco ((a application) theAppleEvent reply handlerRefcon)
@@ -370,7 +370,7 @@
 
 
 
-  
+
 ;;MOVE
 
 (defmethod even-move ((a application) theAppleEvent reply handlerRefcon)
@@ -393,7 +393,7 @@
 (defmethod even-save ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
   (let* ((AE-clos-Ob (make-instance 'closae:AppleEvent :descRecPtr theAppleEvent ))
-         (thePara (closae:getparam AE-clos-Ob :|----| )) 
+         (thePara (closae:getparam AE-clos-Ob :|----| ))
          (thePatch (cond ((equal thePara :|conf|) nil)
                          ((not (equal thePara :|cpat|)) (getpatch-name (AEresolve thePara)))
                          (t *active-patch-window*)))
@@ -414,7 +414,7 @@
                   (pw::salve-as thePatch  as?)))))))
 
 
- 
+
 ;;EVAL
 
 (defmethod even-eval ((a application) theAppleEvent reply handlerRefcon)
@@ -498,7 +498,7 @@
         (dolist (item thePara)
           (let ((thebox (AEresolve item)))
             (activate-control thebox))))))
- 
+
 ;;RENAME
 
 (defmethod even-rena ((a application) theAppleEvent reply handlerRefcon)
@@ -513,7 +513,7 @@
     (put-appleevent-par reply #$keyDirectObject (mkSO :|cbox| nil :|name| thename))))
 
 
-     
+
 ;;LOCK
 (defmethod even-lock ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply))
@@ -526,7 +526,7 @@
         (if (equal (class-name (class-of thebox)) 'C-PATCH-BUFFER::C-patch-buffer)
           (setf (C-PATCH-BUFFER::value thebox) (not (C-PATCH-BUFFER::value thebox)))
           (setf (value thebox) (not (value thebox))))))))
- 
+
 
 ;;UNLOCK
 (defmethod even-unlo ((a application) theAppleEvent reply handlerRefcon)
@@ -555,10 +555,10 @@
   (let* ((psn (make-record :ProcessSerialNumber)))
     (setf *list-pw-script-objects* nil)
     (setf *contador-pw-script-object* 0)
-    (if (not *active-patch-window*) 
-        (make-new-pw-window t) 
-        (if (not (wptr *active-patch-window*)) 
-            (search-for-next-pw-window))) 
+    (if (not *active-patch-window*)
+        (make-new-pw-window t)
+        (if (not (wptr *active-patch-window*))
+            (search-for-next-pw-window)))
     (enable-all-apps-menu-items)
     (menu-item-disable *apps-PW-menu-item*)
     (window-select  *active-patch-window*)
@@ -567,20 +567,20 @@
   (progn
     (setf *list-pw-script-objects* nil)
     (setf *contador-pw-script-object* 0)
-    (unless *active-patch-window* 
-      (make-new-pw-window t)) 
+    (unless *active-patch-window*
+      (make-new-pw-window t))
     (enable-all-apps-menu-items)
     (menu-item-disable *apps-PW-menu-item*)
     (window-select  *active-patch-window*)))
-  
 
-  
+
+
 ;;DUPLICATE
 
 (defmethod even-dupli ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon reply theAppleEvent))
   (duplicate *active-patch-window*))
-  
+
 ;;DELETE
 
 (defmethod even-delete ((a application) theAppleEvent reply handlerRefcon)
@@ -645,8 +645,8 @@
                           (window-select win)
                           (script-get-selected-file boite parametro))))
                    (t (script-get-selected-file boite parametro))))
-            ((and (string-equal (menu-item-title iteme) "Open File") 
-                  (or (equal 'c-patch-file-buffer::C-patch-file-buffer clase) 
+            ((and (string-equal (menu-item-title iteme) "Open File")
+                  (or (equal 'c-patch-file-buffer::C-patch-file-buffer clase)
                       (equal 'c-patch-file-buffer::c-patch-ascii-buffer clase)))
              (script-get-selected-file boite parametro))
             (t (menu-item-action iteme)))))))
@@ -657,7 +657,7 @@
 (defmethod pw::script-get-selected-file ((self C-patch-file-buffer) para)
   (let ((name (full-pathname para)))
     (ui:with-cursor *watch-cursor*
-      (setf (fred-win self) 
+      (setf (fred-win self)
             (make-instance 'fred-window :window-show nil))
       (setf (file-name self) name)
       (set-window-filename (fred-win self) name)
@@ -679,7 +679,7 @@
 
 
 
-;;PLAY 
+;;PLAY
 (defmethod even-play ((a application) theAppleEvent reply handlerRefcon)
   (declare (ignore handlerRefcon))
   (let* ((AE-clos-Ob (make-instance 'closae:AppleEvent :descRecPtr theAppleEvent ))

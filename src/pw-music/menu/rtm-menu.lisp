@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -57,14 +57,14 @@
 
 (defun make-rtm-menu/file ()
   (new-menu "File"
-            (new-leafmenu "Save as midifile..."  
+            (new-leafmenu "Save as midifile..."
                           (lambda () (RTM-midi-file-SAVE)))
 
             (new-leafmenu "Save as ENIGMA..."
-                          (lambda () (save-cleni-rtm-score)))  
+                          (lambda () (save-cleni-rtm-score)))
             (new-leafmenu "Save as 1/4-ENIGMA..."
                           (lambda () (let ((*cleni-temperament-mode* 4))
-                                       (save-cleni-rtm-score))))  
+                                       (save-cleni-rtm-score))))
 
             (setf *rtm-print-setUp* (make-rtm-print-setup-item))
             (setf *print-rtm-menu*  (make-rtm-print-item))))
@@ -88,7 +88,7 @@
                 (update-all-beat-groupings)
                 (erase+view-draw-contents *current-rtm-editor*)))
             (item "Copy"  #\C
-              (when (get-current-rtm-selection) 
+              (when (get-current-rtm-selection)
                 (cond ((eql 'C-measure (class-name (class-of (get-current-rtm-selection))))
                        (setf *measure-selection-scrap* (decompile (get-current-rtm-selection))))
                       ((and (eql 'C-beat (class-name (class-of (get-current-rtm-selection))))
@@ -96,19 +96,19 @@
                        (setf *beat-chord-scrap* (decompile (beat-chord (get-current-rtm-selection)))))
                       ((eql 'C-beat (class-name (class-of (get-current-rtm-selection))))
                        (setf *rtm-struct-selection-scrap* (decompile (get-current-rtm-selection))))
-                      (t   
+                      (t
                        (setf *measure-line-selection-scrap* (decompile (get-current-rtm-selection)))))))
             (item "Paste"  #\V
-              (when (get-current-rtm-selection) 
+              (when (get-current-rtm-selection)
                 (kill-chords (get-current-rtm-selection))
                 (paste-beat (get-current-rtm-selection))
-                (setf (rtm-selection-1 (editor-collection-object *active-rtm-window*)) ())  
-                (setf (rtm-selection-2 (editor-collection-object *active-rtm-window*)) ())  
+                (setf (rtm-selection-1 (editor-collection-object *active-rtm-window*)) ())
+                (setf (rtm-selection-2 (editor-collection-object *active-rtm-window*)) ())
                 (update-all-beat-groupings)
-                (erase+view-draw-contents 
+                (erase+view-draw-contents
                  (current-rtm-editor (editor-collection-object *active-rtm-window*))))) ))
 
-;;(remove-menu-items  *RTM-menu-edit* (find-menu-item *RTM-menu-edit* "Paste")) 
+;;(remove-menu-items  *RTM-menu-edit* (find-menu-item *RTM-menu-edit* "Paste"))
 
 
 (defun initialize-rtm-menu ()
@@ -118,23 +118,23 @@
   (setf *RTM-menu-edit* (make-rtm-menu/edit))
 
   ;; --------------------
-  
+
   (setf *RTM-selection-menu* (new-menu "Edit selection"))
   (ui:add-menu-items *RTM-menu* *RTM-selection-menu*)
 
-  (ui:add-menu-items  *RTM-selection-menu*                        
+  (ui:add-menu-items  *RTM-selection-menu*
                       (new-leafmenu "Velocity..." #'edit-rtm-editor-velocity-menu))
 
-  (ui:add-menu-items  *RTM-selection-menu*                        
+  (ui:add-menu-items  *RTM-selection-menu*
                       (new-leafmenu "Transpose..." #'edit-rtm-editor-transpose-menu))
 
-  (ui:add-menu-items  *RTM-selection-menu*                        
+  (ui:add-menu-items  *RTM-selection-menu*
                       (new-leafmenu "Channel..." #'edit-rtm-editor-chans-menu))
-  
-  (ui:add-menu-items  *RTM-selection-menu*                        
+
+  (ui:add-menu-items  *RTM-selection-menu*
                       (new-leafmenu "Duration..." #'edit-rtm-editor-duration-menu))
 
-  (ui:add-menu-items  *RTM-selection-menu*                        
+  (ui:add-menu-items  *RTM-selection-menu*
                       (new-leafmenu "Metronome..." #'edit-rtm-editor-Metronome-menu))
 
 
@@ -143,45 +143,45 @@
   (setf *RTM-global-menu* (new-menu "Edit globally"))
   (ui:add-menu-items *RTM-menu* *RTM-global-menu*)
 
-  (ui:add-menu-items  *RTM-global-menu*                        
+  (ui:add-menu-items  *RTM-global-menu*
                       (new-leafmenu "Transpose..." #'edit-rtm-editor-transpose-global-menu))
 
-  (ui:add-menu-items  *RTM-global-menu*                        
+  (ui:add-menu-items  *RTM-global-menu*
                       (new-leafmenu "Channel..." #'edit-rtm-editor-chans-global-menu))
 
-  (ui:add-menu-items  *RTM-global-menu*                        
+  (ui:add-menu-items  *RTM-global-menu*
                       (new-leafmenu "Increment channel" (lambda () (edit-rtm-editor-chans-global-2 *active-rtm-window*))))
 
-  (ui:add-menu-items  *RTM-global-menu*                        
+  (ui:add-menu-items  *RTM-global-menu*
                       (new-leafmenu "Duration..." #'edit-rtm-editor-duration-global-menu))
 
-  (ui:add-menu-items  *RTM-global-menu*                        
+  (ui:add-menu-items  *RTM-global-menu*
                       (new-leafmenu "Metronome..." #'edit-rtm-editor-Metronome-global-menu))
 
-  (ui:add-menu-items  *RTM-menu*    
+  (ui:add-menu-items  *RTM-menu*
                       (new-menu "Choose Staff"
                                 (new-menu "Selected staff"
-                                          (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 1)))  
-                                          (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 2))) 
-                                          (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staff-layout *active-rtm-window* 3)))  
-                                          (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 4)))  
-                                          (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staff-layout *active-rtm-window* 5)))  
-                                          (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staff-layout *active-rtm-window* 6)))  
-                                          (new-leafmenu "Empty" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 7)))) 
+                                          (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 1)))
+                                          (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 2)))
+                                          (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staff-layout *active-rtm-window* 3)))
+                                          (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staff-layout *active-rtm-window* 4)))
+                                          (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staff-layout *active-rtm-window* 5)))
+                                          (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staff-layout *active-rtm-window* 6)))
+                                          (new-leafmenu "Empty" (lambda ()     (edit-rtm-editor-staff-layout *active-rtm-window* 7))))
                                 (new-menu "All staffs"
-                                          (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staffs-layout *active-rtm-window* 1)))  
-                                          (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 2))) 
-                                          (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staffs-layout *active-rtm-window* 3)))  
-                                          (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 4)))  
-                                          (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staffs-layout *active-rtm-window* 5)))  
-                                          (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staffs-layout *active-rtm-window* 6)))  
+                                          (new-leafmenu "G2-G" (lambda ()     (edit-rtm-editor-staffs-layout *active-rtm-window* 1)))
+                                          (new-leafmenu "G" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 2)))
+                                          (new-leafmenu "G F" (lambda ()      (edit-rtm-editor-staffs-layout *active-rtm-window* 3)))
+                                          (new-leafmenu "F" (lambda ()        (edit-rtm-editor-staffs-layout *active-rtm-window* 4)))
+                                          (new-leafmenu "G F F2" (lambda ()   (edit-rtm-editor-staffs-layout *active-rtm-window* 5)))
+                                          (new-leafmenu "G2 G F F2" (lambda ()(edit-rtm-editor-staffs-layout *active-rtm-window* 6)))
                                           (new-leafmenu "Empty" (lambda ()     (edit-rtm-editor-staffs-layout *active-rtm-window* 7))))))
 
   ;; --------------------
 
   (setf *rtm-boxes-menu* *pw-MN-Edit-menu*)
 
-  
+
   (pw-addmenu pw::*rtm-boxes-menu* '(pw::quantify))
 
   ;;(pw-addmenu-fun *rtm-boxes-menu* 'score-voice 'C-patch-score-voice)
@@ -190,7 +190,7 @@
 
 
   ;;(setf *rtm-boxes-menu* (new-menu "Rhythm"))
-  (ui:add-menu-items *rtm-boxes-menu* 
+  (ui:add-menu-items *rtm-boxes-menu*
                      (new-leafmenu "-" ()))
 
   ;;(pw-addmenu  *rtm-boxes-menu* '(make-beat make-beat2 make-measure))
@@ -208,19 +208,19 @@
   ;; --------------------
 
   (setf *RTM-menu-root*
-        (list 
+        (list
          *pw-menu-apps*
          *RTM-menu-file*
          *RTM-menu-edit*
          (fifth (ui:menubar))
          (sixth (ui:menubar))
          *RTM-menu*))
-  
-  (setf *apps-RTM-menu-item* 
+
+  (setf *apps-RTM-menu-item*
         (add-apps-item-to-apps-menu  "RTM"
-                                     (lambda () 
+                                     (lambda ()
                                        (if *active-RTM-window*
-                                           (progn 
+                                           (progn
                                              (window-select *active-RTM-window*)
                                              (enable-all-apps-menu-items)
                                              (menu-item-disable *apps-RTM-menu-item*))

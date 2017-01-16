@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -46,7 +46,7 @@
   (make-chord-collector-pops)
   (make-bpf-pops))
 
-(defclass C-mn-window (C-mouse-window C-application-window)  
+(defclass C-mn-window (C-mouse-window C-application-window)
   ((super-win :initform nil :accessor super-win)
    (super-note :initform nil :accessor super-note)))
 
@@ -55,7 +55,7 @@
                             :window-title ,(window-title self)
                             :view-position ,(view-position self)
                             :view-size ,(view-size self)
-                            :view-subviews (list ,(decompile (car (subviews self))))))) 
+                            :view-subviews (list ,(decompile (car (subviews self)))))))
       ;(set-view-container (external-controls (editor-view-object mn-window)) mn-window)
       mn-window))
 
@@ -78,23 +78,23 @@
          (make-MN-help-window))
    (window-select *MN-help-window*))
 
-(defmethod remove-yourself-control ((self C-mn-window)) 
+(defmethod remove-yourself-control ((self C-mn-window))
   (tell (ask-all (editor-objects (car (subviews self))) 'chord-line) 'kill-chords)
   (window-close  self))
 
 (defmethod key-pressed-extra ((self C-MN-window) char)
   (case char
-    ((:Enter #\Etx #\Newline #+has-return #\Return #+has-linefeed #\Linefeed)  
+    ((:Enter #\Etx #\Newline #+has-return #\Return #+has-linefeed #\Linefeed)
      (if (pw-win self)
-         (if (super-win (pw-win self)) 
+         (if (super-win (pw-win self))
              (window-select (super-win (pw-win self)))
              (ui:ed-beep))
          (ui:ed-beep)))
-    ((#\C) 
+    ((#\C)
      (record-structured-process self))
-    ((#\Q) 
+    ((#\Q)
      (make-structured-score self))
-    ((#\L) 
+    ((#\L)
      (pretty-visible-layout  (editor-view-object self)))
     (otherwise
      (key-pressed-MN-editor (editor-view-object self) char))))
@@ -116,7 +116,7 @@
     (ui:set-menubar *MN-menu-root*)
     (enable-all-apps-menu-items))
   (menu-item-disable *apps-MN-menu-item*))
-  
+
 #|(defmethod view-deactivate-event-handler :after ((self C-MN-window))
   (when (pw-object self)
     (draw-appl-label (pw-object self) #\A))

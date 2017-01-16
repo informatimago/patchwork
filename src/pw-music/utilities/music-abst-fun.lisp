@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -48,10 +48,10 @@
 ;;;
 ;;; Classes considered in this file are:
 ;;;
-;;;    C-patch, C-abstract-out, C-abstract-in, C-abstract, 
-;;;    C-patch-chord-box-M (the chord box), 
-;;;    C-pw-circ, C-pw-circ-end, 
-;;;    C-patch-midi (the collector), 
+;;;    C-patch, C-abstract-out, C-abstract-in, C-abstract,
+;;;    C-patch-chord-box-M (the chord box),
+;;;    C-pw-circ, C-pw-circ-end,
+;;;    C-patch-midi (the collector),
 ;;;    C-patch-PolifMN (the polyphonic collector)
 ;;;    C-pw-stop-time, C-clock-constant
 ;;;    C-enum-collect-sink (the loop box)
@@ -63,7 +63,7 @@
 ;;;    C-patch-osc-period (the osc-period)
 ;;;    C-patch-MD-get-slot  (get-slot box)
 ;;;    C-patch-MD-set-slot
-;;;=================================================  
+;;;=================================================
 
 
 (defmethod compile-me ((self C-patch-chord-box-M ) obj)
@@ -75,9 +75,9 @@
            (decompile my-chord)
            `'',my-chord))
        `(let* ((a-chord ,(decompile (make-instance 'C-chord)))
-               (my-chord 
-                (list 'make-chord-object 
-                      (list 'list! ,(compile-me my-connect obj)) 0 
+               (my-chord
+                (list 'make-chord-object
+                      (list 'list! ,(compile-me my-connect obj)) 0
                       (list 'type-of a-chord))))
           my-chord))))
 

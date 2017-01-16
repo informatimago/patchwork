@@ -34,26 +34,67 @@
 ;;;;**************************************************************************
 (in-package "COMMON-LISP-USER")
 
+(defun say (fmt &rest args)
+  (format t "~&;;; ~?~%" fmt args)
+  (finish-output))
+
+(defun local-file (name &optional type)
+  (make-pathname :name name
+                 :type type
+                 :version nil
+                 :defaults #.(or *compile-file-truename* *load-truename*)))
+
 ;;; --------------------------------------------------------------------
 ;;; Load quicklisp
-(format t "~%;;; Loading quicklisp.~%")
-(finish-output)
+(say "Loading quicklisp.")
 (load #P"~/quicklisp/setup.lisp")
 (setf quicklisp-client:*quickload-verbose* t)
 
+
+;;; --------------------------------------------------------------------
+;; Logical Hosts used at compilation time
+;; --------------------------------------
+;;
+;;   PATCHWORK
+;;
+;;     The logical host PATCHWORK should be set so that the .git/
+;;     subdirectory should be  at its root:
+;;
+;;         #+ccl (probe-file #P"PATCHWORK:.git;") --> true
+;;
+;;   MCLGUI
+;;
+;;   MIDI
+;;
+;; Logical Hosts used at run-time
+;; ------------------------------
+;;
+;; Those logical hosts are used by patchwork or its dependencies include:
+;;
+;;   PW-USER  -- See src/application.lisp  initialize-directories
+;;
+;;   CLENI
+
+(say "Defining logical hosts.")
+(load (local-file "loghosts"))
+
 ;;; --------------------------------------------------------------------
 ;;; Configure quicklisp.
+(say "Configure quicklisp.")
 ;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
-#+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
-(push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
+(push (translate-logical-pathname #P"SRC:INFORMATIMAGO;") ql:*local-project-directories*)
 
 ;;; --------------------------------------------------------------------
 ;;; Load builder stuff.
+(say "Load builder stuff from quicklisp.")
 (ql:quickload :cffi                                       :verbose t :explain t)
 (ql:quickload :com.informatimago.tools.pathname           :verbose t :explain t)
 (ql:quickload :com.informatimago.tools.manifest           :verbose t :explain t)
 (ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
-(load (merge-pathnames "builder.lisp" (or *load-pathname* #P"./")))
+
+(say "Load builder.")
+(load (local-file "builder"))
+
 (in-package "PATCHWORK.BUILDER")
 (load (translate-logical-pathname #P"PATCHWORK:PROPERTY-LIST-KEYS"))
 
@@ -118,11 +159,29 @@
 
 (ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
 (setf (logical-pathname-translations "RELEASE")
-      (make-logical-pathname-translations "" *release-directory*))
+      (make-translations "RELEASE" '() *release-directory*))
 
 (say "Generating manifest.")
-(let ((*default-pathname-defaults* *release-directory*))
-  (write-manifest *name-and-version* *program-system*))
+(let ((*default-pathname-defaults* *release-directory*)
+      (*print-circle* nil))
+  (let ((manifest-pathname (write-manifest *name-and-version* *program-system*))
+        (git-source-sandboxes '(#P"SRC:INFORMATIMAGO;"
+                                #P"SRC:MCLGUI;"
+                                #P"SRC:PATCHWORK;"))
+        ;; (svn-source-sandboxes '())
+        (pwd (ccl:current-directory)))
+    (with-open-file (manifest manifest-pathname :direction :output
+                                                :if-exists :append
+                                                :if-does-not-exist :create)
+      (unwind-protect
+           (dolist (git-source-log git-source-sandboxes)
+             (let ((git-source (translate-logical-pathname git-source-log)))
+               (format manifest "~2%~A~%~V@{-~}~2%~A~2%"
+                       (namestring git-source-log) (length (namestring git-source-log))
+                       (namestring git-source))
+               (setf (ccl:current-directory) git-source)
+               (format manifest "~A~%" (com.informatimago.tools.manifest::shell-command-to-string "git-info"))))
+        (setf (ccl:current-directory) pwd)))))
 
 (say "Copying release notes.")
 (copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")
@@ -257,7 +316,7 @@
                  :|UTExportedTypeDeclarations| (exported-type-utis)
                  :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2014 Pascal Bourguignon~%License: GPL3")
                  ;; overriden by write-info-plist, I assume. :|NSMainNibFile| "MainMenu"
-                 :|NSPrincipalClass| "LispApplication"))
+                 :|NSPrincipalClass| "IDEApplication"))
    :nibfiles '()
                                         ; a list of user-specified nibfiles
                                         ; to be copied into the app bundle
@@ -271,21 +330,25 @@
    :altconsole nil))
 
 
-(say "*lisp-startup-functions* = ~S~%" ccl::*lisp-startup-functions*)
+(say "*lisp-startup-functions* = ~S" ccl::*lisp-startup-functions*)
+(say "*release-directory*      = ~S" *release-directory*)
+(say "save image and quit      = ~S" #+save-image-and-quit t #-save-image-and-quit nil)
 
-(unless *load-pathname*
+#+save-image-and-quit
+(progn
   (let ((destination (merge-pathnames #P"Patchwork.app/Contents/Resources/patchwork-icon.icns"
                                       *release-directory*)))
     (ensure-directories-exist destination)
     (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
                destination :element-type '(unsigned-byte 8) :if-exists :supersede))
+
   ;; this quits ccl:
-  (save-patchwork-application :name *program-name* :directory *release-directory*))
+  (save-patchwork-application :name *program-name* :directory *release-directory*)
 
+  #+lispworks
+  (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
+                              :console :always)
 
-#+lispworks
-(hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
-                            :console :always)
-
+  ) ;;unless
 
 ;;;; THE END ;;;;

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    PW rythmic input.
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Camilo Rueda
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 1992
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,12 +36,12 @@
 
 (defvar *valid-rtm-expands* '(#\/))
 
-(defun expand-lists (lists)  
+(defun expand-lists (lists)
   (and lists
        (let ((lists (expand-lst lists))  result)
          (while lists
            (let ((next-elem (pop lists)))
-             (cond 
+             (cond
                ((symbolp next-elem)
                 (let* ((form (coerce (format () "~A" next-elem) 'list))
                        (from-char (is-in form *valid-rtm-expands*))
@@ -50,7 +50,7 @@
                        (int (butlast form (length from-char))))
                   (cond
                     ((and char-symb (char= #\/ char-symb)
-                          (or (not third) 
+                          (or (not third)
                               (and (char= (car third) #\/) (pop third) third
                                    (numberp (setq third
                                                   (read-from-string (coerce third 'string)))))
@@ -77,8 +77,8 @@
 ;;(expand-lists '(2*(/3 3*(2/(1 2))) 2*(/9) /(1 2 3 1 1) 2//8 1.0))
 
 (defunp score-voice ((signs list (:value "(4 4)"))
-                     (beats list (:value "((4 (1 1 1 1)))")) 
-                     (chords list (:value "(6000)" 
+                     (beats list (:value "((4 (1 1 1 1)))"))
+                     (chords list (:value "(6000)"
                                    :type-list (list fixnum chord note-obj)))
                      (tempi midics? (:value 60))
                      &optional (objs list (:value '()))) measure-line
@@ -86,12 +86,12 @@
   (declare (ignore signs beats chords objs tempi)))
 
 (defunp rtm ((signs list (:value "(4 4)"))
-             (beats list (:value "((4 (1 1 1 1)))")) 
-             (chords list (:value "(6000)" 
+             (beats list (:value "((4 (1 1 1 1)))"))
+             (chords list (:value "(6000)"
                            :type-list (list fixnum chord note-obj collector)))
              (tempi midics? (:value 60))
              &optional (objs list (:value '() :type-list ()))) measure-line
-    "makes a measure object out of the input rhythm, where 
+    "makes a measure object out of the input rhythm, where
 <signs> is a list of time signatures,
 <beats> is a list of beat divisions in expand list notation.
 For example '(3*(1/4) /(1 2 1) 2//4 2*(1/5 1/7 1/8)) takes:
@@ -101,11 +101,11 @@ three times: four 16ths notes,
  two times: five 16ths notes (in a beat) seven 16ths notes (in a beat)
 and eight 32ths notes (in a beat).
 <chord> is a list (or list of lists) of midics, and
-<tempi> is a list of tempos  in expand list notation (see <expand-list>). The 
-module can be locked (to avoid new evaluations of the patch that is under 
-'chord') to keep its contents by clicking on the small ‘o’ in the lower right of the 
+<tempi> is a list of tempos  in expand list notation (see <expand-list>). The
+module can be locked (to avoid new evaluations of the patch that is under
+'chord') to keep its contents by clicking on the small ‘o’ in the lower right of the
 module. The ‘o’ indicates that the module is open. An editor for the <score-
-voice> object is entered either by selecting the module and typing the letter 'o',  
+voice> object is entered either by selecting the module and typing the letter 'o',
 or by double-clicking on the module's name. Click 'h' with the rhythm-notation-
 editor opened for more information."
   (declare (ignore signs beats chords objs tempi)))
@@ -115,7 +115,7 @@ editor opened for more information."
 
 (defmethod initialize-instance :after ((self C-patch-score-voice) &key controls)
   (declare (ignore controls))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox "" self
                        *collector-popUp-menu*
                        :view-position (make-point (- (w self) 10)
@@ -157,7 +157,7 @@ editor opened for more information."
                          (chords in-chords)  (construct-chords  (list! in-chords))))
              (measure-line (measure-line self))
              measures chord-objects)
-        (if objs 
+        (if objs
             (setq measures (get-measure-object objs))
             (let* ((in-signs (patch-value (first inputs) obj))
                    (beats (expand-lists (patch-value (second inputs) obj)))
@@ -182,7 +182,7 @@ editor opened for more information."
                        (setf meas-beat-count 0)
                                         ; ----- GAS 110493. alllow for small rounding error
 
-                       (push (make-measure (low-of meas-sign) (nreverse beat-objs) 
+                       (push (make-measure (low-of meas-sign) (nreverse beat-objs)
                                            (or (pop tempi) def-tempo)) measures)
                        (setq meas-sign (or (pop signs) default-sign) meas-beat-count (car meas-sign)
                              beat-objs nil))
@@ -194,7 +194,7 @@ editor opened for more information."
                                (ui:ed-beep)
                                (ui:uiwarn "measures ~S and beats do not agree. Measure(s) will be changed" meas-sign)
                                (setq already-warned t))
-                             (push (make-measure (low-of meas-sign) (nreverse beat-objs) 
+                             (push (make-measure (low-of meas-sign) (nreverse beat-objs)
                                                  (or (pop tempi) def-tempo)) measures)
                              (setq meas-sign (or (pop signs) default-sign) meas-beat-count (car meas-sign)
                                    beat-objs nil)))))
@@ -211,7 +211,7 @@ editor opened for more information."
         (setf (measures measure-line) measures)
         (if objs
             (progn
-              (setq chord-objects 
+              (setq chord-objects
                     (ask-all (collect-all-chord-beat-leafs (measure-line self)) 'beat-chord))
               (setq chords (put-in-grace-notes (extra-measure-stuff (car measures)) chords))
               (dolist (chord chords)
@@ -219,7 +219,7 @@ editor opened for more information."
                 (setf (notes (car chord-objects)) (notes chord))
                 (update-chord (pop chord-objects)))))
         (rtm-dim measure-line 7) ;;;to be refined for keeping note durs!!
-        (with-focused-view (application-object self) 
+        (with-focused-view (application-object self)
           (erase+view-draw-contents (application-object self)))
         (make-instance 'C-measure-line :measures (measures measure-line))
         )))
@@ -233,25 +233,25 @@ editor opened for more information."
     (when  max-grace
       (setf needed-chords (+ 1 max-grace (length grace-notes)))
       (when (> needed-chords (length chords))
-        (setq chords 
+        (setq chords
               (append chords (dotimes (i (- needed-chords (length chords)) res)
                                (push (build-a-chord '(6000)) res)))
               )))
     (setf sorted-grace-notes
-          (loop 
+          (loop
             while grace-notes
-            for current-pos = (caar grace-notes) 
+            for current-pos = (caar grace-notes)
             collect
-            (reverse (loop for grace in (reverse 
+            (reverse (loop for grace in (reverse
                                          (loop
                                            while (and grace-notes (= (caar grace-notes) current-pos))
                                            collect (pop grace-notes)))
-                           with counter = 0 
+                           with counter = 0
                            collect (cons (first grace) (+ (prog1 counter (incf counter (cdr grace))) (cdr grace)))))))
     (dolist (set-of-graces sorted-grace-notes)
       (setq pivot-chord (nth (+ (length set-of-graces) (caar set-of-graces)) chords))
       (dolist (pair set-of-graces)
-        (setq piece-chord (nth (first pair) chords)) 
+        (setq piece-chord (nth (first pair) chords))
         (mapc (lambda (note)
                 (setf (offset-time note) (- (floor (cdr pair))))
                 (setf (dur note) (floor (cdr pair)))
@@ -262,8 +262,8 @@ editor opened for more information."
     chords))
 
 ;;add by aaa 28-08-95 from pw-modif
-(defmethod stop-play ((self C-patch-score-voice)) 
-  (start 
+(defmethod stop-play ((self C-patch-score-voice))
+  (start
     (tell (ask-all (beat-editors (car (subviews (application-object self))))
                    'measure-line) 'stop-measure-line)))
 
@@ -303,13 +303,13 @@ editor opened for more information."
 (defun low-of (sign) (second sign))
 
 (defun rtm-tree (measure-lines)
-  (mapcar (lambda (m-line) 
+  (mapcar (lambda (m-line)
             (epw::flat-once
-             (mapcar 
-              (lambda (beats-in-meas) 
-                (mapcar (lambda (beat) 
+             (mapcar
+              (lambda (beats-in-meas)
+                (mapcar (lambda (beat)
                           (let ((form (decompile beat)))
-                            (list (second form) (eval (third form)))))                                   
+                            (list (second form) (eval (third form)))))
                         beats-in-meas))
               (get-all-slots (get-all-slots m-line 'measures) 'beat-objects))))
           measure-lines))
@@ -339,34 +339,34 @@ editor opened for more information."
 
 
 (defun rtm-signs (measure-lines)
-  (mapcar (lambda (m-line) 
+  (mapcar (lambda (m-line)
             (mapcar (lambda (measure)
-                      (list (apply '+ (ask-all (beat-objects measure) 
+                      (list (apply '+ (ask-all (beat-objects measure)
                                                #'unit-length))
                             (read-from-string (low measure))))
                     (measures m-line)))
           measure-lines))
 
 (defun rtm-tempo (measure-lines)
-  (mapcar 
-   (lambda (m-line) 
+  (mapcar
+   (lambda (m-line)
      (mapcar (lambda (measure) (metronome measure))
              (measures m-line)))
    measure-lines))
 
 (defun rtm-chords (measure-lines)
-  (mapcar (lambda (m-line) 
+  (mapcar (lambda (m-line)
             (pw::calc-t-time-measure-line m-line 1.0)
             (get-rchords m-line))
           measure-lines))
 
 (defunp rtm-dim ((m-lines list (:value '() :type-list (list measure-line)))
-                 (dimension menu 
+                 (dimension menu
                             (:menu-box-list (("tree" . 1) ("delay". 2)
                                              ("sign" . 3) ("tempo" . 4) ("chords" . 5)
                                              ("durs" . 7))
                              :type-list (no-connection)))) list
-    "<m-lines> input can be a measure-line object or a list of them. Dimension can 
+    "<m-lines> input can be a measure-line object or a list of them. Dimension can
 be:
 <tree>, 'delay' 'sign', 'tempo' or 'chords'. The corresponding output is:
 <tree>:  The list of rhythm beat trees for each measure-line.

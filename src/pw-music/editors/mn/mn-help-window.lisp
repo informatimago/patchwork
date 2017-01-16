@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -42,9 +42,9 @@
   (case char
     ((:Newline)
      (when *active-MN-window* (window-select *active-MN-window*))
-     (window-hide self)) 
+     (window-hide self))
     ((:Enter)
-     (when *active-MN-window* (window-select *active-MN-window*))))) 
+     (when *active-MN-window* (window-select *active-MN-window*)))))
 
 ;;====================================================================================================
 
@@ -55,12 +55,12 @@
     (setq *MN-help-window*
           (make-instance 'C-MN-help-window :window-title "MN help" :GROW-ICON-P t
                          :view-position (make-point 30 25) :view-size (make-point 560 455) :close-box-p nil))
-    (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 560 8) (- 455 16)) 
+    (setq scroller (make-instance 'C-pw-help-window-view :view-size (make-point (- 560 8) (- 455 16))
                                   :view-container *MN-help-window* :v-scrollp t :h-scrollp nil :track-thumb-p t))
     (add-subviews scroller
-                  (make-instance 'static-text-dialog-item :view-position (make-point 5 5) 
+                  (make-instance 'static-text-dialog-item :view-position (make-point 5 5)
                                  :view-font *patchwork-font-spec*
-                                 :dialog-item-text 
+                                 :dialog-item-text
                                  "    MN editor keyboard shortcuts and clicks:
    general:
     h         open help window
@@ -71,11 +71,11 @@
     K         kill all chords
     p         play all
     P         play selected or visible chords
-    s         stop play 
+    s         stop play
 
     o         open active notes
-    w         add window to active note 
-    c         add window with collector to active note 
+    w         add window to active note
+    c         add window with collector to active note
     r         remove instrument from active note
 
     Buttons:

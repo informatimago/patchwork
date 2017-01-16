@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -68,10 +68,10 @@
                   (item "Next BPF from lib"  #\N (next-from-BPF-lib *active-BPF-window* *pw-BPF-library*))
                   (item "Prev BPF from lib"  #\P (next-from-BPF-lib *active-BPF-window* *pw-BPF-library* -1))
                   (item "Reset BPF lib"      nil (reset-BPF-lib *pw-BPF-library*))))
-  
+
   (setf *BPF-menu-root*
         (list *pw-menu-apps*
-              *BPF-menu-file* 
+              *BPF-menu-file*
               *BPF-menu-edit*
               (fifth (ui:menubar))
               (sixth (ui:menubar))
@@ -79,9 +79,9 @@
 
   (setf  *apps-BPF-menu-item*
          (add-apps-item-to-apps-menu  "BPF"
-                                      (lambda () 
-                                        (if *active-BPF-window* 
-                                            (progn 
+                                      (lambda ()
+                                        (if *active-BPF-window*
+                                            (progn
                                               (window-select *active-BPF-window*)
                                               (enable-all-apps-menu-items)
                                               (menu-item-disable *apps-BPF-menu-item*))

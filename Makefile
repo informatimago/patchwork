@@ -5,9 +5,9 @@
 #SYSTEM:             POSIX
 #USER-INTERFACE:     NONE
 #DESCRIPTION
-#    
+#
 #    Makefile for the Patchwork project.
-#    
+#
 #AUTHORS
 #    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 #MODIFICATIONS
@@ -15,19 +15,19 @@
 #BUGS
 #LEGAL
 #    GPL3
-#    
+#
 #    Copyright Pascal J. Bourguignon 2012 - 2012
-#    
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
-#    
+#
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
-#    
+#
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*****************************************************************************
@@ -40,7 +40,7 @@
 ## Configurable:
 
 #CCL_EXE=/data/languages/ccl/bin/ccl
-CCL_EXE=ccl
+CCL_EXE=ccl-1.11
 CCL=$(CCL_EXE) --no-init --batch
 CCL_EVAL=--eval
 
@@ -68,7 +68,7 @@ help::
 ### Suffixes and general rules:
 ###---------------------------------------------------------------------
 
-.SUFFIXES: .ps .pdf 
+.SUFFIXES: .ps .pdf
 
 %.ps:%.txt
 	enscript $(ENSCRIPT_OPT) -o $@ $<
@@ -126,7 +126,7 @@ variables::
 help::
 	@printf "$(HELP_FORMAT)" "application" "Generates the application."
 application:clean
-	$(CCL_EXE) < generate-application.lisp
+	printf '(push :save-image-and-quit *features*)\n(load "generate-application.lisp")\n'|$(CCL_EXE)
 
 # There's a bug in ccl when generating an application from a loaded file…
 # $(LISP) \
@@ -149,4 +149,3 @@ generate-new-ccl:
 
 
 #### THE END ####
-

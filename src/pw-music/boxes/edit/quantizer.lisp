@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,27 +15,27 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
+;;;;
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 ;;;=========================================================================
 ;;;
-;;;PW rythmic Quantizing. By Camilo Rueda 
+;;;PW rythmic Quantizing. By Camilo Rueda
 ;;; (c) 1992 IRCAM
 ;;;===========================================================================
 
@@ -70,9 +70,9 @@
 (defun compute-quanta (tmin tmax max-pulses attack-times)
   (let (quants quantized-times)
     (dolist (needed-pulses (needed-pulses max-pulses attack-times tmin tmax) (nreverse quants))
-      (setq quantized-times 
+      (setq quantized-times
             (mapcar (lambda (time) (adjust-time-to-grid time needed-pulses tmin tmax)) attack-times))
-      (push 
+      (push
        (make-quanta needed-pulses (deletions quantized-times) (distance attack-times quantized-times)
                     (proportion-distance attack-times quantized-times tmin tmax) quantized-times)
        quants))))
@@ -101,7 +101,7 @@
 (defun scale-proportion-difference (diff) (* diff diff ))
 
 (defun count-different-proportions (prop1 prop2 count)
-  (let (diff-prop) 
+  (let (diff-prop)
     (cond ((null prop1) (+ count (scale-proportion-difference (apply '+ prop2))))   ;;(length prop2)))
           ((null prop2) (+ count (scale-proportion-difference (apply '+ prop1)))) ;;(length prop1)))
           ((> (setq diff-prop (/ (max (first prop1) (first prop2))
@@ -118,7 +118,7 @@
 
 (defun win3 (var1 var2)
   (apply '+
-    (epw::g-power 
+    (epw::g-power
      (let (A)
        (mapcar (lambda (B) (setf A B) (epw::g/ (apply '+ A) (length A)))
          (let (C D)
@@ -146,7 +146,7 @@
                                                                                           (length (patchwork:const var2)))) 1)))))))))
      3)))
 
-(defun proportion-distance (l ll tmin tmax) 
+(defun proportion-distance (l ll tmin tmax)
   (win3 (remove 0 (epw::x->dx (cons tmin (append l (list tmax)))) :test #'=)
         (remove 0 (epw::x->dx (cons tmin (append ll (list tmax)))) :test #'=)))
 
@@ -179,7 +179,7 @@
           (option2 (sort (compute-quanta tmin (+ tmin sec/black) nb-pulse-max times)
                          #'quant-test2)))
       ;;(format t " ~% option proportions: ~S option number of divs: ~S ~%" option1 option2)
-      ;;(print 
+      ;;(print
        (mapcar (lambda (item1 item2) (if (< (* (get-distance item1) (* 1.2 (- 1 *distance-weight*)))
                                              (* (get-distance item2) *distance-weight*) )
                                         item1 item2)) option1 option2)))   ;;)
@@ -192,7 +192,7 @@
 
 ;;;(setf *dist-iota* 0.0005)
 
-;;;Error distance measures (works INSIDE a beat). 
+;;;Error distance measures (works INSIDE a beat).
 ;;;     A hierarchy of possibilities (in order of importance):
 ;;;        1) Number of notes should be the same
 ;;;        2) Sum of squares of distances between proportions (of durations) should be minimum.
@@ -215,7 +215,7 @@
 
         ((< (get-nb-pulse quant1) (get-nb-pulse quant2)) t)))
 |#
-(defvar *unit-division-hierarchy* 
+(defvar *unit-division-hierarchy*
   '(1 2 4 3 6 5 8 7 10 12 16 9 14 11 13 15 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32
     33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50))
 
@@ -254,7 +254,7 @@
 (defun get-scaled-atimes (atimes dur-max)
   (epw::dx->x (car atimes) (epw::l-scaler/sum (epw::x->dx atimes) dur-max)))
 
-(defun get-list-section (list from to)          
+(defun get-list-section (list from to)
   (let (result (epsilon -1e-3))
     (dolist (elem list)
       (cond ((>= (- elem to) epsilon) ;; GA 10/10/94 (> elem to)
@@ -302,7 +302,7 @@
         (t  (cons (first times) (get-rid-of-duplicates (rest x) (rest times))))))
 
 (defun try-eliminating-one (q-structure times from dur)
-  (dolist (current-atimes 
+  (dolist (current-atimes
            (score-approx  (get-rid-of-duplicates (quanti-of q-structure) times) from dur) nil)
     (unless (forbidden-structure (beat-structure current-atimes nil from (+ from dur)))
       (return current-atimes))))
@@ -329,10 +329,10 @@ becomes prev-slur in the next call)."
                          (if (> end-surplus 1e-4) ; GA 21/10/94 (plusp end-surplus)
                            (progn (reset-error) (setq slur? t) (nconc head (list to)))
                            (if (> to last-list) (progn (set-error to last-list) head) head))))
-    (cond 
+    (cond
      ((null partition)
       (if (and list (not atimes))
-        (progn 
+        (progn
                (mapcar (lambda (time) (keep-unquantized-statistics to time)) (butlast list 2))
                (setq prev-slur nil)
                (unless (or (= last-list to) (= last-list tmin) (not (rest list)))
@@ -353,7 +353,7 @@ becomes prev-slur in the next call)."
 (defun quanti-of (quant-structure) (cdr quant-structure))
 
 (defun deleted-of (quant-structure) (second (first quant-structure)))
-    
+
 (defun compound-beats (beat-list)
   (mapcar (lambda (beat) (if (null (cdr beat)) (car beat) (list 1 beat))) beat-list))
 
@@ -368,7 +368,7 @@ becomes prev-slur in the next call)."
          (durs (remove 0.0 (epw::x->dx atimes) :test #'=))
          (min-dur (/ (- (car (last atimes)) (first atimes)) (pulses-of quants)))
          (beats (and durs (remove 0
-                                  (if slur? 
+                                  (if slur?
                                     (cons (float (round (pop durs) min-dur))
                                           (mapcar (lambda (dur) (round dur min-dur)) durs))
                                     (mapcar (lambda (dur) (round dur min-dur)) durs)) :test #'=))))
@@ -403,11 +403,11 @@ becomes prev-slur in the next call)."
           (/ 60 tempo *max-division*))
     ;aaa
     (while (and (>= (- to-dur from-dur) *minimum-quant-dur*) atimes)
-      (setq partition 
-            (get-list-section atimes from-dur to-dur) 
+      (setq partition
+            (get-list-section atimes from-dur to-dur)
             atimes (nthcdr (length partition) atimes))
       (setq *forbidden-rythmic-divisions* (or (pop forbids) default-forbid))
-      (multiple-value-bind (a-section slur? prev-slur) 
+      (multiple-value-bind (a-section slur? prev-slur)
                            (get-optimal-time-section partition to-dur beat-dur from-dur old-slur?) ;;tmin?
         (if a-section
           (let ((chosen-rythm (simplify (search-rythm a-section from-dur prev-slur))))  ;;tmin?
@@ -489,7 +489,7 @@ becomes prev-slur in the next call)."
                                  (cons (- (truncate (car beat-tree))) (loop-beats (cdr beat-tree))))
                           (progn (setq prev-silence nil new-silence nil)
                                  (cons (car beat-tree) (loop-beats (cdr beat-tree))))))
-                       ((silence? durs count) 
+                       ((silence? durs count)
                         (incf count) (setq new-silence t)
                         (cons (- (car beat-tree)) (loop-beats (cdr beat-tree))))
                        (t (incf count) (setq new-silence nil)
@@ -513,19 +513,19 @@ becomes prev-slur in the next call)."
                         (forbid (list (:value '())))
                         (offset fix/float)
                         (autom menu (:menu-box-list (("no" . 1) ("yes". 2))))) list
-  " Quantizes a list of <durs> (100 = 1 sec.) into the given measure(s), 
-with the given <tempi>. 
-<max/> is the maximum unit division that is taken to be a 
+  " Quantizes a list of <durs> (100 = 1 sec.) into the given measure(s),
+with the given <tempi>.
+<max/> is the maximum unit division that is taken to be a
 significant duration.
-A list of forbidden <forbid> unit divisions can optionally be 
-specified. The output is a list of 
+A list of forbidden <forbid> unit divisions can optionally be
+specified. The output is a list of
 'measure-objects' that can be entered directly into an rtm-
 box."
   (let* ((tempos (if (= autom 2) (select-tempo durs) (pw::expand-lists (pw::list! tempi))))
         (measures-x (pw::expand-lists measures))
         (measures (if (consp (car measures-x)) measures-x (list measures-x)))
         (def-measure (cons (first (car (last measures))) (second (car (last measures)))))
-        (durs (if (zerop offset) durs 
+        (durs (if (zerop offset) durs
                   (cons (- (* offset (get-beat-duration (car tempos) (second (car measures))))) durs)))
         (positive-durs (epw::ll-abs durs))
         (deftempo (car (last tempos)))
@@ -534,7 +534,7 @@ box."
         (max-list (and max/ (if (or (null (first max/)) (consp (first max/))) max/ (list max/))))
         (max-preci (and *distance-weight* (if (or (null (first *distance-weight*)) (consp (first *distance-weight*))) *distance-weight* (list *distance-weight*))))
         (forbids (and forbid (if (or (null (first forbid)) (consp (first forbid))) forbid (list forbid))))
-        (*unquantized-notes* 0) (measure-number -1) 
+        (*unquantized-notes* 0) (measure-number -1)
         (def-forbid (first (last forbids)))
         (def-max (first (last max/)))
         (def-preci (first (last *distance-weight*)))
@@ -555,7 +555,7 @@ box."
                                 :old-slur? slur-fl)
         (setq atimes times c-time current-time)
         (setq slur-fl slur?)
-        (if beats 
+        (if beats
           (multiple-value-bind (beats-with-silences modifs new-silence)
                                (put-in-silences beats durs old-silence)
             (setq old-silence new-silence)
@@ -568,7 +568,7 @@ box."
           (setq atimes nil))))
     (unless (zerop *unquantized-notes*)
       (if result
-        (format t 
+        (format t
                 "Warning: with given constraints, ~D notes were transformed into grace notes while quantizing ~%"
                  *unquantized-notes*)
         (print "cannot quantize with the given constraints"))
@@ -591,24 +591,24 @@ box."
 
 (defunp pw::quantify ((durs list (:value '(100))) (tempi fix/fl/list (:value 60)) (measures list (:value '(4  4)))
                         (max/ fix/fl/list (:value 8 :min-val 1))
-                        &optional 
+                        &optional
                         (forbid (list (:value '())))
                         (offset fix/float)
                         (precis fix/fl/list (:value 0.5))) list
-  "Quantizes a list of durs (100 = 1 sec.) into the given measure(s), with the 
-given tempi. max/   is the maximum unit division that is taken to be a significant 
-duration. A list of forbid   forbidden unit divisions can optionally be specified. 
+  "Quantizes a list of durs (100 = 1 sec.) into the given measure(s), with the
+given tempi. max/   is the maximum unit division that is taken to be a significant
+duration. A list of forbid   forbidden unit divisions can optionally be specified.
 
-With this variable, you can control the subdivisions of the beats, either by 
+With this variable, you can control the subdivisions of the beats, either by
 avoiding them or by imposing them, at a global level or at the beat level.
 
-A simple list, such as ( 11 9 7 6), does not permit at a global level divisions by 
-11, 9, 7, or 6. The introduction of sub-lists at the first level indicates a control 
-over the measures. For example,  ((5 6) (7 4) () () (4 7)) indicates that in the first 
-measure, subdivisions by 5 and by 6 are forbidden, and in the second and fifth 
+A simple list, such as ( 11 9 7 6), does not permit at a global level divisions by
+11, 9, 7, or 6. The introduction of sub-lists at the first level indicates a control
+over the measures. For example,  ((5 6) (7 4) () () (4 7)) indicates that in the first
+measure, subdivisions by 5 and by 6 are forbidden, and in the second and fifth
 measure, subdivisions by 7 and by 4 are forbidden. As the third and fourth sub-
-lists are empty lists, there are no restrictions for these measures. A second 
-level of sub-lists will permit to control subdivisions of beats. The list (   ((5 4) () 
+lists are empty lists, there are no restrictions for these measures. A second
+level of sub-lists will permit to control subdivisions of beats. The list (   ((5 4) ()
 \(3 6) ())  (() () ( 8 7) ())  (  3 2)  ()  )  indicates :
 
 first measure
@@ -634,8 +634,8 @@ To impose subdivisions, you add a !  at the beginning of the lists.
 At a global level
 
 \(! 5)		imposes a subdivision by five on the entire sequence
-\(! 5 7 6)  	imposes a subdivision by 5, by 7, or by 6 on the entire sequence. 
-The module will do the necessary computations et will choose one of the 
+\(! 5 7 6)  	imposes a subdivision by 5, by 7, or by 6 on the entire sequence.
+The module will do the necessary computations et will choose one of the
 subdivisions in such a way that approximation errors are reduced.
 
 The syntax is the same for all other levels:
@@ -648,17 +648,17 @@ and for time units
 
 \(   ((! 5 4) () (!  3 6) ())  (() () ( ! 8 7) ())  (!  3 2)  ()  ) .
 
-Of course, it is possible to mix syntaxes at the measure level as well as at the 
+Of course, it is possible to mix syntaxes at the measure level as well as at the
 beat level. Here is an example:
 
 \(   (( 5 4) () (!  3 6) ())  ((! 6) () (  8 7) ())  (!  3 2)  (6 8)  ),
 
-In this example, some measures and time units have impositions of 
+In this example, some measures and time units have impositions of
 subdivisions, where in others, we have restrictions of subdivisions.
-Warning : because the algorithm of the   quantify  ;module has been modified, 
+Warning : because the algorithm of the   quantify  ;module has been modified,
 input autom   is unused. It's maintained for compatibility purposes.
 
-The output is a list of measure-objects that can be entered directly into  the 
+The output is a list of measure-objects that can be entered directly into  the
 optional Input  objs   of  the rtm module."
   (setf *distance-weight*  (if (numberp precis) (list (list precis)) precis))
   (quant-edit durs tempi measures  (if (numberp max/) (list (list max/)) max/) forbid offset 1))
@@ -676,13 +676,13 @@ A list of forbidden unit divisions can optionally be given."
 ;; (progn
 ;; ;;;===================================================================
 ;; ;;;Tempo variations. Linear, for the moment...
-;; 
+;;
 ;;   (defun linear-tempo-ch (vf v0 tf t0)
 ;;     (lambda (d) (cuad-solve (* 0.5 (/ (- vf v0) (- tf t0))) v0 (- d))))
-;; 
+;;
 ;;   (defun cuad-solve (a b c)
 ;;     (/ (+ (- b) (sqrt (- (sqr b) (* 4.0 a c)))) (* 2.0 a)))
-;; 
+;;
 ;;   (defunp transf-durs ((durs list) (b-tempo fix/float (:value 60))
 ;;                        (e-tempo fix/float (:value 120))) list
 ;;       "transforms durations according to a continuous linear tempo change between the given
@@ -690,32 +690,32 @@ A list of forbidden unit divisions can optionally be given."
 ;;     (let ((tattack (dx->x 0 durs))
 ;;           (final-tempo (/ e-tempo b-tempo 100))
 ;;           (start-tempo (/ 100)))
-;;       (epw::ll/round 
-;;        (epw::l/ (epw::x->dx 
+;;       (epw::ll/round
+;;        (epw::l/ (epw::x->dx
 ;;                  (mapcar (linear-tempo-ch final-tempo start-tempo
 ;;                                           (/ (car (last tattack)) (* 0.5 (+ final-tempo start-tempo))) 0)
 ;;                          tattack)) 100) 1)))
-;; 
+;;
 ;;   ;;(pw-addmenu pw::*rtm-boxes-menu* '(transf-durs))
-;;   
+;;
 ;;   ;;(transf-durs '(100 100 100 100 100 100 100 100 100) 120 60)
 ;;   ;;(transf-durs '(100) 120 60)
-;; 
+;;
 ;;   (defunp mul&subm ((numbers numbers? (:value 100)) (%err fix/float )
 ;;                     (unit fix>=0 (:value 100))) numbers?
-;;       "reorganizes numbers" 
+;;       "reorganizes numbers"
 ;;     (let ((numbers (pw::list! numbers)) result div)
 ;;       (dolist (num numbers (nreverse result))
 ;;         (setq div (/ unit num))
-;;         (push 
+;;         (push
 ;;          (if (> div 1.0)
-;;              (get-adjustement (- (/ unit (truncate div)) num) 
+;;              (get-adjustement (- (/ unit (truncate div)) num)
 ;;                               (-  num (/ unit (1+ (truncate div)))) num %err)
 ;;              (get-adjustement (- (* unit (1+ (truncate (/ div))))  num)
 ;;                               (-  num (* unit (truncate (/ div)))) num %err))
 ;;          result)
 ;;         )))
-;; 
+;;
 ;;   (defun get-adjustement (plus minus num %err)
 ;;     (let ((zone (* num %err)))
 ;;       (cond ((and (<= plus zone) (> minus zone)) (round (+ plus num)))
@@ -723,7 +723,7 @@ A list of forbidden unit divisions can optionally be given."
 ;;             ((and (> plus zone) (> minus zone)) num)
 ;;             ((< plus minus) (round (+ plus num)))
 ;;             (t (round (- num minus))))))
-;; 
+;;
 ;;   ;;(pw-addmenu pw::*pw-menu-patch* '(mul&subm))
 ;;   )
 

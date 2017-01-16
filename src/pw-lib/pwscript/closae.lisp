@@ -5,13 +5,13 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    Simulated AppleEvent CLOS layer.
 ;;;;
 ;;;;    We implement a minimalistic AppleEvent CLOS API, used by the
 ;;;;    rest of the Patchwork application
 ;;;;
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -19,19 +19,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2014 - 2014
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -81,14 +81,14 @@ the extent of the macro.  It is similar to the macro rlet.  It wraps
 body within an UNWIND-PROTECT, so that no matter how body is exited,
 WITH-AEDESCS disposes of all its temporary records in the correct way.
 If the data handle has anything in it, WITH-AEDESCS calls
-#_|AEDisposeDesc|. 
+#_|AEDisposeDesc|.
 
 Thus any memory allocated by the Apple Event Manager is properly
-disposed of. 
+disposed of.
 
 If you have a need for an AEDesc record with indefinite extent, you must
 use MAKE-RECORD.  When you want to dispose of the record, you must
-explicitly call #_|AEDisposeDesc|, then dispose-record. 
+explicitly call #_|AEDisposeDesc|, then dispose-record.
 "
   `(let (,@(mapcar (lambda (var) `(,var (make-instance 'aedesc))) vars))
      ,@body))
@@ -251,7 +251,7 @@ REFCON:         An optional reference identifier, which can be any MCL
            (print fun)
            (funcall fun *application* ae (ae-event-reply event) refcon)
            (when (ae-event-reply event)
-             
+
              )))
        t))
     (t nil)))

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -114,7 +114,7 @@
   (setf *f-staff*  (make-instance 'C-staff  :clef-obj *f-clef* :delta-y (- (* *mn-staff-line-width* -5) 1)))
   (setf *f2-staff* (make-instance 'C-staff  :clef-obj *f-clef* :delta-y (- (* *mn-staff-line-width* -12) 1)))
 
-  (setf *empty-staff* (make-instance 'C-staff-empty))  
+  (setf *empty-staff* (make-instance 'C-staff-empty))
 
   (setf *g2-g-staffs*      (list *g2-staff* *g-staff*))          ;1
   (setf *g-plain-staffs*   (list *g-staff*))                     ;2
@@ -127,7 +127,7 @@
 
 
 (defun get-staff-offsets (staff-num)
-  (case staff-num 
+  (case staff-num
     (1 (values 32 4)) (2 (values 4 4)) (3 (values 4 -20))
     (4 (values -20 -20)) (5 (values 4 -48)) (6 (values 32 -48))
     (7 (values 0 0))))
@@ -139,9 +139,9 @@
 (defvar *MN-editor-scrap* ())
 (defvar *CURRENT-MN-EDITOR* ())
 
-(defclass C-mus-not-view (ui:scroller) 
-  ((editor-objects :initform nil :initarg :editor-objects :accessor editor-objects) 
-   (active-editor :initform nil :accessor active-editor) 
+(defclass C-mus-not-view (ui:scroller)
+  ((editor-objects :initform nil :initarg :editor-objects :accessor editor-objects)
+   (active-editor :initform nil :accessor active-editor)
    (external-controls :initarg nil :accessor external-controls)
    (ctrl-settings :accessor ctrl-settings)
    (saved-selected :initform nil :accessor saved-selected)
@@ -161,12 +161,12 @@
                       :view-size ,(view-size self)
                       :bottom-boarder 20
                       :v-scrollp nil
-                      :track-thumb-p t 
+                      :track-thumb-p t
                       :view-subviews (setq objs (list ,@editor-objects))
                       :editor-objects objs))))
 
 (defmethod initialize-instance :after ((self C-mus-not-view) &key controls)
-  (declare (ignore controls)) 
+  (declare (ignore controls))
   (make-extra-controls self))
 
 ;;=============================
@@ -245,7 +245,7 @@
                                           ((equal scale *c-major-scale*) "C-major")
                                           )))))
 
-(defclass C-zoomer (C-numbox) 
+(defclass C-zoomer (C-numbox)
   ( (the-view :initarg :the-view :reader the-view)))
 
 (defmethod initialize-instance :after ((self C-zoomer) &key args)
@@ -287,11 +287,11 @@
            (make-instance
             'static-text-dialog-item
             :view-container (view-window self)
-            :view-position 
+            :view-position
             (make-point (+ h-initial 60) (- v-extreme 2))
             :dialog-item-text "zoom"
             :view-font *patchwork-font-spec*)
-           (make-instance 
+           (make-instance
             'check-box-dialog-item
             :view-container (view-window self)
             :view-position (make-point h-initial (- v-extreme 27))
@@ -310,12 +310,12 @@
 
 (defgeneric add-to-radio-cluster (self x y txt type))
 (defmethod add-to-radio-cluster ((self C-mus-not-view) x y txt type)
-  (make-instance 
+  (make-instance
    'radio-button-dialog-item
    :view-container (view-window self)
    :view-position (make-point x y)
    :dialog-item-text txt
-   :view-font *patchwork-font-spec* 
+   :view-font *patchwork-font-spec*
    :dialog-item-action
    (lambda (item)
      (set-value-ctrl self item type)
@@ -373,14 +373,14 @@
 
 (defmethod view-window-grown ((self C-mus-not-view))
   (declare (special *MN-view-ctrls-space* *mn-draw-offset*))
-  (set-view-size self 
+  (set-view-size self
                  (subtract-points (view-size (view-window self)) (make-point 15 25)))
-  (let* ((new-view-size 
+  (let* ((new-view-size
            (subtract-points (view-size  self) *MN-view-ctrls-space*))
          (objects (editor-objects self))
          (v-size (truncate (point-v new-view-size) (length objects)))
          (pos 2) (origin-count 0) (adjusted-size (- (point-h new-view-size) *MN-draw-offset*)))
-    (dolist (panel objects) 
+    (dolist (panel objects)
       (set-view-position panel  (make-point (point-h (view-position panel)) pos))
       (set-view-size panel (make-point (point-h new-view-size) (- v-size 6)))
                                         ;(if (monofonic-mn? self) (setf (origin panel) origin-count))
@@ -435,11 +435,11 @@
   (cond ((eql char #\p) (play-all-staffs self))
         ((eql char #\s) (stop-all-staffs self))
         ((eql char #\o) (tell (editor-objects self) 'open-object-editor (view-window self)))
-        ((and (eql char #\c) (active-editor self))  
-         (when (active-note (active-editor self)) 
+        ((and (eql char #\c) (active-editor self))
+         (when (active-note (active-editor self))
            (add-MN-to-note (active-note (active-editor self)) (view-window self) 0 0)))
-        ((eql char #\w)  
-         (when (active-note (active-editor self)) 
+        ((eql char #\w)
+         (when (active-note (active-editor self))
            (add-PWwin-to-note (active-note (active-editor self)) (view-window self) 0 0)))
         ((eql char #\A) (Do-selections-all self))
         (t (when (active-editor self) (handle-key-event (active-editor self) char)) )))
@@ -458,7 +458,7 @@
 
 (defvar *playing-option* :pb)
 
-(defun set-playing-option (option) 
+(defun set-playing-option (option)
   (setf *playing-option* option)
   (cond ((eql option :pb)
          (set-menu-item-check-mark *play-Pbend-menu* t)
@@ -486,7 +486,7 @@
     (if (monofonic-mn? self)
         (progn (setf patchwork.scheduler::*print-on-late?* t)
                (start
-                 (apdfuncall 10  2 20 
+                 (apdfuncall 10  2 20
                              'play-chords (chord-line (car panels)))))
         (progn (setf patchwork.scheduler::*print-on-late?* t)
                (start (setf (advance) 30)
@@ -519,7 +519,7 @@
 ;;==========================================================================================================
 ;;==========================================================================================================
 
-(defclass C-music-notation-panel (ui::scroller) 
+(defclass C-music-notation-panel (ui::scroller)
   ((chord-line :initform nil :initarg :chord-line :accessor chord-line)
    (visible-chords :initform nil :accessor visible-chords)
    (active-chord :initform nil :accessor active-chord)
@@ -544,7 +544,7 @@
   (values (make-point -250 250)
           (make-point -250 250)))
 
-(defmethod reset-active-chord ((self C-music-notation-panel)) 
+(defmethod reset-active-chord ((self C-music-notation-panel))
   (setf (active-chord self) nil)
   (setf (active-note self) nil))
 
@@ -581,17 +581,17 @@
           (*mn-view-dyn-flag* (get-ctrl-setting my-view :dyn))
           (*mn-view-offset-flag* (get-ctrl-setting my-view :offs))
           (*staff-num* (staff-num self))
-          (*current-music-notation-scale* 
+          (*current-music-notation-scale*
             (or (local-scale my-view) *current-music-notation-scale*))
           (*current-approx-scale* (or (local-approx my-view) *current-approx-scale*)))
       (declare (special *mn-view-ins-flag* *mn-view-dur-flag*
                         *mn-view-dyn-flag* *mn-view-offset-flag*))
-      (set-visible-chords self) 
+      (set-visible-chords self)
       ;;(with-focused-view self
       ;;(set-view-font (view-container (view-container  self)) *music-font-spec*))
       (with-font-focused-view self
-        (tell (staff-list self) #'draw-staff 
-              (+ (point-h (view-scroll-position self)) 2) 
+        (tell (staff-list self) #'draw-staff
+              (+ (point-h (view-scroll-position self)) 2)
               *MN-C5*)
         (view-draw-specific self (MN-zoom-scaler (view-container self))
                             (view-scroll-position self) *MN-draw-offset*
@@ -610,32 +610,32 @@
           (*mn-view-dyn-flag* (get-ctrl-setting my-view :dyn))
           (*mn-view-offset-flag* (get-ctrl-setting my-view :offs))
           (*staff-num* (staff-num self))
-          (*current-music-notation-scale* 
+          (*current-music-notation-scale*
             (or (local-scale my-view) *current-music-notation-scale*))
           (*current-approx-scale* (or (local-approx my-view) *current-approx-scale*)))
       (declare (special *mn-view-ins-flag* *mn-view-dur-flag*
                         *mn-view-dyn-flag* *mn-view-offset-flag*))
-      (set-visible-chords self) 
+      (set-visible-chords self)
       ;;(with-focused-view self
       ;;(set-view-font (view-container my-view) *music-font-spec*))
       (with-font-focused-view self
-        (tell (staff-list self) #'draw-staff 
-              (+ (point-h (view-scroll-position self)) 2) 
+        (tell (staff-list self) #'draw-staff
+              (+ (point-h (view-scroll-position self)) 2)
               *MN-C5*)
         (view-draw-specific self (MN-zoom-scaler my-view)
                             (view-scroll-position self) *MN-draw-offset*
                             *MN-C5*)))))
 
-(defmethod view-draw-contents :after ((self C-music-notation-panel)) 
+(defmethod view-draw-contents :after ((self C-music-notation-panel))
   (when (super-win (view-window self))
     (with-focused-view (view-window self)
       (set-view-font  (view-window self) *patchwork-font-spec*)
       (draw-string 5 10 (window-title (super-win (view-window self)))))))
 
 (defgeneric view-draw-specific (self zoom-scale scroll-pos MN-offset MN-C5))
-(defmethod view-draw-specific ((self C-music-notation-panel) 
+(defmethod view-draw-specific ((self C-music-notation-panel)
                                zoom-scale scroll-pos MN-offset MN-C5)
-  (tell (set-visible-chords self) #'draw-chord 
+  (tell (set-visible-chords self) #'draw-chord
         zoom-scale (+ MN-offset (point-h scroll-pos))
         (point-h scroll-pos) MN-C5))
 
@@ -654,9 +654,9 @@
   (declare (special *mn-first-click-mouse*))
   (let ((y-off (- *MN-C5* 39)))
     (for (i 0 1 4)
-      (draw-string 
+      (draw-string
        (+ (point-h (view-scroll-position self))
-          (-  (point-h  
+          (-  (point-h
                *MN-first-click-mouse*) 10)) (+ (* 20 i) y-off) *staff-lines-short*))))
 
 (defgeneric erase-yourself (view))
@@ -687,12 +687,12 @@
        (scaled-mouse-h self (+ mouse-h (origin self))) 5))
 
 (defgeneric give-y-diatone (self y))
-(defmethod give-y-diatone ((self C-music-notation-panel) y) 
+(defmethod give-y-diatone ((self C-music-notation-panel) y)
   (+ 35 (truncate (/ (- *MN-C5* y) 2))))
 
 (defgeneric give-y-value (self y))
-(defmethod give-y-value ((self C-music-notation-panel) y) 
-  (let ((c-c5-to-0 (- *MN-C5* y))) 
+(defmethod give-y-value ((self C-music-notation-panel) y)
+  (let ((c-c5-to-0 (- *MN-C5* y)))
     (* 100 (+ (* 12 (truncate (/  (give-y-diatone self (+ (if (< c-c5-to-0 0) 1 0) y)) 7)))
               (case (mod c-c5-to-0 14)
                 (0 0)(1 1)(2 2)(3 3)(4 4)(5 4)(6 5)(7 6)(8 7)(9 8)
@@ -701,9 +701,9 @@
 (defgeneric remove-all-chords-from-chord-line (self))
 (defmethod remove-all-chords-from-chord-line ((self C-music-notation-panel))
   (tell (apply #'append (ask-all (chords (chord-line self)) 'notes)) 'remove-instrument-item ()())
-  (setf (chords (chord-line self)) ()) 
-  (setf (active-chord self) ()) 
-  (setf (active-note self) ()) 
+  (setf (chords (chord-line self)) ())
+  (setf (active-chord self) ())
+  (setf (active-note self) ())
   (with-focused-view self
     (erase-draw-contents self)
     (view-draw-contents self)))
@@ -716,15 +716,15 @@
   (let* ((mouse (view-mouse-position self))
          (mouse-h (point-h mouse))
          (mouse-v (point-v mouse)))
-    (setf (active-chord self) 
+    (setf (active-chord self)
           (find-mouse-point-in-chords self (- mouse-h *MN-draw-offset*)))
-    (when (active-chord self) 
-      (setf (active-note self) 
-            (ask (notes (active-chord self)) 
-                 'inside-note?-3 mouse-h     
+    (when (active-chord self)
+      (setf (active-note self)
+            (ask (notes (active-chord self))
+                 'inside-note?-3 mouse-h
                  (calc-chord-pixel-x (active-chord self)
                                      (MN-zoom-scaler (view-container  self))
-                                     (+ *MN-draw-offset* 
+                                     (+ *MN-draw-offset*
                                         (point-h (view-scroll-position self)))
                                      (point-h (view-scroll-position self)))
                  (give-y-diatone self  mouse-v ))))))
@@ -751,8 +751,8 @@
 (defmethod draw-single-dur-line-2  ((self C-music-notation-panel) chord note)
   (with-focused-view self
     (draw-single-dur-line chord note
-                          (MN-zoom-scaler (view-container self)) 
-                          *MN-draw-offset* 
+                          (MN-zoom-scaler (view-container self))
+                          *MN-draw-offset*
                           (origin self)
                           *MN-C5*)))
 
@@ -768,7 +768,7 @@
 (defmethod open-object-editor ((self C-music-notation-panel) window )
   (let ((*menubar-frozen* t))
     (if (active-note self)
-        (open-instrument-editor (active-note self) window 0 0))   
+        (open-instrument-editor (active-note self) window 0 0))
     (when (eql (class-name (class-of self)) 'C-MN-PANEL-MOD)
       (let ((active-notes (apply #'append (ask-all (selected-chords self) #'notes))))
         (when active-notes
@@ -838,7 +838,7 @@
                                       w-size &optional name)
   (declare (ignore w-size))
   (let* ((chordL-list (chord-line-list patch-obj))
-         (new-list) 
+         (new-list)
          (dif-len (- count (length chordL-list)))
          (win-string (if name (string-downcase name)
                          (format nil "MN~D" (incf *MN-window-counter*))))
@@ -853,7 +853,7 @@
                                      :bottom-boarder 20
                                      :v-scrollp nil
                                      :track-thumb-p t))
-         position-now 
+         position-now
          editor-objects)
     (unless (zerop dif-len)
       (dotimes (i dif-len)
@@ -882,10 +882,10 @@
 ;;   (defvar second-scroller ())
 ;;   (defvar third-scroller ())
 ;;   (defvar fourth-scroller ())
-;; 
+;;
 ;;   (setf mn-window (make-instance 'C-mn-window :window-title "MN"))
-;; 
-;; 
+;;
+;;
 ;;   (setf first-scroller (make-instance 'C-mus-not-view
 ;;                                       :view-container mn-window
 ;;                                       :view-size #@(190 270)
@@ -893,7 +893,7 @@
 ;;                                       :bottom-boarder 20
 ;;                                       :v-scrollp nil
 ;;                                       :track-thumb-p t))
-;; 
+;;
 ;;   (setf second-scroller (make-instance 'C-music-notation-panel
 ;;                                        :view-container first-scroller
 ;;                                        :view-size #@(180 120)
@@ -915,9 +915,9 @@
 ;;                                        :h-scrollp nil
 ;;                                        :track-thumb-p t
 ;;                                        :chord-line (make-instance 'C-chord-line)))
-;; 
+;;
 ;;   (setf (editor-objects first-scroller) (list second-scroller third-scroller fourth-scroller))
-;; 
+;;
 ;;   ;;(font-codes *music-font-spec*)
 ;;   ;;*font-list*
 ;;   ;;(real-font *music-font-spec*)
@@ -925,7 +925,7 @@
 ;;   ;;(view-font  second-scroller)
 ;;   ;; (set-view-font second-scroller *patchwork-font-spec*)
 ;;   ;;(font-codes *music-font-spec*)
-;; 
+;;
 ;;   ;;(set-view-size  first-scroller (make-point 400 380))
 ;;   ;;(set-view-size second-scroller (make-point 390 125))
 ;;   ;;(set-view-size third-scroller (make-point 390 125))
@@ -938,24 +938,24 @@
 ;;   ;;(point-v (view-scroll-position fourth-scroller))
 ;;   ;;=========================================================================================================
 ;;   ;;=========================================================================================================
-;;   (setf (chords (chord-line second-scroller)) (list 
+;;   (setf (chords (chord-line second-scroller)) (list
 ;;                                                (make-chord-object '(7000 8900 9000) 0)(make-chord-object '(4500 6900 7200) 60)
 ;;                                                (make-chord-object '(3400 7600 9000) 80)(make-chord-object '(4500 5400 6600) 160)
 ;;                                                (make-chord-object '(7000 8800 9000) 200)(make-chord-object '(4300 5400 7200) 260)))
-;; 
-;;   (setf (chords (chord-line third-scroller)) (list 
+;;
+;;   (setf (chords (chord-line third-scroller)) (list
 ;;                                               (make-chord-object '(4500 6700 8800) 0)(make-chord-object '(3300 6900 7200) 70)
 ;;                                               (make-chord-object '(7000 8900 9000) 88)(make-chord-object '(4500 6900 7200) 120)
 ;;                                               (make-chord-object '(3400 7600 9000) 140)(make-chord-object '(4500 5400 6700) 160)
 ;;                                               (make-chord-object '(6500 8800 8900) 180)(make-chord-object '(3300 5400 7200) 240)))
-;; 
-;;   (setf (chords (chord-line fourth-scroller)) (list 
+;;
+;;   (setf (chords (chord-line fourth-scroller)) (list
 ;;                                                (make-chord-object '(4500 6700 8800) 0)(make-chord-object '(3300 6900 7200) 70)
 ;;                                                (make-chord-object '(3400 7600 9000) 90)(make-chord-object '(4500 5400 6700) 110)
 ;;                                                (make-chord-object '(7000 8900 9000) 128)(make-chord-object '(4500 6900 7200) 170)
 ;;                                                (make-chord-object '(6500 8800 8900) 180)(make-chord-object '(3300 5400 7200) 290)))
 ;;   ;;(decompile fourth-scroller)
-;; 
+;;
 ;;   )
 
 

@@ -60,13 +60,85 @@
 ;;;;**************************************************************************
 (defpackage "PATCHWORK.LOGICAL-HOSTS"
   (:use "COMMON-LISP")
-  (:shadowing-import-from "COM.INFORMATIMAGO.TOOLS.PATHNAME"
-                          "MAKE-PATHNAME"
-                          "USER-HOMEDIR-PATHNAME"
-                          "TRANSLATE-LOGICAL-PATHNAME")
-  (:export "*LOGICAL-HOSTS*"))
+  (:shadow "MAKE-PATHNAME"
+           "USER-HOMEDIR-PATHNAME"
+           "TRANSLATE-LOGICAL-PATHNAME")
+  (:export "*LOGICAL-HOSTS*"
+           "MAKE-TRANSLATIONS"))
 (in-package "PATCHWORK.LOGICAL-HOSTS")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; From com.informatimago.tools.pathname
+
+(defparameter *case-common-is-not-downcased-on-posix-systems*
+  #+(or allegro ccl emacs-cl) t
+  #-(or allegro ccl emacs-cl) nil)
+
+
+(defun user-homedir-pathname ()
+  "On CCL on MS-Windows, it's not the USER-HOMEDIR-PATHNAME."
+  #+(and ccl windows-target)
+  (let ((home (ccl::getenv "HOME")))
+    (if home
+        (pathname (format nil "~A\\" home))
+        ;; Fucking MoCL can't handle #+#P!!!
+        (pathname "C:\\cygwin\\home\\pjb\\")))
+  #-(and ccl windows-target)
+  (cl:user-homedir-pathname))
+
+
+(defun make-pathname (&key (host nil hostp) (device nil devicep) (directory nil directoryp)
+                        (name nil namep) (type nil typep) (version nil versionp)
+                        (defaults nil defaultsp) (case :local casep))
+  (declare (ignorable casep))
+  (if *case-common-is-not-downcased-on-posix-systems*
+      (labels ((localize (object)
+                 (typecase object
+                   (list   (mapcar (function localize) object))
+                   (string (string-downcase object))
+                   (t      object)))
+               (parameter (indicator key value)
+                 (when indicator
+                   (list key (if (eql case :common)
+                                 (localize value)
+                                 value)))))
+        (apply (function cl:make-pathname)
+               (append (parameter hostp      :host      host)
+                       (parameter devicep    :device    device)
+                       (parameter directoryp :directory directory)
+                       (parameter namep      :name      name)
+                       (parameter typep      :type      type)
+                       (parameter versionp   :version   version)
+                       (parameter defaultsp  :defaults  defaults)
+                       (list :case :local))))
+      (apply (function cl:make-pathname)
+             (append
+              (when hostp      (list :host      host))
+              (when devicep    (list :device    device))
+              (when directoryp (list :directory directory))
+              (when namep      (list :name      name))
+              (when typep      (list :type      type))
+              (when versionp   (list :version   version))
+              (when defaultsp  (list :defaults  defaults))
+              (when casep      (list :case      case))))))
+
+
+(defun translate-logical-pathname (pathname)
+  (cl:translate-logical-pathname
+   (etypecase pathname
+     (string             (translate-logical-pathname (pathname pathname)))
+     #-mocl ; !!!!
+     (logical-pathname   (make-pathname :host      (pathname-host pathname)
+                                        :device    (pathname-device pathname)
+                                        :directory (pathname-directory pathname)
+                                        :name      (pathname-name pathname)
+                                        :type      (pathname-type pathname)
+                                        :version   (pathname-version pathname)
+                                        :defaults  pathname
+                                        :case      :common))
+     (pathname           pathname))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defvar *logical-hosts* '())
 
@@ -167,18 +239,21 @@ TRANSLATIONS: a list of logical pathname translations.
               :append (make-translations host logical-subdir
                                          (merge-pathnames physical-subdir
                                                           physical-dir))))))
-
-    (let ((home  #+(and) (user-homedir-pathname)
-                 #-(and) #P"/home/pjb/")
-          (src   (merge-pathnames "../"
-                                  (make-pathname :name nil
-                                                 :type nil
-                                                 :version nil
-                                                 :defaults #.(or *compile-file-truename*
-                                                                 *load-truename*
-                                                                 #P"./")))))
+    (let* ((home  #+(and) (user-homedir-pathname)
+                  #-(and) #P"/home/pjb/")
+           (src   (merge-pathnames "../"
+                                   (make-pathname :name nil
+                                                  :type nil
+                                                  :version nil
+                                                  :defaults #.(or *compile-file-truename*
+                                                                  *load-truename*
+                                                                  #P"./"))))
+           (home-src (merge-pathnames "src/" home)))
       (set-host "SRC"
-                '("INFORMATIMAGO")  "src/public/lisp/"             home
+
+                ;; '("INFORMATIMAGO")  "informatimago/"               src
+                '("INFORMATIMAGO")  "lisp/"                        home-src
+
                 '("PATCHWORK")      "patchwork/"                   src
                 '("MCLGUI")         "mclgui/"                      src
                 '("MIDI")           "midi/"                        src
@@ -198,9 +273,8 @@ TRANSLATIONS: a list of logical pathname translations.
                 '()                 "patchwork/src/src-lib/cleni/" src)
 
       (set-host "PW-USER"
-                '()                 "Documents/Patchwork/"         home))))
-
-
+                '()                 "Documents/Patchwork/"         home)))
+  *logical-hosts*)
 
 (define-logical-hosts)
 

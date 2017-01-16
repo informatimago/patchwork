@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    Mikael Laurson
@@ -15,24 +15,24 @@
 ;;;;    Camilo Rueda.
 ;;;;MODIFICATIONS
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
-;;;;    1992-12-25 Tristan Murail révision finale 
+;;;;    1992-12-25 Tristan Murail révision finale
 ;;;;    1991       [jack] Esquisse PW harmonicity functions -- CLPF V1.0
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -60,17 +60,17 @@
 
 (defunp harm-dist ((chord midic) (fund midic (:value 2400))
                    &optional (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) list
-    "Calculates the ratios between each note of <chord> and the closest 
-partial of the harmonic series built on <fund>. (For explanations of 
+    "Calculates the ratios between each note of <chord> and the closest
+partial of the harmonic series built on <fund>. (For explanations of
 harmonic series and partials, see the box 'harm-series')
 
-If <chord> is a list of chords the result will be the analyses of each 
+If <chord> is a list of chords the result will be the analyses of each
 successive chord.
 
 The optional argument <unit> determines whether <chord> and <fund> are
-entered in midicents, ('midic'), or in hertz ('freq'). If 'midic' is 
+entered in midicents, ('midic'), or in hertz ('freq'). If 'midic' is
 selected the notes will be converted to frequencies inside the function
-before analysis." 
+before analysis."
   (if (/= unit 2) (setq fund (mc->f fund) chord (mc->f chord)))
   (deep-mapcar/1 (lambda (x) (harm-dist-f fund x)) chord))
 
@@ -85,24 +85,24 @@ before analysis."
         (if (< d1 d2) n-partial (1+ n-partial) ))))
 
 
-(defunp closest-harm ( (chord midic) (fund midic (:value 2400)) 
+(defunp closest-harm ( (chord midic) (fund midic (:value 2400))
                        &optional (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))
                        (type menu (:menu-box-list (("rank" . 1) ("notes". 2))))) list
     "Calculates the closest partial of the harmonic series built on <fund> to
-each note of <chord>. (For explanations of harmonic series and partials, 
+each note of <chord>. (For explanations of harmonic series and partials,
 see the box 'harm-series')
 
-If <chord> is a list of chords the result will be the analyses of each 
+If <chord> is a list of chords the result will be the analyses of each
 successive chord.
 
-The optional argument <unit> determines whether <chord> is entered in 
-midicents, ('midic'), or in hertz ('freq'). If 'midic' is selected the 
-values will be converted to frequencies inside the function and then the 
-output (if appropriate) is reconverted to midicents. If 'freq' is selected 
+The optional argument <unit> determines whether <chord> is entered in
+midicents, ('midic'), or in hertz ('freq'). If 'midic' is selected the
+values will be converted to frequencies inside the function and then the
+output (if appropriate) is reconverted to midicents. If 'freq' is selected
 the entry, calculations and output (if appropriate) are all in hertz.
 
-The optional argument <type> determines whether the output is a list of 
-partial rankings or the notes corresponding to those partials." 
+The optional argument <type> determines whether the output is a list of
+partial rankings or the notes corresponding to those partials."
   (let* ((ffund  (car! (if (/= unit 2) (mc->f fund) fund)))
          (fchord (if (/= unit 2) (mc->f chord) chord))
          (res (deep-mapcar/1 (lambda (x) (closest-harm-f ffund x)) fchord)))
@@ -376,18 +376,18 @@ If two or more adjacent min or max have the same value, they are collected in a 
 
 (defunp virt-fund ((chord list (:value '(6000 6400))) (cents fix>=0 (:value 50))
                    &optional (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) midic
-    "Returns the highest fundamental for which the notes of <chord> could be 
-thought of as harmonic partials. In general, the lower the virtual 
-fundamental, the more dissonant the chord. 
+    "Returns the highest fundamental for which the notes of <chord> could be
+thought of as harmonic partials. In general, the lower the virtual
+fundamental, the more dissonant the chord.
 
-The argument <cents> determines the precision of the analysis. (a value of 
-'0' would return the real fundamental; the larger the value the more 
-approximate the result) 
+The argument <cents> determines the precision of the analysis. (a value of
+'0' would return the real fundamental; the larger the value the more
+approximate the result)
 
-If <chord> is a list of chords the box returns a list of virtual 
+If <chord> is a list of chords the box returns a list of virtual
 fundamentals.
 
-The optional argument <unit> determines whether <chord> is entered and the 
+The optional argument <unit> determines whether <chord> is entered and the
 result returned in midicents, ('midic'), or in hertz ('freq'). The argument
 <cents> remains, however, unchanged."
   (if (= unit 2)

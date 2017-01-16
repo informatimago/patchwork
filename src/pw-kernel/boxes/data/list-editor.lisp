@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,26 +16,26 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package "C-LIST-ITEM-H")
 
 ;;;======================================================
-;;; A list editor 
+;;; A list editor
 ;;;
 ;;; The editor consists of a window (class C-table-window) and a table dialog item
 ;;; (class C-list-item). The associated patch box is the class C-patch-list-editor.
@@ -96,11 +96,11 @@
       (call-next-method)))
 
 (defmethod edit-selected-cell ((self C-list-item))
-  (let ((selection (car (selected-cells self))))    
+  (let ((selection (car (selected-cells self))))
     (set-dialog-item-text self (format () "~A" (cell-contents self selection)))
     (open-pw-controls-dialog
-     self 
-     (make-point 
+     self
+     (make-point
       (* (- (point-h selection) (point-h (scroll-position self)))
           *cell-width*)
       (* (- (point-v selection) (point-v (scroll-position self)))
@@ -175,7 +175,7 @@
                           (copy-list (nthcdr place sublist))
                           (cons 0 (copy-list (nthcdr place sublist))))))
     (if (zerop place)
-        (progn  
+        (progn
           (setf (nthcdr (1+ place) sublist) added-items)
           (setf (nth 0 sublist) 0))
         (setf (nthcdr place sublist) added-items))
@@ -189,7 +189,7 @@
   (let* ((sublist (nth (point-h point) (my-array self)))
          (place (1+ (point-v point)))
          (length (length sublist))
-         (added-items 
+         (added-items
           (if (= length place) (list 0) (cons 0 (copy-list (nthcdr place sublist))))))
     (setf (nthcdr place sublist) added-items)
     (set-array self (my-array self) (make-point (point-h point)  place))))
@@ -203,7 +203,7 @@
          (place (1+ (point-h point)))
          (length (length the-list))
          (new-list (make-list (1+ (point-v point)) :initial-element 0))
-         (added-items 
+         (added-items
           (if (= length place)
               (list new-list)
               (cons new-list (copy-list (nthcdr place the-list))))))
@@ -214,12 +214,12 @@
   (let* ((the-list (my-array self))
          (place (point-h point))
          (new-list (make-list (1+ (point-v point)) :initial-element 0))
-         (added-items 
+         (added-items
           (if (zerop place)
               (copy-list (nthcdr place the-list))
               (cons new-list (copy-list (nthcdr place the-list))))))
     (if (zerop place)
-        (progn  
+        (progn
           (setf (nthcdr (1+ place) the-list) added-items)
           (setf (nth 0 the-list) new-list))
         (setf (nthcdr place the-list) added-items))
@@ -253,7 +253,7 @@
 
 (in-package "C-TABLE-WINDOW-H")
 
-(defclass C-table-window (C-application-window) ()) 
+(defclass C-table-window (C-application-window) ())
 
 
 
@@ -262,21 +262,21 @@
          (selection (car (selected-cells table))))
     (if (and selection (not (out-side-list-p table selection)))
         (case char
-          ((:ForwardArrow) 
+          ((:ForwardArrow)
            (if (option-key-p)
                (add-forward-element table selection)
                (next-right-element table selection)))
-          ((:BackArrow) 
+          ((:BackArrow)
            (if (option-key-p)
                (add-backward-element table selection)
                (next-left-element table selection)))
-          ((:UpArrow) 
+          ((:UpArrow)
            (cond ((shift-key-p)
                   (add-upward-row table selection))
                  ((option-key-p)
                   (add-upward-element table selection))
                  (t (next-up-element table selection))))
-          ((:DownArrow) 
+          ((:DownArrow)
            (cond ((shift-key-p)
                   (add-downward-row table selection))
                  ((option-key-p)
@@ -284,7 +284,7 @@
                  (t (next-down-element table selection))))
           ((:Backspace) (cut-element table selection))
           ((#\h) (open-application-help-window self))
-          (otherwise 
+          (otherwise
            (set-array-item table selection (string char))
            (edit-selected-cell table)  ;;;(ui:ed-beep)
            )))))
@@ -342,7 +342,7 @@
 
 (in-package "C-PATCH-LIST-EDITOR")
 
-(defclass C-patch-list-editor (C-patch-application) 
+(defclass C-patch-list-editor (C-patch-application)
   ((the-list :initform (list (list 0 0) (list 0 0)) :initarg  :the-list :accessor the-list)
    (popUpBox :accessor popUpBox)
    (lock     :initform nil                          :accessor lock)
@@ -350,7 +350,7 @@
 
 (defmethod make-application-object ((self C-patch-list-editor))
   (make-instance 'C-table-window
-      :view-subviews 
+      :view-subviews
     (list (make-instance 'C-list-item
               :view-font pw::*patchwork-font-spec*
               :table-dimensions (make-point 2 2)
@@ -361,7 +361,7 @@
 
 (defmethod decompile ((self C-patch-list-editor))
   (append (call-next-method)
-          `(nil (list ',(copy-tree (the-list self)) 
+          `(nil (list ',(copy-tree (the-list self))
                       ,(if (wptr (application-object self))
                            (window-title (application-object self))
                            (pw-function-string self))))))
@@ -373,7 +373,7 @@
 
 (defmethod initialize-instance :after ((self C-patch-list-editor) &key controls)
   (declare (ignore controls))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox "" self
                        *collector-popUp-menu*
                        :view-position (make-point (- (w self) 10)
@@ -413,14 +413,14 @@
 (in-package :pw)
 
 (defunp lst-ed ((list (list (:dialog-item-text "()")))) list
-        "This module is an editor for graphic tables. To open the window associated 
-with this module, click twice within the module (but not on the input window!). 
+        "This module is an editor for graphic tables. To open the window associated
+with this module, click twice within the module (but not on the input window!).
 To obtain more information, type ‘o’ with the module open."
         (declare (ignore list)))
 
 
 ;; (in-package :pw)
-;; (add-patch-box *active-patch-window* 
-;; (make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd  
+;; (add-patch-box *active-patch-window*
+;; (make-patch-box  'C-patch-list-editor:C-patch-list-editor 'listEd
 ;; '(*symbol-eval-pw-type* "list") '(list)))
 

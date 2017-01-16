@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,23 +15,23 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;    
+;;;;
 ;;;; -*- mode:lisp; coding:utf-8 -*-
 ;;===================
 ;;Allegro CL version of the table displayer, for now .....
@@ -67,7 +67,7 @@
     (set-table-dimensions self  (first dims) (second dims))
     (setf (my-array self) the-array)
     (add-subviews dialog self)))
-    
+
 (defclass C-table-displayer (C-patch-application)
   ((table :initform (make-array '(11 7) :initial-element #\Space :adjustable t)
           :initarg :table :accessor table)
@@ -76,7 +76,7 @@
    ))
 
 (defvar *Table-disp-popUpMenu*
-  (new-menu 
+  (new-menu
    " "
    (new-leafmenu "Open" (lambda () (open-patch-win *target-action-object* )))
    (new-leafmenu "Column Center" (lambda () (table-layout *target-action-object* 'cc)))
@@ -88,7 +88,7 @@
 
 (defmethod initialize-instance :after((self C-table-displayer) &key rest)
   (declare (ignore rest))
-  (let ((popUpBox (make-popUpbox  "" 
+  (let ((popUpBox (make-popUpbox  ""
                                   self
                                   *Table-disp-popUpMenu*
                                   :view-position (make-point (- (w self) 10)
@@ -99,7 +99,7 @@
 
 (defmethod make-application-object ((self C-table-displayer))
   (make-instance 'C-disp-window
-                 :view-subviews 
+                 :view-subviews
                  (list (make-instance 'C-array-item
                                       :view-font *patchwork-font-spec*
                                       :table-dimensions (make-point 2 2)
@@ -118,13 +118,13 @@
 
 (defmethod table-layout ((self C-table-displayer) option)
   (let* ((data (patch-value (car (input-objects self)) self))
-         (maxlength (apply 'max 
+         (maxlength (apply 'max
                            (mapcar (lambda (row) (length (list! row))) data)))
          )
-    
+
     (cond ((eql option 'cc)
            (fill-table-disp self  maxlength data 2))
-          ((eql option 'r) 
+          ((eql option 'r)
            (fill-table-disp self maxlength data 1)))))
 
 (defmethod fill-table-disp ((self C-table-displayer) maxlength data increm)
@@ -134,7 +134,7 @@
                        :initial-element #\Space))
     (dolist (row data)
       (setq init-pos (- maxlength (length (list! row)) increm))
-      (mapc (lambda (elem) 
+      (mapc (lambda (elem)
               (setf (aref (table self) (incf init-pos increm) index) elem))
             (list! row))
       (incf index))))

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -38,7 +38,7 @@
 (defclass C-nargs-input-patch (C-patch) ())
 
 (defmethod patch-value ((self C-nargs-input-patch) obj)
-  (declare (ignore obj)) 
+  (declare (ignore obj))
   (nth (give-nargs-place self)(input-objects self)))
 
 (defgeneric give-nargs-place (self)
@@ -47,7 +47,7 @@
 (defmethod disconnect-my-self ((self C-nargs-input-patch) patch)
    (for (i 0 1 (1- (length (input-objects self))))
       (if (listp (nth i (input-objects self)))
-            (when  (member patch (nth i (input-objects self)) :test #'eq) 
+            (when  (member patch (nth i (input-objects self)) :test #'eq)
                (setf (nth i (input-objects self))
                   (remove patch (nth i (input-objects self)) :test #'eq))
                (when (null (nth i (input-objects self)))

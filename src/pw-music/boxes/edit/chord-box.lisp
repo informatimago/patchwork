@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,31 +16,31 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
 
 (defclass C-chord-box (C-ttybox)
-  ((chord-line :initform (make-instance 'C-chord-line 
+  ((chord-line :initform (make-instance 'C-chord-line
                                         :chords (list
                                                  (make-instance 'C-chord
-                                                                :t-time 0 
+                                                                :t-time 0
                                                                 :notes (list (make-instance 'C-note
-                                                                                            :midic 6000))))) 
+                                                                                            :midic 6000)))))
                :initarg :chord-line
                :accessor chord-line)))
 
@@ -61,16 +61,16 @@
 
 (defmethod (setf value) (notes (self C-chord-box))
   (setf (chord-line self)
-        (make-instance 'C-chord-line 
+        (make-instance 'C-chord-line
                        :chords (list
-                                (make-instance 'C-chord :t-time 0 
+                                (make-instance 'C-chord :t-time 0
                                                :notes notes)))))
 
 (defun note (&rest list) (apply 'form-note-objs list))
 
 (defun form-note-objs (&rest list)
   (let (note instrument)
-  (mapcar (lambda (note-form) 
+  (mapcar (lambda (note-form)
               (setq note (make-instance 'C-note :midic (first note-form)
                                         :dur (second note-form)
                                         :offset-time (third note-form)
@@ -83,13 +83,13 @@
                 (make-super-note-connections instrument note *current-MN-window*))
               note)
           (apply #'list list))))
-  
+
 (defgeneric give-mid-y (self)
   (:method ((self C-chord-box))
     (+ 5 (y self) (truncate (/ (h self) 2)))))
 
 (defgeneric draw-cb-staffs (self mid-y)
-  (:method ((self C-chord-box) mid-y) 
+  (:method ((self C-chord-box) mid-y)
     (draw-string 0 (- mid-y 31) "==")
     (draw-string 0 (- mid-y 3) "==")
     (draw-string 0 (+ mid-y 21) "==")
@@ -131,9 +131,9 @@
 
 
 (defgeneric get-chord-offset (self)
-  (:method ((self C-chord-box)) 
+  (:method ((self C-chord-box))
     (ask-all (notes (car (chords (chord-line self)))) 'offset-time)))
- 
+
 (defgeneric get-chord-duration (self)
   (:method ((self C-chord-box))
     (ask-all (notes (car (chords (chord-line self)))) 'dur)))

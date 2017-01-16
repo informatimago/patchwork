@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -53,10 +53,10 @@
 ;;   (dotimes (index length)
 ;;     (push (svref vector (decf length)) list))
 ;;   list )
-;; 
+;;
 ;; (time (dotimes (i 10000) (vector-to-list #(a b c d))))
 ;; (dotimes (i 10000) (vector-to-list #(a b c d))) took 205 ticks (3.417 seconds) to run.
-;; 
+;;
 ;; (time (dotimes (i 10000) (vector-to-list1 #(a b c d))))
 ;; (dotimes (i 10000) (vector-to-list1 #(a b c d))) took 218 ticks (3.633 seconds) to run.
 
@@ -403,7 +403,7 @@ The resulting function is a lambda list not compiled."
 
 ;; =============================================================================-======
 ;; (defun tests ()
-;; 
+;;
 ;;   '#i(^ a b)
 ;;   '#i(a + * b)
 ;;   '#i(a + b *)

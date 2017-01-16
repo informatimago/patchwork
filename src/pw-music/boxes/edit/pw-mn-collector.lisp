@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -61,10 +61,10 @@
   self)
 
 (defmethod decompile ((self C-patch-midi))
-  (append (call-next-method) 
-          (list nil 
+  (append (call-next-method)
+          (list nil
                 `(list ,(active-mode self)
-                       ,(if *decompile-chords-mode* 
+                       ,(if *decompile-chords-mode*
                             `(list (list ,@(get-chordline-form (chord-seq self)))
                                    ,(if (wptr (application-object self))
                                         `(list ,@(get-window-state self (application-object self)))
@@ -77,8 +77,8 @@
 
 (defgeneric get-chordline-form (self))
 (defmethod get-chordline-form ((self C-chord-line))
-  (mapcar 
-   (lambda (chord) 
+  (mapcar
+   (lambda (chord)
      `(list ,(t-time chord) ,@(mapcar #'get-useful-note-slots (notes chord))))
    (chords self)))
 
@@ -86,7 +86,7 @@
 (defmethod form-to-chord-line ((self C-chord-line) chords-form)
   (if chords-form
       (setf (chords self)
-            (mapcar (lambda (form) 
+            (mapcar (lambda (form)
                       (make-instance 'C-chord
                                      :t-time (car form)
                                      :notes (apply #'form-note-objs (cdr form))))
@@ -104,10 +104,10 @@
 (defmethod yourself-if-collecting ((self C-patch-midi)) self)
 
 (defmethod draw-patch-extra :after ((self C-patch-midi))
-  (when (play-flag self) (fill-patch-outrect (out-put self)))) 
+  (when (play-flag self) (fill-patch-outrect (out-put self))))
 
-(defmethod remove-yourself-control ((self C-patch-midi)) 
-  (when (application-object self) 
+(defmethod remove-yourself-control ((self C-patch-midi))
+  (when (application-object self)
     (remove-yourself-control (application-object self))))
 
 (defgeneric give-structured-begin-time (self))
@@ -145,7 +145,7 @@
 (defmethod continue-record ((self C-patch-midi))
   (when (< (clock (clock-obj self)) (+ (begin-time self) (duration-time self)))
     (if  (>= (clock (clock-obj self)) (begin-time self))
-         (progn 
+         (progn
            (draw-clock self)
            (let ((clock (- (clock (clock-obj self)) (begin-time self)))
                  (delay (patch-value (first (input-objects self)) self))
@@ -153,7 +153,7 @@
                  note-list instrument)
              (if (minusp delay) ; if negative delay -> a rest and no evaluation of remaining args
                  (setq delay (abs delay))
-                 (progn 
+                 (progn
                    (setq dur   (patch-value (nth 1 (input-objects self)) self))
                    (setq key   (patch-value (nth 2 (input-objects self)) self))
                    (setq vel   (patch-value (nth 3 (input-objects self)) self))
@@ -162,7 +162,7 @@
                      (setq instrument (patch-value (nth 5 (input-objects self)) self)))
                    (if (listp key)
                        (while key
-                         (push (make-instrument-note (pop key) dur chan vel instrument (application-object self)) 
+                         (push (make-instrument-note (pop key) dur chan vel instrument (application-object self))
                                note-list))
                        (and (numberp key)
                             (setq note-list
@@ -171,7 +171,7 @@
                    (if (or (numberp key) (listp key))
                        (push (make-instrument-chord clock (nreverse note-list))
                              (chord-line-list self))
-                       (push (make-instrument-for-chord key clock instrument 
+                       (push (make-instrument-for-chord key clock instrument
                                                         (application-object self))
                              (chord-line-list self)))))
              (incf (clock self) delay)
@@ -183,7 +183,7 @@
 (defmethod make-instrument-for-chord ((self C-chord) clock instrument win)
   (setf (t-time self) clock)
   (dolist (note (notes self))
-    (unless (instrument note) ; to check if there is already an instrument in the note 
+    (unless (instrument note) ; to check if there is already an instrument in the note
       (setf (instrument note) instrument)
       (if (and instrument win)
           (make-super-note-connections instrument note win))))
@@ -191,7 +191,7 @@
 
 (defmethod  begin-process  ((self C-patch-midi))
   (setf (chord-line-list self) ())
-  (fill-patch-outrect (out-put self))  
+  (fill-patch-outrect (out-put self))
   (setf (clock self) 0)
   (funcall (process self) self))
 
@@ -228,16 +228,16 @@
 ;;     (setf (play-flag self) ())
 ;;     (fill-patch-outrect (out-put self))))
 
-(defmethod patch-value ((self C-patch-midi) obj) (declare (ignore obj)) 
+(defmethod patch-value ((self C-patch-midi) obj) (declare (ignore obj))
   (chord-seq self))
                                         ;( give-MN-editor-chord-line self 0))
 
 (defgeneric give-MN-editor-chord-line (self i))
 (defmethod give-MN-editor-chord-line ((self C-patch-midi) i)
   (declare (ignore i))
-  (chord-line (give-MN-editor self))) 
+  (chord-line (give-MN-editor self)))
 (defgeneric give-MN-editor (self))
-(defmethod give-MN-editor ((self C-patch-midi)) 
+(defmethod give-MN-editor ((self C-patch-midi))
   (car (editor-objects (car (subviews (application-object self))))))
 
 ;;====================
@@ -245,13 +245,13 @@
   (new-menu " "
             (new-leafmenu "Save" (lambda () (save *target-action-object*)))))
 
-(defclass C-patch-midi-Mod (C-patch-midi) 
+(defclass C-patch-midi-Mod (C-patch-midi)
   ((clock-obj :initform *global-clock* :allocation :class :accessor clock-obj)
    (popUpBox :initform nil :accessor popUpBox)))
 
 (defmethod initialize-instance :after ((self C-patch-midi-Mod) &key controls)
   (declare (ignore controls))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox "" self
                        *collector-popUp-menu*
                        :view-position (make-point (- (w self) 10)
@@ -304,7 +304,7 @@
   (make-instance 'C-pw-type
                  :control-form
                  `(make-instance 'C-numbox  :view-size (make-point 36 14)
-                                            :value 6000 :min-val 0 :max-val 12700 
+                                            :value 6000 :min-val 0 :max-val 12700
                                             :type-list '(fixnum list chord))))
 
 (defgeneric polifonic? (self))
@@ -327,7 +327,7 @@
 
 (defmethod initialize-instance :after ((self C-patch-PolifMN-mod) &key controls)
   (declare (ignore controls))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox "" self
                        *collector-popUp-menu*
                        :view-position (make-point (- (w self) 10)
@@ -339,19 +339,19 @@
 ;;(defmethod decompile ((self C-patch-PolifMN)) (call-next-method))
 
 ;; (defmethod decompile ((self C-patch-polifMN-mod))
-;;   (append (call-next-method) 
+;;   (append (call-next-method)
 ;;           (list nil `(list ,(active-mode self)
-;;                           ,(if *decompile-chords-mode* 
+;;                           ,(if *decompile-chords-mode*
 ;;                             `(list
 ;;                               ,@(mapcar (lambda (ch-line) `(list ,@(get-chordline-form ch-line)))
 ;;                                         (chord-line-list self))))))))
 
 (defmethod decompile ((self C-patch-polifMN-mod))
-  (append (call-next-method) 
+  (append (call-next-method)
           (list nil `(list ,(active-mode self)
-                           ,(if *decompile-chords-mode* 
+                           ,(if *decompile-chords-mode*
                                 `(list
-                                  ,@(mapcar (lambda (ch-line) 
+                                  ,@(mapcar (lambda (ch-line)
                                               `(list ,@(get-chordline-form ch-line)))
                                             (chord-line-list self))))
                            ,(if (wptr (application-object self))
@@ -367,7 +367,7 @@
 ;;   (mapc (lambda (ch-line chords-form editor)
 ;;           (form-to-chord-line ch-line chords-form)
 ;;           (setf (chord-line editor) ch-line))
-;;         (chord-line-list box) ch-line-forms 
+;;         (chord-line-list box) ch-line-forms
 ;;         (editor-objects (car (subviews (application-object box)))))
 ;;   (if state (put-window-state box (application-object box) state))
 ;;   box)
@@ -380,11 +380,11 @@
       (dotimes (i (length ch-line-forms))
         (push (make-instance 'C-chord-line) (chord-line-list box)))
       (window-close (application-object box))
-      (rebuild-collector-win box))       
+      (rebuild-collector-win box))
     (mapc (lambda (ch-line chords-form editor)
             (form-to-chord-line ch-line chords-form)
             (setf (chord-line editor) ch-line))
-          (chord-line-list box) ch-line-forms 
+          (chord-line-list box) ch-line-forms
           (editor-objects (car (subviews (application-object box)))))
     (if state (put-window-state box (application-object box) state))
     box))
@@ -428,9 +428,9 @@
 ;;           (setq control (nth i controls))
 ;;           (unless (eql control object)
 ;;             (setf (nth i the-list) (patch-value object obj)))
-;;           (incf i))      
+;;           (incf i))
 ;;         (setf (chord-line-list self) the-list))))
-;; 
+;;
 ;; (defmethod patch-value ((self C-patch-polifMN-mod) obj)
 ;;   (if (value self)
 ;;       (chord-line-list self)
@@ -442,7 +442,7 @@
 ;;         (setf (chord-line-list self)
 ;;               (dolist (in-obj objects res)
 ;;                 (setq res
-;;                       (append  res (list! (if (eql in-obj (pop controls)) 
+;;                       (append  res (list! (if (eql in-obj (pop controls))
 ;;                                               (make-instance 'C-chord-line)
 ;;                                               (patch-value in-obj obj)))))))
 ;;         (when (and win (wptr win)
@@ -480,7 +480,7 @@
 
 (defmethod correct-extension-box ((self C-patch-polifMN-mod) new-box values)
   (declare (ignore values))
-  (let* ((new-editors-list 
+  (let* ((new-editors-list
            (editor-objects (car (subviews (application-object new-box)))))
          (last-ed (1- (length new-editors-list))))
     (setf (nthcdr last-ed (chord-line-list self))
@@ -494,7 +494,7 @@
     (if (and editor (wptr editor))
         (set-window-title editor (pw-function-string self)))))
 
-(defmethod give-new-extended-title ((self C-patch-polifMN-mod)) 
+(defmethod give-new-extended-title ((self C-patch-polifMN-mod))
   (pw-function-string self))
 
 (defmethod open-patch-win ((self C-patch-polifMN-mod))
@@ -535,20 +535,20 @@
     collector
     "A PW-box that is able to play in real-time (p - play)
 or to collect in non-real-time (c - collect) notes.
-When the user plays or records,the collector-box begins to 
+When the user plays or records,the collector-box begins to
 evaluate its inputs in a loop.
-The inputs 
+The inputs
 - del (when the next note is to be evaluated)
       (if del is negative then the evaluation of all
        other arguments is skipped and no pitches are played
        or recorded - this is an easy way of making rests)
-- dur (duration) 
-- midic (midi-keynumber * 100  
-         -> 6000 = middle-C, 6050 = middle-C + 50 cents)  
-        (can be a midic or a list of midics or a chord object) 
+- dur (duration)
+- midic (midi-keynumber * 100
+         -> 6000 = middle-C, 6050 = middle-C + 50 cents)
+        (can be a midic or a list of midics or a chord object)
 - vel (velocity)
 - chan (channel)
-- m-ins (midi-instrument - a collection of break-point-functions 
+- m-ins (midi-instrument - a collection of break-point-functions
          or fix-values)
         (this input works only in non-real-time mode)
 are evaluated each time a note is played or collected.
@@ -556,13 +556,13 @@ The collector-box can be stopped in real-time by pressing s.
 In non-real-time the process is stopped at a time-point
 that can be set with a stime-box (stop-time-box).
 This value is set by default to 1000 ticks (10 seconds)
-\(the default value will be used if there is no stime-box in the 
+\(the default value will be used if there is no stime-box in the
 current PW-window).
 The collector-box also owns a music-notation-editor (MN-editor) that can
 be opened by selecting the collector-box and pressing o.
 When collecting notes in non-real-time ,
 all notes are collected inside this editor and each
-aspect of the notes can later be edited. 
+aspect of the notes can later be edited.
 When requested for a value, collector-box returns a chord line object.
 "
   (declare (ignore del dur mid/ob vel chan ins)))
@@ -570,36 +570,36 @@ When requested for a value, collector-box returns a chord line object.
 
 (defunp poly-coll ((coll1 (symbol (:dialog-item-text "obj" :type-list (collector))))
                    &rest (colln (symbol (:dialog-item-text "obj" :type-list (collector)))))
-    list 
-    "A pmnn (polifonic MN-editor) box is used to represent 
+    list
+    "A pmnn (polifonic MN-editor) box is used to represent
 polifonic information.
 For example if you have recorded a process with three collectors,
-you can look at the result with three staffs by selecting 
-a Poly Collector from the Music edit menu and extending it 
-and connecting each output of the 
+you can look at the result with three staffs by selecting
+a Poly Collector from the Music edit menu and extending it
+and connecting each output of the
 three collectors to each input of the Poly Collector box.
-Then you have to make a request by option-clicking the out-put-box 
+Then you have to make a request by option-clicking the out-put-box
 of the Poly Collector box.
 This box can be both opened by selecting it and pressing o from
-the keyboard or extended by option-clicking bottom-right 
+the keyboard or extended by option-clicking bottom-right
 \(EA = extend+application)."
   (declare (ignore coll1 colln)))
 
 (defunp multiseq ((coll1 (symbol (:dialog-item-text "obj" :type-list (collector list))))
                   &rest (colln (symbol (:dialog-item-text "obj" :type-list (collector list)))))
-    list 
-    "A <multiseq> (polyphonic sequence) box represents polyphonic data. It takes 
-one or more chord sequence objects as input and returns them in a list. This 
-module works with the associated music notation editor, which displays as 
-many systems as chord sequence inputs have been defined for the module. 
-The multiseq module is extensible. Option-clicking on it (but not on its output 
-box!) adds a new chord sequence input. A popup menu is linked to the letter 'A' 
-just to the right of the output box. It offers the option of saving the module with 
-all its chord sequences into a file. The multiseq module is state preserving. It 
-only changes its output if there is a module connected to one of its inputs (or if 
-changes are made by hand in the editor, of course). This box can be opened by 
-selecting it and pressing 'o' from the keyboard or extended by option-clicking 
-bottom-right. Type 'h' with the music notation editor opened for more 
+    list
+    "A <multiseq> (polyphonic sequence) box represents polyphonic data. It takes
+one or more chord sequence objects as input and returns them in a list. This
+module works with the associated music notation editor, which displays as
+many systems as chord sequence inputs have been defined for the module.
+The multiseq module is extensible. Option-clicking on it (but not on its output
+box!) adds a new chord sequence input. A popup menu is linked to the letter 'A'
+just to the right of the output box. It offers the option of saving the module with
+all its chord sequences into a file. The multiseq module is state preserving. It
+only changes its output if there is a module connected to one of its inputs (or if
+changes are made by hand in the editor, of course). This box can be opened by
+selecting it and pressing 'o' from the keyboard or extended by option-clicking
+bottom-right. Type 'h' with the music notation editor opened for more
 information."
   (declare (ignore coll1 colln)))
 

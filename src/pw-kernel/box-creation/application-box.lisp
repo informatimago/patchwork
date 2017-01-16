@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -46,7 +46,7 @@
 ;;====================================================================================================
 
 (defclass  C-patch-application (C-pw-functional)
-  ((application-object :initform nil :initarg :application-object 
+  ((application-object :initform nil :initarg :application-object
                        :accessor application-object)
    (lock :initform nil :accessor lock)
    (value :initform nil :accessor value)
@@ -61,7 +61,7 @@
    self)
 
 (defgeneric -make-lock (self &optional position)
-  (:method ((self C-patch-application) 
+  (:method ((self C-patch-application)
             &optional position)
     (setf (lock self)
           (make-instance 'C-radio-button
@@ -76,7 +76,7 @@
   (:method ((self C-patch-application))
     (lambda (item)
       (if (value (view-container item))
-          (progn 
+          (progn
             (set-dialog-item-text item "o")
             (record-event :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self))))))
           (progn
@@ -107,18 +107,18 @@
 
 ;; this method should be redefined by subclasses and should return the pointer to the window
 (defmethod make-application-object ((self C-patch-application))
-  nil) 
+  nil)
 
 (defgeneric set-pw-window-pointers (self win)
-  (:method ((self C-patch-application) win) 
+  (:method ((self C-patch-application) win)
     (update-win-pointers self win)))
 
 (defgeneric update-win-pointers (self win-ptr)
-  (:method ((self C-patch-application) win-ptr) 
+  (:method ((self C-patch-application) win-ptr)
     (set-pw-win+pw-obj (application-object self) win-ptr ())))
 
-(defmethod remove-yourself-control ((self C-patch-application)) 
-  (when (application-object self) (window-close (application-object self))))  
+(defmethod remove-yourself-control ((self C-patch-application))
+  (when (application-object self) (window-close (application-object self))))
 
 (defmethod open-patch-win ((self C-patch-application))
   (let ((win (application-object self)))
@@ -147,13 +147,13 @@
 (defmethod draw-patch-extra ((self C-patch-application))
   (when (application-object self)
     (draw-appl-label self
-                     (if (eql (front-window) (application-object self)) #\* #\A)))) 
- 
+                     (if (eql (front-window) (application-object self)) #\* #\A))))
+
 (defmethod draw-appl-label ((self C-patch-application) label)
   (when (view-container  self)
     (with-focused-view self
       (set-view-font  (view-container  self) '(:srccopy))
-      (draw-char (- (w self) 8) (- (h self) 4) label) 
+      (draw-char (- (w self) 8) (- (h self) 4) label)
       (set-view-font  (view-container  self) '(:srcor)))))
 
 (defmethod set-dialog-item-text-from-dialog ((view C-patch-application) str)
@@ -166,7 +166,7 @@
 (defmethod save ((self C-patch-application))
   (call-next-method)
   (let ((win (application-object self)))
-    (if (and win (wptr win)) 
+    (if (and win (wptr win))
         (set-window-title win (pw-function-string self)))))
 ;;====================================================================================================
 
@@ -180,7 +180,7 @@
 
     ;;==================
 
-    (progn 
+    (progn
      (setq pw-appl (make-patch-box 'C-patch-application-test 'T-Appl ()))
      (add-patch-box *active-patch-window* pw-appl))
 

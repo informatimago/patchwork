@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -17,19 +17,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -54,12 +54,12 @@
                                                            *target-action-object*)))))
 
 (defclass C-abstract-M (C-abstract)
-  ((popUpBox :accessor popUpBox))) 
+  ((popUpBox :accessor popUpBox)))
 ;;;;
 
 (defmethod initialize-instance :after ((self C-abstract-M ) &key controls)
   (declare (ignore controls))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox "" self
                        *abstract-popUpMenu*
                        :view-position (make-point (- (w self) 10)
@@ -77,7 +77,7 @@
         (setf *abs-code* (decompile self))
         (ui:add-menu-items  *pw-menu-patch*
                             (new-leafmenu box-title
-                                          (eval 
+                                          (eval
                                            `(function (lambda ()
                                               (let ((box ,*abs-code*))
                                                 (set-view-position box 15 15)
@@ -113,22 +113,22 @@
          (in-boxes (find-abstract-in-boxes win patches))
          (title (window-title win))
          (in-docs-temp)
-         (in-put-docs 
-           (when in-boxes 
+         (in-put-docs
+           (when in-boxes
              (setq in-docs-temp (get-absin-boxes-types-n patches in-boxes))
-             (cond 
+             (cond
                ((member nil in-docs-temp)
-                (ui:message-dialog 
+                (ui:message-dialog
                  "WARNING! absin box connected to irreducible types. ALL-type used")
                 (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum))
                         in-docs-temp))
                (t in-docs-temp))))
-         (abstract-box 
-           (make-std-patch-box (type-of self)  
+         (abstract-box
+           (make-std-patch-box (type-of self)
                                (read-from-string title) in-put-docs win in-boxes)))
     (dmove-patch abstract-box (x self) (y self))
     ;;   connections
-    (make-abstract-box-connections *active-patch-window* 
+    (make-abstract-box-connections *active-patch-window*
                                    abstract-box out-box in-boxes win)
     (tell (controls *active-patch-window*) 'draw-connections t)
     (when (member self *current-user-configuration*)
@@ -144,39 +144,39 @@
     (tell (controls *active-patch-window*) 'draw-connections) ) )
 
 (defgeneric make-abstraction-M (self &optional abstract-class)
-  (:method ((self C-pw-window) 
+  (:method ((self C-pw-window)
             &optional (abstract-class 'C-abstract-M))
     (let ((*si-record* nil))
       (if (not (active-patches self))
           (ui:message-dialog "No active patches!")
           (let ((active-rect (find-active-rectangle self))
-                (new-win)(patches)(abstract-box)(in-boxes) 
+                (new-win)(patches)(abstract-box)(in-boxes)
                 (out-box (find-abstract-out-box self (active-patches self))))
-            (cond 
-              ((not out-box) 
+            (cond
+              ((not out-box)
                (ui:message-dialog "One abstract-out-box should be selected !"))
               ((> (length out-box) 1)
                (ui:message-dialog "Only one abstract-out-box should be selected !"))
-              (t 
+              (t
                (cut self)
                (setq patches (eval (patch-scrap self)))
                (tell patches 'dmove-patch (- (car active-rect)) (- (second active-rect)))
                (setq out-box (car (find-abstract-out-box self patches)))
-               (setq new-win 
+               (setq new-win
                      (make-instance (type-of self) :close-box-p nil
                                                    :window-title (dialog-item-text (car (pw-controls out-box)))
-                                                   :view-position 
+                                                   :view-position
                                                    (make-point (+ (x self) (first active-rect))
-                                                               (+ (y self) (second active-rect))) 
-                                                   :view-size 
+                                                               (+ (y self) (second active-rect)))
+                                                   :view-size
                                                    (make-point (third active-rect) (fourth active-rect)) ))
                (apply #'add-subviews new-win patches)
                (deactivate-control out-box)
-               ;;inboxes        
+               ;;inboxes
                (setq in-boxes (find-abstract-in-boxes self patches))
-               (setq abstract-box 
+               (setq abstract-box
                      (make-std-abstract-box self patches new-win in-boxes abstract-class ))
-               (unless abstract-box 
+               (unless abstract-box
                  (window-close new-win)
                  (apply #'add-subviews self patches))
                (when abstract-box
@@ -192,15 +192,15 @@
 (defgeneric make-std-abstract-box (self patches new-win in-boxes abstract-class)
   (:method ((self C-pw-window) patches new-win in-boxes  abstract-class)
     (let (in-put-docs)
-      (when in-boxes        
+      (when in-boxes
         (setq in-put-docs (get-absin-boxes-types-n patches in-boxes))
         (when (member nil in-put-docs)
-          (message-dialog  
+          (message-dialog
            "WARNING! absin box connected to irreducible types. ALL-type used.")
           (setq in-put-docs
                 (mapcar (lambda (type-spec) (declare (ignore type-spec)) '(nilNum))
                         in-put-docs))))
-      (make-std-patch-box abstract-class  
+      (make-std-patch-box abstract-class
                           (read-from-string (window-title new-win)) in-put-docs new-win in-boxes))))
 
 (defun all-absins-different (absins)
@@ -222,7 +222,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
       (if (all-absins-different arg-names)
           (progn
             (set-PW-symbolic-type-data fun-name
-                                       (list (cons '&required 
+                                       (list (cons '&required
                                                    (mapcar (lambda (name type) (cons name type)) arg-names
                                                            (setq type-specs (quote-value type-specs))))
                                              '(&optional) '(&rest)) 'nil)  ;output type is nil, for the moment...
@@ -249,7 +249,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
         (append (subseq key-list 0 (- size where -1)) (cons `',(cadr value) (cddr value))))))
 
 (defun get-current-inbox-vals (type-specs)
-  (mapcar (lambda (type) 
+  (mapcar (lambda (type)
             (if (member :value (cadr type))
                 (eval (cadr (member :value (cadr type))))
                 (or (get-type-default (car type))
@@ -257,7 +257,7 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
           type-specs))
 
 (defgeneric make-abstract-box-connections (self abstract-box out-box in-boxes new-win)
-  (:method ((self C-pw-window) 
+  (:method ((self C-pw-window)
             abstract-box out-box in-boxes new-win)
     (setf (abstract-obj out-box) abstract-box)
     (for (i 0 1 (1- (length in-boxes)))
@@ -293,13 +293,13 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 (defmethod patch-work-type-of ((self C-patch) ctrl-index)
   (let* ((types (if (defunp-function? (pw-function self))
                     (get-intypes (pw-function self))
-                    (list 
+                    (list
                      (cons '&required
-                           (mapcar (lambda (ctrl) 
+                           (mapcar (lambda (ctrl)
                                      (list (read-from-string (doc-string ctrl)) 'nilNum))
                                    (pw-controls self)))
                      '(&optional) '(&rest))))
-         (type-specs-list 
+         (type-specs-list
            (append (mapcar #'cdr (cdr (assoc '&required types)))
                    (mapcar #'cdr (cdr (assoc '&optional types)))
                    (mapcar #'cdr (cdr (assoc '&rest types))))))
@@ -310,20 +310,20 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
                            (patch-value (nth ctrl-index (pw-controls self)) self)))))
 
 (defgeneric patch-work-ctrl-box (self ctrl-index)
-  (:method ((self C-patch) ctrl-index) ;{Camilo} should be put in PW-wind+patch 
+  (:method ((self C-patch) ctrl-index) ;{Camilo} should be put in PW-wind+patch
     (nth ctrl-index (pw-controls self))))
 
 ;;coerces types to their intersection. e.g '(float fixnum) and '(fixnum) coerces to
 ;;'(fixnum). The result is an object with this type (if any).
 (defun coerce-PW-types-in-list (list-of-types)
   (and list-of-types
-       (let ((current-intersect 
+       (let ((current-intersect
                (get-the-type-list (car list-of-types))))
          (dolist (type-spec (cdr list-of-types))
-           (setq current-intersect 
+           (setq current-intersect
                  (type-intersection current-intersect (get-the-type-list type-spec))))
-         (and current-intersect 
-              (set-the-type-list 
+         (and current-intersect
+              (set-the-type-list
                (car list-of-types)
                (if (eql current-intersect 'all-types) nil current-intersect))))))
 
@@ -337,14 +337,14 @@ A unique name will be chosen (if not a 'redraw')" fun-name)
 (set-type-default (car type-spec)
 value))|#
 
-(defun set-current-value (type-spec value) 
-  (set-type-default 
+(defun set-current-value (type-spec value)
+  (set-type-default
    (copy-tree  (if (consp (car type-spec)) (car type-spec) type-spec))
    ;;(car type-spec)
    value))
 
 (defun get-the-type-list (type-spec)
-  (let ((the-type-list 
+  (let ((the-type-list
           (member :type-list
                   (if (cdr type-spec)
                       (do-merge-specs (get-PW-type-specs (car type-spec))
@@ -372,7 +372,7 @@ value))|#
   (:documentation "the class of patch-configuration patches"))
 
 (defmethod decompile ((self C-patch-configurer))
-  (when (eql self *active-config-object*) 
+  (when (eql self *active-config-object*)
     (setf *active-config-object*())
     (reset-fill-control self))
   `(sbox ',(type-of self) ',(pw-function self) ,(pw-function-string self)
@@ -397,7 +397,7 @@ value))|#
 (defmethod initialize-instance :after((self C-patch-configurer) &key file-path)
   (declare (ignore file-path))
   (set-view-size self (w self) (+ (h self) 15))
-  (set-view-position (out-put self) 
+  (set-view-position (out-put self)
                      (make-point (x (out-put self)) (+ (y (out-put self)) 15)))
                                         ;(move-control (out-put self) (x (out-put self)) (+ (y (out-put self)) 15))
   (let ((popUpBox (make-popUpbox "M" self
@@ -419,7 +419,7 @@ value))|#
                      :dialog-item-text "D"
                      :view-container self
                      :view-font *patchwork-font-spec*
-                     :dialog-item-action (lambda (item) 
+                     :dialog-item-action (lambda (item)
                                            (configure (view-container item)))))))
 
 (defgeneric set-fill-control (self)
@@ -433,7 +433,7 @@ value))|#
 
 (defun make-user-patch-configurer(&key ((:file file) ()))
   (let ((patch
-          (make-patch-box 'C-patch-configurer "config" 
+          (make-patch-box 'C-patch-configurer "config"
                           '(*symbol-eval-pw-files-type* "FileList") '(list))))
     (setf (file-path patch) file)
     patch))
@@ -464,13 +464,13 @@ value))|#
                 (setf (fdefinition 'add-patch-box) (fdefinition 'no-add-patch-box))
                 (load (car file-name))
                 (setf (fdefinition 'add-patch-box) (fdefinition saved-fun))
-                (form-patch-subMenu (car file-name) 
+                (form-patch-subMenu (car file-name)
                                     `(add-patch-box *active-patch-window*
                                                     ,(decompile *added-box-object*)))))))
       (set-user-patch-config Lib&patch-files)
       (unless (eql self *active-config-object*)
         (set-fill-control self)
-        (and *active-config-object* 
+        (and *active-config-object*
              (reset-fill-control *active-config-object*))
         (setf *active-config-object* self)))))
 
@@ -487,7 +487,7 @@ value))|#
 (defgeneric remove-from-config (self)
   (:method ((self C-patch-configurer))
     (let* ((lib&patches (mapcar #'car (file-path self)))
-           (items 
+           (items
              (ui:catch-cancel (ui:select-item-from-list
                                (mapcar (lambda (path) (file-namestring path)) lib&patches)
                                :window-title "Please Select Abstract and Library Files"
@@ -499,8 +499,8 @@ value))|#
 
 ;;;==========================================================================
 ;;; the config functions
-;;;==========================================================================    
-(defun SAVE-PATCH-CONFIG()                              
+;;;==========================================================================
+(defun SAVE-PATCH-CONFIG()
   (SHOW-PATCH-LIB nil nil))
 
 (defun SHOW-PATCH-LIB(conf-list obj)   ;useless parameters. Present for "connection-style".
@@ -516,7 +516,7 @@ value))|#
       (ADD-CELLS items patches))))
 
 
-(defun ADD-CELLS(selection all-list) 
+(defun ADD-CELLS(selection all-list)
   (set-user-patch-config  (get-path-names selection all-list)))
 
 (defun get-path-names(files path-list)
@@ -538,8 +538,8 @@ value))|#
             (if (and (consp lib-a-list) (consp (car lib-a-list))
                      (atom (caar lib-a-list)))
                 (ui:catch-cancel
-                  (ui:select-item-from-list 
-                   (eval lib-a-list) 
+                  (ui:select-item-from-list
+                   (eval lib-a-list)
                    :window-title (format nil "please select ~A functions" (file-namestring file-name))
                    :table-print-function (lambda (it &optional strm)(princ (cdr it) strm))
                    :selection-type :disjoint))))))
@@ -550,19 +550,19 @@ value))|#
 ;;;and builds the user Lib Menu.
 
 (defun form-patch-subMenu (patch-file-name code)
-  (let ((sub-dir-list 
+  (let ((sub-dir-list
           (cdr (member "PW-user-patches" (parse-file-name patch-file-name) :test #'string=)))
         (current-sub-menu *pw-menu-patch*)
         (menu))
     (dotimes (x (1- (length sub-dir-list)))
-      (unless 
+      (unless
           (setq menu (find-menu-item current-sub-menu (car sub-dir-list)))
         (ui:add-menu-items current-sub-menu
-                           (setq menu (new-menu (car sub-dir-list)))))                            
+                           (setq menu (new-menu (car sub-dir-list)))))
       (setq current-sub-menu menu)
       (pop sub-dir-list))
     (or (find-menu-item current-sub-menu (car sub-dir-list))
-        (ui:add-menu-items current-sub-menu (new-leafmenu (car sub-dir-list) 
+        (ui:add-menu-items current-sub-menu (new-leafmenu (car sub-dir-list)
                                                           (eval `(function (lambda () ,code))))))))
 
 (defun parse-file-name (name)
@@ -574,7 +574,7 @@ value))|#
     name-list))
 
 (defun handle-library-load (lib-file-name key-a-list)
-  (setq *library-selection* 
+  (setq *library-selection*
         (mapcar #'cdr key-a-list))
   (load lib-file-name))
 
@@ -583,7 +583,7 @@ value))|#
     (dolist (file-pair1 cf1)
       (if (library-p (car file-pair1))
           (setq result (merge-lib-select file-pair1 result))
-          (setq result (adjoin file-pair1 result :test #'string=  
+          (setq result (adjoin file-pair1 result :test #'string=
                                                  :key (lambda (item) (car item))))))
     result))
 
@@ -592,7 +592,7 @@ value))|#
     (dolist (file-pair1 take-list)
       (if (library-p (car file-pair1))
           (setq result (delete-lib-select file-pair1 result))
-          (setq result (remove (car file-pair1) result :test #'string=  
+          (setq result (remove (car file-pair1) result :test #'string=
                                                        :key (lambda (item) (car item))))))
     result))
 
@@ -626,7 +626,7 @@ value))|#
                           :count 1)))
         file-list)))
 
-(defun merge-lib-keys(f-p1 f-p2) 
+(defun merge-lib-keys(f-p1 f-p2)
   (cons (car f-p1) (union (cdr f-p1)(cdr f-p2) :test #'equal :key #'car)))
 
 (defun delete-lib-keys(f-p1 f-p2)

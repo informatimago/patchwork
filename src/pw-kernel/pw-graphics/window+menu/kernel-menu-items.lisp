@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -53,7 +53,7 @@
 
 (defun new-PW-sub-menu-item (main-menu mtitle patch-type box-title type-forms
                              &optional type-list defaults-list)
-  (let ((body 
+  (let ((body
           `(make-patch-box ',patch-type ',box-title ',type-forms ',type-list ',defaults-list))
         (sub-menu (find-menu-item main-menu mtitle)))
     (unless sub-menu
@@ -71,7 +71,7 @@
 
 
 (defun initialize-kernel-menu ()
-  
+
   ;;(PW-addmenu-fun *PWoper-menu* 'config 'C-patch-configurer)
 
   ;;======================================================
@@ -99,34 +99,34 @@
   (PW-addmenu *pw-Arith-menu*
               '(g+ g- g* g/ g-power g-exp g-log))
 
-  (ui:add-menu-items *pw-Arith-menu* 
+  (ui:add-menu-items *pw-Arith-menu*
                      (new-leafmenu "-" ()))
 
-  (PW-addmenu *pw-Arith-menu* 
+  (PW-addmenu *pw-Arith-menu*
               '(g-div g-mod g-round g-floor g-ceiling g-abs))
 
-  (ui:add-menu-items *pw-Arith-menu* 
+  (ui:add-menu-items *pw-Arith-menu*
                      (new-leafmenu "-" ()))
 
   (PW-addmenu *pw-Arith-menu*  '(g-min g-max g-random g-average))
 
   (PW-addmenu *pw-Num-series-menu* '(arithm-ser geometric-ser fibo-ser))
 
-  (ui:add-menu-items *pw-Num-series-menu* 
+  (ui:add-menu-items *pw-Num-series-menu*
                      (new-leafmenu "-" ()))
 
-  (PW-addmenu *pw-Num-series-menu* '(g-scaling g-scaling/sum g-scaling/max interpolation 
+  (PW-addmenu *pw-Num-series-menu* '(g-scaling g-scaling/sum g-scaling/max interpolation
                                      g-alea x->dx dx->x ))
 
-  (ui:add-menu-items *pw-Num-series-menu* 
+  (ui:add-menu-items *pw-Num-series-menu*
                      (new-leafmenu "-" ()))
 
   (PW-addmenu *pw-Num-series-menu* '(prime-ser prime-factors prime?))
 
-  (PW-addmenu *pw-Num-Fun-Gen-menu* 
+  (PW-addmenu *pw-Num-Fun-Gen-menu*
               '(epw::make-num-fun sample-fun epw::lagrange-fun epw::linear-fun epw::power-fun))
 
-  (ui:add-menu-items *pw-Num-Fun-Gen-menu* 
+  (ui:add-menu-items *pw-Num-Fun-Gen-menu*
                      (new-leafmenu "-" ()))
 
   (PW-addmenu *pw-Num-Fun-Gen-menu* '(g-oper cartesian inverse))
@@ -144,9 +144,9 @@
   (PW-addmenu-fun *pw-control-menu* 'pwrepeat 'C-pw-loop)
 
 
-  (ui:add-menu-items  *pw-control-menu* 
-                      (new-leafmenu "pwmap" 
-                                    (lambda () 
+  (ui:add-menu-items  *pw-control-menu*
+                      (new-leafmenu "pwmap"
+                                    (lambda ()
                                       (let ((enum (make-PW-standard-box 'C-enum-collect-source 'enum))
                                             (loop (make-PW-standard-box 'C-map-first 'pwmap)))
                                         (init-patch-pos *active-patch-window* loop)
@@ -160,9 +160,9 @@
                                         (tell (controls *active-patch-window*) 'draw-connections)
                                         loop))))
 
-  (ui:add-menu-items  *pw-control-menu* 
-                      (new-leafmenu "pwreduce" 
-                                    (lambda () 
+  (ui:add-menu-items  *pw-control-menu*
+                      (new-leafmenu "pwreduce"
+                                    (lambda ()
                                       (let ((enum1 (make-PW-standard-box 'C-enum-collect-source 'enum))
                                             (enum2 (make-PW-standard-box 'C-enum-collect-source 'enum))
                                             (reduce (make-PW-standard-box 'C-reducer 'pwreduce)))
@@ -189,19 +189,19 @@
 ;;;==============================
 ;;; List items
 
-  (PW-addmenu *pw-usual-lisp-menu* '(first rest butlast reverse length mapcar list 
+  (PW-addmenu *pw-usual-lisp-menu* '(first rest butlast reverse length mapcar list
                                      apply funcall remove))
 
   (PW-addmenu *pw-List-menu* '(posn-match last-elem x-append))
   (ui:add-menu-items *pw-List-menu* (new-leafmenu "-" ()))
   (PW-addmenu *pw-List-menu* '(flat flat-once flat-low ))
   (ui:add-menu-items *pw-List-menu* (new-leafmenu "-" ()))
-  (PW-addmenu *pw-List-menu* '(create-list expand-lst rem-dups list-modulo list-explode 
+  (PW-addmenu *pw-List-menu* '(create-list expand-lst rem-dups list-modulo list-explode
                                mat-trans list-filter table-filter range-filter band-filter))
   (ui:add-menu-items *pw-List-menu* (new-leafmenu "-" ()))
   (PW-addmenu *pw-List-menu* '(interlock subs-posn group-list first-n last-n))
-  
-  #|(ui:add-menu-items *pw-List-menu* 
+
+  #|(ui:add-menu-items *pw-List-menu*
   (new-leafmenu "-" ())
   *pw-set-menu* *pw-list-gen-menu* *pw-list-trans-menu*
   *pw-list-combin-menu*)|#
@@ -211,7 +211,7 @@
   ;;(PW-addmenu *pw-list-gen-menu* '(create-list expand-lst))
 
   #|(PW-addmenu *pw-list-trans-menu*
-  '(rem-dups list-modulo list-explode mat-trans list-filter 
+  '(rem-dups list-modulo list-explode mat-trans list-filter
   range-filter band-filter))|#
 
   (PW-addmenu *pw-list-combin-menu* '(sort-list posn-order permut-random
@@ -243,7 +243,7 @@
 
   (PW-addmenu-fun *pw-BPF-menu* 'bpf-lib  'C-patch-bpf-lib)
 
-  ;;(ui:add-menu-items *pw-BPF-menu* 
+  ;;(ui:add-menu-items *pw-BPF-menu*
   ;;                (new-leafmenu "-" ()))
 
   ;;(PW-addmenu-fun *pw-BPF-menu* 'points-view 'C-pw-points-view)
@@ -278,7 +278,7 @@
   (setf *PW-print-setUp*
         (new-leafmenu "Page Setup…" (lambda () (win-print-setUp *active-patch-window*))))
 
-  (setf *print-PW-menu* 
+  (setf *print-PW-menu*
         (new-leafmenu "Print…" (lambda () (window-hardcopy  *active-patch-window*))))
 
   (ui:add-menu-items *pw-menu-file* *PW-print-setUp* *print-PW-menu*))

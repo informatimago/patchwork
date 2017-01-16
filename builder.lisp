@@ -37,12 +37,14 @@
                           "MAKE-PATHNAME"
                           "USER-HOMEDIR-PATHNAME"
                           "TRANSLATE-LOGICAL-PATHNAME")
+  (:use "PATCHWORK.LOGICAL-HOSTS")
   (:use "COM.INFORMATIMAGO.TOOLS.MANIFEST")
   (:use "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.FILE")
   (:export "*PATCHWORK-VERSION*"
            "VERSION" "VERSION=" "VERSION<"
            "RT-VERSION=" "RT-VERSION<" "RT-VERSION<="
-           "FEATUREP" "SYSTEM-VERSION" "ADD-COCOA-VERSION-FEATURES"))
+           "FEATUREP" "SYSTEM-VERSION" "ADD-COCOA-VERSION-FEATURES"
+           "SAY"))
 (in-package "PATCHWORK.BUILDER")
 (declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
 
@@ -53,36 +55,6 @@
 
 (setf *load-verbose* t
       *print-right-margin* 110)
-
-
-;; Logical Hosts used at compilation time
-;; --------------------------------------
-;;
-;;   PATCHWORK
-;;
-;;     The logical host PATCHWORK should be set so that the .git/
-;;     subdirectory should be  at its root:
-;;
-;;         #+ccl (probe-file #P"PATCHWORK:.git;") --> true
-;;
-;;   MCLGUI
-;;
-;;   MIDI
-;;
-;; Logical Hosts used at run-time
-;; ------------------------------
-;;
-;; Those logical hosts are used by patchwork or its dependencies include:
-;;
-;;   PW-USER  -- See src/application.lisp  initialize-directories
-;;
-;;   CLENI
-
-(load (make-pathname :name "loghosts"
-                     :type nil
-                     :version nil
-                     :defaults #.(or *compile-file-truename* *load-truename*)))
-
 
 
 (defun say (fmt &rest args)
@@ -106,12 +78,6 @@
 (pushnew (translate-logical-pathname #P"MIDI:")
          asdf:*central-registry* :test (function equalp))
 
-#-(and) (progn
-          (logical-pathname-translations "PATCHWORK")
-          (logical-pathname-translations "MCLGUI")
-          (list (translate-logical-pathname #P"PATCHWORK:")
-                (translate-logical-pathname #P"MCLGUI:"))
-          )
 
 
 (defparameter *patchwork-version*

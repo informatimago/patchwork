@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -85,8 +85,8 @@
 
 (defparameter *enum-collect-type*
   (make-instance 'C-pw-type
-                 :control-form 
-                 `(make-instance 'C-ttybox :view-size (make-point 36 12) 
+                 :control-form
+                 `(make-instance 'C-ttybox :view-size (make-point 36 12)
                                            :dialog-item-text "coll" :type-list '(collector))))
 
 (defparameter *MD-object-type*
@@ -105,7 +105,7 @@
 
 (defunp trigger ((patch1 list (:value "patch" :type-list ()))
                  (patch2 list (:value "patch" :type-list ()))
-                 &rest (patch list (:value "patch" :type-list ()))) nil "This extensible module launches the evaluation of many patches in sequence. 
+                 &rest (patch list (:value "patch" :type-list ()))) nil "This extensible module launches the evaluation of many patches in sequence.
 The sequence of evaluation is equal to the sequence of the inputs."
   (declare (ignore patch1 patch2 patch)))
 
@@ -114,10 +114,10 @@ The sequence of evaluation is equal to the sequence of the inputs."
 (defunp pwmap ((en-ob (symbol (:type-list (loop))))
                (patch (list (:type-list ())))
                &rest (en-obs (symbol (:type-list (loop))))) list
-    "This group of modules creates a list starting with the evaluation of a patch that takes 
-into account all the elements of a list connected to the module enum. The output of the 
-patch must be connected to the input patch of pwmap. Since this module is extensible, 
-it is possible to control many lists, by opening the inputs arg to which is connected a 
+    "This group of modules creates a list starting with the evaluation of a patch that takes
+into account all the elements of a list connected to the module enum. The output of the
+patch must be connected to the input patch of pwmap. Since this module is extensible,
+it is possible to control many lists, by opening the inputs arg to which is connected a
 module enum. In the case of lists ofvarious sizes, pwmap will select the shortest one. "
   (declare (ignore en-ob patch en-obs)))
 
@@ -145,8 +145,8 @@ module enum. In the case of lists ofvarious sizes, pwmap will select the shortes
   (let ((enum (make-PW-standard-box 'C-enum-collect-source 'enum))
         (even (zerop (rem (length (pw-controls new-box)) 2))))
     (add-subviews *active-patch-window* enum)
-    (set-view-position enum 
-                       (make-point (if even 
+    (set-view-position enum
+                       (make-point (if even
                                        (+ (x new-box) (w new-box))
                                        (x new-box)) (- (y new-box) (h new-box) )))
     (connect-ctrl new-box (car (last (pw-controls new-box))) enum)

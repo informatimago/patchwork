@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,39 +16,39 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
- 
+
 (defvar *global-current-value-patch* ())
 
-;; (defparameter *pw-debug-mode-menu*    
+;; (defparameter *pw-debug-mode-menu*
 ;;   (new-leafmenu "show error box" 'activate-current-patch-value-patch))
-;; (defparameter *pw-remove-debug-mode-menu*    
+;; (defparameter *pw-remove-debug-mode-menu*
 ;;   (new-leafmenu "remove pw debug" 'remove-PW-mode-method))
-;; 
+;;
 ;; (let ((rem-menu (find-menu-item *PWoper-menu* "remove pw debug"))
 ;;       (show-menu (find-menu-item *PWoper-menu* "show error box")))
 ;;   (if rem-menu (remove-menu-items *PWoper-menu* rem-menu))
 ;;   (if show-menu (remove-menu-items *PWoper-menu* show-menu)))
-;; 
+;;
 ;; (ui:add-menu-items  *PWoper-menu* *pw-debug-mode-menu*)
 ;; (ui:add-menu-items  *PWoper-menu* *pw-remove-debug-mode-menu* )
-;; 
+;;
 ;; ;;==========================================================================================
 ;; (setf *break-on-errors* ())
 
@@ -61,12 +61,12 @@
 
 (defun set-patch-value-methods ()
   (set-menu-item-check-mark *pw-debug-menu* t)
-  (defmethod patch-value :before ((self C-patch) obj) 
+  (defmethod patch-value :before ((self C-patch) obj)
     (declare (ignore obj))
                                         ;  (activate-control self)
     (setf *global-current-value-patch* (adjoin self *global-current-value-patch*)))
-  
-  (defmethod patch-value :after ((self C-patch) obj) 
+
+  (defmethod patch-value :after ((self C-patch) obj)
     (declare (ignore obj))
                                         ;   (print 'after)
                                         ;  (deactivate-control self)
@@ -84,7 +84,7 @@
 
 
 (defun remove-PW-mode-method ()
-  (set-menu-item-check-mark *pw-debug-menu* ())    
+  (set-menu-item-check-mark *pw-debug-menu* ())
                                         ;(setf *break-on-errors* t)
   (let* ((generic-function (symbol-function 'patch-value))
          (method (find-method generic-function

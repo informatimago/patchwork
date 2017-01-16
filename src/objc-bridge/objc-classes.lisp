@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
-;;;;    objc-class stuff. 
-;;;;    
+;;;;
+;;;;    objc-class stuff.
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,24 +15,24 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;    
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
-;;;;    
+;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;    
+;;;;
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;    
+;;;;
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -78,7 +78,7 @@
 
 #+(or apple-objc cocotron-objc)
 (defun count-objc-classes ()
-  (#_objc_getClassList (ccl:%null-ptr) 0))  
+  (#_objc_getClassList (ccl:%null-ptr) 0))
 
 
 #+gnu-objc
@@ -183,7 +183,7 @@
            `(ccl:%ff-call (ccl:%reference-external-entry-point (load-time-value (external "objc_msgSend"))))
            `(:address ,receiver :<SEL> (@selector ,selector-name) ,@argspecs)
            :arg-coerce 'objc-arg-coerce
-           :result-coerce 'objc-result-coerce)  
+           :result-coerce 'objc-result-coerce)
   #+gnu-objc
   (let* ((r (gensym))
          (s (gensym))

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -60,7 +60,7 @@
     (while s
                                         ;(when (and (null p) (>= (caar s) 0))
                                         ;      (setq p q))
-      (cond 
+      (cond
         ( (< (cdar s) 0)
           (if (oddp (cdar s))
               (rplacd (car s) (- (bessel MI (abs (cdar s)))))
@@ -75,7 +75,7 @@
     (setq spec
           (if (not p)
               spec
-              (fmMerge (cdr p) 
+              (fmMerge (cdr p)
                        (progn (rplacd p ()) (nreverse spec)))))
     (mapc (lambda (comp)
             (rplacd comp (abs (cdr comp))))
@@ -142,7 +142,7 @@
 
 
 (defun fmMerge2 (r f1 f2)
-  (cond 
+  (cond
     ((null f1) (rplacd r f2))
     ((null f2) (rplacd r f1))
     ((< (caar f1) (caar f2))
@@ -170,13 +170,13 @@
 
 
 (defunp fm-chord ((carrier midics?) (modul midics? (:value 6600)) (index fix/float (:value 1))
-                  &optional 
+                  &optional
                   (unit menu (:menu-box-list (("midic" . 1) ("freq". 2))))) ch-ob
     "Computes a FM spectrum. Outputs a chord object"
   (when (= unit 1)
     (setf carrier (mc->f carrier) modul (mc->f modul)))
   (let* ((spec (fmspec carrier modul index)) (slength (length spec)))
-    (pw::mk-chord 
+    (pw::mk-chord
      (f->mc (epw::band-filter (mapcar #'car spec) '((15.0 20000.0))))
      (make-list slength :initial-element 50)
      (make-list slength :initial-element 0)
@@ -207,7 +207,7 @@ midics, or freqs, or velocities depending on the popup menu"
           ((string= (pw::current-str self) "V") vel)
           ((string= (pw::current-str self) "F") spec)
           ((string= (pw::current-str self) "C")
-           (pw::mk-chord 
+           (pw::mk-chord
             (f->mc spec)
             (make-list slength :initial-element 50)
             (make-list slength :initial-element 0)

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -65,7 +65,7 @@
 
 (defvar *bpf-popUp-menu* ())
 
-(defun make-bpf-pops () 
+(defun make-bpf-pops ()
   (setf *points-menu* (new-leafmenu "flip-mode" (lambda () (set-the-points-view *target-action-object*))))
   (setf *bpf-popUp-menu*
         (new-menu " "  *points-menu*
@@ -76,17 +76,17 @@
               (new-leafmenu "-" ())
               (new-leafmenu "Save" (lambda () (save *target-action-object*))))))
 
-(defclass  C-patch-function (C-patch-application C-pw-resize-x) 
+(defclass  C-patch-function (C-patch-application C-pw-resize-x)
   ((popUpBox :initform nil :accessor popUpBox)
    (points-state :initform nil :accessor points-state)
    (out-type :initform :bpf :accessor out-type)
-   (current-str :initform #\B :accessor current-str)   
+   (current-str :initform #\B :accessor current-str)
    (lock :initform nil :accessor lock)
    (value :initform nil :accessor value)))
 
 (defmethod initialize-instance :after ((self C-patch-function) &key controls)
   (declare (ignore controls))
-  (setf (popUpBox self) 
+  (setf (popUpBox self)
         (make-popUpbox "  " self
                        *bpf-popUp-menu*
                        :view-position (make-point (- (w self) 8)
@@ -102,7 +102,7 @@
                        :view-container self
                        :dialog-item-action (get-lock-button-fun self)))
   (let ((mini-bpf (give-mini-bpf self)) bpf)
-    (unless (break-point-function mini-bpf)  
+    (unless (break-point-function mini-bpf)
       (setq bpf (make-break-point-function '(0 100) '(0 100)))
       (set-break-point-function-to-mini mini-bpf bpf))
     (add-bpf-to-bpf-editor-from-PW (application-object self) (break-point-function mini-bpf))
@@ -112,7 +112,7 @@
 (defmethod get-lock-button-fun ((self C-patch-function))
   (lambda (item)
       (if (value (view-container item))
-        (progn 
+        (progn
           (set-dialog-item-text item "o")
           (record-event :|PWst| :|cann| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string self))))))
         (progn
@@ -143,7 +143,7 @@
   (call-next-method))
 
 (defgeneric erase-BPF-label? (self)
-  (:method ((self C-patch-function)) 
+  (:method ((self C-patch-function))
     (set-box-title (popUpBox self) "  ")))
 
 (defmethod draw-appl-label ((self C-patch-function) label)
@@ -161,7 +161,7 @@
   (let ((patches (subviews *active-patch-window*)))
     (dolist (patch patches)
       (if (am-i-connected? patch self)
-          (progn 
+          (progn
             (draw-connections patch t)
             (disconnect-my-self patch self)
             (draw-connections patch ))))))
@@ -211,8 +211,8 @@
                     (eql (second (pw-controls self)) (second (input-objects self)))))
     (let* ((in-1 (patch-value (first (input-objects self)) obj))
            (in-2 (patch-value (second (input-objects self)) obj))
-           (bpf 
-            (make-break-point-function 
+           (bpf
+            (make-break-point-function
               (if (consp in-1) (mapcar #'round in-1) (round in-1))
               (if (consp in-2) (mapcar #'round in-2) (round in-2))))
           (*no-line-segments* (display-only-points self)))
@@ -227,16 +227,16 @@
 (defmethod resize-patch-box ((self C-patch-function) mp delta)
  (let ((point-now (make-point (add-points mp delta)))
        (min-w 84)(min-h 60))
-   (when (and (< min-w (point-h point-now))(< min-h (point-v point-now))) 
+   (when (and (< min-w (point-h point-now))(< min-h (point-v point-now)))
       (set-view-size self point-now)
-      (set-view-size (third (pw-controls self)) 
+      (set-view-size (third (pw-controls self))
           (make-point (- (w self) 10) (- (h self) 35)))
-      (set-view-position (second (pw-controls self)) 
+      (set-view-position (second (pw-controls self))
           (make-point (- (w self) 5 (w (second (pw-controls self)))) 5))
       (init-xs-ys self)
-      (set-view-position (out-put self) 
+      (set-view-position (out-put self)
           (make-point (- (round (w self) 2) 6) (- (h self) 5)))
-      (set-view-position (popUpBox self) 
+      (set-view-position (popUpBox self)
                          (make-point (- (w self) 8) (- (h self) 14)))
       (set-view-position (lock self) (add-points (view-position (out-put self)) #@(20 -6)))
       (let ((*no-line-segments* (display-only-points self)))
@@ -248,13 +248,13 @@
 
 (defunp bpf ((tlist (fix>0s? (:value 10))) (vlist (fix>0s? (:value 100)))
              (mini-bpf bpf)) bpf
-"A <bpf>-box with a breakpoint function (bpf). A function editor can be opened by 
-selecting this box and typing 'o' from the keyboard. The bpf can be changed from 
-PatchWork by connecting a value-list to the <vlist> input box and option-clicking its 
-output box. If there is no connection in the first input box <tlist> then the points have a 
+"A <bpf>-box with a breakpoint function (bpf). A function editor can be opened by
+selecting this box and typing 'o' from the keyboard. The bpf can be changed from
+PatchWork by connecting a value-list to the <vlist> input box and option-clicking its
+output box. If there is no connection in the first input box <tlist> then the points have a
 constant time-difference.
 If the first input box <tlist> is connected, then the input
-should be a list of ascending timepoints. One can change the representation of the 
+should be a list of ascending timepoints. One can change the representation of the
 module bpf (in segments by default) to a representation in points by selecting <flip-
 mode> in the front menu. Click on the "
   (declare (ignore tlist vlist mini-bpf)))
@@ -287,7 +287,7 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
   (if bpf-ob
     (let ((points (list! x-val))
           result)
-      (setq result 
+      (setq result
             (mapcar (lambda (x) (bpf-out bpf-ob x (give-x-points bpf-ob)))
                     points))
       (if (consp x-val)  result (car result)))))|#
@@ -316,12 +316,12 @@ to the second inputbox <x-val>. returns the y value (or list of y values)
 
 (defunp bpf-sample ((bpf-ob0 list (:value 'nil :type-list (list pw::bpf)))
                     (echan1 fix>0 (:min-val 2 :value 2)) (xinit2 fix) (xend3 fix (:value 100))
-                    (fact4 fix/float (:value 1)) (nbdec5 fix)) list 
-"  The bpf-sample module creates a list starting by sampling a  
-breakpoint function table;. bpf-ob  is the input to the table, 
-echant is the number of samples desired, xinit et xend delimit the  sampling interval;. 
-The fact   variable is a multiplicative coefficient for scaling the data, 
-and nbdec  is the number of decimals desired in the output. 
+                    (fact4 fix/float (:value 1)) (nbdec5 fix)) list
+"  The bpf-sample module creates a list starting by sampling a
+breakpoint function table;. bpf-ob  is the input to the table,
+echant is the number of samples desired, xinit et xend delimit the  sampling interval;.
+The fact   variable is a multiplicative coefficient for scaling the data,
+and nbdec  is the number of decimals desired in the output.
  "
 
   (get-bpf-sample-output bpf-ob0 echan1 xinit2 xend3 fact4 nbdec5))
@@ -331,7 +331,7 @@ and nbdec  is the number of decimals desired in the output.
   (declare (ignore echan1 xinit2 xend3 fact4 nbdec5)) self)
 
 (defmethod get-bpf-sample-output ((self C-break-point-function) echan1 xinit2 xend3 fact4 nbdec5)
-  (epw::g-round 
+  (epw::g-round
    (epw::g* (transfer self (epw:arithm-ser xinit2 (/ (- xend3 xinit2) (- echan1 '1))
                                               xend3)) fact4) nbdec5))
 
@@ -361,7 +361,7 @@ Behaves like an oscillator."
 
 (defmethod patch-value ((self C-patch-osc-period) obj)
    (let ((break-point-function (patch-value (car (input-objects self)) obj)))
-      (bpf-out-osc-period break-point-function (clock obj) 
+      (bpf-out-osc-period break-point-function (clock obj)
            (patch-value (nth 1 (input-objects self)) obj) (give-x-points break-point-function))))
 
 
@@ -377,7 +377,7 @@ by the second inputbox"
 ;;________________
 
 (defclass  C-patch-osc-phase (C-patch)
-   ((osc-phase :initform 0 :accessor osc-phase) 
+   ((osc-phase :initform 0 :accessor osc-phase)
     (old-time :initform 0 :accessor old-time)))
 
 (defmethod init-patch ((self C-patch-osc-phase))
@@ -387,17 +387,17 @@ by the second inputbox"
 
 (defmethod patch-value ((self C-patch-osc-phase) obj)
    (let* ((break-point-function (patch-value (car (input-objects self)) obj))
-          (time (clock obj)) 
-          (old-time (old-time self)) 
+          (time (clock obj))
+          (old-time (old-time self))
           (period (patch-value (nth 1 (input-objects self)) obj))
           (points (give-x-points break-point-function))
           (time-diff (- (car (last points)) (car points))))
       (setf (old-time self) time)
-      (bpf-out break-point-function 
+      (bpf-out break-point-function
             (+ (setf (osc-phase self)
-                  (float (mod (+ (osc-phase self)  
+                  (float (mod (+ (osc-phase self)
                           (/ (* time-diff (- time old-time)) period)) time-diff)))
-                (car points)) 
+                (car points))
              points)))
 
 (defunp oscil-phase ((bpf-ob (list (:value '() :type-list (bpf))))
@@ -421,7 +421,7 @@ request at input."
 
 ;; ;;not needed??!!  [911107]
 ;; (setq *bpf-lib-pw-type*
-;;   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf  
+;;   (make-instance 'C-pw-type :control-form `(make-instance 'C-menubox-bpf
 ;;     :view-size (make-point 40 40)
 ;;     :menu-box-list ,*pw-BPF-library* :type-list '(no-connection))))
 
@@ -431,11 +431,11 @@ request at input."
                          :menu-box-list *pw-BPF-library* :type-list '(no-connection)))
 
 (defunp bpf-lib ((bpflib bpf-lib)) bpf
-"Breakpoint functions can be stored in a library.  
-There is only one current  library, structured as 
-a circular list. The menu item add to lib 
-\(in the bpf  menu, when the window of multiple-bpf  module is open)  
-adds the current BPF to the library and reset lib resets the library to one item: a ramp. 
+"Breakpoint functions can be stored in a library.
+There is only one current  library, structured as
+a circular list. The menu item add to lib
+\(in the bpf  menu, when the window of multiple-bpf  module is open)
+adds the current BPF to the library and reset lib resets the library to one item: a ramp.
 The menu items next BPF from lib   and prev BPF from lib   allow browsing in the library.
 "
   (declare (ignore bpflib)))

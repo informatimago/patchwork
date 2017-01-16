@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    User Patch configuration
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,26 +16,26 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
 (in-package :pw)
 
 ;;;============================================================
-;;;A dynamic user library configuration scheme for PW. Each function in a PW 
+;;;A dynamic user library configuration scheme for PW. Each function in a PW
 ;;;user library can be surrounded by an 'eval-if-key' macro call which does
 ;;;selecting loading based on an a-list of user supplied keywords. The a-list takes
 ;;;the form: ((logical-fun-name1 . keyword1)...(logical-fun-nameN . keywordN))
@@ -44,7 +44,7 @@
 ;;;'keyword' represents internally this set of related functions. The following example,
 ;;;taken from the ESQUISSE library configuration, ilustrates this syntax:
 
-;;; the a-list for configuring ESQUISSE 
+;;; the a-list for configuring ESQUISSE
 ;; (setq *epw-config-a-list*
 ;;       '(((sortlist list-min list-max) . :sort-and-list )
 ;;         ((unique union intersection a\\b aΔb included? ensemble? compare) . :set-operations)
@@ -60,31 +60,31 @@
 ;;;illustrated bellow for some ESQUISSE functions:
 
 ;; (eval-if-key (:pitch-conversion
-;; 
+;;
 ;;               (defune f-mc1 ((freq freq)) midic
 ;;                   "Converts <freq> (Hz) to a midicent pitch."
 ;;                 (+ (round (* (log (/ freq *diapason-freq*)) #.(/ 12.0 (log 2.0))) .01)
 ;;                    *diapason-midic* ))
-;; 
+;;
 ;;               (defune f-mc ((freqs? freqs?)) midics?
 ;;                   "Converts <freqs?> (Hz) to midicents."
 ;;                 (deep-mapcar 'f-mc 'f-mc1 freqs?))
-;; 
+;;
 ;;               ;; ---- midic -> frequency ----
-;; 
+;;
 ;;               (defune mc-f1 ((midic midic)) freq
 ;;                   "Converts a midicent pitch to a frequency (Hz)."
 ;;                 (* *diapason-freq*
 ;;                    (expt 2.0 (/ (- midic *diapason-midic*) 1200.0)) ))
-;; 
+;;
 ;;               (defune mc-f ((midics? midics?)) freqs?
 ;;                   "Converts a midicent pitches to frequencies (Hz)."
 ;;                 (deep-mapcar 'mc-f 'mc-f1 midics?))
-;; 
+;;
 ;;               ) )    ; end of eval-if-key
-;; 
+;;
 ;; (eval-if-key (:pitch-conversion
-;; 
+;;
 ;;               (PW-addmenu *epw-Pitch-conversion-menu*
 ;;                           '(f-mc mc-f))
 ;;               ) )  ;end of eval-if-key
@@ -97,9 +97,9 @@
 ;;;sets can be loaded if any one of them is requested:
 
 ;; (eval-if-key ((:arithmetic :sequences)
-;; 
+;;
 ;;               (defun foo (m n) (bar m n))
-;; 
+;;
 ;;               ) )  ; end of eval-if-key
 
 ;;;The function FOO will be loaded if any one of the :arithmetic or :sequences functions
@@ -132,7 +132,7 @@
 (defvar *PW-user-library-extension* "lib")
 (defvar *library-selection* ())
 
-;;The path-names for user patches and user libraries. Folders "PW-user-patches" and 
+;;The path-names for user patches and user libraries. Folders "PW-user-patches" and
 ;;"PW-user-library" should exist somewhere within the "PW;" path.
 (defvar *PW-user-abstract-pathName* "PW-USER:PW-user-patches;**;*.*")
 (defvar *PW-user-library-pathName* "PW-USER:PW-user-library;**;*.*")

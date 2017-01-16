@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    Load an objc library.
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,24 +15,24 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    LLGPL
-;;;;    
+;;;;
 ;;;;    Copyright Pascal J. Bourguignon 2012 - 2012
-;;;;    
+;;;;
 ;;;;    This library is licenced under the Lisp Lesser General Public
 ;;;;    License.
-;;;;    
+;;;;
 ;;;;    This library is free software; you can redistribute it and/or
 ;;;;    modify it under the terms of the GNU Lesser General Public
 ;;;;    License as published by the Free Software Foundation; either
 ;;;;    version 2 of the License, or (at your option) any later
 ;;;;    version.
-;;;;    
+;;;;
 ;;;;    This library is distributed in the hope that it will be
 ;;;;    useful, but WITHOUT ANY WARRANTY; without even the implied
 ;;;;    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ;;;;    PURPOSE.  See the GNU Lesser General Public License for more
 ;;;;    details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU Lesser General
 ;;;;    Public License along with this library; if not, write to the
 ;;;;    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
@@ -79,7 +79,7 @@
         (#_objc_msgSend nsthread-class message-selector)
         nil)))
 
-  
+
   (defun create-void-nsthread ()
     ;; Create an NSThread which does nothing but exit.
     ;; This'll help to convince the AppKit that we're
@@ -110,7 +110,7 @@
                              :address (ccl:%null-ptr))
           (#_objc_msgSend pool release-selector))
         nil)))
-  
+
 
   (defun load-cocoa-framework ()
     #-ccl (niy load-cocoa-framework)
@@ -141,7 +141,7 @@
            #+not-yet
            (with-string-vector (argv (list (kernel-path)))
              (#_NSInitializeProcess 1 argv)))
-         
+
          ;;(#_GetCurrentEventQueue)
          (current-ns-thread)
          (create-void-nsthread))))
@@ -191,7 +191,7 @@
                            c))))
           (push (ccl:%inc-ptr category 0) (cdr cell))))))
 
-  
+
   ;; Shouldn't really be GNU-objc-specific.
   (defun get-c-format-string (c-format-ptr c-arg-ptr)
     (do* ((n 128))
@@ -238,7 +238,7 @@
   (setf (ccl::foreign-type-ordinal (ccl::parse-foreign-type '(:struct :<GGA>ffine<T>ransform)))
         (ccl::foreign-type-ordinal (ccl::parse-foreign-type :<NSA>ffine<T>ransform<S>truct)))
 
-  
+
   (setf *cls-meta*   #+apple-objc #$CLS_META   #+gnu-objc #$_CLS_META)
   (setf *cls-class*  #+apple-objc #$CLS_CLASS  #+gnu-objc #$_CLS_CLASS)
   (setf *cls-resolv* #+apple-objc #$CLS_RESOLV #+gnu-objc #$_CLS_RESOLV)

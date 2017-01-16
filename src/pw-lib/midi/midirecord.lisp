@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
@@ -15,19 +15,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -56,9 +56,9 @@
   (setf (popUpBox self)
         (make-popUpbox  "A" self
                         (new-menu " "
-                                  (new-leafmenu "Chord" 
+                                  (new-leafmenu "Chord"
                                                 (lambda () (setf (out-type self) :chord)))
-                                  (new-leafmenu "Chord-line" 
+                                  (new-leafmenu "Chord-line"
                                                 (lambda () (setf (out-type self) :c-l))))
                        :view-position (make-point (- (w self) 10)
                                                   (- (h self) 14))
@@ -142,7 +142,7 @@ delta and output mode."
               recording-seq)
           (patchwork.midi:date tempo-evnt 0)
           (patchwork.midi:field tempo-evnt 0 1000000)
-          (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))  
+          (ccl:rlet ((myInfo :<M>idi<F>ile<I>nfos))
             (patchwork.midi:mf-format myInfo  1)
             (patchwork.midi:mf-timedef myInfo 0)
             (patchwork.midi:mf-clicks myInfo 480)
@@ -172,7 +172,7 @@ delta and output mode."
         recording-seq)
     (patchwork.midi:date tempo-evnt 0)
     (patchwork.midi:field tempo-evnt 0 1000000)
-    (patchwork.midi:with-temporary-midi-file-infos (myInfo)  
+    (patchwork.midi:with-temporary-midi-file-infos (myInfo)
       (patchwork.midi:mf-format myInfo  1)
       (patchwork.midi:mf-timedef myInfo 0)
       (patchwork.midi:mf-clicks myInfo 500)
@@ -201,9 +201,9 @@ delta and output mode."
       (setf *play-chseq-w/offset* t)
       (MidiPlay object 0 (compute-approx) 0 seq 500)
       seq)))
-          
 
-(defunp patchwork.midi:Midi-Save ((objs list (:value '() :type-list ())))  nil 
+
+(defunp patchwork.midi:Midi-Save ((objs list (:value '() :type-list ())))  nil
         "MidiFile saver.
 
 Once evaluated, issues a choose-file-dialog that lets you name a MidiFile.
@@ -226,7 +226,7 @@ Input may be any PatchWork object that could be played through play-object
   (let ((recording-seq (patchwork.midi:midiNewSeq))
         (delta (patch-value (first (input-objects self)) (first (input-objects self))))
         rep)
-    (patchwork.midi:with-temporary-midi-file-infos (myInfo)   
+    (patchwork.midi:with-temporary-midi-file-infos (myInfo)
       (patchwork.midi:midi-file-load name recording-seq  myInfo)
       (when recording-seq
         (print (list  "clicks" (patchwork.midi:mf-clicks myInfo)
@@ -247,7 +247,7 @@ Input may be any PatchWork object that could be played through play-object
 #|
 (defun logical-time (abstract-time cur-tempo tempo-change-abst-time tempo-change-log-time unit/sec)
   (+ tempo-change-log-time
-     (round (* (/ 100.0 unit/sec) 
+     (round (* (/ 100.0 unit/sec)
                (* (- abstract-time tempo-change-abst-time)
                   (/ cur-tempo *midi-tempo*))))))
 
@@ -263,37 +263,37 @@ Input may be any PatchWork object that could be played through play-object
       (while (not (patchwork.midi:null-event-p event))
         (setf date (- (patchwork.midi:date event) initdate))
         (case (patchwork.midi:evtype event)
-          (144  (unless *pw-recording-midi* 
-                  (setf 
+          (144  (unless *pw-recording-midi*
+                  (setf
                    tempo-change-log-time (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
                    cur-tempo (patchwork.midi:tempo event)
                    tempo-change-abst-time date ) )
            )
-          
-          (0 
+
+          (0
            (push (list (* 100 (patchwork.midi:pitch event))
-                       (convert-time (patchwork.midi:dur event) units/sec) 
+                       (convert-time (patchwork.midi:dur event) units/sec)
                        (patchwork.midi:vel event)
                        (1+ (patchwork.midi:chan event))
                        (convert-time date units/sec))
                  rep)
            )
-          (1 
+          (1
            (if (= (patchwork.midi:vel event) 0)
-             (close-notes-on rep 
-                             (* 100 (patchwork.midi:pitch event)) 
+             (close-notes-on rep
+                             (* 100 (patchwork.midi:pitch event))
                              (1+ (patchwork.midi:chan event))
                              (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
-             (push (list  (* 100 (patchwork.midi:pitch event)) 
+             (push (list  (* 100 (patchwork.midi:pitch event))
                           (logical-time date   cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
-                          (patchwork.midi:vel event) 
+                          (patchwork.midi:vel event)
                           (1+ (patchwork.midi:chan event))
                           (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
                    rep))
            )
-          (2 
-           (close-notes-on rep 
-                           (* 100 (patchwork.midi:pitch event)) 
+          (2
+           (close-notes-on rep
+                           (* 100 (patchwork.midi:pitch event))
                            (1+ (patchwork.midi:chan event))
                            (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
                            )
@@ -301,9 +301,9 @@ Input may be any PatchWork object that could be played through play-object
         (setf event (patchwork.midi:link event)))
       (patchwork.midi:MidiFreeSeq seq)
       (reverse rep))))
-            
 
-(defun close-notes-on (list pitch chan data) 
+
+(defun close-notes-on (list pitch chan data)
   (flet ((match (x) (and (equal (first x) pitch) (equal (fourth x) chan))))
     (let ((pos (position-if #'match list)))
       (when pos
@@ -313,7 +313,7 @@ Input may be any PatchWork object that could be played through play-object
 
 (defun logical-time (abstract-time cur-tempo tempo-change-abst-time tempo-change-log-time unit/sec)
   (+ tempo-change-log-time
-     (round (* (/ 100.0 unit/sec) 
+     (round (* (/ 100.0 unit/sec)
                (* (- abstract-time tempo-change-abst-time)
                   (/ cur-tempo *midi-tempo*))))))
 
@@ -329,37 +329,37 @@ Input may be any PatchWork object that could be played through play-object
       (while (not (patchwork.midi:null-event-p event))
         (setf date (- (patchwork.midi:date event) initdate))
         (case (patchwork.midi:evtype event)
-          (144  (unless *pw-recording-midi* 
-                  (setf 
+          (144  (unless *pw-recording-midi*
+                  (setf
                    tempo-change-log-time (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
                    cur-tempo (patchwork.midi:tempo event)
                    tempo-change-abst-time date ) )
            )
-          
-          (0 
+
+          (0
            (push (list (* 100 (patchwork.midi:pitch event))
-                       (convert-time (patchwork.midi:dur event) units/sec) 
+                       (convert-time (patchwork.midi:dur event) units/sec)
                        (patchwork.midi:vel event)
                        (1+ (patchwork.midi:chan event))
                        (convert-time date units/sec))
                  rep)
            )
-          (1 
+          (1
            (if (= (patchwork.midi:vel event) 0)
-             (close-notes-on rep 
-                             (* 100 (patchwork.midi:pitch event)) 
+             (close-notes-on rep
+                             (* 100 (patchwork.midi:pitch event))
                              (1+ (patchwork.midi:chan event))
                              (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
-             (push (list  (* 100 (patchwork.midi:pitch event)) 
+             (push (list  (* 100 (patchwork.midi:pitch event))
                           (logical-time date   cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
-                          (patchwork.midi:vel event) 
+                          (patchwork.midi:vel event)
                           (1+ (patchwork.midi:chan event))
                           (logical-time date  cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec))
                    rep))
            )
-          (2 
-           (close-notes-on rep 
-                           (* 100 (patchwork.midi:pitch event)) 
+          (2
+           (close-notes-on rep
+                           (* 100 (patchwork.midi:pitch event))
                            (1+ (patchwork.midi:chan event))
                            (logical-time date cur-tempo tempo-change-abst-time tempo-change-log-time  units/sec)
                            )
@@ -367,9 +367,9 @@ Input may be any PatchWork object that could be played through play-object
         (setf event (patchwork.midi:link event)))
       (patchwork.midi:MidiFreeSeq seq)
       (reverse rep))))
-            
 
-(defun close-notes-on (list pitch chan data) 
+
+(defun close-notes-on (list pitch chan data)
   (flet ((match (x) (and (equal (first x) pitch) (equal (fourth x) chan))))
     (let ((pos (position-if #'match list)))
       (when pos
@@ -384,8 +384,8 @@ Input may be any PatchWork object that could be played through play-object
 
 
 (defun midiseq2cl (list delta)
-  (make-instance 'pw::c-chord-line 
-    :chords 
+  (make-instance 'pw::c-chord-line
+    :chords
     (make-quanti-chords list delta)))
 
 
@@ -400,25 +400,25 @@ Input may be any PatchWork object that could be played through play-object
         with pitch-list and dur-list and vel-list and  chan-list and offset-list
         with base-time = (fifth (first note-list))
         if (<= (- (fifth note) base-time) delta)
-        do 
-        
+        do
+
         (push (first note) pitch-list)
-        (push (second note) dur-list)    
+        (push (second note) dur-list)
         (push (third note) vel-list)
         (push (fourth note) chan-list)
         (push (- (fifth note) base-time) offset-list)
         (pop note-list)
-        
+
         else
         collect (mk-chord-at base-time  pitch-list dur-list offset-list vel-list chan-list) into result
         and do (setf base-time (fifth note) pitch-list () dur-list () vel-list ()  chan-list () offset-list ())
-        
+
         finally (return (append result (list  (mk-chord-at base-time  pitch-list dur-list offset-list vel-list chan-list))))))
 
 
 
 
-   
+
 (defunp patchwork.midi:Midi-Load ((delta fix/fl/list (:value 0 :min-val 0 :max-val 1000)))  nil
  "MidiFile loader.
 
@@ -427,7 +427,7 @@ Any Midifile format, any number of tracks is allowed. Tempo and tempo change
 is recognized. Channels are kept.
 
 Notes falling in a time interval of 'delta' will be considered as chords.
-delta is expressed in 1/100secs. 
+delta is expressed in 1/100secs.
 
 Output is a chord-line object.
 "
@@ -446,7 +446,7 @@ Output is a chord-line object.
 
 
 
-         
+
 
 
 

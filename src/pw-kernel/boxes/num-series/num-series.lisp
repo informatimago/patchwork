@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    Numeric series functions
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda, Gérard Assayag.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -36,10 +36,10 @@
 
 
 (defunp arithm-ser ((begin fix/float) (step (fix/float (:value 1)))
-                    (end (fix/float (:value 10)))) 
+                    (end (fix/float (:value 10))))
     list
-    "Returns a list of numbers starting from begin to end with increment step. For 
-example:   ? (epw::arithm-ser   0  1  12 ) 
+    "Returns a list of numbers starting from begin to end with increment step. For
+example:   ? (epw::arithm-ser   0  1  12 )
 returns:
 PW->(0 1 2 3 4 5 6 7 8 9 10 11 12)"
   (let ((l ()))
@@ -48,21 +48,21 @@ PW->(0 1 2 3 4 5 6 7 8 9 10 11 12)"
 
 (defunp fibo-ser ((seed1 fix/float ) (seed2 fix/float (:value 1)) (limit fix>=0 (:value 10))
                   &optional (begin fix/float) (end (fix/float (:value most-positive-fixnum)))) list
-    "Returns a list of numbers in the  Fibonacci series ;where the first element is 
-seed and the additive factor is seed2. The limit parameter is the limit of this list. 
-It is also possible to specify two parameters begin and end which delimit the 
-calculation of the series. For example: 
- 
+    "Returns a list of numbers in the  Fibonacci series ;where the first element is
+seed and the additive factor is seed2. The limit parameter is the limit of this list.
+It is also possible to specify two parameters begin and end which delimit the
+calculation of the series. For example:
+
 \(pw::fibo-ser  0 1 337)
 returns
 
 ? PW->(0 1 2 3 5 8 13 21 34 55 89 144 233),
 
- 
+
 \(pw::fibo-ser  0 4 337)
 returns
 ? PW->(0 4 8 12 20 32 52 84 136 220)
-and 
+and
 
 \(pw::fibo-ser  0 4 337 3  6)
 returns
@@ -83,15 +83,15 @@ returns
 (defunp geometric-ser ((seed fix/float (:value 1)) (factor (fix/float (:value 2))) (limit fix>=0 (:value 10))
                        &optional(begin fix/float)(end (fix/float (:value most-positive-fixnum))))
     list
-    " The geometric-ser module returns a  geometric series ;of numbers in which 
-the first element is seed  and the multiplicative coefficient is factor. The limit  
-parameter is the limit of this list.  It is also possible to specify two parameters 
-begin and end which delimit the calculation of the series. For example: 
+    " The geometric-ser module returns a  geometric series ;of numbers in which
+the first element is seed  and the multiplicative coefficient is factor. The limit
+parameter is the limit of this list.  It is also possible to specify two parameters
+begin and end which delimit the calculation of the series. For example:
 
 \(pw::geometric-ser  10  2   2000)
 will return
 ? PW->(10 20 40 80 160 320 640 1280)
-and if one sets begin to 2 and end to 5 
+and if one sets begin to 2 and end to 5
 
 \(pw::geometric-ser  10  2   2000  2   5)
 one obtains:
@@ -104,21 +104,21 @@ one obtains:
 
 (defunp sinus ((phase fix/float) (nb-osc fix/float (:value 1))
                (nb-samples fix/float (:value 8)) (amp numbers? (:value 1))) list
-    "parameters: phase = where we start on the sine curve (xmin)  
+    "parameters: phase = where we start on the sine curve (xmin)
 nb-osc = number of oscillations needed (-> determines xmax)
-nb-samples = how many steps on the fragment of curve thus defined  
+nb-samples = how many steps on the fragment of curve thus defined
 amplitude (ambitus normal -1 / 1)"
   (let* ((xmin (* phase (/ pi 180))) (xmax (+ xmin (* 2 pi nb-osc)))
          (step (/ (- xmax xmin) (1- nb-samples))))
     (g*  amp (sample-fun  'sin xmin step xmax))))
 
-(defunp sample-fun ((fun symbol) (xmin fix/float (:value 1)) 
+(defunp sample-fun ((fun symbol) (xmin fix/float (:value 1))
                     (step fix/float (:value 1)) (xmax fix/float (:value 10))) list
     "Returns the list of values of <fun> from <xmin> to <xmax> with <step>.
 For example:
 \(pw::sample-fun  'sin  0 1 6.3)
 will return
-? PW->(0.0 0.8414709848078965    0.9092974268256817     0.1411200080598672 
+? PW->(0.0 0.8414709848078965    0.9092974268256817     0.1411200080598672
           -0.7568024953079282   -0.9589242746631385    -0.27941549819892586)
 and
 \(pw::sample-fun  (pw::make-num-fun '(f(x)= x + 1))  0 1 10)
@@ -137,7 +137,7 @@ will return
     (/ num den) ))
 
 (defmethod less-tree-mapcar ((fun cl:function) (arg1 number) (arg2 number) &optional deep)
-  (funcall fun (list arg1) 
+  (funcall fun (list arg1)
            (if deep arg2 (list arg2))))
 
 (defmethod less-tree-mapcar ((fun cl:function) (arg1 cons) (arg2 number) &optional deep)
@@ -165,8 +165,8 @@ will return
       (funcall fun arg1 arg2)))
 
 (defunp g-average ((xs list) (weights? list (:value 1))) midics?
-    "average value of <xs>, weighted by linear <weights> or 1. <xs> and 
-<weights> may be trees. Trees must be well-formed. That is, the children of a 
+    "average value of <xs>, weighted by linear <weights> or 1. <xs> and
+<weights> may be trees. Trees must be well-formed. That is, the children of a
 node must be either all leaves or all nonleaves. "
   (less-tree-mapcar (function average) xs weights?))
 
@@ -194,12 +194,12 @@ placed between <minout> and <maxout>."
 
 (defunp g-scaling ((vals? numbers?)
                    (minout fix/float) (maxout fix/float)
-                   &optional (minin fix/float (:value most-negative-fixnum)) 
+                   &optional (minin fix/float (:value most-negative-fixnum))
                    (maxin fix/float (:value most-positive-fixnum))) numbers?
-    "Replaces all the <vals?> considered between the minimum value of the list 
-and the maximum value of the list,  by the values proportionally placed between 
-<minout> and <maxout>. If the list in question is a part of a larger list, or 
-<vals?> is a variable that takes a value within a known interval, one can specify 
+    "Replaces all the <vals?> considered between the minimum value of the list
+and the maximum value of the list,  by the values proportionally placed between
+<minout> and <maxout>. If the list in question is a part of a larger list, or
+<vals?> is a variable that takes a value within a known interval, one can specify
 the minimum and maximum values by opening two optional windows by double-
 clicking on ‘E’ at the right of the module. "
   (setq vals? (list! vals?))
@@ -236,28 +236,28 @@ by the values proportionaly placed between <minout> and <maxout>."
         (nreverse res))))
 
 ;; ;;from Rhythms:Functions [magnus]
-;; 
+;;
 ;; (defun -power-function (begin end time curve)
 ;;   (+ (* (- end begin) (expt time curve)) begin))
 
 
 (defunp interpolation ((begin list) (end list) (samples fix>0 (:value 4))
-                       (curves floats (:value 1)) 
+                       (curves floats (:value 1))
                        &optional (format menu (:menu-box-list (("incl" . 1) ("excl". 2))) )) list
-    "Interpolates two lists of the same length. (If the lists are not the same length, the 
-operation produces only the number of terms equal to the shorter list.) begin and end, in 
-samples steps (i.e., samples is the number of steps). curve is an optional value that 
+    "Interpolates two lists of the same length. (If the lists are not the same length, the
+operation produces only the number of terms equal to the shorter list.) begin and end, in
+samples steps (i.e., samples is the number of steps). curve is an optional value that
 selects the type of interpolation:
 
-      1  =  straight line, 
+      1  =  straight line,
     < 1  =  convex
     > 1  =  concave
 
-If format    is  'incl' the two extremes are included in the output. If  format   is 
+If format    is  'incl' the two extremes are included in the output. If  format   is
 'excl' they are excluded."
                                         ;(*Esquisse* *Pitch*)
   (let ((int (abc-interpolation (list! begin) (list! end) samples
-                                (cond 
+                                (cond
                                   ((consp curves) curves)
                                   ((numberp curves) (list curves))
                                   (t (error "bad curves:~S~%" curves)) ))))
@@ -288,7 +288,7 @@ or decreasing in the interval"
 
 (defunp inverse ((xmin fix/float) (xmax fix/float (:value 100)) (value fix/float (:value 50))
                  (fun list (:value "(lambda(x)(* 2 x))"))) number
-    "binary searches x in the interval [xmin,xmax] , such that fun(x)=value. fun must 
+    "binary searches x in the interval [xmin,xmax] , such that fun(x)=value. fun must
 be either increasing
 or decreasing in the interval"
   (dicho-iter xmin xmax value (make-fun-object fun)))
@@ -420,14 +420,14 @@ or decreasing in the interval"
 
 (defun prime-facts (x)
   (let ((ip 1) (r) (n 0))
-    (while (and (> x 1) 
-                (<= (* (aref *prime-numbers* ip) 
+    (while (and (> x 1)
+                (<= (* (aref *prime-numbers* ip)
                        (aref *prime-numbers* ip))
                     x))
       (when (= 0 (mod x (aref *prime-numbers* ip)))
         (setq n 1)
-        (while (= 0 
-                  (progn (setq x (/ x (aref *prime-numbers* ip))) 
+        (while (= 0
+                  (progn (setq x (/ x (aref *prime-numbers* ip)))
                          (mod x (aref *prime-numbers* ip))))
           (incf n))
         (push  (list (aref *prime-numbers* ip) n) r))
@@ -436,12 +436,12 @@ or decreasing in the interval"
     (or (reverse r) (list (list 1 1)))))
 
 
-(defunp prime-ser ((max fix (:value 1000))) 
+(defunp prime-ser ((max fix (:value 1000)))
     list
-    "Returns the set of prime-numbers ranging from 0 upto max" 
+    "Returns the set of prime-numbers ranging from 0 upto max"
   (coerce (gen-prime max) 'list))
 
-(defunp prime-factors ((number fix (:value 1000))) 
+(defunp prime-factors ((number fix (:value 1000)))
     list
     "Returns the prime decomposition of  <number> in the form (... (prime exponent) ...)
 Primes known to the system are the 1230 primes ranging from 1 to 9973. They are

@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    A typing scheme for PW.
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    Mikael Laurson, Jacques Duthen, Camilo Rueda.
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
@@ -16,19 +16,19 @@
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
@@ -43,15 +43,15 @@
 (defgeneric stop-play           (patch) (:method (patch) (declare (ignorable patch))))
 (defgeneric open-patch-win      (patch) (:method (patch) (declare (ignorable patch))))
 (defgeneric record              (patch) (:method (patch) (declare (ignorable patch))))
-(defgeneric browse              (patch) (:method (patch) (declare (ignorable patch)))) 
+(defgeneric browse              (patch) (:method (patch) (declare (ignorable patch))))
 
 (defclass C-PW-type-set ()
   ((type-list :initform () :initarg :type-list :accessor type-list))
-  (:documentation 
+  (:documentation
    "the class of internal types. Type-list is an a-list of (type-name . type-obj) specs"))
 
 (defun make-type-set (list)
-  (make-instance 'C-PW-type-set 
+  (make-instance 'C-PW-type-set
                  :type-list (mapcar (lambda (type) (cons (type-name type) type)) list)))
 
 (defgeneric get-type (self type-name)
@@ -65,7 +65,7 @@
 
 (defgeneric delete-type (self type-name)
   (:method ((self C-PW-type-set) type-name)
-    (setf (type-list self) 
+    (setf (type-list self)
           (delete (list type-name) (type-list self) :key #'car :test #'string=))))
 
 (defgeneric add-type (self type)
@@ -80,7 +80,7 @@
                :initarg :type-specs :accessor type-specs)))
 
 (defun make-type-object (name class specs)
-  (make-instance 'C-pw-type-obj 
+  (make-instance 'C-pw-type-obj
                  :type-name name :type-class class :type-specs specs))
 
 (defgeneric merge-specs (self new-specs)
@@ -98,7 +98,7 @@
 
 (defun update-spec (key-value specs)
   (let ((sublist (member (first key-value) specs)))
-    (if sublist 
+    (if sublist
       (setf (second sublist) (cdr key-value))
       (error "invalid key-name ~S for type: ~S" (car key-value) (cdr key-value)))
     specs))
@@ -117,12 +117,12 @@
         (if (valid-keyword-p arg)
           (setq current-key arg)
           (error "invalid keyword: ~S" arg))
-        (setq collection 
+        (setq collection
               (substitute (cons current-key (append element (list arg)))
                           (cons current-key element)
                           collection :test (lambda (x y) (string= (car x) (car y)))))))
     collection))
-  
+
 (defun valid-keyword-p (arg)
   (and (symbolp arg)
        (member arg *valid-defune-keywords* :test (lambda (x y) (string= x (car y))))))
@@ -137,25 +137,25 @@
         (if (not (consp (car var-spec))) var-spec (car var-spec)))
       (dolist (key (cons '&required *valid-defp-keywords*) nil)
         (setq specs (cdr (assoc key args-types)))
-        (when specs 
+        (when specs
           (setq var-spec (cdr (assoc arg-name specs :test #'string=)))
-          (if var-spec 
+          (if var-spec
             (return (if (not (consp (car var-spec))) var-spec (car var-spec))))))
       )))
 
 
 ;;=========================
-;;PW-types 
+;;PW-types
 ;;=========================
 
 (defclass C-menubox-val-mod (C-menubox) ())
 
-(defmethod menubox-value ((self C-menubox-val-mod)) 
-  (car (call-next-method))) 
+(defmethod menubox-value ((self C-menubox-val-mod))
+  (car (call-next-method)))
 
-(defmethod patch-value ((self C-menubox-val-mod) obj) 
+(defmethod patch-value ((self C-menubox-val-mod) obj)
   (declare (ignore obj))
-  (cdr (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self)))) 
+  (cdr (nth (mod (value self) (length (menu-box-list self))) (menu-box-list self))))
 
 
 (defvar *box-open* nil)
@@ -176,15 +176,15 @@
 
 (defvar *pw-integer-type*
    (make-type-object 'integer 'C-numbox
-                     (list :view-size #@(36 14) :value 0 :min-val -9999 :max-val 999999 
+                     (list :view-size #@(36 14) :value 0 :min-val -9999 :max-val 999999
                            :doc-string "fix" :type-list '(fixnum))))
 (defvar *pw-fix/float-type*
   (make-type-object 'fix/float 'C-numbox
-                    (list :view-size #@(36 14) :value 0 :min-val -9999 :max-val 999999 
+                    (list :view-size #@(36 14) :value 0 :min-val -9999 :max-val 999999
                           :doc-string "fix/fl" :type-list '(fixnum float))))
 (defvar *pw-midic-type*
   (make-type-object 'midic 'C-numbox
-                    (list :view-size #@(36 14) :value 6000 :min-val 0 :max-val 12700 
+                    (list :view-size #@(36 14) :value 6000 :min-val 0 :max-val 12700
                           :doc-string "midic" :type-list '(fixnum list))))
 (defvar *pw-fx/fl/l-type*
   (make-type-object 'fix/fl/list 'C-numbox
@@ -192,17 +192,17 @@
                           :doc-string "fx/fl/l" :type-list '(fixnum float list))))
 (defvar *pw-approx-type*
   (make-type-object 'approx 'C-numbox
-                    (list :view-size #@(36 14) :value 1 :min-val 1 :max-val 16 
+                    (list :view-size #@(36 14) :value 1 :min-val 1 :max-val 16
                           :doc-string "approx" :type-list '(fixnum))))
 
 (defvar *pw-nilNum-type*
   (make-type-object 'nilNum 'C-numbox
-                    (list :view-size #@(36 14) :value 0 :min-val -9999 :max-val 999999 
+                    (list :view-size #@(36 14) :value 0 :min-val -9999 :max-val 999999
                           :doc-string "num" :type-list ())))
 
 (defvar *pw-positiveFix-type*
   (make-type-object 'Pfix 'C-numbox
-                    (list :view-size #@(36 14) :value 100 :min-val 0 :max-val 999999 
+                    (list :view-size #@(36 14) :value 100 :min-val 0 :max-val 999999
                           :doc-string "num" :type-list '(fixnum))))
 
 (defvar *pw-symbol-type*
@@ -212,12 +212,12 @@
 
 (defvar *pw-string-type*
   (make-type-object 'string 'C-ttybox-str
-                    (list :view-size #@(36 14) :dialog-item-text "name" 
+                    (list :view-size #@(36 14) :dialog-item-text "name"
                           :doc-string "str" :type-list '(list))))
 
 (defvar *pw-symEval-type*
   (make-type-object 'list-eval 'C-ttybox-eval
-                    (list :view-size #@(36 14) :dialog-item-text "lst" 
+                    (list :view-size #@(36 14) :dialog-item-text "lst"
                           :doc-string "list" :type-list '(list))))
 
 (defvar *pw-menu-type*
@@ -252,12 +252,12 @@
   (make-type-object 'ch-box 'C-chord-box
                  (list  :view-size (make-point 38 120)
                         :type-list '(list midic chord))))
-    
+
 (defvar *PW-all-basic-types*
-  (make-type-set 
+  (make-type-set
    (list *pw-integer-type* *pw-fix/float-type* *pw-midic-type* *pw-fx/fl/l-type*
-         *chord-box-M-pw-type* *pw-approx-type* *pw-nilNum-type* *pw-positiveFix-type* 
-         *pw-symbol-type* *pw-string-type* *pw-absin-type* *pw-symEval-type* *pw-menu-type* 
+         *chord-box-M-pw-type* *pw-approx-type* *pw-nilNum-type* *pw-positiveFix-type*
+         *pw-symbol-type* *pw-string-type* *pw-absin-type* *pw-symEval-type* *pw-menu-type*
          *pw-absout-type* *pw-absin-type* *pw-object-type* *pw-user-out-type* *pw-user-in-type*)))
 
 (defvar *pw-all-out-types*
@@ -308,7 +308,7 @@
 (defvar *pw-all-type-alias*
   `((list . fixs) (symbol . (fixs .  (:dialog-item-text "foo")))
     (freq . (fix/float . (:value 440 :doc-string "freq")))
-    (cents . midic) (freqs? . (fix/fl/list . (:value 440))) 
+    (cents . midic) (freqs? . (fix/fl/list . (:value 440)))
     (freqs . (fix/fl/list . (:value 440)))
     (midics? . midic) (chord . midic)
     (fix . fix/float) (fix>=0 . (Pfix . (:value 0)))
@@ -327,11 +327,11 @@
   (let ((alias (cdr (assoc type-name *pw-all-type-alias* :test #'string=)))
         type)
     (if alias
-      (values 
+      (values
        (merge-specs (setq type (get-type *PW-all-basic-types* (get-alias-name alias)))
                    (get-alias-specs alias))
        (type-class type))
-      (values 
+      (values
        (get-type-specs *PW-all-basic-types* type-name)
        (type-class (get-type *PW-all-basic-types* type-name))))))
 
@@ -355,7 +355,7 @@
              type-form)
             ((member :value (get-pw-type-specs (car type-form)))
              (list (car type-form) (list* :value value (cadr type-form))))
-            (t (list (car type-form) 
+            (t (list (car type-form)
                      (list* :dialog-item-text (format nil "~D" value) (cadr type-form))))))
     (if (member :value (get-pw-type-specs type-form))
       (list  type-form (list :value value))
@@ -392,7 +392,7 @@
 
 (defun get-arg-names (key a-list)
   "gets argument names from the type a-list"
-  (let ((type-list 
+  (let ((type-list
          (mapcar (if (string= key '&optional) #'collect-optionals #'car)
                  (cdr (assoc key a-list)))))
     (if type-list
@@ -402,7 +402,7 @@
     `(set-PW-symbolic-type-data ',name  ',(collect-keywords args) ',outtype))
 
 ;; (nconc (cassq 'function *define-type-alist*) (list "unp" "unt"))
-  
+
 (defgeneric set-PW-symbolic-type-data (me intypes outtype)
   (:documentation "the symbol stores information about its function")
   (:method ((me symbol) intypes outtype)
@@ -431,10 +431,10 @@
 (defun set-function-arg-names (fun name-list)
   (let (result)
     (setf (get fun '*type-intypes*)
-          (mapcar (lambda (args) 
+          (mapcar (lambda (args)
                       (setq result nil)
-                      (cons (car args) 
-                            (and name-list 
+                      (cons (car args)
+                            (and name-list
                                  (nreverse (dolist (var-form (cdr args) result)
                                              (push (cons (pop name-list) (cdr var-form))
                                                    result))))))
@@ -444,7 +444,7 @@
   (mapc (lambda (form) (check-io-type (if (not (consp (cadr form)))
                                           (cadr form) (caadr form)) :input fun))
         (cdr type-form)))
-  
+
 (defconstant *error-unknown-symbolic-pw-type* "unknown symbolic ~A type ~A for fun ~A")
 (defvar *keywords-for-extension* '(&optional &rest))
 
@@ -454,7 +454,7 @@
              (:output (assoc type *pw-all-out-types* :test #'string=)))
       (error *error-unknown-symbolic-pw-type* in-out type sym)))
 
-(defun find-out-type (name) 
+(defun find-out-type (name)
   (cdr (assoc name *pw-all-out-types* :test #'string=)))
 
 (defun get-arglist (function)
@@ -469,12 +469,12 @@
     (when (null (car arg-list)) ; no argument == (())
       (setq arg-list ()))
     (while (and arg-list (not (memq (car arg-list) *valid-defp-keywords*)))
-      (setq res 
+      (setq res
             (list* (string-downcase (string (setq name (pop arg-list))))
                    (multiple-value-bind (specs class)
                             (merge-pw-type-specs function name) (cons class specs)) res))
       (decf nb-arg))
-    (setq extensible? 
+    (setq extensible?
           (not (null (intersection arg-list *keywords-for-extension*))))
     (while (> nb-arg 0)
       (while (and arg-list
@@ -483,20 +483,20 @@
         (setq keyword (pop arg-list)))
       (case keyword
         (&rest
-         (repeat nb-arg 
-           (setq res (list* "arg" 
+         (repeat nb-arg
+           (setq res (list* "arg"
                             (multiple-value-bind (specs class)
                               (merge-pw-type-specs function (car arg-list))
                               (cons class specs))
                             res)))
          (setq nb-arg 0))
-        (t (if (endp arg-list) 
+        (t (if (endp arg-list)
              (progn (ui:ed-beep) (setq nb-arg 0))
              ;(error "Function ~S cannot provide ~D extra argument~:P.~%"
                    ; function nb-arg))
            (ccase keyword
                   (&optional
-                   (setq res 
+                   (setq res
                          (list* (string-downcase (string (setq name (pop arg-list))))
                                 (multiple-value-bind (specs class)
                                      (merge-pw-type-specs function name) (cons class specs))
@@ -509,7 +509,7 @@
   (let* ((args-types (get function '*type-intypes*))
          (type-a-list (get-arg-specs name args-types)))
     (unless type-a-list
-      (setq type-a-list 
+      (setq type-a-list
             (get-arg-specs name args-types (find-position name (get-arglist function)))))
     (multiple-value-bind (specs class)
                          (Get-Pw-Type-Specs (car type-a-list))
@@ -521,12 +521,12 @@
              (search-arg (cdr args) num)
              (if (eql (car args) var) num (search-arg (cdr args) (1+ num))))))
     (search-arg args 0)))
-  
+
 ;;=================================
 ;; the PW-box construction function
 ;;=================================
 
-(defun make-PW-standard-box (class-name pw-function 
+(defun make-PW-standard-box (class-name pw-function
                              &optional (position (make-point 15 15)) value-list size)
   (let ((input-boxes-types (make-defunp-function-arg-list pw-function (length value-list)))
         (y-now 5)
@@ -550,8 +550,8 @@
       (setq index (mod (incf index) 2)))
     (if (not (zerop index)) (incf y-now (+ 2 (h (car (last input-boxes))))))
     (setq module (make-instance class-name
-                                :view-position position 
-                                :view-size  (make-point 
+                                :view-position position
+                                :view-size  (make-point
                                              (+ 5  (if input-boxes
                                                        (apply #'max (ask-all input-boxes 'x+w))
                                                        42))
@@ -579,10 +579,10 @@
     box))
 
 (defun set-new-values (boxes values)
-  (mapc (lambda (box val) 
+  (mapc (lambda (box val)
             (unless (eql val :default)
               (setf (value box) val)
-              (set-dialog-item-text box 
+              (set-dialog-item-text box
                    (if (or (numberp val) (listp val))
                      (format () "~D" val)
                      val  ; (string-downcase val)
@@ -598,11 +598,11 @@
       (set-view-size box (make-point (truncate (* w-scale (w box)))
                                      (truncate (* h-scale (h box))))))))
 
-(defun make-functional-pw-boxes (function win) 
+(defun make-functional-pw-boxes (function win)
   (if (not (fboundp function))
       (format t "~15A~25A" function "no such function !" )
       (multiple-value-bind (args extensible?) (make-defunp-function-arg-list function)
-        (add-patch-box win 
+        (add-patch-box win
                        (make-PW-standard-box
                         (cond
                           (extensible?           'C-pw-functional)
@@ -612,10 +612,10 @@
 
 
 ;; (progn
-;;   (setq foo (make-type-object 'bar 'C-numbox 
+;;   (setq foo (make-type-object 'bar 'C-numbox
 ;;                               '(:value 4 :min-val -100 :max-val 400 :doc-string "bar")))
-;; 
-;;   (setq foo2 (make-type-object 'lago 'C-tty 
+;;
+;;   (setq foo2 (make-type-object 'lago 'C-tty
 ;;                                '(:value 'fru  :doc-string "logo")))
 ;;   (setq set (make-type-set (list foo2 foo)))
 ;;   (merge-specs (get-type set 'lago) '(min-val 887))
@@ -632,7 +632,7 @@
   (let (res)
     (do ((next-args args (cdr next-args)) (index 0 (1+ index)))
         ((null next-args) (nreverse res))
-      (push 
+      (push
        (cond
         ((string= (first next-args) '&optional)
          (prog1 (list (caadr next-args)

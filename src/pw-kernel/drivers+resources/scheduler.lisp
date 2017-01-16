@@ -5,9 +5,9 @@
 ;;;;SYSTEM:             Common-Lisp
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
-;;;;    
+;;;;
 ;;;;    XXX
-;;;;    
+;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;    Mikael Laurson
@@ -18,24 +18,24 @@
 ;;;;    2012-05-07 <PJB> Changed license to GPL3; Added this header.
 ;;;;    1991-07-15 [jack]      Scheduler.Lisp
 ;;;;    1991                   Scheduler -- CLPF V1.0 (after Lee Boynton) © 1991 IRCAM
-;;;;    1988       Lee Boynton preFORM 3.0 Scheduler 
+;;;;    1988       Lee Boynton preFORM 3.0 Scheduler
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
-;;;;    
+;;;;
 ;;;;    Copyright IRCAM 1986 - 2012
-;;;;    Copyright 1988 Lee Boynton, MIT Media Lab. For non-profit use only 
-;;;;    
+;;;;    Copyright 1988 Lee Boynton, MIT Media Lab. For non-profit use only
+;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
 ;;;;    the Free Software Foundation, either version 3 of the License, or
 ;;;;    (at your option) any later version.
-;;;;    
+;;;;
 ;;;;    This program is distributed in the hope that it will be useful,
 ;;;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;;;    GNU General Public License for more details.
-;;;;    
+;;;;
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
