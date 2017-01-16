@@ -37,6 +37,7 @@
                           "MAKE-PATHNAME"
                           "USER-HOMEDIR-PATHNAME"
                           "TRANSLATE-LOGICAL-PATHNAME")
+  (:use "PATCHWORK.LOGICAL-HOSTS")
   (:use "COM.INFORMATIMAGO.TOOLS.MANIFEST")
   (:use "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.FILE")
   (:export "*PATCHWORK-VERSION*"

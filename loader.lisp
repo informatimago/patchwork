@@ -34,6 +34,16 @@
 ;;;;**************************************************************************
 (in-package "COMMON-LISP-USER")
 
+(defun say (fmt &rest args)
+  (format t "~&;;; ~?~%" fmt args)
+  (finish-output))
+
+(defun local-file (name &optional type)
+  (make-pathname :name name
+                 :type type
+                 :version nil
+                 :defaults #.(or *compile-file-truename* *load-truename*)))
+
 ;;; --------------------------------------------------------------------
 ;;; Redirect swank streams.
 ;;; This is for the case where swank:*globally-redirect-io* is true.
@@ -95,6 +105,7 @@
 ;;   PW-USER  -- See src/application.lisp  initialize-directories
 ;;
 ;;   CLENI
+
 
 (say "Defining logical hosts.")
 (load (local-file "loghosts"))

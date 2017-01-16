@@ -40,7 +40,7 @@
 ## Configurable:
 
 #CCL_EXE=/data/languages/ccl/bin/ccl
-CCL_EXE=ccl
+CCL_EXE=ccl-1.11
 CCL=$(CCL_EXE) --no-init --batch
 CCL_EVAL=--eval
 
@@ -126,7 +126,7 @@ variables::
 help::
 	@printf "$(HELP_FORMAT)" "application" "Generates the application."
 application:clean
-	$(CCL_EXE) < generate-application.lisp
+	printf '(push :save-image-and-quit *features*)\n(load "generate-application.lisp")\n'|$(CCL_EXE)
 
 # There's a bug in ccl when generating an application from a loaded file…
 # $(LISP) \

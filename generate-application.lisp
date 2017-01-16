@@ -80,9 +80,8 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Configure quicklisp.
-;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
-#+(and ccl-1.6 (not ccl-1.7)) (push #P"/Users/pjb/src/public/lisp/" ql:*local-project-directories*)
 (say "Configure quicklisp.")
+;; On ccl-1.6/MacOSX 10.5.8, quicklisp doesn't deal properly with symbolic links in local-projects.
 (push (translate-logical-pathname #P"SRC:INFORMATIMAGO;") ql:*local-project-directories*)
 
 ;;; --------------------------------------------------------------------
@@ -160,16 +159,16 @@
 
 (ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
 (setf (logical-pathname-translations "RELEASE")
-      (make-logical-pathname-translations "" *release-directory*))
+      (make-translations "RELEASE" '() *release-directory*))
 
 (say "Generating manifest.")
 (let ((*default-pathname-defaults* *release-directory*)
       (*print-circle* nil))
   (let ((manifest-pathname (write-manifest *name-and-version* *program-system*))
         (git-source-sandboxes '(#P"SRC:INFORMATIMAGO;"
-                                #P"SRC:PATCHWORK:MCLGUI;"
-                                #P"SRC:PATCHWORK:PATCHWORK;"))
-        (svn-source-sandboxes '())
+                                #P"SRC:MCLGUI;"
+                                #P"SRC:PATCHWORK;"))
+        ;; (svn-source-sandboxes '())
         (pwd (ccl:current-directory)))
     (with-open-file (manifest manifest-pathname :direction :output
                                                 :if-exists :append
@@ -317,7 +316,7 @@
                  :|UTExportedTypeDeclarations| (exported-type-utis)
                  :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2014 Pascal Bourguignon~%License: GPL3")
                  ;; overriden by write-info-plist, I assume. :|NSMainNibFile| "MainMenu"
-                 :|NSPrincipalClass| "LispApplication"))
+                 :|NSPrincipalClass| "IDEApplication"))
    :nibfiles '()
                                         ; a list of user-specified nibfiles
                                         ; to be copied into the app bundle
@@ -331,21 +330,25 @@
    :altconsole nil))
 
 
-(say "*lisp-startup-functions* = ~S~%" ccl::*lisp-startup-functions*)
+(say "*lisp-startup-functions* = ~S" ccl::*lisp-startup-functions*)
+(say "*release-directory*      = ~S" *release-directory*)
+(say "save image and quit      = ~S" #+save-image-and-quit t #-save-image-and-quit nil)
 
-(unless *load-pathname*
+#+save-image-and-quit
+(progn
   (let ((destination (merge-pathnames #P"Patchwork.app/Contents/Resources/patchwork-icon.icns"
                                       *release-directory*)))
     (ensure-directories-exist destination)
     (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
                destination :element-type '(unsigned-byte 8) :if-exists :supersede))
+
   ;; this quits ccl:
-  (save-patchwork-application :name *program-name* :directory *release-directory*))
+  (save-patchwork-application :name *program-name* :directory *release-directory*)
 
+  #+lispworks
+  (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
+                              :console :always)
 
-#+lispworks
-(hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
-                            :console :always)
-
+  ) ;;unless
 
 ;;;; THE END ;;;;
