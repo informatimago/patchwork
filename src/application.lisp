@@ -121,15 +121,14 @@
 (defun initialize-patchwork ()
   "Initialize the Patchwork application.
 Must be called on the main thread."
-  (ui::reporting-errors
-    (ui:initialize)
-    (setf (application-name *application*) "Patchwork")
-    (initialize-streams)
-    (initialize-mn-editor)
-    (initialize-menus)
-    (initialize-beat-measure-line)
-    (initialize-directories)
-    #-(and)(installapple-event-handlers))
+  ;; (ui::reporting-errors (ui:initialize))
+  (ui::reporting-errors (setf (application-name *application*) "Patchwork"))
+  (ui::reporting-errors (initialize-streams))
+  (ui::reporting-errors (initialize-mn-editor))
+  (ui::reporting-errors (initialize-menus))
+  (ui::reporting-errors (initialize-beat-measure-line))
+  (ui::reporting-errors (initialize-directories))
+  ;;#-(and)(ui::reporting-errors (installapple-event-handlers)
   ;; ---
   (format *patchwork-io* "~2%Welcome to ~A Version ~A!~%~?"
           (application-name *application*)
@@ -141,51 +140,15 @@ Must be called on the main thread."
   (values))
 
 
-(defun date (&optional (date (get-universal-time)))
-  (format nil "~{~5*~4,'0D-~2:*~2,'0D-~2:*~2,'0D ~2:*~2,'0D:~2:*~2,'0D:~2:*~2,'0D~8*~}"
-          (multiple-value-list (decode-universal-time date))))
-
-(defun safe-repl (&rest arguments &key &allow-other-keys)
-  (loop
-    (handler-bind ((error (function invoke-debugger)))
-      (apply (function ccl::read-loop) arguments))))
-
 (defun short-package-name (package)
   (first (sort (copy-list (cons (package-name package) (package-nicknames package)))
                (function <) :key (function length))))
 
-;;; --------------------------------------------------------------------
-;;; Initialization of patchwork
 
-#+ccl (on-restore patchwork-ccl-repl
-        (setf ccl::*read-loop-function* 'safe-repl
-              ccl::*inhibit-greeting*    t))
+(defclass patchwork-application (ui:lisp-development-system)
+  ())
 
-(defvar *patchwork-trace-output* *trace-output*)
-
-(defun redirect-trace-output-to-file (pathname)
-  (setf *patchwork-trace-output* (open pathname
-                                       :direction :output
-                                       :if-does-not-exist :create
-                                       :if-exists :append
-                                       #+ccl :sharing #+ccl :lock)
-        *trace-output* *patchwork-trace-output*
-        (ui::aget ui::*event-environment-bindings* '*trace-output*) *patchwork-trace-output*)
-  (format *trace-output* "~%~A~2%" (date)))
-
-(on-restore patchwork-trace
-  (redirect-trace-output-to-file (merge-pathnames #P"Desktop/Patchwork-trace.txt"
-                                                  (user-homedir-pathname))))
-
-(on-startup patchwork-initialization
-  ;; in ccl-1.11, ccl::*application* is still nil here.
-  (let ((ccl::*application* (or ccl::*application* t)))
-    (eval-enqueue '(initialize-patchwork))))
-
-(setf (symbol-function 'patchwork-initialization)
-      (lambda nil (block patchwork-initialization
-                    (let ((ccl::*application*
-                            (or ccl::*application* t)))
-                      (eval-enqueue '(initialize-patchwork))))))
+(defmethod ui::application-did-finish-launching :after ((application patchwork-application))
+  (initialize-patchwork))
 
 ;;;; THE END ;;;;
