@@ -91,6 +91,7 @@
 (ql:quickload :com.informatimago.tools.pathname           :verbose t :explain t)
 (ql:quickload :com.informatimago.tools.manifest           :verbose t :explain t)
 (ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
+;; (ql:quickload :com.informatimago.common-lisp.interactive  :verbose t :explain t)
 
 (say "Load builder.")
 (load (local-file "builder"))
@@ -140,8 +141,8 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Loading patchwork
-(ql:quickload :patchwork                                  :verbose t :explain t)
-
+;; (ql:quickload :patchwork                                  :verbose t :explain t)
+(defpackage "PATCHWORK" (:use "CL") (:nicknames "PW"))
 
 (mapc (lambda (package) (unuse-package package "COMMON-LISP-USER"))
       (remove (find-package "COMMON-LISP") (package-use-list "COMMON-LISP-USER")))
@@ -156,6 +157,9 @@
                                    (make-pathname :directory (list :relative "Desktop"
                                                                    (executable-name *name-and-version*)))
                                    (user-homedir-pathname)))
+(defparameter *application-class* 'pw::patchwork-application) ; mclgui:application subclass
+(defparameter *principal-class*   "IdeApplication")           ; NSApplication subclass.
+
 
 (ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
 (setf (logical-pathname-translations "RELEASE")
@@ -273,7 +277,12 @@
     :|NSDocumentClass| "DisplayDocument")))
 
 
-(defun save-patchwork-application (&key (name "Patchwork") (directory #P"~/Desktop/"))
+(defun save-patchwork-application (&key
+                                     (name "Untitled Application")
+                                     (directory #P"~/Desktop/")
+                                     (principal-class "NSApplication")
+                                     (main-nib-file nil)
+                                     (nib-files '()))
   ;; ccl::build-application
   ;;  calls ccl::save-application
   ;;  calls ccl::%save-application-interal
@@ -314,25 +323,49 @@
                  :|LSMinimumSystemVersion| (if (featurep :cocoa-10.6) "10.6" "10.3")
                  :|CFBundleDevelopmentRegion| "English"
                  :|UTExportedTypeDeclarations| (exported-type-utis)
-                 :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2014 Pascal Bourguignon~%License: GPL3")
-                 ;; overriden by write-info-plist, I assume. :|NSMainNibFile| "MainMenu"
-                 :|NSPrincipalClass| "IDEApplication"))
-   :nibfiles '()
+                 :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2017 Pascal Bourguignon~%License: GPL3")
+
+                 ;; :|NSMainNibFile| main-nib-file ; overriden by write-info-plist, I assume.
+                 :|NSPrincipalClass| principal-class))
+   :nibfiles nib-files
                                         ; a list of user-specified nibfiles
                                         ; to be copied into the app bundle
-   :main-nib-name "MainMenu"
+   :main-nib-name main-nib-file
                                         ; the name of the nib that is to be loaded
                                         ; as the app's main. this name gets written
                                         ; into the Info.plist on the "NSMainNibFile" key
-   ;; :application-class #-ccl-1.9 'gui::cocoa-application #+ccl-1.9 'gui::lisp-application
+   ;; :application-class
+   ;; #-ccl-1.9 'gui::cocoa-application
+   ;; #+ccl-1.9 'gui::lisp-application
    :private-frameworks '()
    :toplevel-function nil
    :altconsole nil))
 
 
-(say "*lisp-startup-functions* = ~S" ccl::*lisp-startup-functions*)
+
+
+
+(say "old ui::*application*    = ~S"  ui::*application*)
+(if ui::*application*
+    (change-class ui::*application* *application-class*)
+    (setf ui::*application* (make-instance *application-class*)))
+(say "new ui::*application*    = ~S"  ui::*application*)
+
 (say "*release-directory*      = ~S" *release-directory*)
 (say "save image and quit      = ~S" #+save-image-and-quit t #-save-image-and-quit nil)
+
+(dolist (var
+         '(mclgui.system:*lisp-cleanup-functions*
+           mclgui.system:*save-exit-functions*
+           mclgui.system:*restore-lisp-functions*
+           mclgui.system:*lisp-user-pointer-functions*
+           mclgui.system:*lisp-startup-functions*
+           mclgui.system:*application-did-finish-launching-functions*
+           mclgui.system:*application-should-terminate-functions*))
+  (say "~50A = ~S" var (symbol-value var)))
+
+
+
 
 #+save-image-and-quit
 (progn
@@ -342,8 +375,19 @@
     (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
                destination :element-type '(unsigned-byte 8) :if-exists :supersede))
 
+  (progn ; print path of generated executable
+    (format t  "~%~A~%" (merge-pathnames (make-pathname :directory (list :relative
+                                                                         (format nil "~A.app" *program-name*)
+                                                                         "Contents" "MacOS")
+                                                        :name "Patchwork"
+                                                        :type nil)
+                                         *release-directory*))
+    (finish-output))
+
   ;; this quits ccl:
-  (save-patchwork-application :name *program-name* :directory *release-directory*)
+  (save-patchwork-application :name *program-name*
+                              :directory *release-directory*
+                              :principal-class *principal-class*)
 
   #+lispworks
   (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
