@@ -55,6 +55,7 @@
                )
   :components ((:file "packages"
                 :depends-on ("pw-kernel/environment/lelisp-macros"))
+
                (:file "gf"
                 :depends-on ("packages"))
 

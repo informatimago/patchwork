@@ -76,12 +76,6 @@
 
 
 
-#+(and ccl (not patchwork.builder::no-cocoa))
-(defmethod  ccl:application-init-file (app)
-  (declare (ignorable app))
-  #P"PW-USER:PW-inits;init.lisp")
-
-
 (defun logical-pathname-translations-directory ()
   (merge-pathnames #P"LOGHOSTS/" (user-homedir-pathname)))
 
@@ -121,7 +115,6 @@
 (defun initialize-patchwork ()
   "Initialize the Patchwork application.
 Must be called on the main thread."
-  ;; (ui::reporting-errors (ui:initialize))
   (ui::reporting-errors (setf (application-name *application*) "Patchwork"))
   (ui::reporting-errors (initialize-streams))
   (ui::reporting-errors (initialize-mn-editor))
@@ -130,13 +123,18 @@ Must be called on the main thread."
   (ui::reporting-errors (initialize-directories))
   ;;#-(and)(ui::reporting-errors (installapple-event-handlers)
   ;; ---
-  (format *patchwork-io* "~2%Welcome to ~A Version ~A!~%~?"
+  ;; We cannot flush yet, since the listener window is not open yet.
+  (format-trace  'initialize-patchwork
+                 (hemlock-ext:top-listener-input-stream)
+                 (hemlock-ext:top-listener-output-stream))
+  (format *trace-output* ;; *patchwork-io*
+          "~2%Welcome to ~A Version ~A!~%~?"
           (application-name *application*)
           patchwork.builder:*patchwork-version*
           #+ccl ccl:*listener-prompt-format* #+ccl '(0)
-          #-ccl "? "
-          )
-  (finish-output *patchwork-io*)
+          #-ccl "? ")
+  (finish-output *trace-output* ;; *patchwork-io*
+                 )
   (values))
 
 
@@ -145,10 +143,13 @@ Must be called on the main thread."
                (function <) :key (function length))))
 
 
-(defclass patchwork-application (ui:lisp-development-system)
+(defclass patchwork-application (cocoa-ide-application)
   ())
 
-(defmethod ui::application-did-finish-launching :after ((application patchwork-application))
+(defmethod application-init-file ((application patchwork-application))
+  (directory #P"PW-USER:PW-inits;*.lisp"))
+
+(defmethod application-did-finish-launching :after ((application patchwork-application))
   (initialize-patchwork))
 
 ;;;; THE END ;;;;

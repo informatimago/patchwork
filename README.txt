@@ -25,7 +25,7 @@ Installing the sources of Patchwork
 2- Obtain the sources and dependencies
 
    cd "${SRC}"
-   git clone git@gitorious.org:patchwork/scripts.git
+   git clone git@gitlab.com:patchwork/scripts.git
    scripts/get-sources
 
 3- Compile the dependencies and Patchwork
@@ -40,11 +40,11 @@ Sources and dependencies
 The sources of patchwork and dependencies are in the following git
 repositories (cf `scripts/get-sources`): ::
 
-    git clone git@gitorious.org:patchwork/scripts.git
+    git clone git@gitlab.com:patchwork/scripts.git
 
-    git clone git@gitorious.org:patchwork/midishare.git
-    git clone git@gitorious.org:patchwork/mclgui.git
-    git clone git@gitorious.org:patchwork/patchwork.git
+    git clone git@gitlab.com:patchwork/midishare.git
+    git clone git@gitlab.com:patchwork/mclgui.git
+    git clone git@gitlab.com:patchwork/patchwork.git
 
     svn co http://svn.clozure.com/publicsvn/ffigen4/branches/ffigen-apple-gcc-5646/ffigen4
     svn co https://subversion.assembla.com/svn/portaudio/portaudio/trunk portaudio
@@ -60,7 +60,7 @@ integrated into the monthly release of quicklisp.
 You can get an up-to-date version of informatimago from git: ::
 
         cd ~/quicklisp/local-projects
-        git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
+        git clone https://git.gitlab.com/com-informatimago/com-informatimago.git
 
 
 Note: with ccl-1.6 on MacOSX 10.5.8, symbolic links in
@@ -68,31 +68,16 @@ Note: with ccl-1.6 on MacOSX 10.5.8, symbolic links in
 Therefore you should put com-informatimago anywhere, eg.: ::
 
         cd ~/src
-        git clone https://git.gitorious.org/com-informatimago/com-informatimago.git
-        
+        git clone https://git.gitlab.com/com-informatimago/com-informatimago.git
+
 and just add this path to the list ``ql:*local-project-directories*``: ::
-       
+
         (push (merge-pathnames #P"./src/com-informatimago/" (user-homedir-pathname))
               ql:*local-project-directories*)
 
 
-.. comment: this is not needed anymore, the patchwork/builder.lisp script determines the logical pathname automatically.
-
-    2- Edit ``~/LOGHOSTS/PATCHWORK`` to tell where the sources of
-       Patchwork are installed, eg.: ::
-
-          ;; -*- mode:lisp; coding:utf-8; -*-
-
-          #.(list
-             (list "PATCHWORK:**;*.*.*"
-                   (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
-                                    (user-homedir-pathname) nil))
-             (list "PATCHWORK:**;*.*"
-                   (merge-pathnames #P"works/patchwork/patchwork/**/*.*"
-                                    (user-homedir-pathname) nil))
-             (list "PATCHWORK:**;*"
-                   (merge-pathnames #P"works/patchwork/patchwork/**/*"
-                                    (user-homedir-pathname) nil)))
+Normally, the ``patchwork/builder.lisp`` script determines the logical
+pathnames automatically, so other configuration is needed.
 
 
 Loading and compiling for development
@@ -105,6 +90,10 @@ Loading and compiling for development
 2- (cd #P"/directory/where/are/installed/the/sources/of/patchwork/")
 
 3- (load "loader.lisp")
+
+
+The current ccl version is 1.11 and the current MacOSX version
+is 10.12.3 macOS Sierra.
 
 
 Generate the Patchwork.app application
@@ -124,8 +113,8 @@ eg. ``~/Desktop/patchwork-10.0-0.000-ccl-1.9_darwinx8664-darwin-apple-13.1.0-x86
 A manifest file is written to containing the systems used and their licenses.
 
 The generated application is compatible with MacOSX 10.3 and up if
-compiled with ccl-1.6 on MacOSX 10.5.8, and with MacOSX 10.6 and more
-otherwise.
+compiled with ccl-1.6 on MacOSX 10.5.8, and with MacOSX 10.6 and up
+if compiled with a later ccl version on a later MacOSX version.
 
 
 Development tips
@@ -136,8 +125,9 @@ Development tips
   an error message that would disappear in the Finder.
 
 - The ``*trace-output*`` is configured for now to save to the file
-  ``~/Desktop/patchwork-trace.txt``.
+  ``~/Desktop/Patchwork-trace.txt``.
 
 
-.. comment:  THE END 
-
+.. comment:
+    __Pascal Bourguignon__
+    Sat Mar  4 20:56:21 CET 2017

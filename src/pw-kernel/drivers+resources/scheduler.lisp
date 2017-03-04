@@ -713,7 +713,7 @@ nil)
 
 
 (on-quit quit/scheduler (setq *eventhook* nil))
-(on-load-and-now init/scheduler (init-scheduler))
+(on-startup init/scheduler (init-scheduler))
 
 
 #||

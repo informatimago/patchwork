@@ -91,7 +91,7 @@
 (ql:quickload :com.informatimago.tools.pathname           :verbose t :explain t)
 (ql:quickload :com.informatimago.tools.manifest           :verbose t :explain t)
 (ql:quickload :com.informatimago.common-lisp.cesarum      :verbose t :explain t)
-;; (ql:quickload :com.informatimago.common-lisp.interactive  :verbose t :explain t)
+(ql:quickload :com.informatimago.common-lisp.interactive  :verbose t :explain t)
 
 (say "Load builder.")
 (load (local-file "builder"))
@@ -141,25 +141,31 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Loading patchwork
-;; (ql:quickload :patchwork                                  :verbose t :explain t)
-(defpackage "PATCHWORK" (:use "CL") (:nicknames "PW"))
+(ql:quickload :patchwork                                  :verbose t :explain t)
+;; (defpackage "PATCHWORK" (:use "CL") (:nicknames "PW"))
 
 (mapc (lambda (package) (unuse-package package "COMMON-LISP-USER"))
       (remove (find-package "COMMON-LISP") (package-use-list "COMMON-LISP-USER")))
 (use-package '("MCLGUI" "PATCHWORK") "COMMON-LISP-USER")
 
+
+;;; --------------------------------------------------------------------
+;;; Program Parameters
+
+(defparameter *program-name*                     "Patchwork")
+(defparameter *program-system*                   :patchwork)
+(defparameter *name-and-version*                 (format nil "~A-~A" *program-name* *patchwork-version*))
+(defparameter *release-directory*                (merge-pathnames
+                                                  (make-pathname :directory (list :relative "Desktop"
+                                                                                  (executable-name *name-and-version*)))
+                                                  (user-homedir-pathname)))
+(defparameter *application-class-name*           'pw::patchwork-application)   ; mclgui:application subclass
+(defparameter *application-delegate-class-name*  "MclguiApplicationDelegate")  ; IdeApplicationDelegate subclass
+(defparameter *principal-class-name*             "CCLApplication")             ; NSApplication subclass.
+
+
 ;;; --------------------------------------------------------------------
 ;;; Save the manifest.
-(defparameter *program-name*      "Patchwork")
-(defparameter *program-system*    :patchwork)
-(defparameter *name-and-version*  (format nil "~A-~A" *program-name* *patchwork-version*))
-(defparameter *release-directory* (merge-pathnames
-                                   (make-pathname :directory (list :relative "Desktop"
-                                                                   (executable-name *name-and-version*)))
-                                   (user-homedir-pathname)))
-(defparameter *application-class* 'pw::patchwork-application) ; mclgui:application subclass
-(defparameter *principal-class*   "IdeApplication")           ; NSApplication subclass.
-
 
 (ensure-directories-exist (merge-pathnames "TEST" *release-directory*))
 (setf (logical-pathname-translations "RELEASE")
@@ -280,20 +286,31 @@
 (defun save-patchwork-application (&key
                                      (name "Untitled Application")
                                      (directory #P"~/Desktop/")
-                                     (principal-class "NSApplication")
+                                     (application-class-name
+                                      #+(and ccl      (not ccl-1.9))  'gui::cocoa-application
+                                      #+(and ccl-1.9  (not ccl-1.10)) 'gui::lisp-application
+                                      #+(and ccl-1.10 (not ccl-1.11)) 'ccl::lisp-development-system
+                                      #+(and ccl-1.11)                'gui::cocoa-ide)
+                                     (principal-class-name "NSApplication")
+                                     (application-delegate-class-name nil)
                                      (main-nib-file nil)
                                      (nib-files '()))
+
+  #+(and ccl (not patchwork.builder::no-cocoa))
+  (when application-delegate-class-name
+    (setf gui::*delegate-class-name* application-delegate-class-name))
+
   ;; ccl::build-application
   ;;  calls ccl::save-application
   ;;  calls ccl::%save-application-interal
   ;;  calls ccl::save-image
-  #+ (and ccl (not patchwork.builder::no-cocoa))
+  #+(and ccl (not patchwork.builder::no-cocoa))
   (ccl::build-application ;; This doesn't return.
    :name name
    :directory directory
    :type-string "APPL"
    :creator-string "SOSP"
-   :copy-ide-resources t   ; whether to copy the IDE's resources
+   :copy-ide-resources t         ; whether to copy the IDE's resources
    ;; :info-plist nil         ; optional user-defined info-plist
    :info-plist (ui::unwrap
                 (dictionary
@@ -326,7 +343,7 @@
                  :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2017 Pascal Bourguignon~%License: GPL3")
 
                  ;; :|NSMainNibFile| main-nib-file ; overriden by write-info-plist, I assume.
-                 :|NSPrincipalClass| principal-class))
+                 :|NSPrincipalClass| principal-class-name))
    :nibfiles nib-files
                                         ; a list of user-specified nibfiles
                                         ; to be copied into the app bundle
@@ -334,24 +351,19 @@
                                         ; the name of the nib that is to be loaded
                                         ; as the app's main. this name gets written
                                         ; into the Info.plist on the "NSMainNibFile" key
-   ;; :application-class
-   ;; #-ccl-1.9 'gui::cocoa-application
-   ;; #+ccl-1.9 'gui::lisp-application
    :private-frameworks '()
-   :toplevel-function nil
+   :application-class application-class-name
+   :toplevel-function nil ; implies (gui::toplevel-function *application*)
    :altconsole nil))
 
 
 
 
 
-(say "old ui::*application*    = ~S"  ui::*application*)
-(if ui::*application*
-    (change-class ui::*application* *application-class*)
-    (setf ui::*application* (make-instance *application-class*)))
-(say "new ui::*application*    = ~S"  ui::*application*)
-
 (say "*release-directory*      = ~S" *release-directory*)
+(say "MCLGUI application class = ~S" *application-class-name*)
+(say "Cocoa application class  = ~S" *principal-class-name*)
+(say "Cocoa delegate class     = ~S" *application-delegate-class-name*)
 (say "save image and quit      = ~S" #+save-image-and-quit t #-save-image-and-quit nil)
 
 (dolist (var
@@ -363,8 +375,6 @@
            mclgui.system:*application-did-finish-launching-functions*
            mclgui.system:*application-should-terminate-functions*))
   (say "~50A = ~S" var (symbol-value var)))
-
-
 
 
 #+save-image-and-quit
@@ -387,7 +397,9 @@
   ;; this quits ccl:
   (save-patchwork-application :name *program-name*
                               :directory *release-directory*
-                              :principal-class *principal-class*)
+                              :application-class-name *application-class-name*
+                              :principal-class-name *principal-class-name*
+                              :application-delegate-class-name *application-delegate-class-name*)
 
   #+lispworks
   (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
