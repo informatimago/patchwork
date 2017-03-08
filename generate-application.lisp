@@ -175,9 +175,11 @@
 (let ((*default-pathname-defaults* *release-directory*)
       (*print-circle* nil))
   (let ((manifest-pathname (write-manifest *name-and-version* *program-system*))
-        (git-source-sandboxes '(#P"SRC:INFORMATIMAGO;"
+        (git-source-sandboxes '(#P"SRC:PATCHWORK;"
                                 #P"SRC:MCLGUI;"
-                                #P"SRC:PATCHWORK;"))
+                                #P"SRC:MIDI;"
+                                #P"SRC:MIDISHARE;"
+                                #P"SRC:INFORMATIMAGO;"))
         ;; (svn-source-sandboxes '())
         (pwd (ccl:current-directory)))
     (with-open-file (manifest manifest-pathname :direction :output
