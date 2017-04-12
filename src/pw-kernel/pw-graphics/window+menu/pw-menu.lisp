@@ -581,6 +581,5 @@
   ;; (on-quit cleanup-PW-wins)
   )
 
-;; (initialize-menus)
 
 ;;;; THE END ;;;;

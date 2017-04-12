@@ -1,10 +1,20 @@
 .. comment:  -*- mode:rst; coding:utf-8 -*-
 
-PATCHWORK RELEASE NOTES 
+PATCHWORK RELEASE NOTES
 ========================
 
 next release
 -----------------------
+
+- updated to work on macOS Sierra.
+- lisp files from ~/Documents/Patchwork/PW-inits/ are loaded when the
+  application is launched, for user initialization.
+
+Bugs remaining in patchwork-10.1-0.838-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64:
+
+- instance drawing doesn't occur (threads?) (moving boxes).
+- lines don't draw (threads?)
+- streams are in a mess (redirection to the Listener window is broken).
 
 
 10.0-0.607
@@ -15,7 +25,7 @@ next release
 - Made use of the Maestro font instead of Mus-Not-j, corrected chord-box displaying.
 - Added (interlock subs-posn group-list first-n last-n) to Kernel/List menu.
 - Corrected origin of line when click-and-dragging from the output box.
-- Implemented TextEdit, editable-text-dialog-item.  
+- Implemented TextEdit, editable-text-dialog-item.
   Still need some graphic adjustments, and some integration debugging.
 
 
@@ -43,13 +53,13 @@ Lisp MIDI library (from Robert Strandh at Bordeaux), instead of
 MidiShare, which is not entirely ported to MacOSX 64-bit yet.
 
 This release uses the new graphic model where MCL view classes don't
-have a matching Cocoa NSView class.  
+have a matching Cocoa NSView class.
 
 The text fields, controls and dialogs are not completed yet.
 
 
 - PW-USER configured by default as ~/Documents/Patchwork/
-  This can be changed by adding or editing the file ~/LOGHOSTS/PW-USER 
+  This can be changed by adding or editing the file ~/LOGHOSTS/PW-USER
   with a sexp such as: ::
 
       #.(let ((pw-user (merge-pathnames #P"Documents/Patchwork/" (user-homedir-pathname))))
@@ -87,7 +97,7 @@ The text fields, controls and dialogs are not completed yet.
 - patchwork-trace.txt is written in the user's Desktop instead of pjb's.
 
 
-10.0-0.922, 10.0-0.919 
+10.0-0.922, 10.0-0.919
 ----------------------
 
 - Set the minimum system version to 10.3 when compiled on 10.5 and 10.6 otherwise.
@@ -99,4 +109,5 @@ The text fields, controls and dialogs are not completed yet.
 - Added instance drawing to replace srcXor trick.
 
 
-.. comment:  THE END 
+10.1-0.915
+.. comment:  THE END

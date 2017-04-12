@@ -54,14 +54,19 @@
                           (com.informatimago.common-lisp.cesarum.stream:stream-output-stream
                            *terminal-io*)))
                     (lambda ()
-                      (or (hemlock-ext:top-listener-output-stream)
-                          default-stream))))))
+                      (let ((hemlock-stream (hemlock-ext:top-listener-output-stream)))
+                        (if (and hemlock-stream
+                                 #+ccl (gui::dob-output-data (slot-value hemlock-stream 'gui::buffer)))
+                            hemlock-stream
+                            default-stream)))))))
 
 
-(defvar *patchwork-io* (make-synonym-stream '*terminal-io*))
+(defvar *old-terminal-io* (make-synonym-stream '*terminal-io*))
+(defvar *patchwork-io*    (make-synonym-stream '*terminal-io*))
 #+swank (defvar swank::*current-terminal-io*)
 
 (defun initialize-streams ()
+  (setf *old-terminal-io* *terminal-io*)
   (setf *patchwork-io* (make-patchwork-io))
   #+swank (setf swank::*current-terminal-io* *patchwork-io*)
   (let ((stream (make-synonym-stream '*terminal-io*)))
@@ -115,26 +120,18 @@
 (defun initialize-patchwork ()
   "Initialize the Patchwork application.
 Must be called on the main thread."
-  (ui::reporting-errors (setf (application-name *application*) "Patchwork"))
+  (format *error-output* "~&initialize-patchwork before~%")
+  (format-trace 'initialize-patchwork *error-output*)
   (ui::reporting-errors (initialize-streams))
+  (format *error-output* "~&initialize-patchwork after~%")
+  (format-trace 'initialize-patchwork *error-output* *terminal-io*)
   (ui::reporting-errors (initialize-mn-editor))
   (ui::reporting-errors (initialize-menus))
+  (ui::reporting-errors (setf (application-name *application*) "Patchwork"))
   (ui::reporting-errors (initialize-beat-measure-line))
   (ui::reporting-errors (initialize-directories))
   ;;#-(and)(ui::reporting-errors (installapple-event-handlers)
-  ;; ---
   ;; We cannot flush yet, since the listener window is not open yet.
-  (format-trace  'initialize-patchwork
-                 (hemlock-ext:top-listener-input-stream)
-                 (hemlock-ext:top-listener-output-stream))
-  (format *trace-output* ;; *patchwork-io*
-          "~2%Welcome to ~A Version ~A!~%~?"
-          (application-name *application*)
-          patchwork.builder:*patchwork-version*
-          #+ccl ccl:*listener-prompt-format* #+ccl '(0)
-          #-ccl "? ")
-  (finish-output *trace-output* ;; *patchwork-io*
-                 )
   (values))
 
 
@@ -144,12 +141,95 @@ Must be called on the main thread."
 
 
 (defclass patchwork-application (cocoa-ide-application)
-  ())
+  ((%flags :initform 0)))
+
+(defgeneric %did-show-welcome (application)
+  (:method ((self patchwork-application)) (logbitp (slot-value self '%flags) 0)))
+(defgeneric %initialized (application)
+  (:method ((self patchwork-application)) (logbitp (slot-value self '%flags) 1)))
+(defgeneric set-%did-show-welcome (application)
+  (:method ((self patchwork-application)) (dpb (slot-value self '%flags) (byte 1 0) 1)))
+(defgeneric set-%initialized (application)
+  (:method ((self patchwork-application)) (dpb (slot-value self '%flags) (byte 1 1) 1)))
+
+
+(defgeneric show-welcome (application)
+  (:method ((application patchwork-application))
+    (unless (%did-show-welcome application)
+      (dolist (stream-var '(*terminal-io*
+                            *standard-input*
+                            *standard-output*
+                            *error-output*
+                            *trace-output*
+                            *query-io*
+                            *debug-io*))
+        (format t "~&~40A = ~S~%" stream-var (symbol-value stream-var)))
+      (format t "~% ~S~% ~S~%"
+              (application-name *application*)
+              (application-name application))
+      (format t
+              "~2%Welcome to ~A Version ~A!~%~?"
+              (application-name application)
+              patchwork.builder:*patchwork-version*
+              #+ccl ccl:*listener-prompt-format* #+ccl '(0)
+              #-ccl "? ")
+      (finish-output)
+      (set-%did-show-welcome application))
+    (values)))
+
 
 (defmethod application-init-file ((application patchwork-application))
   (directory #P"PW-USER:PW-inits;*.lisp"))
 
+
+(defmethod application-will-finish-launching ((application patchwork-application))
+  (format *error-output* "~S ~S :name ~:[nil~;~A~]  (eq self *application*) = ~A~%"
+          'application-will-finish-launching
+          *application*
+          (and *application* (application-name *application*))
+          (eq application *application*))
+  (call-next-method))
+
+(defmethod application-did-finish-launching :before ((application patchwork-application))
+  (format-trace 'application-did-finish-launching  :before (application-name application) application)
+  (values))
+
+(defmethod application-did-finish-launching ((application patchwork-application))
+  (format-trace 'application-did-finish-launching (eq application *application*))
+  (call-next-method)
+  (format-trace 'application-did-finish-launching "after call-next-method" :%initialized  (%initialized application))
+  ;; (application-eval-enqueue application '(show-welcome *application*))
+  (format-trace 'application-did-finish-launching  :after :before (application-name application) application)
+  (initialize-patchwork)
+  (set-%initialized application)
+  (format-trace 'application-did-finish-launching  :after :after (application-name application) application)
+  (show-welcome application)
+  (values))
+
 (defmethod application-did-finish-launching :after ((application patchwork-application))
-  (initialize-patchwork))
+  (format-trace 'application-did-finish-launching :after application (application-name application))
+  (format-trace 'application-did-finish-launching :after *application*
+                (and *application* (application-name *application*))
+                '(eq application *application*) (eq application *application*))
+  (values))
+
+(defmethod application-will-become-active ((application patchwork-application))
+  (format-trace 'application-will-become-active application)
+  (call-next-method))
+
+(defmethod application-will-become-active :after ((application patchwork-application))
+  (format-trace 'application-will-become-active :after application))
+
+(defmethod application-did-become-active ((application patchwork-application))
+  (format-trace 'application-did-become-active application)
+  (call-next-method))
+
+(defmethod application-will-resign-active ((application patchwork-application))
+  (format-trace 'application-will-resign-active application)
+  (call-next-method))
+
+(defmethod application-did-resign-active ((application patchwork-application))
+  (format-trace 'application-did-resign-active application)
+  (call-next-method))
 
 ;;;; THE END ;;;;
