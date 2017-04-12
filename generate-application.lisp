@@ -375,7 +375,9 @@
            mclgui.system:*lisp-user-pointer-functions*
            mclgui.system:*lisp-startup-functions*
            mclgui.system:*application-did-finish-launching-functions*
-           mclgui.system:*application-should-terminate-functions*))
+           mclgui.system:*application-should-terminate-functions*
+           ccl:*application*
+           ui:*application*))
   (say "~50A = ~S" var (symbol-value var)))
 
 
