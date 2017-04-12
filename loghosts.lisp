@@ -257,6 +257,7 @@ TRANSLATIONS: a list of logical pathname translations.
                 '("PATCHWORK")      "patchwork/"                   src
                 '("MCLGUI")         "mclgui/"                      src
                 '("MIDI")           "midi/"                        src
+                '("MIDISHARE")      "midishare/"                   src
                 '()                 "src/"                         home)
 
       (set-host "PATCHWORK"
