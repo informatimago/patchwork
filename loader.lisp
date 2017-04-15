@@ -150,6 +150,7 @@
                                    :debug-views-instance
                                    :debug-event
                                    :debug-focused-view
+                                   :debug-streams
                                    :debug-text
                                    patchwork.builder::no-cocoa
                                    patchwork.builder::use-apple-events
@@ -157,6 +158,8 @@
                                    patchwork.builder::use-midishare
                                    patchwork.builder::use-cl-midi)))
 
+;; (pushnew :debug-streams        *features*)
+;; (pushnew :debug-trace          *features*)
 ;; (pushnew :debug-wrapper        *features*)
 ;; (pushnew :debug-objc           *features*)
    (pushnew :debug-graphics       *features*)
@@ -164,7 +167,7 @@
 ;; (pushnew :debug-views-colors   *features*)
 ;; (pushnew :debug-views-instance *features*)
 ;; (pushnew :debug-focused-view   *features*)
-;; (pushnew :debug-event          *features*)
+;; (pushnew :debug-event          *features*)/Users/pjb/Desktop/patchwork-10.1-0.836-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64/Patchwork.app/Contents/MacOS/Patchwork
 ;; (pushnew :debug-text           *features*)
 ;; (pushnew 'patchwork.builder::no-cocoa          *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events  *features*)
