@@ -127,7 +127,7 @@ Must be called on the main thread."
         (format t "~% ~S~% ~S~%"
                 (application-name *application*)
                 (application-name application)))
-      
+
       (format t "~2%Welcome to ~A Version ~A!~%~?"
               (application-name application)
               patchwork.builder:*patchwork-version*
