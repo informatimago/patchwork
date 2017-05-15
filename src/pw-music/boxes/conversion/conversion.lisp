@@ -216,12 +216,12 @@ frequency resolution of the approximation. A value of 100 specifies   semitone
 symbolic interval name.
 Intervals are labeled as follows:
 
-	1 = unison		2m = minor second
-	2M = major second	3m = minor third
-	3M = major third	4 = perfect fourth	
-	4A = tritone		5 = perfect fifth	
-	6m = minor sixth	6M = major sixth	
-	7m = minor seventh	7M = major seventh
+        1 = unison              2m = minor second
+        2M = major second       3m = minor third
+        3M = major third        4 = perfect fourth
+        4A = tritone            5 = perfect fifth
+        6m = minor sixth        6M = major sixth
+        7m = minor seventh      7M = major seventh
 
 All intervals larger than an octave are expressed by adding or  subtracting an
 octave displacement after the simple interval name;
@@ -246,12 +246,12 @@ program has a strange way of expressing downward intervals:
   "<symb->int> takes a symbolic interval name  , and returns an interval
 expressed in midi-cents. Intervals are labeled as follows:
 
-	1 = unison			2m = minor second
-	2M = major second	3m = minor third
-	3M = major third		4 = perfect fourth	
-	4A = tritone		5 = perfect fifth	
-	6m = minor sixth		6M = major sixth	
-	7m = minor seventh	7M = major seventh
+        1 = unison                      2m = minor second
+        2M = major second       3m = minor third
+        3M = major third                4 = perfect fourth
+        4A = tritone            5 = perfect fifth
+        6m = minor sixth                6M = major sixth
+        7m = minor seventh      7M = major seventh
 
 All intervals larger than an octave are expressed by adding or subtracting an
 octave displacement after the simple interval name;

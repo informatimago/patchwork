@@ -141,7 +141,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 			MidiShare Constant Definitions
+;;;                     MidiShare Constant Definitions
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -178,17 +178,17 @@
 (defconstant typeNonRegParam 132)
 (defconstant typeRegParam    133)
 
-(defconstant typeSeqNum	     134)
+(defconstant typeSeqNum      134)
 (defconstant typeTextual     135)
 (defconstant typeCopyright   136)
 (defconstant typeSeqName     137)
 (defconstant typeInstrName   138)
-(defconstant typeLyric	     139)
-(defconstant typeMarker	     140)
+(defconstant typeLyric       139)
+(defconstant typeMarker      140)
 (defconstant typeCuePoint    141)
 (defconstant typeChanPrefix  142)
 (defconstant typeEndTrack    143)
-(defconstant typeTempo	     144)
+(defconstant typeTempo       144)
 (defconstant typeSMPTEOffset 145)
 
 (defconstant typeTimeSign    146)
@@ -250,7 +250,7 @@
 (defconstant MIDIChgSlotName    16)
 
 ;;;-----------------------------------------------------------------------
-;;; 			 To Add Startup and Quit Actions
+;;;                      To Add Startup and Quit Actions
 ;;;-----------------------------------------------------------------------
 
 (unless (and (boundp '*lisp-startup-functions*)
@@ -268,7 +268,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;; 	Interface for MCL 4.2, 4.3. and 5.0 on Macintosh
+;;;     Interface for MCL 4.2, 4.3. and 5.0 on Macintosh
 ;;;-----------------------------------------------------------------------
 
 
@@ -282,7 +282,7 @@
 
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 				Utilities
+;;;                             Utilities
 ;;;
 ;;;-----------------------------------------------------------------------
 
@@ -315,7 +315,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 			MidiShare Data Structures
+;;;                     MidiShare Data Structures
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -426,7 +426,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 		Macros for accessing MidiShare Events data structures
+;;;             Macros for accessing MidiShare Events data structures
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -696,7 +696,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 		Macros for accessing MidiShare Sequences data structures
+;;;             Macros for accessing MidiShare Sequences data structures
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -718,14 +718,14 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 				MidiShare Entry Points
+;;;                             MidiShare Entry Points
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
 
 ;;;-----------------------------------------------------------------------
-;;;			 MCL 5.0
+;;;                      MCL 5.0
 ;;;-----------------------------------------------------------------------
 
 #+CCL-5.0
@@ -807,7 +807,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Know about MidiShare and Active Sessions
+;;;                     To Know about MidiShare and Active Sessions
 ;;;-----------------------------------------------------------------------
 
 
@@ -843,7 +843,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Open and Close a MidiShare session
+;;;                     To Open and Close a MidiShare session
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiOpen
@@ -861,7 +861,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Configure a MidiShare session
+;;;                     To Configure a MidiShare session
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiGetName
@@ -982,7 +982,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare IAC and Midi Ports
+;;;                     To Manage MidiShare IAC and Midi Ports
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiConnect
@@ -1012,7 +1012,7 @@
                     :signed-halfword port :unsigned-byte state :void))
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare events
+;;;                     To Manage MidiShare events
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiFreeSpace
@@ -1068,7 +1068,7 @@
                     :address ev :signed-fullword))
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare Sequences
+;;;                     To Manage MidiShare Sequences
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiNewSeq
@@ -1102,7 +1102,7 @@
                      :address seq :address proc :void))
 
 ;;;-----------------------------------------------------------------------
-;;;				   MidiShare Time
+;;;                                MidiShare Time
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiGetTime
@@ -1112,7 +1112,7 @@
                     :unsigned-fullword))
 
 ;;;-----------------------------------------------------------------------
-;;;				To Send MidiShare events
+;;;                             To Send MidiShare events
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiSendIm
@@ -1391,7 +1391,7 @@
 (progn
 
 ;;;-----------------------------------------------------------------------
-;;;			To Know about MidiShare and Active Sessions
+;;;                     To Know about MidiShare and Active Sessions
 ;;;-----------------------------------------------------------------------
 
 
@@ -1443,7 +1443,7 @@
     (%%unsigned-to-signed-word (ff-call *midiShare* :ptr s :d0 3 :word))))
 
 ;;;-----------------------------------------------------------------------
-;;;			To Open and Close a MidiShare session
+;;;                     To Open and Close a MidiShare session
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiOpen
@@ -1459,7 +1459,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Configure a MidiShare session
+;;;                     To Configure a MidiShare session
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiGetName
@@ -1555,7 +1555,7 @@
   (ff-call *midiShare* :word refNum :ptr alarm :d0 #x0F))
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare IAC and Midi Ports
+;;;                     To Manage MidiShare IAC and Midi Ports
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiConnect
@@ -1579,7 +1579,7 @@
   (ff-call *midiShare* :word port :word state :d0 #x13))
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare events
+;;;                     To Manage MidiShare events
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiFreeSpace
@@ -1623,7 +1623,7 @@
   (ff-call *midiShare* :ptr ev :d0 #x3C :long))
 
 ;;;-----------------------------------------------------------------------
-;;			To Manage MidiShare Sequences
+;;                      To Manage MidiShare Sequences
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiNewSeq
@@ -1652,7 +1652,7 @@
   (ff-call *midiShare* :ptr seq :ptr proc :d0 #x21))
 
 ;;;-----------------------------------------------------------------------
-;;;				   MidiShare Time
+;;;                                MidiShare Time
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiGetTime
@@ -1661,7 +1661,7 @@
   (ff-call *midiShare* :d0 #x22 :long))
 
 ;;;-----------------------------------------------------------------------
-;;;				To Send MidiShare events
+;;;                             To Send MidiShare events
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiSendIm
@@ -1882,13 +1882,13 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 			To Install and Remove the MidiShare Interface
+;;;                     To Install and Remove the MidiShare Interface
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
 ;;;-----------------------------------------------------------------------
-;;; 	 		MidiShare Startup and Quit Actions
+;;;                     MidiShare Startup and Quit Actions
 ;;;-----------------------------------------------------------------------
 
 
@@ -1918,7 +1918,7 @@
 #+openmcl
 
 ;;;-----------------------------------------------------------------------
-;;; 			Interface for OpenMCL/OSX
+;;;                     Interface for OpenMCL/OSX
 ;;;-----------------------------------------------------------------------
 
 (progn
@@ -2602,14 +2602,14 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;; 			Interface for CMULisp on Linux
+;;;                     Interface for CMULisp on Linux
 ;;;-----------------------------------------------------------------------
 
 #+(and linux cmu)
 
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 				Utilities
+;;;                             Utilities
 ;;;
 ;;;-----------------------------------------------------------------------
 
@@ -2641,7 +2641,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 				MidiShare Data Structures
+;;;                             MidiShare Data Structures
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -2651,8 +2651,8 @@
 
 (def-alien-type nil
   (struct TMidiSEX
-	  (link  (*(struct TMidiSEX)) )
-	  (data  (array char 12)      )
+          (link  (*(struct TMidiSEX)) )
+          (data  (array char 12)      )
   )
 )
 
@@ -2661,13 +2661,13 @@
 
 (def-alien-type nil
   (struct TMidiST
-	  (ptr1 ptr )
-	  (ptr2 ptr )
-	  (ptr3 ptr )
-	  (ptr4 ptr )
+          (ptr1 ptr )
+          (ptr2 ptr )
+          (ptr3 ptr )
+          (ptr4 ptr )
   )
 )
-	
+
 
 ;;;-----------------------------------------------------------------------
 ;;; Common Record for all MidiShare events
@@ -2677,16 +2677,16 @@
 
 (def-alien-type nil
   (struct PitchVelDur
-	  (pitch char  )
-	  (vel   char  )
-	  (dur   short )))
+          (pitch char  )
+          (vel   char  )
+          (dur   short )))
 
 (def-alien-type nil
   (struct datas
-	  (data0 char)
-	  (data1 char)
-	  (data2 char)
-	  (data3 char) ))
+          (data0 char)
+          (data1 char)
+          (data2 char)
+          (data3 char) ))
 
 (def-alien-type T_info long)
 (def-alien-type T_linkSE (*(struct TMidiSEX)))
@@ -2694,11 +2694,11 @@
 
 (def-alien-type nil
    (union evData
-	  (note (struct pitchVelDur))
-	  (data (struct datas      ))
-	  (info T_info              )
-	  (linkSE T_linkSE          )
-	  (linkST T_linkST          )))
+          (note (struct pitchVelDur))
+          (data (struct datas      ))
+          (info T_info              )
+          (linkSE T_linkSE          )
+          (linkST T_linkST          )))
 
 
 ;;; The last field of a TMidiEv is either :
@@ -2712,13 +2712,13 @@
 
 (def-alien-type nil
   (struct TMidiEv
-	  (link    (*(struct TMidiEv))  )
-	  (date    long                 )
-	  (evtype  char                 )
-	  (ref     char                 )
-	  (port    char                 )
-	  (chan    char                 )
-	  (data  (union evData)         )
+          (link    (*(struct TMidiEv))  )
+          (date    long                 )
+          (evtype  char                 )
+          (ref     char                 )
+          (port    char                 )
+          (chan    char                 )
+          (data  (union evData)         )
    )
 )
 
@@ -2729,10 +2729,10 @@
 
 (def-alien-type nil
   (struct TMidiSeq
-	  (first   (*(struct TMidiEv)) )
-	  (last    (*(struct TMidiEv)) )
-	  (undef1  ptr                 )
-	  (undef2  ptr                 )
+          (first   (*(struct TMidiEv)) )
+          (last    (*(struct TMidiEv)) )
+          (undef1  ptr                 )
+          (undef2  ptr                 )
   )
 )
 
@@ -2742,17 +2742,17 @@
 
 (def-alien-type nil
   (struct TSyncInfo
-	  (time        long   )
-	  (reenter     long   )
-	  (syncMode    short  )
-	  (syncLocked  char   )
-	  (syncPort    char   )
-	  (syncStart   long   )
-	  (syncStop    long   )
-	  (syncOffset  long   )
-	  (syncSpeed   long   )
-	  (SyncBreaks  long   )
-	  (syncFormat  short  )
+          (time        long   )
+          (reenter     long   )
+          (syncMode    short  )
+          (syncLocked  char   )
+          (syncPort    char   )
+          (syncStart   long   )
+          (syncStop    long   )
+          (syncOffset  long   )
+          (syncSpeed   long   )
+          (SyncBreaks  long   )
+          (syncFormat  short  )
   )
 )
 
@@ -2762,12 +2762,12 @@
 
 (def-alien-type nil
   (struct TSmpteLocation
-	  (format   short )
-	  (hours    short )
-	  (minutes  short )
-	  (seconds  short )
-	  (frames   short )
-	  (fracs    short )
+          (format   short )
+          (hours    short )
+          (minutes  short )
+          (seconds  short )
+          (frames   short )
+          (fracs    short )
   )
 )
 
@@ -2777,10 +2777,10 @@
 
 (def-alien-type nil
   (struct TFilter
-	  (port    (array char 32) )
-	  (evType  (array char 32) )
-	  (channel (array char 2)  )
-	  (unused  (array char 2)  )
+          (port    (array char 32) )
+          (evType  (array char 32) )
+          (channel (array char 2)  )
+          (unused  (array char 2)  )
   )
 )
 
@@ -2800,7 +2800,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 		Macros for accessing MidiShare Events data structures
+;;;             Macros for accessing MidiShare Events data structures
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -3170,7 +3170,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 	Accessing MidiShare Sequences data structures
+;;;     Accessing MidiShare Sequences data structures
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -3199,7 +3199,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 				MidiShare Entry Points
+;;;                             MidiShare Entry Points
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -3220,7 +3220,7 @@
 (defvar *midiShare*)
 
 ;;;-----------------------------------------------------------------------
-;;;			To Know about MidiShare and Active Sessions
+;;;                     To Know about MidiShare and Active Sessions
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiShare
@@ -3253,7 +3253,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Open and Close a MidiShare session
+;;;                     To Open and Close a MidiShare session
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiOpen
@@ -3271,7 +3271,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Configure a MidiShare session
+;;;                     To Configure a MidiShare session
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiGetName
@@ -3388,7 +3388,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare IAC and Midi Ports
+;;;                     To Manage MidiShare IAC and Midi Ports
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiConnect
@@ -3417,7 +3417,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare events
+;;;                     To Manage MidiShare events
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiFreeSpace
@@ -3529,7 +3529,7 @@
   (ev MidiEvPtr) (date short))
 
 ;;;-----------------------------------------------------------------------
-;;;			To Manage MidiShare Sequences
+;;;                     To Manage MidiShare Sequences
 ;;;-----------------------------------------------------------------------
 
 
@@ -3588,7 +3588,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;				   MidiShare Time
+;;;                                MidiShare Time
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiGetTime
@@ -3597,7 +3597,7 @@
   "give the current time")
 
 ;;;-----------------------------------------------------------------------
-;;;				To Send MidiShare events
+;;;                             To Send MidiShare events
 ;;;-----------------------------------------------------------------------
 
 ;;;..................................................: MidiSendIm
@@ -3803,7 +3803,7 @@
 
 
 ;;;-----------------------------------------------------------------------
-;;;	 			**Evaluate this**
+;;;                             **Evaluate this**
 ;;;-----------------------------------------------------------------------
 
 (eval-when (:load-toplevel :execute)

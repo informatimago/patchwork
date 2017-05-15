@@ -710,8 +710,8 @@ The current distribution of Midishare (.dmg) is compiled only for ppc and 32-bit
 
     $ file /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare
     /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare: Mach-O universal binary with 2 architectures
-    /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare (for architecture i386):	Mach-O dynamically linked shared library i386
-    /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare (for architecture ppc):	Mach-O dynamically linked shared library ppc
+    /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare (for architecture i386):        Mach-O dynamically linked shared library i386
+    /System/Library/Frameworks/MidiShare.framework/Versions/A/MidiShare (for architecture ppc): Mach-O dynamically linked shared library ppc
 
 Therefore we must compile midishare ourselves.
 
@@ -1311,10 +1311,10 @@ ARGS := "--non-interactive"
 
 debug: export ASDF_OUTPUT_TRANSLATIONS = "/:/tmp/lisp-cache/$@/"
 debug:
-	$(LISP) $(ARGS) --load $@.lisp --load build.lisp
+        $(LISP) $(ARGS) --load $@.lisp --load build.lisp
 
 release: export ASDF_OUTPUT_TRANSLATIONS = "/:/tmp/lisp-cache/$@/"
 release:
-	$(LISP) $(ARGS) --load $@.lisp --load build.lisp
+        $(LISP) $(ARGS) --load $@.lisp --load build.lisp
 
     where debug.lisp / release.lisp would contain the wanted optimization setting

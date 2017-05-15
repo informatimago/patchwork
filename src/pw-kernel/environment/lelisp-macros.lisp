@@ -52,12 +52,12 @@
 ;; before "compile-file" can compile any source file using these macros,
 ;; otherwise you get strange error messages ("undefined variable", "cant compile ...").
 ;; So any file saying :
-;;	(load-once "CLPF:LELISP-MACROS")
+;;      (load-once "CLPF:LELISP-MACROS")
 ;; MUST embed it in a good "eval-when":
 ;; (eval-when (eval compile)
-;;	(load-once "CLPF:LELISP-MACROS"))
+;;      (load-once "CLPF:LELISP-MACROS"))
 ;; It is not needed to import the macros since they are exported to common lisp
-;;	(use-package "LELISP-MACROS") ;is not needed
+;;      (use-package "LELISP-MACROS") ;is not needed
 ;; =============================================================================-======
 
 #-ccl (progn

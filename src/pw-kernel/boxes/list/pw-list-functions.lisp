@@ -410,7 +410,7 @@ their level. If, for example, the predicate is >, all elements of list which are
 greater than <val> are removed. Note that <val> can be a string, but only if the
 predicate <test> can handle a string.
 \(epw::list-filter  ‘=    5   ‘(5 7 3 5 11 5 16 3 1 7 15 5 8 10 0 7 5 4 5 10))
-will return		? PW->(7 3 11 16 3 1 7 15 8 10 0 7 4 10) ,
+will return             ? PW->(7 3 11 16 3 1 7 15 8 10 0 7 4 10) ,
 with    test.    "
   (less-deep-mapcar 'list-filter1 list test val ))
 

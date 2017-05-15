@@ -125,16 +125,16 @@
 
 #|
 (defmethod MidiPlay ((note c-note) at approx chanbase seq unit/sec)
-  (let ((event (patchwork.midi:MidiNewEv patchwork.midi:typeNote)))	; ask for a new note event
+  (let ((event (patchwork.midi:MidiNewEv patchwork.midi:typeNote)))     ; ask for a new note event
     (when (zerop chanbase) (setf chanbase (chan note)))
-    (unless (patchwork.midi:nullptrp event)	; if the allocation was succesfull
+    (unless (patchwork.midi:nullptrp event)     ; if the allocation was succesfull
       (patchwork.midi:chan event    ; set the midi channel to 0 (means channel 1)
                        (1- (+ chanbase
                               (1- (micro-channel (epw::approx-m  (midic note) approx))))))
-      (patchwork.midi:port event 0)			; set the destination port to Modem
-      (patchwork.midi:field event 0 (truncate (midic note) 100))		; set the pitch field
-      (patchwork.midi:field event 1 (round (vel note)))		        ; set the velocity field
-      (patchwork.midi:field event 2 (round (convert-time-1 (dur note) unit/sec)))		; set the duration field to 1 second
+      (patchwork.midi:port event 0)                     ; set the destination port to Modem
+      (patchwork.midi:field event 0 (truncate (midic note) 100))                ; set the pitch field
+      (patchwork.midi:field event 1 (round (vel note)))                 ; set the velocity field
+      (patchwork.midi:field event 2 (round (convert-time-1 (dur note) unit/sec)))               ; set the duration field to 1 second
       (patchwork.midi:date event (+  *MidiShare-start-time* at))
       (patchwork.midi:MidiAddSeq seq event)
       )))

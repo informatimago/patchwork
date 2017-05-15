@@ -234,12 +234,12 @@ To save data, evaluate the text-win module.
 
 The front menu presents six options:
 
-new	creates a new window and links it to the text-win module
-open	opens (selects) the window linked to the module.
-open-file	opens a Macintosh dialog box for retrieving a text window to be
+new     creates a new window and links it to the text-win module
+open    opens (selects) the window linked to the module.
+open-file       opens a Macintosh dialog box for retrieving a text window to be
 linked to the module.
- save-win;	lets one save the current window in a file,
- ASCII ;or  Lisp;	an option that selects the format of the data written on the
+ save-win;      lets one save the current window in a file,
+ ASCII ;or  Lisp;       an option that selects the format of the data written on the
 window.
 
 When this module is selected the default format is Lisp expressions. In this

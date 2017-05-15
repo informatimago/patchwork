@@ -612,29 +612,29 @@ level of sub-lists will permit to control subdivisions of beats. The list (   ((
 \(3 6) ())  (() () ( 8 7) ())  (  3 2)  ()  )  indicates :
 
 first measure
-	first beat - fourth beat : no restriction
-	second beat : no restriction
-	third beat : subdivisions by 3 and by 6 forbidden
-	fourth beat : no restriction
+        first beat - fourth beat : no restriction
+        second beat : no restriction
+        third beat : subdivisions by 3 and by 6 forbidden
+        fourth beat : no restriction
 
 second measure
-	first beat - fourth beat : no restrictions
-	second beat : no restrictions
-	third beat : subdivisions by 8 and by 7 forbidden
-	fourth beat : no restrictions
+        first beat - fourth beat : no restrictions
+        second beat : no restrictions
+        third beat : subdivisions by 8 and by 7 forbidden
+        fourth beat : no restrictions
 
 third measure
-	all beats : subdivisions by 3 and by 2 forbidden
+        all beats : subdivisions by 3 and by 2 forbidden
 
 fourth measure
-	all beats : no restrictions
+        all beats : no restrictions
 
 To impose subdivisions, you add a !  at the beginning of the lists.
 
 At a global level
 
-\(! 5)		imposes a subdivision by five on the entire sequence
-\(! 5 7 6)  	imposes a subdivision by 5, by 7, or by 6 on the entire sequence.
+\(! 5)          imposes a subdivision by five on the entire sequence
+\(! 5 7 6)      imposes a subdivision by 5, by 7, or by 6 on the entire sequence.
 The module will do the necessary computations et will choose one of the
 subdivisions in such a way that approximation errors are reduced.
 

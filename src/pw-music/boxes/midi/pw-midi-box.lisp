@@ -42,8 +42,8 @@
     note, we would have to give bytes the argument (144 60 0)."
   (when bytes
     (let ((event (patchwork.midi:MidiNewEv patchwork.midi:typeStream)))
-      (unless (patchwork.midi:null-event-p event)	
-        (patchwork.midi:chan event 0)			
+      (unless (patchwork.midi:null-event-p event)
+        (patchwork.midi:chan event 0)
         (patchwork.midi:port event 0)
         (dolist (byte (list! bytes))
           (patchwork.midi:midiaddfield event byte))

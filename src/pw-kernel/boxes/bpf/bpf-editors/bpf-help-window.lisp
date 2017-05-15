@@ -64,24 +64,24 @@
                                  "
     BPF Editor Keyboard Commands
 
-H			opens the Window Help file, displaying commands
-Return		selects the current PW window, hiding the BPF editor
-Enter			selects the current PW window, hiding the BPF editor
-R			renames the BPF window
-Backspace		deletes the selected point
-f			rescales the BPF so that the function fills the editor window
-K			removes all point except the first
-+			zoom out
--			zoom in
-g			show/hide the grid
-->			time-stretch the selected points
-<-			time-contract the selected points
-up-arrow		stretch the values of the selected points
-down-arrow		contract the values of the selected points
-tab			change to another edit mode following the sequence
-			(edit - zoom - sel - drag ...)
-a			add another BPF to the editor
-s			select  one BPF
-d			deletes the selected BPF
+H                       opens the Window Help file, displaying commands
+Return          selects the current PW window, hiding the BPF editor
+Enter                   selects the current PW window, hiding the BPF editor
+R                       renames the BPF window
+Backspace               deletes the selected point
+f                       rescales the BPF so that the function fills the editor window
+K                       removes all point except the first
++                       zoom out
+-                       zoom in
+g                       show/hide the grid
+->                      time-stretch the selected points
+<-                      time-contract the selected points
+up-arrow                stretch the values of the selected points
+down-arrow              contract the values of the selected points
+tab                     change to another edit mode following the sequence
+                        (edit - zoom - sel - drag ...)
+a                       add another BPF to the editor
+s                       select  one BPF
+d                       deletes the selected BPF
 
 "))))

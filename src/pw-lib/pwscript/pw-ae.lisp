@@ -30,7 +30,7 @@
 (defconstant $formAbsolutePosition     :|indx|)
 (defconstant $formRelativePosition     :|rele|)
 (defconstant $formTest                 :|test|)
-(defconstant $formRange	               :|rang|)
+(defconstant $formRange                :|rang|)
 (defconstant $formPropertyID           :|prop|)
 (defconstant $formName                 :|name|)
 

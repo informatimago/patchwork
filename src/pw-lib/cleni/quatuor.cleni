@@ -2,12 +2,12 @@
 ;;;
 ;;;      CLENI: Common Lisp to Enigma Interface 2.0
 ;;;
-;;;      © 1991 IRCAM - GŽrard Assayag.
+;;;      © 1991 IRCAM - Gérard Assayag.
 ;;;
-;;;      A CLENI specification of the 5 last bars of  of Beethoven's 14th 
+;;;      A CLENI specification of the 5 last bars of  of Beethoven's 14th
 ;;;      string quartet, slightly modified in order to show every cleni
 ;;;      feature (and thus introducing weird things)
-;;;      
+;;;
 ;;; =====================================================================
 
 
@@ -19,7 +19,7 @@
 
 (describe-score my-score
      :temperament *half-tone*
-     :staff 1 
+     :staff 1
         :measure 1
            :chord 1 '(c5 g5) :tie '(t t)
         :measure 2
@@ -27,10 +27,10 @@
         :measure 3
            :chord 1/4 '(c5 g5)
            :rest 1/8
-           :note 1/8 'c6 
+           :note 1/8 'c6
            :note 1/4 'e6s
            :rest 1/8
-           :note 1/8 'g6 
+           :note 1/8 'g6
         :measure 4  :signature '(3 4)
            :note 1/4 'c7
            :rest 1/4
@@ -44,17 +44,17 @@
         :measure 2
            :note 1/4 'e4s
            :rest 1/8
-           :note 1/8 'f4 
+           :note 1/8 'f4
            :note 1/4 'g4b
            :rest 1/8
-           :note 1/8 'b4s 
+           :note 1/8 'b4s
         :measure 3
            :note 1/4 'c5
            :rest 1/8
-           :note 1/8 'c5 
+           :note 1/8 'c5
            :note 1/4 'e5s
            :rest 1/8
-           :note 1/8 'g5 
+           :note 1/8 'g5
         :measure 4
            :note 1/4 'c6
            :rest 1/4
@@ -74,10 +74,10 @@
               :chord 1/16 '(c3 g3b) :follow
               :chord 1/16 '(c3 g3b) :follow
               :rest 1/8 'c4
-              :note 1/8 'c4 
+              :note 1/8 'c4
               :note 1/8 'c4 :follow
            :close-tuplet
-           :note 1/4 'e4s 
+           :note 1/4 'e4s
            :rest 1/8 'c4
            :note 1/8 'g4b
         :measure 4
@@ -95,10 +95,10 @@
               :chord 1/16 '(c3 g3b) :follow
               :chord 1/16 '(c3 g3b) :follow
               :rest 1/8 'd3
-              :note 1/8 'c4 
+              :note 1/8 'c4
               :note 1/8 'c4 :follow
            :close-tuplet
-           :note 1/4 'e4s 
+           :note 1/4 'e4s
            :rest 1/8 'd3
            :note 1/8 'g4b
         :measure 2

@@ -43,7 +43,7 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 			MidiShare Constant Definitions
+;;;                     MidiShare Constant Definitions
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
@@ -81,17 +81,17 @@
   (defconstant typeNonRegParam 132)
   (defconstant typeRegParam    133)
 
-  (defconstant typeSeqNum	     134)
+  (defconstant typeSeqNum            134)
   (defconstant typeTextual     135)
   (defconstant typeCopyright   136)
   (defconstant typeSeqName     137)
   (defconstant typeInstrName   138)
-  (defconstant typeLyric	     139)
-  (defconstant typeMarker	     140)
+  (defconstant typeLyric             139)
+  (defconstant typeMarker            140)
   (defconstant typeCuePoint    141)
   (defconstant typeChanPrefix  142)
   (defconstant typeEndTrack    143)
-  (defconstant typeTempo	     144)
+  (defconstant typeTempo             144)
   (defconstant typeSMPTEOffset 145)
 
   (defconstant typeTimeSign    146)
@@ -154,7 +154,7 @@
   );;eval-when
 
 ;;;-----------------------------------------------------------------------
-;;; 			Midishare implemented over CL-MIDI (midi file only).
+;;;                     Midishare implemented over CL-MIDI (midi file only).
 ;;;-----------------------------------------------------------------------
 
 ;;;
@@ -890,7 +890,7 @@ and the FINALIZATION is the clean-up form."
 ;;--------------------------------------------------------------------------
 
 (defconstant kIdle       0)
-(defconstant kPause  	 1)
+(defconstant kPause      1)
 (defconstant kRecording  2)
 (defconstant kPlaying    3)
 (defconstant kWaiting    4)
@@ -900,7 +900,7 @@ and the FINALIZATION is the clean-up form."
 ;; Tracks state
 ;;--------------------------------------------------------------------------
 
-(defconstant kMaxTrack	256)
+(defconstant kMaxTrack  256)
 (defconstant kMuteOn  1)
 (defconstant kMuteOff 0)
 (defconstant kSoloOn  1)
@@ -912,16 +912,16 @@ and the FINALIZATION is the clean-up form."
 ;; Recording management
 ;;--------------------------------------------------------------------------
 
-(defconstant kNoTrack		-1)
-(defconstant kEraseMode  	1)
-(defconstant kMixMode 		0)
+(defconstant kNoTrack           -1)
+(defconstant kEraseMode         1)
+(defconstant kMixMode           0)
 
 ;;--------------------------------------------------------------------------
 ;; Loop  management
 ;;--------------------------------------------------------------------------
 
-(defconstant kLoopOn  	0)
-(defconstant kLoopOff 	1)
+(defconstant kLoopOn    0)
+(defconstant kLoopOff   1)
 
 ;;--------------------------------------------------------------------------
 ;; Step Playing
@@ -934,12 +934,12 @@ and the FINALIZATION is the clean-up form."
 ;; Synchronisation
 ;;--------------------------------------------------------------------------
 
-(defconstant kInternalSync	0)
-(defconstant kClockSync  	1)
-(defconstant kSMPTESync 	2)
-(defconstant kExternalSync 	3)
+(defconstant kInternalSync      0)
+(defconstant kClockSync         1)
+(defconstant kSMPTESync         2)
+(defconstant kExternalSync      3)
 
-(defconstant kNoSyncOut	0)
+(defconstant kNoSyncOut 0)
 (defconstant kClockSyncOut 1)
 
 ;;--------------------------------------------------------------------------

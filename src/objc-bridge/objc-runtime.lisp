@@ -1660,7 +1660,7 @@ argument lisp string."
          (rest-arg (gensym))
          (arg-temp (gensym))
          (marg-ptr (gensym))
-         (static-arg-words 2)		;receiver, selptr
+         (static-arg-words 2)           ;receiver, selptr
          (marg-words (gensym))
          (marg-size (gensym))
          (selptr (gensym)))
@@ -2667,8 +2667,8 @@ ultimately malloc-based.
   class-descriptor
   sel
   typestring
-  class-p				;t for class methods
-  imp					; callback ptr
+  class-p                               ;t for class methods
+  imp                                   ; callback ptr
   )
 
 (defun %add-lisp-objc-method (m)
@@ -2753,7 +2753,7 @@ ultimately malloc-based.
                (setf argspecs specs resulttype :id)
                (setf resulttype (car (last specs))
                      argspecs (butlast specs)))))
-        (cons				;sic
+        (cons                           ;sic
          (setf resulttype (pop selector-form))
          (unless (consp selector-form)
            (bad-selector "selector-form not a cons"))

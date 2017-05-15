@@ -117,19 +117,19 @@
      of its output box. The output of the chord module depends on the menu item chosen.
      The items in this menu are as follows:
 
-midics:	output is the list of midic slots of the notes.
+midics: output is the list of midic slots of the notes.
 
-Durations:	output is the list of dur  slots of the notes.
+Durations:      output is the list of dur  slots of the notes.
 
-Velocity:	output is the list of vel  slots of the notes.
+Velocity:       output is the list of vel  slots of the notes.
 
-offsets: 	output is the list of offset-time  slots.
+offsets:        output is the list of offset-time  slots.
 
-Reorder: 	output is the list of midic  slots, reordered according to their order slots.
+Reorder:        output is the list of midic  slots, reordered according to their order slots.
 
-Chord Object:  	output is the whole chord object.
+Chord Object:   output is the whole chord object.
 
-Save Chord:  	output does not change. The module is saved in a file.
+Save Chord:     output does not change. The module is saved in a file.
 
 The letter to the right of the chord module's output box indicates the current output option.
 

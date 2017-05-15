@@ -19,7 +19,7 @@
 ;;              SetRecordFilterPlayer entry-points.
 ;;   21/11/03 : Converted to functional API. (HKT)
 ;;   19/04/03 : Add MidiFreeMidiFileInfos, MidiFreePlayerState and MidiFreePos
-;;	 22-03-04 : Correct MidiFreeMidiFileInfos, MidiFreePlayerState and MidiFreePos for OpenMcl interface
+;;       22-03-04 : Correct MidiFreeMidiFileInfos, MidiFreePlayerState and MidiFreePos for OpenMcl interface
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -67,7 +67,7 @@
 ;;--------------------------------------------------------------------------
 
 (defconstant kIdle       0)
-(defconstant kPause  	 1)
+(defconstant kPause      1)
 (defconstant kRecording  2)
 (defconstant kPlaying    3)
 (defconstant kWaiting    4)
@@ -77,7 +77,7 @@
 ;; Tracks state
 ;;--------------------------------------------------------------------------
 
-(defconstant kMaxTrack	256)
+(defconstant kMaxTrack  256)
 (defconstant kMuteOn  1)
 (defconstant kMuteOff 0)
 (defconstant kSoloOn  1)
@@ -89,16 +89,16 @@
 ;; Recording management
 ;;--------------------------------------------------------------------------
 
-(defconstant kNoTrack		-1)
-(defconstant kEraseMode  	1)
-(defconstant kMixMode 		0)
+(defconstant kNoTrack           -1)
+(defconstant kEraseMode         1)
+(defconstant kMixMode           0)
 
 ;;--------------------------------------------------------------------------
 ;; Loop  management
 ;;--------------------------------------------------------------------------
 
-(defconstant kLoopOn  	0)
-(defconstant kLoopOff 	1)
+(defconstant kLoopOn    0)
+(defconstant kLoopOff   1)
 
 ;;--------------------------------------------------------------------------
 ;; Step Playing
@@ -111,12 +111,12 @@
 ;; Synchronisation
 ;;--------------------------------------------------------------------------
 
-(defconstant kInternalSync	0)
-(defconstant kClockSync  	1)
-(defconstant kSMPTESync 	2)
-(defconstant kExternalSync 	3)
+(defconstant kInternalSync      0)
+(defconstant kClockSync         1)
+(defconstant kSMPTESync         2)
+(defconstant kExternalSync      3)
 
-(defconstant kNoSyncOut	0)
+(defconstant kNoSyncOut 0)
 (defconstant kClockSyncOut 1)
 
 ;;--------------------------------------------------------------------------
@@ -1439,13 +1439,13 @@
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 ;;;
-;;; 			To Install and Remove the Player Interface
+;;;                     To Install and Remove the Player Interface
 ;;;
 ;;;-----------------------------------------------------------------------
 ;;;-----------------------------------------------------------------------
 
 ;;;-----------------------------------------------------------------------
-;;; 	 		Player Startup and Quit Actions
+;;;                     Player Startup and Quit Actions
 ;;;-----------------------------------------------------------------------
 
 
@@ -1471,7 +1471,7 @@
 
 
 ;;---------------------------------------------------------------------------------
-;; 	 			**Evaluate this**
+;;                              **Evaluate this**
 ;;---------------------------------------------------------------------------------
 
 (eval-when (:load-toplevel :execute)
