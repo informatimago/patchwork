@@ -216,13 +216,13 @@
 
 
 (defmacro with-streams (&body body)
-  `(let ((*terminal-io* *terminal-io*)
-         (*standard-input* *standard-input*)
+  `(let ((*terminal-io*     *terminal-io*)
+         (*standard-input*  *standard-input*)
          (*standard-output* *standard-output*)
-         (*error-output* *error-output*)
-         (*trace-output* *trace-output*)
-         (*query-io* *query-io*)
-         (*debug-io* *debug-io*))
+         (*error-output*    *error-output*)
+         (*trace-output*    *trace-output*)
+         (*query-io*        *query-io*)
+         (*debug-io*        *debug-io*))
      ,@body))
 
 
@@ -265,7 +265,10 @@ DO:         Prints each expression and their values.
         (progn
           #+swank (setf *trace-output* *slime-output*)
           (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
-          (pw::initialize-patchwork))
+          (unless (typep ui:*application* 'pw::patchwork-application)
+            (change-class ui:*application* 'pw::patchwork-application))
+          (ui:initialize)
+          (pw::initialize-patchwork ui:*application*))
       (error (err)
         (format *error-output* "~A~%" err)))))
 
