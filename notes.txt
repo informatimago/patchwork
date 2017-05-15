@@ -364,6 +364,7 @@ Therefore this todo is not prioritary at all.
 
 The following features produce a lot of trace output.
 
+    :debug-application       activates debugging application class..
     :debug-event             activates debugging events.
     :debug-objc              activates debugging objc-classes.
     :debug-focused-view      activates debugging of call-with-focused-view.

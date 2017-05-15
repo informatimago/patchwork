@@ -164,6 +164,7 @@
 ;; (pushnew :debug-objc           *features*)
    (pushnew :debug-graphics       *features*)
    (pushnew :debug-views          *features*)
+   (pushnew :debug-application    *features*)
 ;; (pushnew :debug-views-colors   *features*)
 ;; (pushnew :debug-views-instance *features*)
 ;; (pushnew :debug-focused-view   *features*)
