@@ -95,19 +95,22 @@
   (declare (ignore arg colon at parameters))
   (write-string (shortest-package-nickname *package*) stream))
 
+(defun reset-application-name ()
+  (setf (application-name *application*) "Patchwork"))
+
 (defun initialize-patchwork (application)
   "Initialize the Patchwork application.
 Must be called on the main thread."
   (unless (%initialized application)
     (setf *package*       (find-package "PATCHWORK")
-          #+ccl ccl::*listener-prompt-format* #+ccl "~[?~:;~:*~/pw::fmt-package/ ~:*~d >~] ")
-   (ui::reporting-errors (initialize-mn-editor))
-   (ui::reporting-errors (initialize-menus))
-   (ui::reporting-errors (setf (application-name *application*) "Patchwork"))
-   (ui::reporting-errors (initialize-beat-measure-line))
-   (ui::reporting-errors (initialize-directories))
-   ;;#-(and)(ui::reporting-errors (installapple-event-handlers)
-   (set-%initialized application))
+          #+ccl ccl::*listener-prompt-format* #+ccl "~/pw::fmt-package/~:* ~[?~:;~:*~d >~] ")
+    (ui::reporting-errors (initialize-mn-editor))
+    (ui::reporting-errors (initialize-menus))
+    (ui::reporting-errors (reset-application-name))
+    (ui::reporting-errors (initialize-beat-measure-line))
+    (ui::reporting-errors (initialize-directories))
+    ;;#-(and)(ui::reporting-errors (installapple-event-handlers)
+    (set-%initialized application))
   (values))
 
 (defgeneric show-welcome (application)
