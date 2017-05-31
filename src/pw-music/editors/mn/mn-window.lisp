@@ -84,7 +84,9 @@
 
 (defmethod key-pressed-extra ((self C-MN-window) char)
   (case char
-    ((:Enter #\Etx #\Newline #+has-return #\Return #+has-linefeed #\Linefeed)
+    ((:Enter #\Etx #\Newline
+             #+(and has-return (not newline-is-return)) #\Return
+             #+(and has-linefeed (not newline-is-linefeed)) #\Linefeed)
      (if (pw-win self)
          (if (super-win (pw-win self))
              (window-select (super-win (pw-win self)))
