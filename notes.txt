@@ -1,6 +1,6 @@
 # -*- mode:org; coding:utf-8 -*-
 * TODO [#A] Patchwork Project                                     :patchwork:
-** TODO [#A] debug Patchwork and produce a release                      :bug:
+** IN-PROGRESS [#A] debug Patchwork and produce a release               :bug:
    CLOCK: [2016-02-08 Mon 00:16]--[2016-02-08 Mon 00:56] =>  0:40
    :DEADLINE: <2016-03-01 -3m>
 
@@ -47,7 +47,9 @@ Use com.informatimago.manifest.lisp in Patchwork (generate-application).
 12. Quickdraw           : 119/179 fonctions implémentées [ 66%]
 13. Files               :  18/ 18 fonctions implémentées [100%]
 14. Divers              : 257/258 fonctions implémentées [ 99%]
-*** Bugs https://gitlab.com/groups/patchwork/issues
+*** Bugs / Patchwork Issues  https://framagit.org/patchwork/patchwork/issues
+**** TODO [#C] #12 Gather online documentation and hook it in.      :feature:
+"PW-HELP-DOC:**;NUMBOX.pw"
 **** IN-PROGRESS [#A] 00007 Text Edit                               :feature:
    :DEADLINE: <2016-03-01 -3m>
    - State "IN-PROGRESS" from "DONE"       [2014-10-07 Tue 09:25] \\
@@ -63,7 +65,6 @@ Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la 
 
 - offset of yellow text-edit box: cf. editable-text-dialog-item as subview of a view.
 
-*** Patchwork Issues https://gitlab.com/patchwork/patchwork/issues
 **** TODO [#A] 00014 doublons sur opt-clic                              :bug:
 pOn génère une entrée supplémentaire pour certains objets avec alt-clic
 
@@ -90,28 +91,28 @@ On doit verrouiller en cliquant sur un petit rond au centre de l’objet
 qui se transforme alors en croix, pour dévérouiller on clique sur
 cette croix qui redevient alors un petit rond.
 
-**** TODO [#A] 00024 growing while editing                                   :bug:
+**** TODO [#A] 00024 growing while editing                              :bug:
 - Open for editing a text field.
 - Try to grow the patch.
 Growing fails, the patch box size becomes slightly smaller.
 
-**** TODO [#A] 00010 Qque fois il y a eu impossibilité d’évaluation.         :bug:
+**** TODO [#A] 00010 Qque fois il y a eu impossibilité d’évaluation.    :bug:
 En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
 crois plutôt que - pour une raison inconnue - la fenêtre du Listener
 en fonction devient inactive, en activant une nouvelle fenêtre de
 Listener l’évaluation est à nouveau possible…
 
-**** TODO [#A] 00004 Les patchs complexes sont lents à charger.          :feature:
+**** TODO [#A] 00004 Les patchs complexes sont lents à charger.      :feature:
 Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
 <d:s:R x 5>*
-**** TODO [#A] 00027 numbox click-and-drag w/ opt/cmd aphazadical.           :bug:
+**** TODO [#A] 00027 numbox click-and-drag w/ opt/cmd aphazadical.      :bug:
 Note: option-click and command-click have specific meanings.
-**** TODO [#A] 00031 the first menus must berenamed                         :port:
+**** TODO [#A] 00031 the first menus must berenamed                    :port:
 The application menu should be Patchwork instead of Clozure CL
 The next menu should be Apps instead of Patchwork.
-**** TODO [#A] 00032 multi-bpf breaks                                        :bug:
-**** TODO [#A] 00033 bpf-lib breaks                                          :bug:
-**** TODO [#A] 00035 pw-patch drag bar line off-by-1                         :bug:
+**** TODO [#A] 00032 multi-bpf breaks                                   :bug:
+**** TODO [#A] 00033 bpf-lib breaks                                     :bug:
+**** TODO [#A] 00035 pw-patch drag bar line off-by-1                    :bug:
 The line of the drag bar of pw-patch is drawn one pixel beyond the right border some times.
 *** Done
 **** DONE 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item

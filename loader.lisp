@@ -152,6 +152,7 @@
                                    :debug-focused-view
                                    :debug-streams
                                    :debug-text
+                                   :debug-trace
                                    patchwork.builder::no-cocoa
                                    patchwork.builder::use-apple-events
                                    patchwork.builder::cocoa-midi-player
@@ -170,6 +171,7 @@
 ;; (pushnew :debug-focused-view   *features*)
 ;; (pushnew :debug-event          *features*)/Users/pjb/Desktop/patchwork-10.1-0.836-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64/Patchwork.app/Contents/MacOS/Patchwork
 ;; (pushnew :debug-text           *features*)
+   (pushnew :debug-trace          *features*)
 ;; (pushnew 'patchwork.builder::no-cocoa          *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events  *features*)
 ;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
@@ -265,10 +267,12 @@ DO:         Prints each expression and their values.
     (handler-case
         (progn
           #+swank (setf *trace-output* *slime-output*)
-          (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
           (unless (typep ui:*application* 'pw::patchwork-application)
+            (ui:format-trace 'start-patchwork "change-class application")
             (change-class ui:*application* 'pw::patchwork-application))
+          (ui:format-trace 'start-patchwork 'ui:initialize)
           (ui:initialize)
+          (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
           (pw::initialize-patchwork ui:*application*))
       (error (err)
         (format *error-output* "~A~%" err)))))

@@ -66,6 +66,22 @@
 (defvar *object-connection-draw-mode* *gray-pattern*)
 (defvar *normal-connection-draw-mode* *black-pattern*)
 
+;; NOTE: with current MCLGUI, *GRAY-PATTERN* and *BLACK-PATTERN* are
+;;       not set until run-time, after (UI:INITIALIZE).  Therefore
+;;       we set them lazily with PATTERN-FOR-DRAW-MODE.
+
+(defun pattern-for-draw-mode (erase-mode control)
+  (unless *object-connection-draw-mode*
+    (setf *object-connection-draw-mode* *gray-pattern*))
+  (unless *normal-connection-draw-mode*
+    (setf *normal-connection-draw-mode* *black-pattern*))
+  (cond
+    ((eql erase-mode *white-pattern*)
+     erase-mode)
+    ((pw-object-p (type-list control))
+     *object-connection-draw-mode*)
+    (t
+     *normal-connection-draw-mode*)))
 
 (defclass C-pw-outrect (BUTTON-DIALOG-ITEM)
   ((fill-state :initform nil :accessor %outrect-fill-state)))
@@ -416,10 +432,7 @@
                      (not (eql ctrl (pop pw-controls))))
             (when (atom ctrl)(setq ctrl (list ctrl))) ; for nargs
             (while ctrl
-              (unless (eql erase-mode *white-pattern*)
-                (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
-                                     *object-connection-draw-mode* *normal-connection-draw-mode*)))
-              (with-pen-state (:pattern erase-mode)
+              (with-pen-state (:pattern (pattern-for-draw-mode erase-mode (car ctrl)))
                 (setq x1 (mid-x (out-put (car ctrl))))
                 (setq y1 (mid-y (out-put (pop ctrl))))
                 (setq xi (+ x-self (car in-xs)))
@@ -485,11 +498,7 @@
                        (or (null from-patches) (member ctrl from-patches :test #'eq)))
               (if (atom ctrl) (setq ctrl (list ctrl))) ; for nargs
               (while ctrl
-                (unless (eql erase-mode *white-pattern*)
-                  (setq erase-mode (if (pw-object-p (type-list (car ctrl)))
-                                       *object-connection-draw-mode*
-                                       *normal-connection-draw-mode*)))
-                (with-pen-state (:pattern erase-mode)
+                (with-pen-state (:pattern (pattern-for-draw-mode erase-mode (car ctrl)))
                   (setq x1 (mid-x (out-put (car ctrl))))
                   (setq y1 (mid-y (out-put (pop ctrl))))
                   (setq xi (+ x-self (car in-xs)))
