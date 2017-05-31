@@ -200,6 +200,10 @@
 (copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")
            (translate-logical-pathname #P"RELEASE:RELEASE-NOTES.TXT"))
 
+(say "Copying reference documentation.")
+(copy-file (translate-logical-pathname #P"PATCHWORK:DOC/PW-REFERENCE.PDF")
+           (translate-logical-pathname #P"RELEASE:PW-REFERENCE.PDF"))
+
 (say "Copying tutorials.")
 (copy-directory (translate-logical-pathname #P"PATCHWORK:TUTORIALS;")
                 (translate-logical-pathname #P"RELEASE:TUTORIALS;")
