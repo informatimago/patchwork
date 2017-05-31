@@ -252,7 +252,7 @@ TRANSLATIONS: a list of logical pathname translations.
       (set-host "SRC"
 
                 ;; '("INFORMATIMAGO")  "informatimago/"               src
-                '("INFORMATIMAGO")  "lisp/"                        home-src
+                '("INFORMATIMAGO")  "public/lisp/"                 home-src
 
                 '("PATCHWORK")      "patchwork/"                   src
                 '("MCLGUI")         "mclgui/"                      src
