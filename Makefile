@@ -147,5 +147,7 @@ generate-new-ccl:
 		$(LISP_EVAL) '(ccl:rebuild-ccl :full t)' \
 		$(LISP_EVAL) '(ccl:quit)'
 
+# TODO: add targets to zip and upload the releases
+# scp patchwork-10.1-0.791-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.5-x86-64.tar.bz2 patchwork-10.1-0.791-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.5-x86-64.zip    pjb@ftp.informatimago.com:/srv/ftp/users/pjb/patchwork/
 
 #### THE END ####
