@@ -81,7 +81,7 @@
           (pop chords))
         (setq pw-windows (nreverse pw-windows))
         (setq midi-boxes-temp (setq midi-boxes (nreverse midi-boxes)))
-        (setq  begin-times (ask-all pw-windows 'give-structured-begin-time))
+        (setq begin-times (ask-all pw-windows 'give-structured-begin-time))
         (setq duration-times (ask-all pw-windows 'give-structured-duration1 1))
         (setq total-dur (apply #'max (mapcar #'+ begin-times duration-times)))
         (while midi-boxes-temp
