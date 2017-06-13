@@ -117,29 +117,25 @@ Must be called on the main thread."
 
 (defgeneric show-welcome (application)
   (:method ((application patchwork-application))
-    (unless (%did-show-welcome application)
-
-      #+debug-streams
-      (progn
-        (dolist (stream-var '(*terminal-io*
-                              *standard-input*
-                              *standard-output*
-                              *error-output*
-                              *trace-output*
-                              *query-io*
-                              *debug-io*))
-          (format t "~&~40A = ~S~%" stream-var (symbol-value stream-var)))
-        (format t "~% ~S~% ~S~%"
-                (application-name *application*)
-                (application-name application)))
-
-      (format t "~2%Welcome to ~A Version ~A!~%~?"
-              (application-name application)
-              patchwork.builder:*patchwork-version*
-              #+ccl ccl:*listener-prompt-format* #+ccl '(0)
-              #-ccl "? ")
-      (finish-output)
-      (set-%did-show-welcome application))
+    #+debug-streams
+    (progn
+      (dolist (stream-var '(*terminal-io*
+                            *standard-input*
+                            *standard-output*
+                            *error-output*
+                            *trace-output*
+                            *query-io*
+                            *debug-io*))
+        (format t "~&~40A = ~S~%" stream-var (symbol-value stream-var)))
+      (format t "~% ~S~% ~S~%"
+              (application-name *application*)
+              (application-name application)))
+    (format t "~2%Welcome to ~A Version ~A!~%~?"
+            (application-name application)
+            patchwork.builder:*patchwork-version*
+            #+ccl ccl:*listener-prompt-format* #+ccl '(0)
+            #-ccl "? ")
+    (finish-output)
     (values)))
 
 
@@ -148,7 +144,7 @@ Must be called on the main thread."
 
 
 (defmethod application-will-finish-launching ((application patchwork-application))
-  (format *error-output* "~S ~S :name ~:[nil~;~A~]  (eq self *application*) = ~A~%"
+  (format *error-output*  "~S ~S :name ~:[nil~;~:*~A~]  (eq self *application*) = ~A~%"
           'application-will-finish-launching
           *application*
           (and *application* (application-name *application*))
@@ -163,7 +159,9 @@ Must be called on the main thread."
   (format-trace 'application-did-finish-launching (eq application *application*))
   (call-next-method)
   (initialize-patchwork application)
-  (show-welcome application)
+  (unless (%did-show-welcome application)
+    (show-welcome application)
+    (set-%did-show-welcome application))
   (values))
 
 (defmethod application-did-finish-launching :after ((application patchwork-application))
