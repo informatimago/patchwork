@@ -39,7 +39,7 @@
 (defparameter *tiny-music-font-spec*       '("Maestro" 13 :plain :srcor))
 
 (defparameter *patchwork-font-spec*        '("Monaco"   9 :plain :srcor))
-(defparameter *patchwork-copy-font-spec*   '("Monaco"   9 :plain :srcopy))
+(defparameter *patchwork-copy-font-spec*   '("Monaco"   9 :plain :srccopy))
 (defparameter *patchwork-small-font-spec*  '("Monaco"   8 :plain :srcor))
 
 
