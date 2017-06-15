@@ -120,14 +120,15 @@
 
 (defun get-evaluation-option () *standard-click-eval*)
 
+(defvar *value* nil "Bound to the last value evaluated by a C-PW-OUTRECT.")
+
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
-  #+debug-views
-  (format-trace '(view-click-event-handler c-pw-outrect) :where (point-to-list where) :view self)
+  #+debug-views (format-trace '(view-click-event-handler c-pw-outrect) :where (point-to-list where) :view self)
   (if (eql (not (get-evaluation-option)) (not (option-key-p)))
       (progn
         (incf (clock *global-clock*))
         (eval-enqueue
-         `(format t "PW->~S~%" (patch-value ',(view-container self) ',(view-container self)))) ; aaa
+         `(format t "PW->~S~%" (setf *value* (patch-value ',(view-container self) ',(view-container self))))) ; aaa
         (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))))))
       (drag-out-line self where)))
 
