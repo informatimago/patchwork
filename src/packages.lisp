@@ -255,7 +255,10 @@
            "SCROLL-RECT")
 
   ;; For EPW:
-  (:export "NEW-MENU" "PW-ADDMENU"))
+  (:export "NEW-MENU" "PW-ADDMENU")
+
+  ;; Extension:
+  (:export "*VALUE*"))
 
 (cl:defpackage "USER-SUPPLIED-IN-OUTS"
   (:use))
