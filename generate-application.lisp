@@ -157,9 +157,15 @@
 (defparameter *program-system*                   :patchwork)
 (defparameter *name-and-version*                 (format nil "~A-~A" *program-name* *patchwork-version*))
 (defparameter *release-directory*                (merge-pathnames
-                                                  (make-pathname :directory (list :relative "Desktop"
+                                                  (make-pathname :directory (list :relative
+                                                                                  "Desktop"
                                                                                   (executable-name *name-and-version*)))
                                                   (user-homedir-pathname)))
+(defparameter *application-package*              (merge-pathnames
+                                                  (make-pathname :directory (list :relative
+                                                                                  (format nil "~A.app" *program-name*))
+                                                                 :defaults *release-directory*)
+                                                  *release-directory*))
 (defparameter *application-class-name*           'pw::patchwork-application)   ; mclgui:application subclass
 (defparameter *application-delegate-class-name*  "MclguiApplicationDelegate")  ; IdeApplicationDelegate subclass
 (defparameter *principal-class-name*             "CCLApplication")             ; NSApplication subclass.
@@ -199,10 +205,14 @@
 (say "Copying release notes.")
 (copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")
            (translate-logical-pathname #P"RELEASE:RELEASE-NOTES.TXT"))
+(say "Copying init.lisp.")
+(copy-file (translate-logical-pathname #P"PATCHWORK:PACKAGE;INIT.LISP")
+           (translate-logical-pathname #P"RELEASE:INIT.LISP"))
 
-(say "Copying reference documentation.")
-(copy-file (translate-logical-pathname #P"PATCHWORK:DOC;PW-REFERENCE.PDF")
-           (translate-logical-pathname #P"RELEASE:PW-REFERENCE.PDF"))
+;; TODO: Not yet, we need consent from IRCAM.
+;; (say "Copying reference documentation.")
+;; (copy-file (translate-logical-pathname #P"PATCHWORK:DOC;PW-REFERENCE.PDF")
+;;            (translate-logical-pathname #P"RELEASE:PW-REFERENCE.PDF"))
 
 (say "Copying tutorials.")
 (copy-directory (translate-logical-pathname #P"PATCHWORK:TUTORIALS;")
@@ -211,6 +221,7 @@
                 :on-error :continue)
 
 (say "Copying MidiShare.framework.")
+;; TODO: Don't copy MidiShare.framework from the current system, but from sources!
 (copy-directory #P"/Library/Frameworks/MidiShare.framework/"
                 #P"RELEASE:MidiShare.framework;"
                 :if-exists :supersede
@@ -346,6 +357,7 @@
                  :|NSAppleScriptEnabled| nil ; not yet.
                  :|LSMinimumSystemVersion| (if (featurep :cocoa-10.6) "10.6" "10.3")
                  :|CFBundleDevelopmentRegion| "English"
+                 :|ATSApplicationFontsPath| "Fonts/"
                  :|UTExportedTypeDeclarations| (exported-type-utis)
                  :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2017 Pascal Bourguignon~%License: GPL3")
 
@@ -388,13 +400,23 @@
 
 #+save-image-and-quit
 (progn
-  (let ((destination (merge-pathnames #P"Patchwork.app/Contents/Resources/patchwork-icon.icns"
-                                      *release-directory*)))
+
+  (let ((destination (merge-pathnames #P"Contents/Resources/Fonts/"
+                                      *application-package*)))
+    (ensure-directories-exist (merge-pathnames #P"probe.file" destination))
+    (copy-directory #P"PATCHWORK:SRC;MACOSX;RESOURCES;FONTS;"
+                    destination
+                    :if-exists :supersede
+                    :on-error :continue
+                    :element-type '(unsigned-byte 8)))
+
+  (let ((destination (merge-pathnames #P"Contents/Resources/patchwork-icon.icns"
+                                      *application-package*)))
     (ensure-directories-exist destination)
     (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
                destination :element-type '(unsigned-byte 8) :if-exists :supersede))
 
-  (progn ; print path of generated executable
+  (progn                          ; print path of generated executable
     (format t  "~%~A~%" (merge-pathnames (make-pathname :directory (list :relative
                                                                          (format nil "~A.app" *program-name*)
                                                                          "Contents" "MacOS")

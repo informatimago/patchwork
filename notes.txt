@@ -9,6 +9,23 @@
 https://github.com/informatimago/mclgui/graphs/code-frequency
 https://github.com/informatimago/patchwork/graphs/code-frequency
 
+** TODO [#A] cursors still don't show                                   :bug:
+** TODO [#A] chord editor midicents text is displayed too big           :bug:
+so the bottom part is truncated in its box…
+** TODO [#A] use a symbolic representation for Maestro characters       :bug:
+(independent from encodings).
+https://en.wikipedia.org/wiki/Mac_OS_Roman
+
+Mac-Roman is assumed in the source;
+MacOSX Maestro.ttf maps characters from #xf021 to #xf0f0 (+ #xf000 code).
+
+** TODO [#A] find out the design of those cursor resources              :bug:
+
+;;                     default  dur  vel  chan  travel  order midic.alteration=Y   midic.alternation=I  midi.else
+;; *default-MN-cursor* 110      605  605  605   202     202    107                   103                   110
+;; *cross-line-cursor* 604
+;; *note-head-cursor*  110
+
 ** TODO [#A] save-image --> dead macptrs in wrappers                    :bug:
    :DEADLINE: <2016-09-01 -3m>
 

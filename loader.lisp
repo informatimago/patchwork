@@ -142,36 +142,36 @@
 (setf (uiop::getenv "CG_CONTEXT_SHOW_BACKTRACE") "YES")
 
 (setf *features* (set-difference *features*
-                                 '(:debug-wrapper
-                                   :debug-objc
-                                   :debug-graphics
-                                   :debug-views
-                                   :debug-views-colors
-                                   :debug-views-instance
+                                 '(:debug-application
                                    :debug-event
                                    :debug-focused-view
+                                   :debug-graphics
+                                   :debug-objc
                                    :debug-streams
                                    :debug-text
                                    :debug-trace
+                                   :debug-views
+                                   :debug-views-colors
+                                   :debug-views-instance
+                                   :debug-wrapper
                                    patchwork.builder::no-cocoa
                                    patchwork.builder::use-apple-events
                                    patchwork.builder::cocoa-midi-player
                                    patchwork.builder::use-midishare
                                    patchwork.builder::use-cl-midi)))
 
-;; (pushnew :debug-streams        *features*)
-;; (pushnew :debug-trace          *features*)
-;; (pushnew :debug-wrapper        *features*)
-;; (pushnew :debug-objc           *features*)
-   (pushnew :debug-graphics       *features*)
-   (pushnew :debug-views          *features*)
    (pushnew :debug-application    *features*)
-;; (pushnew :debug-views-colors   *features*)
-;; (pushnew :debug-views-instance *features*)
+;; (pushnew :debug-event          *features*)
 ;; (pushnew :debug-focused-view   *features*)
-;; (pushnew :debug-event          *features*)/Users/pjb/Desktop/patchwork-10.1-0.836-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64/Patchwork.app/Contents/MacOS/Patchwork
+   (pushnew :debug-graphics       *features*)
+;; (pushnew :debug-objc           *features*)
+;; (pushnew :debug-streams        *features*)
 ;; (pushnew :debug-text           *features*)
    (pushnew :debug-trace          *features*)
+   (pushnew :debug-views          *features*)
+;; (pushnew :debug-views-colors   *features*)
+;; (pushnew :debug-views-instance *features*)
+;; (pushnew :debug-wrapper        *features*)
 ;; (pushnew 'patchwork.builder::no-cocoa          *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events  *features*)
 ;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
@@ -273,7 +273,8 @@ DO:         Prints each expression and their values.
           (ui:format-trace 'start-patchwork 'ui:initialize)
           (ui:initialize)
           (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
-          (pw::initialize-patchwork ui:*application*))
+          (pw::initialize-patchwork ui:*application*)
+          (show-welcome ui:*application*))
       (error (err)
         (format *error-output* "~A~%" err)))))
 

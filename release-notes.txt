@@ -6,15 +6,58 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
-- updated to work on macOS Sierra.
-- lisp files from ~/Documents/Patchwork/PW-inits/ are loaded when the
-  application is launched, for user initialization.
+- Updated to work on macOS Sierra.
+
+- Lisp files from ~/Documents/Patchwork/PW-inits/ are loaded when the
+  application is launched, for user initialization.  An example
+  init.lisp file is provided; move it to
+  ~/Documents/Patchwork/PW-inits/.  It defines an alias PW for
+  pw:*value* and two shortcut functions (patchwork) and (lisp) to
+  switch between the patchwork application and the lisp environment.
+
+- Implemented check-box and radio-button drawing, so now they show.
+  Not implemented yet: hiliting the controls during the mouse down and tracking.
+
+- Made use of the Maestro font.
+  Problems:
+
+     + the Maestro.ttf font maps Maestro characters to unicode #xf021 - #xf0f0;
+       we offset the character code when using this font, however it looks like
+       some characters have different code offsets (eg. flat), so currently they
+       don't show (placeholder character is displayed).
+
+     + the metrics are different, so the characters are not displayed
+       where expected, eg. the staff is not positionned properly; the
+       notes seems to be placed higher (we must click below them to
+       select or move them).
+
+   Currently the Maestro font needs to be installed in the system /Library/Fonts directory.
+   Eventually it'll be used with no installation, directly from the application resources.
+
+- the variable PW:*VALUE* is bound to the last value evaluated (printed after "PW->").
+  It can then be used in the REPL:
+
+        CL-USER ? (in-package :pw)
+        #<Package "PATCHWORK">
+        PW ? PW->#<C-CHORD #x302005B97FAD>
+        *value*
+        #<C-CHORD #x302005ABE27D>
+        PW ? (notes *value*)
+        (#<C-NOTE #x302005ABE64D> #<C-NOTE #x302005ABE59D>
+         #<C-NOTE #x302005ABE4ED> #<C-NOTE #x302005ABE43D>
+         #<C-NOTE #x302005ABE38D> #<C-NOTE #x302005ABE2DD>)
+        PW ? (ask-all (notes *value*) 'midic)
+        (2000 2400 2700 3800 6000 8700)
+        PW ?
+
+- Redirection to the Listener window is corrected.
+
 
 Bugs remaining in patchwork-10.1-0.838-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64:
 
-- instance drawing doesn't occur (threads?) (moving boxes).
-- lines don't draw (threads?)
-- streams are in a mess (redirection to the Listener window is broken).
+- instance drawing doesn't occur (threads?) (moving, growing boxes).
+- also: lines don't draw (threads?)
+
 
 
 10.0-0.607
