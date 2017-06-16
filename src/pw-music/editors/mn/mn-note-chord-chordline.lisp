@@ -218,7 +218,8 @@
       (if (and *mn-view-offset-flag* (not *mn-view-time-flag*))
           (draw-note-offset-line self x-now y-now t-scfactor)) )
     (when (and (instrument self) *mn-view-ins-flag* t-scfactor)
-      (draw-char x-now y-now #\Ω)
+      ;; TODO: use a symbolic representation for Maestro characters (independent from encodings).
+      (draw-char x-now y-now (code-char 189) #|#\Ω|#)
       (draw-instrument (instrument self) x-now y-now (round (+ (* t-scfactor (dur self))))))
     (if (and alt (not (eql *staff-num* 7) )) ; empty staff
         (draw-char (+ x (alt-delta-x self)) y-now alt))))
@@ -265,12 +266,13 @@
 (defgeneric map-to-note-symbolic-dynamic (self))
 (defmethod map-to-note-symbolic-dynamic ((self C-note))
   (cond
-    ((< (vel self) 60) #\π)
+    ;; TODO: use a symbolic representation for Maestro characters (independent from encodings).
+    ((< (vel self) 60) (code-char 185) #|#\π|#)
     ((< (vel self) 75) #\p)
     ((< (vel self) 90) #\P)
     ((< (vel self) 105) #\F)
     ((< (vel self) 115) #\f)
-    (t #\ƒ)))
+    (t                  (code-char 196) #|#\ƒ|#)))
 
 (defgeneric draw-note-symbolic-dynamic (self x y-now))
 (defmethod draw-note-symbolic-dynamic ((self C-note) x y-now)
