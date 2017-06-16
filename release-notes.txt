@@ -6,6 +6,15 @@ PATCHWORK RELEASE NOTES
 next release
 -----------------------
 
+Bugs remaining in patchwork-10.1-0.838-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64:
+
+- instance drawing doesn't occur (threads?) (moving, growing boxes).
+- also: lines don't draw (threads?)
+
+
+10.1-0.722
+-----------------------
+
 - Updated to work on macOS Sierra.
 
 - Lisp files from ~/Documents/Patchwork/PW-inits/ are loaded when the
@@ -35,7 +44,7 @@ next release
    Eventually it'll be used with no installation, directly from the application resources.
 
 - the variable PW:*VALUE* is bound to the last value evaluated (printed after "PW->").
-  It can then be used in the REPL:
+  It can then be used in the REPL: ::
 
         CL-USER ? (in-package :pw)
         #<Package "PATCHWORK">
@@ -54,12 +63,6 @@ next release
 
 - Improved speed of loading patch documents by removing debugging logs.
   (&2Ryt loads in less than 10 seconds on iMac 4 GHz Intel Core i7).
-
-Bugs remaining in patchwork-10.1-0.838-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64:
-
-- instance drawing doesn't occur (threads?) (moving, growing boxes).
-- also: lines don't draw (threads?)
-
 
 
 10.0-0.607
