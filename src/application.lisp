@@ -100,11 +100,26 @@
 (defun reset-application-name ()
   (setf (application-name *application*) "Patchwork"))
 
+(defun initialize-resources ()
+  ;;                     default  dur  vel  chan  travel  order midic.alteration=Y   midic.alternation=I  midi.else
+  ;; *default-MN-cursor* 110      605  605  605   202     202    107                   103                   110
+  ;; *cross-line-cursor* 604
+  ;; *note-head-cursor*  110
+  (register-resource "CURS" 103 *top-ps-cursor*)
+  (register-resource "CURS" 107 *bottom-ps-cursor*)
+  (register-resource "CURS" 110 *arrow-cursor*)
+  (register-resource "CURS" 202 *vertical-ps-cursor*)
+  (register-resource "CURS" 604 *plus-cursor*)
+  (register-resource "CURS" 605 *plus-cursor*)
+  (values))
+
+
 (defun initialize-patchwork (application)
   "Initialize the Patchwork application.
 Must be called on the main thread."
   (setf *package*       (find-package "PATCHWORK")
         #+ccl ccl::*listener-prompt-format* #+ccl "~/pw::fmt-package/~:* ~[?~:;~:*~d >~] ")
+  (ui::reporting-errors (initialize-resources))
   (ui::reporting-errors (initialize-mn-editor))
   (ui::reporting-errors (initialize-menus))
   (ui::reporting-errors (reset-application-name))
@@ -117,24 +132,12 @@ Must be called on the main thread."
 
 (defgeneric show-welcome (application)
   (:method ((application patchwork-application))
-    #+debug-streams
-    (progn
-      (dolist (stream-var '(*terminal-io*
-                            *standard-input*
-                            *standard-output*
-                            *error-output*
-                            *trace-output*
-                            *query-io*
-                            *debug-io*))
-        (format t "~&~40A = ~S~%" stream-var (symbol-value stream-var)))
-      (format t "~% ~S~% ~S~%"
-              (application-name *application*)
-              (application-name application)))
-    (format t "~2%Welcome to ~A Version ~A!~%~?"
+    (format t "~%Welcome to ~A ~A!~%"         ; the Clozure welcome message.
+	    (lisp-implementation-type)
+	    (lisp-implementation-version))
+    (format t "~%Welcome to ~A Version ~A!~%" ; patchwork welcome message.
             (application-name application)
-            patchwork.builder:*patchwork-version*
-            #+ccl ccl:*listener-prompt-format* #+ccl '(0)
-            #-ccl "? ")
+            patchwork.builder:*patchwork-version*)
     (finish-output)
     (values)))
 
