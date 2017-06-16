@@ -202,17 +202,31 @@
                (format manifest "~A~%" (com.informatimago.tools.manifest::shell-command-to-string "git-info"))))
         (setf (ccl:current-directory) pwd)))))
 
-(say "Copying release notes.")
-(copy-file (translate-logical-pathname #P"PATCHWORK:RELEASE-NOTES.TXT")
-           (translate-logical-pathname #P"RELEASE:RELEASE-NOTES.TXT"))
-(say "Copying init.lisp.")
-(copy-file (translate-logical-pathname #P"PATCHWORK:PACKAGE;INIT.LISP")
-           (translate-logical-pathname #P"RELEASE:INIT.LISP"))
+(loop
+  :for (name src dst . options)
+    :in '(("release notes"
+           #P"PATCHWORK:RELEASE-NOTES.TXT"
+           #P"RELEASE:RELEASE-NOTES.TXT"
+           :rst2pdf)
+          ("license file"
+           #P"PATCHWORK:PATCHWORK-LICENSE.TXT"
+           #P"RELEASE:PATCHWORK-LICENSE.TXT")
+          ("init.lisp"
+           #P"PATCHWORK:PACKAGE;INIT.LISP"
+           #P"RELEASE:INIT.LISP")
+          ;; TODO: Not yet, we need consent from IRCAM.
+          #-(and)
+          ("reference documentation"
+           #P"PATCHWORK:DOC;PW-REFERENCE.PDF"
+           #P"RELEASE:PW-REFERENCE.PDF"))
+  :do (say "Copying ~A." name)
+      (let ((src (translate-logical-pathname src))
+            (dst (translate-logical-pathname dst)))
+        (copy-file src dst)
+        (when (member :rst2pdf options)
+          (com.informatimago.tools.manifest::shell-command-to-string
+           (format nil "rst2pdf ~S" (namestring dst))))))
 
-;; TODO: Not yet, we need consent from IRCAM.
-;; (say "Copying reference documentation.")
-;; (copy-file (translate-logical-pathname #P"PATCHWORK:DOC;PW-REFERENCE.PDF")
-;;            (translate-logical-pathname #P"RELEASE:PW-REFERENCE.PDF"))
 
 (say "Copying tutorials.")
 (copy-directory (translate-logical-pathname #P"PATCHWORK:TUTORIALS;")
