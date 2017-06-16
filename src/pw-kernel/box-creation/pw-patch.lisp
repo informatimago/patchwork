@@ -122,13 +122,22 @@
 
 (defvar *value* nil "Bound to the last value evaluated by a C-PW-OUTRECT.")
 
+(defun evaluate-patch (patch)
+  (handler-case (patch-value patch patch)
+    (:no-error (value &rest ignored)
+      (declare (ignore ignored))
+      (setf *value* value)
+      (format t "~&PW->~S~%" value))
+    (error (err)
+      (setf *value* patch)
+      (format t "~&Error while evaluating patch PW->~S~%~A~%" *value* err))))
+
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
   #+debug-views (format-trace '(view-click-event-handler c-pw-outrect) :where (point-to-list where) :view self)
   (if (eql (not (get-evaluation-option)) (not (option-key-p)))
       (progn
         (incf (clock *global-clock*))
-        (eval-enqueue
-         `(format t "PW->~S~%" (setf *value* (patch-value ',(view-container self) ',(view-container self))))) ; aaa
+        (eval-enqueue `(evaluate-patch ',(view-container self)))
         (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string (view-container self)))))))
       (drag-out-line self where)))
 

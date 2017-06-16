@@ -52,6 +52,8 @@ next release
 
 - Redirection to the Listener window is corrected.
 
+- Improved speed of loading patch documents by removing debugging logs.
+  (&2Ryt loads in less than 10 seconds on iMac 4 GHz Intel Core i7).
 
 Bugs remaining in patchwork-10.1-0.838-ccl-1.11_r16635_darwinx8664-darwin-apple-10.12.4-x86-64:
 
