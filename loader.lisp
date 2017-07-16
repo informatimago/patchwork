@@ -274,7 +274,7 @@ DO:         Prints each expression and their values.
           (ui:initialize)
           (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
           (pw::initialize-patchwork ui:*application*)
-          (show-welcome ui:*application*))
+          (pw::show-welcome ui:*application*))
       (error (err)
         (format *error-output* "~A~%" err)))))
 
