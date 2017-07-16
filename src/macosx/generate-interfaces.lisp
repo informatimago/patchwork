@@ -53,6 +53,7 @@
 
 (generate-interface "CoreGraphics")
 (generate-interface "CoreServices")
+(generate-interface "CoreMidi")
 (generate-interface "MidiShare"  :defines '(("__Types__" 1)))
 (generate-interface "Player"     :defines '(("__Types__" 1)) :dependencies '("MidiShare"))
 
