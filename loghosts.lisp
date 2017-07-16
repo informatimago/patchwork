@@ -279,4 +279,12 @@ TRANSLATIONS: a list of logical pathname translations.
 
 (define-logical-hosts)
 
+(setf (logical-pathname-translations "PATCHWORK")
+      (append (make-translations "PATCHWORK"
+                                 '("SRC" "MACOSX" "RESOURCES" "FONTS")
+                                 (merge-pathnames #P"src/macosx/Resources/Fonts/"
+                                                  (translate-logical-pathname #P"PATCHWORK:")
+                                                  nil))
+              (logical-pathname-translations "PATCHWORK")))
+
 ;;;; THE END ;;;;
