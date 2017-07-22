@@ -16,6 +16,8 @@ patchwork-icon.icns:patchwork-icon.iconset
 # 	cd headers64/player/C/          ; sh ./populate.sh
 # 	cd headers32/coreservices/C/    ; sh ./populate.sh
 # 	cd headers64/coreservices/C/    ; sh ./populate.sh
+# 	cd headers32/coremidi/C/        ; sh ./populate.sh
+# 	cd headers64/coremidi/C/        ; sh ./populate.sh
 # 	cd headers32/coregraphics/C/    ; sh ./populate.sh
 # 	cd headers64/coregraphics/C/    ; sh ./populate.sh
 # 	cd headers32/coremidi/A/        ; sh ./populate.sh
