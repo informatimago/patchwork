@@ -10,7 +10,7 @@ ported from MacOS (MCL) to MacOSX (ccl).
 License
 =======
 
-See the file ``Patchwork_license.rtf`` or ``Patchwork_license.txt``.
+See the file ``patchwork-license.rtf`` or ``patchwork-license.txt``.
 
 Compiling Patchwork
 ===================

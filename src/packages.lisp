@@ -258,7 +258,7 @@
   (:export "NEW-MENU" "PW-ADDMENU")
 
   ;; Extension:
-  (:export "*VALUE*"))
+  (:export "*VALUE*" "*VALUES*"))
 
 (cl:defpackage "USER-SUPPLIED-IN-OUTS"
   (:use))

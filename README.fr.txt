@@ -9,7 +9,7 @@ de MacOS (MCL) à MacOSX (ccl).
 License
 =======
 
-Voir le fichier ``Patchwork_license.rtf`` ou ``Patchwork_license.txt``.
+Voir le fichier ``patchwork-license.rtf`` ou ``patchwork-license.txt``.
 
 Compilation de Patchwork
 ========================

@@ -34,22 +34,106 @@
 (in-package "PATCHWORK.BUILDER")
 
 
-(defun version (major minor)
-  (list major minor))
+(defun version (major minor &rest rest)
+  (list* major minor rest))
 
-(defun version= (a b)
-  (equal a b))
 
-(defun version< (a b)
-  (cond
-    ((null a)            (not (null b)))
-    ((null b)            nil)
-    ((< (car a) (car b)) t)
-    ((= (car a) (car b)) (version< (cdr a) (cdr b)))
-    (t                   nil)))
+(defun version-split (version-string)
+  "We handle n{.n}[-n{.n}]"
+  (let ((dash (position #\- version-string)))
+    (if dash
+        (append (version-split (subseq version-string 0 dash))
+                (mapcar (function -)
+                        (version-split (subseq version-string (1+ dash)))))
+        (mapcar (function parse-integer)
+                (split-string version-string ".")))))
 
-(defun version<= (a b)
-  (or (version= a b) (version< a b)))
+(defun version-join (version)
+  (let ((neg (position-if (function minusp) version)))
+    (if neg
+        (format nil "~{~A~^.~A~}-~{~A~^.~A~}"
+                (subseq version 0 (1- neg))
+                (mapcar (function -) (subseq version (1- neg))))
+        (format nil "~{~A~^.~A~}" version))))
+
+(defun maptree (func tree)
+  "Calls func on each node of the tree (conses and atoms).
+If the function returns the node itself, proceeds recursively,
+otherwise uses the result to build the resuling tree."
+  (let ((new (funcall func tree)))
+    (if (and (consp tree) (eql new tree))
+        (cons (maptree func (car tree))
+              (maptree func (cdr tree)))
+        new)))
+
+(defgeneric version= (a b)
+  (:method ((a string) b)      (version= (version-split a) b))
+  (:method (a (b string))      (version= a (version-split b)))
+  (:method ((a null) b)        (every (function zerop) b))
+  (:method (a (b null))        (every (function zerop) a))
+  (:method (a b)               (and (equal (first a) (first b))
+                                    (version= (rest a) (rest b)))))
+
+(defgeneric version< (a b)
+  (:method ((a string) b)      (version< (version-split a) b))
+  (:method (a (b string))      (version< a (version-split b)))
+  (:method ((a null) (b null)) t)
+
+  (:method ((a null) b)
+    (loop :while b
+          :do (let ((item (pop b)))
+                (cond
+                  ((plusp  item) (return t))
+                  ((minusp item) (return nil))))
+          :finally (return t)))
+
+  (:method (a (b null))
+    (loop :while a
+          :do (let ((item (pop a)))
+                (cond
+                  ((plusp  item) (return nil))
+                  ((minusp item) (return t))))
+          :finally (return nil)))
+
+  (:method (a b)
+    (cond
+      ((< (car a) (car b)) t)
+      ((= (car a) (car b)) (version< (cdr a) (cdr b)))
+      (t                   nil))))
+
+(defgeneric version<= (a b)
+  (:method (a b)
+    (or (version= a b) (version< a b))))
+
+#-(and)
+(assert (every (function identity)
+               (list
+                (not (version< '(10 1) '(10 1 0 -722)))
+                (version< '(10 1 0 -722) '(10 1))
+                (version< '(10 1) '(10 1 0))
+                (not (version< '(10 1 0)   '(10 1)))
+                (not (version< '(10 1 0 0) '(10 1)))
+                (version< '(10 1 0 -12) '(10 1))
+                (not (version< '(10 1 0 33) '(10 1)))
+                (version< '(10 0) '(10 1))
+                (not (version< '(10 1) '(10 0)))
+                (version< '(10 1 0) '(10 2 1))
+                (not (version< '(10 2 1) '(10 2 0)))
+                (version< '(10 1 0 0) '(10 2 1 0))
+                (not (version< '(10 2 1 0) '(10 2 0 0)))
+                (not (version< "10.1" "10.1-0.722"))
+                (version< "10.1-0.722" "10.1")
+                (version< "10.1" "10.10")
+                (not (version< "10.10" "10.1"))
+                (not (version< "10.10.0" "10.1"))
+                (version< "10.1-0.12" "10.1")
+                (not (version< "10.10.33" "10.1"))
+                (version< "10.0" "10.1")
+                (not (version< "10.1" "10.0"))
+                (version< "10.10" "10.21")
+                (not (version< "10.21" "10.20"))
+                (version< "10.10.0" "10.21.0")
+                (not (version< "10.21.0" "10.20.0")))))
 
 
 (defun rt-version=  (a b) (if (version=  a b) '(:and) '(:or)))
