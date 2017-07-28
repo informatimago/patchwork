@@ -314,21 +314,21 @@ and the FINALIZATION is the clean-up form."
       port    ; "read or set the port number of an event"
       chan    ; "read or set the chan number of an event"
       )
-    (
-     (pitch
-      clk bend
-      pgm      fmsg    song ; clk.hi  bend.hi
-      ctrl param num prefix tempo seconds tsnum      alteration ; 0
-      )
-     (kpress fcount       ; clk.lo  bend.lo
-             vel
-             subframes valint                    tsdenom    minor-scale% ; 1
-             )
-     (dur
-      tsclick             ; 2
-      )
-     (tsquarter)          ; 3
-     ))
+  (
+   (pitch
+    clk bend
+    pgm      fmsg    song ; clk.hi  bend.hi
+    ctrl param num prefix tempo seconds tsnum      alteration ; 0
+    )
+   (kpress fcount       ; clk.lo  bend.lo
+           vel
+           subframes valint                    tsdenom    minor-scale% ; 1
+           )
+   (dur
+    tsclick             ; 2
+    )
+   (tsquarter)          ; 3
+   ))
 
 (defun null-event-p (event) (null event))
 
@@ -390,10 +390,10 @@ and the FINALIZATION is the clean-up form."
 
 #-(and) (
          (let ((seq (make-seq)))
-            (seq-add-event seq (make-midi-event :evtype 1))
-            (seq-add-event seq (make-midi-event :evtype 2))
-            (seq-add-event seq (make-midi-event :evtype 3))
-            (seq-to-list seq))
+           (seq-add-event seq (make-midi-event :evtype 1))
+           (seq-add-event seq (make-midi-event :evtype 2))
+           (seq-add-event seq (make-midi-event :evtype 3))
+           (seq-to-list seq))
          )
 
 
