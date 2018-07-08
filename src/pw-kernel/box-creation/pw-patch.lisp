@@ -128,7 +128,8 @@
     (:no-error (&rest values)
       (setf *value*  (first values))
       (setf *values* values)
-      (format t "~&PW->~S~%" *value*))
+      (let ((*package* (load-time-value (find-package "PW"))))
+        (format t "~&PW->~S~%" *value*)))
     (error (err)
       (setf *value*  patch
             *values* (list :error err patch))
@@ -152,17 +153,15 @@
            (last-mp (view-mouse-position win))
            (where   (convert-coordinates where (view-container view) win)))
       (flet ((draw-the-line ()
-               (with-focused-view win
+               (drawing-instance win
                  (draw-line (point-h where)(point-v where)(point-h last-mp)(point-v last-mp)))))
         (with-instance-drawing win
           (draw-the-line)
-          (loop :while (mouse-down-p) :do
-            (let ((mp (view-mouse-position win)))
-              (unless (eql mp last-mp)
-                (setq last-mp mp)
-                (new-instance win)
-                (draw-the-line))))
-          (new-instance win)))
+          (loop :while (mouse-down-p)
+                :do (let ((mp (view-mouse-position win)))
+                      (unless (eql mp last-mp)
+                        (setq last-mp mp)
+                        (draw-the-line))))))
       (connect-patch? view (find-view-containing-point win last-mp))
       (with-focused-view view
         (erase-view-inside-rect view)))))
@@ -334,7 +333,7 @@
 
 (defmethod view-click-event-handler ((self C-patch) where)
   (let ((res (call-next-method)))
-    #+debug-views
+    ;; #+debug-views
     (format-trace '(view-click-event-handler c-patch)
                   :where (point-to-list where)
                   :view-size (list (h self) (w self))
@@ -363,20 +362,24 @@
                   #+debug-views (format-trace 'view-click-event-handler "move top bar " (list (point-h where) (point-v where)) self)
                   (change-position self where))
                  ((inside-rectangle? (point-h where) (point-v where) (- (w self) 5) (- (h self) 5) 5 5) ; botright corner
-                  #+debug-click (format-trace'click '(resize corner) 'change-size)
-                  #+debug-views (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
+                  ;; #+debug-click
+                  (format-trace'click '(resize corner) 'change-size)
+                  ;; #+debug-views
+                  (format-trace 'view-click-event-handler "resize corner" (list (point-h where) (point-v where)) self)
                   (change-size self (subtract-points (view-size self) where)))
                  ((inside-rectangle? (point-h where) (point-v where) 0 (- (h self) 12) 15 12) ; bottom left box
 
                   #+debug-views (format-trace 'view-click-event-handler "bottom box" (list (point-h where) (point-v where)) self)
                   (cond ((option-key-p)
                          #+debug-click (format-trace'click '(bottom left box) '(option) 'output-type)
-                         (print (list 'outputtype (type-list self))))
+                         (let ((*package* (load-time-value (find-package "PW"))))
+                           (print (list 'outputtype (type-list self)))))
                         ((command-key-p)
                          #+debug-click (format-trace'click '(bottom left box) '(command) 'input-type)
-                         (print (list 'inputtypes (mapcar 'list
-                                                          (ask-all (pw-controls self) 'doc-string)
-                                                          (ask-all (pw-controls self) 'type-list)))))
+                         (let ((*package* (load-time-value (find-package "PW"))))
+                           (print (list 'inputtypes (mapcar 'list
+                                                            (ask-all (pw-controls self) 'doc-string)
+                                                            (ask-all (pw-controls self) 'type-list))))))
                         (t
                          #+debug-click (format-trace'click '(bottom left box) '() 'flip-controls)
                          (flip-controls self (setf (flip-flag self) (not (flip-flag self)))))))
@@ -709,16 +712,16 @@
       (unwind-protect
            (progn
              (with-instance-drawing container
-               (tell moving-patches 'view-frame-patch (subtract-points prev-mp orig-mp))
+               (drawing-instance container
+                (tell moving-patches 'view-frame-patch (subtract-points prev-mp orig-mp)))
                (loop
                  (event-dispatch)
                  (unless (mouse-down-p) (return))
                  (let ((mp (view-mouse-position container)))
                    (unless (eql prev-mp mp)
-                     (new-instance container)
-                     (tell moving-patches 'view-frame-patch (subtract-points prev-mp orig-mp))
-                     (setq prev-mp mp))))
-               (new-instance container))
+                     (drawing-instance container
+                       (tell moving-patches 'view-frame-patch (subtract-points prev-mp orig-mp)))
+                     (setq prev-mp mp)))))
              (unless (eql prev-mp orig-mp)
                (push-to-top view)
                (let ((new-position  (add-points (view-position view)
@@ -751,22 +754,23 @@
   (:method ((view C-patch) where)
     (when (resize-patch? view)
       (let ((the-rest (remove view (controls (view-window view)) :test #'eq)))
+        (with-focused-view view (invalidate-view view t))
         (connect/unconn (list view) the-rest t)
         (unwind-protect
              (let* ((container (view-container view))
                     (last-mp   (add-points (view-position view) where))
                     (delta     (subtract-points 0 last-mp)))
                (with-instance-drawing container
-                 (view-frame-patch view 0)
+                 (drawing-instance container
+                   (view-frame-patch view 0))
                  (loop
                    (unless (mouse-down-p) (return))
                    (let ((mp (view-mouse-position view)))
                      (unless (eql mp last-mp)
                        (setq last-mp mp)
-                       (resize-patch-box view mp delta)
-                       (new-instance container)
-                       (view-frame-patch view 0))))
-                 (new-instance container)))
+                       (drawing-instance container
+                         (resize-patch-box view mp delta)
+                         (view-frame-patch view 0)))))))
           (connect/unconn (list view) the-rest))
         (view-draw-contents view)))))
 
