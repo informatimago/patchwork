@@ -78,8 +78,8 @@
 (defmethod patch-value ((self C-patch-buffer) obj)
   (let ((in (car (input-objects self))))
     (if (value self)
-      (the-buffer self)
-      (setf (the-buffer self) (patch-value in obj)))))
+        (the-buffer self)
+        (setf (the-buffer self) (patch-value in obj)))))
 
 (defunp Buffer ((buff nilNum)) nil
         "The buffer module stores the results of patch calculations connected to its
