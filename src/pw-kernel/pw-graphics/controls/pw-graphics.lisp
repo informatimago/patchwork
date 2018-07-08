@@ -53,17 +53,18 @@
                (with-pen-state (:pattern *gray-pattern* :mode :patCopy)
                  (draw-rect rect)))))
       (with-instance-drawing view
-        (draw-gray-rect (pt2rect anchor delta))
+        (drawing-instance view
+          (draw-gray-rect (pt2rect anchor delta)))
         (loop :while (mouse-down-p) :do
           (let ((new-mouse (view-mouse-position view)))
-           (unless (eql old-mouse new-mouse) ;has the mouse moved?
-             (new-instance view)
-             (setf delta (add-points offset new-mouse))
-             (when limit (setq delta (point-max delta limit)))
-             (draw-gray-rect (pt2rect anchor delta))
-             (get-next-event nil 0 1)
-             (setf old-mouse new-mouse))))
-        (new-instance view)))
+            (unless (eql old-mouse new-mouse) ;has the mouse moved?
+
+              (setf delta (add-points offset new-mouse))
+              (when limit (setq delta (point-max delta limit)))
+              (drawing-instance view
+                (draw-gray-rect (pt2rect anchor delta)))
+              (get-next-event nil 0 1)
+              (setf old-mouse new-mouse))))))
     delta))
 
 
