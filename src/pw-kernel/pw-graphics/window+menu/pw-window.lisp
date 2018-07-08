@@ -459,6 +459,9 @@
 
 (defmethod view-key-event-handler ((self C-pw-window) char)
   #+debug-views (format-trace 'view-key-event-handler char self)
+  (format *trace-output* "~&view-key-event-handler ((self C-pw-window) char) thread = (eq ~S ~S) = ~S~%"
+          ccl::*current-process* ccl::*cocoa-event-process*
+          (eq ccl::*current-process* ccl::*cocoa-event-process*))
   (cond
     ;; editing a field:
     (*current-small-inBox*
@@ -479,31 +482,31 @@
           (cond ((abstract-box self) (window-select (view-window (abstract-box self))))
                 ((super-win self) (window-select (super-win self)))
                 (t (ui:ed-beep) (setq no-change-flag t))))
-#|*|#    (#\b  (when (active-patches self)
-                 (browse (car (active-patches self)))))
+         #|*|#    (#\b  (when (active-patches self)
+                          (browse (car (active-patches self)))))
          (#\Rubout
           (cut-delete self))
-#|*|#    (#\h
-          (if *PW-help-window*
-              (unless (wptr *PW-help-window*)
-                (make-PW-help-window))
-              (make-PW-help-window))
-          (window-select *PW-help-window*))
-         (#\t     ;;tutorial patch
+         #|*|#    (#\h
+                   (if *PW-help-window*
+                       (unless (wptr *PW-help-window*)
+                         (make-PW-help-window))
+                       (make-PW-help-window))
+                   (window-select *PW-help-window*))
+         (#\t ;;tutorial patch
           (if (active-patches self)
               (tell (active-patches self) #'get-tutorial-patch)
               (ui:ed-beep)))
-#|*|#    (#\R
-          (if (top-level-patch-win? self)
-              (ui:ed-beep)
-              (let ((title (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
-                                                             :initial-string (window-title self))))
-                (when title
-                  (cond
-                    ((abstract-box self)
-                     (set-dialog-item-text-from-dialog (car (pw-controls (out-obj (abstract-box self)))) title))
-                    ((super-win self)
-                     (set-window-title self title)(erase+view-draw-contents (super-win self))))))))
+         #|*|#    (#\R
+                   (if (top-level-patch-win? self)
+                       (ui:ed-beep)
+                       (let ((title (get-string-from-user  "New name" :size (make-point 200 85) :position :centered
+                                                                      :initial-string (window-title self))))
+                         (when title
+                           (cond
+                             ((abstract-box self)
+                              (set-dialog-item-text-from-dialog (car (pw-controls (out-obj (abstract-box self)))) title))
+                             ((super-win self)
+                              (set-window-title self title)(erase+view-draw-contents (super-win self))))))))
          (#\r (if (active-patches self)
                   (rename-boxes self)
                   (ui:ed-beep)))
@@ -513,13 +516,13 @@
          (#\Y (if (active-patches self)
                   (allign-patches-to-y self)
                   (setq no-change-flag t)))
-#|*|#    (#\D (view-draw-contents  self))
-#|*|#    (#\i (tell (ask-all (active-patches self) 'pw-function) 'inspect))
+         #|*|#    (#\D (view-draw-contents  self))
+         #|*|#    (#\i (tell (ask-all (active-patches self) 'pw-function) 'inspect))
          (#\e (tell (ask-all (active-patches self) 'pw-function) 'edit-definition))
          (#\d (tell (ask-all (active-patches self) 'pw-function) 'show-documentation))
          (#\o (tell (active-patches self) 'open-patch-win))
          (#\A (make-abstraction-M self))
-#|*|#    (#\p (tell (active-patches self) 'init-patch) (tell (active-patches self) 'play))
+         #|*|#    (#\p (tell (active-patches self) 'init-patch) (tell (active-patches self) 'play))
          (#\c
           (let ((stop-time (ask (controls self) 'give-stop-time)))
             (if stop-time
@@ -529,9 +532,10 @@
           (if (super-note self)
               (record-midi-out-boxes- self (give-structured-duration1 self 1))
               (ui:ed-beep)))
-#|*|#    (#\s (tell (controls self) 'stop-play))
+         #|*|#    (#\s (tell (controls self) 'stop-play))
          (#\v (run-boxes self))
          (otherwise (ed-beep) (setq no-change-flag t)))
+       (finish-output)
        (when (and (not (member char '(#\h #\i #\I #\R #\s #\p #\b #\D)))
                   (not no-change-flag))
          (set-changes-to-file-flag self))))))
