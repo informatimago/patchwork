@@ -9,6 +9,7 @@
 https://github.com/informatimago/mclgui/graphs/code-frequency
 https://github.com/informatimago/patchwork/graphs/code-frequency
 
+** TODO [#B] provide restarts to skip or retry loading init files   :feature:
 ** TODO [#A] cursors still don't show                                   :bug:
 ** TODO [#A] chord editor midicents text is displayed too big           :bug:
 so the bottom part is truncated in its box…
@@ -1337,3 +1338,23 @@ release:
         $(LISP) $(ARGS) --load $@.lisp --load build.lisp
 
     where debug.lisp / release.lisp would contain the wanted optimization setting
+* Notes
+** pw-patch
+
+
+| context          | gesture                                  | action                        |
+|------------------+------------------------------------------+-------------------------------|
+| inside patch box | double click                             | open-patch-win                |
+|                  | control+option click in box              | delete-extra-inputs           |
+|                  | contro click in box                      | change-position               |
+|                  | click in title bar                       | change-position               |
+|                  | click in grow box        (5x5)           | change-size                   |
+|                  | option click in bottom left box (15x12)  | print outputtypes             |
+|                  | command click in bottom left box (15x12) | print inputtypes              |
+|                  | click in bottom left box (15x12)         | flip-controls                 |
+|                  | option click                             | mouse-pressed-no-active-extra |
+|                  | click                                    | toggle-patch-active-mode      |
+|------------------+------------------------------------------+-------------------------------|
+| inside controls  | option click                             | disconnect-ctrl               |
+|                  | click                                    | nothing                       |
+|                  |                                          |                               |

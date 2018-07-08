@@ -50,6 +50,7 @@
                "closer-mop"
                "trivial-gray-streams"
                "mclgui"
+               #+patchwork.builder::use-cl-midi "com.informatimago.macosx.coremidi"
                #+patchwork.builder::use-cl-midi "midi"
                ;; "com.informatimago.common-lisp.lisp.stepper"
                )

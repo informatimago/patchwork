@@ -117,8 +117,14 @@
   (require :cocoa))
 (defparameter *cocoa-readtable* (copy-readtable *readtable*))
 
-(load (translate-logical-pathname #P"PATCHWORK:GESTALT"))
-(add-cocoa-version-features)
+(load (translate-logical-pathname #P"MCLGUI:GESTALT")) ; calls (add-cocoa-version-features)
+(shadow '(version
+          version=     version<    version<=
+          version/=    version>    version>=
+          rt-version=  rt-version< rt-version<=
+          rt-version/= rt-version> rt-version>=))
+(use-package "MCLGUI.GESTALT")
+
 
 ;;; --------------------------------------------------------------------
 ;; #+(and ccl (not patchwork.builder::no-cocoa))

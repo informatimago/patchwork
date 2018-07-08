@@ -266,9 +266,11 @@ TRANSLATIONS: a list of logical pathname translations.
       (set-host "MCLGUI"
                 '()                 "mclgui/"                      src)
 
+      (set-host "COREMIDI"
+                '()                 "CoreMIDI/"                    src)
+
       (set-host "MIDI"
                 '()                 "midi/"                        src)
-
 
       (set-host "CLENI"
                 '()                 "patchwork/src/src-lib/cleni/" src)

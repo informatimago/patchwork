@@ -160,18 +160,19 @@
                                    patchwork.builder::use-midishare
                                    patchwork.builder::use-cl-midi)))
 
-   (pushnew :debug-application    *features*)
+;; (pushnew :debug-application    *features*)
 ;; (pushnew :debug-event          *features*)
 ;; (pushnew :debug-focused-view   *features*)
-   (pushnew :debug-graphics       *features*)
+;; (pushnew :debug-graphics       *features*)
 ;; (pushnew :debug-objc           *features*)
 ;; (pushnew :debug-streams        *features*)
 ;; (pushnew :debug-text           *features*)
-   (pushnew :debug-trace          *features*)
-   (pushnew :debug-views          *features*)
+;; (pushnew :debug-trace          *features*)
+;; (pushnew :debug-views          *features*)
 ;; (pushnew :debug-views-colors   *features*)
 ;; (pushnew :debug-views-instance *features*)
 ;; (pushnew :debug-wrapper        *features*)
+
 ;; (pushnew 'patchwork.builder::no-cocoa          *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events  *features*)
 ;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
@@ -185,10 +186,7 @@
 (progn
   (say "Loading :cocoa (takes some time to start…)")
   (require :cocoa))
-(defparameter *cocoa-readtable* (copy-readtable *readtable*))
 
-(load (translate-logical-pathname #P"PATCHWORK:GESTALT"))
-(add-cocoa-version-features)
 
 
 
@@ -285,8 +283,6 @@ DO:         Prints each expression and their values.
 (let ((*print-circle* nil))
   (format t "~&;; Use ~S to start Patchwork in the main thread.~%~:*~S~%"
           '(start-patchwork))
-  (format t  "~&;; Use ~S to start Patchwork in swank.~%~:*~S~%"
-          '(with-streams (pw::initialize-patchwork)))
   (format t  "~&~S~%"
           '(in-package :pw)))
 

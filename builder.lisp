@@ -41,11 +41,7 @@
   (:use "COM.INFORMATIMAGO.TOOLS.MANIFEST")
   (:use "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.FILE"
         "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.STRING")
-  (:export "*PATCHWORK-VERSION*"
-           "VERSION" "VERSION=" "VERSION<"
-           "RT-VERSION=" "RT-VERSION<" "RT-VERSION<="
-           "FEATUREP" "SYSTEM-VERSION" "ADD-COCOA-VERSION-FEATURES"
-           "SAY"))
+  (:export "*PATCHWORK-VERSION*" "SAY"))
 (in-package "PATCHWORK.BUILDER")
 (declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
 
@@ -74,6 +70,9 @@
          asdf:*central-registry* :test (function equalp))
 
 (pushnew (translate-logical-pathname #P"MCLGUI:")
+         asdf:*central-registry* :test (function equalp))
+
+(pushnew (translate-logical-pathname #P"COREMIDI:")
          asdf:*central-registry* :test (function equalp))
 
 (pushnew (translate-logical-pathname #P"MIDI:")

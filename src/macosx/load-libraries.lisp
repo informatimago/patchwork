@@ -43,10 +43,14 @@
   (load-framework "CoreServices")
   (pushnew :has-appleevent *features*)
   (load-framework "CoreGraphics")
-  (load-framework "MidiShare")
-  (pushnew :has-midishare *features*)
-  (load-framework "Player")
-  (pushnew :has-midiplayer *features*))
+
+  #+patchwork.builder::use-cl-midi (load-framework "CoreMIDI")
+
+  #+patchwork.builder::use-midishare (load-framework "MidiShare")
+  #+patchwork.builder::use-midishare (pushnew :has-midishare *features*)
+  #+patchwork.builder::use-midishare (load-framework "Player")
+  #+patchwork.builder::use-midishare (pushnew :has-midiplayer *features*))
+
 
 #||
 
