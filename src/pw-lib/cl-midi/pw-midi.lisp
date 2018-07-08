@@ -6,19 +6,36 @@
 ;;;;USER-INTERFACE:     MCL User Interface Classes
 ;;;;DESCRIPTION
 ;;;;
-;;;;    This package exports an interface to midi files using the CL-MIDI system.
+;;;;    This package exports an interface to midi files using the
+;;;;    CL-MIDI system:
+;;;;
+;;;;        This library for reading and writing MIDI files, and for
+;;;;        representing MIDI events, was originally written by
+;;;;        students of Robert Strandh at Université Bordeaux I.  It
+;;;;        was then included in the Gsharp score editor[1], and was
+;;;;        also posted to the alt.music.midi and comp.lang.lisp
+;;;;        newsgroups[2].  Subsequently, workers at Goldsmiths
+;;;;        College included it in their own projects, and took over
+;;;;        the responsibility of distributing a copy usable by
+;;;;        multiple projects.
+;;;;
+;;;;
+;;;;    In addition real-time midi playing and recording is provided
+;;;;    using the MacOSX CoreMIDI framework.
+;;;;
 ;;;;
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
-;;;;    1986-??-?? Assayag, Agon -- Patchwork midi stuff.
+;;;;    2017-07-29 <PJB> Connected to CoreMIDI for real-time MIDI I/O.
 ;;;;    2014-08-13 <PJB> Midishare API implemented over cl-midi.
+;;;;    1986-??-?? Assayag, Agon -- Patchwork midi stuff.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    GPL3
 ;;;;
 ;;;;    Copyright IRCAM 1986 - 1996
-;;;;    Copyright Pascal J. Bourguignon 2014 - 2014
+;;;;    Copyright Pascal J. Bourguignon 2014 - 2017
 ;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU General Public License as published by
@@ -49,6 +66,7 @@
 ;;;-----------------------------------------------------------------------
 
 ;;; Constant definitions for every type of MidiShare event
+
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defconstant typeNote          0 "note with pitch, velocity and duration")
@@ -307,10 +325,10 @@ and the FINALIZATION is the clean-up form."
 
 (defstruct* midi-event
     (
-     link           ; "read or set the link of an event"
-        date           ; "read or set the date of an event"
-      evtype ; "read or set the type of an event. Be careful in modifying the type of an event"
-      ref ; "read or set the reference number of an event"
+     link    ; "read or set the link of an event"
+      date    ; "read or set the date of an event"
+      evtype  ; "read or set the type of an event. Be careful in modifying the type of an event"
+      ref     ; "read or set the reference number of an event"
       port    ; "read or set the port number of an event"
       chan    ; "read or set the chan number of an event"
       )
@@ -318,16 +336,16 @@ and the FINALIZATION is the clean-up form."
    (pitch
     clk bend
     pgm      fmsg    song ; clk.hi  bend.hi
-    ctrl param num prefix tempo seconds tsnum      alteration ; 0
+    ctrl param num prefix tempo seconds tsnum alteration    ; 0
     )
-   (kpress fcount       ; clk.lo  bend.lo
+   (kpress fcount         ; clk.lo  bend.lo
            vel
-           subframes valint                    tsdenom    minor-scale% ; 1
+           subframes valint  tsdenom   minor-scale%         ; 1
            )
    (dur
-    tsclick             ; 2
+    tsclick                                                 ; 2
     )
-   (tsquarter)          ; 3
+   (tsquarter)                                              ; 3
    ))
 
 (defun null-event-p (event) (null event))
@@ -397,6 +415,120 @@ and the FINALIZATION is the clean-up form."
          )
 
 
+
+;;----------------------------------------------------------------------
+
+(defparameter *sources-refnums*      (make-hash-table :test (function equal)))
+(defparameter *destinations-refnums* (make-hash-table :test (function equal)))
+
+(defun list-source-ports ()
+  (loop
+    :with ports := '()
+    :for device :in (append (coremidi:devices)
+                            (coremidi:external-devices))
+    :do (loop :for entity :in (coremidi:device-entities device)
+              :do (loop
+                    :for source :in  (coremidi:entity-sources entity)
+                    :for key := (list  (coremidi:name device)
+                                       (coremidi:name entity)
+                                       (coremidi:name source))
+                    :do (push key ports)))
+    :finally (return (nreverse ports))))
+
+(defun list-destination-ports ()
+  (loop
+    :with ports := '()
+    :for device :in (append (coremidi:devices)
+                            (coremidi:external-devices))
+    :do (loop :for entity :in (coremidi:device-entities device)
+              :do (loop
+                    :for destination :in  (coremidi:entity-destinations entity)
+                    :for key := (list  (coremidi:name device)
+                                       (coremidi:name entity)
+                                       (coremidi:name destination))
+                    :do (push key ports)))
+    :finally (return (nreverse ports))))
+
+(defun update-port-refnums ()
+  (let ((sources       (make-hash-table :test (function equal)))
+        (destinations  (make-hash-table :test (function equal))))
+    (loop
+      :for device :in (append (coremidi:devices)
+                              (coremidi:external-devices))
+      :do (loop :for entity :in (coremidi:device-entities device)
+                :do (loop
+                      :for source :in  (coremidi:entity-sources entity)
+                      :for key := (list  (coremidi:name device)
+                                         (coremidi:name entity)
+                                         (coremidi:name source))
+                      :for refnum := (sxhash key)
+                      :do (setf (gethash refnum sources) key
+                                (gethash key    sources) refnum))
+                    (loop
+                      :for destination :in  (coremidi:entity-destinations entity)
+                      :for key := (list  (coremidi:name device)
+                                         (coremidi:name entity)
+                                         (coremidi:name destination))
+                      :for refnum := (sxhash key)
+                      :do (setf (gethash refnum destinations) key
+                                (gethash key    destinations) refnum))))
+    (setf *sources-refnums* sources
+          *destinations-refnums* destinations))
+  (values))
+
+(defun get-source-refnum (source-names)
+  (values (gethash source-names *sources-refnums*)))
+
+(defun get-destination-refnum (destination-names)
+  (values (gethash destination-names *destinations-refnums*)))
+
+(defun get-source-by-refnum (source-refnum)
+  (let* ((names  (gethash source-refnum *sources-refnums*))
+         (device (find (first names) (append (coremidi:devices)
+                                             (coremidi:external-devices))
+                       :test (function string=)
+                       :key (function coremidi:name)))
+         (entity (find (second names) (coremidi:device-entities device)
+                       :test (function string=)
+                       :key (function coremidi:name)))
+         (port   (find (third names) (coremidi:entity-sources entity)
+                       :test (function string=)
+                       :key (function coremidi:name))))
+    port))
+
+(defun get-destination-by-refnum (destination-refnum)
+  (let* ((names  (gethash destination-refnum *destinations-refnums*))
+         (device (find (first names) (append (coremidi:devices)
+                                             (coremidi:external-devices))
+                       :test (function string=)
+                       :key (function coremidi:name)))
+         (entity (find (second names) (coremidi:device-entities device)
+                       :test (function string=)
+                       :key (function coremidi:name)))
+         (port   (find (third names) (coremidi:entity-destinations entity)
+                       :test (function string=)
+                       :key (function coremidi:name))))
+    port))
+
+
+(defvar *default-source-refnum*)
+(defvar *default-destination-refnum*)
+
+(defun set-default-refnums (source-refnum destination-refnum)
+  (setf *default-source-refnum*      source-refnum
+        *default-destination-refnum* destination-refnum))
+
+
+(progn
+ (update-port-refnums)
+ (set-default-refnums
+  (get-source-refnum      (find "Network" (list-source-ports)      :key (function first) :test (function string=)))
+  (get-destination-refnum (find "Network" (list-destination-ports) :key (function first) :test (function string=)))))
+
+
+;;----------------------------------------------------------------------
+
+
 ;;;
 ;;; To Know about MidiShare and Active Sessions
 ;;;
@@ -409,15 +541,6 @@ and the FINALIZATION is the clean-up form."
   "Give MidiShare version as a fixnum. For example 131 as result, means : version 1.31"
   100)
 
-(defun MidiCountAppls ()
-  "Give the number of MidiShare applications currently opened"
-  1)
-
-(defun MidiGetIndAppl (index)
-  "Give the reference number of a MidiShare application from its index, a fixnum between 1 and (MidiCountAppls)"
-  1)
-
-
 (defstruct midiapp
   refnum
   name
@@ -425,9 +548,28 @@ and the FINALIZATION is the clean-up form."
   filter
   receive-alarm
   context-alarm
-  receive-queue)
+  receive-queue
+  coremidi)
+
+(defstruct coremidi
+  client
+  output-port destination-endpoint
+  input-port  source-endpoint)
+
+(defun cm-client      (app) (coremidi-client      (midiapp-coremidi app)))
+(defun cm-input-port  (app) (coremidi-input-port  (midiapp-coremidi app)))
+(defun cm-output-port (app) (coremidi-output-port (midiapp-coremidi app)))
+
 
 (defvar *midi-apps* '() "A list of midiapp.")
+
+(defun MidiCountAppls ()
+  "Give the number of MidiShare applications currently opened"
+  (length *midi-apps*))
+
+(defun MidiGetIndAppl (index)
+  "Give the reference number of a MidiShare application from its index, a fixnum between 1 and (MidiCountAppls)"
+  (midiapp-refnum (elt *midi-apps* (1- index))))
 
 (defun getapp (refnum)  (find refNum *midi-apps* :key (function midiapp-refnum)))
 
@@ -440,14 +582,38 @@ and the FINALIZATION is the clean-up form."
 ;;; To Open and Close a MidiShare session
 ;;;
 
+(defun cm-client-notify (&rest args))
+(defun cm-port-read (&rest args))
+
+(defun cm-close (cm)
+  (when (coremidi-source-endpoint cm)
+    (coremidi:port-disconnect-source (coremidi-input-port cm)
+                                     (coremidi-source-endpoint cm)))
+  (coremidi:port-dispose (coremidi-input-port  cm))
+  (coremidi:port-dispose (coremidi-output-port cm))
+  (coremidi:client-dispose (coremidi-client cm)))
+
 (defun MidiOpen (name)
-  "Open a new MidiShare application, with name name. Give a unique reference number."
+  "Open a new MidiShare application, with name NAME. Give a unique reference number."
+  (update-port-refnums)
   (let ((ref (1+ (reduce (function max) *midi-apps* :key (function midiapp-refnum) :initial-value 0))))
-    (push (make-midiapp :refnum ref :name name) *midi-apps*)
+    (push (make-midiapp
+           :refnum ref
+           :name name
+           :coremidi (let ((client (coremidi:client-create name 'cm-client-notify)))
+                       (make-coremidi
+                        :client  client
+                        :output-port (coremidi:output-port-create client (format nil "~A-OUT" name))
+                        :input-port  (coremidi:input-port-create  client (format nil "~A-IN"  name)
+                                                                  'cm-port-read))))
+          *midi-apps*)
     ref))
 
 (defun MidiClose (refNum)
   "Close an opened MidiShare application from its reference number"
+  (let ((app (getapp refNum)))
+    (when app
+      (cm-close (midiapp-coremidi app))))
   (deletef *midi-apps* refNum :key (function midiapp-refnum)))
 
 ;;;
@@ -461,7 +627,14 @@ and the FINALIZATION is the clean-up form."
 
 (defun MidiSetName (refNum name)
   "Change the name of a MidiShare application"
-  (setf (midiapp-name (getapp refNum)) name))
+  ;; TODO: call Midi Alarms?
+  (let ((app (getapp refNum)))
+    (when app
+      (setf (midiapp-name app) name)
+      (let ((cm (midiapp-coremidi app)))
+        (setf (coremidi:name (cm-client      cm)) name
+              (coremidi:name (cm-input-port  cm)) (format nil "~A-IN"  name)
+              (coremidi:name (cm-output-port cm)) (format nil "~A-OUT" name))))))
 
 (defun MidiGetInfo (refNum)
   "Give the 32-bits user defined content of the info field of a MidiShare application. Analogous to window's refcon."
@@ -540,7 +713,13 @@ and the FINALIZATION is the clean-up form."
 (defun MidiConnect (src dst s)
   "Connect or disconnect two MidiShare applications"
   ;;(#_MidiConnect src dst s)
-  )
+  (error "Not implemented yet")
+  (if (zerop src)
+      *default-source-refnum*
+      src)
+  (if (zerop dst)
+      *default-destination-refnum*
+      dst))
 
 (defun MidiIsConnected (src dst)
   "Test if two MidiShare applications are connected"
@@ -670,6 +849,7 @@ and the FINALIZATION is the clean-up form."
   (values (truncate (* 10 (ui::timestamp)) (/ ui::+tick-per-second+))))
 
 (defun midi-get-time ()
+  ;; TODO
   (midigettime))
 
 (declaim (inline midi-get-time))
@@ -679,6 +859,7 @@ and the FINALIZATION is the clean-up form."
 ;;;
 
 (defun MidiSendIm (refNum ev)
+  ;; TODO
   "send an event now"
   (midisendat refnum ev (MidiGetTime)))
 
@@ -870,11 +1051,14 @@ and the FINALIZATION is the clean-up form."
 ;;;
 
 (defun install-midishare-interface ()
-
+  (unless (coremidi:coreaudio-framework) (error "Missing CoreAudio"))
+  (unless (coremidi:coremidi-framework)  (error "Missing CoreMIDI"))
   (unless (midishare) (error "MidiShare not installed")))
 
 (defun remove-midishare-interface ()
-  (setf *midiShare* nil))
+  (setf coremidi:*coremidi*  nil)
+  (setf coremidi:*coreaudio* nil)
+  (setf *midiShare*          nil))
 
 
 ;;;---------------------------------------------------------------------
@@ -994,7 +1178,18 @@ and the FINALIZATION is the clean-up form."
      unit))
 
 (defstruct* (player-state (:conc-name s-))
-    (bar beat unit date tempo num denom click quater state syncin syncout))
+    ((bar 0)
+     (beat 0)
+     (unit 0)
+     (date 0)
+     (tempo 0)
+     (num 0)
+     (denom 0)
+     (click 0)
+     (quater 0)
+     (state kIdle)
+     (syncin 0)
+     (syncout 0)))
 
 (define-with-temporary-macro with-temporary-player-state    (make-player-state))
 
@@ -1027,6 +1222,8 @@ and the FINALIZATION is the clean-up form."
   (deletef *players* (getplayer refnum)))
 
 (defun open-player (name)
+  (format t "~S~%" (list 'open-player name))
+  ;; TODO
   (OpenPlayer name))
 
 ;;===================
@@ -1034,119 +1231,146 @@ and the FINALIZATION is the clean-up form."
 ;;===================
 
 (defun StartPlayer (refNum)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'startplayer refnum)))
 
 (defun ContPlayer (refNum)
-  )
+  (format t "~S~%" (list 'contplayer refnum)))
 
 (defun StopPlayer (refNum)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'StopPlayer refnum)))
 
 (defun PausePlayer (refNum)
-  )
+  (format t "~S~%" (list 'pauseplayer refnum)))
 
 ;;===================
 ;; Record management
 ;;===================
 
 (defun SetRecordModePlayer (refNum state)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetRecordModePlayer refnum state)))
 
 (defun RecordPlayer (refNum tracknum)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'RecordPlayer refnum tracknum)))
 
 (defun SetRecordFilterPlayer (refNum filter)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetRecordFilterPlayer refnum filter)))
 
 ;;=====================
 ;; Position management
 ;;=====================
 
 (defun SetPosBBUPlayer (refNum pos)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetPosBBUPlayer refnum pos)))
 
-(defun SetPosMsPlayer (refNum date_ms)
-  )
+(defun SetPosMsPlayer (refNum date-ms)
+  ;; TODO
+  (format t "~S~%" (list 'SetPosMsPlayer refnum date-ms)))
 
 ;;==================
 ;; Loop management
 ;;==================
 
 (defun SetLoopPlayer (refNum state)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetLoopPlayer refnum state)))
 
 (defun SetLoopStartBBUPlayer (refNum pos)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetLoopStartBBUPlayer refnum pos)))
 
 (defun SetLoopEndBBUPlayer (refNum pos)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetLoopEndMsPlayer refnum pos)))
 
-(defun SetLoopStartMsPlayer (refNum date_ms)
-  )
+(defun SetLoopStartMsPlayer (refNum date-ms)
+  ;; TODO
+  (format t "~S~%" (list 'SetLoopStartMsPlayer refnum date-ms)))
 
-(defun SetLoopEndMsPlayer (refNum date_ms)
-  )
+(defun SetLoopEndMsPlayer (refNum date-ms)
+  ;; TODO
+  (format t "~S~%" (list 'SetLoopEndMsPlayer refnum date-ms)))
 
 ;;============================
 ;; Synchronisation management
 ;;============================
 
 (defun SetSynchroInPlayer (refNum state)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetSynchroInPlayer refnum state)))
 
 (defun SetSynchroOutPlayer (refNum state)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetSynchroOutPlayer refnum state)))
 
 (defun SetSMPTEOffsetPlayer (refNum smptepos)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetSMPTEOffsetPlayer refnum smptepos)))
 
 (defun SetTempoPlayer (refNum tempo)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetTempoPlayer refnum tempo)))
 
 ;;===================
 ;; State management
 ;;===================
 
 (defun GetStatePlayer (refNum playerstate)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'GetStatePlayer refnum playerstate)))
 
 (defun GetEndScorePlayer (refNum playerstate)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'GetEndScorePlayer refnum playerstate)))
 
 ;;==============
 ;; Step playing
 ;;==============
 
 (defun ForwardStepPlayer (refNum flag)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'ForwardStepPlayer refnum flag)))
 
 (defun BackwardStepPlayer (refNum flag)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'BackwardStepPlayer refnum flag)))
 
 ;;====================
 ;; Tracks management
 ;;====================
 
 (defun GetAllTrackPlayer (refNum)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'GetAllTrackPlayer refnum)))
 
 (defun GetTrackPlayer (refNum tracknum)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'GetTrackPlayer refnum tracknum)))
 
 (defun SetTrackPlayer (refNum tracknum seq)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetTrackPlayer refnum tracknum seq)))
 
 (defun SetAllTrackPlayer (refNum seq tpq)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetAllTrackPlayer refnum seq tpq)))
 
 (defun SetParamPlayer (refNum track param val)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'SetParamPlayer refnum track param val)))
 
 (defun InsertAllTrackPlayer (refNum seq)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'InsertAllTrackPlayer refnum seq)))
 
 (defun InsertTrackPlayer (refNum track seq)
-  )
+  ;; TODO
+  (format t "~S~%" (list 'InsertTrackPlayer refnum track seq)))
 
 
 ;;====================
@@ -1533,9 +1757,11 @@ and the FINALIZATION is the clean-up form."
          )
 
 (defun midi-file-save (name seq info)
+  ;; TODO
   (MidiFileSave  name seq info))
 
 (defun midi-file-load (name seq info)
+  ;; TODO
   (MidiFileLoad  name seq info))
 
 (defun MidiNewMidiFileInfos ()
@@ -1607,6 +1833,7 @@ and the FINALIZATION is the clean-up form."
 
 ;;;;Open MidiShare and connections
 (defun midi-open ()
+  ;; TODO
   (midi-close)
   (setf *pw-refnum* nil)
   (setf *player* nil)
@@ -1625,6 +1852,7 @@ and the FINALIZATION is the clean-up form."
 
 ;;;;Close MidiShare and off the scheduler
 (defun midi-close ()
+  ;; TODO
   (when *pw-refnum*
     (when *player* (closeplayer *player*))
     (when *filter* (midi-free-filter *filter*))
@@ -1633,15 +1861,18 @@ and the FINALIZATION is the clean-up form."
 
 ;;;;MidiWrite
 (defun midi-write-time (event time)
+  ;; TODO
   (when *pw-refnum*
     (MidiSendAt *pw-refnum* event time)))
 
 (defun midi-write (event)
+  ;; TODO
   (midi-write-time event (MidiGetTime)))
 
 
 ;;;;Midi-read
 (defun midi-read ()
+  ;; TODO
   (ui::without-interrupts
     (let ((ev (MidiGetEv *pw-refnum*)))
       (loop :named eat-clock-events
@@ -1680,6 +1911,7 @@ and the FINALIZATION is the clean-up form."
                                 chan #x7b 0))))
 
 (defun midi-reset ()
+  ;; TODO
   (MidiFlushEvs *pw-refnum*)
   (midi-notes-off))
 
@@ -1701,4 +1933,14 @@ and the FINALIZATION is the clean-up form."
 
 
 ;;;; THE END ;;;;
+#|
 
+
+(mapcar (compose 'print (apply/E 'coremidi:model 'identity))  (coremidi:devices))
+(map nil (apply/E (compose 'print 'coremidi:model)
+(compose 'print 'identity)
+(no-argument 'terpri))
+(coremidi:devices))
+
+
+|#

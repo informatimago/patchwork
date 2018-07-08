@@ -123,7 +123,9 @@ if 'chord line' a sequence will be recorded. Notes falling in a time interval of
 
 Once the recording is done, the box may be evaluated as many time as required with different
 delta and output mode."
-  (declare (ignore delta)))
+  (declare (ignore delta))
+  ;; TODO
+  )
 
 
 
@@ -213,7 +215,9 @@ from your favorite sequencer is the same.
 
 Input may be any PatchWork object that could be played through play-object
 \(chord, chord-line, measure-line (rtm) , or a list of such)"
-  (declare (ignore objs)))
+  (declare (ignore objs))
+  ;; TODO
+  )
 
 
 ;;====Load
@@ -431,7 +435,9 @@ delta is expressed in 1/100secs.
 
 Output is a chord-line object.
 "
-  (declare (ignore delta)))
+  (declare (ignore delta))
+  ;; TODO
+  )
 
 
 
