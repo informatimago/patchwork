@@ -251,32 +251,37 @@ TRANSLATIONS: a list of logical pathname translations.
            (home-src (merge-pathnames "src/" home)))
       (set-host "SRC"
 
-                ;; '("INFORMATIMAGO")  "informatimago/"               src
-                '("INFORMATIMAGO")  "public/lisp/"                 home-src
+                ;; '("INFORMATIMAGO")  "informatimago/"                         src
+                '("INFORMATIMAGO")  "public/lisp/"                           home-src
 
-                '("PATCHWORK")      "patchwork/"                   src
-                '("MCLGUI")         "mclgui/"                      src
-                '("MIDI")           "midi/"                        src
-                '("MIDISHARE")      "midishare/"                   src
-                '()                 "src/"                         home)
+                '("PATCHWORK")      "patchwork/"                             src
+                '("MCLGUI")         "mclgui/"                                src
+                '("MIDI")           "midi/"                                  src
+                '("MIDISHARE")      "midishare/"                             src
+                '()                 "src/"                                   home)
 
       (set-host "PATCHWORK"
-                '()                 "patchwork/"                   src)
+                '()                 "patchwork/"                             src)
 
       (set-host "MCLGUI"
-                '()                 "mclgui/"                      src)
+                '()                 "mclgui/"                                src)
 
       (set-host "COREMIDI"
-                '()                 "CoreMIDI/"                    src)
+                '()                 "CoreMIDI/"                              src)
 
       (set-host "MIDI"
-                '()                 "midi/"                        src)
+                '()                 "midi/"                                  src)
 
       (set-host "CLENI"
-                '()                 "patchwork/src/src-lib/cleni/" src)
+                '()                 "patchwork/src/src-lib/cleni/"           src)
 
       (set-host "PW-USER"
-                '()                 "Documents/Patchwork/"         home)))
+                '()                 "Documents/Patchwork/"                   home)
+
+      ;; Used in: load-library-config in pw-library-config.lisp
+      (set-host "CL"
+                '("USER-LIBRARIES") "Documents/Patchwork/PW-user-library/"   home)))
+
   *logical-hosts*)
 
 (define-logical-hosts)
