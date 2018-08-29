@@ -209,8 +209,9 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Loading patchwork
+#+(and ccl cocoa) (load "src/macosx/headers.lisp")
+#+(and ccl cocoa) (load "src/macosx/load-libraries.lisp")
 (ql:quickload :patchwork                                  :verbose t :explain t)
-
 
 ;;; --------------------------------------------------------------------
 ;;; Initialization of patchwork
