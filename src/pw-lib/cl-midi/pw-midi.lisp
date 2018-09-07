@@ -547,7 +547,8 @@ and the FINALIZATION is the clean-up form."
 
 (defun MidiShare ()
   "returns true if MidiShare is installed"
-  1) ; hkt: The MCL version checked a macptr.
+  ;; hkt: The MCL version checked a macptr.
+  (when *midiShare* 1))
 
 (defun MidiGetVersion ()
   "Give MidiShare version as a fixnum. For example 131 as result, means : version 1.31"
@@ -582,7 +583,10 @@ and the FINALIZATION is the clean-up form."
 
 (defun MidiGetIndAppl (index)
   "Give the reference number of a MidiShare application from its index, a fixnum between 1 and (MidiCountAppls)"
-  (midiapp-refnum (elt *midi-apps* (1- index))))
+  (when (<= 1 index (1- (length *midi-apps*)))
+      (midiapp-refnum (elt *midi-apps*  (1- index)))
+      (error "Invalid midi application index: ~A" index)))
+
 
 (defun getapp (refnum)  (find refNum *midi-apps* :key (function midiapp-refnum)))
 
@@ -1112,19 +1116,6 @@ For now, we'll just hardwire a single port 0.
                (ccl::free  location))
 
              )
-;;;
-;;; To Install and Remove the MidiShare Interface
-;;;
-
-(defun install-midishare-interface ()
-  (unless (coremidi:coreaudio-framework) (error "Missing CoreAudio"))
-  (unless (coremidi:coremidi-framework)  (error "Missing CoreMIDI"))
-  (unless (midishare) (error "MidiShare not installed")))
-
-(defun remove-midishare-interface ()
-  (setf coremidi:*coremidi*  nil)
-  (setf coremidi:*coreaudio* nil)
-  (setf *midiShare*          nil))
 
 
 ;;;---------------------------------------------------------------------
@@ -1986,8 +1977,20 @@ For now, we'll just hardwire a single port 0.
 
 
 ;;;---------------------------------------------------------------------
-(on-load-and-now init/filter
-  (setf *filter* (midi-new-filter :chan t :port t :type t)))
+;;;
+;;; To Install and Remove the MidiShare Interface
+;;;
+
+(defun install-midishare-interface ()
+  (unless (coremidi:coreaudio-framework) (error "Missing CoreAudio"))
+  (unless (coremidi:coremidi-framework)  (error "Missing CoreMIDI"))
+  (setf *midiShare* t)
+  (unless (midishare) (error "MidiShare not installed")))
+
+(defun remove-midishare-interface ()
+  (setf coremidi:*coremidi*  nil)
+  (setf coremidi:*coreaudio* nil)
+  (setf *midiShare*          nil))
 
 (on-quit midi/quit
   (midi-close)
@@ -1996,6 +1999,10 @@ For now, we'll just hardwire a single port 0.
 (on-load-and-now init/midi
   (install-midishare-interface)
   (midi-open))
+
+(on-load-and-now init/filter
+  (setf *filter* (midi-new-filter :chan t :port t :type t)))
+
 
 
 ;; (eval-when (:load-toplevel :execute)  (pushnew ':midishare *features*))
@@ -2231,12 +2238,12 @@ is linked to some endpoint of this EXTERNAL-DEVICE."
 
 
           (test/send (cm-output-port (getapp 1))
-           (find-destination-endpoint-for-device-named "Network")
-           :channel 9)
+                     (find-destination-endpoint-for-device-named "Network")
+                     :channel 9)
 
           (test/send (cm-output-port (getapp 1))
-           (find-destination-endpoint-for-device-named "SCHMIDT SYNTH")
-           :channel 7)
+                     (find-destination-endpoint-for-device-named "SCHMIDT SYNTH")
+                     :channel 7)
 
           (mapcar (lambda (device) (print (list  (coremidi:name device) :model (coremidi:model device))))  (coremidi:devices))
 
@@ -2261,18 +2268,33 @@ is linked to some endpoint of this EXTERNAL-DEVICE."
           (getapp 1) ; #S(midiapp :refnum 1 :name #1="PatchWork" :info nil :filter #S(filter :types #*0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 :ports #*1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 :chans #*1111111111111111) :receive-alarm nil :context-alarm nil :receive-queue nil :coremidi #S(coremidi :client #<client :name #1# :ref 89502161 #x302004B4D61D> :output-port #<port :name "PatchWork-OUT" :ref 89502162 #x302004B4D35D> :destination-endpoint nil :input-port #<port :name "PatchWork-IN" :ref 89502163 #x302004B4D23D> :source-endpoint nil))
           (MidiGetNamedAppl "PatchWork") ; #S(midiapp :refnum 1 :name #1="PatchWork" :info nil :filter #S(filter :types #*0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 :ports #*1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 :chans #*1111111111111111) :receive-alarm nil :context-alarm nil :receive-queue nil :coremidi #S(coremidi :client #<client :name #1# :ref 89502161 #x302004B4D61D> :output-port #<port :name "PatchWork-OUT" :ref 89502162 #x302004B4D35D> :destination-endpoint nil :input-port #<port :name "PatchWork-IN" :ref 89502163 #x302004B4D23D> :source-endpoint nil))
 
-          (cm-client (getapp 1)) ; #<client :name "PatchWork" :ref 89502161 #x302004B4D61D>
-          (cm-input-port (getapp 1)) ; #<port :name "PatchWork-IN" :ref 89502163 #x302004B4D23D>
-          (cm-output-port (getapp 1)) ; #<port :name "PatchWork-OUT" :ref 89502162 #x302004B4D35D>
+          (MidiOpen  "PatchWork")
+          (values
+            (MidiCountAppls)            ; 1
+            (MidiGetIndAppl 1)          ; 1
+            (mapcar (function midiapp-refnum) *midi-apps*) ; (1)
+            (getapp 1)
+            (MidiGetNamedAppl "PatchWork")
+            (MidiGetNamedAppl "Midishare"))
 
-          (MidiGetName 1)               ; "PatchWork"
-          (MidiGetInfo 1)               ; 0
-          (MidiSetInfo 1 0)             ; 0
+          (values
+           (cm-client (getapp 1)) ; #<client :name "PatchWork" :ref 89502161 #x302004B4D61D>
+           (cm-input-port (getapp 1)) ; #<port :name "PatchWork-IN" :ref 89502163 #x302004B4D23D>
+           (cm-output-port (getapp 1)) ; #<port :name "PatchWork-OUT" :ref 89502162 #x302004B4D35D>
+           )
 
-          (progn (MidiConnect 0 1 t) (MidiConnect 1 0 t))
+          (values
+           (MidiGetName 1)               ; "PatchWork"
+           (MidiGetInfo 1)               ; 0
+           (MidiSetInfo 1 0)             ; 0
+           )
 
+          (values
+           (MidiConnect 0 1 t)
+           (MidiConnect 1 0 t))
 
           (let ((*print-right-margin* 72))
+
             (pprint
              (mapcar (lambda (device) (list (coremidi:name device)
                                             (mapcar (lambda (entity)
@@ -2289,7 +2311,23 @@ is linked to some endpoint of this EXTERNAL-DEVICE."
                                                     (coremidi:device-entities device))))
                      (coremidi:devices))))
 
-
+          (("Bluetooth" nil)
+           ("IAC Driver"
+            ((:entity "Bus 1" :ref 217346058 :source-endpoints
+                      ((:endpoint "Bus 1" :ref 217346059)) :destination-endpoints
+                      ((:endpoint "Bus 1" :ref 217346060)))))
+           ("Network"
+            ((:entity "larissa" :ref 217346062 :source-endpoints
+                      ((:endpoint "larissa" :ref 217346063)) :destination-endpoints
+                      ((:endpoint "larissa" :ref 217346064)))))
+           ("Ribbon Mark2"
+            ((:entity "Ribbon Mark2" :ref 217346066 :source-endpoints
+                      ((:endpoint "Ribbon Mark2" :ref 217346067)) :destination-endpoints
+                      ((:endpoint "Ribbon Mark2" :ref 217346068)))))
+           ("Akai LPK25 Wireless"
+            ((:entity "Bluetooth" :ref 217346070 :source-endpoints
+                      ((:endpoint "Bluetooth" :ref 217346071)) :destination-endpoints
+                      nil))))
 
           (("Korg KRONOS"
             ((:entity "SOUND"
