@@ -52,6 +52,7 @@
                "mclgui"
                #+patchwork.builder::use-cl-midi "com.informatimago.macosx.coremidi"
                #+patchwork.builder::use-cl-midi "midi"
+               #+patchwork.builder::use-cl-midi "com.informatimago.macosx.coremidi.midi"
                ;; "com.informatimago.common-lisp.lisp.stepper"
                )
   :components ((:file "packages"
