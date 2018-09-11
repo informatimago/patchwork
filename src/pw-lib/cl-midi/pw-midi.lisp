@@ -530,11 +530,12 @@ and the FINALIZATION is the clean-up form."
   (setf *default-source-refnum*      source-refnum
         *default-destination-refnum* destination-refnum))
 
-(progn
- (update-port-refnums)
- (set-default-refnums
-  (get-source-refnum      (find "Network" (list-source-ports)      :key (function first) :test (function string=)))
-  (get-destination-refnum (find "Network" (list-destination-ports) :key (function first) :test (function string=)))))
+
+(on-load-and-now init/port-refnums
+  (update-port-refnums)
+  (set-default-refnums
+   (get-source-refnum      (find "Network" (list-source-ports)      :key (function first) :test (function string=)))
+   (get-destination-refnum (find "Network" (list-destination-ports) :key (function first) :test (function string=)))))
 
 
 ;;----------------------------------------------------------------------
@@ -623,6 +624,52 @@ one for source, another for destination).
 
 |#
 
+
+(defun test/send (output-port destination &key (channel 0))
+  (let ((ti (coremidi:current-host-time))
+        (1s 1000000000))
+    (flet ((in (n)
+             (+ ti (* n 1s))))
+      (coremidi:send output-port destination
+                     (com.informatimago.macosx.coremidi.midi:packet-list-from-messages
+                      (list  (make-instance 'midi::note-on-message :time (in 1) :status #x90 :channel channel :key 80 :velocity 70)
+                             (make-instance 'midi::note-on-message :time (in 1) :status #x90 :channel channel :key 64 :velocity 70)
+                             (make-instance 'midi::note-on-message :time (in 3) :status #x90 :channel channel :key 68 :velocity 40)
+                             (make-instance 'midi::note-on-message :time (in 6) :status #x90 :channel channel :key 87 :velocity 80)
+                             (make-instance 'midi::note-on-message :time (in 6) :status #x90 :channel channel :key 80 :velocity 80)
+                             (make-instance 'midi::all-notes-off-message :time (in 10) :status #xb0 :channel channel)))))))
+
+
+
+(mapcar 'coremidi:name(coremidi:devices))
+("Korg KRONOS" "Bluetooth" "IAC Driver" "Network" "MIDI4x4" "Moog Subsequent 37cv" "VI61" "SCHMIDT SYNTH" "VMini" "TOUCHE_BOOTLOADER" "TOUCHE" "EWI5000" "sao" "sao")
+
+(defparameter *destination*
+  (let* ((entity      (first (coremidi:device-entities (coremidi:find-device-named "Korg KRONOS"))))
+         (source      (first (coremidi:entity-sources entity)))
+         (destination (first (coremidi:entity-destinations entity))))
+    (coremidi:port-connect-source (cm-input-port (getapp 1)) source (coremidi:generate-refcon))
+    (values destination
+            source)))
+
+(coremidi:output-port-create (first (CoreMIDI:clients)))
+(getapp 1)
+(loop for channel below 16
+      do (sleep 5)
+         (print channel)
+         (test/send (cm-output-port (getapp 1)) *destination* :channel channel))
+
+
+
+(make-midiapp
+ :refnum 0
+ :name "MidiShare"
+ :coremidi (let ((client (coremidi:client-create name 'cm-client-notify)))
+             (make-coremidi
+              :client  client
+              :output-port (coremidi:output-port-create client (format nil "~A-OUT" name))
+              :input-port  (coremidi:input-port-create  client (format nil "~A-IN"  name)
+                                                        'cm-port-read))))
 
 (defun MidiOpen (name)
   "Open a new MidiShare application, with name NAME. Give a unique reference number."
@@ -2310,6 +2357,7 @@ is linked to some endpoint of this EXTERNAL-DEVICE."
                                                                                            (coremidi:entity-destinations entity))))
                                                     (coremidi:device-entities device))))
                      (coremidi:devices))))
+
 
           (("Bluetooth" nil)
            ("IAC Driver"
