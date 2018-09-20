@@ -185,7 +185,8 @@
 #+(and ccl (not patchwork.builder::no-cocoa))
 (progn
   (say "Loading :cocoa (takes some time to start…)")
-  (require :cocoa))
+  (require :cocoa)
+  (say "Required :cocoa"))
 
 
 
@@ -200,6 +201,7 @@
 
 ;;; --------------------------------------------------------------------
 ;;; Loading dependencies
+(terpri)
 (ql:quickload :com.informatimago.common-lisp.lisp.stepper :verbose t :explain t) ; debug
 (ql:quickload :com.informatimago.objcl                    :verbose t :explain t)
 (ql:quickload :com.informatimago.clext                    :verbose t :explain t) ; closer-weak
@@ -211,6 +213,7 @@
 ;;; Loading patchwork
 #+(and ccl cocoa) (load "src/macosx/headers.lisp")
 #+(and ccl cocoa) (load "src/macosx/load-libraries.lisp")
+(terpri)
 (ql:quickload :patchwork                                  :verbose t :explain t)
 
 ;;; --------------------------------------------------------------------
