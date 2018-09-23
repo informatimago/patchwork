@@ -699,10 +699,6 @@ is linked to some endpoint of this EXTERNAL-DEVICE."
 (defvar *destination*)
 (defvar *source*)
 
-
-
-
-
 (defun MidiOpen (name)
   "Open a new MidiShare application, with name NAME. Give a unique reference number."
   (update-port-refnums)
@@ -2250,3 +2246,25 @@ For now, we'll just hardwire a single port 0.
   (initialize))
 
 ;;;; THE END ;;;;
+
+;; (mapcar 'coremidi:name(coremidi:devices))
+;; ("Korg KRONOS" "Bluetooth" "IAC Driver" "Network" "MIDI4x4" "Moog Subsequent 37cv" "VI61" "SCHMIDT SYNTH" "VMini" "TOUCHE_BOOTLOADER" "TOUCHE" "EWI5000" "sao" "sao")
+;;
+;; (coremidi:output-port-create (first (CoreMIDI:clients)))
+;; (getapp 1)
+;; (loop for channel below 16
+;;       do (sleep 5)
+;;          (print channel)
+;;          (test/send (cm-output-port (getapp 1)) *destination* :channel channel))
+;;
+;;
+;;
+;; (make-midiapp
+;;  :refnum 0
+;;  :name "MidiShare"
+;;  :coremidi (let ((client (coremidi:client-create name 'cm-client-notify)))
+;;              (make-coremidi
+;;               :client  client
+;;               :output-port (coremidi:output-port-create client (format nil "~A-OUT" name))
+;;               :input-port  (coremidi:input-port-create  client (format nil "~A-IN"  name)
+;;                                                         'cm-port-read))))
