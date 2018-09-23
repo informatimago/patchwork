@@ -531,11 +531,6 @@ and the FINALIZATION is the clean-up form."
         *default-destination-refnum* destination-refnum))
 
 
-(on-load-and-now init/port-refnums
-  (update-port-refnums)
-  (set-default-refnums
-   (get-source-refnum      (find "Network" (list-source-ports)      :key (function first) :test (function string=)))
-   (get-destination-refnum (find "Network" (list-destination-ports) :key (function first) :test (function string=)))))
 
 
 ;;----------------------------------------------------------------------
@@ -625,51 +620,88 @@ one for source, another for destination).
 |#
 
 
-(defun test/send (output-port destination &key (channel 0))
-  (let ((ti (coremidi:current-host-time))
-        (1s 1000000000))
-    (flet ((in (n)
-             (+ ti (* n 1s))))
-      (coremidi:send output-port destination
-                     (com.informatimago.macosx.coremidi.midi:packet-list-from-messages
-                      (list  (make-instance 'midi::note-on-message :time (in 1) :status #x90 :channel channel :key 80 :velocity 70)
-                             (make-instance 'midi::note-on-message :time (in 1) :status #x90 :channel channel :key 64 :velocity 70)
-                             (make-instance 'midi::note-on-message :time (in 3) :status #x90 :channel channel :key 68 :velocity 40)
-                             (make-instance 'midi::note-on-message :time (in 6) :status #x90 :channel channel :key 87 :velocity 80)
-                             (make-instance 'midi::note-on-message :time (in 6) :status #x90 :channel channel :key 80 :velocity 80)
-                             (make-instance 'midi::all-notes-off-message :time (in 10) :status #xb0 :channel channel)))))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
 
+(defun find-endpoint-for-external-device (external-device &key (direction :source))
+  "Finds a source or destination endpoint belonging to a device, that
+is linked to some endpoint of this EXTERNAL-DEVICE."
+  (check-type external-device coremidi:device)
+  (check-type direction (member :source :input :destination :output))
+  (flet ((not-connected (device)
+           (error "Device named ~S doesn't seem to be connected" (coremidi:name device))))
+    (let* ((inp (case direction
+                  ((:source :input) t)
+                  (otherwise        nil)))
+           (entity-endpoints (if inp
+                                 (function coremidi:entity-sources)
+                                 (function coremidi:entity-destinations))))
+      (with-functions (entity-endpoints)
+        (first (mapcan (lambda (device)
+                         (mapcan (lambda (entity)
+                                   (let ((endpoints (find external-device (entity-endpoints entity)
+                                                          :key (function coremidi:connected-devices)
+                                                          :test (function member))))
+                                     (when endpoints (list endpoints))))
+                                 (coremidi:device-entities device)))
+                       (delete-duplicates
+                        (mapcan (lambda (x)
+                                  (mapcan (function coremidi:connected-devices)
+                                          (append (coremidi:entity-sources x)
+                                                  (coremidi:entity-destinations x))))
+                                (coremidi:device-entities external-device)))))))))
 
+(defun find-endpoint-for-device (device &key (direction :source))
+  "Finds a source or destination endpoint belonging to a device, that
+is linked to some endpoint of this EXTERNAL-DEVICE."
+  (check-type device coremidi:device)
+  (check-type direction (member :source :input :destination :output))
+  (flet ((not-connected (device)
+           (error "Device named ~S doesn't seem to be connected" (name device))))
+    (let* ((inp (case direction
+                  ((:source :input) t)
+                  (otherwise        nil)))
+           (entity-endpoints (if inp
+                                 (function coremidi:entity-sources)
+                                 (function coremidi:entity-destinations))))
+      (with-functions (entity-endpoints)
+        (first (entity-endpoints
+                (find-if (lambda (entity)
+                           (and (coremidi:entity-sources      entity)
+                                (coremidi:entity-destinations entity)))
+                         (coremidi:device-entities device))))))))
 
-(mapcar 'coremidi:name(coremidi:devices))
-("Korg KRONOS" "Bluetooth" "IAC Driver" "Network" "MIDI4x4" "Moog Subsequent 37cv" "VI61" "SCHMIDT SYNTH" "VMini" "TOUCHE_BOOTLOADER" "TOUCHE" "EWI5000" "sao" "sao")
+(defun find-source-endpoint-for-device-named (name)
+  (let ((device (coremidi:find-external-device-named name)))
+    (if device
+        (find-endpoint-for-external-device device :direction :source)
+        (let ((device (coremidi:find-device-named name)))
+          (when device
+            (find-endpoint-for-device device :direction :source))))))
 
-(defparameter *destination*
-  (let* ((entity      (first (coremidi:device-entities (coremidi:find-device-named "Korg KRONOS"))))
-         (source      (first (coremidi:entity-sources entity)))
-         (destination (first (coremidi:entity-destinations entity))))
-    (coremidi:port-connect-source (cm-input-port (getapp 1)) source (coremidi:generate-refcon))
+(defun find-destination-endpoint-for-device-named (name)
+  (let ((device (coremidi:find-external-device-named name)))
+    (if device
+        (find-endpoint-for-external-device device :direction :destination)
+        (let ((device (coremidi:find-device-named name)))
+          (when device
+            (find-endpoint-for-device device :direction :destination))))))
+;;;
+;;;;;;;;
+
+(defun midishare-endpoints (&optional (device-name "Network"))
+  (let ((source      (find-source-endpoint-for-device-named device-name))
+        (destination (find-destination-endpoint-for-device-named device-name)))
+    (coremidi:port-connect-source (cm-input-port (getapp 0)) source (coremidi:generate-refcon))
     (values destination
             source)))
 
-(coremidi:output-port-create (first (CoreMIDI:clients)))
-(getapp 1)
-(loop for channel below 16
-      do (sleep 5)
-         (print channel)
-         (test/send (cm-output-port (getapp 1)) *destination* :channel channel))
+(defvar *destination*)
+(defvar *source*)
 
 
 
-(make-midiapp
- :refnum 0
- :name "MidiShare"
- :coremidi (let ((client (coremidi:client-create name 'cm-client-notify)))
-             (make-coremidi
-              :client  client
-              :output-port (coremidi:output-port-create client (format nil "~A-OUT" name))
-              :input-port  (coremidi:input-port-create  client (format nil "~A-IN"  name)
-                                                        'cm-port-read))))
+
 
 (defun MidiOpen (name)
   "Open a new MidiShare application, with name NAME. Give a unique reference number."
@@ -2043,12 +2075,7 @@ For now, we'll just hardwire a single port 0.
   (midi-close)
   (remove-midishare-interface))
 
-(on-load-and-now init/midi
-  (install-midishare-interface)
-  (midi-open))
 
-(on-load-and-now init/filter
-  (setf *filter* (midi-new-filter :chan t :port t :type t)))
 
 
 
@@ -2175,19 +2202,6 @@ For now, we'll just hardwire a single port 0.
         (force-output)))))
 
 
-(defun test/send (output-port destination &key (channel 0))
-  (let ((ti (coremidi:current-host-time))
-        (1s 1000000000))
-    (flet ((in (n)
-             (+ ti (* n 1s))))
-      (coremidi:send output-port destination
-                     (com.informatimago.macosx.coremidi.midi:packet-list-from-messages
-                      (list  (make-instance 'midi::note-on-message :time (in 1) :status #x90 :channel channel :key 80 :velocity 70)
-                             (make-instance 'midi::note-on-message :time (in 1) :status #x90 :channel channel :key 64 :velocity 70)
-                             (make-instance 'midi::note-on-message :time (in 2) :status #x90 :channel channel :key 68 :velocity 40)
-                             (make-instance 'midi::note-on-message :time (in 3) :status #x90 :channel channel :key 87 :velocity 80)
-                             (make-instance 'midi::note-on-message :time (in 3) :status #x90 :channel channel :key 80 :velocity 80)
-                             (make-instance 'midi::all-notes-off-message :time (in 5) :status #xb0 :channel channel)))))))
 
 
 (defun print-midi-devices ()
@@ -2210,292 +2224,29 @@ For now, we'll just hardwire a single port 0.
           (terpri))))))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
+(defun initialize ()
+  (let ((midishare-device-name "Network"))
+    (install-midishare-interface)
+    (update-port-refnums)
+    (push (let ((name "MidiShare"))
+            (make-midiapp
+             :refnum 0
+             :name name
+             :coremidi (let ((client (coremidi:client-create name 'cm-client-notify)))
+                         (make-coremidi
+                          :client  client
+                          :output-port (coremidi:output-port-create client (format nil "~A-OUT" name))
+                          :input-port  (coremidi:input-port-create  client (format nil "~A-IN"  name)
+                                                                    'cm-port-read)))))
+          *midi-apps*)
+    (set-default-refnums
+     (get-source-refnum      (find midishare-device-name (list-source-ports)      :key (function first) :test (function string=)))
+     (get-destination-refnum (find midishare-device-name (list-destination-ports) :key (function first) :test (function string=))))
+    (multiple-value-setq (*destination* *source*) (midishare-endpoints midishare-device-name))
+    (setf *filter* (midi-new-filter :chan t :port t :type t))
+    (midi-open)))
 
-(defun find-endpoint-for-external-device (external-device &key (direction :source))
-  "Finds a source or destination endpoint belonging to a device, that
-is linked to some endpoint of this EXTERNAL-DEVICE."
-  (check-type external-device coremidi:device)
-  (check-type direction (member :source :input :destination :output))
-  (flet ((not-connected (device)
-           (error "Device named ~S doesn't seem to be connected" (coremidi:name device))))
-    (let* ((inp (case direction
-                  ((:source :input) t)
-                  (otherwise        nil)))
-           (entity-endpoints (if inp
-                                 (function coremidi:entity-sources)
-                                 (function coremidi:entity-destinations))))
-      (with-functions (entity-endpoints)
-        (first (mapcan (lambda (device)
-                         (mapcan (lambda (entity)
-                                   (let ((endpoints (find external-device (entity-endpoints entity)
-                                                          :key (function coremidi:connected-devices)
-                                                          :test (function member))))
-                                     (when endpoints (list endpoints))))
-                                 (coremidi:device-entities device)))
-                       (delete-duplicates
-                        (mapcan (lambda (x)
-                                  (mapcan (function coremidi:connected-devices)
-                                          (append (coremidi:entity-sources x)
-                                                  (coremidi:entity-destinations x))))
-                                (coremidi:device-entities external-device)))))))))
+(eval-when (:load-toplevel :execute)
+  (initialize))
 
-(defun find-endpoint-for-device (device &key (direction :source))
-  "Finds a source or destination endpoint belonging to a device, that
-is linked to some endpoint of this EXTERNAL-DEVICE."
-  (check-type device coremidi:device)
-  (check-type direction (member :source :input :destination :output))
-  (flet ((not-connected (device)
-           (error "Device named ~S doesn't seem to be connected" (name device))))
-    (let* ((inp (case direction
-                  ((:source :input) t)
-                  (otherwise        nil)))
-           (entity-endpoints (if inp
-                                 (function coremidi:entity-sources)
-                                 (function coremidi:entity-destinations))))
-      (with-functions (entity-endpoints)
-        (first (entity-endpoints
-                (find-if (lambda (entity)
-                           (and (coremidi:entity-sources      entity)
-                                (coremidi:entity-destinations entity)))
-                         (coremidi:device-entities device))))))))
-
-(defun find-source-endpoint-for-device-named (name)
-  (let ((device (coremidi:find-external-device-named name)))
-    (if device
-        (find-endpoint-for-external-device device :direction :source)
-        (let ((device (coremidi:find-device-named name)))
-          (when device
-            (find-endpoint-for-device device :direction :source))))))
-
-(defun find-destination-endpoint-for-device-named (name)
-  (let ((device (coremidi:find-external-device-named name)))
-    (if device
-        (find-endpoint-for-external-device device :direction :destination)
-        (let ((device (coremidi:find-device-named name)))
-          (when device
-            (find-endpoint-for-device device :direction :destination))))))
-
-
-
-
-
-#-(and) (progn
-
-
-          (test/send (cm-output-port (getapp 1))
-                     (find-destination-endpoint-for-device-named "Network")
-                     :channel 9)
-
-          (test/send (cm-output-port (getapp 1))
-                     (find-destination-endpoint-for-device-named "SCHMIDT SYNTH")
-                     :channel 7)
-
-          (mapcar (lambda (device) (print (list  (coremidi:name device) :model (coremidi:model device))))  (coremidi:devices))
-
-          ("Bluetooth" :model "Bluetooth MIDI Driver")
-          ("IAC Driver" :model "IAC Driver")
-          ("Network" :model "")
-          ("MIDI4x4" :model "MIDI4x4")
-          ("Moog Subsequent 37cv" :model "Moog Sub 37")
-          ("VI61" :model "VI61")
-          ("SCHMIDT SYNTH" :model "SCHMIDT SYNTH")
-          ("VMini" :model "VMini")
-          ("TOUCHE_BOOTLOADER" :model "TOUCHE_BOOTLOADER")
-          ("TOUCHE" :model "TOUCHE")
-          ("EWI5000" :model "EWI5000")
-          ("sao" :model "iPad6,8")
-                                        ; (("Korg KRONOS" :model "KRONOS") ("Bluetooth" :model "Bluetooth MIDI Driver") ("IAC Driver" :model "IAC Driver") ("Network" :model "") ("MIDI4x4" :model "MIDI4x4") ("Moog Subsequent 37cv" :model "Moog Sub 37") ("VI61" :model "VI61") ("SCHMIDT SYNTH" :model "SCHMIDT SYNTH") ("VMini" :model "VMini") ("TOUCHE_BOOTLOADER" :model "TOUCHE_BOOTLOADER") ("TOUCHE" :model "TOUCHE") ("EWI5000" :model "EWI5000") ("sao" :model "iPad6,8"))
-
-
-          (MidiCountAppls)                               ; 1
-          (MidiGetIndAppl 1)                             ; 1
-          (mapcar (function midiapp-refnum) *midi-apps*) ; (1)
-          (getapp 1) ; #S(midiapp :refnum 1 :name #1="PatchWork" :info nil :filter #S(filter :types #*0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 :ports #*1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 :chans #*1111111111111111) :receive-alarm nil :context-alarm nil :receive-queue nil :coremidi #S(coremidi :client #<client :name #1# :ref 89502161 #x302004B4D61D> :output-port #<port :name "PatchWork-OUT" :ref 89502162 #x302004B4D35D> :destination-endpoint nil :input-port #<port :name "PatchWork-IN" :ref 89502163 #x302004B4D23D> :source-endpoint nil))
-          (MidiGetNamedAppl "PatchWork") ; #S(midiapp :refnum 1 :name #1="PatchWork" :info nil :filter #S(filter :types #*0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 :ports #*1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 :chans #*1111111111111111) :receive-alarm nil :context-alarm nil :receive-queue nil :coremidi #S(coremidi :client #<client :name #1# :ref 89502161 #x302004B4D61D> :output-port #<port :name "PatchWork-OUT" :ref 89502162 #x302004B4D35D> :destination-endpoint nil :input-port #<port :name "PatchWork-IN" :ref 89502163 #x302004B4D23D> :source-endpoint nil))
-
-          (MidiOpen  "PatchWork")
-          (values
-            (MidiCountAppls)            ; 1
-            (MidiGetIndAppl 1)          ; 1
-            (mapcar (function midiapp-refnum) *midi-apps*) ; (1)
-            (getapp 1)
-            (MidiGetNamedAppl "PatchWork")
-            (MidiGetNamedAppl "Midishare"))
-
-          (values
-           (cm-client (getapp 1)) ; #<client :name "PatchWork" :ref 89502161 #x302004B4D61D>
-           (cm-input-port (getapp 1)) ; #<port :name "PatchWork-IN" :ref 89502163 #x302004B4D23D>
-           (cm-output-port (getapp 1)) ; #<port :name "PatchWork-OUT" :ref 89502162 #x302004B4D35D>
-           )
-
-          (values
-           (MidiGetName 1)               ; "PatchWork"
-           (MidiGetInfo 1)               ; 0
-           (MidiSetInfo 1 0)             ; 0
-           )
-
-          (values
-           (MidiConnect 0 1 t)
-           (MidiConnect 1 0 t))
-
-          (let ((*print-right-margin* 72))
-
-            (pprint
-             (mapcar (lambda (device) (list (coremidi:name device)
-                                            (mapcar (lambda (entity)
-                                                      (list :entity (coremidi:name entity)
-                                                            :ref (coremidi:ref entity)
-                                                            :source-endpoints (mapcar (lambda (endpoint)
-                                                                                        (list :endpoint (coremidi:name endpoint)
-                                                                                              :ref (coremidi:ref endpoint)))
-                                                                                      (coremidi:entity-sources entity))
-                                                            :destination-endpoints (mapcar (lambda (endpoint)
-                                                                                             (list :endpoint (coremidi:name endpoint)
-                                                                                                   :ref (coremidi:ref endpoint)))
-                                                                                           (coremidi:entity-destinations entity))))
-                                                    (coremidi:device-entities device))))
-                     (coremidi:devices))))
-
-
-          (("Bluetooth" nil)
-           ("IAC Driver"
-            ((:entity "Bus 1" :ref 217346058 :source-endpoints
-                      ((:endpoint "Bus 1" :ref 217346059)) :destination-endpoints
-                      ((:endpoint "Bus 1" :ref 217346060)))))
-           ("Network"
-            ((:entity "larissa" :ref 217346062 :source-endpoints
-                      ((:endpoint "larissa" :ref 217346063)) :destination-endpoints
-                      ((:endpoint "larissa" :ref 217346064)))))
-           ("Ribbon Mark2"
-            ((:entity "Ribbon Mark2" :ref 217346066 :source-endpoints
-                      ((:endpoint "Ribbon Mark2" :ref 217346067)) :destination-endpoints
-                      ((:endpoint "Ribbon Mark2" :ref 217346068)))))
-           ("Akai LPK25 Wireless"
-            ((:entity "Bluetooth" :ref 217346070 :source-endpoints
-                      ((:endpoint "Bluetooth" :ref 217346071)) :destination-endpoints
-                      nil))))
-
-          (("Korg KRONOS"
-            ((:entity "SOUND"
-              :ref 89501710
-              :source-endpoints      nil
-              :destination-endpoints ((:endpoint "SOUND"
-                                       :ref 89501711)))
-             (:entity "KEYBOARD"
-              :ref 89501712
-              :source-endpoints      ((:endpoint "KEYBOARD"
-                                       :ref 89501713))
-              :destination-endpoints nil)))
-           ("Bluetooth" nil)
-           ("IAC Driver"
-            ((:entity "Bus 1"
-              :ref 89501716
-              :source-endpoints      ((:endpoint "Bus 1"
-                                       :ref 89501717))
-              :destination-endpoints ((:endpoint "Bus 1"
-                                       :ref 89501718)))))
-           ("Network"
-            ((:entity "Neptune"
-              :ref 89501720
-              :source-endpoints      ((:endpoint "Neptune"
-                                       :ref 89501721))
-              :destination-endpoints ((:endpoint "Neptune"
-                                       :ref 89501722)))))
-           ("MIDI4x4"
-            ((:entity "Port 1"
-              :ref 89501724
-              :source-endpoints      ((:endpoint "Midi In 1"
-                                       :ref 89501725))
-              :destination-endpoints ((:endpoint "Midi Out 1"
-                                       :ref 89501726)))
-             (:entity "Port 2"
-              :ref 89501727
-              :source-endpoints      ((:endpoint "Midi In 2"
-                                       :ref 89501728))
-              :destination-endpoints ((:endpoint "Midi Out 2"
-                                       :ref 89501729)))
-             (:entity "Port 3"
-              :ref 89501730
-              :source-endpoints      ((:endpoint "Midi In 3"
-                                       :ref 89501731))
-              :destination-endpoints ((:endpoint "Midi Out 3"
-                                       :ref 89501732)))
-             (:entity "Port 4"
-              :ref 89501733
-              :source-endpoints      ((:endpoint "Midi In 4"
-                                       :ref 89501734))
-              :destination-endpoints ((:endpoint "Midi Out 4"
-                                       :ref 89501735)))))
-           ("Moog Subsequent 37cv"
-            ((:entity "Moog Sub 37"
-              :ref 89501737
-              :source-endpoints      ((:endpoint "Moog Sub 37"
-                                       :ref 89501738))
-              :destination-endpoints ((:endpoint "Moog Sub 37"
-                                       :ref 89501739)))))
-           ("VI61"
-            ((:entity "Port 1"
-              :ref 89501741
-              :source-endpoints      ((:endpoint "Out"
-                                       :ref 89501742))
-              :destination-endpoints ((:endpoint "In"
-                                       :ref 89501743)))
-             (:entity "Port 2"
-              :ref 89501744
-              :source-endpoints      ((:endpoint "EDITOR Out"
-                                       :ref 89501745))
-              :destination-endpoints ((:endpoint "EDITOR In"
-                                       :ref 89501746)))))
-           ("SCHMIDT SYNTH"
-            ((:entity "SCHMIDT SYNTH"
-              :ref 89501748
-              :source-endpoints      ((:endpoint "SCHMIDT SYNTH"
-                                       :ref 89501749))
-              :destination-endpoints ((:endpoint "SCHMIDT SYNTH"
-                                       :ref 89501750)))))
-           ("VMini"
-            ((:entity "Port 1"
-              :ref 89501752
-              :source-endpoints      ((:endpoint "Out"
-                                       :ref 89501753))
-              :destination-endpoints ((:endpoint "In"
-                                       :ref 89501754)))
-             (:entity "Port 2"
-              :ref 89501755
-              :source-endpoints      ((:endpoint "EDITOR Out"
-                                       :ref 89501756))
-              :destination-endpoints ((:endpoint "EDITOR In"
-                                       :ref 89501757)))))
-           ("TOUCHE_BOOTLOADER"
-            ((:entity "TOUCHE_BOOTLOADER"
-              :ref 89501759
-              :source-endpoints      ((:endpoint "TOUCHE_BOOTLOADER"
-                                       :ref 89501760))
-
-              :destination-endpoints ((:endpoint "TOUCHE_BOOTLOADER"
-                                       :ref 89501761)))))
-           ("TOUCHE"
-            ((:entity "TOUCHE"
-              :ref 89501763
-              :source-endpoints      ((:endpoint "TOUCHE"
-                                       :ref 89501764))
-              :destination-endpoints ((:endpoint "TOUCHE"
-                                       :ref 89501765)))))
-           ("EWI5000"
-            ((:entity "EWI5000"
-              :ref 89501767
-              :source-endpoints      ((:endpoint "EWI5000"
-                                       :ref 89501768))
-              :destination-endpoints ((:endpoint "EWI5000"
-                                       :ref 89501769)))))
-           ("sao"
-            ((:entity "Bluetooth"
-              :ref 89501771
-              :source-endpoints      ((:endpoint "Bluetooth"
-                                       :ref 89501772))
-              :destination-endpoints ((:endpoint "Bluetooth"
-                                       :ref 89501773))))))
-
-          ) ;;progn
+;;;; THE END ;;;;
