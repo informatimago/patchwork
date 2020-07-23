@@ -290,19 +290,19 @@ returned; called with two arguments, the value of the field is set.
              `((info (make-array ,(length variable-fields) :initial-element nil))
                additionnal-fields)))
        ,@(mapcar (lambda (field)
-                   (let* ((fname (conc-symbol conc-name (first-element field)))
-                          (aname (conc-symbol sname '-  (first-element field))))
+                   (let* ((fname (scat conc-name (first-element field)))
+                          (aname (scat sname '-  (first-element field))))
                      `(defun ,fname (s &optional (v nil vp))
                         (if vp
                             (setf (,aname s) v)
                             (,aname s)))))
                  compulsory-fields)
        ,@(loop
-           :with kname = (conc-symbol sname '-info)
+           :with kname = (scat sname '-info)
            :for i :from 0
            :for fields :in variable-fields
            :append (loop :for field :in fields
-                         :collect (let* ((fname (conc-symbol conc-name (first-element field))))
+                         :collect (let* ((fname (scat conc-name (first-element field))))
                                     `(defun ,fname (s &optional (v nil vp))
                                        (if vp
                                            (setf (aref (,kname s) ,i) v)
@@ -831,10 +831,10 @@ MidiConnect connects a coremidi:source to a coremidi:destination of two applicat
 |#
 
 (defun MidiConnect (src dst s)
-  (declare (ignore s))
+  (declare (ignorable s))
   "Connect or disconnect two MidiShare applications"
   ;;(#_MidiConnect src dst s)
-  (error "Not implemented yet")
+  (warn "Not implemented yet: (~S ~S ~S ~S)" 'MidiConnect src dst s)
   ;; (if (ensure-boolean s)
   ;;     (midiapp-connect)
   ;;     (midiapp-disconnect))
@@ -2220,7 +2220,7 @@ For now, we'll just hardwire a single port 0.
           (terpri))))))
 
 
-(defun initialize ()
+(defun initialize-midi ()
   (let ((midishare-device-name "Network"))
     (install-midishare-interface)
     (update-port-refnums)
@@ -2242,8 +2242,9 @@ For now, we'll just hardwire a single port 0.
     (setf *filter* (midi-new-filter :chan t :port t :type t))
     (midi-open)))
 
+#-(and)
 (eval-when (:load-toplevel :execute)
-  (initialize))
+  (initialize-midi))
 
 ;;;; THE END ;;;;
 
