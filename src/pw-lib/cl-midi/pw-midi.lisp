@@ -991,7 +991,9 @@ For now, we'll just hardwire a single port 0.
 
 (defun MidiGetTime ()
   "give the current time"
-  (values (truncate (* 10 (ui::timestamp)) (/ ui::+tick-per-second+))))
+  (values (truncate (* 10.0d0 #| ccl produces an error when given two ratios |#
+                       (ui::timestamp))
+                    (/ ui::+tick-per-second+))))
 
 (defun midi-get-time ()
   ;; TODO
