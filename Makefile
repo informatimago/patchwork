@@ -40,7 +40,7 @@
 ## Configurable:
 
 #CCL_EXE=/data/languages/ccl/bin/ccl
-CCL_EXE=ccl-1.11
+CCL_EXE=ccl-1.12
 CCL=$(CCL_EXE) --no-init --batch
 CCL_EVAL=--eval
 
