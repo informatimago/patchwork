@@ -177,6 +177,7 @@
   )
 
 (defmethod add-to-file ((self C-patch-file-buffer) list format)
+  (declare (ignorable list format))
   (niy add-to-file self list format)
   ;; (let ((count 0)
   ;;       (format (if (zerop format) (length list) format))
@@ -265,36 +266,37 @@ information; type h with the selected module open. "
 (defclass C-patch-ascii-buffer (C-patch-file-buffer) ())
 
 (defmethod patch-value ((self C-patch-ascii-buffer) obj)
+  (declare (ignorable obj))
   (if *lisp-win-option*
-    (call-next-method)
-    (niy patch-value self obj)
-    ;; (when (and (fred-win self) (wptr (fred-win self)))
-    ;;   (if (not (eql (car (pw-controls self)) (car (input-objects self))))
-    ;;     (add-to-file self
-    ;;                  (patch-value (first (input-objects self)) obj)
-    ;;                  (patch-value (second (input-objects self)) obj)))
-    ;;   (let ((win (fred-win self)))
-    ;;     (if (and win (wptr win))
-    ;;       (let* ((fred-buff (fred-buffer win))
-    ;;              (size (buffer-size fred-buff))
-    ;;              (pos (get-buffer-next-pos fred-buff 0 size))
-    ;;              result)
-    ;;         (when pos
-    ;;           (with-cursor *watch-cursor*
-    ;;             (multiple-value-bind (beg end) (selection-range win)
-    ;;               (unless (= beg end)
-    ;;                 (setq size end)
-    ;;                 (setq pos (get-buffer-next-pos fred-buff beg size))))
-    ;;             (if pos
-    ;;               (do  (i) ((>= pos size) result)
-    ;;                 (declare (ignore i))
-    ;;                 (multiple-value-bind (exp pos1)
-    ;;                                      (get-buffer-next-token fred-buff pos size)
-    ;;                   (push exp result)
-    ;;                   (setq pos
-    ;;                         (or (get-buffer-next-pos fred-buff pos1 size) size))))))
-    ;;           (nreverse result))))))
-    ))
+      (call-next-method)
+      (niy patch-value self obj)
+      ;; (when (and (fred-win self) (wptr (fred-win self)))
+      ;;   (if (not (eql (car (pw-controls self)) (car (input-objects self))))
+      ;;     (add-to-file self
+      ;;                  (patch-value (first (input-objects self)) obj)
+      ;;                  (patch-value (second (input-objects self)) obj)))
+      ;;   (let ((win (fred-win self)))
+      ;;     (if (and win (wptr win))
+      ;;       (let* ((fred-buff (fred-buffer win))
+      ;;              (size (buffer-size fred-buff))
+      ;;              (pos (get-buffer-next-pos fred-buff 0 size))
+      ;;              result)
+      ;;         (when pos
+      ;;           (with-cursor *watch-cursor*
+      ;;             (multiple-value-bind (beg end) (selection-range win)
+      ;;               (unless (= beg end)
+      ;;                 (setq size end)
+      ;;                 (setq pos (get-buffer-next-pos fred-buff beg size))))
+      ;;             (if pos
+      ;;               (do  (i) ((>= pos size) result)
+      ;;                 (declare (ignore i))
+      ;;                 (multiple-value-bind (exp pos1)
+      ;;                                      (get-buffer-next-token fred-buff pos size)
+      ;;                   (push exp result)
+      ;;                   (setq pos
+      ;;                         (or (get-buffer-next-pos fred-buff pos1 size) size))))))
+      ;;           (nreverse result))))))
+      ))
 
 (defvar *token-separators* '(#\Space #\Tab #\Newline))
 

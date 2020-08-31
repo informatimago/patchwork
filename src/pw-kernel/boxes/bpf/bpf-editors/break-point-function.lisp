@@ -139,6 +139,7 @@
          (pop x-points)(pop y-points)))))|#
 
 (defun draw-bpf-function-points (x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
+  (declare (ignorable x-points y-points h-view-scaler v-view-scaler draw-rects-fl y))
   (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
    ;; (let (point-x-now point-y-now)
    ;;  (when x-points

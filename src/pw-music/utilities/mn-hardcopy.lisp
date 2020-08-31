@@ -49,6 +49,7 @@
 (defconstant $err-printer-start 97)
 
 (defmethod window-hardcopy ((self pw::C-MN-window) &optional show-fl)
+  (declare (ignorable show-fl))
   (niy window-hardcopy self show-fl)
   ;; show-fl
   ;; (let* ((panels (pw::editor-objects (car (subviews self))))

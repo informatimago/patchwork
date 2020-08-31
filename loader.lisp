@@ -274,6 +274,7 @@ DO:         Prints each expression and their values.
             (change-class ui:*application* 'pw::patchwork-application))
           (ui:format-trace 'start-patchwork 'ui:initialize)
           (ui:initialize)
+          (patchwork.midi:initialize-midi)
           (ui:format-trace 'start-patchwork 'pw::initialize-patchwork)
           (pw::initialize-patchwork ui:*application*)
           (pw::show-welcome ui:*application*))

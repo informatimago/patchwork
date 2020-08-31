@@ -611,6 +611,7 @@
 
 (defgeneric inval-r-view-sides (view &optional top&left\?)
   (:method ((view C-patch) &optional top&left?)
+    (declare (ignorable top&left?))
     (niy inval-r-view-sides view top&left?)
     ;; (when (wptr view)
     ;;   (let* ((pos (view-scroll-position view))

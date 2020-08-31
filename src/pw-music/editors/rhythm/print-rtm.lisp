@@ -31,12 +31,12 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-;;;;
-;;;; -*- mode:lisp; coding:utf-8 -*-
 (in-package :pw)
 
 (defmethod window-hardcopy ((self pw::C-rtm-editor-window) &optional show-fl)
+  (declare (ignorable show-fl))
   (niy window-hardcopy self show-fl)
+
   ;; show-fl
   ;; (unwind-protect
   ;;   (with-cursor *arrow-cursor*

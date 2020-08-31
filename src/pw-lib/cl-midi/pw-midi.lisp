@@ -831,10 +831,10 @@ MidiConnect connects a coremidi:source to a coremidi:destination of two applicat
 |#
 
 (defun MidiConnect (src dst s)
-  (declare (ignore s))
+  (declare (ignorable s))
   "Connect or disconnect two MidiShare applications"
   ;;(#_MidiConnect src dst s)
-  (error "Not implemented yet")
+  (warn "Not implemented yet: (~S ~S ~S ~S)" 'MidiConnect src dst s)
   ;; (if (ensure-boolean s)
   ;;     (midiapp-connect)
   ;;     (midiapp-disconnect))
@@ -991,7 +991,9 @@ For now, we'll just hardwire a single port 0.
 
 (defun MidiGetTime ()
   "give the current time"
-  (values (truncate (* 10 (ui::timestamp)) (/ ui::+tick-per-second+))))
+  (values (truncate (* 10.0d0 #| ccl produces an error when given two ratios |#
+                       (ui::timestamp))
+                    (/ ui::+tick-per-second+))))
 
 (defun midi-get-time ()
   ;; TODO
@@ -2220,7 +2222,7 @@ For now, we'll just hardwire a single port 0.
           (terpri))))))
 
 
-(defun initialize ()
+(defun initialize-midi ()
   (let ((midishare-device-name "Network"))
     (install-midishare-interface)
     (update-port-refnums)
@@ -2242,8 +2244,9 @@ For now, we'll just hardwire a single port 0.
     (setf *filter* (midi-new-filter :chan t :port t :type t))
     (midi-open)))
 
+#-(and)
 (eval-when (:load-toplevel :execute)
-  (initialize))
+  (initialize-midi))
 
 ;;;; THE END ;;;;
 

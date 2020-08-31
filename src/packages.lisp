@@ -56,6 +56,8 @@
 
   #-patchwork.builder::use-midishare (:import-from "UI" "DELETEF")
 
+  (:export "INITIALIZE-MIDI")
+
   (:export "MIDI-OPEN" "MIDI-CLOSE" "MIDI-WRITE" "MIDI-WRITE-TIME"
            "MIDI-WRITE-NOW" "MIDI-READ" "MIDI-CLEAR"
            "CLOCK-TIME" "MIDI-GET-TIME" "MIDI-RESET"
