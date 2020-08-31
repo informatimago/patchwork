@@ -48,6 +48,7 @@
 (cl:defpackage "PATCHWORK.MIDI"
 
   (:use "COMMON-LISP"
+        "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.SYMBOL"
         #+patchwork.builder::use-cl-midi "UI"
         #+patchwork.builder::use-cl-midi "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.ARRAY"
         #+patchwork.builder::use-cl-midi "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.UTILITY"

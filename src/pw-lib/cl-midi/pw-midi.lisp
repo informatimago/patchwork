@@ -290,19 +290,19 @@ returned; called with two arguments, the value of the field is set.
              `((info (make-array ,(length variable-fields) :initial-element nil))
                additionnal-fields)))
        ,@(mapcar (lambda (field)
-                   (let* ((fname (conc-symbol conc-name (first-element field)))
-                          (aname (conc-symbol sname '-  (first-element field))))
+                   (let* ((fname (scat conc-name (first-element field)))
+                          (aname (scat sname '-  (first-element field))))
                      `(defun ,fname (s &optional (v nil vp))
                         (if vp
                             (setf (,aname s) v)
                             (,aname s)))))
                  compulsory-fields)
        ,@(loop
-           :with kname = (conc-symbol sname '-info)
+           :with kname = (scat sname '-info)
            :for i :from 0
            :for fields :in variable-fields
            :append (loop :for field :in fields
-                         :collect (let* ((fname (conc-symbol conc-name (first-element field))))
+                         :collect (let* ((fname (scat conc-name (first-element field))))
                                     `(defun ,fname (s &optional (v nil vp))
                                        (if vp
                                            (setf (aref (,kname s) ,i) v)
