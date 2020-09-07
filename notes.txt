@@ -1,6 +1,6 @@
 # -*- mode:org; coding:utf-8 -*-
-* TODO [#A] Patchwork Project                                     :patchwork:
-** IN-PROGRESS [#A] debug Patchwork and produce a release               :bug:
+* TODO Patchwork Project                                          :patchwork:
+** IN-PROGRESS [#A] Mise à jour pour macOS 10.14 Catallina.             :bug:
    CLOCK: [2016-02-08 Mon 00:16]--[2016-02-08 Mon 00:56] =>  0:40
    :DEADLINE: <2016-03-01 -3m>
 
@@ -8,6 +8,88 @@
 
 https://github.com/informatimago/mclgui/graphs/code-frequency
 https://github.com/informatimago/patchwork/graphs/code-frequency
+
+** IN-PROGRESS [#A] 00007 Text Edit                                 :feature:
+   :DEADLINE: <2016-03-01 -3m>
+   - State "IN-PROGRESS" from "DONE"       [2014-10-07 Tue 09:25] \\
+     En cours.
+- Impossibilité d’inscrire une liste dans un objet.
+- Window Comment ne fonctionne pas.
+
+** IN-PROGRESS [#A] 00006 edition des boites numeriques                 :bug:
+   :DEADLINE: <2016-03-01 -3m>
+Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
+    - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:25] \\
+      text-edit en cours.
+
+- offset of yellow text-edit box: cf. editable-text-dialog-item as subview of a view.
+
+** Alex report
+
+D’abord merci beaucoup, je suis déjà très content de disposer de cette
+version opérationnelle hormis midi-save et midi-road qui ne
+fonctionnent pas et qui sont évidemment essentiels.
+
+C’est donc ce que je vous demande de compléter en priorité.
+
+Les calculs sont rapides, mes patchs et mes « abstracts » s’ouvrent et
+je peux en créer d’autres (malgré quelques plantages lors de créations
+d’abstracts), les objets fonctionnent (j’en ai testé la majorité)
+hormis les objets graphiques multi-bpf (peu important) et Window
+Comment (très peu important).
+
+Ce que j’ai repéré lors de mes premiers tests :
+A corriger :
+
+** IN-PROGRESS [#A] 00036 Rendre opérationnels midi-save et midi-load. Essentiel.
+https://framagit.org/patchwork/patchwork/-/issues/13
+
+** TODO [#A] 00037 Non-Affichage des objets déplacés.
+https://framagit.org/patchwork/patchwork/-/issues/14
+Lorsque un objet est chargé sur la fenêtre PW il apparaît et si je
+le déplace il disparaît : pour le faire réapparaître je suis
+contraint de changer la taille de la fenêtre avec la souris, de même
+lorsque j’ajoute une entrée supplémentaire à un objet à extension
+(exemple x-append) il disparaît et se déplace. Pas essentiel car je
+peux travailler malgré ces objets facétieux mais ça ralentit le
+travail et ce manque de fluidité est une gêne.
+
+** TODO [#A] 00038 Plantage lors de l'affichage de listes.
+https://framagit.org/patchwork/patchwork/-/issues/15
+Plantage lorsque je veux afficher des listes même relativement peu
+longues, je peux afficher des listes de quelques dizaines de nombres
+mais plantage dès une centaine de nombres… Pas essentiel car je peux
+« tricher » en évaluant une liste avec l’objet trigger, ou length,
+ou autre et en intercalant l’objet lst-ed qui récupère la liste dont
+j’ai besoin, mais ce n’est pas très pratique...
+
+** TODO [#A] 00039 Plantage sur clic sur le bouton A des objets.
+https://framagit.org/patchwork/patchwork/-/issues/16
+Plantage lorsque j’ouvre le menu d’un objet ou pour sauver son
+contenu en cliquant sur le A en bas à droite de l’objet.
+
+** TODO [#A] 00040 Plantages inexpliqués lors de tests de constructions d’abstracts élémentaires
+https://framagit.org/patchwork/patchwork/-/issues/17
+
+** TODO [#B] 00041 Affichage des notes de chord-seq fonctionne en partie
+https://framagit.org/patchwork/patchwork/-/issues/18
+Dans cette version l’affichage des notes de chord-seq fonctionne en
+partie (ce qui n’était pas le cas avant) avec des lignes de portées
+en pointillés (alors que les lignes des portées supplémentaires de
+l’objet multiseq sont continues), par contre les altérations # et b
+ne fonctionnent pas correctement, ce n’est pas important mais ce
+serait bien de finaliser.
+
+** TODO [#A] 00042 bogue: on ne peut pas enregistrer une fenêtre éditeur.
+https://framagit.org/patchwork/patchwork/-/issues/19
+While trying to save with C-x C-s an editor window: GUI::BUILD-ENCODINGS-POPUP on <NS-DOCUMENT-CONTROLLER
+
+There is no applicable method for the generic function:
+  #<COMMON-LISP:STANDARD-GENERIC-FUNCTION GUI::BUILD-ENCODINGS-POPUP #x3020011B1CFF>
+when called with arguments:
+  (#<NS-DOCUMENT-CONTROLLER <NSDocumentController: 0x600000c290b0> (#x600000C290B0)>)
+
+The file menu save, save as and save to are ineffective.
 
 ** TODO [#B] provide restarts to skip or retry loading init files   :feature:
 ** TODO [#A] cursors still don't show                                   :bug:
@@ -27,17 +109,6 @@ MacOSX Maestro.ttf maps characters from #xf021 to #xf0f0 (+ #xf000 code).
 ;; *cross-line-cursor* 604
 ;; *note-head-cursor*  110
 
-** TODO [#A] save-image --> dead macptrs in wrappers                    :bug:
-   :DEADLINE: <2016-09-01 -3m>
-
-** TODO [#A] generate-application --> patchwork menus missing           :bug:
-     :DEADLINE: <2016-09-01 -3m>
-
-This generates a patchwork.app, but when launched, we don't have the
-Patchwork menus, but Clozure CL menus.
-
-** TODO [#A] use manifest in generate-application                       :bug:
-Use com.informatimago.manifest.lisp in Patchwork (generate-application).
 ** TODO [#A] AppleEvent                                                 :bug:
    - State "TODO"       from "IN-PROGRESS" [2014-06-22 Sun 06:32] \\
      To be done.
@@ -48,43 +119,13 @@ Use com.informatimago.manifest.lisp in Patchwork (generate-application).
      Not yet.
    - State "IN-PROGRESS" from "TODO"       [2012-12-12 Wed 23:43] \\
      Let's start working on it.
-** TODO [#A] Rest of port.                                              :bug:
-** TO DO List, Bugs, Error, Warnings, TODOs
-*** Avancement
- 1. Points              :  17/ 17 fonctions implémentées [100%]
- 2. Fonts               :  76/ 79 fonctions implémentées [ 96%]
- 3. Menus               :  98/ 98 fonctions implémentées [100%]
- 4. Views               :  90/ 93 fonctions implémentées [ 96%]
- 5. Windows             :  82/ 82 fonctions implémentées [100%]
- 6. Dialogs             :  43/ 53 fonctions implémentées [ 81%]
- 7. Dialog Items        : 356/445 fonctions implémentées [ 80%]
- 8. Colors              :  32/ 32 fonctions implémentées [100%]
- 9. Events              : 110/115 fonctions implémentées [ 95%]
-10. Clipboard           :   2/  8 fonctions implémentées [ 25%]
-11. Apple Events        :   9/ 16 fonctions implémentées [ 56%]
-12. Quickdraw           : 119/179 fonctions implémentées [ 66%]
-13. Files               :  18/ 18 fonctions implémentées [100%]
-14. Divers              : 257/258 fonctions implémentées [ 99%]
-*** Bugs / Patchwork Issues  https://framagit.org/patchwork/patchwork/issues
-**** TODO [#C] #12 Gather online documentation and hook it in.      :feature:
+** TODO [#C] #12 Gather online documentation and hook it in.        :feature:
+https://framagit.org/patchwork/patchwork/-/issues/12
 "PW-HELP-DOC:**;NUMBOX.pw"
-**** IN-PROGRESS [#A] 00007 Text Edit                               :feature:
-   :DEADLINE: <2016-03-01 -3m>
-   - State "IN-PROGRESS" from "DONE"       [2014-10-07 Tue 09:25] \\
-     En cours.
-- Impossibilité d’inscrire une liste dans un objet.
-- Window Comment ne fonctionne pas.
+** TODO [#A] 00014 doublons sur opt-clic                                :bug:
+https://framagit.org/patchwork/patchwork/-/issues/10
 
-**** IN-PROGRESS [#A] 00006 edition des boites numeriques               :bug:
-   :DEADLINE: <2016-03-01 -3m>
-Les chiffres ne s’inscrivent dans les objets que par l’intermédiaire de la souris.
-    - State "IN-PROGRESS" from "TODO"       [2014-10-07 Tue 09:25] \\
-      text-edit en cours.
-
-- offset of yellow text-edit box: cf. editable-text-dialog-item as subview of a view.
-
-**** TODO [#A] 00014 doublons sur opt-clic                              :bug:
-pOn génère une entrée supplémentaire pour certains objets avec alt-clic
+On génère une entrée supplémentaire pour certains objets avec alt-clic
 
 trigger, x-append, test, pwmap, list-ed, create-list, range-filter,
 band-filter, x-union, x-intersect, x-xor, x-diff, inclued ?,
@@ -95,7 +136,8 @@ Lors de cette opération les objets se déplacent sur la fenêtre. Pour
 l’objet test, alt-clic génère deux entrées supplémentaires plutôt
 qu’une seule.
 
-**** TODO [#A] 00011 Le buffer est incomplet                            :bug:
+** TODO [#A] 00011 Le buffer est incomplet                              :bug:
+https://framagit.org/patchwork/patchwork/-/issues/9
 
 il doit avoir une fonction de conservation des données obtenue par un
 clic sur un petit rond au centre de l’objet, ce petit rond doit alors
@@ -109,31 +151,104 @@ On doit verrouiller en cliquant sur un petit rond au centre de l’objet
 qui se transforme alors en croix, pour dévérouiller on clique sur
 cette croix qui redevient alors un petit rond.
 
-**** TODO [#A] 00024 growing while editing                              :bug:
+** TODO [#A] 00024 growing while editing                                :bug:
+https://framagit.org/patchwork/patchwork/-/issues/8
+
 - Open for editing a text field.
 - Try to grow the patch.
 Growing fails, the patch box size becomes slightly smaller.
 
-**** TODO [#A] 00010 Qque fois il y a eu impossibilité d’évaluation.    :bug:
+** TODO [#A] 00010 Qque fois il y a eu impossibilité d’évaluation.      :bug:
+https://framagit.org/patchwork/patchwork/-/issues/7
+
 En fait je crois qu’il n’y a pas d’impossibilité d’évaluation, je
 crois plutôt que - pour une raison inconnue - la fenêtre du Listener
 en fonction devient inactive, en activant une nouvelle fenêtre de
 Listener l’évaluation est à nouveau possible…
 
-**** TODO [#A] 00004 Les patchs complexes sont lents à charger.      :feature:
+** TODO [#A] 00004 Les patchs complexes sont lents à charger.       :feature:
+https://framagit.org/patchwork/patchwork/-/issues/6
+
 Le patch (d/s/R x 5) ci-joint dont j’ai le plus besoin actuellement ne s’ouvre pas non plus, c’est ma priorité.
 <d:s:R x 5>*
-**** TODO [#A] 00027 numbox click-and-drag w/ opt/cmd aphazadical.      :bug:
+** TODO [#A] 00027 numbox click-and-drag w/ opt/cmd aphazadical.        :bug:
+https://framagit.org/patchwork/patchwork/-/issues/5
 Note: option-click and command-click have specific meanings.
-**** TODO [#A] 00031 the first menus must berenamed                    :port:
+** TODO [#A] 00032 multi-bpf breaks                                     :bug:
+https://framagit.org/patchwork/patchwork/-/issues/3
+
+** TODO [#A] 00033 bpf-lib breaks                                       :bug:
+https://framagit.org/patchwork/patchwork/-/issues/2
+
+** TODO [#A] 00035 pw-patch drag bar line off-by-1                      :bug:
+https://framagit.org/patchwork/patchwork/-/issues/1
+
+The line of the drag bar of pw-patch is drawn one pixel beyond the right border some times.
+
+** TODO [#A] Rest of port.                                              :bug:
+** Features                                                         :feature:
+*** TODO [#A] event sources and event handling
+
+There seem to be two paths of event handling, with MacOSX events being
+delivered directly to views thru MclGui, and some other events being
+delivered thru get-next-event.
+
+Check that all events (key, mouse, etc) and all modifiers are
+correctly transmitted where they must go.
+
+*** TODO [#A] Windows
+*** TODO [#A] Dialog Items
+*** TODO [#A] Dialogs
+*** TODO [#B] Midi: revis  midi stuff
+Restructure it: midiplay redefines methods. Use Cocoa Midi libraries.
+*** TODO Pathnames: revise the handling of pathnames
+Mac pathnames, logical pathnames, loading libraries, resources, saving images.
+*** TODO [#B] Quickdraw
+*** TODO [#B] Views
+*** TODO [#C] Fonts
+*** TODO [#C] Clipboard
+*** TODO [#C] Apple Events
+
+Apple Events are only used for external scriptability: aesend is only
+called from send-appleevent, which is only called from record--ae et
+al. in recordables.lisp
+
+Therefore this todo is not prioritary at all.
+
+**** ~/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
+
+*** TODO find-grep ';; *('
+*** TODO a keymap to bind keys to commands dynamicaly
+* Done
+** DONE [#A] save-image --> dead macptrs in wrappers                    :bug:
+CLOSED: [2020-09-07 Mon 02:00] :DEADLINE: <2016-09-01 -3m>
+- State "DONE"       from "TODO"       [2020-09-07 Mon 02:00]
+
+** DONE [#A] generate-application --> patchwork menus missing           :bug:
+CLOSED: [2020-09-07 Mon 02:00] :DEADLINE: <2016-09-01 -3m>
+- State "DONE"       from "TODO"       [2020-09-07 Mon 02:00] \\
+  Done
+
+This generates a patchwork.app, but when launched, we don't have the
+Patchwork menus, but Clozure CL menus.
+
+** DONE [#A] use manifest in generate-application                       :bug:
+CLOSED: [2020-09-06 Sun 15:26]
+- State "DONE"       from "TODO"       [2020-09-06 Sun 15:26] \\
+  Done.
+Use com.informatimago.manifest.lisp in Patchwork (generate-application).
+** DONE [#A] Delivery: debug de/serialization of wrapper/NSObjects save-image.
+     CLOSED: [2014-04-01 Tue 04:36]
+     - State "DONE"       from "TODO"       [2014-04-01 Tue 04:36] \\
+       Done, application saving works now.
+** DONE [#A] 00031 the first menus must be renamed                     :port:
+CLOSED: [2020-09-07 Mon 02:03]
+- State "DONE"       from "TODO"       [2020-09-07 Mon 02:03] \\
+  Done.
+https://framagit.org/patchwork/patchwork/-/issues/4
 The application menu should be Patchwork instead of Clozure CL
 The next menu should be Apps instead of Patchwork.
-**** TODO [#A] 00032 multi-bpf breaks                                   :bug:
-**** TODO [#A] 00033 bpf-lib breaks                                     :bug:
-**** TODO [#A] 00035 pw-patch drag bar line off-by-1                    :bug:
-The line of the drag bar of pw-patch is drawn one pixel beyond the right border some times.
-*** Done
-**** DONE 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item
+** DONE 00000 Classes that need to be implemented satisfactorily: editable-text-dialog-item
     CLOSED: [2014-10-23 Thu 05:41]
     - State "DONE"       from "IN-PROGRESS" [2014-10-23 Thu 05:41] \\
       Implemented editable-text-dialog-item as a text-edit-dialog-item.
@@ -142,12 +257,12 @@ The line of the drag bar of pw-patch is drawn one pixel beyond the right border 
 - static-text-dialog-item
 - editable-text-dialog-ietm
 
-**** DONE [#A] 00005 Effacements partiels et provisoires des objets
+** DONE [#A] 00005 Effacements partiels et provisoires des objets
     CLOSED: [2014-10-23 Thu 05:33]
     - State "DONE"       from "TODO"       [2014-10-23 Thu 05:33] \\
       Corrected.
 (réapparitions lors des déplacements des objets ou de l’agrandissement de la fenêtre du patch).
-**** DONE [#A] 00012 graphic offset in output box link drawing
+** DONE [#A] 00012 graphic offset in output box link drawing
    CLOSED: [2014-10-13 Mon 14:53]
    - State "DONE"       from "TODO"       [2014-10-13 Mon 14:53] \\
      Corrected.
@@ -156,15 +271,15 @@ quand on active le lien entre deux objets (en cliquant sur le petit
 rectangle au bas de l’objet) l’origine de ce lien apparaît plus bas à
 gauche plutôt que dans le petit rectangle...
 
-**** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
+** DONE 00001 view-origin / compute-view-origin / view-valid-p problem
      CLOSED: [2014-07-24 Thu 02:55]
      - State "DONE"       from "TODO"       [2014-07-24 Thu 02:55] \\
        Temporary hack.
-**** DONE 00003 When we click on the output box, the view is displayed zoomed in.
+** DONE 00003 When we click on the output box, the view is displayed zoomed in.
      CLOSED: [2014-08-31 Sun 08:42]
      - State "DONE"       from "TODO"       [2014-08-31 Sun 08:42] \\
        new-instance & coordinate system corrected.
-**** DONE 00017 Grow box
+** DONE 00017 Grow box
    CLOSED: [2014-09-01 Mon 12:25]
    - State "DONE"       from "TODO"       [2014-09-01 Mon 12:25] \\
      done 10.0-0.717
@@ -175,11 +290,11 @@ Les objets avec un petit carré en bas à droite devraient pouvoir
 s’allonger en cliquant sur ce petit carré et en étirant l’objet avec
 la souris.
 
-**** DONE 00018 closing a modified patch asks twice to save it.
+** DONE 00018 closing a modified patch asks twice to save it.
      CLOSED: [2014-09-01 Mon 12:25]
      - State "DONE"       from "TODO"       [2014-09-01 Mon 12:25] \\
        Done 10.0-0.717
-**** DONE 00019 Bad default for PW-User directory.
+** DONE 00019 Bad default for PW-User directory.
    CLOSED: [2014-09-02 Tue 05:18]
    - State "DONE"       from "IN-PROGRESS" [2014-09-02 Tue 05:18] \\
      Done: Corrected the PW-USER logical host translations loading.
@@ -211,70 +326,70 @@ ERROR while (PROGN (INITIALIZE) (INITIALIZE-STREAMS) (INITIALIZE-MN-EDITOR) (INI
 Can't create directory "/Users/pjb/".
 #+END_QUOTE
 
-**** DONE 00009 Impossibilité de supprimer des objets dans un patch.
+** DONE 00009 Impossibilité de supprimer des objets dans un patch.
      CLOSED: [2014-09-02 Tue 05:29]
      - State "DONE"       from "TODO"       [2014-09-02 Tue 05:29] \\
        Can't reproduce.
-**** DONE 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer.
+** DONE 00016 L’objet multi-bpf fait planter l’appli et l’objet bpf-lib la fait fermer.
      CLOSED: [2014-09-03 Wed 07:51]
      - State "DONE"       from "TODO"       [2014-09-03 Wed 07:51] \\
        Corrected.
-**** DONE 00020 Made use of the Maestro font instead of Mus-Not-j.  Corrected chord-box.
+** DONE 00020 Made use of the Maestro font instead of Mus-Not-j.  Corrected chord-box.
      CLOSED: [2014-09-04 Thu 15:37]
      - State "DONE"       from "TODO"       [2014-09-04 Thu 15:37] \\
        Done
-**** DONE 00015 Dans le menu Kernel —> List, il manque les objets suivants : interlock, subs-posn, group-list, first-n, last-n.
+** DONE 00015 Dans le menu Kernel —> List, il manque les objets suivants : interlock, subs-posn, group-list, first-n, last-n.
      CLOSED: [2014-09-04 Thu 15:43]
      - State "DONE"       from "TODO"       [2014-09-04 Thu 15:43] \\
        Added.
-**** DONE dragging links doesn't work                                   :bug:
+** DONE dragging links doesn't work                                     :bug:
      CLOSED: [2014-03-31 Mon 10:51]
      - State "DONE"       from "IN-PROGRESS" [2014-03-31 Mon 10:51] \\
        Completed.
      - State "IN-PROGRESS" from "TODO"       [2014-03-31 Mon 04:45] \\
        drag-out-line
 
-**** DONE drawing of outboxes doesn't work                              :bug:
+** DONE drawing of outboxes doesn't work                                :bug:
      CLOSED: [2014-03-31 Mon 10:52]
      - State "DONE"       from "TODO"       [2014-03-31 Mon 10:52] \\
        Corrected.
-**** DONE dragging the top bar of a patch doesn't move it.              :bug:
+** DONE dragging the top bar of a patch doesn't move it.                :bug:
      CLOSED: [2014-03-31 Mon 10:52]
      - State "DONE"       from "TODO"       [2014-03-31 Mon 10:52] \\
        Corrected.
-**** DONE moving a box works only the first time.                       :bug:
+** DONE moving a box works only the first time.                         :bug:
     CLOSED: [2014-03-31 Mon 10:52]
     - State "DONE"       from "TODO"       [2014-03-31 Mon 10:52] \\
       Corrected.
 with control click and drag.
-**** DONE resizing a box works only the first time.                     :bug:
+** DONE resizing a box works only the first time.                       :bug:
     CLOSED: [2014-03-31 Mon 10:53]
     - State "DONE"       from "TODO"       [2014-03-31 Mon 10:53] \\
       Corrected.
 with click and drag on the grow box.
-**** DONE [#A] debug generated applications from recent changes         :bug:
+** DONE [#A] debug generated applications from recent changes           :bug:
      CLOSED: [2014-03-31 Mon 01:02]
      - State "DONE"       from "TODO"       [2014-03-31 Mon 01:02] \\
        Done.
-**** DONE menubar switching doesn't work in the generated application   :bug:
+** DONE menubar switching doesn't work in the generated application     :bug:
      CLOSED: [2014-03-31 Mon 01:01]
      - State "DONE"       from "TODO"       [2014-03-31 Mon 01:01] \\
        Corrected.
      - State "TODO"       from "TODO"       [2014-03-31 Mon 01:01] \\
        Corrected.
-**** DONE I/O redirection doesn't work in the generated application     :bug:
+** DONE I/O redirection doesn't work in the generated application       :bug:
      CLOSED: [2014-03-31 Mon 01:01]
      - State "DONE"       from "TODO"       [2014-03-31 Mon 01:01] \\
        Corrected.
-**** DONE click-and-drag to move a box doesn't work.
+** DONE click-and-drag to move a box doesn't work.
      CLOSED: [2014-03-26 Wed 03:47]
      - State "DONE"       from "TODO"       [2014-03-26 Wed 03:47] \\
        Implemented, it's actually control-click-and-drag.
-**** DONE no way to make multiple selections by click-and-dragging an rect arround boxes?
+** DONE no way to make multiple selections by click-and-dragging an rect arround boxes?
      CLOSED: [2014-03-26 Wed 03:49]
      - State "DONE"       from "TODO"       [2014-03-26 Wed 03:49] \\
        Implemented.
-**** CANCELED 00013 Abstract (patch contenu dans un nouvel objet) ne peut pas se créer pour le moment.
+** CANCELED 00013 Abstract (patch contenu dans un nouvel objet) ne peut pas se créer pour le moment.
    CLOSED: [2014-09-04 Thu 15:51]
    - State "CANCELED"   from "TODO"       [2014-09-04 Thu 15:51] \\
      can't reproduce.
@@ -286,43 +401,67 @@ nommant l’Abstract dans la fenêtre « absout »), puis sélectionner le
 tout et aller dans le menu PWoper —> Abstract. Le nouvel objet doit
 alors apparaître.
 
-*** Features                                                        :feature:
-**** TODO [#A] event sources and event handling
+* Avancement
+ 1. Points              :  17/ 17 fonctions implémentées [100%]
+ 2. Fonts               :  76/ 79 fonctions implémentées [ 96%]
+ 3. Menus               :  98/ 98 fonctions implémentées [100%]
+ 4. Views               :  90/ 93 fonctions implémentées [ 96%]
+ 5. Windows             :  82/ 82 fonctions implémentées [100%]
+ 6. Dialogs             :  43/ 53 fonctions implémentées [ 81%]
+ 7. Dialog Items        : 356/445 fonctions implémentées [ 80%]
+ 8. Colors              :  32/ 32 fonctions implémentées [100%]
+ 9. Events              : 110/115 fonctions implémentées [ 95%]
+10. Clipboard           :   2/  8 fonctions implémentées [ 25%]
+11. Apple Events        :   9/ 16 fonctions implémentées [ 56%]
+12. Quickdraw           : 119/179 fonctions implémentées [ 66%]
+13. Files               :  18/ 18 fonctions implémentées [100%]
+14. Divers              : 257/258 fonctions implémentées [ 99%]
+* Notes
+** Files
 
-There seem to be two paths of event handling, with MacOSX events being
-delivered directly to views thru MclGui, and some other events being
-delivered thru get-next-event.
+notes.txt                     This file.
 
-Check that all events (key, mouse, etc) and all modifiers are
-correctly transmitted where they must go.
+Makefile                      Makefile for the project.
 
-**** TODO [#A] Windows
-**** TODO [#A] Dialog Items
-**** TODO [#A] Dialogs
-**** TODO [#B] Midi: revis  midi stuff
-Restructure it: midiplay redefines methods. Use Cocoa Midi libraries.
-**** TODO Pathnames: revise the handling of pathnames
-Mac pathnames, logical pathnames, loading libraries, resources, saving images.
-**** TODO [#B] Quickdraw
-**** TODO [#B] Views
-**** TODO [#C] Fonts
-**** TODO [#C] Clipboard
-**** TODO [#C] Apple Events
+devis/                        The proposal.
 
-Apple Events are only used for external scriptability: aesend is only
-called from send-appleevent, which is only called from record--ae et
-al. in recordables.lisp
+doc/                          Documentation and reference.
 
-Therefore this todo is not prioritary at all.
+This directory is used as prefix for installation of project specific
+programs and tools found in src/.  Therefore we have bin/, lib/ and
+share/ where things are installed.
 
-***** ~/works/patchwork/patchwork/src/pw-lib/pwscript/recordables.lisp
+bin/                          Binaries (executables).
 
-**** TODO find-grep ';; *('
-**** TODO a keymap to bind keys to commands dynamicaly
-**** DONE [#A] Delivery: debug de/serialization of wrapper/NSObjects save-image.
-     CLOSED: [2014-04-01 Tue 04:36]
-     - State "DONE"       from "TODO"       [2014-04-01 Tue 04:36] \\
-       Done, application saving works now.
+lib/                          Libraries.
+
+share/                        Share files.
+
+src/                          Sources for various programs and tools.
+
+tools/                        Sources for tools written specifically
+                              for the Patchwork project.
+
+patches/                      Sample patch files.
+
+patchwork.fossil              The local fossil repository.
+
+patchwork/                    The patchwork sources (in an open fossil repository).
+
+PW-code.zip                   The original MCL files.
+
+pw-src-original/              The original lisp files.
+
+pw-src-utf-8-unix/            Converted into utf-8-unix encoding.
+
+pw-src/                       The Demo Patchwork version, before fossil.
+
+classes-hierarchy.txt         Class hierarchy as generated by tools/read-sources.
+
+classes-parents.txt           Class parents as generated by tools/read-sources.
+
+errors.txt                    Compilation errors so far.
+
 ** *FEATURES* used by Patchwork/mclgui
 *** Implementation features:
 
@@ -411,264 +550,6 @@ The following features produce a lot of trace output.
 
      :not-yet                 used by patchwork/src/pw-lib/cl-midi/pw-midi and objc-bridge to disable features not implemented yet.
      :not-needed              used by patchwork/src/pw-lib/cl-midi/pw-midi
-
-** Not Implemented Yet
-
-#+BEGIN_QUOTE
-
-find ~/works/patchwork/src -name \*.lisp -exec grep  -Hi '^ *(niy ' {} \;
-/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy quit-application-handler)
-/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy open-application-document application filename startup)))
-/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy open-documents-handler)))
-/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy print-application-document application filename startup)))
-/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy print-documents-handler)))
-/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:  (niy appleevent-idle event sleeptime mousergn))
-/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-error))
-/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-overwrite-dialog)))
-/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy find-edit-menu)))
-/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-about-view)))
-/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-about-view)))
-/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-suspend-event-handler)))
-/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-resume-event-handler)))
-/Users/pjb/works/patchwork/src/mclgui/button-dialog-item.lisp:  (niy validate-control-dialog-item item)
-/Users/pjb/works/patchwork/src/mclgui/check-box-dialog-item.lisp:        (niy check-box-check item)
-/Users/pjb/works/patchwork/src/mclgui/check-box-dialog-item.lisp:        (niy check-box-uncheck item)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:        (niy install-view-in-window :after button w)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy set-view-font-codes :after button ff ms m1 m2)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy set-dialog-item-text item text)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy install-view-in-window dialog-item dialog)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:            (niy set-view-position item h v)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:            (niy set-view-size item h v)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy remove-view-from-window item)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy dialog-item-disable item)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy dialog-item-enable item)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:    (niy view-activate-event-handler item)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy view-deactivate-event-handler item)
-/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy font-codes-string-width-for-control string ff ms start end)
-/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:  (niy current-pixel-depth)
-/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:  (niy current-port-color-p)
-/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:    (niy draw-theme-text-box text rect text-justification truncwhere active-p)
-/Users/pjb/works/patchwork/src/mclgui/event.lisp:  (niy with-timer)
-/Users/pjb/works/patchwork/src/mclgui/event.lisp:  (niy with-event-processing-enabled)
-/Users/pjb/works/patchwork/src/mclgui/font.lisp:  (niy color->ff-index color)
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy ed-kill-selection window)
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-insert-file buffer file-pathname)))
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-insert buffer text)))
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-write-file buffer file-pathname  if-exists if-does-not-exists)))
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-size buffer)
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-current-sexp buffer position)
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-char buffer position)
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy set-fred-display-start-mark dialog-item position)
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy fred-update dialog-item)
-/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-skip-fwd-wsp&comments buffer length size)
-/Users/pjb/works/patchwork/src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-disable :before item)#-(and)
-/Users/pjb/works/patchwork/src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-enable :after item)#-(and)
-/Users/pjb/works/patchwork/src/mclgui/message-dialog.lisp:    (niy dialog-item-text-length item)
-/Users/pjb/works/patchwork/src/mclgui/pen.lisp:      (niy line-to view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
-/Users/pjb/works/patchwork/src/mclgui/pen.lisp:      (niy line view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy make-new-pop-up-control menu window) #-(and)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-height pop-up-menu height)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:            (niy set-pop-up-menu-default-item menu num force)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-size menu h v)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-position menu h v)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy size-rectangles menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy view-corners item)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy point-in-click-region-p menu where)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:                (niy draw-menu-title menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy view-draw-contents menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy paint-menu-gray menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-activate-event-handler menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-deactivate-event-handler menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-disable menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-enable menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:              (niy title-hilite menu un)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-items menu items)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy remove-menu-items menu items)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-select)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy menu-install menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy remove-view-from-window menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy remove-view-from-window menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-draw-contents menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-click-event-handler menu where)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:              (niy size-rectangles menu)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:          (niy menu-select menu num)
-/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy set-pop-up-item-check-mark item mark)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy clip-region view save-region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy set-clip-region view new-region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-rect view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-rect view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-rect view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-oval view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-oval view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-oval view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-oval view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-oval view pattern left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-round-rect view oval-width oval-height left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-round-rect view oval-width oval-height left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-round-rect view oval-width oval-height left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-round-rect view oval-width oval-height left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-round-rect view pattern oval-width oval-height left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-arc view start-angle arc-angle left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-arc view start-angle arc-angle left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-arc view start-angle arc-angle left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-arc view start-angle arc-angle left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-arc view pattern start-angle arc-angle left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-region view region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-region view region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-region view region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-region view region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-region view pattern region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy start-picture view left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-picture view)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy draw-picture view picture left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy kill-picture picture)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy start-polygon view)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-polygon view)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy kill-polygon polygon)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy offset-polygon polygon h v)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-polygon view polygon)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-polygon view polygon)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-polygon view polygon)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-polygon view polygon)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-polygon view pattern polygon)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-pixel view h v)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy scale-point source-rect dest-rect h v)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-point source-rect dest-rect h v)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-rect source-rect dest-rect rect)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-region source-rect dest-rect region)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-polygon source-rect dest-rect polygon)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy make-bitmap left top right bottom)
-/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy copy-bits source-bitmap dest-bitmap source-rect dest-rect mode mask-region)
-/Users/pjb/works/patchwork/src/mclgui/radio-button-dialog-item.lisp:        (niy radio-button-push item)
-/Users/pjb/works/patchwork/src/mclgui/radio-button-dialog-item.lisp:    (niy radio-button-unpush item)
-/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy with-hilite-mode body)
-/Users/pjb/works/patchwork/src/mclgui/region.lisp:     (niy with-hilite-mode ',body)
-/Users/pjb/works/patchwork/src/mclgui/region.lisp:    (niy open-region view)
-/Users/pjb/works/patchwork/src/mclgui/region.lisp:    (niy close-region view dest-region)
-/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy inset-region region h v)
-/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy point-in-region-p region h v))
-/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy rect-in-region-p region left top right bot))
-/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:  (niy reinit-frec frec owner-or-wptr owner)
-/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:    (niy make-frec cursor owner size)
-/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:      (niy call-with-frec frec thunk)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy outside-scroll-bar-setting scroll-bar handle)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:      (niy install-view-in-window item view)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy remove-view-from-window item)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-draw-contents item)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-deactivate-event-handler item)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-activate-event-handler item)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:      (niy track-scroll-bar-thumb item)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-click-event-handler item where)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:    (niy dialog-item-action item)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy %set-scroll-bar-setting item new-value only-if-new-value)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy update-scroll-bar-max-min-setting item)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy track-and-draw container function pos direction delta min-pos max-pos)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:    (niy draw-pane-splitter-outline scrollee scroll-bar pos min max direction)
-/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy scroll-wheel-handler w delta direction wherep)
-/Users/pjb/works/patchwork/src/mclgui/select-dialog.lisp:               (niy select-item-from-list)
-/Users/pjb/works/patchwork/src/mclgui/sequence-dialog-item.lisp:  (niy put-scraps value text)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy highlight-rect-frame rect)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:        (niy invert-cell-selection item h v selected-p)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:      (niy invalidate-cell h v)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:          (niy scroll-to-cell item h v)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:            (niy scroll-to-cell item h v)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy string-width-for-focused-control string ff ms)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:              (niy default-cell-size item width)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy compute-selection-regions item min-row max-row min-column max-column)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy dispose-selection-regions item)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                        (niy add-to-selection-region item selected-p h v dont-compute-outline-region)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:            (niy view-draw-contents item)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                  (niy %draw-table-cell-new item h v rect selectedp)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:        (niy toggle-cell-outlining)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy view-click-event-handler item where)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                                         (niy view-click-event-handler item where)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy get-local-mouse-position)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:      (niy toggle-selection-region item)
-/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy two-byte-script-p script)
-/Users/pjb/works/patchwork/src/mclgui/test/test-graphics.lisp:  (niy draw-char '(x y cn))
-/Users/pjb/works/patchwork/src/mclgui/test/test-graphics.lisp:  (niy draw-string x y str)
-/Users/pjb/works/patchwork/src/mclgui/view.lisp:        (niy view-is-invalid-p view visrgn cliprgn tl br)
-/Users/pjb/works/patchwork/src/mclgui/view.lisp:  (niy view erase-p right-and-bottom-only) #-(and)
-/Users/pjb/works/patchwork/src/mclgui/view.lisp:  (niy initialize/view))
-/Users/pjb/works/patchwork/src/patchwork/src/objc-bridge/objc-classes.lisp:  (niy note-class-protocols class))
-/Users/pjb/works/patchwork/src/patchwork/src/objc-bridge/objc-runtime.lisp:  (niy with-nsstr nsstr cstring len body))
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/box-creation/pw-patch.lisp:    (niy inval-r-view-sides view top&left?)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/bpf/bpf-editors/break-point-function.lisp:  (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy get-selected-file self)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy save-win self)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy add-to-file self list format)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:    (niy patch-value self obj)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/environment/mac-rsrc.lisp:  (niy get-box-cursor)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy win-print-setUp self)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy window-hardcopy self show-fl)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-menu.lisp:  (niy save-special-pw-image)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/closae.lisp:  (niy aesend the-appleevent the-reply mode priority timeout idleproc filterproc)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getSize self)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getNthDesc self index type)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfNthDesc self index)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfKeyDesc self keyword)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfParam self keyword)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfAttribute self keyword)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/recordables.lisp:  (niy *record-enable*)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-music/editors/rhythm/print-rtm.lisp:  (niy window-hardcopy self show-fl)
-/Users/pjb/works/patchwork/src/patchwork/src/pw-music/utilities/mn-hardcopy.lisp:  (niy window-hardcopy self show-fl)
-
-#+END_QUOTE
-
-** Scratch
-
-#+BEGIN_QUOTE
-
-
-    diff --exclude \*.bak -r rmcl-unix/level-1/ mcl-unix/level-1/
-    diff --exclude '*TAGS' --exclude .git --exclude .svn --exclude CVS --exclude _darcs --exclude '*~' --exclude '*.x86f' --exclude '*.fasl' --exclude '*.fas' --exclude '*.lib' --exclude '*.[oa]' --exclude '*.so' --exclude '#*' --exclude '*.orig' --exclude '*.rej' --exclude '*.bak' -r rmcl-unix/level-1//l1-aprims.lisp mcl-unix/level-1//l1-aprims.lisp
-    diff rmcl-unix/level-1//l1-boot-1.lisp mcl-unix/level-1//l1-boot-1.lisp
-    diff rmcl-unix/level-1//l1-boot-3.lisp mcl-unix/level-1//l1-boot-3.lisp
-    diff rmcl-unix/level-1//l1-boot-lds.lisp mcl-unix/level-1//l1-boot-lds.lisp
-    diff rmcl-unix/level-1//l1-edbuf.lisp mcl-unix/level-1//l1-edbuf.lisp
-    diff rmcl-unix/level-1//l1-edcmd.lisp mcl-unix/level-1//l1-edcmd.lisp
-    diff rmcl-unix/level-1//l1-edfrec.lisp mcl-unix/level-1//l1-edfrec.lisp
-    diff rmcl-unix/level-1//l1-edwin.lisp mcl-unix/level-1//l1-edwin.lisp
-    diff rmcl-unix/level-1//l1-events.lisp mcl-unix/level-1//l1-events.lisp
-    diff rmcl-unix/level-1//l1-files.lisp mcl-unix/level-1//l1-files.lisp
-    diff rmcl-unix/level-1//l1-highlevel-events.lisp mcl-unix/level-1//l1-highlevel-events.lisp
-    diff rmcl-unix/level-1//l1-init.lisp mcl-unix/level-1//l1-init.lisp
-    diff rmcl-unix/level-1//l1-initmenus-lds.lisp mcl-unix/level-1//l1-initmenus-lds.lisp
-    diff rmcl-unix/level-1//l1-initmenus.lisp mcl-unix/level-1//l1-initmenus.lisp
-    diff rmcl-unix/level-1//l1-listener.lisp mcl-unix/level-1//l1-listener.lisp
-    diff rmcl-unix/level-1//l1-menus.lisp mcl-unix/level-1//l1-menus.lisp
-    diff rmcl-unix/level-1//l1-pathnames.lisp mcl-unix/level-1//l1-pathnames.lisp
-    diff rmcl-unix/level-1//l1-processes.lisp mcl-unix/level-1//l1-processes.lisp
-    diff rmcl-unix/level-1//l1-streams.lisp mcl-unix/level-1//l1-streams.lisp
-    diff rmcl-unix/level-1//l1-sysio.lisp mcl-unix/level-1//l1-sysio.lisp
-    diff rmcl-unix/level-1//l1-windows.lisp mcl-unix/level-1//l1-windows.lisp
-    diff rmcl-unix/level-1//new-fred-window.lisp mcl-unix/level-1//new-fred-window.lisp
-    diff rmcl-unix/level-1//script-manager.lisp mcl-unix/level-1//script-manager.lisp
-    diff rmcl-unix/level-1//sysutils.lisp mcl-unix/level-1//sysutils.lisp
-
-
-
-    find ~/works/patchwork/patchwork/src/mclgui -name \*.lisp -print0 | xargs -0  grep -niH -e '[^-a-z]\<\(copy-file\|*warn-if-redefine*\|*lisp-cleanup-functions*\|*eventhook*\|event-dispatch\|def-load-pointers\|prompt\|point\|point-p\|point-x\|point-y\|point-h\|point-v\|make-point\|copy-point\|add-points\|subtract-points\|*black-pattern*\|*dkgray-pattern*\|*gray-pattern*\|*ltgray-pattern*\|*white-pattern*\|with-cursor\|*watch-cursor*\|*i-beam-cursor*\|*arrow-cursor*\|command-key\|set-command-key\|menu-element\|menu-element-p\|menu-item\|menu-item-p\|menu-item-enable\|menu-item-disable\|menu-item-title\|menu-item-action\|menu-item-check-mark\|set-menu-item-check-mark\|set-menu-item-action-function\|menu-item-action-function\|menu-item-action\|menu\|menup\|menu-enabled-p\|menu-title\|menu-items\|add-menu-items\|find-menu-item\|menubar\|set-menubar\|find-menu\|mouse-down-p\|double-click-p\|shift-key-p\|control-key-p\|command-key-p\|option-key-p\|command-key\|enabled\|event-dispatch\|file-name\|font\|item-action\|item-text\|items\|maxwidth\|text\|title\|width\|simple-view\|view\|view-container\|view-font\|view-position\|view-size\|view-window\|subviews\|view-subviews\|track-thumb-p\|h-scrollp\|v-scrollp\|bottom-boarder\|check-mark\|set-view-position\|set-view-size\|set-view-font\|add-subview\|add-subviews\|remove-subview\|remove-subviews\|with-focused-view\|with-font-focused-view\|scroller\|scroller-mixin\|scroll-bar-correction\|h-scroller\|v-scroller\|control\|button-string\|window\|window-title\|set-window-title\|close-box-p\|fred-window\|window-select\|bring-to-front\|front-window\|window-show\|window-hide\|view-activate-event-handler\|view-deactivate-event-handler\|dialog-item\|dialog-item-action\|dialog-item-text\|set-dialog-item-text\|static-text-dialog-item\|editable-text-dialog-item\|table-dialog-item\|button-dialog-item\|radio-button-dialog-item\|check-box-dialog-item\|dialog\|message\|message-dialog\|choose-file-dialog\|choose-new-file-dialog\|y-or-n-dialog\|select-item-from-list\|make-popupbox\|key-equal\)\>[^-a-z]
-
-#+END_QUOTE
-
-#+BEGIN_SRC sh
-rm application.log ; make clean ; make application 2>&1 | tee application.log
-#+END_SRC
-
-#+BEGIN_SRC lisp
-(push #P"/home/pjb/works/patchwork/tools/" asdf:*central-registry*)
-(ql:quickload :com.informatimago.check-asdf)
-(com.informatimago.check-asdf:check-asdf-system-file #P"~/works/patchwork/patchwork/src/patchwork.asd")
-
-
-(process-interrupt ccl::*initial-process* (lambda ()
-                                            (make-window)
-                                            (start-run-loop)))
-#+END_SRC
-
-
-https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
 
 ** Patchwork Development Notes
 *** Window Key Commands
@@ -1097,54 +978,267 @@ cut copy paste clear
 undo undo-more     -[[NSResponder undoManager] undo]
 select-all         -[NSResponder selectAll:]
 
-** Files
-
-notes.txt                     This file.
-
-Makefile                      Makefile for the project.
-
-devis/                        The proposal.
-
-doc/                          Documentation and reference.
-
-This directory is used as prefix for installation of project specific
-programs and tools found in src/.  Therefore we have bin/, lib/ and
-share/ where things are installed.
-
-bin/                          Binaries (executables).
-
-lib/                          Libraries.
-
-share/                        Share files.
-
-src/                          Sources for various programs and tools.
-
-tools/                        Sources for tools written specifically
-                              for the Patchwork project.
-
-patches/                      Sample patch files.
-
-patchwork.fossil              The local fossil repository.
-
-patchwork/                    The patchwork sources (in an open fossil repository).
-
-PW-code.zip                   The original MCL files.
-
-pw-src-original/              The original lisp files.
-
-pw-src-utf-8-unix/            Converted into utf-8-unix encoding.
-
-pw-src/                       The Demo Patchwork version, before fossil.
-
-classes-hierarchy.txt         Class hierarchy as generated by tools/read-sources.
-
-classes-parents.txt           Class parents as generated by tools/read-sources.
-
-errors.txt                    Compilation errors so far.
-
 ** References
 
 http://recherche.ircam.fr/equipes/repmus/Rapports/PeterHanappe95/
+
+** Scratch
+
+#+BEGIN_QUOTE
+
+
+    diff --exclude \*.bak -r rmcl-unix/level-1/ mcl-unix/level-1/
+    diff --exclude '*TAGS' --exclude .git --exclude .svn --exclude CVS --exclude _darcs --exclude '*~' --exclude '*.x86f' --exclude '*.fasl' --exclude '*.fas' --exclude '*.lib' --exclude '*.[oa]' --exclude '*.so' --exclude '#*' --exclude '*.orig' --exclude '*.rej' --exclude '*.bak' -r rmcl-unix/level-1//l1-aprims.lisp mcl-unix/level-1//l1-aprims.lisp
+    diff rmcl-unix/level-1//l1-boot-1.lisp mcl-unix/level-1//l1-boot-1.lisp
+    diff rmcl-unix/level-1//l1-boot-3.lisp mcl-unix/level-1//l1-boot-3.lisp
+    diff rmcl-unix/level-1//l1-boot-lds.lisp mcl-unix/level-1//l1-boot-lds.lisp
+    diff rmcl-unix/level-1//l1-edbuf.lisp mcl-unix/level-1//l1-edbuf.lisp
+    diff rmcl-unix/level-1//l1-edcmd.lisp mcl-unix/level-1//l1-edcmd.lisp
+    diff rmcl-unix/level-1//l1-edfrec.lisp mcl-unix/level-1//l1-edfrec.lisp
+    diff rmcl-unix/level-1//l1-edwin.lisp mcl-unix/level-1//l1-edwin.lisp
+    diff rmcl-unix/level-1//l1-events.lisp mcl-unix/level-1//l1-events.lisp
+    diff rmcl-unix/level-1//l1-files.lisp mcl-unix/level-1//l1-files.lisp
+    diff rmcl-unix/level-1//l1-highlevel-events.lisp mcl-unix/level-1//l1-highlevel-events.lisp
+    diff rmcl-unix/level-1//l1-init.lisp mcl-unix/level-1//l1-init.lisp
+    diff rmcl-unix/level-1//l1-initmenus-lds.lisp mcl-unix/level-1//l1-initmenus-lds.lisp
+    diff rmcl-unix/level-1//l1-initmenus.lisp mcl-unix/level-1//l1-initmenus.lisp
+    diff rmcl-unix/level-1//l1-listener.lisp mcl-unix/level-1//l1-listener.lisp
+    diff rmcl-unix/level-1//l1-menus.lisp mcl-unix/level-1//l1-menus.lisp
+    diff rmcl-unix/level-1//l1-pathnames.lisp mcl-unix/level-1//l1-pathnames.lisp
+    diff rmcl-unix/level-1//l1-processes.lisp mcl-unix/level-1//l1-processes.lisp
+    diff rmcl-unix/level-1//l1-streams.lisp mcl-unix/level-1//l1-streams.lisp
+    diff rmcl-unix/level-1//l1-sysio.lisp mcl-unix/level-1//l1-sysio.lisp
+    diff rmcl-unix/level-1//l1-windows.lisp mcl-unix/level-1//l1-windows.lisp
+    diff rmcl-unix/level-1//new-fred-window.lisp mcl-unix/level-1//new-fred-window.lisp
+    diff rmcl-unix/level-1//script-manager.lisp mcl-unix/level-1//script-manager.lisp
+    diff rmcl-unix/level-1//sysutils.lisp mcl-unix/level-1//sysutils.lisp
+
+
+
+    find ~/works/patchwork/patchwork/src/mclgui -name \*.lisp -print0 | xargs -0  grep -niH -e '[^-a-z]\<\(copy-file\|*warn-if-redefine*\|*lisp-cleanup-functions*\|*eventhook*\|event-dispatch\|def-load-pointers\|prompt\|point\|point-p\|point-x\|point-y\|point-h\|point-v\|make-point\|copy-point\|add-points\|subtract-points\|*black-pattern*\|*dkgray-pattern*\|*gray-pattern*\|*ltgray-pattern*\|*white-pattern*\|with-cursor\|*watch-cursor*\|*i-beam-cursor*\|*arrow-cursor*\|command-key\|set-command-key\|menu-element\|menu-element-p\|menu-item\|menu-item-p\|menu-item-enable\|menu-item-disable\|menu-item-title\|menu-item-action\|menu-item-check-mark\|set-menu-item-check-mark\|set-menu-item-action-function\|menu-item-action-function\|menu-item-action\|menu\|menup\|menu-enabled-p\|menu-title\|menu-items\|add-menu-items\|find-menu-item\|menubar\|set-menubar\|find-menu\|mouse-down-p\|double-click-p\|shift-key-p\|control-key-p\|command-key-p\|option-key-p\|command-key\|enabled\|event-dispatch\|file-name\|font\|item-action\|item-text\|items\|maxwidth\|text\|title\|width\|simple-view\|view\|view-container\|view-font\|view-position\|view-size\|view-window\|subviews\|view-subviews\|track-thumb-p\|h-scrollp\|v-scrollp\|bottom-boarder\|check-mark\|set-view-position\|set-view-size\|set-view-font\|add-subview\|add-subviews\|remove-subview\|remove-subviews\|with-focused-view\|with-font-focused-view\|scroller\|scroller-mixin\|scroll-bar-correction\|h-scroller\|v-scroller\|control\|button-string\|window\|window-title\|set-window-title\|close-box-p\|fred-window\|window-select\|bring-to-front\|front-window\|window-show\|window-hide\|view-activate-event-handler\|view-deactivate-event-handler\|dialog-item\|dialog-item-action\|dialog-item-text\|set-dialog-item-text\|static-text-dialog-item\|editable-text-dialog-item\|table-dialog-item\|button-dialog-item\|radio-button-dialog-item\|check-box-dialog-item\|dialog\|message\|message-dialog\|choose-file-dialog\|choose-new-file-dialog\|y-or-n-dialog\|select-item-from-list\|make-popupbox\|key-equal\)\>[^-a-z]
+
+#+END_QUOTE
+
+#+BEGIN_SRC sh
+rm application.log ; make clean ; make application 2>&1 | tee application.log
+#+END_SRC
+
+#+BEGIN_SRC lisp
+(push #P"/home/pjb/works/patchwork/tools/" asdf:*central-registry*)
+(ql:quickload :com.informatimago.check-asdf)
+(com.informatimago.check-asdf:check-asdf-system-file #P"~/works/patchwork/patchwork/src/patchwork.asd")
+
+
+(process-interrupt ccl::*initial-process* (lambda ()
+                                            (make-window)
+                                            (start-run-loop)))
+#+END_SRC
+
+
+https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Multithreading/Introduction/Introduction.html
+
+** Not Implemented Yet
+
+#+BEGIN_QUOTE
+
+find ~/works/patchwork/src -name \*.lisp -exec grep  -Hi '^ *(niy ' {} \;
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy quit-application-handler)
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy open-application-document application filename startup)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy open-documents-handler)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy print-application-document application filename startup)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:    (niy print-documents-handler)))
+/Users/pjb/works/patchwork/src/mclgui/apple-event.lisp:  (niy appleevent-idle event sleeptime mousergn))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-error))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-overwrite-dialog)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy find-edit-menu)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-about-view)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-about-view)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-suspend-event-handler)))
+/Users/pjb/works/patchwork/src/mclgui/application.lisp:    (niy application-resume-event-handler)))
+/Users/pjb/works/patchwork/src/mclgui/button-dialog-item.lisp:  (niy validate-control-dialog-item item)
+/Users/pjb/works/patchwork/src/mclgui/check-box-dialog-item.lisp:        (niy check-box-check item)
+/Users/pjb/works/patchwork/src/mclgui/check-box-dialog-item.lisp:        (niy check-box-uncheck item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:        (niy install-view-in-window :after button w)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy set-view-font-codes :after button ff ms m1 m2)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy set-dialog-item-text item text)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy install-view-in-window dialog-item dialog)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:            (niy set-view-position item h v)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:            (niy set-view-size item h v)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy remove-view-from-window item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy dialog-item-disable item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:      (niy dialog-item-enable item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:    (niy view-activate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy view-deactivate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/control-dialog-item.lisp:  (niy font-codes-string-width-for-control string ff ms start end)
+/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:  (niy current-pixel-depth)
+/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:  (niy current-port-color-p)
+/Users/pjb/works/patchwork/src/mclgui/dialog.lisp:    (niy draw-theme-text-box text rect text-justification truncwhere active-p)
+/Users/pjb/works/patchwork/src/mclgui/event.lisp:  (niy with-timer)
+/Users/pjb/works/patchwork/src/mclgui/event.lisp:  (niy with-event-processing-enabled)
+/Users/pjb/works/patchwork/src/mclgui/font.lisp:  (niy color->ff-index color)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy ed-kill-selection window)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-insert-file buffer file-pathname)))
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-insert buffer text)))
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-write-file buffer file-pathname  if-exists if-does-not-exists)))
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-size buffer)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-current-sexp buffer position)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-char buffer position)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy set-fred-display-start-mark dialog-item position)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy fred-update dialog-item)
+/Users/pjb/works/patchwork/src/mclgui/fred-window.lisp:    (niy buffer-skip-fwd-wsp&comments buffer length size)
+/Users/pjb/works/patchwork/src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-disable :before item)#-(and)
+/Users/pjb/works/patchwork/src/mclgui/key-handler-mixin.lisp:        (niy dialog-item-enable :after item)#-(and)
+/Users/pjb/works/patchwork/src/mclgui/message-dialog.lisp:    (niy dialog-item-text-length item)
+/Users/pjb/works/patchwork/src/mclgui/pen.lisp:      (niy line-to view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
+/Users/pjb/works/patchwork/src/mclgui/pen.lisp:      (niy line view h v "if there's an open region, add it to the region; if there's an open picture, add it to the picture")
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy make-new-pop-up-control menu window) #-(and)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-height pop-up-menu height)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:            (niy set-pop-up-menu-default-item menu num force)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-size menu h v)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy set-view-position menu h v)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy size-rectangles menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy view-corners item)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy point-in-click-region-p menu where)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:                (niy draw-menu-title menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy view-draw-contents menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy paint-menu-gray menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-activate-event-handler menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy view-deactivate-event-handler menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-disable menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-enable menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:              (niy title-hilite menu un)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy add-menu-items menu items)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy remove-menu-items menu items)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy menu-select)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:    (niy menu-install menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:  (niy remove-view-from-window menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy remove-view-from-window menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-draw-contents menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:        (niy view-click-event-handler menu where)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:              (niy size-rectangles menu)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:          (niy menu-select menu num)
+/Users/pjb/works/patchwork/src/mclgui/pop-up-menu-dialog-item.lisp:      (niy set-pop-up-item-check-mark item mark)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy clip-region view save-region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy set-clip-region view new-region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-rect view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-rect view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-rect view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-oval view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-oval view pattern left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-round-rect view oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-round-rect view pattern oval-width oval-height left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-arc view start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-arc view pattern start-angle arc-angle left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-region view region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-region view pattern region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy start-picture view left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-picture view)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy draw-picture view picture left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy kill-picture picture)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy start-polygon view)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-polygon view)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy kill-polygon polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy offset-polygon polygon h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy frame-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy paint-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy erase-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy invert-polygon view polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy fill-polygon view pattern polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy get-pixel view h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy scale-point source-rect dest-rect h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-point source-rect dest-rect h v)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-rect source-rect dest-rect rect)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-region source-rect dest-rect region)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy map-polygon source-rect dest-rect polygon)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy make-bitmap left top right bottom)
+/Users/pjb/works/patchwork/src/mclgui/quickdraw.lisp:  (niy copy-bits source-bitmap dest-bitmap source-rect dest-rect mode mask-region)
+/Users/pjb/works/patchwork/src/mclgui/radio-button-dialog-item.lisp:        (niy radio-button-push item)
+/Users/pjb/works/patchwork/src/mclgui/radio-button-dialog-item.lisp:    (niy radio-button-unpush item)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy with-hilite-mode body)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:     (niy with-hilite-mode ',body)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:    (niy open-region view)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:    (niy close-region view dest-region)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy inset-region region h v)
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy point-in-region-p region h v))
+/Users/pjb/works/patchwork/src/mclgui/region.lisp:  (niy rect-in-region-p region left top right bot))
+/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:  (niy reinit-frec frec owner-or-wptr owner)
+/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:    (niy make-frec cursor owner size)
+/Users/pjb/works/patchwork/src/mclgui/scratch/frec.lisp:      (niy call-with-frec frec thunk)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy outside-scroll-bar-setting scroll-bar handle)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:      (niy install-view-in-window item view)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy remove-view-from-window item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-draw-contents item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-deactivate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-activate-event-handler item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:      (niy track-scroll-bar-thumb item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy view-click-event-handler item where)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:    (niy dialog-item-action item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy %set-scroll-bar-setting item new-value only-if-new-value)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy update-scroll-bar-max-min-setting item)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy track-and-draw container function pos direction delta min-pos max-pos)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:    (niy draw-pane-splitter-outline scrollee scroll-bar pos min max direction)
+/Users/pjb/works/patchwork/src/mclgui/scroll-bar-dialog-item.lisp:  (niy scroll-wheel-handler w delta direction wherep)
+/Users/pjb/works/patchwork/src/mclgui/select-dialog.lisp:               (niy select-item-from-list)
+/Users/pjb/works/patchwork/src/mclgui/sequence-dialog-item.lisp:  (niy put-scraps value text)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy highlight-rect-frame rect)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:        (niy invert-cell-selection item h v selected-p)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:      (niy invalidate-cell h v)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:          (niy scroll-to-cell item h v)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:            (niy scroll-to-cell item h v)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy string-width-for-focused-control string ff ms)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:              (niy default-cell-size item width)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy compute-selection-regions item min-row max-row min-column max-column)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy dispose-selection-regions item)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                        (niy add-to-selection-region item selected-p h v dont-compute-outline-region)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:            (niy view-draw-contents item)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                  (niy %draw-table-cell-new item h v rect selectedp)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:        (niy toggle-cell-outlining)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy view-click-event-handler item where)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:                                         (niy view-click-event-handler item where)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy get-local-mouse-position)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:      (niy toggle-selection-region item)
+/Users/pjb/works/patchwork/src/mclgui/table-dialog-item.lisp:  (niy two-byte-script-p script)
+/Users/pjb/works/patchwork/src/mclgui/test/test-graphics.lisp:  (niy draw-char '(x y cn))
+/Users/pjb/works/patchwork/src/mclgui/test/test-graphics.lisp:  (niy draw-string x y str)
+/Users/pjb/works/patchwork/src/mclgui/view.lisp:        (niy view-is-invalid-p view visrgn cliprgn tl br)
+/Users/pjb/works/patchwork/src/mclgui/view.lisp:  (niy view erase-p right-and-bottom-only) #-(and)
+/Users/pjb/works/patchwork/src/mclgui/view.lisp:  (niy initialize/view))
+/Users/pjb/works/patchwork/src/patchwork/src/objc-bridge/objc-classes.lisp:  (niy note-class-protocols class))
+/Users/pjb/works/patchwork/src/patchwork/src/objc-bridge/objc-runtime.lisp:  (niy with-nsstr nsstr cstring len body))
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/box-creation/pw-patch.lisp:    (niy inval-r-view-sides view top&left?)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/bpf/bpf-editors/break-point-function.lisp:  (niy draw-bpf-function-points x-points y-points h-view-scaler v-view-scaler draw-rects-fl y)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy get-selected-file self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy save-win self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:  (niy add-to-file self list format)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/boxes/data/file-buffer.lisp:    (niy patch-value self obj)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/environment/mac-rsrc.lisp:  (niy get-box-cursor)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy win-print-setUp self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-hardcopy.lisp:  (niy window-hardcopy self show-fl)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-kernel/pw-graphics/window+menu/pw-menu.lisp:  (niy save-special-pw-image)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/closae.lisp:  (niy aesend the-appleevent the-reply mode priority timeout idleproc filterproc)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getSize self)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getNthDesc self index type)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfNthDesc self index)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfKeyDesc self keyword)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfParam self keyword)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/pw-ae.lisp:  (niy getAESizeOfAttribute self keyword)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-lib/pwscript/recordables.lisp:  (niy *record-enable*)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-music/editors/rhythm/print-rtm.lisp:  (niy window-hardcopy self show-fl)
+/Users/pjb/works/patchwork/src/patchwork/src/pw-music/utilities/mn-hardcopy.lisp:  (niy window-hardcopy self show-fl)
+
+#+END_QUOTE
 
 ** sandboxing appstore
 
@@ -1338,23 +1432,22 @@ release:
         $(LISP) $(ARGS) --load $@.lisp --load build.lisp
 
     where debug.lisp / release.lisp would contain the wanted optimization setting
-* Notes
 ** pw-patch
 
-
+|------------------+------------------------------------------+-------------------------------|
 | context          | gesture                                  | action                        |
 |------------------+------------------------------------------+-------------------------------|
 | inside patch box | double click                             | open-patch-win                |
 |                  | control+option click in box              | delete-extra-inputs           |
 |                  | contro click in box                      | change-position               |
 |                  | click in title bar                       | change-position               |
-|                  | click in grow box        (5x5)           | change-size                   |
-|                  | option click in bottom left box (15x12)  | print outputtypes             |
+|                  | click in grow box                  (5x5) | change-size                   |
+|                  | option click in bottom left box  (15x12) | print outputtypes             |
 |                  | command click in bottom left box (15x12) | print inputtypes              |
-|                  | click in bottom left box (15x12)         | flip-controls                 |
+|                  | click in bottom left box         (15x12) | flip-controls                 |
 |                  | option click                             | mouse-pressed-no-active-extra |
 |                  | click                                    | toggle-patch-active-mode      |
 |------------------+------------------------------------------+-------------------------------|
 | inside controls  | option click                             | disconnect-ctrl               |
 |                  | click                                    | nothing                       |
-|                  |                                          |                               |
+|------------------+------------------------------------------+-------------------------------|
