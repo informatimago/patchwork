@@ -76,7 +76,7 @@
           (unless sub-menu
             (ui:add-menu-items main-menu
                                (setq sub-menu (make-instance 'menu-item :menu-item-title mtitle))))
-          (push (eval `(function(lambda () ,body))) *PW-box-instance-list*)
+          (push (eval `(function (lambda () ,body))) *PW-box-instance-list*)
           (set-menu-item-action-function sub-menu
                                          (lambda () (add-patch-box *active-patch-window* (eval body))))
           sub-menu))))
