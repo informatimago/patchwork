@@ -549,7 +549,11 @@
   #+debug-views (format-trace 'run-boxes self)
   (let ((boxes (active-patches self)))
     (dolist (box boxes)
-      (eval-enqueue `(print (patch-value ,box ,box)))
+      (eval-enqueue `(progn
+                       (format t "~%;; ~A:~%~S~%"
+                               (pw-function-string ,box)
+                               (patch-value ,box ,box))
+                       (finish-output)))
                                         ;aaa
       (record-event :|PWst| :|eval| `((,:|----| ,(mkSO :|cbox| nil :|name| (pw-function-string box))))))))
 
