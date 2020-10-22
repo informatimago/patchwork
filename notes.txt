@@ -41,15 +41,21 @@ Comment (très peu important).
 Ce que j’ai repéré lors de mes premiers tests :
 A corriger :
 
-** DONE [#A] 00036 Rendre opérationnels midi-save et midi-load. Essentiel.
-- State "DONE"       from "IN-PROGRESS" [2020-10-22 Thu 16:55] \\
-  Completed implementation of C-patch-save-midi and C-patch-load-midi.
-CLOSED: [2020-10-22 Thu 16:55]
-https://framagit.org/patchwork/patchwork/-/issues/13
+** IN-PROGRESS [#A] 00037 Non-Affichage des objets déplacés.            :bug:
+- State "IN-PROGRESS" from "TODO"       [2020-10-22 Thu 17:45]
+https://framagit.org/patchwork/patchwork/-/issues/14
+Lorsque un objet est chargé sur la fenêtre PW il apparaît et si je
+le déplace il disparaît : pour le faire réapparaître je suis
+contraint de changer la taille de la fenêtre avec la souris, de même
+lorsque j’ajoute une entrée supplémentaire à un objet à extension
+(exemple x-append) il disparaît et se déplace. Pas essentiel car je
+peux travailler malgré ces objets facétieux mais ça ralentit le
+travail et ce manque de fluidité est une gêne.
 
-We don't test (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
-for loading or saving MIDI files, because we don't need the real-time player
-to do that.
+** TODO [#A] 00045 integration CoreMIDI                             :feature:
+https://framagit.org/patchwork/patchwork/-/issues/23
+Intégrer CoreMIDI afin de pouvoir utiliser midi record et midi play en
+temps réel avec des synthétiseurs.
 
 ** TODO [#B] 00043 interface files                                      :bug:
 https://framagit.org/patchwork/patchwork/-/issues/20
@@ -80,22 +86,12 @@ pour les interfaces coregraphics, coremidi, midishare, player, etc,
 
 et configurer les logical-pathname-translations de "ccl" pour ceux-ci.
 
-** TODO [#A] 00044 00044 Integrate CCLApplication                       :bug:
+** TODO [#A] 00044 Integrate CCLApplication                             :bug:
 nib files provided by ccl are too old, they cannot be converted and read by Xcode 12.
 This may be the cause of some crashes (for example, the About Patchwork crash).
 Furthermore, we're doing some patching of the CCLApplication (eg. the listener), and may have to do other cleanup (references to CCL (upgrading, etc)).
 Therefore we should copy in the sources of CCL Application (ccl-ide) and take over its maintenance.
 Probably more a MCLGUI issue.
-** TODO [#A] 00037 Non-Affichage des objets déplacés.                   :bug:
-https://framagit.org/patchwork/patchwork/-/issues/14
-Lorsque un objet est chargé sur la fenêtre PW il apparaît et si je
-le déplace il disparaît : pour le faire réapparaître je suis
-contraint de changer la taille de la fenêtre avec la souris, de même
-lorsque j’ajoute une entrée supplémentaire à un objet à extension
-(exemple x-append) il disparaît et se déplace. Pas essentiel car je
-peux travailler malgré ces objets facétieux mais ça ralentit le
-travail et ce manque de fluidité est une gêne.
-
 ** TODO [#A] 00042 bogue: on ne peut pas enregistrer une fenêtre éditeur. :bug:
 https://framagit.org/patchwork/patchwork/-/issues/19
 While trying to save with C-x C-s an editor window: GUI::BUILD-ENCODINGS-POPUP on <NS-DOCUMENT-CONTROLLER
@@ -106,19 +102,6 @@ when called with arguments:
   (#<NS-DOCUMENT-CONTROLLER <NSDocumentController: 0x600000c290b0> (#x600000C290B0)>)
 
 The file menu Save, Save As and Save To are ineffective.
-
-** DONE [#A] 00038 Plantage lors de l'affichage de listes.
-- State "DONE"       from "TODO"       [2020-10-15 Thu 12:12] \\
-  commit 4def87648461ad72aa2e05bf5c9e29b7ab54f1ab
-      Corrected bug in cocoa-listener that blocked big outputs to the listener.
-CLOSED: [2020-10-15 Thu 12:12]
-https://framagit.org/patchwork/patchwork/-/issues/15
-Plantage lorsque je veux afficher des listes même relativement peu
-longues, je peux afficher des listes de quelques dizaines de nombres
-mais plantage dès une centaine de nombres… Pas essentiel car je peux
-« tricher » en évaluant une liste avec l’objet trigger, ou length,
-ou autre et en intercalant l’objet lst-ed qui récupère la liste dont
-j’ai besoin, mais ce n’est pas très pratique...
 
 ** TODO [#A] 00039 Plantage sur clic sur le bouton A des objets.
 https://framagit.org/patchwork/patchwork/-/issues/16
@@ -266,6 +249,29 @@ Therefore this todo is not prioritary at all.
 *** TODO find-grep ';; *('
 *** TODO a keymap to bind keys to commands dynamicaly
 * Done
+** DONE [#A] 00036 Rendre opérationnels midi-save et midi-load. Essentiel.
+- State "DONE"       from "IN-PROGRESS" [2020-10-22 Thu 16:55] \\
+  Completed implementation of C-patch-save-midi and C-patch-load-midi.
+CLOSED: [2020-10-22 Thu 16:55]
+https://framagit.org/patchwork/patchwork/-/issues/13
+
+We don't test (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
+for loading or saving MIDI files, because we don't need the real-time player
+to do that.
+
+** DONE [#A] 00038 Plantage lors de l'affichage de listes.
+- State "DONE"       from "TODO"       [2020-10-15 Thu 12:12] \\
+  commit 4def87648461ad72aa2e05bf5c9e29b7ab54f1ab
+      Corrected bug in cocoa-listener that blocked big outputs to the listener.
+CLOSED: [2020-10-15 Thu 12:12]
+https://framagit.org/patchwork/patchwork/-/issues/15
+Plantage lorsque je veux afficher des listes même relativement peu
+longues, je peux afficher des listes de quelques dizaines de nombres
+mais plantage dès une centaine de nombres… Pas essentiel car je peux
+« tricher » en évaluant une liste avec l’objet trigger, ou length,
+ou autre et en intercalant l’objet lst-ed qui récupère la liste dont
+j’ai besoin, mais ce n’est pas très pratique...
+
 ** DONE [#A] save-image --> dead macptrs in wrappers                    :bug:
 CLOSED: [2020-09-07 Mon 02:00] :DEADLINE: <2016-09-01 -3m>
 - State "DONE"       from "TODO"       [2020-09-07 Mon 02:00]
