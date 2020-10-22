@@ -126,7 +126,7 @@ variables::
 help::
 	@printf "$(HELP_FORMAT)" "application" "Generates the application."
 application:clean release-notes.pdf
-	printf '(push :save-image-and-quit *features*)\n(handler-bind ((error (lambda (condition) (uiop:print-backtrace) nil))) (load "generate-application.lisp"))\n'|$(CCL_EXE)
+	printf '(push :save-image-and-quit *features*)\n(handler-bind ((error (lambda (condition) (declare (ignore condition)) (uiop:print-backtrace) nil))) (load "generate-application.lisp"))\n'|$(CCL_EXE)
 
 # There's a bug in ccl when generating an application from a loaded file…
 # $(LISP) \
