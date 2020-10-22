@@ -129,14 +129,16 @@
       (setf *value*  (first values))
       (setf *values* values)
       (let ((*package* (load-time-value (find-package "PW"))))
-        (format t "~&PW->~S~%" *value*)))
+        (format t "~&PW->~S~%" *value*)
+        (finish-output)))
     (error (err)
       (setf *value*  patch
             *values* (list :error err patch))
       (let ((errmsg (handler-case (format nil "~A" err)
                       (error (err)
-                        (format nil "Error while formating error message: ~A" err)))))
-        (format t "~&Error while evaluating patch PW->~S~%~A~%" *value* errmsg)))))
+                        (format nil "~&Error while formating error message: ~A~%" err)))))
+        (format t "~&Error while evaluating patch PW->~S~%~A~%" *value* errmsg)
+        (finish-output)))))
 
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
   #+debug-views (format-trace '(view-click-event-handler c-pw-outrect) :where (point-to-list where) :view self)
@@ -1015,7 +1017,4 @@ tutorial file only if the names differ"
     (setf *active-patch-window* win)))
 
 
-
 ;;;; THE END ;;;;
-
-
