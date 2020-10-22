@@ -125,7 +125,7 @@ variables::
 
 help::
 	@printf "$(HELP_FORMAT)" "application" "Generates the application."
-application:clean
+application:clean release-notes.pdf
 	printf '(push :save-image-and-quit *features*)\n(handler-bind ((error (lambda (condition) (uiop:print-backtrace) nil))) (load "generate-application.lisp"))\n'|$(CCL_EXE)
 
 # There's a bug in ccl when generating an application from a loaded file…
@@ -133,6 +133,18 @@ application:clean
 # 	$(LISP_EVAL) '(load "generate-application.lisp")' \
 # 	$(LISP_EVAL) '(ccl:quit)'
 # looks ccl 1.8 doesn't quit always after build-application.
+
+
+release-notes.pdf:release-notes.org
+clean::
+	-rm -f release-notes.pdf
+# Generate PDF from org-mode document.
+%.pdf:%.org
+	-rm -f $@
+	emacs --batch \
+		--eval '(find-file "'$<'")' \
+		--funcall org-latex-export-to-pdf \
+		--kill
 
 
 ###---------------------------------------------------------------------
