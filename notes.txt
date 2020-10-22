@@ -41,10 +41,52 @@ Comment (très peu important).
 Ce que j’ai repéré lors de mes premiers tests :
 A corriger :
 
-** IN-PROGRESS [#A] 00036 Rendre opérationnels midi-save et midi-load. Essentiel.
+** DONE [#A] 00036 Rendre opérationnels midi-save et midi-load. Essentiel.
+- State "DONE"       from "IN-PROGRESS" [2020-10-22 Thu 16:55] \\
+  Completed implementation of C-patch-save-midi and C-patch-load-midi.
+CLOSED: [2020-10-22 Thu 16:55]
 https://framagit.org/patchwork/patchwork/-/issues/13
 
-** TODO [#A] 00037 Non-Affichage des objets déplacés.
+We don't test (and patchwork.midi:*pw-refnum* patchwork.midi:*player*)
+for loading or saving MIDI files, because we don't need the real-time player
+to do that.
+
+** TODO [#B] 00043 interface files                                      :bug:
+https://framagit.org/patchwork/patchwork/-/issues/20
+Dans le Listener de Patchwork.app:
+#+BEGIN_CODE
+UI ? [[NApplication sharedApplication] orderFrontStandardAboutPanel:cffi-sys:null-pointer]
+; Warning: Interface file #P"/Users/pjb/Desktop/patchwork-10.1-0.553-ccl-1.12_dev_v1.12_dev.4_8_gf4a517fc_darwinx8664-darwin-apple-10.15.7-x86-64/darwin-x86-headers64/foundation/objc-methods.cdb" does not exist, and the containing directory does not exist.
+;          This may mean that that the "ccl:" logical-pathname host has not been properly initialized.
+; While executing: CCL::CDB-OPEN, in process Listener(19).
+; Warning: Interface file #P"/Users/pjb/Desktop/patchwork-10.1-0.553-ccl-1.12_dev_v1.12_dev.4_8_gf4a517fc_darwinx8664-darwin-apple-10.15.7-x86-64/darwin-x86-headers64/cocoa/objc-methods.cdb" does not exist, and the containing directory does not exist.
+;          This may mean that that the "ccl:" logical-pathname host has not been properly initialized.
+; While executing: CCL::CDB-OPEN, in process Listener(19).
+; Warning: Interface file #P"/Users/pjb/Desktop/patchwork-10.1-0.553-ccl-1.12_dev_v1.12_dev.4_8_gf4a517fc_darwinx8664-darwin-apple-10.15.7-x86-64/darwin-x86-headers64/libc/objc-methods.cdb" does not exist, and the containing directory does not exist.
+;          This may mean that that the "ccl:" logical-pathname host has not been properly initialized.
+; While executing: CCL::CDB-OPEN, in process Listener(19).
+> Debug: Unknown message: "orderFrontStandardAboutPanel:"
+#+END_CODE
+
+Il faudrait donc copier les fichiers cdb dans les Ressources de
+l'application, comme ils sont dans `/usr/local/src/ccl/`,
+
+#+BEGIN_CODE
+/usr/local/src/ccl-git/darwin-x86-headers64
+#+END_CODE
+
+en plus des cdb que nous avons généré dans  `src/macosx/headers64/`
+pour les interfaces coregraphics, coremidi, midishare, player, etc,
+
+et configurer les logical-pathname-translations de "ccl" pour ceux-ci.
+
+** TODO [#A] 00044 00044 Integrate CCLApplication                       :bug:
+nib files provided by ccl are too old, they cannot be converted and read by Xcode 12.
+This may be the cause of some crashes (for example, the About Patchwork crash).
+Furthermore, we're doing some patching of the CCLApplication (eg. the listener), and may have to do other cleanup (references to CCL (upgrading, etc)).
+Therefore we should copy in the sources of CCL Application (ccl-ide) and take over its maintenance.
+Probably more a MCLGUI issue.
+** TODO [#A] 00037 Non-Affichage des objets déplacés.                   :bug:
 https://framagit.org/patchwork/patchwork/-/issues/14
 Lorsque un objet est chargé sur la fenêtre PW il apparaît et si je
 le déplace il disparaît : pour le faire réapparaître je suis
@@ -54,7 +96,22 @@ lorsque j’ajoute une entrée supplémentaire à un objet à extension
 peux travailler malgré ces objets facétieux mais ça ralentit le
 travail et ce manque de fluidité est une gêne.
 
-** TODO [#A] 00038 Plantage lors de l'affichage de listes.
+** TODO [#A] 00042 bogue: on ne peut pas enregistrer une fenêtre éditeur. :bug:
+https://framagit.org/patchwork/patchwork/-/issues/19
+While trying to save with C-x C-s an editor window: GUI::BUILD-ENCODINGS-POPUP on <NS-DOCUMENT-CONTROLLER
+
+There is no applicable method for the generic function:
+  #<COMMON-LISP:STANDARD-GENERIC-FUNCTION GUI::BUILD-ENCODINGS-POPUP #x3020011B1CFF>
+when called with arguments:
+  (#<NS-DOCUMENT-CONTROLLER <NSDocumentController: 0x600000c290b0> (#x600000C290B0)>)
+
+The file menu Save, Save As and Save To are ineffective.
+
+** DONE [#A] 00038 Plantage lors de l'affichage de listes.
+- State "DONE"       from "TODO"       [2020-10-15 Thu 12:12] \\
+  commit 4def87648461ad72aa2e05bf5c9e29b7ab54f1ab
+      Corrected bug in cocoa-listener that blocked big outputs to the listener.
+CLOSED: [2020-10-15 Thu 12:12]
 https://framagit.org/patchwork/patchwork/-/issues/15
 Plantage lorsque je veux afficher des listes même relativement peu
 longues, je peux afficher des listes de quelques dizaines de nombres
@@ -79,17 +136,6 @@ en pointillés (alors que les lignes des portées supplémentaires de
 l’objet multiseq sont continues), par contre les altérations # et b
 ne fonctionnent pas correctement, ce n’est pas important mais ce
 serait bien de finaliser.
-
-** TODO [#A] 00042 bogue: on ne peut pas enregistrer une fenêtre éditeur.
-https://framagit.org/patchwork/patchwork/-/issues/19
-While trying to save with C-x C-s an editor window: GUI::BUILD-ENCODINGS-POPUP on <NS-DOCUMENT-CONTROLLER
-
-There is no applicable method for the generic function:
-  #<COMMON-LISP:STANDARD-GENERIC-FUNCTION GUI::BUILD-ENCODINGS-POPUP #x3020011B1CFF>
-when called with arguments:
-  (#<NS-DOCUMENT-CONTROLLER <NSDocumentController: 0x600000c290b0> (#x600000C290B0)>)
-
-The file menu save, save as and save to are ineffective.
 
 ** TODO [#B] provide restarts to skip or retry loading init files   :feature:
 ** TODO [#A] cursors still don't show                                   :bug:
@@ -199,7 +245,7 @@ correctly transmitted where they must go.
 *** TODO [#A] Windows
 *** TODO [#A] Dialog Items
 *** TODO [#A] Dialogs
-*** TODO [#B] Midi: revis  midi stuff
+*** TODO [#B] Midi: revise  midi stuff
 Restructure it: midiplay redefines methods. Use Cocoa Midi libraries.
 *** TODO Pathnames: revise the handling of pathnames
 Mac pathnames, logical pathnames, loading libraries, resources, saving images.
@@ -465,91 +511,127 @@ errors.txt                    Compilation errors so far.
 ** *FEATURES* used by Patchwork/mclgui
 *** Implementation features:
 
-     :allegro                  used by midishare
-     :clisp                      "
-     :cmu                        "
-     :ecl                        "
-     :lispworks                  "
-     :openmcl                    "
-     :sbcl                       "
-     :ccl                      used a lot by patchwork/mclgui for remaining ccl specific stuff
-                               (waiting for a portable objc-bridge).
-
-         :ccl-1.9              was used by patchwork loader to detect ccl 1.9 (to load a patch).
-         :ccl-4.3              used by midishare to detect MCL-4.x vs. MCL-5.x (!)
-         :ccl-5.0              used by midishare to detect MCL-4.x vs. MCL-5.x (!)
-
-
-
-     :32-bit-target            used by mclgui/cg to determine floating point type.
-     :64-bit-target            used by mclgui/cg to determine floating point type.
-     :ppc-target               used by mclgui/initialize to determined fasl file type.
-
-     :carbon-compat            used by old mcl code (remaining traces in mclgui, to be removed).
-     :carbon-compat-2          used by old mcl code (remaining traces in mclgui, to be removed).
-
-
-     :ppc-target               used by objc-bridge (unused for now).
-     :ppc32-target               "
-     :ppc64-target               "
-     :win32-target               "
-     :x86-target                 "
-     :x8632-target               "
-     :x8664-target               "
-     :darwin-target              "
-     :cocotron                   "
-     :cocotron-objc              "
-     :gnu-objc                   "
-     :apple-objc                 "
-     :apple-objc-2.0             "
+|------------------+-------------------------------------------------------------------|
+| :allegro         | used by midishare                                                 |
+| :clisp           | "                                                                 |
+| :cmu             | "                                                                 |
+| :ecl             | "                                                                 |
+| :lispworks       | "                                                                 |
+| :openmcl         | "                                                                 |
+| :sbcl            | "                                                                 |
+| :ccl             | used a lot by patchwork/mclgui for remaining ccl specific stuff   |
+|                  | (waiting for a portable objc-bridge).                             |
+| :ccl-1.9         | was used by patchwork loader to detect ccl 1.9 (to load a patch). |
+| :ccl-4.3         | used by midishare to detect MCL-4.x vs. MCL-5.x (!)               |
+| :ccl-5.0         | used by midishare to detect MCL-4.x vs. MCL-5.x (!)               |
+|------------------+-------------------------------------------------------------------|
+| :32-bit-target   | used by mclgui/cg to determine floating point type.               |
+| :64-bit-target   | used by mclgui/cg to determine floating point type.               |
+| :ppc-target      | used by mclgui/initialize to determined fasl file type.           |
+|------------------+-------------------------------------------------------------------|
+| :carbon-compat   | used by old mcl code (remaining traces in mclgui, to be removed). |
+| :carbon-compat-2 | used by old mcl code (remaining traces in mclgui, to be removed). |
+|------------------+-------------------------------------------------------------------|
+| :ppc-target      | used by objc-bridge (unused for now).                             |
+| :ppc32-target    | "                                                                 |
+| :ppc64-target    | "                                                                 |
+| :win32-target    | "                                                                 |
+| :x86-target      | "                                                                 |
+| :x8632-target    | "                                                                 |
+| :x8664-target    | "                                                                 |
+| :darwin-target   | "                                                                 |
+| :cocotron        | "                                                                 |
+| :cocotron-objc   | "                                                                 |
+| :gnu-objc        | "                                                                 |
+| :apple-objc      | "                                                                 |
+| :apple-objc-2.0  | "                                                                 |
+|------------------+-------------------------------------------------------------------|
 
 *** Library features:
 
-     :player                   set by the midishare/player.
-
-     :loop                     used by lelisp-macros to detect the LOOP library is used (for, while).
-     :swank                    used by patchwork/{loader,init-streams,src/application} to configure streams.
+|---------+-------------------------------------------------------------------------------|
+| :player | set by the midishare/player.                                                  |
+| :loop   | used by lelisp-macros to detect the LOOP library is used (for, while).        |
+| :swank  | used by patchwork/{loader,init-streams,src/application} to configure streams. |
+|---------+-------------------------------------------------------------------------------|
 
 *** features used by mclgui
 
-    :test                    activate running tests upon loading.
-
-    :has-appleevent          set by patchwork/load-libraries. (=!=) used by mclgui to detect whether to use AppleEvents.
-
-    :report-error-in-dialog  display error and backtrace in a dialog window.
-    :debug-on-error          invokes the debugger when reporting a detected error.
+|-------------------------+---------------------------------------------------------------------------------------------|
+| :test                   | activate running tests upon loading.                                                        |
+|                         |                                                                                             |
+| :has-appleevent         | set by patchwork/load-libraries. (=!=) used by mclgui to detect whether to use AppleEvents. |
+|                         |                                                                                             |
+| :report-error-in-dialog | display error and backtrace in a dialog window.                                             |
+| :debug-on-error         | invokes the debugger when reporting a detected error.                                       |
+|-------------------------+---------------------------------------------------------------------------------------------|
 
 
 The following features produce a lot of trace output.
 
-    :debug-application       activates debugging application class..
-    :debug-event             activates debugging events.
-    :debug-objc              activates debugging objc-classes.
-    :debug-focused-view      activates debugging of call-with-focused-view.
-    :debug-views-colors      activates debugging views (with colors).
-    :debug-views             activates debugging views.
-    :debug-wrapper           activates debugging wrappers.
+|---------------------+------------------------------------------------|
+| :debug-application  | activates debugging application class..        |
+| :debug-event        | activates debugging events.                    |
+| :debug-objc         | activates debugging objc-classes.              |
+| :debug-focused-view | activates debugging of call-with-focused-view. |
+| :debug-views-colors | activates debugging views (with colors).       |
+| :debug-views        | activates debugging views.                     |
+| :debug-wrapper      | activates debugging wrappers.                  |
+|---------------------+------------------------------------------------|
 
 *** features used by patchwork
 
-     :cocoa                   set by patchwork/gestalt. used by patchwork (loader, generate-application, etc).
-     :cocoa-10.9              set by patchwork/gestalt.
-     :cocoa-10.8              set by patchwork/gestalt.
-     :cocoa-10.7              set by patchwork/gestalt. (=!=) used by mclgui/cocoa interface
-     :cocoa-10.6              set by patchwork/gestalt. (=!=) used by mclgui/cocoa interface
-     :cocoa-10.5              set by patchwork/gestalt.
-     :cocoa-10.4              set by patchwork/gestalt.
+|-------------------------------------+---------------------------------------------------------------|
+|                                     | Set by patchwork/gestalt.lisp                                 |
+|-------------------------------------+---------------------------------------------------------------|
+| :cocoa                              | used by patchwork (loader, generate-application, etc).        |
+| :cocoa-10.9                         |                                                               |
+| :cocoa-10.8                         |                                                               |
+| :cocoa-10.7                         | (=!=) used by mclgui/cocoa interface                          |
+| :cocoa-10.6                         | (=!=) used by mclgui/cocoa interface                          |
+| :cocoa-10.5                         |                                                               |
+| :cocoa-10.4                         |                                                               |
+|-------------------------------------+---------------------------------------------------------------|
+|                                     | Set by loader.lisp or generate-application.lisp               |
+|-------------------------------------+---------------------------------------------------------------|
+| patchwork.builder::no-cocoa         | used by patchwork to disable requiring cocoa.                 |
+| patchwork.builder::use-apple-events | used by patchwork to select AppleEvent (not implemented yet). |
+| :debug-application                  | activates debugging application class..                       |
+| :debug-event                        | activates debugging events.                                   |
+| :debug-focused-view                 | activates debugging of call-with-focused-view.                |
+| :debug-graphics                     |                                                               |
+| :debug-midi                         | debug the midi code.                                          |
+| :debug-objc                         | activates debugging objc-classes.                             |
+| :debug-streams                      |                                                               |
+| :debug-text                         |                                                               |
+| :debug-trace                        |                                                               |
+| :debug-views                        | activates debugging views.                                    |
+| :debug-views-colors                 | activates debugging views (with colors).                      |
+| :debug-views-instance               |                                                               |
+| :debug-wrapper                      | activates debugging wrappers.                                 |
+|-------------------------------------+---------------------------------------------------------------|
 
-     patchwork.builder::no-cocoa          set by patchwork/{loader,generate-application}. used by patchwork to disable requiring cocoa.
-     patchwork.builder::use-apple-events  set by patchwork/{loader,generate-application}. used by patchwork to select AppleEvent (not implemented yet).
-     patchwork.builder::cocoa-midi-player set by patchwork/{loader,generate-application}. used by patchwork to select the cocoa midi-player. (not implemented yet).
-     patchwork.builder::use-cl-midi       set by patchwork/{loader,generate-application}. used by patchwork to select the use of cl-midi instead of midishare.
-     patchwork.builder::use-midishare     set by patchwork/{loader,generate-application}. used by patchwork to select the use of midisahre instead of cl-midi.
+**** MIDI  module selection
+
+All this options implement the "PATCHWORK.MIDI" package interface.
+
+| Current | *FEATURE*                            | Source Path                       | Description                                        | Where it's set.                                 | Where it's tested.                                                        |
+|---------+--------------------------------------+-----------------------------------+----------------------------------------------------+-------------------------------------------------+---------------------------------------------------------------------------|
+|         |                                      | src/pw-lib/midi/                  | Defines the midi c-patch classes.                  |                                                 |                                                                           |
+|         |                                      |                                   | - uses the midi module for file I/O.               |                                                 |                                                                           |
+|         |                                      |                                   | - uses the MidiShare API for real-time MIDI.       |                                                 |                                                                           |
+|---------+--------------------------------------+-----------------------------------+----------------------------------------------------+-------------------------------------------------+---------------------------------------------------------------------------|
+|         | patchwork.builder::cocoa-midi-player | (not implemented yet)             | A module using CoreMIDI without MidiShare API.     | set by patchwork/{loader,generate-application}. | used by patchwork to select the cocoa midi-player. (not implemented yet). |
+| ✓       | patchwork.builder::use-cl-midi       | src/pw-lib/cl-midi/pw-midi.lisp   | Implements the midishare API using Cocoa CoreMIDI. | set by patchwork/{loader,generate-application}. | used by patchwork to select the use of cl-midi instead of midishare.      |
+|         | patchwork.builder::use-midishare     | src/pw-lib/midishare/pw-midi.lisp | Uses the (legacy) midishare library.               | set by patchwork/{loader,generate-application}. | used by patchwork to select the use of midisahre instead of cl-midi.      |
+|---------+--------------------------------------+-----------------------------------+----------------------------------------------------+-------------------------------------------------+---------------------------------------------------------------------------|
 
 **** should not be set:
 
-     :not-yet                 used by patchwork/src/pw-lib/cl-midi/pw-midi and objc-bridge to disable features not implemented yet.
-     :not-needed              used by patchwork/src/pw-lib/cl-midi/pw-midi
+|-------------+-------------------------------------------------------------------------------------------------------|
+| :not-yet    | used by patchwork/src/pw-lib/cl-midi/pw-midi and objc-bridge to disable features not implemented yet. |
+| :not-needed | used by patchwork/src/pw-lib/cl-midi/pw-midi                                                          |
+|-------------+-------------------------------------------------------------------------------------------------------|
 
 ** Patchwork Development Notes
 *** Window Key Commands
@@ -1451,3 +1533,4 @@ release:
 | inside controls  | option click                             | disconnect-ctrl               |
 |                  | click                                    | nothing                       |
 |------------------+------------------------------------------+-------------------------------|
+

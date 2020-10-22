@@ -21,6 +21,11 @@
 #+LATEX_HEADER: \pagenumbering{arabic}
 
 * PATCHWORK RELEASE NOTES
+
+Patchwork applications releases are stored in:
+
+ftp://ftp.informatimago.com/users/pjb/patchwork/
+
 ** next release
 
 
@@ -33,10 +38,16 @@ The full list can be found at:
 
 https://framagit.org/patchwork/patchwork/-/issues
 
-** 10.1-0.563
+** 10.1-0.547
+
+- Corrected the problem with loading and saving MIDI files.
+  Check midi-save, it should save in sequence in the MIDI file all the
+  objects in its inputs instead of just one.
+  https://framagit.org/patchwork/patchwork/-/issues/13
 
 - Corrected bug that blocked or slowed bigger output in the listener.
   Now, it should display quickly even big outputs.
+  https://framagit.org/patchwork/patchwork/-/issues/15
 
 - In addition to ~*value*~, there's a ~*values*~ variable that holds a
   list of values returned by the last patch evaluation.

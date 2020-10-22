@@ -2002,6 +2002,7 @@ For now, we'll just hardwire a single port 0.
   (when *pw-refnum*
     (MidiSendAt *pw-refnum* event time)))
 
+(declaim (notinline midi-write))
 (defun midi-write (event)
   ;; TODO
   (midi-write-time event (MidiGetTime)))

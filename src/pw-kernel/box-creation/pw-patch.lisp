@@ -137,7 +137,7 @@
       (let ((errmsg (handler-case (format nil "~A" err)
                       (error (err)
                         (format nil "~&Error while formating error message: ~A~%" err)))))
-        (format t "~&Error while evaluating patch PW->~S~%~A~%" *value* errmsg)
+        (format t "~&Error while evaluating patch ~S~%~A~%" *value* errmsg)
         (finish-output)))))
 
 (defmethod view-click-event-handler ((self C-pw-outrect) where)

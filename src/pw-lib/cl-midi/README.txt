@@ -2,6 +2,8 @@
 
 * cl-midi
 
+cl-midi implements the midishare API using Cocoa CoreMidi.
+
 This modules interfaces Patchwork with the CL midi library.
 It is a replacement of the midishare-based midi interface.
 
