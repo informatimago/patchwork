@@ -211,9 +211,8 @@
 (loop
   :for (name src dst . options)
     :in '(("release notes"
-           #P"PATCHWORK:RELEASE-NOTES.TXT"
-           #P"RELEASE:RELEASE-NOTES.TXT"
-           :rst2pdf)
+           #P"PATCHWORK:RELEASE-NOTES.PDF"
+           #P"RELEASE:RELEASE-NOTES.PDF")
           ("license file"
            #P"PATCHWORK:PATCHWORK-LICENSE.TXT"
            #P"RELEASE:PATCHWORK-LICENSE.TXT")
