@@ -28,7 +28,6 @@ ftp://ftp.informatimago.com/users/pjb/patchwork/
 
 ** next release
 
-
 Issues remaining in current release:
 
 - instance drawing doesn't occur (threads?) (moving, growing boxes).
@@ -38,7 +37,7 @@ The full list can be found at:
 
 https://framagit.org/patchwork/patchwork/-/issues
 
-** 10.1-0.547
+** 10.1-0.545
 
 - Corrected the problem with loading and saving MIDI files.
   Check midi-save, it should save in sequence in the MIDI file all the
