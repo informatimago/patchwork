@@ -68,6 +68,7 @@ located in the x,y position specified by the &rest key arguments"
     the-Box))
 
 (defmethod view-click-event-handler ((self C-PopUpbox) mouse)
+  (declare (ignorable mouse))
   (format-trace '(view-click-event-handler c-popupbox)
                 :where (point-to-list mouse)
                 :event *current-event*

@@ -167,6 +167,7 @@ appropriately.
 
 
 (defun aesend (the-appleevent the-reply mode priority timeout idleproc filterproc)
+  (declare (ignorable the-appleevent the-reply mode priority timeout idleproc filterproc))
   (niy aesend the-appleevent the-reply mode priority timeout idleproc filterproc)
   #-(and)
   (ui::post-event (make-ae-event
