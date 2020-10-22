@@ -137,7 +137,8 @@ application:clean release-notes.pdf
 
 release-notes.pdf:release-notes.org
 clean::
-	-rm -f release-notes.pdf
+	-rm -f release-notes.pdf release-notes.tex
+
 # Generate PDF from org-mode document.
 %.pdf:%.org
 	-rm -f $@
