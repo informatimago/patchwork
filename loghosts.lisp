@@ -226,10 +226,25 @@ TRANSLATIONS: a list of logical pathname translations.
        (setf (logical-pathname-translations host) translations)))
 
 
+#+ccl
+(defun update-interfaces-logical-pathname-translations ()
+  (setf (logical-pathname-translations "ccl")
+        (append
+         (let ((ccl-sources (make-pathname :directory (butlast
+                                                       (pathname-directory
+                                                        (translate-logical-pathname #P"ccl:compiler;")))
+                                           :defaults #P"/")))
+           (loop
+             :for dir :in (append (directory (translate-logical-pathname "SRC:PATCHWORK;SRC;MACOSX;HEADERS64;*;"))
+                                  (directory (merge-pathnames #P"darwin-x86-headers64/*/" ccl-sources)))
+             :for name := (first (last (pathname-directory dir)))
+             :collect (list (format nil "ccl:darwin-x86-headers64;~A;**;*.*" name)
+                            (merge-pathnames #P";**;*.*" dir))))
+         (logical-pathname-translations "ccl"))))
 
 (defun define-logical-hosts ()
   (flet ((set-host (host logical-subdir physical-subdir physical-dir
-                    &rest other-definitions)
+                         &rest other-definitions)
            (set-logical-pathname-translations
             host
             (loop
@@ -282,6 +297,9 @@ TRANSLATIONS: a list of logical pathname translations.
       (set-host "CL"
                 '("USER-LIBRARIES") "Documents/Patchwork/PW-user-library/"   home)))
 
+  ;; Update the ccl:darwin-x86-headers64; logical-pathname-translations, for compilation-time.
+  ;; We'll have to set them at run-time to the copied interfaces into the bundle Resources.
+  #+ccl (update-interfaces-logical-pathname-translations)
   *logical-hosts*)
 
 (define-logical-hosts)
