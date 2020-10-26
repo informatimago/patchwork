@@ -37,6 +37,20 @@ The full list can be found at:
 
 https://framagit.org/patchwork/patchwork/-/issues
 
+** 10.1.0.
+
+- Improved error logging.
+
+  When an error occurs while evaluating a patch by option-click on the
+  connection box, the error is printed in the Listener, along with a
+  stack of the patches being currently evaluated.  (The error doesn't
+  necessarily come from the clicked patch, it can be from one of its
+  inputs).
+
+  In addition, the whole backtrace stack and the error is logged to
+  the =~/Desktop/Patchwork-errors.txt= file.
+
+
 ** 10.1-0.545
 
 - Corrected the problem with loading and saving MIDI files.

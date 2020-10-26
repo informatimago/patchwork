@@ -200,6 +200,12 @@
    (value :initform nil :initarg :value)
    (type-list :initform ()  :initarg :type-list :accessor type-list)))
 
+(defmethod print-object ((self c-ttybox) stream)
+  (if *print-readably*
+      (print-unreadable-object (self stream))
+      (prin1 (list (class-name (class-of self)) (slot-value self 'value)) stream))
+  self)
+
 #-(and)
 (defmethod print-object ((self pw::c-ttybox) stream)
   (let ((*print-pretty* nil))

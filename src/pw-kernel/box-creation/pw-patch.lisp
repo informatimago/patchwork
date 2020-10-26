@@ -123,23 +123,48 @@
 (defvar *value*  nil "Bound to the last value evaluated by a C-PW-OUTRECT.")
 (defvar *values* nil "Bound to the list of last values evaluated by a C-PW-OUTRECT.")
 
+(declaim (declaration stepper))
 (defun evaluate-patch (patch)
-  (handler-case (patch-value patch patch)
-    (:no-error (&rest values)
-      (setf *value*  (first values))
-      (setf *values* values)
-      (let ((*package* (load-time-value (find-package "PW")))
-            (*print-circle* t))
-        (format t "~&PW->~S~%" *value*)
-        (finish-output)))
-    (error (err)
-      (setf *value*  patch
-            *values* (list :error err patch))
-      (let ((errmsg (handler-case (format nil "~A" err)
-                      (error (err)
-                        (format nil "~&Error while formating error message: ~A~%" err)))))
-        (format t "~&Error while evaluating patch ~S~%~A~%" *value* errmsg)
-        (finish-output)))))
+  (handler-bind
+      ;; In case of error, we will print the error message in the Listerner,
+      ;; along with a stack backtrace of the patch being evaluated.
+      ;; Furthermore, a whole backtrace and the error message is saved to the error-file.
+      ((error (lambda (err)
+                (declare (stepper disable))
+                (setf *value*  patch
+                      *values* (list :error err patch))
+                (let* ((*package* (load-time-value (find-package "PW")))
+                       (*print-readably* nil)
+                       (errmsg (handler-case (format nil "~A" err)
+                                 (error (err)
+                                   ;; We cannot use ~A here since it gives an error!
+                                   (format nil "~&Error while formating error message: ~S~%" err)))))
+                  (ui::with-error-file
+                    (let ((*error-output*   (make-broadcast-stream *error-output* *standard-output*))
+                          (*print-readably* nil))
+                      (format *error-output* "~&Error while evaluating patch ~S~%~A~%" *value* errmsg)
+                      #-(and)
+                      (let ((backtrace #+ccl (ccl::backtrace-as-list) #-ccl  '()))
+                        (when backtrace
+                          (format *error-output* "Patch stack:~%~{    ~S~%~}"
+                                  (remove 'patch-value backtrace
+                                                :key (function first) :test-not (function eql)))))))
+                  (finish-output)))))
+    ;; Note: The original view-click-event-handler called (patch-value patch patch);
+    ;; while the patch-value method forward the obj argument to the input-objects,
+    ;; and the results to the pw-function.
+    ;; (let ((args (ask-all (input-objects self) 'patch-value obj)))
+    ;;   (apply (pw-function self) args))
+    ;; There may be differences between clicking on the patch evaluation box,
+    ;; and calling patch-value with an obj argument…
+    (let ((*patch-value-stack* '()))
+      (setf *values* (multiple-value-list (patch-value patch patch))))
+    (setf *value*  (first *values*))
+    (let ((*package* (load-time-value (find-package "PW")))
+          (*print-circle*   t)
+          (*print-readably* nil))
+      (format t "~&PW->~S~%" *value*)
+      (finish-output))))
 
 (defmethod view-click-event-handler ((self C-pw-outrect) where)
   #+debug-views (format-trace '(view-click-event-handler c-pw-outrect) :where (point-to-list where) :view self)
@@ -233,6 +258,12 @@
    (out-put :initform nil :initarg :out-put :accessor out-put)
    (pw-function-string :initform "+"  :accessor pw-function-string)
    (pw-function :initform '+ :initarg :pw-function :accessor pw-function)))
+
+(defmethod print-object ((patch c-patch) stream)
+  (if *print-readably*
+      (print-unreadable-object (patch stream))
+      (prin1 (list (class-name (class-of patch)) (pw-function-string patch)) stream))
+  patch)
 
 (defgeneric decompile-connections (self patch-controls)
   (:method ((self C-patch) patch-controls)

@@ -80,6 +80,12 @@
         (pw::fill-rect* 0 0 (w self) 3)))
     (pw::draw-patch-extra self)))
 
+(defmethod print-object ((self C-pw-text-box) stream)
+  (if *print-readably*
+      (print-unreadable-object (self stream))
+      (prin1 (list (class-name (class-of self)) (patch-value self nil)) stream))
+  self)
+
 ;; (defmethod pw::view-frame-patch ((self C-pw-text-box) offset)
 ;;   (pw::with-pen-state (:pattern *gray-pattern* :mode :patXor)
 ;;     (with-focused-view (view-container self)
