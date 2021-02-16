@@ -99,7 +99,7 @@ is 10.12.3 macOS Sierra.
 Generate the Patchwork.app application
 --------------------------------------
 
-1- cd "/repertoire/ou/sont/installes/les/sources/de/patchwork/"
+1- cd "/directory/where/are/installed/the/sources/of/patchwork/"
 
 2- make clean
 
