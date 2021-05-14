@@ -682,7 +682,7 @@ defaults to 1) element, (n=0 means the \"car\", n=1 means the \"cadr\")."
 evaluation;
  at the next time a value was requested it might return the string foo, the next
 time maybe 3 again, etc."
-  (nth (random (length list)) list))
+  (when list (nth (random (length list)) list)))
 
 (defunp permut-random ((list list)) list
     " Returns a random permutation of list."
