@@ -55,16 +55,16 @@
      (load-framework-library "CoreServices")
      (pushnew :has-appleevent *features*)
      (load-framework-library "CoreGraphics")
-     #+patchwork.builder::use-cl-midi (load-framework-library "CoreMIDI")
+     #+patchwork-use-cl-midi (load-framework-library "CoreMIDI")
      )
     (11                                 ; macOS Big Sur
      ;; or darwin verson 20
      ))
 
-  #+patchwork.builder::use-midishare (load-framework-library "MidiShare")
-  #+patchwork.builder::use-midishare (pushnew :has-midishare *features*)
-  #+patchwork.builder::use-midishare (load-framework-library "Player")
-  #+patchwork.builder::use-midishare (pushnew :has-midiplayer *features*)
+  #+patchwork-use-midishare (load-framework-library "MidiShare")
+  #+patchwork-use-midishare (pushnew :has-midishare *features*)
+  #+patchwork-use-midishare (load-framework-library "Player")
+  #+patchwork-use-midishare (pushnew :has-midiplayer *features*)
 
   ) ;; eval-when
 

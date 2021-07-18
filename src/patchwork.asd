@@ -50,13 +50,19 @@
                "closer-mop"
                "trivial-gray-streams"
                "mclgui"
-               #+patchwork.builder::use-cl-midi "com.informatimago.macosx.coremidi"
-               #+patchwork.builder::use-cl-midi "midi"
-               #+patchwork.builder::use-cl-midi "com.informatimago.macosx.coremidi.midi"
+               #+patchwork-use-cl-midi "com.informatimago.macosx.coremidi"
+               #+patchwork-use-cl-midi "midi"
+               #+patchwork-use-cl-midi "com.informatimago.macosx.coremidi.midi"
                ;; "com.informatimago.common-lisp.lisp.stepper"
                )
-  :components ((:file "packages"
-                :depends-on ("pw-kernel/environment/lelisp-macros"))
+  :components (
+
+               (:file "loghosts"
+                :depends-on ())
+
+               (:file "packages"
+                :depends-on ("loghosts"
+                             "pw-kernel/environment/lelisp-macros"))
 
                (:file "gf"
                 :depends-on ("packages"))
@@ -75,8 +81,8 @@
 
 
 
-                 ;;; -----------
-                 ;;; AppleEvents
+;;; -----------
+;;; AppleEvents
 
                ;; (:file "pw-lib/pwscript/appleevent-toolkit"
                ;;        :depends-on ("packages"))
@@ -138,13 +144,13 @@
                              "pw-music/editors/rhythm/beat-measure-measure-line"
                              "pw-music/editors/rhythm/rtm-window"))
 
-                 ;;; ----------------
-                 ;;; pw-lib/midi
+;;; ----------------
+;;; pw-lib/midi
 
                (:file "pw-lib/midi/midiplay"
                 :depends-on ("packages"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-music/boxes/edit/pw-chord-box"
                              "pw-music/boxes/edit/pw-mn-collector"
@@ -161,8 +167,8 @@
                 :depends-on ("packages"
                              "global"
                              "pw-lib/midi/midiplay"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"
                              "pw-kernel/boxes/bpf/bpf-editors/bpf-mn-pw-interface"
                              ;; "pw-kernel/pw-graphics/window+menu/pw-menu"
                              "pw-kernel/types/pw-box-to-menu"
@@ -171,44 +177,44 @@
                              "pw-music/editors/mn/mn-note-chord-chordline"))
 
 
-                 ;;; -----------
-                 ;;; cl-midi
+;;; -----------
+;;; cl-midi
 
-               #+patchwork.builder::use-cl-midi
+               #+patchwork-use-cl-midi
                (:file "pw-lib/cl-midi/pw-midi"
                 :depends-on ("packages"
                              ))
 
-                 ;;; -----------
-                 ;;; MidiShare
+;;; -----------
+;;; MidiShare
 
-               #+patchwork.builder::use-midishare
+               #+patchwork-use-midishare
                (:file "macosx/headers"
                 :depends-on ())
 
-               #+patchwork.builder::use-midishare
+               #+patchwork-use-midishare
                (:file "macosx/load-libraries"
                 :depends-on ("macosx/headers"))
 
-               #+patchwork.builder::use-midishare
+               #+patchwork-use-midishare
                (:file "pw-lib/midishare/midishare-interface"
                 :depends-on ("macosx/load-libraries"))
 
-               #+patchwork.builder::use-midishare
+               #+patchwork-use-midishare
                (:file "pw-lib/midishare/player-interface"
                 :depends-on ("pw-lib/midishare/midishare-interface"))
 
 
-               #+patchwork.builder::use-midishare
+               #+patchwork-use-midishare
                (:file "pw-lib/midishare/pw-midi"
                 :depends-on (
                              "pw-lib/midishare/midishare-interface"
                              "pw-lib/midishare/player-interface"
-                             ;; #+patchwork.builder::cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
+                             ;; #+patchwork-cocoa-midi-player "pw-lib/midishare/cocoa-midi-player"
                              ))
 
 
-                 ;;; -----------
+;;; -----------
 
                (:file "pw-lib/cleni/cleni"
                 :depends-on ("packages"))
@@ -220,14 +226,14 @@
 
                (:file "pw-kernel/environment/midi-note"
                 :depends-on ("packages"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"))
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"))
 
                (:file "pw-kernel/environment/clpf-utils"
                 :depends-on ("packages"
                              "pw-kernel/environment/lelisp-macros"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"))
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"))
 
                (:file "pw-kernel/environment/mac-rsrc"
                 :depends-on ("packages"
@@ -242,8 +248,8 @@
                (:file "pw-kernel/environment/pw-scheduler"
                 :depends-on ("packages"
                              "pw-kernel/environment/lelisp-macros"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"
                              "pw-kernel/drivers+resources/scheduler"))
 
                (:file "pw-kernel/environment/pw-symbolic-types"
@@ -261,8 +267,8 @@
                (:file "pw-kernel/drivers+resources/scheduler"
                 :depends-on ("packages"
                              "pw-kernel/environment/lelisp-macros"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"))
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"))
 
                (:file "pw-lib/epw-1.0b/epw-menus"
                 :depends-on ("pw-kernel/environment/epw-package"))
@@ -518,8 +524,8 @@
                              "pw-kernel/environment/reader-macros"
                              "pw-kernel/types/pw-type-scheme"
                              "pw-kernel/pw-graphics/controls/pw-graphics"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"
                              "pw-kernel/pw-graphics/window+menu/pw-window"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"))
 
@@ -638,8 +644,8 @@
                (:file "pw-music/boxes/midi/pw-midi-box"
                 :depends-on ("packages"
                              "global"
-                             #+patchwork.builder::use-midishare "pw-lib/midishare/pw-midi"
-                             #+patchwork.builder::use-cl-midi   "pw-lib/cl-midi/pw-midi"
+                             #+patchwork-use-midishare "pw-lib/midishare/pw-midi"
+                             #+patchwork-use-cl-midi   "pw-lib/cl-midi/pw-midi"
                              "pw-kernel/drivers+resources/scheduler"
                              "pw-kernel/environment/lelisp-macros"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"
@@ -967,7 +973,6 @@
                (:file "pw-kernel/boxes/bpf/bpf-editors/bpf-menu"
                 :depends-on ("packages"
                              "pw-kernel/pw-graphics/window+menu/pw-menu"))
-
 
                ))
 

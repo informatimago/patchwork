@@ -31,69 +31,103 @@
 ;;;;    You should have received a copy of the GNU General Public License
 ;;;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;;;**************************************************************************
-(defpackage "PATCHWORK.BUILDER"
-  (:use "COMMON-LISP")
-  (:shadowing-import-from "COM.INFORMATIMAGO.TOOLS.PATHNAME"
-                          "MAKE-PATHNAME"
-                          "USER-HOMEDIR-PATHNAME"
-                          "TRANSLATE-LOGICAL-PATHNAME")
-  (:use "PATCHWORK.LOGICAL-HOSTS")
-  (:use "COM.INFORMATIMAGO.TOOLS.MANIFEST")
-  (:use "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.FILE"
-        "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.STRING")
-  (:export "*PATCHWORK-VERSION*" "SAY" "SHOW"))
-(in-package "PATCHWORK.BUILDER")
+(in-package "COMMON-LISP-USER")
+
+(setf *readtable*
+      (copy-readtable
+       #+#.(cl:if (cl:find-package "COM.INFORMATIMAGO.PJB.UTILITY")
+                  '(:and) '(:or))
+       com.informatimago.pjb.utility:*original-readtable*
+       #-#.(cl:if (cl:find-package "COM.INFORMATIMAGO.PJB.UTILITY")
+                  '(:and) '(:or))
+       nil))
+
+#+ccl (setf ccl:*default-external-format*           :utf-8
+            ccl:*default-file-character-encoding*   :utf-8
+            ccl:*default-socket-character-encoding* :utf-8
+            ccl:*default-line-termination*          :unix)
+
 (declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
 
-#+ccl (setf ccl:*default-external-format*           :unix
-            ccl:*default-file-character-encoding*   :utf-8
-            ccl:*default-line-termination*          :unix
-            ccl:*default-socket-character-encoding* :utf-8)
+(defvar *verbose* nil)
 
-(setf *load-verbose* t
-      *print-right-margin* 110)
-
-
-(defun say (fmt &rest args)
-  (format t "~&;;; ~?~%" fmt args)
-  (finish-output))
-
-(defmacro show (form)
-  `(let ((*print-length* nil)
-         (*print-level*  nil))
-     (say "Evaluating ~S" ,(list* 'list (list 'quote (car form))
-                                  (cdr form)))
-     ,form))
+(setf *LOAD-VERBOSE*    *verbose*
+      *COMPILE-VERBOSE* *verbose*
+      *LOAD-PRINT*      *verbose*
+      *COMPILE-PRINT*   *verbose*)
 
 
-(defun cd (path)
-  #+ccl       (ccl::cd      path)
-  #+lispworks (cl-user::cd  path)
-  #+clisp     (ext:cd       path))
+(pushnew :patchwork-use-cl-midi *features*)
 
-(cd (translate-logical-pathname #P"PATCHWORK:"))
+
+(load "src/loghosts.lisp")
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (shadowing-import
+   '(patchwork.logical-hosts:*logical-hosts*
+     patchwork.logical-hosts:make-pathname
+     patchwork.logical-hosts:user-homedir-pathname
+     patchwork.logical-hosts:make-translations
+     patchwork.logical-hosts:translate-logical-pathname
+     patchwork.logical-hosts:set-logical-pathname-translations
+     patchwork.logical-hosts:define-runtime-loghosts)))
+
+(load "ct-loghosts.lisp")
+
+
+(uiop:chdir (translate-logical-pathname #P"PATCHWORK:"))
+
+#+quicklisp
+(pushnew (translate-logical-pathname #P"PATCHWORK:SRC;")
+         quicklisp:*local-project-directories*
+         :test (function equalp))
+
+#+quicklisp
+(pushnew (translate-logical-pathname #P"SRC:INFORMATIMAGO;")
+         quicklisp:*local-project-directories*
+         :test (function equalp))
 
 (pushnew (translate-logical-pathname #P"PATCHWORK:SRC;")
-         asdf:*central-registry* :test (function equalp))
+         asdf:*central-registry*
+         :test (function equalp))
 
 (pushnew (translate-logical-pathname #P"MCLGUI:")
-         asdf:*central-registry* :test (function equalp))
-
-(pushnew (translate-logical-pathname #P"COREMIDI:")
-         asdf:*central-registry* :test (function equalp))
+         asdf:*central-registry*
+         :test (function equalp))
 
 (pushnew (translate-logical-pathname #P"MIDI:")
-         asdf:*central-registry* :test (function equalp))
+         asdf:*central-registry*
+         :test (function equalp))
 
+(pushnew (translate-logical-pathname #P"COREMIDI:")
+         asdf:*central-registry*
+         :test (function equalp))
+
+(pushnew (translate-logical-pathname #P"SRC:INFORMATIMAGO;")
+         asdf:*central-registry*
+         :test (function equalp))
 
 
 (defparameter *patchwork-version*
-  #.(destructuring-bind (major minor compile)
-        (sexp-file-contents (translate-logical-pathname #P"PATCHWORK:VERSION.DATA"))
-      (decf compile 0.001d0)
-      (setf (sexp-file-contents (translate-logical-pathname #P"PATCHWORK:VERSION.DATA"))
-            (list major minor compile))
-      (format nil "~A.~A-~,3F" major minor compile))
+  (destructuring-bind (major minor compile)
+      (with-open-file (version "version.data") (read version))
+    (format nil "~A.~A-~,3F" major minor compile))
   "Patchwork version")
+
+(defun increment-patchwork-version ()
+  (destructuring-bind (major minor compile)
+      (with-open-file (version "version.data") (read version))
+    (decf compile 0.001d0)
+    (with-open-file (version "version.data" :direction :output :if-exists :supersede)
+      (prin1 (list major minor compile) version))
+    (setf *patchwork-version* (format nil "~A.~A-~,3F" major minor compile))))
+
+(defun build-patchwork ()
+  (increment-patchwork-version)
+  (asdf:oos 'asdf:monolithic-compile-bundle-op "patchwork-main")
+  (let* ((fasl   (asdf:output-file (asdf:make-operation 'asdf:monolithic-compile-bundle-op) (asdf:find-system "patchwork-main")))
+         (target (translate-logical-pathname (merge-pathnames  #P"PATCHWORK:PATCHWORK" fasl))))
+    (ignore-errors (delete-file target))
+    (rename-file fasl target)))
 
 ;;;; THE END ;;;;

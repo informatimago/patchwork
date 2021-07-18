@@ -129,6 +129,12 @@ Must be called on the main thread."
   (set-%initialized application)
   (values))
 
+(eval-when (:compile-toplevel :execute)
+  (defvar *version*
+    (destructuring-bind (major minor compile)
+        (with-open-file (version (PATCHWORK.LOGICAL-HOSTS:translate-logical-pathname #P"PATCHWORK:VERSION.DATA"))
+          (read version))
+      (format nil "~A.~A-~,3F" major minor compile))))
 
 (defgeneric show-welcome (application)
   (:method ((application patchwork-application))
@@ -136,8 +142,7 @@ Must be called on the main thread."
 	    (lisp-implementation-type)
 	    (lisp-implementation-version))
     (format t "~%Welcome to ~A Version ~A!~%" ; patchwork welcome message.
-            (application-name application)
-            patchwork.builder:*patchwork-version*)
+            (application-name application) *version*)
     (finish-output)
     (values)))
 

@@ -142,6 +142,10 @@ debug-building:clean release-notes.pdf
 # 	$(LISP_EVAL) '(ccl:quit)'
 # looks ccl 1.8 doesn't quit always after build-application.
 
+.PHONY:: patchwork.dx64fsl
+patchwork.dx64fsl:
+	: ccl -n -e '(require :asdf)' -l "builder.lisp" -e '(build-patchwork)'
+	ccl -n -e '(load "~/quicklisp/setup.lisp")' -l "builder.lisp" -e '(build-patchwork)' -e '(ccl:quit)'
 
 release-notes.pdf:release-notes.org
 clean::

@@ -49,12 +49,12 @@
 
   (:use "COMMON-LISP"
         "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.SYMBOL"
-        #+patchwork.builder::use-cl-midi "UI"
-        #+patchwork.builder::use-cl-midi "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.ARRAY"
-        #+patchwork.builder::use-cl-midi "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.UTILITY"
-        #+patchwork.builder::use-midishare "MIDISHARE")
+        #+patchwork-use-cl-midi "UI"
+        #+patchwork-use-cl-midi "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.ARRAY"
+        #+patchwork-use-cl-midi "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.UTILITY"
+        #+patchwork-use-midishare "MIDISHARE")
 
-  #-patchwork.builder::use-midishare (:import-from "UI" "DELETEF")
+  #-patchwork-use-midishare (:import-from "UI" "DELETEF")
 
   (:export "INITIALIZE-MIDI")
 

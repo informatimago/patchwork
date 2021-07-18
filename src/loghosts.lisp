@@ -6,25 +6,8 @@
 ;;;;USER-INTERFACE:     NONE
 ;;;;DESCRIPTION
 ;;;;
-;;;;    Defines the logical hosts for this project.
-;;;;
-;;;;    We define the logical host used at compilation time in this file
-;;;;    so that we may define them in function of the source directories.
-;;;;
-;;;;
-;;;;    Logical Hosts used at compilation time
-;;;;    --------------------------------------
-;;;;
-;;;;      PATCHWORK
-;;;;
-;;;;        The logical host PATCHWORK should be set so that the .git/
-;;;;        subdirectory should be  at its root:
-;;;;
-;;;;            #+ccl (probe-file #P"PATCHWORK:.git;") --> true
-;;;;
-;;;;      MCLGUI
-;;;;
-;;;;      MIDI
+;;;;    Defines the logical hosts utilities for this project,
+;;;;    and run-time loghosts.
 ;;;;
 ;;;;    Logical Hosts used at run-time
 ;;;;    ------------------------------
@@ -38,12 +21,13 @@
 ;;;;AUTHORS
 ;;;;    <PJB> Pascal J. Bourguignon <pjb@informatimago.com>
 ;;;;MODIFICATIONS
+;;;;    2021-07-18 <PJB> Split out compilation-time loghosts.
 ;;;;    2016-11-12 <PJB> Created.
 ;;;;BUGS
 ;;;;LEGAL
 ;;;;    AGPL3
 ;;;;
-;;;;    Copyright Pascal J. Bourguignon 2016 - 2016
+;;;;    Copyright Pascal J. Bourguignon 2016 - 2021
 ;;;;
 ;;;;    This program is free software: you can redistribute it and/or modify
 ;;;;    it under the terms of the GNU Affero General Public License as published by
@@ -64,7 +48,12 @@
            "USER-HOMEDIR-PATHNAME"
            "TRANSLATE-LOGICAL-PATHNAME")
   (:export "*LOGICAL-HOSTS*"
-           "MAKE-TRANSLATIONS"))
+           "MAKE-PATHNAME"
+           "USER-HOMEDIR-PATHNAME"
+           "TRANSLATE-LOGICAL-PATHNAME"
+           "MAKE-TRANSLATIONS"
+           "SET-LOGICAL-PATHNAME-TRANSLATIONS"
+           "DEFINE-RUNTIME-LOGHOSTS"))
 (in-package "PATCHWORK.LOGICAL-HOSTS")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -142,12 +131,12 @@
 
 (defvar *logical-hosts* '())
 
-(defun make-translations (host logical-dir physical-dir &optional file-type)
+(defun make-translations (host logical-dir target-dir &optional file-type)
   "
 Returns logical pathname translations for the given HOST, mapping the
 logical directory LOGICAL-DIR and all the files with the given
-FILE-TYPE, in its subdirectories, to the physical directory
-PHYSICAL-DIR.
+FILE-TYPE, in its subdirectories, to the target directory
+TARGET-DIR.
 
 If no FILE-TYPE is given, or if it's NIL, then a wildcard is used for
 the file type, and the logical pathnames are translated with and
@@ -169,8 +158,10 @@ The inclusion  of a version wildcard is also implementation dependant.
                      list)))
     (mapcan
      (lambda (item)
-       (destructuring-bind (logical-tail physical-tail) item
-         (let ((phys (format nil "~A**/~A" physical-dir physical-tail))
+       (destructuring-bind (logical-tail target-tail) item
+         (let ((target (if (typep (pathname target-dir) 'logical-pathname)
+                           (format nil "~A**;~A" target-dir target-tail)
+                           (format nil "~A**/~A" target-dir target-tail)))
                (ild (invert-case logical-dir))
                (ilt (invert-case logical-tail)))
            (list*
@@ -179,7 +170,7 @@ The inclusion  of a version wildcard is also implementation dependant.
                          :directory `(:absolute ,@logical-dir :wild-inferiors)
                          :case :local
                          logical-tail)
-                  phys)
+                  target)
             (unless (and (equal logical-dir ild)
                          (equal logical-tail ilt))
               (list
@@ -188,7 +179,7 @@ The inclusion  of a version wildcard is also implementation dependant.
                             :directory `(:absolute ,@ild :wild-inferiors)
                             :case :local
                             ilt)
-                     phys)))))))
+                     target)))))))
      #+clisp
      (if file-type
          `(((:name :wild :type ,file-type :version nil) ,(format nil "*.~(~A~)" file-type)))
@@ -226,90 +217,38 @@ TRANSLATIONS: a list of logical pathname translations.
        (setf (logical-pathname-translations host) translations)))
 
 
-#+ccl
-(defun update-interfaces-logical-pathname-translations ()
-  (setf (logical-pathname-translations "ccl")
-        (append
-         (let ((ccl-sources (make-pathname :directory (butlast
-                                                       (pathname-directory
-                                                        (translate-logical-pathname #P"ccl:compiler;")))
-                                           :defaults #P"/")))
-           (loop
-             :for dir :in (append (directory (translate-logical-pathname "SRC:PATCHWORK;SRC;MACOSX;HEADERS64;*;"))
-                                  (directory (merge-pathnames #P"darwin-x86-headers64/*/" ccl-sources)))
-             :for name := (first (last (pathname-directory dir)))
-             :collect (list (format nil "ccl:darwin-x86-headers64;~A;**;*.*" name)
-                            (merge-pathnames #P";**;*.*" dir))))
-         (logical-pathname-translations "ccl"))))
-
-(defun define-logical-hosts ()
-  (flet ((set-host (host logical-subdir physical-subdir physical-dir
+(defun define-runtime-loghosts ()
+  (flet ((set-host (host logical-subdir target-subdir target-dir
                          &rest other-definitions)
            (set-logical-pathname-translations
             host
             (loop
-              :for (logical-subdir physical-subdir physical-dir)
-                :on (list* logical-subdir physical-subdir physical-dir
+              :for (logical-subdir target-subdir target-dir)
+                :on (list* logical-subdir target-subdir target-dir
                            other-definitions) :by (function cdddr)
               :append (make-translations host logical-subdir
-                                         (merge-pathnames physical-subdir
-                                                          physical-dir))))))
-    (let* ((home  #+(and) (user-homedir-pathname)
-                  #-(and) #P"/home/pjb/")
-           (src   (merge-pathnames "../"
-                                   (make-pathname :name nil
-                                                  :type nil
-                                                  :version nil
-                                                  :defaults #.(or *compile-file-truename*
-                                                                  *load-truename*
-                                                                  #P"./"))))
-           (home-src (merge-pathnames "src/" home)))
-      (set-host "SRC"
-
-                ;; '("INFORMATIMAGO")  "informatimago/"                         src
-                '("INFORMATIMAGO")  "public/lisp/"                           home-src
-
-                '("PATCHWORK")      "patchwork/"                             src
-                '("MCLGUI")         "mclgui/"                                src
-                '("MIDI")           "midi/"                                  src
-                '("MIDISHARE")      "midishare/"                             src
-                '()                 "src/"                                   home)
-
-      (set-host "PATCHWORK"
-                '()                 "patchwork/"                             src)
-
-      (set-host "MCLGUI"
-                '()                 "mclgui/"                                src)
-
-      (set-host "COREMIDI"
-                '()                 "CoreMIDI/"                              src)
-
-      (set-host "MIDI"
-                '()                 "midi/"                                  src)
-
-      (set-host "CLENI"
-                '()                 "patchwork/src/src-lib/cleni/"           src)
+                                         (merge-pathnames target-subdir
+                                                          target-dir))))))
+    (let ((home  (truename (user-homedir-pathname))))
 
       (set-host "PW-USER"
                 '()                 "Documents/Patchwork/"                   home)
 
+      (set-host "CLENI"
+                '()                 "CLENI;"                                 "PW-USER:")
+
       ;; Used in: load-library-config in pw-library-config.lisp
       (set-host "CL"
-                '("USER-LIBRARIES") "Documents/Patchwork/PW-user-library/"   home)))
+                '("USER-LIBRARIES") "Documents/Patchwork/PW-user-library/"   home
+                '("PW-USER")        ""                                       "PW-USER:"
+                '("PW-INITS")       "PW-INITS;"                              "PW-USER:"
+                '("IMAGES")         "IMAGES/"                                "PW-USER:")))
 
-  ;; Update the ccl:darwin-x86-headers64; logical-pathname-translations, for compilation-time.
-  ;; We'll have to set them at run-time to the copied interfaces into the bundle Resources.
-  #+ccl (update-interfaces-logical-pathname-translations)
+  ;; TODO: Update the ccl:darwin-x86-headers64; logical-pathname-translations, at run-time to the copied interfaces into the bundle Resources.
+
   *logical-hosts*)
 
-(define-logical-hosts)
 
-(setf (logical-pathname-translations "PATCHWORK")
-      (append (make-translations "PATCHWORK"
-                                 '("SRC" "MACOSX" "RESOURCES" "FONTS")
-                                 (merge-pathnames #P"src/macosx/Resources/Fonts/"
-                                                  (translate-logical-pathname #P"PATCHWORK:")
-                                                  nil))
-              (logical-pathname-translations "PATCHWORK")))
+(define-runtime-loghosts)
 
 ;;;; THE END ;;;;

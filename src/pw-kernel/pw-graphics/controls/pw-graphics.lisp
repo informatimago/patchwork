@@ -122,12 +122,12 @@
 
 (defgeneric erase-view-inside-rect (self)
   (:method ((self simple-view))
-    #+debug-view (format-trace '(erase-view-inside-rect simple-view))
+    #+debug-views (format-trace '(erase-view-inside-rect simple-view))
     ;; we're called with with-focused-view self
     (with-pen-state (:pattern *white-pattern* :mode :patcopy)
       (fill-rect* 1 1 (- (w self) 2) (- (h self) 2))))
   (:method ((self view))
-    #+debug-view (format-trace '(erase-view-inside-rect view))
+    #+debug-views (format-trace '(erase-view-inside-rect view))
     ;; we're called with with-focused-view self
    (with-pen-state (:pattern *white-pattern* :mode :patcopy)
       (fill-rect* (1+ (point-h (view-scroll-position self)))
@@ -135,7 +135,7 @@
                   (- (w self) 2)
                   (- (h self) 2))))
   (:method ((self dialog-item))
-    #+debug-view (format-trace '(erase-view-inside-rect dialog-item))
+    #+debug-views (format-trace '(erase-view-inside-rect dialog-item))
     ;; We're called with with-focused-dialog-item (self)
     (with-pen-state (:pattern *white-pattern* :mode :patcopy)
       (fill-rect* (1+ (point-h (view-position self)))
