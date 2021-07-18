@@ -172,13 +172,19 @@
            (level-dop me)
            (level-iop me)
            (level-l-op.tr me)))))
-    dop                     ;default operators
-    iop                     ;inverse operators
-    tr-default              ;default operator translation
-    tr-inverse              ;inverse operator translation
-    ops                     ;all operators
-    l-op.tr                 ;translations
+    dop                                 ;default operators
+    iop                                 ;inverse operators
+    tr-default                          ;default operator translation
+    tr-inverse                          ;inverse operator translation
+    ops                                 ;all operators
+    l-op.tr                             ;translations
     associative?)
+
+  (defun level-has? (me op) (memq op (level-ops me)))
+  (defun level-default? (me op) (memq op (level-dop me)))
+  (defun level-inverse? (me op) (memq op (level-iop me)))
+  (defun level-default (me) (first (level-dop me)))
+  (defun level-translate (me op) (or (cassq op (level-l-op.tr me)) op))
 
   (defun create-level (dop iop l-op.tr associative? &aux me ops)
     "Create a level object from the specification of the default and inverse operators
@@ -202,13 +208,9 @@ and the associativity."
     ;;        (import op "COMMON-LISP")
     ;;        (export op "COMMON-LISP")))
     ;;  ops)
-    me))
+    me)
+  );;eval-when
 
-(defun level-has? (me op) (memq op (level-ops me)))
-(defun level-default? (me op) (memq op (level-dop me)))
-(defun level-inverse? (me op) (memq op (level-iop me)))
-(defun level-default (me) (first (level-dop me)))
-(defun level-translate (me op) (or (cassq op (level-l-op.tr me)) op))
 
 ;; ==== globals and macros ====
 
