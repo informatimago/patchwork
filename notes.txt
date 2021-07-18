@@ -1541,3 +1541,9 @@ release:
 |------------------+------------------------------------------+-------------------------------|
 
 ** Unbound variable: CCL::NS-APPLICATION
+
+This problem can be solved by erasing the .cache/common-lisp/ccl*
+and recompiling everything.
+It's due to compiling/loading some files in the bad order…
+
+*** TODO [#C] find a better solution to avoid CCL::NS-APPLICATION :objcl:bug:
