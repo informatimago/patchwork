@@ -34,22 +34,39 @@
 (in-package "COMMON-LISP-USER")
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun load-framework (name)
+  (defun load-framework-library (name)
     (add-headers-logical-pathname-translations (string-downcase name))
     (ccl:open-shared-library (find-framework-path :library name))
-    (ccl:use-interface-dir (intern (string-upcase name) (load-time-value (find-package "KEYWORD"))))))
+    (ccl:use-interface-dir (intern (string-upcase name) (load-time-value (find-package "KEYWORD")))))
+  (defun load-library (path)
+    (ccl:open-shared-library path)))
+
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (load-framework "CoreServices")
-  (pushnew :has-appleevent *features*)
-  (load-framework "CoreGraphics")
 
-  #+patchwork.builder::use-cl-midi (load-framework "CoreMIDI")
+  (defun macos-version-major ()
+    (read-from-string
+     (first (split-sequence:split-sequence
+             #\.
+             (third (com.informatimago.tools.manifest:distribution))))))
 
-  #+patchwork.builder::use-midishare (load-framework "MidiShare")
+  (ecase (macos-version-major)
+    (10                                 ; MacOSX
+     (load-framework-library "CoreServices")
+     (pushnew :has-appleevent *features*)
+     (load-framework-library "CoreGraphics")
+     #+patchwork.builder::use-cl-midi (load-framework-library "CoreMIDI")
+     )
+    (11                                 ; macOS Big Sur
+     ;; or darwin verson 20
+     ))
+
+  #+patchwork.builder::use-midishare (load-framework-library "MidiShare")
   #+patchwork.builder::use-midishare (pushnew :has-midishare *features*)
-  #+patchwork.builder::use-midishare (load-framework "Player")
-  #+patchwork.builder::use-midishare (pushnew :has-midiplayer *features*))
+  #+patchwork.builder::use-midishare (load-framework-library "Player")
+  #+patchwork.builder::use-midishare (pushnew :has-midiplayer *features*)
+
+  ) ;; eval-when
 
 
 #||

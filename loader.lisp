@@ -34,6 +34,15 @@
 ;;;;**************************************************************************
 (in-package "COMMON-LISP-USER")
 
+(setf *readtable*
+      (copy-readtable
+       #+#.(cl:if (cl:find-package "COM.INFORMATIMAGO.PJB.UTILITY")
+                  '(:and) '(:or))
+       com.informatimago.pjb.utility:*original-readtable*
+       #-#.(cl:if (cl:find-package "COM.INFORMATIMAGO.PJB.UTILITY")
+                  '(:and) '(:or))
+       nil))
+
 (defun say (fmt &rest args)
   (format t "~&;;; ~?~%" fmt args)
   (finish-output))
@@ -175,9 +184,13 @@
 
 ;; (pushnew 'patchwork.builder::no-cocoa          *features*)
 ;; (pushnew 'patchwork.builder::use-apple-events  *features*)
+
+;; Zero, or One of the three:
 ;; (pushnew 'patchwork.builder::cocoa-midi-player *features*)
 ;; (pushnew 'patchwork.builder::use-midishare     *features*)
-   (pushnew 'patchwork.builder::use-cl-midi       *features*)
+(pushnew 'patchwork.builder::use-cl-midi       *features*)
+
+
 
 
 ;;; --------------------------------------------------------------------

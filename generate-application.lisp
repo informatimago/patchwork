@@ -34,6 +34,12 @@
 ;;;;**************************************************************************
 (in-package "COMMON-LISP-USER")
 
+
+(setf *LOAD-VERBOSE*    t
+      *COMPILE-VERBOSE* t
+      *LOAD-PRINT*      t
+      *COMPILE-PRINT*   t)
+
 (defun say (fmt &rest args)
   (format t "~&;;; ~?~%" fmt args)
   (finish-output))
@@ -96,6 +102,7 @@
 (say "Load builder.")
 (load (local-file "builder"))
 
+;;; ====================================================================
 (in-package "PATCHWORK.BUILDER")
 (load (translate-logical-pathname #P"PATCHWORK:PROPERTY-LIST-KEYS"))
 
@@ -319,6 +326,17 @@
     :|CFBundleTypeRole| "Editor"
     :|NSDocumentClass| "DisplayDocument")))
 
+#-(and)
+(require :build-application)
+#-(and)
+(ccl:save-application #P"~/Desktop/Bar"
+                      :toplevel-function nil
+			          :init-file nil
+                      :error-handler nil
+                      :application-class 'gui::cocoa-ide
+			          :clear-clos-caches t
+			          :mode #o755
+			          :prepend-kernel t)
 
 (defun save-patchwork-application (&key
                                      (name "Untitled Application")
@@ -345,62 +363,71 @@
   (handler-bind
       ((error (lambda (condition)
                 (invoke-debugger condition))))
-    (ccl::build-application ;; This doesn't return.
-     :name name
-     :directory directory
-     :type-string "APPL"
-     :creator-string "SOSP"
-     :copy-ide-resources t       ; whether to copy the IDE's resources
-     ;; :info-plist nil         ; optional user-defined info-plist
-     :info-plist (ui::unwrap
-                  (dictionary
-                   :|LSApplicationCategoryType| "public.app-category.music"
-                   ;; (development-region $default-info-plist-development-region)
-                   ;; (executable $default-info-plist-executable)
-                   ;; (help-book-folder $default-info-plist-help-book-folder)
-                   ;; (help-book-name $default-info-plist-help-book-name)
-                   ;; (icon-file $default-info-plist-icon-file)
-                   :|CFBundleIconFile| (file-namestring (translate-logical-pathname
-                                                         #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS"))
-                   :|CFBundleIdentifier| "com.informatimago.patchwork"
-                   ;; (dictionary-version $default-info-dictionary-version)
-                   ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
-                   ;; overriden by write-info-plist (bundle-package-type $default-info-plist-bundle-package-type)
-                   ;; overriden by write-info-plist (bundle-signature $default-info-plist-bundle-signature)
-                   :|CFBundleShortVersionString|  (format nil "~A" *patchwork-version*)
-                   :|CFBundleVersion| (format nil "Patchwork ~A, ~A ~A" *patchwork-version*
-                                              (lisp-implementation-type)
-                                              (lisp-implementation-version))
-                   ;; (has-localized-display-name $default-info-plist-has-localized-display-name)
-                   ;; (minimum-system-version $default-info-plist-minimum-system-version)
-                   ;; (main-nib-file $default-info-plist-main-nib-file)
-                   ;; (principal-class $default-info-plist-principal-class)
-                   :|CFBundleDocumentTypes| (cf-bundle-document-types)
-                   :|NSAppleScriptEnabled| nil ; not yet.
-                   :|LSMinimumSystemVersion| (if (featurep :cocoa-10.6) "10.6" "10.3")
-                   :|CFBundleDevelopmentRegion| "English"
-                   :|ATSApplicationFontsPath| "Fonts/"
-                   :|UTExportedTypeDeclarations| (exported-type-utis)
-                   :|NSHumanReadableCopyright| (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - 2017 Pascal Bourguignon~%License: GPL3")
+    (show
+      (ccl:save-application (merge-pathnames name directory)
+                            :toplevel-function nil
+			                :init-file nil
+                            :error-handler nil
+                            :application-class application-class-name
+			                :clear-clos-caches t
+			                :mode #o755
+			                :prepend-kernel t))
+    (show
+      (ccl::build-application ;; This doesn't return.
+       :name name
+       :directory directory
+       :type-string "APPL"
+       :creator-string "SOSP"
+       :copy-ide-resources t     ; whether to copy the IDE's resources
+       ;; :info-plist nil         ; optional user-defined info-plist
+       :info-plist (ui::unwrap
+                    (dictionary
+                     :|LSApplicationCategoryType| "public.app-category.music"
+                     ;; (development-region $default-info-plist-development-region)
+                     ;; (executable $default-info-plist-executable)
+                     ;; (help-book-folder $default-info-plist-help-book-folder)
+                     ;; (help-book-name $default-info-plist-help-book-name)
+                     ;; (icon-file $default-info-plist-icon-file)
+                     :|CFBundleIconFile| (file-namestring (translate-logical-pathname
+                                                           #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS"))
+                     :|CFBundleIdentifier| "com.informatimago.patchwork"
+                     ;; (dictionary-version $default-info-dictionary-version)
+                     ;; overriden by write-info-plist (bundle-name $default-info-plist-bundle-name)
+                     ;; overriden by write-info-plist (bundle-package-type $default-info-plist-bundle-package-type)
+                     ;; overriden by write-info-plist (bundle-signature $default-info-plist-bundle-signature)
+                     :|CFBundleShortVersionString|  (format nil "~A" *patchwork-version*)
+                     :|CFBundleVersion| (format nil "Patchwork ~A, ~A ~A" *patchwork-version*
+                                                (lisp-implementation-type)
+                                                (lisp-implementation-version))
+                     ;; (has-localized-display-name $default-info-plist-has-localized-display-name)
+                     ;; (minimum-system-version $default-info-plist-minimum-system-version)
+                     ;; (main-nib-file $default-info-plist-main-nib-file)
+                     ;; (principal-class $default-info-plist-principal-class)
+                     :|CFBundleDocumentTypes| (cf-bundle-document-types)
+                     :|NSAppleScriptEnabled| nil ; not yet.
+                     :|LSMinimumSystemVersion| (if (featurep :cocoa-10.6) "10.6" "10.3")
+                     :|CFBundleDevelopmentRegion| "English"
+                     :|ATSApplicationFontsPath| "Fonts/"
+                     :|UTExportedTypeDeclarations| (exported-type-utis)
+                     :|NSHumanReadableCopyright| (let ((year (nth-value 5 (decode-universal-time (get-universal-time)))))
+                                                   (format nil "Copyright 1992 - 2012 IRCAM~%Copyright 2012 - ~4D Pascal Bourguignon~%License: GPL3" year))
 
-                   ;; :|NSMainNibFile| main-nib-file ; overriden by write-info-plist, I assume.
-                   :|NSPrincipalClass| principal-class-name))
-     :nibfiles nib-files
+                     ;; :|NSMainNibFile| main-nib-file ; overriden by write-info-plist, I assume.
+                     :|NSPrincipalClass| principal-class-name))
+       :nibfiles nib-files
                                         ; a list of user-specified nibfiles
                                         ; to be copied into the app bundle
-     :main-nib-name main-nib-file
+       :main-nib-name main-nib-file
                                         ; the name of the nib that is to be loaded
                                         ; as the app's main. this name gets written
                                         ; into the Info.plist on the "NSMainNibFile" key
-     :private-frameworks '()
-     :application-class application-class-name
-     :toplevel-function nil ; implies (gui::toplevel-function *application*)
-     :altconsole nil)))
+       :private-frameworks '()
+       :application-class application-class-name
+       :toplevel-function nil ; implies (gui::toplevel-function *application*)
+       :altconsole nil))))
 
 
-
-
-
+(say "~69@{=~}" nil)
 (say "*release-directory*      = ~S" *release-directory*)
 (say "MCLGUI application class = ~S" *application-class-name*)
 (say "Cocoa application class  = ~S" *principal-class-name*)
@@ -418,7 +445,11 @@
            ccl:*application*
            ui:*application*))
   (say "~50A = ~S" var (symbol-value var)))
+(say "~69@{=~}" nil)
 
+
+
+;; monolithic-compile-bundle-op
 
 #+save-image-and-quit
 (progn
@@ -426,17 +457,19 @@
   (let ((destination (merge-pathnames #P"Contents/Resources/Fonts/"
                                       *application-package*)))
     (ensure-directories-exist (merge-pathnames #P"probe.file" destination))
-    (copy-directory #P"PATCHWORK:SRC;MACOSX;RESOURCES;FONTS;"
-                    destination
-                    :if-exists :supersede
-                    :on-error :continue
-                    :element-type '(unsigned-byte 8)))
+    (show
+     (copy-directory #P"PATCHWORK:SRC;MACOSX;RESOURCES;FONTS;"
+                     destination
+                     :if-exists :supersede
+                     :on-error :continue
+                     :element-type '(unsigned-byte 8))))
 
   (let ((destination (merge-pathnames #P"Contents/Resources/patchwork-icon.icns"
                                       *application-package*)))
     (ensure-directories-exist destination)
-    (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
-               destination :element-type '(unsigned-byte 8) :if-exists :supersede))
+    (show
+     (copy-file (translate-logical-pathname #P"PATCHWORK:SRC;MACOSX;PATCHWORK-ICON.ICNS")
+                destination :element-type '(unsigned-byte 8) :if-exists :supersede)))
 
   (let ((app-path  (merge-pathnames (make-pathname :directory (list :relative
                                                                     (format nil "~A.app" *program-name*)
@@ -449,15 +482,17 @@
     (finish-output)
 
     ;; this quits ccl:
-    (save-patchwork-application :name *program-name*
-                                :directory *release-directory*
-                                :application-class-name *application-class-name*
-                                :principal-class-name *principal-class-name*
-                                :application-delegate-class-name *application-delegate-class-name*)
+
+    #+ccl
+    (show (save-patchwork-application :name *program-name*
+                                      :directory *release-directory*
+                                      :application-class-name *application-class-name*
+                                      :principal-class-name *principal-class-name*
+                                      :application-delegate-class-name *application-delegate-class-name*))
 
     #+lispworks
-    (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
-                                :console :always)
+    (show (hcl:save-image-with-bundle #P"~/Desktop/PatchWork.app"
+                                      :console :always))
 
     ))
 

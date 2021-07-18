@@ -40,12 +40,14 @@
 ## Configurable:
 
 #CCL_EXE=/data/languages/ccl/bin/ccl
-CCL_EXE=ccl-1.12
-CCL=$(CCL_EXE) --no-init --batch
-CCL_EVAL=--eval
+CCL_EXE   = ccl-1.12
+CCL       = $(CCL_EXE) --no-init --batch
+CCL_DEBUG = $(CCL_EXE) --no-init
+CCL_EVAL  = --eval
 
-LISP=$(CCL)
-LISP_EVAL=$(CCL_EVAL)
+LISP       = $(CCL)
+LISP_DEBUG = $(CCL_DEBUG)
+LISP_EVAL  = $(CCL_EVAL)
 
 
 ## Should not change that much:
@@ -126,7 +128,13 @@ variables::
 help::
 	@printf "$(HELP_FORMAT)" "application" "Generates the application."
 application:clean release-notes.pdf
-	printf '(push :save-image-and-quit *features*)\n(handler-bind ((error (lambda (condition) (declare (ignore condition)) (uiop:print-backtrace) nil))) (load "generate-application.lisp"))\n'|$(CCL_EXE)
+	printf '(push :save-image-and-quit *features*)\n(handler-bind ((error (lambda (condition) (declare (ignore condition)) (ccl:print-call-history :count count :start-frame-number 1) nil))) (load "generate-application.lisp"))\n'|$(LISP)
+
+debug-building:clean release-notes.pdf
+	$(LISP_DEBUG) \
+		$(LISP_EVAL) '(push :save-image-and-quit *features*)' \
+		$(LISP_EVAL) '(load "generate-application.lisp")'
+
 
 # There's a bug in ccl when generating an application from a loaded file…
 # $(LISP) \

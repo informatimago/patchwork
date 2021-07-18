@@ -13,22 +13,16 @@
  )
 
 
-
-
-
-
-
-
  #|
 
 (dlsym (ccl::shlib.handle *libobjc*) "class_getClassMethod")
 
 
 (class-get-class-method  [NSApplication class] (objc:@selector "sharedApplication"))
-#<ns-date 2001-01-01 00:00:00 +0000 (#x7FFF23B29EE5)>     
+#<ns-date 2001-01-01 00:00:00 +0000 (#x7FFF23B29EE5)>
 (type-of (class-get-class-method  [NSApplication class] (objc:@selector "sharedApplication")))
 
-(ccl:external-call "class_getClassMethod" 
+(ccl:external-call "class_getClassMethod"
                    :<c>lass (objc:send ns:+ns-application 'class)
                    :<sel> (objc:\@SELECTOR "sharedApplication")
                    :<m>ethod)
@@ -46,82 +40,82 @@
  t
  (#/class_getName [NSApplication class])
  (#/class_getClassMethod [NSApplication class] (objc:@selector "sharedApplication"))
- 
+
  )
 ;; (load-library "/usr/lib/libobjc-trampolines.dylib")
 
 (apropos "MACPTR")
  arch::error-object-not-macptr                          V  140
-  ccl::%consmacptr%                                        
-  ccl::%copy-macptr-to-macptr                              
-  ccl::%DOUBLE-FLOAT-FROM-MACPTR\!                       F 
-  ccl::%fixnum-from-macptr                               F 
-  ccl::%fixnum-ref-macptr                                F 
-  ccl::%fixnum-set-macptr                                F 
-  ccl::%ivector-from-macptr                              F 
-  ccl::%macptr->dead-macptr                              F 
-  ccl::%macptr-allocation-string                         F 
-  ccl::%macptr-domain                                    F 
-  ccl::%macptr-foreign                                     
-  ccl::%macptr-hash                                      F 
-  ccl::%macptr-type                                      F 
-  ccl::%macptrptr%                                         
-  ccl::%ordinal-type-class-for-macptr                    F 
-  ccl::%revive-macptr                                    F 
-  ccl::%set-macptr-domain                                F 
-  ccl::%set-macptr-type                                  F 
-  ccl::%set-new-macptr-value                               
-  ccl:%setf-macptr                                       F 
-  ccl::%setf-macptr-to-object                            F 
-  ccl::%vect-data-to-macptr                              F 
-  ccl::%write-macptr-allocation-info                     F 
-  ccl::%write-macptr-type-info                           F 
+  ccl::%consmacptr%
+  ccl::%copy-macptr-to-macptr
+  ccl::%DOUBLE-FLOAT-FROM-MACPTR\!                       F
+  ccl::%fixnum-from-macptr                               F
+  ccl::%fixnum-ref-macptr                                F
+  ccl::%fixnum-set-macptr                                F
+  ccl::%ivector-from-macptr                              F
+  ccl::%macptr->dead-macptr                              F
+  ccl::%macptr-allocation-string                         F
+  ccl::%macptr-domain                                    F
+  ccl::%macptr-foreign
+  ccl::%macptr-hash                                      F
+  ccl::%macptr-type                                      F
+  ccl::%macptrptr%
+  ccl::%ordinal-type-class-for-macptr                    F
+  ccl::%revive-macptr                                    F
+  ccl::%set-macptr-domain                                F
+  ccl::%set-macptr-type                                  F
+  ccl::%set-new-macptr-value
+  ccl:%setf-macptr                                       F
+  ccl::%setf-macptr-to-object                            F
+  ccl::%vect-data-to-macptr                              F
+  ccl::%write-macptr-allocation-info                     F
+  ccl::%write-macptr-type-info                           F
   ccl::*macptr-class*                                   V  #<built-in-class ccl:macptr>
-  ccl::copy-foreign-macptr-type                          F 
-  ccl::dead-macptr                                         
-  ccl::dead-macptr-p                                     F 
-  ccl::deref-macptr                                        
-  ccl::describe-macptr-allocation-and-address            F 
-  ccl::encoded-gpr-macptr                                F 
-  ccl::foreign-macptr                                      
-  ccl::foreign-macptr-type                                 
-  ccl::foreign-macptr-type-alignment                     F 
-  ccl::foreign-macptr-type-bits                          F 
-  ccl::foreign-macptr-type-class                         F 
-  ccl::foreign-macptr-type-ordinal                       F 
-  ccl::foreign-macptr-type-p                             F 
-  ccl::indexed-gpr-macptr                                F 
-  ccl:macptr                                               
-  ccl::macptr->fixnum                                    F 
-  ccl::macptr->stack                                       
-  ccl::macptr-deport-gen-method                          F 
-  ccl::macptr-extract-gen-method                         F 
-  ccl::macptr-flags                                      F 
-  ccl::macptr-foreign-rep-method                         F 
-  ccl::macptr-lisp-rep-method                            F 
-  ccl::macptr-naturalize-gen-method                      F 
-  ccl::macptr-ptr                                          
-  ccl::macptr-unparse-method                             F 
-  ccl:macptrp                                            F 
-  ccl::make-foreign-macptr-type                          F 
-  ccl::make-gcable-macptr                                F 
-  ccl::nx1-%setf-macptr                                    
-  ccl::register-xmacptr-dispose-function                 F 
-  ccl::set-%gcable-macptrs%                              F 
-  ccl::set-macptr-address                                  
-  ccl::set-macptr-flags                                  F 
-  ccl::setup-macptr-allocation                             
-  ccl::trap-unless-macptr                                  
-  ccl::with-area-macptr                                  M 
-  ccl:with-macptrs                                       M 
-  ccl::write-a-dead-macptr                               F 
-  ccl::write-a-macptr                                    F 
-  ccl::x862-%consmacptr%                                   
-  ccl::x862-%macptrptr%                                    
-  ccl::x862-%setf-macptr                                   
-  ccl::x862-macptr->heap                                 F 
-  ccl::x862-macptr-arg-to-reg                            F 
-  ccl::x862-store-macptr                                 F 
+  ccl::copy-foreign-macptr-type                          F
+  ccl::dead-macptr
+  ccl::dead-macptr-p                                     F
+  ccl::deref-macptr
+  ccl::describe-macptr-allocation-and-address            F
+  ccl::encoded-gpr-macptr                                F
+  ccl::foreign-macptr
+  ccl::foreign-macptr-type
+  ccl::foreign-macptr-type-alignment                     F
+  ccl::foreign-macptr-type-bits                          F
+  ccl::foreign-macptr-type-class                         F
+  ccl::foreign-macptr-type-ordinal                       F
+  ccl::foreign-macptr-type-p                             F
+  ccl::indexed-gpr-macptr                                F
+  ccl:macptr
+  ccl::macptr->fixnum                                    F
+  ccl::macptr->stack
+  ccl::macptr-deport-gen-method                          F
+  ccl::macptr-extract-gen-method                         F
+  ccl::macptr-flags                                      F
+  ccl::macptr-foreign-rep-method                         F
+  ccl::macptr-lisp-rep-method                            F
+  ccl::macptr-naturalize-gen-method                      F
+  ccl::macptr-ptr
+  ccl::macptr-unparse-method                             F
+  ccl:macptrp                                            F
+  ccl::make-foreign-macptr-type                          F
+  ccl::make-gcable-macptr                                F
+  ccl::nx1-%setf-macptr
+  ccl::register-xmacptr-dispose-function                 F
+  ccl::set-%gcable-macptrs%                              F
+  ccl::set-macptr-address
+  ccl::set-macptr-flags                                  F
+  ccl::setup-macptr-allocation
+  ccl::trap-unless-macptr
+  ccl::with-area-macptr                                  M
+  ccl:with-macptrs                                       M
+  ccl::write-a-dead-macptr                               F
+  ccl::write-a-macptr                                    F
+  ccl::x862-%consmacptr%
+  ccl::x862-%macptrptr%
+  ccl::x862-%setf-macptr
+  ccl::x862-macptr->heap                                 F
+  ccl::x862-macptr-arg-to-reg                            F
+  ccl::x862-store-macptr                                 F
      :macptr                                            V  :macptr
 x8632::kernel-import-register-xmacptr-dispose-function  V  48
 x8632::macptr-header                                    V  799
