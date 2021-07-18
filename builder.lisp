@@ -41,7 +41,7 @@
   (:use "COM.INFORMATIMAGO.TOOLS.MANIFEST")
   (:use "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.FILE"
         "COM.INFORMATIMAGO.COMMON-LISP.CESARUM.STRING")
-  (:export "*PATCHWORK-VERSION*" "SAY"))
+  (:export "*PATCHWORK-VERSION*" "SAY" "SHOW"))
 (in-package "PATCHWORK.BUILDER")
 (declaim (optimize (safety 3) (debug 3) (space 0) (speed 0)))
 
@@ -57,6 +57,13 @@
 (defun say (fmt &rest args)
   (format t "~&;;; ~?~%" fmt args)
   (finish-output))
+
+(defmacro show (form)
+  `(let ((*print-length* nil)
+         (*print-level*  nil))
+     (say "Evaluating ~S" ,(list* 'list (list 'quote (car form))
+                                  (cdr form)))
+     ,form))
 
 
 (defun cd (path)
@@ -83,11 +90,10 @@
 (defparameter *patchwork-version*
   #.(destructuring-bind (major minor compile)
         (sexp-file-contents (translate-logical-pathname #P"PATCHWORK:VERSION.DATA"))
-      (decf compile 0.001)
+      (decf compile 0.001d0)
       (setf (sexp-file-contents (translate-logical-pathname #P"PATCHWORK:VERSION.DATA"))
             (list major minor compile))
       (format nil "~A.~A-~,3F" major minor compile))
   "Patchwork version")
-
 
 ;;;; THE END ;;;;
