@@ -157,8 +157,7 @@
     ;;   (apply (pw-function self) args))
     ;; There may be differences between clicking on the patch evaluation box,
     ;; and calling patch-value with an obj argument…
-    (let ((*patch-value-stack* '()))
-      (setf *values* (multiple-value-list (patch-value patch patch))))
+    (setf *values* (multiple-value-list (patch-value patch patch)))
     (setf *value*  (first *values*))
     (let ((*package* (load-time-value (find-package "PW")))
           (*print-circle*   t)
